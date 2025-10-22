@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\UserProductInteractions\Pages;
 
 use App\Filament\Resources\UserProductInteractions\UserProductInteractionResource;

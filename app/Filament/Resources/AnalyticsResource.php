@@ -6,7 +6,6 @@ namespace App\Filament\Resources;
 
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\AnalyticsResource\Pages;
-use App\Filament\Resources\OrderResource;
 use App\Models\Order;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
@@ -22,14 +21,18 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use UnitEnum;
 
 final class AnalyticsResource extends Resource
 {
     protected static ?string $model = Order::class;
+
+    /** @var string|BackedEnum|null */
     /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    /** @var string|\BackedEnum|null */
+    /** @var UnitEnum|string|null */
+    /** @var UnitEnum|string|null */
     protected static $navigationGroup = NavigationGroup::Analytics;
 
     public static function getNavigationLabel(): string
@@ -71,7 +74,7 @@ final class AnalyticsResource extends Resource
         return $form;
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             // Preload frequently accessed relationships so table metrics do not suffer from N+1 queries.
@@ -135,7 +138,7 @@ final class AnalyticsResource extends Resource
                     ->label(__('analytics.status'))
                     ->sortable()
                     ->badge()
-                    ->formatStateUsing(static fn (string $state): string => __('analytics.'.strtolower($state)))
+                    ->formatStateUsing(static fn (string $state): string => __('analytics.' . strtolower($state)))
                     ->color(static fn (string $state): string => match ($state) {
                         'completed', 'delivered' => 'success',
                         'pending' => 'warning',
@@ -158,13 +161,13 @@ final class AnalyticsResource extends Resource
                 SelectFilter::make('status')
                     ->label(__('analytics.status'))
                     ->options([
-                        'pending' => __('analytics.pending'),
+                        'pending'    => __('analytics.pending'),
                         'processing' => __('analytics.processing'),
-                        'completed' => __('analytics.completed'),
-                        'cancelled' => __('analytics.cancelled'),
-                        'shipped' => __('analytics.shipped'),
-                        'delivered' => __('analytics.delivered'),
-                        'refunded' => __('analytics.refunded'),
+                        'completed'  => __('analytics.completed'),
+                        'cancelled'  => __('analytics.cancelled'),
+                        'shipped'    => __('analytics.shipped'),
+                        'delivered'  => __('analytics.delivered'),
+                        'refunded'   => __('analytics.refunded'),
                     ])
                     ->searchable(),
                 SelectFilter::make('user_id')
@@ -184,7 +187,7 @@ final class AnalyticsResource extends Resource
                             ->displayFormat('Y-m-d'),
                     ])
                     ->indicateUsing(static fn (array $data): ?string => isset($data['range']['start'], $data['range']['end'])
-                        ? __('analytics.order_date_range').': '.$data['range']['start'].' → '.$data['range']['end']
+                        ? __('analytics.order_date_range') . ': ' . $data['range']['start'] . ' → ' . $data['range']['end']
                         : null)
                     ->query(static fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,

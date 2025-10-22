@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\ProductRequestResource\Pages;
 use App\Models\Product;
 use App\Models\ProductRequest;
+use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -25,7 +24,6 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 final class ProductRequestResource extends Resource
 {
@@ -36,7 +34,8 @@ final class ProductRequestResource extends Resource
         return 'heroicon-o-clipboard-document-list';
     }
 
-    protected static UnitEnum|string|null $navigationGroup = 'Products';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 16;
 
@@ -55,9 +54,9 @@ final class ProductRequestResource extends Resource
         return __('product_requests.single');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 SearchableInput::make('product_id')
                     ->label(__('product_requests.fields.product'))
@@ -129,10 +128,10 @@ final class ProductRequestResource extends Resource
                 Forms\Components\Select::make('status')
                     ->label(__('product_requests.fields.status'))
                     ->options([
-                        'pending' => __('product_requests.status.pending'),
+                        'pending'     => __('product_requests.status.pending'),
                         'in_progress' => __('product_requests.status.in_progress'),
-                        'completed' => __('product_requests.status.completed'),
-                        'cancelled' => __('product_requests.status.cancelled'),
+                        'completed'   => __('product_requests.status.completed'),
+                        'cancelled'   => __('product_requests.status.cancelled'),
                     ])
                     ->default('pending')
                     ->required(),
@@ -148,7 +147,7 @@ final class ProductRequestResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -176,9 +175,9 @@ final class ProductRequestResource extends Resource
                     ->label(__('product_requests.fields.status'))
                     ->colors([
                         'warning' => 'pending',
-                        'info' => 'in_progress',
+                        'info'    => 'in_progress',
                         'success' => 'completed',
-                        'danger' => 'cancelled',
+                        'danger'  => 'cancelled',
                     ]),
                 Tables\Columns\TextColumn::make('responded_at')
                     ->label(__('product_requests.fields.responded_at'))
@@ -196,10 +195,10 @@ final class ProductRequestResource extends Resource
                 Tables\Filters\SelectFilter::make('status')
                     ->label(__('product_requests.filters.status'))
                     ->options([
-                        'pending' => __('product_requests.status.pending'),
+                        'pending'     => __('product_requests.status.pending'),
                         'in_progress' => __('product_requests.status.in_progress'),
-                        'completed' => __('product_requests.status.completed'),
-                        'cancelled' => __('product_requests.status.cancelled'),
+                        'completed'   => __('product_requests.status.completed'),
+                        'cancelled'   => __('product_requests.status.cancelled'),
                     ]),
                 Tables\Filters\SelectFilter::make('product_id')
                     ->label(__('product_requests.filters.product'))
@@ -235,10 +234,10 @@ final class ProductRequestResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProductRequests::route('/'),
+            'index'  => Pages\ListProductRequests::route('/'),
             'create' => Pages\CreateProductRequest::route('/create'),
-            'view' => Pages\ViewProductRequest::route('/{record}'),
-            'edit' => Pages\EditProductRequest::route('/{record}/edit'),
+            'view'   => Pages\ViewProductRequest::route('/{record}'),
+            'edit'   => Pages\EditProductRequest::route('/{record}/edit'),
         ];
     }
 }

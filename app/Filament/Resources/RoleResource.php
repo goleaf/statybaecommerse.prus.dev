@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
-use App\Support\Forms\MatrixFactory;
 use App\Filament\Resources\RoleResource\Pages;
 use App\Models\Role;
 use App\Support\Authorization\AuthorizationMatrix;
+use App\Support\Forms\MatrixFactory;
 use BackedEnum;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -32,10 +30,12 @@ final class RoleResource extends Resource
     protected static ?int $navigationSort = 19;
 
     protected static ?string $recordTitleAttribute = 'name';
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-shield-check';
 
-    protected static UnitEnum|string|null $navigationGroup = 'System';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'System';
 
     public static function shouldRegisterNavigation(): bool
     {
@@ -92,9 +92,9 @@ final class RoleResource extends Resource
         return __('roles.single');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Section::make(__('roles.sections.general'))
                     ->schema([
@@ -121,7 +121,7 @@ final class RoleResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

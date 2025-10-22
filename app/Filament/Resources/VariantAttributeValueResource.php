@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantAttributeValueResource\Pages;
 use App\Models\Attribute;
 use App\Models\ProductVariant;
@@ -39,7 +37,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 use UnitEnum;
-    /** @var string|\BackedEnum|null */
+
+final class VariantAttributeValueResource extends Resource
+{
+    protected static ?string $model = \App\Models\VariantAttributeValue::class;
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-tag';
 
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';
@@ -61,9 +64,9 @@ use UnitEnum;
         return __('admin.variant_attribute_values.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('admin.variant_attribute_values.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -181,7 +184,7 @@ use UnitEnum;
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -334,7 +337,7 @@ use UnitEnum;
                     ->color('info')
                     ->action(function (VariantAttributeValue $record): void {
                         $newRecord = $record->replicate();
-                        $newRecord->attribute_value = $record->attribute_value.' (Copy)';
+                        $newRecord->attribute_value = $record->attribute_value . ' (Copy)';
                         $newRecord->save();
                         Notification::make()
                             ->title(__('admin.variant_attribute_values.duplicated_successfully'))
@@ -428,10 +431,10 @@ use UnitEnum;
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListVariantAttributeValues::route('/'),
+            'index'  => Pages\ListVariantAttributeValues::route('/'),
             'create' => Pages\CreateVariantAttributeValue::route('/create'),
-            'view' => Pages\ViewVariantAttributeValue::route('/{record}'),
-            'edit' => Pages\EditVariantAttributeValue::route('/{record}/edit'),
+            'view'   => Pages\ViewVariantAttributeValue::route('/{record}'),
+            'edit'   => Pages\EditVariantAttributeValue::route('/{record}/edit'),
         ];
     }
 }

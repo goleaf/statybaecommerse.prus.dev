@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
-
-use Filament\Schemas\Schema;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\Document;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -21,7 +21,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\BadgeColumn;
@@ -32,7 +31,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use App\Support\Filament\Components\Flatpickr;
 
 /**
  * OrderDocumentsRelationManager
@@ -57,7 +55,7 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
     /**
      * Configure the form schema for order documents.
      */
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -80,14 +78,14 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
                                 Select::make('type')
                                     ->label(__('orders.document_type'))
                                     ->options([
-                                        'invoice' => __('orders.document_types.invoice'),
-                                        'receipt' => __('orders.document_types.receipt'),
+                                        'invoice'        => __('orders.document_types.invoice'),
+                                        'receipt'        => __('orders.document_types.receipt'),
                                         'shipping_label' => __('orders.document_types.shipping_label'),
-                                        'packing_slip' => __('orders.document_types.packing_slip'),
-                                        'return_label' => __('orders.document_types.return_label'),
-                                        'warranty' => __('orders.document_types.warranty'),
-                                        'manual' => __('orders.document_types.manual'),
-                                        'other' => __('orders.document_types.other'),
+                                        'packing_slip'   => __('orders.document_types.packing_slip'),
+                                        'return_label'   => __('orders.document_types.return_label'),
+                                        'warranty'       => __('orders.document_types.warranty'),
+                                        'manual'         => __('orders.document_types.manual'),
+                                        'other'          => __('orders.document_types.other'),
                                     ])
                                     ->required(),
                             ]),
@@ -100,8 +98,8 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
                                 Select::make('status')
                                     ->label(__('orders.document_status'))
                                     ->options([
-                                        'draft' => __('orders.document_statuses.draft'),
-                                        'pending' => __('orders.document_statuses.pending'),
+                                        'draft'    => __('orders.document_statuses.draft'),
+                                        'pending'  => __('orders.document_statuses.pending'),
                                         'approved' => __('orders.document_statuses.approved'),
                                         'rejected' => __('orders.document_statuses.rejected'),
                                         'archived' => __('orders.document_statuses.archived'),
@@ -181,7 +179,7 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
     /**
      * Configure the table for order documents.
      */
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -198,23 +196,23 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
                 BadgeColumn::make('type')
                     ->label(__('orders.document_type'))
                     ->colors([
-                        'primary' => 'invoice',
-                        'success' => 'receipt',
-                        'info' => 'shipping_label',
-                        'warning' => 'packing_slip',
-                        'danger' => 'return_label',
+                        'primary'   => 'invoice',
+                        'success'   => 'receipt',
+                        'info'      => 'shipping_label',
+                        'warning'   => 'packing_slip',
+                        'danger'    => 'return_label',
                         'secondary' => 'warranty',
-                        'gray' => 'manual',
-                        'slate' => 'other',
+                        'gray'      => 'manual',
+                        'slate'     => 'other',
                     ])
                     ->formatStateUsing(fn (?string $state): string => $state ? __("orders.document_types.{$state}") : '-'),
                 BadgeColumn::make('status')
                     ->label(__('orders.document_status'))
                     ->colors([
-                        'warning' => 'draft',
-                        'primary' => 'pending',
-                        'success' => 'approved',
-                        'danger' => 'rejected',
+                        'warning'   => 'draft',
+                        'primary'   => 'pending',
+                        'success'   => 'approved',
+                        'danger'    => 'rejected',
                         'secondary' => 'archived',
                     ])
                     ->formatStateUsing(fn (?string $state): string => $state ? __("orders.document_statuses.{$state}") : '-'),
@@ -223,7 +221,7 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
                     ->sortable(),
                 TextColumn::make('file_size')
                     ->label(__('orders.file_size'))
-                    ->formatStateUsing(fn (?int $state): string => $state ? number_format($state / 1024, 2).' MB' : '-')
+                    ->formatStateUsing(fn (?int $state): string => $state ? number_format($state / 1024, 2) . ' MB' : '-')
                     ->sortable(),
                 IconColumn::make('is_public')
                     ->label(__('orders.is_public'))
@@ -254,21 +252,21 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
                 SelectFilter::make('type')
                     ->label(__('orders.document_type'))
                     ->options([
-                        'invoice' => __('orders.document_types.invoice'),
-                        'receipt' => __('orders.document_types.receipt'),
+                        'invoice'        => __('orders.document_types.invoice'),
+                        'receipt'        => __('orders.document_types.receipt'),
                         'shipping_label' => __('orders.document_types.shipping_label'),
-                        'packing_slip' => __('orders.document_types.packing_slip'),
-                        'return_label' => __('orders.document_types.return_label'),
-                        'warranty' => __('orders.document_types.warranty'),
-                        'manual' => __('orders.document_types.manual'),
-                        'other' => __('orders.document_types.other'),
+                        'packing_slip'   => __('orders.document_types.packing_slip'),
+                        'return_label'   => __('orders.document_types.return_label'),
+                        'warranty'       => __('orders.document_types.warranty'),
+                        'manual'         => __('orders.document_types.manual'),
+                        'other'          => __('orders.document_types.other'),
                     ])
                     ->multiple(),
                 SelectFilter::make('status')
                     ->label(__('orders.document_status'))
                     ->options([
-                        'draft' => __('orders.document_statuses.draft'),
-                        'pending' => __('orders.document_statuses.pending'),
+                        'draft'    => __('orders.document_statuses.draft'),
+                        'pending'  => __('orders.document_statuses.pending'),
                         'approved' => __('orders.document_statuses.approved'),
                         'rejected' => __('orders.document_statuses.rejected'),
                         'archived' => __('orders.document_statuses.archived'),

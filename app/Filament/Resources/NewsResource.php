@@ -8,28 +8,28 @@ use App\Enums\ModerationState;
 use App\Filament\Resources\NewsResource\Pages;
 use App\Filament\Resources\NewsResource\RelationManagers;
 use App\Models\News;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 use Novadaemon\FilamentCombobox\Combobox;
+use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 use RuntimeException;
-use App\Support\Filament\Components\Flatpickr;
 
 class NewsResource extends Resource
 {
     protected static ?string $model = News::class;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-newspaper';
 
     protected static ?int $navigationSort = 1;
@@ -38,9 +38,9 @@ class NewsResource extends Resource
 
     protected static ?string $pluralModelLabel = 'News Articles';
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->components([
+        return $form->components([
             Forms\Components\Section::make('Article Information')
                 ->components([
                     LanguageTabs::make([
@@ -152,7 +152,7 @@ class NewsResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -379,7 +379,7 @@ class NewsResource extends Resource
             ->defaultSort('published_at', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema   
+    public static function infolist(Schema $schema): Schema
     {
         return $schema
             ->components([

@@ -25,8 +25,8 @@ final class ProductCategoriesWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('products.charts.products_by_category'),
-                    'data' => $data->pluck('count')->toArray(),
+                    'label'           => __('products.charts.products_by_category'),
+                    'data'            => $data->pluck('count')->toArray(),
                     'backgroundColor' => [
                         '#3B82F6', // blue
                         '#10B981', // emerald

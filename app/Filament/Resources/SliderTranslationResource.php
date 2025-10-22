@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\SliderTranslationResource\Pages;
 use App\Models\Slider;
-use App\Models\SliderTranslation;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -25,7 +22,12 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
-    /** @var string|\BackedEnum|null */
+
+final class SliderTranslationResource extends Resource
+{
+    protected static ?string $model = \App\Models\SliderTranslation::class;
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?int $navigationSort = 3;
@@ -49,9 +51,9 @@ use UnitEnum;
         return __('admin.slider_translations.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             SchemaSection::make(__('admin.slider_translations.basic_information'))
                 ->components([
                     SchemaGrid::make(2)
@@ -88,7 +90,7 @@ use UnitEnum;
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -101,11 +103,11 @@ use UnitEnum;
                     ->label(__('admin.slider_translations.locale'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'en' => 'success',
-                        'lt' => 'info',
-                        'de' => 'warning',
-                        'fr' => 'danger',
-                        'es' => 'primary',
+                        'en'    => 'success',
+                        'lt'    => 'info',
+                        'de'    => 'warning',
+                        'fr'    => 'danger',
+                        'es'    => 'primary',
                         default => 'gray',
                     }),
                 TextColumn::make('title')
@@ -177,10 +179,10 @@ use UnitEnum;
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSliderTranslations::route('/'),
+            'index'  => Pages\ListSliderTranslations::route('/'),
             'create' => Pages\CreateSliderTranslation::route('/create'),
-            'view' => Pages\ViewSliderTranslation::route('/{record}'),
-            'edit' => Pages\EditSliderTranslation::route('/{record}/edit'),
+            'view'   => Pages\ViewSliderTranslation::route('/{record}'),
+            'edit'   => Pages\EditSliderTranslation::route('/{record}/edit'),
         ];
     }
 }

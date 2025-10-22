@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\CampaignConversionResource\Pages;
 use App\Models\Campaign;
@@ -29,7 +27,12 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Number;
 use UnitEnum;
-    /** @var string|\BackedEnum|null */
+
+final class CampaignConversionResource extends Resource
+{
+    protected static ?string $model = \App\Models\CampaignConversion::class;
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-rocket-launch';
 
     protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Campaigns;
@@ -59,9 +62,9 @@ use UnitEnum;
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('campaign_conversions.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -134,7 +137,7 @@ use UnitEnum;
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

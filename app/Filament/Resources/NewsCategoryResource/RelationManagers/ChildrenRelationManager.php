@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsCategoryResource\RelationManagers;
 
-
-use Filament\Schemas\Schema;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\NewsCategory;
 use Filament\Forms;
-use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -23,7 +20,7 @@ final class ChildrenRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Sub Categories';
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -50,21 +47,21 @@ final class ChildrenRelationManager extends BaseRelationManager
                             ->placeholder('#000000'),
                         Forms\Components\Select::make('icon')
                             ->options([
-                                'heroicon-o-tag' => 'Tag',
-                                'heroicon-o-document-text' => 'Document',
-                                'heroicon-o-newspaper' => 'Newspaper',
-                                'heroicon-o-folder' => 'Folder',
-                                'heroicon-o-rectangle-stack' => 'Stack',
-                                'heroicon-o-squares-2x2' => 'Grid',
-                                'heroicon-o-bookmark' => 'Bookmark',
-                                'heroicon-o-star' => 'Star',
-                                'heroicon-o-fire' => 'Fire',
-                                'heroicon-o-bolt' => 'Bolt',
-                                'heroicon-o-light-bulb' => 'Light Bulb',
-                                'heroicon-o-cog' => 'Settings',
+                                'heroicon-o-tag'                => 'Tag',
+                                'heroicon-o-document-text'      => 'Document',
+                                'heroicon-o-newspaper'          => 'Newspaper',
+                                'heroicon-o-folder'             => 'Folder',
+                                'heroicon-o-rectangle-stack'    => 'Stack',
+                                'heroicon-o-squares-2x2'        => 'Grid',
+                                'heroicon-o-bookmark'           => 'Bookmark',
+                                'heroicon-o-star'               => 'Star',
+                                'heroicon-o-fire'               => 'Fire',
+                                'heroicon-o-bolt'               => 'Bolt',
+                                'heroicon-o-light-bulb'         => 'Light Bulb',
+                                'heroicon-o-cog'                => 'Settings',
                                 'heroicon-o-wrench-screwdriver' => 'Tools',
-                                'heroicon-o-building-office' => 'Building',
-                                'heroicon-o-home' => 'Home',
+                                'heroicon-o-building-office'    => 'Building',
+                                'heroicon-o-home'               => 'Home',
                             ])
                             ->searchable()
                             ->preload(),
@@ -75,7 +72,7 @@ final class ChildrenRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('name')

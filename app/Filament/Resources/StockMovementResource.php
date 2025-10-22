@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\StockMovementResource\Pages;
 use App\Models\StockMovement;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -26,8 +25,12 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
-    /** @var string|\BackedEnum|null */
+
+final class StockMovementResource extends Resource
+{
+    protected static ?string $model = \App\Models\StockMovement::class;
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-archive-box';
 
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';
@@ -56,9 +59,9 @@ use App\Support\Filament\Components\Flatpickr;
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('stock_movement.sections.basic_information'))
                 ->components([
                     Grid::make(2)
@@ -86,10 +89,10 @@ use App\Support\Filament\Components\Flatpickr;
                             Select::make('type')
                                 ->label(__('stock_movement.fields.type'))
                                 ->options([
-                                    'in' => __('stock_movement.types.in'),
-                                    'out' => __('stock_movement.types.out'),
+                                    'in'         => __('stock_movement.types.in'),
+                                    'out'        => __('stock_movement.types.out'),
                                     'adjustment' => __('stock_movement.types.adjustment'),
-                                    'transfer' => __('stock_movement.types.transfer'),
+                                    'transfer'   => __('stock_movement.types.transfer'),
                                 ])
                                 ->required(),
                         ]),
@@ -118,7 +121,7 @@ use App\Support\Filament\Components\Flatpickr;
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -138,11 +141,11 @@ use App\Support\Filament\Components\Flatpickr;
                     ->label(__('stock_movement.fields.type'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'in' => 'success',
-                        'out' => 'danger',
+                        'in'         => 'success',
+                        'out'        => 'danger',
                         'adjustment' => 'warning',
-                        'transfer' => 'info',
-                        default => 'gray',
+                        'transfer'   => 'info',
+                        default      => 'gray',
                     }),
                 TextColumn::make('reason')
                     ->label(__('stock_movement.fields.reason'))
@@ -158,10 +161,10 @@ use App\Support\Filament\Components\Flatpickr;
             ->filters([
                 SelectFilter::make('type')
                     ->options([
-                        'in' => __('stock_movement.types.in'),
-                        'out' => __('stock_movement.types.out'),
+                        'in'         => __('stock_movement.types.in'),
+                        'out'        => __('stock_movement.types.out'),
                         'adjustment' => __('stock_movement.types.adjustment'),
-                        'transfer' => __('stock_movement.types.transfer'),
+                        'transfer'   => __('stock_movement.types.transfer'),
                     ]),
                 SelectFilter::make('user_id')
                     ->relationship('user', 'name')
@@ -197,10 +200,10 @@ use App\Support\Filament\Components\Flatpickr;
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListStockMovements::route('/'),
+            'index'  => Pages\ListStockMovements::route('/'),
             'create' => Pages\CreateStockMovement::route('/create'),
-            'view' => Pages\ViewStockMovement::route('/{record}'),
-            'edit' => Pages\EditStockMovement::route('/{record}/edit'),
+            'view'   => Pages\ViewStockMovement::route('/{record}'),
+            'edit'   => Pages\EditStockMovement::route('/{record}/edit'),
         ];
     }
 }

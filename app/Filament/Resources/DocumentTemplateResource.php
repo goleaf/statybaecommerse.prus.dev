@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Enums\DocumentTemplateCategory;
 use App\Enums\DocumentTemplateType;
 use App\Filament\Resources\DocumentTemplateResource\Pages;
@@ -37,7 +35,12 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
-    /** @var string|\BackedEnum|null */
+
+final class DocumentTemplateResource extends Resource
+{
+    protected static ?string $model = \App\Models\DocumentTemplate::class;
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-document-text';
 
     public static function getNavigationGroup(): ?string
@@ -78,9 +81,9 @@ use Illuminate\Support\Str;
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Tabs::make('document_template_form')
                 ->tabs([
                     Tab::make(__('admin/document_templates.form.tabs.basic_information'))
@@ -188,7 +191,7 @@ use Illuminate\Support\Str;
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

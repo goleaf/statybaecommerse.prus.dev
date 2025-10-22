@@ -52,7 +52,7 @@ final class VariantAnalyticsWidget extends BaseWidget
                 ->description(__('product_variants.stats.variant_selections'))
                 ->descriptionIcon('heroicon-m-cursor-arrow-rays')
                 ->color('info'),
-            Stat::make(__('product_variants.stats.conversion_rate'), number_format($avgConversionRate, 2).'%')
+            Stat::make(__('product_variants.stats.conversion_rate'), number_format($avgConversionRate, 2) . '%')
                 ->description(__('product_variants.stats.views_to_sales'))
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color($avgConversionRate > 5 ? 'success' : ($avgConversionRate > 2 ? 'warning' : 'danger')),

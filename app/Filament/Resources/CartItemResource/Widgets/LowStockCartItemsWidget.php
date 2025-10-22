@@ -17,7 +17,7 @@ final class LowStockCartItemsWidget extends BaseWidget
 
     protected static ?string $heading = 'Low Stock Cart Items';
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->query(
@@ -54,10 +54,10 @@ final class LowStockCartItemsWidget extends BaseWidget
                     ->sortable()
                     ->badge()
                     ->color(fn (int $state): string => match (true) {
-                        $state <= 0 => 'danger',
-                        $state <= 5 => 'warning',
+                        $state <= 0  => 'danger',
+                        $state <= 5  => 'warning',
                         $state <= 10 => 'info',
-                        default => 'success',
+                        default      => 'success',
                     }),
                 Tables\Columns\IconColumn::make('is_active')
                     ->label(__('cart_items.is_active'))

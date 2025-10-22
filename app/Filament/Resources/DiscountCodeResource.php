@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\DiscountCodeResource\Pages;
 use App\Models\DiscountCode;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -32,7 +31,6 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 final class DiscountCodeResource extends Resource
 {
@@ -67,9 +65,9 @@ final class DiscountCodeResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('discount_codes.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -98,10 +96,10 @@ final class DiscountCodeResource extends Resource
                             Select::make('type')
                                 ->label(__('discount_codes.type'))
                                 ->options([
-                                    'percentage' => __('discount_codes.types.percentage'),
-                                    'fixed' => __('discount_codes.types.fixed'),
+                                    'percentage'    => __('discount_codes.types.percentage'),
+                                    'fixed'         => __('discount_codes.types.fixed'),
                                     'free_shipping' => __('discount_codes.types.free_shipping'),
-                                    'buy_x_get_y' => __('discount_codes.types.buy_x_get_y'),
+                                    'buy_x_get_y'   => __('discount_codes.types.buy_x_get_y'),
                                 ])
                                 ->default('percentage')
                                 ->live(),
@@ -210,7 +208,7 @@ final class DiscountCodeResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -230,22 +228,22 @@ final class DiscountCodeResource extends Resource
                     ->label(__('discount_codes.type'))
                     ->formatStateUsing(fn (string $state): string => __("discount_codes.types.{$state}"))
                     ->color(fn (string $state): string => match ($state) {
-                        'percentage' => 'green',
-                        'fixed' => 'blue',
+                        'percentage'    => 'green',
+                        'fixed'         => 'blue',
                         'free_shipping' => 'purple',
-                        'buy_x_get_y' => 'orange',
-                        default => 'gray',
+                        'buy_x_get_y'   => 'orange',
+                        default         => 'gray',
                     }),
                 TextColumn::make('value')
                     ->label(__('discount_codes.value'))
                     ->formatStateUsing(function ($state, $record): string {
                         if ($record->type === 'percentage') {
-                            return $state.'%';
+                            return $state . '%';
                         } elseif ($record->type === 'free_shipping') {
                             return __('discount_codes.free_shipping');
                         }
 
-                        return '€'.number_format($state, 2);
+                        return '€' . number_format($state, 2);
                     })
                     ->sortable(),
                 TextColumn::make('usage_limit')
@@ -301,10 +299,10 @@ final class DiscountCodeResource extends Resource
             ->filters([
                 SelectFilter::make('type')
                     ->options([
-                        'percentage' => __('discount_codes.types.percentage'),
-                        'fixed' => __('discount_codes.types.fixed'),
+                        'percentage'    => __('discount_codes.types.percentage'),
+                        'fixed'         => __('discount_codes.types.fixed'),
                         'free_shipping' => __('discount_codes.types.free_shipping'),
-                        'buy_x_get_y' => __('discount_codes.types.buy_x_get_y'),
+                        'buy_x_get_y'   => __('discount_codes.types.buy_x_get_y'),
                     ]),
                 SelectFilter::make('customer_group_id')
                     ->relationship('customerGroup', 'name')
@@ -346,8 +344,8 @@ final class DiscountCodeResource extends Resource
                     ->color('info')
                     ->action(function (DiscountCode $record): void {
                         $newDiscountCode = $record->replicate();
-                        $newDiscountCode->code = $record->code.'_copy_'.time();
-                        $newDiscountCode->name = $record->name.' (Copy)';
+                        $newDiscountCode->code = $record->code . '_copy_' . time();
+                        $newDiscountCode->name = $record->name . ' (Copy)';
                         $newDiscountCode->used_count = 0;
                         $newDiscountCode->save();
 
@@ -406,10 +404,10 @@ final class DiscountCodeResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDiscountCodes::route('/'),
+            'index'  => Pages\ListDiscountCodes::route('/'),
             'create' => Pages\CreateDiscountCode::route('/create'),
-            'view' => Pages\ViewDiscountCode::route('/{record}'),
-            'edit' => Pages\EditDiscountCode::route('/{record}/edit'),
+            'view'   => Pages\ViewDiscountCode::route('/{record}'),
+            'edit'   => Pages\EditDiscountCode::route('/{record}/edit'),
         ];
     }
 }

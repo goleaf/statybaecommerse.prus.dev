@@ -21,8 +21,8 @@ final class AttributeUsageWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('attributes.charts.attribute_usage'),
-                    'data' => $data->pluck('products_count')->toArray(),
+                    'label'           => __('attributes.charts.attribute_usage'),
+                    'data'            => $data->pluck('products_count')->toArray(),
                     'backgroundColor' => [
                         '#3B82F6', // blue
                         '#10B981', // emerald

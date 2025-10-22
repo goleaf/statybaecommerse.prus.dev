@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\Pages;
 
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\OrderResource;
 use App\Filament\Resources\OrderResource\Widgets\OrderResourceStats;
 use App\Filament\Resources\OrderResource\Widgets\OrderRevenueTrend;
 use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions;
-use App\Filament\Pages\Support\BaseListRecords;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
 use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable as SpatieTranslatableListRecords;
 

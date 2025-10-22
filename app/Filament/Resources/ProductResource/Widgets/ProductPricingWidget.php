@@ -34,8 +34,8 @@ final class ProductPricingWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('products.charts.price_distribution'),
-                    'data' => array_values($priceRanges),
+                    'label'           => __('products.charts.price_distribution'),
+                    'data'            => array_values($priceRanges),
                     'backgroundColor' => [
                         '#10B981', // emerald
                         '#3B82F6', // blue

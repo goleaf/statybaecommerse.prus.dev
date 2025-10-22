@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\ReferralCodeUsageLogResource\Pages;
 use App\Filament\Resources\ReferralCodeUsageLogs\Schemas\ReferralCodeUsageLogForm as ReferralCodeUsageLogFormSchema;
 use App\Filament\Resources\ReferralCodeUsageLogs\Tables\ReferralCodeUsageLogsTable as ReferralCodeUsageLogsTableSchema;
@@ -28,7 +26,8 @@ final class ReferralCodeUsageLogResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'ip_address';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Analytics';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Analytics';
 
     public static function getNavigationLabel(): string
     {
@@ -45,12 +44,12 @@ final class ReferralCodeUsageLogResource extends Resource
         return __('admin.referral_code_usage_logs.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return ReferralCodeUsageLogFormSchema::configure($schema);
+        return ReferralCodeUsageLogFormSchema::configure($form);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return ReferralCodeUsageLogsTableSchema::configure($table);
     }

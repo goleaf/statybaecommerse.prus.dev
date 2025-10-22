@@ -34,8 +34,8 @@ final class ProductReviewsWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('products.charts.review_distribution'),
-                    'data' => array_values($reviewRanges),
+                    'label'           => __('products.charts.review_distribution'),
+                    'data'            => array_values($reviewRanges),
                     'backgroundColor' => [
                         '#10B981', // emerald (5 stars)
                         '#3B82F6', // blue (4 stars)

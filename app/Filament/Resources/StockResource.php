@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\StockResource\Pages;
 use App\Models\Inventory;
 use App\Models\Product;
@@ -42,7 +40,8 @@ final class StockResource extends Resource
 {
     protected static ?string $model = Inventory::class;
 
-    protected static UnitEnum|string|null $navigationGroup = 'Inventory';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 7;
 
@@ -63,9 +62,9 @@ final class StockResource extends Resource
         return __('inventory.single');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('inventory.product_information'))
                 ->schema([
                     Grid::make(2)
@@ -134,7 +133,7 @@ final class StockResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -274,10 +273,10 @@ final class StockResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListStocks::route('/'),
+            'index'  => Pages\ListStocks::route('/'),
             'create' => Pages\CreateStock::route('/create'),
-            'view' => Pages\ViewStock::route('/{record}'),
-            'edit' => Pages\EditStock::route('/{record}/edit'),
+            'view'   => Pages\ViewStock::route('/{record}'),
+            'edit'   => Pages\EditStock::route('/{record}/edit'),
         ];
     }
 }

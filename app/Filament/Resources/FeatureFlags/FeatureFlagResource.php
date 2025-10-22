@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\FeatureFlags;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\FeatureFlags\Pages\CreateFeatureFlag;
 use App\Filament\Resources\FeatureFlags\Pages\EditFeatureFlag;
 use App\Filament\Resources\FeatureFlags\Pages\ListFeatureFlags;
 use App\Filament\Resources\FeatureFlags\Schemas\FeatureFlagForm;
 use App\Filament\Resources\FeatureFlags\Tables\FeatureFlagsTable;
 use App\Models\FeatureFlag;
+use BackedEnum;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
@@ -20,15 +19,16 @@ use Filament\Tables\Table;
 class FeatureFlagResource extends Resource
 {
     protected static ?string $model = FeatureFlag::class;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return FeatureFlagForm::configure($schema);
+        return FeatureFlagForm::configure($form);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return FeatureFlagsTable::configure($table);
     }
@@ -43,9 +43,9 @@ class FeatureFlagResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListFeatureFlags::route('/'),
+            'index'  => ListFeatureFlags::route('/'),
             'create' => CreateFeatureFlag::route('/create'),
-            'edit' => EditFeatureFlag::route('/{record}/edit'),
+            'edit'   => EditFeatureFlag::route('/{record}/edit'),
         ];
     }
 }

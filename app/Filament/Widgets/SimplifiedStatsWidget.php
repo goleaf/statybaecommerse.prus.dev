@@ -11,8 +11,8 @@ use App\Models\User;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTagHelper;
 use App\Support\Cache\CacheTags;
-use DateTimeInterface;
 use Carbon\Carbon;
+use DateTimeInterface;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Cache\TaggableStore;
@@ -150,44 +150,44 @@ class SimplifiedStatsWidget extends BaseWidget
             $cacheKey,
             now()->addSeconds(180),
             function () use ($startDate, $endDate, $now): array {
-            $dateKeys = [];
-            for ($i = 6; $i >= 0; $i--) {
-                $dateKeys[] = $now->copy()->subDays($i)->toDateString();
-            }
+                $dateKeys = [];
+                for ($i = 6; $i >= 0; $i--) {
+                    $dateKeys[] = $now->copy()->subDays($i)->toDateString();
+                }
 
-            $orderStats = Order::query()
-                ->createdBetween($startDate, $endDate)
-                ->selectRaw('DATE(created_at) as date, SUM(CASE WHEN status != ? THEN total ELSE 0 END) as revenue, COUNT(*) as total_orders', ['cancelled'])
-                ->groupBy('date')
-                ->toBase()
-                ->get()
-                ->mapWithKeys(static function (object $row): array {
-                    $data = (array) $row;
-                    $date = isset($data['date']) ? (string) $data['date'] : '';
+                $orderStats = Order::query()
+                    ->createdBetween($startDate, $endDate)
+                    ->selectRaw('DATE(created_at) as date, SUM(CASE WHEN status != ? THEN total ELSE 0 END) as revenue, COUNT(*) as total_orders', ['cancelled'])
+                    ->groupBy('date')
+                    ->toBase()
+                    ->get()
+                    ->mapWithKeys(static function (object $row): array {
+                        $data = (array) $row;
+                        $date = isset($data['date']) ? (string) $data['date'] : '';
 
-                    return [
-                        $date => [
-                            'revenue' => isset($data['revenue']) ? (float) $data['revenue'] : 0.0,
-                            'orders' => isset($data['total_orders']) ? (int) $data['total_orders'] : 0,
-                        ],
-                    ];
-                })
-                ->all();
+                        return [
+                            $date => [
+                                'revenue' => isset($data['revenue']) ? (float) $data['revenue'] : 0.0,
+                                'orders'  => isset($data['total_orders']) ? (int) $data['total_orders'] : 0,
+                            ],
+                        ];
+                    })
+                    ->all();
 
-            $revenueChart = [];
-            $ordersChart = [];
+                $revenueChart = [];
+                $ordersChart = [];
 
-            foreach ($dateKeys as $date) {
-                $dailyStats = $orderStats[$date] ?? null;
-                $revenueChart[] = $dailyStats['revenue'] ?? 0.0;
-                $ordersChart[] = $dailyStats['orders'] ?? 0;
-            }
+                foreach ($dateKeys as $date) {
+                    $dailyStats = $orderStats[$date] ?? null;
+                    $revenueChart[] = $dailyStats['revenue'] ?? 0.0;
+                    $ordersChart[] = $dailyStats['orders'] ?? 0;
+                }
 
-            return [
-                'revenue' => $revenueChart,
-                'orders' => $ordersChart,
-            ];
-        });
+                return [
+                    'revenue' => $revenueChart,
+                    'orders'  => $ordersChart,
+                ];
+            });
 
         return $this->chartData = $chartData;
     }
@@ -219,67 +219,67 @@ class SimplifiedStatsWidget extends BaseWidget
             CacheKeys::dashboardSimplifiedSummary(),
             now()->addSeconds(300),
             function () use ($lastMonth): array {
-            $orderStats = Order::query()
-                ->selectRaw('
+                $orderStats = Order::query()
+                    ->selectRaw('
                     SUM(CASE WHEN status != ? THEN total ELSE 0 END) as total_revenue,
                     SUM(CASE WHEN status != ? AND created_at >= ? THEN total ELSE 0 END) as last_month_revenue,
                     COUNT(*) as total_orders,
                     SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) as last_month_orders
                 ', ['cancelled', 'cancelled', $lastMonth, $lastMonth])
-                ->toBase()
-                ->first();
+                    ->toBase()
+                    ->first();
 
-            $userStats = User::query()
-                ->selectRaw('
+                $userStats = User::query()
+                    ->selectRaw('
                     COUNT(*) as total_users,
                     SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) as new_users_this_month
                 ', [$lastMonth])
-                ->toBase()
-                ->first();
+                    ->toBase()
+                    ->first();
 
-            $productStats = Product::query()
-                ->selectRaw('
+                $productStats = Product::query()
+                    ->selectRaw('
                     COUNT(*) as total_products,
                     SUM(CASE WHEN is_visible = 1 THEN 1 ELSE 0 END) as active_products
                 ')
-                ->toBase()
-                ->first();
+                    ->toBase()
+                    ->first();
 
-            $reviewStats = Review::query()
-                ->selectRaw('
+                $reviewStats = Review::query()
+                    ->selectRaw('
                     COUNT(*) as total_reviews,
                     SUM(CASE WHEN is_approved = 1 THEN 1 ELSE 0 END) as approved_reviews,
                     AVG(CASE WHEN is_approved = 1 THEN rating END) as avg_rating
                 ')
-                ->toBase()
-                ->first();
+                    ->toBase()
+                    ->first();
 
-            return [
-                'orders' => [
-                    'total_revenue'      => (float) ($orderStats->total_revenue ?? 0),
-                    'last_month_revenue' => (float) ($orderStats->last_month_revenue ?? 0),
-                    'total_orders'       => (int) ($orderStats->total_orders ?? 0),
-                    'last_month_orders'  => (int) ($orderStats->last_month_orders ?? 0),
-                ],
-                'users' => [
-                    'total_users'          => (int) ($userStats->total_users ?? 0),
-                    'new_users_this_month' => (int) ($userStats->new_users_this_month ?? 0),
-                ],
-                'products' => [
-                    'total_products'  => (int) ($productStats->total_products ?? 0),
-                    'active_products' => (int) ($productStats->active_products ?? 0),
-                ],
-                'catalog' => [
-                    'total_categories' => (int) DB::table('categories')->count(),
-                    'total_brands'     => (int) DB::table('brands')->count(),
-                ],
-                'reviews' => [
-                    'total_reviews'    => (int) ($reviewStats->total_reviews ?? 0),
-                    'approved_reviews' => (int) ($reviewStats->approved_reviews ?? 0),
-                    'avg_rating'       => (float) ($reviewStats->avg_rating ?? 0),
-                ],
-            ];
-        });
+                return [
+                    'orders' => [
+                        'total_revenue'      => (float) ($orderStats->total_revenue ?? 0),
+                        'last_month_revenue' => (float) ($orderStats->last_month_revenue ?? 0),
+                        'total_orders'       => (int) ($orderStats->total_orders ?? 0),
+                        'last_month_orders'  => (int) ($orderStats->last_month_orders ?? 0),
+                    ],
+                    'users' => [
+                        'total_users'          => (int) ($userStats->total_users ?? 0),
+                        'new_users_this_month' => (int) ($userStats->new_users_this_month ?? 0),
+                    ],
+                    'products' => [
+                        'total_products'  => (int) ($productStats->total_products ?? 0),
+                        'active_products' => (int) ($productStats->active_products ?? 0),
+                    ],
+                    'catalog' => [
+                        'total_categories' => (int) DB::table('categories')->count(),
+                        'total_brands'     => (int) DB::table('brands')->count(),
+                    ],
+                    'reviews' => [
+                        'total_reviews'    => (int) ($reviewStats->total_reviews ?? 0),
+                        'approved_reviews' => (int) ($reviewStats->approved_reviews ?? 0),
+                        'avg_rating'       => (float) ($reviewStats->avg_rating ?? 0),
+                    ],
+                ];
+            });
     }
 
     protected function getReferenceTime(): Carbon
@@ -292,9 +292,8 @@ class SimplifiedStatsWidget extends BaseWidget
      *
      * @template TValue
      *
-     * @param  array<int, string>     $tags
-     * @param  callable(): TValue     $callback
-     * @param  DateTimeInterface|int  $ttl
+     * @param  array<int, string> $tags
+     * @param  callable(): TValue $callback
      * @return TValue
      */
     private function rememberDashboardCache(array $tags, string $key, DateTimeInterface|int $ttl, callable $callback): mixed

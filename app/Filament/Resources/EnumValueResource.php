@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\EnumValueResource\Pages;
 use App\Models\EnumValue;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -37,16 +36,17 @@ use Illuminate\Database\Eloquent\Collection;
 final class EnumValueResource extends Resource
 {
     protected static ?string $model = EnumValue::class;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-squares-2x2';
 
-    /** @var string|\BackedEnum|null Keep enum value tools inside the System cluster. */
+    /** @var string|BackedEnum|null Keep enum value tools inside the System cluster. */
     protected static $navigationGroup = NavigationGroup::System;
 
     public static function getNavigationGroup(): ?string
     {
         // Resolve the translated label from the shared navigation enum.
-        $group = static::$navigationGroup;
+        $group = self::$navigationGroup;
 
         return $group instanceof NavigationGroup ? $group->label() : $group;
     }
@@ -68,9 +68,9 @@ final class EnumValueResource extends Resource
         return __('admin.enum_values.navigation_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('admin.enum_values.form.sections.basic_information'))
                 ->schema([
                     Select::make('type')
@@ -145,7 +145,7 @@ final class EnumValueResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -156,12 +156,12 @@ final class EnumValueResource extends Resource
                     ->badge()
                     ->color(static fn (string $state): string => match ($state) {
                         'navigation_group' => 'primary',
-                        'order_status' => 'success',
-                        'payment_status' => 'warning',
-                        'shipping_status' => 'info',
-                        'user_role' => 'danger',
-                        'product_status' => 'secondary',
-                        default => 'gray',
+                        'order_status'     => 'success',
+                        'payment_status'   => 'warning',
+                        'shipping_status'  => 'info',
+                        'user_role'        => 'danger',
+                        'product_status'   => 'secondary',
+                        default            => 'gray',
                     }),
                 TextColumn::make('key')
                     ->label(__('admin.enum_values.table.key'))
@@ -353,10 +353,10 @@ final class EnumValueResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListEnumValues::route('/'),
+            'index'  => Pages\ListEnumValues::route('/'),
             'create' => Pages\CreateEnumValue::route('/create'),
-            'view' => Pages\ViewEnumValue::route('/{record}'),
-            'edit' => Pages\EditEnumValue::route('/{record}/edit'),
+            'view'   => Pages\ViewEnumValue::route('/{record}'),
+            'edit'   => Pages\EditEnumValue::route('/{record}/edit'),
         ];
     }
 
@@ -393,8 +393,8 @@ final class EnumValueResource extends Resource
     public static function getGlobalSearchResultDetails($record): array
     {
         return [
-            __('admin.enum_values.table.value') => $record->value,
-            __('admin.enum_values.table.name') => $record->name,
+            __('admin.enum_values.table.value')       => $record->value,
+            __('admin.enum_values.table.name')        => $record->name,
             __('admin.enum_values.table.description') => $record->description,
         ];
     }

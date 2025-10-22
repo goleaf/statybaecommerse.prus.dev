@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\AttributeValueResource\Pages;
 use App\Filament\Resources\AttributeValueResource\Relations\ProductsRelationManager as AttributeValueProductsRelationManager;
@@ -51,10 +49,12 @@ use UnitEnum;
 final class AttributeValueResource extends Resource
 {
     protected static ?string $model = AttributeValue::class;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-tag';
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 3;
 
@@ -75,9 +75,9 @@ final class AttributeValueResource extends Resource
         return __('attribute_values.plural');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('attribute_values.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -156,7 +156,7 @@ final class AttributeValueResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

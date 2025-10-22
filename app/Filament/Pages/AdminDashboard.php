@@ -10,7 +10,7 @@ use Filament\Pages\Dashboard as BaseDashboard;
 
 class AdminDashboard extends BaseDashboard
 {
-    /** @var string|\BackedEnum|null */
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-home';
 
     protected string $view = 'filament.pages.admin-dashboard';

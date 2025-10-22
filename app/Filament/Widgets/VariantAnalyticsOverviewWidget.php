@@ -87,14 +87,14 @@ final class VariantAnalyticsOverviewWidget extends BaseWidget
     {
         $total = VariantAnalytics::daily()->sum('revenue');
 
-        return '€'.number_format($total, 2);
+        return '€' . number_format($total, 2);
     }
 
     private function getAverageConversionRate(): string
     {
         $avg = VariantAnalytics::daily()->avg('conversion_rate');
 
-        return number_format($avg ?? 0, 2).'%';
+        return number_format($avg ?? 0, 2) . '%';
     }
 
     private function getTopPerformingVariantsCount(): string
@@ -124,7 +124,7 @@ final class VariantAnalyticsOverviewWidget extends BaseWidget
         $direction = $change >= 0 ? 'up' : 'down';
 
         return __('filament::variant_analytics.change_from_yesterday', [
-            'direction' => $direction,
+            'direction'  => $direction,
             'percentage' => abs(round($change, 1)),
         ]);
     }
@@ -160,7 +160,7 @@ final class VariantAnalyticsOverviewWidget extends BaseWidget
 
         $revenue = VariantAnalytics::daily()->whereBetween('date', [$weekStart, $weekEnd])->sum('revenue');
 
-        return '€'.number_format($revenue, 2);
+        return '€' . number_format($revenue, 2);
     }
 
     private function getRevenueChangeDescription(): string
@@ -176,7 +176,7 @@ final class VariantAnalyticsOverviewWidget extends BaseWidget
         $direction = $change >= 0 ? 'up' : 'down';
 
         return __('filament::variant_analytics.change_from_last_week', [
-            'direction' => $direction,
+            'direction'  => $direction,
             'percentage' => abs(round($change, 1)),
         ]);
     }

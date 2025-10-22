@@ -4,15 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\CollectionRuleResource\Pages;
 use App\Models\CollectionRule;
 use BackedEnum;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
@@ -25,6 +19,10 @@ use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\DateFilter;
@@ -73,10 +71,10 @@ final class CollectionRuleResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
         // Expose the schema via the Filament v4 `Form` instance to drop the deprecated array fallback.
-        return $schema->schema([
+        return $form->schema([
             Tabs::make('collection_rule_tabs')
                 ->tabs([
                     Tab::make(__('admin.collection_rules.form.tabs.basic_information'))
@@ -105,16 +103,16 @@ final class CollectionRuleResource extends Resource
                                             Select::make('operator')
                                                 ->label(__('admin.collection_rules.form.fields.operator'))
                                                 ->options([
-                                                    'equals' => __('admin.collection_rules.operators.equals'),
-                                                    'not_equals' => __('admin.collection_rules.operators.not_equals'),
-                                                    'contains' => __('admin.collection_rules.operators.contains'),
-                                                    'not_contains' => __('admin.collection_rules.operators.not_contains'),
-                                                    'starts_with' => __('admin.collection_rules.operators.starts_with'),
-                                                    'ends_with' => __('admin.collection_rules.operators.ends_with'),
-                                                    'greater_than' => __('admin.collection_rules.operators.greater_than'),
-                                                    'less_than' => __('admin.collection_rules.operators.less_than'),
+                                                    'equals'                => __('admin.collection_rules.operators.equals'),
+                                                    'not_equals'            => __('admin.collection_rules.operators.not_equals'),
+                                                    'contains'              => __('admin.collection_rules.operators.contains'),
+                                                    'not_contains'          => __('admin.collection_rules.operators.not_contains'),
+                                                    'starts_with'           => __('admin.collection_rules.operators.starts_with'),
+                                                    'ends_with'             => __('admin.collection_rules.operators.ends_with'),
+                                                    'greater_than'          => __('admin.collection_rules.operators.greater_than'),
+                                                    'less_than'             => __('admin.collection_rules.operators.less_than'),
                                                     'greater_than_or_equal' => __('admin.collection_rules.operators.greater_than_or_equal'),
-                                                    'less_than_or_equal' => __('admin.collection_rules.operators.less_than_or_equal'),
+                                                    'less_than_or_equal'    => __('admin.collection_rules.operators.less_than_or_equal'),
                                                 ])
                                                 ->required()
                                                 ->columnSpan(1),
@@ -156,7 +154,7 @@ final class CollectionRuleResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Publish the full table definition through the Filament v4 `Table` signature for consistency.
         return $table
@@ -172,23 +170,23 @@ final class CollectionRuleResource extends Resource
                 BadgeColumn::make('operator')
                     ->label(__('admin.collection_rules.form.fields.operator'))
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'equals' => __('admin.collection_rules.operators.equals'),
-                        'not_equals' => __('admin.collection_rules.operators.not_equals'),
-                        'contains' => __('admin.collection_rules.operators.contains'),
-                        'not_contains' => __('admin.collection_rules.operators.not_contains'),
-                        'starts_with' => __('admin.collection_rules.operators.starts_with'),
-                        'ends_with' => __('admin.collection_rules.operators.ends_with'),
-                        'greater_than' => __('admin.collection_rules.operators.greater_than'),
-                        'less_than' => __('admin.collection_rules.operators.less_than'),
+                        'equals'                => __('admin.collection_rules.operators.equals'),
+                        'not_equals'            => __('admin.collection_rules.operators.not_equals'),
+                        'contains'              => __('admin.collection_rules.operators.contains'),
+                        'not_contains'          => __('admin.collection_rules.operators.not_contains'),
+                        'starts_with'           => __('admin.collection_rules.operators.starts_with'),
+                        'ends_with'             => __('admin.collection_rules.operators.ends_with'),
+                        'greater_than'          => __('admin.collection_rules.operators.greater_than'),
+                        'less_than'             => __('admin.collection_rules.operators.less_than'),
                         'greater_than_or_equal' => __('admin.collection_rules.operators.greater_than_or_equal'),
-                        'less_than_or_equal' => __('admin.collection_rules.operators.less_than_or_equal'),
-                        default => $state,
+                        'less_than_or_equal'    => __('admin.collection_rules.operators.less_than_or_equal'),
+                        default                 => $state,
                     })
                     ->colors([
                         'primary' => 'equals',
                         'success' => 'contains',
                         'warning' => 'starts_with',
-                        'danger' => 'not_equals',
+                        'danger'  => 'not_equals',
                     ]),
                 TextColumn::make('value')
                     ->label(__('admin.collection_rules.form.fields.value'))
@@ -211,16 +209,16 @@ final class CollectionRuleResource extends Resource
                 SelectFilter::make('operator')
                     ->label(__('admin.collection_rules.filters.operator'))
                     ->options([
-                        'equals' => __('admin.collection_rules.operators.equals'),
-                        'not_equals' => __('admin.collection_rules.operators.not_equals'),
-                        'contains' => __('admin.collection_rules.operators.contains'),
-                        'not_contains' => __('admin.collection_rules.operators.not_contains'),
-                        'starts_with' => __('admin.collection_rules.operators.starts_with'),
-                        'ends_with' => __('admin.collection_rules.operators.ends_with'),
-                        'greater_than' => __('admin.collection_rules.operators.greater_than'),
-                        'less_than' => __('admin.collection_rules.operators.less_than'),
+                        'equals'                => __('admin.collection_rules.operators.equals'),
+                        'not_equals'            => __('admin.collection_rules.operators.not_equals'),
+                        'contains'              => __('admin.collection_rules.operators.contains'),
+                        'not_contains'          => __('admin.collection_rules.operators.not_contains'),
+                        'starts_with'           => __('admin.collection_rules.operators.starts_with'),
+                        'ends_with'             => __('admin.collection_rules.operators.ends_with'),
+                        'greater_than'          => __('admin.collection_rules.operators.greater_than'),
+                        'less_than'             => __('admin.collection_rules.operators.less_than'),
                         'greater_than_or_equal' => __('admin.collection_rules.operators.greater_than_or_equal'),
-                        'less_than_or_equal' => __('admin.collection_rules.operators.less_than_or_equal'),
+                        'less_than_or_equal'    => __('admin.collection_rules.operators.less_than_or_equal'),
                     ]),
                 DateFilter::make('created_at')
                     ->label(__('admin.collection_rules.filters.created_at')),
@@ -295,10 +293,10 @@ final class CollectionRuleResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCollectionRules::route('/'),
+            'index'  => Pages\ListCollectionRules::route('/'),
             'create' => Pages\CreateCollectionRule::route('/create'),
-            'view' => Pages\ViewCollectionRule::route('/{record}'),
-            'edit' => Pages\EditCollectionRule::route('/{record}/edit'),
+            'view'   => Pages\ViewCollectionRule::route('/{record}'),
+            'edit'   => Pages\EditCollectionRule::route('/{record}/edit'),
         ];
     }
 }

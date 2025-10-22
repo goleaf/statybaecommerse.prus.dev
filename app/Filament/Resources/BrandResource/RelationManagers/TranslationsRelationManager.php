@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\BrandResource\RelationManagers;
 
-
-use Filament\Schemas\Schema;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -21,7 +18,7 @@ final class TranslationsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Translations';
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -63,7 +60,7 @@ final class TranslationsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('name')
@@ -72,14 +69,14 @@ final class TranslationsRelationManager extends BaseRelationManager
                     ->label(__('brands.locale'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'lt' => 'success',
-                        'en' => 'primary',
-                        'de' => 'warning',
-                        'fr' => 'info',
-                        'es' => 'danger',
-                        'it' => 'secondary',
-                        'pl' => 'gray',
-                        'ru' => 'slate',
+                        'lt'    => 'success',
+                        'en'    => 'primary',
+                        'de'    => 'warning',
+                        'fr'    => 'info',
+                        'es'    => 'danger',
+                        'it'    => 'secondary',
+                        'pl'    => 'gray',
+                        'ru'    => 'slate',
                         default => 'gray',
                     })
                     ->sortable(),

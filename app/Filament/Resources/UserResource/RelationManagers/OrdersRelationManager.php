@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\UserResource\RelationManagers;
 
-use Filament\Actions\ViewAction;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -19,7 +19,7 @@ class OrdersRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Orders';
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -32,14 +32,14 @@ class OrdersRelationManager extends BaseRelationManager
                     ->label(__('orders.fields.status'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'pending' => 'warning',
-                        'confirmed' => 'info',
+                        'pending'    => 'warning',
+                        'confirmed'  => 'info',
                         'processing' => 'primary',
-                        'shipped' => 'success',
-                        'delivered' => 'success',
-                        'completed' => 'success',
-                        'cancelled' => 'danger',
-                        default => 'gray',
+                        'shipped'    => 'success',
+                        'delivered'  => 'success',
+                        'completed'  => 'success',
+                        'cancelled'  => 'danger',
+                        default      => 'gray',
                     }),
                 TextColumn::make('grand_total_amount')
                     ->label(__('orders.fields.total'))

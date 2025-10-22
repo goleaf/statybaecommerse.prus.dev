@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\InventoryResource\Pages;
 use App\Models\Inventory;
 use App\Models\Product;
@@ -44,7 +42,8 @@ use UnitEnum;
 final class InventoryResource extends Resource
 {
     protected static ?string $model = Inventory::class;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-cube';
 
     protected static ?int $navigationSort = 2;
@@ -69,9 +68,9 @@ final class InventoryResource extends Resource
         return __('Inventory');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('Inventory Details'))
                 ->schema([
                     Grid::make(2)
@@ -159,7 +158,7 @@ final class InventoryResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

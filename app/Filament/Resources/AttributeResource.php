@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\AttributeResource\Pages;
 use App\Models\Attribute;
 use BackedEnum;
@@ -31,7 +29,8 @@ use Illuminate\Database\Eloquent\Collection;
 final class AttributeResource extends Resource
 {
     protected static ?string $model = Attribute::class;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-tag';
 
     public static function getNavigationGroup(): ?string
@@ -58,9 +57,9 @@ final class AttributeResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('attributes.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -209,7 +208,7 @@ final class AttributeResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->query(Attribute::query()->withoutGlobalScopes())

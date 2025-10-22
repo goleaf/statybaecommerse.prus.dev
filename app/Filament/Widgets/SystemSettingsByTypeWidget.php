@@ -22,8 +22,8 @@ final class SystemSettingsByTypeWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('system_settings.charts.settings_by_type'),
-                    'data' => $data->pluck('count')->toArray(),
+                    'label'           => __('system_settings.charts.settings_by_type'),
+                    'data'            => $data->pluck('count')->toArray(),
                     'backgroundColor' => [
                         '#3B82F6', // blue
                         '#10B981', // emerald

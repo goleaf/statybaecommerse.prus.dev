@@ -4,36 +4,36 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ProductFeatureResource\Pages;
 use App\Models\ProductFeature;
 use BackedEnum;
-use Filament\Tables\Actions\BulkActionGroup as TablesBulkActionGroup;
-use Filament\Tables\Actions\DeleteAction as TablesDeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction as TablesDeleteBulkAction;
-use Filament\Tables\Actions\EditAction as TablesEditAction;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\BulkActionGroup as TablesBulkActionGroup;
+use Filament\Tables\Actions\DeleteAction as TablesDeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction as TablesDeleteBulkAction;
+use Filament\Tables\Actions\EditAction as TablesEditAction;
 use Filament\Tables\Table;
 use UnitEnum;
 
 final class ProductFeatureResource extends Resource
 {
     protected static ?string $model = ProductFeature::class;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-star';
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 17;
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Forms\Components\Select::make('product_id')
                 ->label('Product')
                 ->relationship('product', 'name')
@@ -69,7 +69,7 @@ final class ProductFeatureResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -84,8 +84,8 @@ final class ProductFeatureResource extends Resource
                         'primary' => 'specification',
                         'success' => 'benefit',
                         'warning' => 'feature',
-                        'info' => 'technical',
-                        'danger' => 'performance',
+                        'info'    => 'technical',
+                        'danger'  => 'performance',
                     ]),
                 Tables\Columns\TextColumn::make('feature_key')
                     ->label('Feature Key')
@@ -144,9 +144,9 @@ final class ProductFeatureResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProductFeatures::route('/'),
+            'index'  => Pages\ListProductFeatures::route('/'),
             'create' => Pages\CreateProductFeature::route('/create'),
-            'edit' => Pages\EditProductFeature::route('/{record}/edit'),
+            'edit'   => Pages\EditProductFeature::route('/{record}/edit'),
         ];
     }
 
@@ -157,10 +157,10 @@ final class ProductFeatureResource extends Resource
     {
         return [
             'specification' => 'Specification',
-            'benefit' => 'Benefit',
-            'feature' => 'Feature',
-            'technical' => 'Technical',
-            'performance' => 'Performance',
+            'benefit'       => 'Benefit',
+            'feature'       => 'Feature',
+            'technical'     => 'Technical',
+            'performance'   => 'Performance',
         ];
     }
 }

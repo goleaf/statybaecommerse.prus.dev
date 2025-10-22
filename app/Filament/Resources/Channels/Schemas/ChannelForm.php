@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Channels\Schemas;
 
 use Filament\Forms\Components\Grid;
@@ -9,6 +11,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Str;
 
 class ChannelForm
 {
@@ -25,7 +28,7 @@ class ChannelForm
                                     ->required()
                                     ->maxLength(255)
                                     ->live(onBlur: true)
-                                    ->afterStateUpdated(fn (string $context, $state, callable $set) => $context === 'create' ? $set('slug', \Str::slug($state)) : null),
+                                    ->afterStateUpdated(fn (string $context, $state, callable $set) => $context === 'create' ? $set('slug', Str::slug($state)) : null),
                                 TextInput::make('slug')
                                     ->label(__('admin.channels.slug'))
                                     ->required()
@@ -41,10 +44,10 @@ class ChannelForm
                                 Select::make('type')
                                     ->label(__('admin.channels.type'))
                                     ->options([
-                                        'web' => __('admin.channels.types.web'),
+                                        'web'    => __('admin.channels.types.web'),
                                         'mobile' => __('admin.channels.types.mobile'),
-                                        'api' => __('admin.channels.types.api'),
-                                        'pos' => __('admin.channels.types.pos'),
+                                        'api'    => __('admin.channels.types.api'),
+                                        'pos'    => __('admin.channels.types.pos'),
                                     ])
                                     ->required()
                                     ->default('web'),
@@ -81,7 +84,7 @@ class ChannelForm
                                     ->label(__('admin.channels.currency_position'))
                                     ->options([
                                         'before' => __('admin.channels.currency_positions.before'),
-                                        'after' => __('admin.channels.currency_positions.after'),
+                                        'after'  => __('admin.channels.currency_positions.after'),
                                     ])
                                     ->default('after'),
                             ]),

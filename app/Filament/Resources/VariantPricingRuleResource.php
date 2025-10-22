@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantPricingRuleResource\Pages;
 use App\Models\VariantPricingRule;
 use App\Support\Filament\Components\Flatpickr;
@@ -43,7 +41,8 @@ final class VariantPricingRuleResource extends Resource
 {
     protected static ?string $model = VariantPricingRule::class;
 
-    protected static UnitEnum|string|null $navigationGroup = 'Products';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 10;
 
@@ -84,9 +83,9 @@ final class VariantPricingRuleResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Section::make(__('variant_pricing_rules.basic_information'))
                     ->schema([
@@ -100,9 +99,9 @@ final class VariantPricingRuleResource extends Resource
                                     ->label(__('variant_pricing_rules.type'))
                                     ->options([
                                         'percentage' => __('variant_pricing_rules.types.percentage'),
-                                        'fixed' => __('variant_pricing_rules.types.fixed'),
-                                        'tier' => __('variant_pricing_rules.types.tier'),
-                                        'bulk' => __('variant_pricing_rules.types.bulk'),
+                                        'fixed'      => __('variant_pricing_rules.types.fixed'),
+                                        'tier'       => __('variant_pricing_rules.types.tier'),
+                                        'bulk'       => __('variant_pricing_rules.types.bulk'),
                                     ])
                                     ->required()
                                     ->reactive(),
@@ -183,7 +182,7 @@ final class VariantPricingRuleResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -197,10 +196,10 @@ final class VariantPricingRuleResource extends Resource
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'percentage' => 'blue',
-                        'fixed' => 'green',
-                        'tier' => 'purple',
-                        'bulk' => 'orange',
-                        default => 'gray',
+                        'fixed'      => 'green',
+                        'tier'       => 'purple',
+                        'bulk'       => 'orange',
+                        default      => 'gray',
                     }),
                 TextColumn::make('productVariant.name')
                     ->label(__('variant_pricing_rules.product_variant'))
@@ -214,7 +213,7 @@ final class VariantPricingRuleResource extends Resource
                     ->numeric()
                     ->formatStateUsing(function ($state, VariantPricingRule $record): string {
                         if ($record->type === 'percentage') {
-                            return $state.'%';
+                            return $state . '%';
                         }
 
                         // Provide a predictable locale-aware currency string for administrators.
@@ -257,9 +256,9 @@ final class VariantPricingRuleResource extends Resource
                 SelectFilter::make('type')
                     ->options([
                         'percentage' => __('variant_pricing_rules.types.percentage'),
-                        'fixed' => __('variant_pricing_rules.types.fixed'),
-                        'tier' => __('variant_pricing_rules.types.tier'),
-                        'bulk' => __('variant_pricing_rules.types.bulk'),
+                        'fixed'      => __('variant_pricing_rules.types.fixed'),
+                        'tier'       => __('variant_pricing_rules.types.tier'),
+                        'bulk'       => __('variant_pricing_rules.types.bulk'),
                     ]),
                 SelectFilter::make('product_variant_id')
                     ->relationship('productVariant', 'name')
@@ -341,10 +340,10 @@ final class VariantPricingRuleResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListVariantPricingRules::route('/'),
+            'index'  => Pages\ListVariantPricingRules::route('/'),
             'create' => Pages\CreateVariantPricingRule::route('/create'),
-            'view' => Pages\ViewVariantPricingRule::route('/{record}'),
-            'edit' => Pages\EditVariantPricingRule::route('/{record}/edit'),
+            'view'   => Pages\ViewVariantPricingRule::route('/{record}'),
+            'edit'   => Pages\EditVariantPricingRule::route('/{record}/edit'),
         ];
     }
 }

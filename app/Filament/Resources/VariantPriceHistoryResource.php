@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\VariantPriceHistoryResource\Pages;
 use App\Models\VariantPriceHistory;
 use App\Support\Filament\Components\Flatpickr;
+use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -20,10 +19,11 @@ use Illuminate\Database\Eloquent\Builder;
 final class VariantPriceHistoryResource extends Resource
 {
     protected static ?string $model = VariantPriceHistory::class;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-currency-euro';
 
-    /** @var string|\BackedEnum|null Navigation grouping centralized via enum. */
+    /** @var string|BackedEnum|null Navigation grouping centralized via enum. */
     protected static $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 20;
@@ -31,14 +31,14 @@ final class VariantPriceHistoryResource extends Resource
     public static function getNavigationGroup(): ?string
     {
         // Resolve enum-backed navigation label so the sidebar remains localized.
-        $group = static::$navigationGroup;
+        $group = self::$navigationGroup;
 
         return $group instanceof NavigationGroup ? $group->label() : $group;
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Forms\Components\Select::make('variant_id')
                     ->relationship('variant', 'name')
@@ -91,7 +91,7 @@ final class VariantPriceHistoryResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

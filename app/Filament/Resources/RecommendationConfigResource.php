@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\RecommendationConfigResource\Pages;
 use App\Models\RecommendationConfig;
 use Filament\Actions\BulkAction;
 use Filament\Actions\DeleteBulkAction;
-use Novadaemon\FilamentCombobox\Combobox;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -24,13 +21,15 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Novadaemon\FilamentCombobox\Combobox;
 use UnitEnum;
 
 final class RecommendationConfigResource extends Resource
 {
     protected static ?string $model = RecommendationConfig::class;
 
-    protected static UnitEnum|string|null $navigationGroup = 'Analytics';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Analytics';
 
     protected static ?int $navigationSort = 11;
 
@@ -51,9 +50,9 @@ final class RecommendationConfigResource extends Resource
         return __('recommendation_configs.single');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('recommendation_config.sections.basic_info'))
                 ->schema([
                     Grid::make(2)
@@ -144,7 +143,7 @@ final class RecommendationConfigResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

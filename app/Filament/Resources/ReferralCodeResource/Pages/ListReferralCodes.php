@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ReferralCodeResource\Pages;
 
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\ReferralCodeResource;
 use App\Filament\Resources\ReferralCodeResource\Widgets\ReferralCodeStatsWidget;
 use App\Filament\Resources\ReferralCodeResource\Widgets\ReferralCodeUsageChartWidget;
 use App\Filament\Resources\ReferralCodeResource\Widgets\TopReferralCodesWidget;
 use Filament\Actions;
-use App\Filament\Pages\Support\BaseListRecords;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
 use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable as SpatieTranslatableListRecords;
 

@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\SubscriberResource\Pages;
 use App\Models\Subscriber;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -34,7 +32,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 /**
  * SubscriberResource
@@ -45,7 +42,8 @@ final class SubscriberResource extends Resource
 {
     protected static ?string $model = Subscriber::class;
 
-    protected static UnitEnum|string|null $navigationGroup = 'Users';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Users';
 
     protected static ?int $navigationSort = 1;
 
@@ -83,9 +81,9 @@ final class SubscriberResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Section::make(__('subscribers.personal_information'))
                     ->schema([
@@ -128,11 +126,11 @@ final class SubscriberResource extends Resource
                                 Select::make('status')
                                     ->label(__('subscribers.status'))
                                     ->options([
-                                        'active' => __('subscribers.statuses.active'),
-                                        'inactive' => __('subscribers.statuses.inactive'),
+                                        'active'       => __('subscribers.statuses.active'),
+                                        'inactive'     => __('subscribers.statuses.inactive'),
                                         'unsubscribed' => __('subscribers.statuses.unsubscribed'),
-                                        'bounced' => __('subscribers.statuses.bounced'),
-                                        'complained' => __('subscribers.statuses.complained'),
+                                        'bounced'      => __('subscribers.statuses.bounced'),
+                                        'complained'   => __('subscribers.statuses.complained'),
                                     ])
                                     ->required()
                                     ->default('active'),
@@ -140,10 +138,10 @@ final class SubscriberResource extends Resource
                                     ->label(__('subscribers.source'))
                                     ->options([
                                         'website' => __('subscribers.sources.website'),
-                                        'admin' => __('subscribers.sources.admin'),
-                                        'import' => __('subscribers.sources.import'),
-                                        'api' => __('subscribers.sources.api'),
-                                        'other' => __('subscribers.sources.other'),
+                                        'admin'   => __('subscribers.sources.admin'),
+                                        'import'  => __('subscribers.sources.import'),
+                                        'api'     => __('subscribers.sources.api'),
+                                        'other'   => __('subscribers.sources.other'),
                                     ])
                                     ->required()
                                     ->default('website'),
@@ -180,7 +178,7 @@ final class SubscriberResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -200,12 +198,12 @@ final class SubscriberResource extends Resource
                     ->formatStateUsing(fn (string $state): string => __("subscribers.statuses.{$state}"))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'active' => 'success',
-                        'inactive' => 'gray',
+                        'active'       => 'success',
+                        'inactive'     => 'gray',
                         'unsubscribed' => 'warning',
-                        'bounced' => 'danger',
-                        'complained' => 'danger',
-                        default => 'gray',
+                        'bounced'      => 'danger',
+                        'complained'   => 'danger',
+                        default        => 'gray',
                     })
                     ->sortable(),
                 TextColumn::make('source')
@@ -243,19 +241,19 @@ final class SubscriberResource extends Resource
             ->filters([
                 SelectFilter::make('status')
                     ->options([
-                        'active' => __('subscribers.statuses.active'),
-                        'inactive' => __('subscribers.statuses.inactive'),
+                        'active'       => __('subscribers.statuses.active'),
+                        'inactive'     => __('subscribers.statuses.inactive'),
                         'unsubscribed' => __('subscribers.statuses.unsubscribed'),
-                        'bounced' => __('subscribers.statuses.bounced'),
-                        'complained' => __('subscribers.statuses.complained'),
+                        'bounced'      => __('subscribers.statuses.bounced'),
+                        'complained'   => __('subscribers.statuses.complained'),
                     ]),
                 SelectFilter::make('source')
                     ->options([
                         'website' => __('subscribers.sources.website'),
-                        'admin' => __('subscribers.sources.admin'),
-                        'import' => __('subscribers.sources.import'),
-                        'api' => __('subscribers.sources.api'),
-                        'other' => __('subscribers.sources.other'),
+                        'admin'   => __('subscribers.sources.admin'),
+                        'import'  => __('subscribers.sources.import'),
+                        'api'     => __('subscribers.sources.api'),
+                        'other'   => __('subscribers.sources.other'),
                     ]),
                 TernaryFilter::make('is_verified')
                     ->trueLabel(__('subscribers.verified_only'))
@@ -308,7 +306,7 @@ final class SubscriberResource extends Resource
                     ->visible(fn (Subscriber $record): bool => $record->status === 'active')
                     ->action(function (Subscriber $record): void {
                         $record->update([
-                            'status' => 'unsubscribed',
+                            'status'          => 'unsubscribed',
                             'unsubscribed_at' => now(),
                         ]);
                         Notification::make()
@@ -323,8 +321,8 @@ final class SubscriberResource extends Resource
                     ->visible(fn (Subscriber $record): bool => $record->status === 'unsubscribed')
                     ->action(function (Subscriber $record): void {
                         $record->update([
-                            'status' => 'active',
-                            'unsubscribed_at' => null,
+                            'status'             => 'active',
+                            'unsubscribed_at'    => null,
                             'unsubscribe_reason' => null,
                         ]);
                         Notification::make()
@@ -359,7 +357,7 @@ final class SubscriberResource extends Resource
                             \App\Models\Subscriber::withoutGlobalScopes()
                                 ->whereIn('id', $ids)
                                 ->update([
-                                    'status' => 'unsubscribed',
+                                    'status'          => 'unsubscribed',
                                     'unsubscribed_at' => now(),
                                 ]);
                             Notification::make()
@@ -399,10 +397,10 @@ final class SubscriberResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSubscribers::route('/'),
+            'index'  => Pages\ListSubscribers::route('/'),
             'create' => Pages\CreateSubscriber::route('/create'),
-            'view' => Pages\ViewSubscriber::route('/{record}'),
-            'edit' => Pages\EditSubscriber::route('/{record}/edit'),
+            'view'   => Pages\ViewSubscriber::route('/{record}'),
+            'edit'   => Pages\EditSubscriber::route('/{record}/edit'),
         ];
     }
 }

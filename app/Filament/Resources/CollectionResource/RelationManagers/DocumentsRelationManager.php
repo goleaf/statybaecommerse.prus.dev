@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CollectionResource\RelationManagers;
 
-
-use Filament\Schemas\Schema;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\Document;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -22,7 +19,7 @@ final class DocumentsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Collection Documents';
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -43,10 +40,10 @@ final class DocumentsRelationManager extends BaseRelationManager
                 Forms\Components\Select::make('status')
                     ->label(__('admin.documents.fields.status'))
                     ->options([
-                        'draft' => __('admin.documents.status.draft'),
+                        'draft'     => __('admin.documents.status.draft'),
                         'generated' => __('admin.documents.status.generated'),
                         'published' => __('admin.documents.status.published'),
-                        'archived' => __('admin.documents.status.archived'),
+                        'archived'  => __('admin.documents.status.archived'),
                     ])
                     ->default('draft')
                     ->required(),
@@ -54,7 +51,7 @@ final class DocumentsRelationManager extends BaseRelationManager
                     ->label(__('admin.documents.fields.format'))
                     ->options([
                         'html' => 'HTML',
-                        'pdf' => 'PDF',
+                        'pdf'  => 'PDF',
                         'docx' => 'DOCX',
                         'xlsx' => 'XLSX',
                     ])
@@ -74,7 +71,7 @@ final class DocumentsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('title')
@@ -93,24 +90,24 @@ final class DocumentsRelationManager extends BaseRelationManager
                     ->label(__('admin.documents.fields.status'))
                     ->colors([
                         'secondary' => 'draft',
-                        'primary' => 'generated',
-                        'success' => 'published',
-                        'warning' => 'archived',
+                        'primary'   => 'generated',
+                        'success'   => 'published',
+                        'warning'   => 'archived',
                     ])
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'draft' => __('admin.documents.status.draft'),
+                        'draft'     => __('admin.documents.status.draft'),
                         'generated' => __('admin.documents.status.generated'),
                         'published' => __('admin.documents.status.published'),
-                        'archived' => __('admin.documents.status.archived'),
-                        default => $state,
+                        'archived'  => __('admin.documents.status.archived'),
+                        default     => $state,
                     }),
                 Tables\Columns\BadgeColumn::make('format')
                     ->label(__('admin.documents.fields.format'))
                     ->colors([
-                        'info' => 'pdf',
+                        'info'    => 'pdf',
                         'success' => 'html',
                         'warning' => 'docx',
-                        'danger' => 'xlsx',
+                        'danger'  => 'xlsx',
                     ])
                     ->formatStateUsing(fn (string $state): string => strtoupper($state)),
                 Tables\Columns\TextColumn::make('file_size')
@@ -125,7 +122,7 @@ final class DocumentsRelationManager extends BaseRelationManager
                             $bytes /= 1024;
                         }
 
-                        return round($bytes, 2).' '.$units[$i];
+                        return round($bytes, 2) . ' ' . $units[$i];
                     })
                     ->alignCenter(),
                 Tables\Columns\TextColumn::make('generated_at')
@@ -143,16 +140,16 @@ final class DocumentsRelationManager extends BaseRelationManager
                 Tables\Filters\SelectFilter::make('status')
                     ->label(__('admin.documents.filters.status'))
                     ->options([
-                        'draft' => __('admin.documents.status.draft'),
+                        'draft'     => __('admin.documents.status.draft'),
                         'generated' => __('admin.documents.status.generated'),
                         'published' => __('admin.documents.status.published'),
-                        'archived' => __('admin.documents.status.archived'),
+                        'archived'  => __('admin.documents.status.archived'),
                     ]),
                 Tables\Filters\SelectFilter::make('format')
                     ->label(__('admin.documents.filters.format'))
                     ->options([
                         'html' => 'HTML',
-                        'pdf' => 'PDF',
+                        'pdf'  => 'PDF',
                         'docx' => 'DOCX',
                         'xlsx' => 'XLSX',
                     ]),
@@ -179,7 +176,7 @@ final class DocumentsRelationManager extends BaseRelationManager
                         Forms\Components\Select::make('format')
                             ->label(__('admin.documents.fields.format'))
                             ->options([
-                                'pdf' => 'PDF',
+                                'pdf'  => 'PDF',
                                 'html' => 'HTML',
                                 'docx' => 'DOCX',
                             ])
@@ -193,11 +190,11 @@ final class DocumentsRelationManager extends BaseRelationManager
                     ->action(function (array $data, $record) {
                         $record->documents()->create([
                             'document_template_id' => $data['template_id'],
-                            'title' => 'Generated Document',
-                            'status' => 'generated',
-                            'format' => $data['format'],
-                            'variables' => $data['variables'] ?? [],
-                            'generated_at' => now(),
+                            'title'                => 'Generated Document',
+                            'status'               => 'generated',
+                            'format'               => $data['format'],
+                            'variables'            => $data['variables'] ?? [],
+                            'generated_at'         => now(),
                         ]);
                     }),
             ])
@@ -232,10 +229,10 @@ final class DocumentsRelationManager extends BaseRelationManager
                             Forms\Components\Select::make('status')
                                 ->label(__('admin.documents.fields.status'))
                                 ->options([
-                                    'draft' => __('admin.documents.status.draft'),
+                                    'draft'     => __('admin.documents.status.draft'),
                                     'generated' => __('admin.documents.status.generated'),
                                     'published' => __('admin.documents.status.published'),
-                                    'archived' => __('admin.documents.status.archived'),
+                                    'archived'  => __('admin.documents.status.archived'),
                                 ])
                                 ->required(),
                         ])

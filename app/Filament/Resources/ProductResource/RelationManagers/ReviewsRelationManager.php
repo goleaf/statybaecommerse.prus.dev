@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
-use Filament\Actions\ViewAction;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -20,7 +20,7 @@ class ReviewsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Reviews';
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -34,7 +34,7 @@ class ReviewsRelationManager extends BaseRelationManager
                     ->color(fn (int $state): string => match (true) {
                         $state >= 4 => 'success',
                         $state >= 3 => 'warning',
-                        default => 'danger',
+                        default     => 'danger',
                     }),
                 TextColumn::make('title')
                     ->label(__('reviews.fields.title'))

@@ -30,8 +30,8 @@ final class ProductInventoryWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('products.charts.inventory_status'),
-                    'data' => [$inStock, $lowStock, $outOfStock, $noInventory],
+                    'label'           => __('products.charts.inventory_status'),
+                    'data'            => [$inStock, $lowStock, $outOfStock, $noInventory],
                     'backgroundColor' => [
                         '#10B981', // emerald (in stock)
                         '#F59E0B', // amber (low stock)

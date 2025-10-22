@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\NormalSettingTranslationResource\Pages;
 use App\Models\NormalSetting;
@@ -37,7 +35,8 @@ final class NormalSettingTranslationResource extends Resource
 {
     protected static ?string $model = NormalSettingTranslation::class;
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 16;
 
@@ -68,9 +67,9 @@ final class NormalSettingTranslationResource extends Resource
         return __('admin.normal_setting_translations.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 SchemaSection::make(__('admin.normal_setting_translations.basic_information'))
                     ->schema([
@@ -114,7 +113,7 @@ final class NormalSettingTranslationResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

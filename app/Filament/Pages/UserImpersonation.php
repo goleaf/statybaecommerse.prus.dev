@@ -6,6 +6,7 @@ namespace App\Filament\Pages;
 
 use App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
 use App\Models\User;
+use BackedEnum;
 use Filament\Pages\Page;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
@@ -20,7 +21,8 @@ final class UserImpersonation extends Page implements HasTable
     use ConfiguresToggleableTableLayout;
     use HasToggleableTable;
     use InteractsWithTable;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-user';
 
     public static function getNavigationGroup(): ?string
@@ -34,7 +36,7 @@ final class UserImpersonation extends Page implements HasTable
 
     protected string $view = 'filament.pages.user-impersonation';
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         $table = $table
             ->query(User::query()->where('is_admin', false))

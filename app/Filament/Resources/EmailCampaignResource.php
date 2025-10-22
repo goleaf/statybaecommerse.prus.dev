@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\EmailCampaignResource\Pages;
 use App\Models\EmailCampaign;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -25,14 +24,14 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use App\Support\Filament\Components\Flatpickr;
 
 final class EmailCampaignResource extends Resource
 {
     protected static ?string $model = EmailCampaign::class;
 
     protected static ?int $navigationSort = 4;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-envelope';
 
     public static function getNavigationLabel(): string
@@ -50,9 +49,9 @@ final class EmailCampaignResource extends Resource
         return __('admin.email_campaigns.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('admin.email_campaigns.basic_information'))
                 ->description(__('admin.email_campaigns.basic_information_description'))
                 ->schema([
@@ -98,7 +97,7 @@ final class EmailCampaignResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers\AttributesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\CategoriesRelationManager;
@@ -14,9 +12,10 @@ use App\Filament\Resources\ProductResource\RelationManagers\DocumentsRelationMan
 use App\Filament\Resources\ProductResource\RelationManagers\ImagesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\ReviewsRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
-use App\Models\Product;
 use App\Filament\Widgets\InlineCharts\ProductSalesSparkline;
+use App\Models\Product;
 use App\Support\Authorization\AuthorizationMatrix;
+use App\Support\Filament\Components\Flatpickr;
 use App\Support\Seo\LocaleUrlGenerator;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
@@ -27,7 +26,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\RichEditor;
@@ -58,16 +56,15 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
+use LaraZeus\InlineChart\Tables\Columns\InlineChart;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
-use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
-use UnitEnum;
+use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
-use App\Support\Filament\Components\Flatpickr;
-use LaraZeus\InlineChart\Tables\Columns\InlineChart;
+use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
+use UnitEnum;
 
 /**
  * ProductResource
@@ -147,9 +144,9 @@ final class ProductResource extends Resource
         return __('products.single');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->components([
                 Tabs::make('Product Information')
                     ->tabs([
@@ -353,7 +350,7 @@ final class ProductResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->defaultPaginationPageOption(25)
@@ -398,10 +395,10 @@ final class ProductResource extends Resource
                                 return [
                                     'label' => __('Storefront (:locale): :name', [
                                         'locale' => strtoupper($locale),
-                                        'name' => $name,
+                                        'name'   => $name,
                                     ]),
-                                    'url' => $url,
-                                    'icon' => 'heroicon-o-arrow-top-right-on-square',
+                                    'url'   => $url,
+                                    'icon'  => 'heroicon-o-arrow-top-right-on-square',
                                     'color' => 'primary',
                                 ];
                             })

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingHistories;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\SystemSettingHistories\Pages\CreateSystemSettingHistory;
 use App\Filament\Resources\SystemSettingHistories\Pages\EditSystemSettingHistory;
 use App\Filament\Resources\SystemSettingHistories\Pages\ListSystemSettingHistories;
@@ -21,15 +19,16 @@ use Filament\Tables\Table;
 class SystemSettingHistoryResource extends Resource
 {
     protected static ?string $model = SystemSettingHistory::class;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return SystemSettingHistoryForm::configure($schema);
+        return SystemSettingHistoryForm::configure($form);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return SystemSettingHistoriesTable::configure($table);
     }
@@ -44,9 +43,9 @@ class SystemSettingHistoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListSystemSettingHistories::route('/'),
+            'index'  => ListSystemSettingHistories::route('/'),
             'create' => CreateSystemSettingHistory::route('/create'),
-            'edit' => EditSystemSettingHistory::route('/{record}/edit'),
+            'edit'   => EditSystemSettingHistory::route('/{record}/edit'),
         ];
     }
 }

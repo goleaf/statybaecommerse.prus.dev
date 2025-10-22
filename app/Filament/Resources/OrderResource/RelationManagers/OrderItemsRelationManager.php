@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\OrderItem;
 use App\Support\Filament\ProductVariantFieldHelper;
@@ -59,7 +57,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
     /**
      * Configure the form schema for order items.
      */
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -74,29 +72,29 @@ final class OrderItemsRelationManager extends BaseRelationManager
                                     ->placeholder(__('orders.lookups.variant_placeholder'))
                                     ->required()
                                     ->reactive()
-                                ->searchUsing(fn (string $value): array => ProductVariantSearch::results($value))
-                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                    ->searchUsing(fn (string $value): array => ProductVariantSearch::results($value))
+                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
                                 // Refer to docs/filament/searchable-inputs.md for helper usage guidance and payload expectations.
-                                ->afterStateHydrated(fn (SearchableInput $component, ?int $state) => ProductVariantFieldHelper::hydrateSearchableVariant($component, $state))
-                                ->afterStateUpdated(function (?string $state, Set $set, Get $get): void {
-                                    if ($state === null || $state === '') {
-                                        // Reset dependent fields when the variant lookup clears.
-                                        SearchableInputHelper::clear($set, [
-                                            'product_variant_id' => null,
-                                            'product_id'         => null,
-                                            'name'               => null,
-                                            'sku'                => null,
-                                            'unit_price'         => null,
-                                            'total'              => 0,
-                                        ]);
+                                    ->afterStateHydrated(fn (SearchableInput $component, ?int $state) => ProductVariantFieldHelper::hydrateSearchableVariant($component, $state))
+                                    ->afterStateUpdated(function (?string $state, Set $set, Get $get): void {
+                                        if ($state === null || $state === '') {
+                                            // Reset dependent fields when the variant lookup clears.
+                                            SearchableInputHelper::clear($set, [
+                                                'product_variant_id' => null,
+                                                'product_id'         => null,
+                                                'name'               => null,
+                                                'sku'                => null,
+                                                'unit_price'         => null,
+                                                'total'              => 0,
+                                            ]);
 
-                                        ProductVariantFieldHelper::handleVariantSelection(null, $set, $get);
+                                            ProductVariantFieldHelper::handleVariantSelection(null, $set, $get);
 
-                                        return;
-                                    }
+                                            return;
+                                        }
 
-                                    ProductVariantFieldHelper::handleVariantSelection($state, $set, $get);
-                                }),
+                                        ProductVariantFieldHelper::handleVariantSelection($state, $set, $get);
+                                    }),
                                 TextInput::make('quantity')
                                     ->label(__('orders.quantity'))
                                     ->numeric()
@@ -183,7 +181,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
     /**
      * Configure the table for order items.
      */
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

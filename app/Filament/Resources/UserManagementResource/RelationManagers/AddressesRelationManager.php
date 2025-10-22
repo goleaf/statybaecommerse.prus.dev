@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\UserManagementResource\RelationManagers;
 
-
-use Filament\Schemas\Schema;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -23,7 +20,7 @@ final class AddressesRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Addresses';
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
@@ -38,7 +35,7 @@ final class AddressesRelationManager extends BaseRelationManager
                 Forms\Components\TextInput::make('country'),
                 Forms\Components\Select::make('type')
                     ->options([
-                        'billing' => 'Billing',
+                        'billing'  => 'Billing',
                         'shipping' => 'Shipping',
                     ])
                     ->required(),
@@ -47,7 +44,7 @@ final class AddressesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('name')
@@ -62,9 +59,9 @@ final class AddressesRelationManager extends BaseRelationManager
                 Tables\Columns\TextColumn::make('type')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'billing' => 'info',
+                        'billing'  => 'info',
                         'shipping' => 'success',
-                        default => 'gray',
+                        default    => 'gray',
                     }),
                 Tables\Columns\IconColumn::make('is_default')
                     ->boolean(),

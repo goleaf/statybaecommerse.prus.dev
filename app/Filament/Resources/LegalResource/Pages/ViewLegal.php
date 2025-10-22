@@ -13,7 +13,6 @@ use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Schemas\Schema;
 
 class ViewLegal extends ViewRecord
 {
@@ -27,7 +26,7 @@ class ViewLegal extends ViewRecord
         ];
     }
 
-    public function infolist(Schema $schema): Schema   
+    public function infolist(Schema $schema): Schema
     {
         return $schema
             ->components([
@@ -43,16 +42,16 @@ class ViewLegal extends ViewRecord
                             ->formatStateUsing(fn (string $state): string => Legal::getTypes()[$state] ?? $state)
                             ->badge()
                             ->color(fn (string $state): string => match ($state) {
-                                'privacy_policy' => 'success',
-                                'terms_of_use' => 'warning',
-                                'refund_policy' => 'info',
+                                'privacy_policy'  => 'success',
+                                'terms_of_use'    => 'warning',
+                                'refund_policy'   => 'info',
                                 'shipping_policy' => 'primary',
-                                'cookie_policy' => 'secondary',
-                                'gdpr_policy' => 'danger',
-                                'legal_notice' => 'gray',
-                                'imprint' => 'success',
-                                'legal_document' => 'warning',
-                                default => 'gray',
+                                'cookie_policy'   => 'secondary',
+                                'gdpr_policy'     => 'danger',
+                                'legal_notice'    => 'gray',
+                                'imprint'         => 'success',
+                                'legal_document'  => 'warning',
+                                default           => 'gray',
                             }),
                         IconEntry::make('is_enabled')
                             ->label(__('legal.is_enabled'))
@@ -76,10 +75,10 @@ class ViewLegal extends ViewRecord
                                     ->label(__('legal.locale'))
                                     ->badge()
                                     ->color(fn (string $state): string => match ($state) {
-                                        'lt' => 'success',
-                                        'en' => 'info',
-                                        'ru' => 'warning',
-                                        'de' => 'gray',
+                                        'lt'    => 'success',
+                                        'en'    => 'info',
+                                        'ru'    => 'warning',
+                                        'de'    => 'gray',
                                         default => 'secondary',
                                     }),
                                 TextEntry::make('title')

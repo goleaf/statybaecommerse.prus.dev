@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CustomerGroupResource\RelationManagers;
 
-
-use Filament\Schemas\Schema;
-use Filament\Forms;
-use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Forms;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -18,7 +15,7 @@ final class DiscountsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'customer_groups.relation_discounts';
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -30,7 +27,7 @@ final class DiscountsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('name')
@@ -47,10 +44,10 @@ final class DiscountsRelationManager extends BaseRelationManager
                 Tables\Columns\TextColumn::make('type')
                     ->label(__('discounts.type'))
                     ->color(fn (string $state): string => match ($state) {
-                        'percentage' => 'success',
-                        'fixed' => 'warning',
+                        'percentage'    => 'success',
+                        'fixed'         => 'warning',
                         'free_shipping' => 'info',
-                        default => 'gray',
+                        default         => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('value')
                     ->label(__('discounts.value'))
@@ -63,8 +60,8 @@ final class DiscountsRelationManager extends BaseRelationManager
             ->filters([
                 Tables\Filters\SelectFilter::make('type')
                     ->options([
-                        'percentage' => __('discounts.percentage'),
-                        'fixed' => __('discounts.fixed'),
+                        'percentage'    => __('discounts.percentage'),
+                        'fixed'         => __('discounts.fixed'),
                         'free_shipping' => __('discounts.free_shipping'),
                     ]),
                 Tables\Filters\TernaryFilter::make('is_active')

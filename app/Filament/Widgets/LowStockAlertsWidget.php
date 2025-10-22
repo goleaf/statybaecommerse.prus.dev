@@ -33,7 +33,7 @@ final class LowStockAlertsWidget extends BaseWidget
         return self::$heading;
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->query(
@@ -52,7 +52,7 @@ final class LowStockAlertsWidget extends BaseWidget
                     ->label(__('translations.status'))
                     ->getStateUsing(fn (Product $record): string => $record->stock_quantity <= 0 ? 'out_of_stock' : 'low_stock')
                     ->colors([
-                        'danger' => 'out_of_stock',
+                        'danger'  => 'out_of_stock',
                         'warning' => 'low_stock',
                     ]),
             ])

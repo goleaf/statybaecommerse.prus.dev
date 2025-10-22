@@ -48,7 +48,7 @@ class EditLegal extends EditRecord
                 ->color('gray')
                 ->action(function () {
                     $newRecord = $this->record->replicate();
-                    $newRecord->key = $this->record->key.'-copy';
+                    $newRecord->key = $this->record->key . '-copy';
                     $newRecord->published_at = null;
                     $newRecord->save();
 

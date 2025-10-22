@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\CartItemResource\Pages;
 use App\Models\CartItem;
 use App\Models\Product;
@@ -13,6 +11,7 @@ use App\Models\ProductVariant;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;
+use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -37,7 +36,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 final class CartItemResource extends Resource
 {
-    /** @var string|\BackedEnum|null */
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static ?string $model = CartItem::class;
@@ -65,9 +64,9 @@ final class CartItemResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('cart_items.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -254,7 +253,7 @@ final class CartItemResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -411,10 +410,10 @@ final class CartItemResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCartItems::route('/'),
+            'index'  => Pages\ListCartItems::route('/'),
             'create' => Pages\CreateCartItem::route('/create'),
-            'view' => Pages\ViewCartItem::route('/{record}'),
-            'edit' => Pages\EditCartItem::route('/{record}/edit'),
+            'view'   => Pages\ViewCartItem::route('/{record}'),
+            'edit'   => Pages\EditCartItem::route('/{record}/edit'),
         ];
     }
 }

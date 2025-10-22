@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ReferralCodeUsageLogs;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\ReferralCodeUsageLogs\Pages\CreateReferralCodeUsageLog;
 use App\Filament\Resources\ReferralCodeUsageLogs\Pages\EditReferralCodeUsageLog;
 use App\Filament\Resources\ReferralCodeUsageLogs\Pages\ListReferralCodeUsageLogs;
@@ -28,12 +26,12 @@ final class ReferralCodeUsageLogResource extends Resource
         return Heroicon::OutlinedRectangleStack;
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return ReferralCodeUsageLogForm::configure($schema);
+        return ReferralCodeUsageLogForm::configure($form);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return ReferralCodeUsageLogsTable::configure($table);
     }

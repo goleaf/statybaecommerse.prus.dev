@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\EmailCampaigns;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\EmailCampaigns\Pages\CreateEmailCampaign;
 use App\Filament\Resources\EmailCampaigns\Pages\EditEmailCampaign;
 use App\Filament\Resources\EmailCampaigns\Pages\ListEmailCampaigns;
@@ -22,15 +20,16 @@ use Filament\Tables\Table;
 class EmailCampaignResource extends Resource
 {
     protected static ?string $model = EmailCampaign::class;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return EmailCampaignForm::configure($schema);
+        return EmailCampaignForm::configure($form);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return EmailCampaignsTable::configure($table);
     }

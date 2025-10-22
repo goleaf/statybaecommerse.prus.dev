@@ -16,7 +16,7 @@ final class RecentOrdersWidget extends BaseWidget
 
     protected static ?int $sort = 2;
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->query(fn (): Builder => Order::query()
@@ -41,8 +41,8 @@ final class RecentOrdersWidget extends BaseWidget
                         'confirmed', 'processing' => 'primary',
                         'shipped', 'delivered' => 'success',
                         'cancelled' => 'danger',
-                        'refunded' => 'gray',
-                        default => 'secondary',
+                        'refunded'  => 'gray',
+                        default     => 'secondary',
                     }),
                 Tables\Columns\TextColumn::make('total')
                     ->label(__('orders.total_amount'))

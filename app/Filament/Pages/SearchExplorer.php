@@ -6,11 +6,12 @@ namespace App\Filament\Pages;
 
 use App\Data\SearchQueryData;
 use App\Services\SearchService;
+use BackedEnum;
 use Filament\Pages\Page;
 
 final class SearchExplorer extends Page
 {
-    /** @var string|\BackedEnum|null */
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-magnifying-glass-circle';
 
     public static function getNavigationGroup(): ?string

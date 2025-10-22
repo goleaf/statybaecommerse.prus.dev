@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\CouponResource\Pages;
 use App\Models\Coupon;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -37,7 +36,6 @@ use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
-use App\Support\Filament\Components\Flatpickr;
 
 final class CouponResource extends Resource
 {
@@ -62,9 +60,9 @@ final class CouponResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('coupons.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -204,7 +202,7 @@ final class CouponResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -427,9 +425,9 @@ final class CouponResource extends Resource
                         ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE)
                         ->formatStateUsing(
                             fn ($state, Coupon $record): string => match ($record->type) {
-                                'percentage' => $state === null ? '' : sprintf('%s%%', $state),
+                                'percentage'    => $state === null ? '' : sprintf('%s%%', $state),
                                 'free_shipping' => __('coupons.free_shipping'),
-                                default => $state === null ? '' : (string) $state,
+                                default         => $state === null ? '' : (string) $state,
                             }
                         ),
                     Column::make('starts_at')

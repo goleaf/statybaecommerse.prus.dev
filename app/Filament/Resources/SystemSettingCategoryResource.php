@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\SystemSettingCategoryResource\Pages;
 use App\Filament\Resources\SystemSettingCategoryResource\RelationManagers;
 use App\Models\Scopes\ActiveScope;
 use App\Models\SystemSettingCategory;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -49,14 +48,14 @@ final class SystemSettingCategoryResource extends Resource
     protected static ?string $model = SystemSettingCategory::class;
 
     /**
-     * @var string|\BackedEnum|null Keep navigation grouping aligned with the shared enum helper.
+     * @var string|BackedEnum|null Keep navigation grouping aligned with the shared enum helper.
      */
     protected static $navigationGroup = NavigationGroup::System;
 
     public static function getNavigationGroup(): ?string
     {
         // Harmonize enum and string groups to avoid leaking raw enum values in the UI.
-        $group = static::$navigationGroup;
+        $group = self::$navigationGroup;
 
         return $group instanceof NavigationGroup ? $group->label() : $group;
     }
@@ -94,9 +93,9 @@ final class SystemSettingCategoryResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 SchemaSection::make(__('system_setting_categories.basic_information'))
                     ->schema([
@@ -168,7 +167,7 @@ final class SystemSettingCategoryResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([ActiveScope::class]))
@@ -246,8 +245,8 @@ final class SystemSettingCategoryResource extends Resource
                     ->color('info')
                     ->action(function (SystemSettingCategory $record): void {
                         $newRecord = $record->replicate();
-                        $newRecord->name = $record->name.' (Copy)';
-                        $newRecord->slug = $record->slug.'-copy';
+                        $newRecord->name = $record->name . ' (Copy)';
+                        $newRecord->slug = $record->slug . '-copy';
                         $newRecord->save();
 
                         Notification::make()
@@ -342,10 +341,10 @@ final class SystemSettingCategoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSystemSettingCategories::route('/'),
+            'index'  => Pages\ListSystemSettingCategories::route('/'),
             'create' => Pages\CreateSystemSettingCategory::route('/create'),
-            'view' => Pages\ViewSystemSettingCategory::route('/{record}'),
-            'edit' => Pages\EditSystemSettingCategory::route('/{record}/edit'),
+            'view'   => Pages\ViewSystemSettingCategory::route('/{record}'),
+            'edit'   => Pages\EditSystemSettingCategory::route('/{record}/edit'),
         ];
     }
 }

@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\DiscountRedemptionResource\Pages;
 use App\Filament\Resources\DiscountRedemptionResource\RelationManagers\CodeRelationManager;
 use App\Filament\Resources\DiscountRedemptionResource\RelationManagers\DiscountRelationManager;
 use App\Filament\Resources\DiscountRedemptionResource\RelationManagers\UserRelationManager;
 use App\Models\DiscountRedemption;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -34,7 +33,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 final class DiscountRedemptionResource extends Resource
 {
@@ -60,9 +58,9 @@ final class DiscountRedemptionResource extends Resource
         return __('discount_redemptions.single');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('discount_redemptions.sections.associations'))
                 ->schema([
                     Grid::make(2)
@@ -154,7 +152,7 @@ final class DiscountRedemptionResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\SystemSettingHistoryResource\Pages;
 use App\Models\SystemSettingHistory;
 use BackedEnum;
@@ -15,14 +13,14 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -63,9 +61,9 @@ final class SystemSettingHistoryResource extends Resource
         return __('admin.system_setting_histories.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Section::make(__('admin.system_setting_histories.basic_information'))
                     ->schema([
@@ -110,7 +108,7 @@ final class SystemSettingHistoryResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->deferFilters(false)
@@ -185,7 +183,7 @@ final class SystemSettingHistoryResource extends Resource
                     ->color('warning')
                     ->action(function (SystemSettingHistory $record): void {
                         $record->systemSetting()->update([
-                            'type' => 'string',
+                            'type'  => 'string',
                             'value' => $record->old_value,
                         ]);
                         Notification::make()
@@ -225,10 +223,10 @@ final class SystemSettingHistoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSystemSettingHistories::route('/'),
+            'index'  => Pages\ListSystemSettingHistories::route('/'),
             'create' => Pages\CreateSystemSettingHistory::route('/create'),
-            'view' => Pages\ViewSystemSettingHistory::route('/{record}'),
-            'edit' => Pages\EditSystemSettingHistory::route('/{record}/edit'),
+            'view'   => Pages\ViewSystemSettingHistory::route('/{record}'),
+            'edit'   => Pages\EditSystemSettingHistory::route('/{record}/edit'),
         ];
     }
 }
