@@ -7,6 +7,9 @@ namespace App\Filament\Resources;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\EnabledScope;
+use App\Models\Scopes\VisibleScope;
 use App\Support\Authorization\AuthorizationMatrix;
 use BackedEnum;
 use Filament\Forms\Components\ColorPicker;
@@ -18,17 +21,23 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -37,12 +46,10 @@ use UnitEnum;
 
 final class CategoryResource extends Resource
 {
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
+    /** Aligns the navigation icon with Filament's expectations. */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
-    /** @var string|BackedEnum|null Align the resource under the Products navigation section. */
+    /** Align the resource under the Products navigation section. */
     protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 3;
@@ -110,11 +117,26 @@ final class CategoryResource extends Resource
                         TextInput::make('name')
                             ->label(__('categories.name'))
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            // Keep the slug synchronised with the initial name while creating new categories for faster authoring.
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(function (string $operation, ?string $state, Set $set): void {
+                                if ($operation === 'create') {
+                                    $set('slug', Str::slug((string) $state));
+                                }
+                            }),
                         TextInput::make('slug')
                             ->label(__('categories.slug'))
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            // Enforce clean, URL-friendly slugs and keep them unique for routing safety.
+                            ->unique(ignoreRecord: true)
+                            ->rule('alpha_dash')
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(function (?string $state, Set $set): void {
+                                // Normalise user edits so the slug never diverges from the expected format.
+                                $set('slug', Str::slug((string) $state));
+                            }),
                         Textarea::make('description')
                             ->label(__('categories.description'))
                             ->rows(3),
@@ -191,8 +213,14 @@ final class CategoryResource extends Resource
                             Toggle::make('is_active')
                                 ->label(__('categories.is_active'))
                                 ->default(true),
+                            Toggle::make('is_visible')
+                                ->label(__('categories.is_visible'))
+                                ->default(true),
                             Toggle::make('is_featured')
                                 ->label(__('categories.is_featured')),
+                            Toggle::make('is_enabled')
+                                ->label(__('categories.is_enabled'))
+                                ->default(true),
                         ]),
                 ]),
         ]);
@@ -213,8 +241,11 @@ final class CategoryResource extends Resource
                     ->weight('bold')
                     ->formatStateUsing(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
+                        /** @var Category|null $record */
                         $record = $column->getRecord();
-                        if ($record->parent) {
+
+                        if ($record?->parent) {
                             // Use the Str helper to avoid deprecated string helper aliases while building the breadcrumb label.
                             return Str::of($record->parent->name)
                                 ->append(' → ')
@@ -222,11 +253,12 @@ final class CategoryResource extends Resource
                                 ->toString();
                         }
 
-                        return $state;
+                        return is_string($state) ? $state : null;
                     }),
                 TextColumn::make('slug')
                     ->label(__('categories.slug'))
                     ->copyable()
+                    ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 ColorColumn::make('color')
                     ->label(__('categories.color'))
@@ -240,6 +272,9 @@ final class CategoryResource extends Resource
                     ->counts('children'),
                 IconColumn::make('is_active')
                     ->label(__('categories.is_active'))
+                    ->boolean(),
+                IconColumn::make('is_visible')
+                    ->label(__('categories.is_visible'))
                     ->boolean(),
                 IconColumn::make('is_featured')
                     ->label(__('categories.is_featured'))
@@ -261,22 +296,32 @@ final class CategoryResource extends Resource
                     ->label(__('categories.parent_category'))
                     ->relationship('parent', 'name')
                     ->preload(),
-                TernaryFilter::make('is_active')
-                    ->trueLabel(__('categories.active_only'))
-                    ->falseLabel(__('categories.inactive_only'))
-                    ->native(false),
-                TernaryFilter::make('is_featured')
-                    ->trueLabel(__('categories.featured_only'))
-                    ->falseLabel(__('categories.not_featured'))
-                    ->native(false),
+                SelectFilter::make('is_active')
+                    ->label(__('categories.status'))
+                    ->options([
+                        '1' => __('categories.active_only'),
+                        '0' => __('categories.inactive_only'),
+                    ]),
+                SelectFilter::make('is_visible')
+                    ->label(__('categories.visibility'))
+                    ->options([
+                        '1' => __('categories.visible_only'),
+                        '0' => __('categories.hidden_only'),
+                    ]),
+                SelectFilter::make('is_featured')
+                    ->label(__('categories.featured_status'))
+                    ->options([
+                        '1' => __('categories.featured_only'),
+                        '0' => __('categories.not_featured'),
+                    ]),
                 TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()
+                ViewAction::make()
                     ->visible(fn () => AuthorizationMatrix::check('categories', 'view')),
-                Tables\Actions\EditAction::make()
+                EditAction::make()
                     ->visible(fn () => AuthorizationMatrix::check('categories', 'update')),
-                Tables\Actions\Action::make('toggle_active')
+                Action::make('toggle_active')
                     ->label(fn (Category $record): string => $record->is_active ? __('categories.deactivate') : __('categories.activate'))
                     ->icon(fn (Category $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                     ->color(fn (Category $record): string => $record->is_active ? 'warning' : 'success')
@@ -289,12 +334,26 @@ final class CategoryResource extends Resource
                     })
                     ->requiresConfirmation()
                     ->visible(fn () => AuthorizationMatrix::check('categories', 'update')),
+                Action::make('toggle_visible')
+                    ->label(fn (Category $record): string => $record->is_visible ? __('categories.hide') : __('categories.show'))
+                    ->icon(fn (Category $record): string => $record->is_visible ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn (Category $record): string => $record->is_visible ? 'warning' : 'success')
+                    ->action(function (Category $record): void {
+                        // Allow merchandisers to quickly adjust storefront visibility without leaving the list view.
+                        $record->update(['is_visible' => ! $record->is_visible]);
+                        Notification::make()
+                            ->title($record->is_visible ? __('categories.made_visible_successfully') : __('categories.hidden_successfully'))
+                            ->success()
+                            ->send();
+                    })
+                    ->requiresConfirmation()
+                    ->visible(fn () => AuthorizationMatrix::check('categories', 'update')),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->visible(fn () => AuthorizationMatrix::check('categories', 'delete')),
-                    Tables\Actions\BulkAction::make('activate')
+                    BulkAction::make('activate')
                         ->label(__('categories.activate_selected'))
                         ->icon('heroicon-o-eye')
                         ->color('success')
@@ -307,7 +366,7 @@ final class CategoryResource extends Resource
                         })
                         ->requiresConfirmation()
                         ->visible(fn () => AuthorizationMatrix::check('categories', 'update')),
-                    Tables\Actions\BulkAction::make('deactivate')
+                    BulkAction::make('deactivate')
                         ->label(__('categories.deactivate_selected'))
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
@@ -340,5 +399,19 @@ final class CategoryResource extends Resource
             'view'   => Pages\ViewCategory::route('/{record}'),
             'edit'   => Pages\EditCategory::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * @return Builder<Category>
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        // Lift the storefront-specific scopes so administrators can manage inactive or hidden categories directly.
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                ActiveScope::class,
+                EnabledScope::class,
+                VisibleScope::class,
+            ]);
     }
 }
