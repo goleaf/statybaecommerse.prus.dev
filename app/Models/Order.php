@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Carbon;
 use Schema;
 use Spatie\Activitylog\LogOptions;
@@ -253,6 +254,10 @@ final class Order extends Model
     {
         [$startAt, $endAt] = self::normalizeRange($start, $end);
 
+        // Hint the planner towards the standalone created_at index before applying the
+        // date range constraint so SQLite/MySQL avoid falling back to composite scans.
+        self::enforceCreatedAtIndex($query);
+
         return $query->whereBetween($query->qualifyColumn('created_at'), [$startAt, $endAt]);
     }
 
@@ -262,6 +267,10 @@ final class Order extends Model
      */
     public function scopeCreatedSince(Builder $query, CarbonInterface|DateTimeInterface|string $start): Builder
     {
+        // Ensure partial window scans also leverage the dedicated created_at index for
+        // analytics roll-ups and dashboard aggregations.
+        self::enforceCreatedAtIndex($query);
+
         return $query->where($query->qualifyColumn('created_at'), '>=', self::toImmutableCarbon($start));
     }
 
@@ -271,6 +280,10 @@ final class Order extends Model
      */
     public function scopeCreatedUntil(Builder $query, CarbonInterface|DateTimeInterface|string $end): Builder
     {
+        // Apply the same index hint when only an upper bound is provided so sequential
+        // scans remain fast even under heavy data volumes.
+        self::enforceCreatedAtIndex($query);
+
         return $query->where($query->qualifyColumn('created_at'), '<=', self::toImmutableCarbon($end));
     }
 
@@ -281,6 +294,10 @@ final class Order extends Model
     public function scopeCreatedOn(Builder $query, CarbonInterface|DateTimeInterface|string $date): Builder
     {
         $day = self::toImmutableCarbon($date);
+
+        // Keep day-level analytics aligned with the created_at index to avoid table
+        // scans whenever widgets drill into a single date bucket.
+        self::enforceCreatedAtIndex($query);
 
         return $query->whereBetween($query->qualifyColumn('created_at'), [$day->copy()->startOfDay(), $day->copy()->endOfDay()]);
     }
@@ -413,5 +430,52 @@ final class Order extends Model
         }
 
         return [$startAt, $endAt];
+    }
+
+    /**
+     * Apply a portable index hint so different database drivers consistently favour the
+     * dedicated orders_created_at_index during analytics queries.
+     */
+    private static function enforceCreatedAtIndex(Builder $query): void
+    {
+        $baseTable = $query->getModel()->getTable();
+        $connection = $query->getConnection();
+        $prefixedTable = $connection->getTablePrefix() . $baseTable;
+        $indexName = 'orders_created_at_index';
+
+        $from = $query->getQuery()->from;
+
+        // Abort when the builder already carries a custom FROM clause (for example when
+        // joining with aliases) or the hint has been applied previously.
+        if ($from instanceof Expression) {
+            $fromString = (string) $from;
+
+            if (! str_contains($fromString, $prefixedTable) || str_contains($fromString, $indexName)) {
+                return;
+            }
+        } elseif (is_string($from)) {
+            $normalizedFrom = trim($from, '`" ');
+
+            if ($normalizedFrom !== $prefixedTable && $normalizedFrom !== $baseTable) {
+                return;
+            }
+        } elseif ($from !== null) {
+            return;
+        }
+
+        $hint = match ($connection->getDriverName()) {
+            'sqlite' => sprintf('%s INDEXED BY %s', $prefixedTable, $indexName),
+            'mysql', 'mariadb' => sprintf('%s USE INDEX (%s)', $prefixedTable, $indexName),
+            default => null,
+        };
+
+        if ($hint === null) {
+            return;
+        }
+
+        // Swap the underlying FROM clause with the hint-aware variant so explain plans
+        // acknowledge the standalone created_at index even when other covering indexes
+        // are present.
+        $query->fromRaw($hint);
     }
 }
