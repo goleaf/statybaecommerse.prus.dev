@@ -6,6 +6,7 @@ namespace App\Filament\Widgets\InlineCharts;
 
 use App\Models\Product;
 use App\Support\Stats\Series\ProductSeries;
+use Illuminate\Database\Eloquent\Model;
 use LaraZeus\InlineChart\InlineChartWidget;
 
 /**
@@ -14,9 +15,9 @@ use LaraZeus\InlineChart\InlineChartWidget;
 final class ProductSalesSparkline extends InlineChartWidget
 {
     /**
-     * The product record that powers the sparkline widget instance.
+     * The product record that powers the sparkline widget instance while honouring the base contract.
      */
-    public ?Product $record = null;
+    public ?Model $record = null;
 
     /**
      * Hide the heading so the widget renders as a pure sparkline.
@@ -38,7 +39,7 @@ final class ProductSalesSparkline extends InlineChartWidget
     /**
      * Hash of the dataset passed to the frontend, used by tests and the Blade view for diffing.
      */
-    public string $dataChecksum = '';
+    public ?string $dataChecksum = null;
 
     /**
      * Capture the optional product record and seed the dataset cache during component boot.
@@ -103,7 +104,8 @@ final class ProductSalesSparkline extends InlineChartWidget
     private function refreshDataset(): void
     {
         $this->cachedDataset = $this->resolveDataset();
-        $this->dataChecksum = md5(json_encode($this->cachedDataset));
+        // Cast the JSON payload to a string so checksum generation stays deterministic for Chart.js consumers.
+        $this->dataChecksum = md5((string) json_encode($this->cachedDataset));
     }
 
     /**
