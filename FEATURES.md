@@ -29,7 +29,8 @@ This snapshot complements the changelog by listing functional capabilities that 
   activity state, campaign, customer group, and segment type so analytics and
   admin listings can intentionally include inactive records without removing
   visibility controls from the model entirely.
-- Campaign conversion queries now rely solely on the status-aware scope so
+- Campaign conversion queries now rely solely on the status-aware scope while
+  exposing their translation model and defaulting fresh `converted_at` values, so
   completed, pending, and other lifecycle records remain accessible to analytics
   tooling without fighting an `is_active` filter that the table never exposed.
 - Restored the default RefreshDatabase migration flow after the toggleable table Pest suite and ensured the news category factory seeds visible records so unit coverage can assert parent/child/category pivots without global scope interference.
