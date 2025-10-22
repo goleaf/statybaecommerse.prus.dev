@@ -34,6 +34,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - Developer tooling regained the full Husky bootstrap shim with its executable bit restored, ensuring local Git hooks run automatically after installs while still reminding contributors about the upcoming v10 script changes.
 - Shipping option management screens now present accurate delivery windows even when the minimum day value is zero or one side of the range is missing, giving merchandisers clearer expectations when auditing carriers.
 - Filament admin navigation icons once again rely on docblock-based overrides, preventing BackedEnum collisions, while variant stock history badges group destructive events under the shared danger palette and the `data:import` command advertises its purpose directly in Artisan listings.
+- Analytics dashboard navigation now uses the documented docblock override and `Form` signature so Filament v4 boots without the BackedEnum type collision previously raised by the resource.
 
 ## Documentation
 - Start with the curated [documentation index](docs/INDEX.md) for the setup → deploy → data model → admin guide → troubleshooting path.

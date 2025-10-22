@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\AnalyticsResource\Pages;
 use App\Filament\Resources\OrderResource;
@@ -24,7 +22,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
 
 final class AnalyticsResource extends Resource
 {
@@ -32,7 +29,8 @@ final class AnalyticsResource extends Resource
     /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Analytics;
+    /** @var string|\BackedEnum|null */
+    protected static $navigationGroup = NavigationGroup::Analytics;
 
     public static function getNavigationLabel(): string
     {
@@ -67,9 +65,10 @@ final class AnalyticsResource extends Resource
         return 'warning';
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema;
+        // Keep the dashboard read-only by returning the base form configuration untouched.
+        return $form;
     }
 
     public static function table(Table $table): Table   

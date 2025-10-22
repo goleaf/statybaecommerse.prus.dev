@@ -32,6 +32,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Ensured the test bootstrap reloads JSON translation directories so Filament commerce navigation labels resolve to localized values instead of falling back to raw keys during regression runs.
 * Ensured the Feature Flag resource surfaces inactive and disabled toggles so administrators can audit rollout states without adjusting global scopes.
 * Fixed the Activity Log Filament resource navigation icon property by adopting the BackedEnum-aware union type required by Filament v4, preventing fatal errors during admin boot.
+* Updated the Analytics dashboard resource to rely on the BackedEnum-aware navigation metadata and `Form` signature expected by Filament v4, resolving the fatal error triggered during panel boot.
 
 ### Security
 * Introduced a request-scoped CSP nonce service with middleware, Livewire, and Vite integration, hardened permissions/HSTS headers, and refreshed inline Blade assets to comply with nonce-based CSP directives.
