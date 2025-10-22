@@ -11,6 +11,7 @@ use App\Models\CampaignSchedule;
 use App\Models\CustomerGroup;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Campaign>
@@ -22,15 +23,12 @@ final class CampaignFactory extends Factory
     public function definition(): array
     {
         $name = $this->faker->sentence(3);
-        $baseSlug = \Illuminate\Support\Str::slug($name);
+        $baseSlug = Str::slug($name);
 
-        // Ensure unique slug
-        $slug = $baseSlug;
-        $counter = 1;
-        while (\App\Models\Campaign::where('slug', $slug)->exists()) {
-            $slug = $baseSlug . '-' . $counter;
-            $counter++;
-        }
+        // Avoid hitting missing tables when migrations are not loaded yet (e.g. during in-memory tests).
+        $slug = Schema::hasTable('discount_campaigns')
+            ? $this->generateUniqueSlug($baseSlug)
+            : $baseSlug.'-'.Str::random(6);
 
         return [
             'name'       => $name,
@@ -38,6 +36,11 @@ final class CampaignFactory extends Factory
             'starts_at'  => $this->faker->dateTimeBetween('-1 week', 'now'),
             'ends_at'    => $this->faker->dateTimeBetween('now', '+3 months'),
             'channel_id' => function () {
+                // Skip channel lookups entirely when the supporting table has not been migrated yet.
+                if (! Schema::hasTable('channels')) {
+                    return null;
+                }
+
                 $existingChannels = \App\Models\Channel::query()->get();
                 if ($existingChannels->isNotEmpty()) {
                     return $existingChannels->random()->id;
@@ -63,27 +66,50 @@ final class CampaignFactory extends Factory
     public function configure(): static
     {
         return $this->afterCreating(function (Campaign $campaign): void {
-            CampaignProductTarget::factory()
-                ->category()
-                ->for($campaign)
-                ->state($this->ensureActiveState('campaign_product_targets'))
-                ->create();
+            // Create related records only when the necessary tables exist in the temporary test database.
+            if ($this->tableExists('campaign_product_targets')) {
+                CampaignProductTarget::factory()
+                    ->category()
+                    ->for($campaign)
+                    ->state($this->ensureActiveState('campaign_product_targets'))
+                    ->create();
+            }
 
-            CampaignCustomerSegment::factory()
-                ->demographic()
-                ->for($campaign)
-                ->state(array_merge(
-                    ['customer_group_id' => CustomerGroup::factory()],
-                    $this->ensureActiveState('campaign_customer_segments'),
-                ))
-                ->create();
+            if ($this->tableExists('campaign_customer_segments')) {
+                CampaignCustomerSegment::factory()
+                    ->demographic()
+                    ->for($campaign)
+                    ->state(array_merge(
+                        ['customer_group_id' => CustomerGroup::factory()],
+                        $this->ensureActiveState('campaign_customer_segments'),
+                    ))
+                    ->create();
+            }
 
-            CampaignSchedule::factory()
-                ->daily()
-                ->for($campaign)
-                ->state($this->ensureActiveState('campaign_schedules'))
-                ->create();
+            if ($this->tableExists('campaign_schedules')) {
+                CampaignSchedule::factory()
+                    ->daily()
+                    ->for($campaign)
+                    ->state($this->ensureActiveState('campaign_schedules'))
+                    ->create();
+            }
         });
+    }
+
+    /**
+     * Generate a unique slug by consulting the campaigns table when it is available.
+     */
+    private function generateUniqueSlug(string $baseSlug): string
+    {
+        $slug = $baseSlug;
+        $counter = 1;
+
+        while (Campaign::where('slug', $slug)->exists()) {
+            $slug = $baseSlug.'-'.$counter;
+            $counter++;
+        }
+
+        return $slug;
     }
 
     /**
@@ -98,6 +124,14 @@ final class CampaignFactory extends Factory
         }
 
         return ['is_active' => true];
+    }
+
+    /**
+     * Determine if a table is available for seeding related models.
+     */
+    private function tableExists(string $table): bool
+    {
+        return Schema::hasTable($table);
     }
 
     public function active(): static

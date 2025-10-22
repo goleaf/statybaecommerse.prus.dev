@@ -6,6 +6,7 @@ namespace Database\Factories;
 
 use App\Models\CustomerGroup;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\CustomerGroup>
@@ -21,14 +22,20 @@ final class CustomerGroupFactory extends Factory
      */
     public function definition(): array
     {
-        return [
+        $attributes = [
             'name' => $this->faker->words(2, true),
             'code' => strtoupper($this->faker->bothify('??##')),
             'description' => $this->faker->sentence(),
             'slug' => $this->faker->slug(),
             'discount_percentage' => $this->faker->randomFloat(2, 0, 50),
             'is_enabled' => $this->faker->boolean(80),
-            'metadata' => [
+            'conditions' => [],
+        ];
+
+        // Only include the JSON metadata payload when the backing table exposes the column to
+        // avoid SQLite errors in minimal migration scenarios used during isolated unit tests.
+        if (Schema::hasColumn('customer_groups', 'metadata')) {
+            $attributes['metadata'] = [
                 'type' => $this->faker->randomElement(['regular', 'vip', 'corporate', 'retail']),
                 'has_special_pricing' => $this->faker->boolean(30),
                 'has_volume_discounts' => $this->faker->boolean(40),
@@ -37,9 +44,10 @@ final class CustomerGroupFactory extends Factory
                 'can_view_catalog' => $this->faker->boolean(85),
                 'can_use_coupons' => $this->faker->boolean(70),
                 'sort_order' => $this->faker->numberBetween(1, 100),
-            ],
-            'conditions' => [],
-        ];
+            ];
+        }
+
+        return $attributes;
     }
 
     /**
