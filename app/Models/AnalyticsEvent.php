@@ -83,13 +83,13 @@ final class AnalyticsEvent extends Model
     ];
 
     protected $casts = [
-        'properties' => 'array',
-        'event_data' => 'array',
-        'is_important' => 'boolean',
-        'is_conversion' => 'boolean',
+        'properties'       => 'array',
+        'event_data'       => 'array',
+        'is_important'     => 'boolean',
+        'is_conversion'    => 'boolean',
         'conversion_value' => 'decimal:2',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
+        'created_at'       => 'datetime',
+        'updated_at'       => 'datetime',
     ];
 
     protected $dates = ['created_at', 'updated_at'];
@@ -126,6 +126,13 @@ final class AnalyticsEvent extends Model
      */
     public function scopeByUser(Builder $query, int $userId): Builder
     {
+        // Guard against leaking analytics for other customers by enforcing the authenticated user when present.
+        $authenticatedUser = auth()->user();
+
+        if ($authenticatedUser !== null && ! $authenticatedUser->is_admin && $authenticatedUser->id !== $userId) {
+            return $query->whereRaw('0 = 1');
+        }
+
         return $query->where('user_id', $userId);
     }
 
@@ -248,7 +255,7 @@ final class AnalyticsEvent extends Model
      */
     public function getEventTypeLabelAttribute(): string
     {
-        $translationKey = 'admin.analytics.event_types.'.$this->event_type;
+        $translationKey = 'admin.analytics.event_types.' . $this->event_type;
 
         // Allow gracefully falling back to the raw event type when the translation
         // string is missing instead of triggering translator argument exceptions.
@@ -266,9 +273,9 @@ final class AnalyticsEvent extends Model
     {
         return match ($this->device_type) {
             'desktop' => 'heroicon-o-computer-desktop',
-            'mobile' => 'heroicon-o-device-phone-mobile',
-            'tablet' => 'heroicon-o-device-tablet',
-            default => 'heroicon-o-question-mark-circle',
+            'mobile'  => 'heroicon-o-device-phone-mobile',
+            'tablet'  => 'heroicon-o-device-tablet',
+            default   => 'heroicon-o-question-mark-circle',
         };
     }
 
@@ -282,7 +289,7 @@ final class AnalyticsEvent extends Model
         }
         $currency = $this->currency ?? 'EUR';
 
-        return number_format($this->value, 2).' '.$currency;
+        return number_format($this->value, 2) . ' ' . $currency;
     }
 
     /**
@@ -332,7 +339,7 @@ final class AnalyticsEvent extends Model
      */
     public static function getEventTypeStats(): array
     {
-        return static::queryForAdmin()
+        return self::queryForAdmin()
             ->selectRaw('event_type, COUNT(*) as count')
             ->groupBy('event_type')
             ->orderBy('count', 'desc')
@@ -345,7 +352,7 @@ final class AnalyticsEvent extends Model
      */
     public static function getDeviceTypeStats(): array
     {
-        return static::queryForAdmin()
+        return self::queryForAdmin()
             ->selectRaw('device_type, COUNT(*) as count')
             ->whereNotNull('device_type')
             ->groupBy('device_type')
@@ -359,7 +366,7 @@ final class AnalyticsEvent extends Model
      */
     public static function getBrowserStats(): array
     {
-        return static::queryForAdmin()
+        return self::queryForAdmin()
             ->selectRaw('browser, COUNT(*) as count')
             ->whereNotNull('browser')
             ->groupBy('browser')
@@ -373,7 +380,7 @@ final class AnalyticsEvent extends Model
      */
     public static function getRevenueStats(): array
     {
-        return static::queryForAdmin()
+        return self::queryForAdmin()
             ->whereNotNull('value')
             ->selectRaw('DATE(created_at) as date, SUM(value) as revenue')
             ->groupBy('date')
@@ -397,13 +404,13 @@ final class AnalyticsEvent extends Model
      */
     protected static function queryForAdmin(): Builder
     {
-        return static::query()->withoutGlobalScope(UserOwnedScope::class);
+        return self::query()->withoutGlobalScope(UserOwnedScope::class);
     }
 
     /**
      * Handle track functionality with proper error handling.
      *
-     * @param  mixed  $trackable
+     * @param mixed $trackable
      */
     public static function track(string $eventType, array $data = [], $trackable = null): self
     {
@@ -427,9 +434,9 @@ final class AnalyticsEvent extends Model
         $eventData = [
             'event_type' => $eventType,
             'session_id' => $sessionId,
-            'user_id' => auth()->id(),
-            'url' => $request?->fullUrl(),
-            'referrer' => $request?->headers->get('referer'),
+            'user_id'    => auth()->id(),
+            'url'        => $request?->fullUrl(),
+            'referrer'   => $request?->headers->get('referer'),
             'ip_address' => $request?->ip(),
             'user_agent' => $request?->userAgent(),
             'created_at' => now(),
