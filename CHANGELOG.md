@@ -9,6 +9,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ### Bug Fixes
 * Re-enabled flexible system setting translations by replacing the locale uniqueness constraint with an index, restoring soft delete support, and trimming the fillable contract so replication and counting scenarios match the documented API.
 * Preserved Attribute validation rule strings while still decoding JSON arrays, refreshed the Filament form so arrays render as comma-separated chips, and added regression coverage for both storage paths.
+* Normalized attribute group labels inside the Filament resource so legacy slugs fall back to readable headlines when translations are missing, keeping filters, columns, and forms from leaking raw keys in admin listings.
 * Reintroduced the `regions` schema with defensive guards and rebuilt the `customers`/`orders` relationship so SQLite-backed factories and analytics widgets can create location-aware records without missing column errors during tests.
 * Resolved localized product and category routing by honouring translated slugs during route model binding and updating storefront links so product detail pages load reliably from the home feed and other localized listings.
 * Restored the dashboard permission guard to default to open access when no abilities are configured and aligned inline sparkline widgets with Filament's nullable model contract, clearing the latest unit test regressions around navigation metadata and dataset checksums.
