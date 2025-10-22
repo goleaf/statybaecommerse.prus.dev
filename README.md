@@ -16,6 +16,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Multilingual experience** across storefront and admin via `spatie/laravel-translatable`, Volt-powered Livewire pages, and localized seed data.
 
 ### Latest updates
+- Localized search results now ship with a guided hero, contextual metrics, and improved empty states so catalog lookups (like Makita) surface faster insights and next steps.
 - Pest test helpers now guard the `login()`, `get()`, and `post()` helpers with existence checks, preventing redeclaration fatals during repeated `php artisan test` bootstrap cycles.
 - Order seeding now uses the expanded `orders.status` enum (`confirmed`, `completed`, and return-friendly values) so `php artisan migrate:fresh --seed` no longer trips MySQL truncation warnings when loading the demo store checkout history.
 - Hardened the `2025_02_15_120000_add_created_at_indexes` migration with case-insensitive index detection and information schema fallbacks, eliminating duplicate key errors during repeated deploys or fresh seeds.
