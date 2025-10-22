@@ -4,7 +4,27 @@ declare(strict_types=1);
 
 use App\Filament\Resources\DiscountRedemptionResource;
 use Filament\Forms\Form;
+use Filament\Support\Contracts\TranslatableContentDriver;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+
+function makeTestTable(): Table
+{
+    // Provide a minimal HasTable implementation so Filament can construct the table during the unit test.
+    $component = new class implements HasTable
+    {
+        use InteractsWithTable;
+
+        public function makeFilamentTranslatableContentDriver(): ?TranslatableContentDriver
+        {
+            // Return null because translation handling is irrelevant for these simple unit assertions.
+            return null;
+        }
+    };
+
+    return Table::make($component);
+}
 
 it('can create form', function (): void {
     $form = DiscountRedemptionResource::form(Form::make());
@@ -12,7 +32,7 @@ it('can create form', function (): void {
 });
 
 it('can create table', function (): void {
-    $table = DiscountRedemptionResource::table(Table::make());
+    $table = DiscountRedemptionResource::table(makeTestTable());
     expect($table)->toBeInstanceOf(Table::class);
 });
 

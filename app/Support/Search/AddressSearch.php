@@ -37,7 +37,9 @@ final class AddressSearch
         return self::cityQuery($term)
             ->limit($limit)
             ->pluck('name')
-            ->filter(fn (?string $name): bool => $name !== null && $name !== '')
+            // Keep only non-empty string values because upstream databases could surface
+            // nulls when a translation is missing or the record is incomplete.
+            ->filter(fn (mixed $name): bool => is_string($name) && $name !== '')
             ->unique()
             ->values()
             ->all();
@@ -128,7 +130,9 @@ final class AddressSearch
     {
         $search = trim($term);
 
-        return Address::query()
+        // Ignore user ownership scopes so administrative lookups can return the full set
+        // of address suggestions irrespective of the currently authenticated context.
+        return Address::query()->withoutGlobalScopes()
             ->select(['id', 'address_line_1', 'city', 'state', 'postal_code', 'country_code'])
             ->when($search !== '', function (Builder $builder) use ($search): void {
                 $builder->where(function (Builder $query) use ($search): void {

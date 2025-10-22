@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,7 +15,7 @@ return new class extends Migration
     {
         // Create brands table
         if (! Schema::hasTable('brands')) {
-            Schema::create('brands', function (Blueprint $table) {
+            Schema::create('brands', function (Blueprint $table): void {
                 $table->id();
                 $table->string('name');
                 $table->string('slug')->unique();
@@ -34,7 +36,7 @@ return new class extends Migration
 
         // Create categories table
         if (! Schema::hasTable('categories')) {
-            Schema::create('categories', function (Blueprint $table) {
+            Schema::create('categories', function (Blueprint $table): void {
                 $table->id();
                 $table->string('name');
                 $table->string('slug')->unique();
@@ -55,7 +57,7 @@ return new class extends Migration
 
         // Create products table
         if (! Schema::hasTable('products')) {
-            Schema::create('products', function (Blueprint $table) {
+            Schema::create('products', function (Blueprint $table): void {
                 $table->id();
                 $table->string('name');
                 $table->string('slug')->unique();
@@ -96,7 +98,7 @@ return new class extends Migration
 
         // Create product_categories pivot table
         if (! Schema::hasTable('product_categories')) {
-            Schema::create('product_categories', function (Blueprint $table) {
+            Schema::create('product_categories', function (Blueprint $table): void {
                 $table->id();
                 $table->unsignedBigInteger('product_id');
                 $table->unsignedBigInteger('category_id');
@@ -110,7 +112,7 @@ return new class extends Migration
 
         // Create collections table
         if (! Schema::hasTable('collections')) {
-            Schema::create('collections', function (Blueprint $table) {
+            Schema::create('collections', function (Blueprint $table): void {
                 $table->id();
                 $table->string('name');
                 $table->string('slug')->unique();
@@ -130,7 +132,7 @@ return new class extends Migration
 
         // Create product_collections pivot table
         if (! Schema::hasTable('product_collections')) {
-            Schema::create('product_collections', function (Blueprint $table) {
+            Schema::create('product_collections', function (Blueprint $table): void {
                 $table->id();
                 $table->unsignedBigInteger('product_id');
                 $table->unsignedBigInteger('collection_id');
@@ -144,7 +146,7 @@ return new class extends Migration
 
         // Create orders table
         if (! Schema::hasTable('orders')) {
-            Schema::create('orders', function (Blueprint $table) {
+            Schema::create('orders', function (Blueprint $table): void {
                 $table->id();
                 $table->string('number')->unique();
                 $table->unsignedBigInteger('user_id')->nullable();
@@ -173,7 +175,7 @@ return new class extends Migration
 
         // Create reviews table
         if (! Schema::hasTable('reviews')) {
-            Schema::create('reviews', function (Blueprint $table) {
+            Schema::create('reviews', function (Blueprint $table): void {
                 $table->id();
                 $table->unsignedBigInteger('product_id');
                 $table->unsignedBigInteger('user_id')->nullable();
@@ -199,7 +201,7 @@ return new class extends Migration
 
         // Create coupons table
         if (! Schema::hasTable('coupons')) {
-            Schema::create('coupons', function (Blueprint $table) {
+            Schema::create('coupons', function (Blueprint $table): void {
                 $table->id();
                 $table->string('code')->unique();
                 $table->string('name');
@@ -207,7 +209,11 @@ return new class extends Migration
                 $table->enum('type', ['percentage', 'fixed', 'free_shipping']);
                 $table->decimal('value', 10, 2);
                 $table->decimal('minimum_amount', 10, 2)->nullable();
+                // Store an optional hard cap for the calculated discount to avoid over-discounting orders.
+                $table->decimal('maximum_discount', 10, 2)->nullable();
                 $table->integer('usage_limit')->nullable();
+                // Track how many times a single authenticated shopper may redeem the coupon.
+                $table->integer('usage_limit_per_user')->nullable();
                 $table->integer('used_count')->default(0);
                 $table->boolean('is_active')->default(true);
                 $table->boolean('is_public')->default(false);
@@ -215,6 +221,9 @@ return new class extends Migration
                 $table->boolean('is_stackable')->default(false);
                 $table->timestamp('starts_at')->nullable();
                 $table->timestamp('expires_at')->nullable();
+                // Persist any product or category scoping that limits when the coupon should apply.
+                $table->json('applicable_products')->nullable();
+                $table->json('applicable_categories')->nullable();
                 $table->timestamps();
                 $table->softDeletes();
 
@@ -226,7 +235,7 @@ return new class extends Migration
 
         // Create cart_items table for session-based cart
         if (! Schema::hasTable('cart_items')) {
-            Schema::create('cart_items', function (Blueprint $table) {
+            Schema::create('cart_items', function (Blueprint $table): void {
                 $table->id();
                 $table->string('session_id');
                 $table->unsignedBigInteger('user_id')->nullable();
