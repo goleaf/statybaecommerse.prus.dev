@@ -7,6 +7,9 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\PublishedScope;
+use App\Models\Scopes\VisibleScope;
 use App\Models\UserWishlist;
 use App\Models\WishlistItem;
 use App\Services\Cart\CartService;
@@ -100,7 +103,11 @@ final class ApiController extends Controller
 
         $productId = (int) $request->integer('product_id');
 
-        if ($productId <= 0 || ! Product::query()->whereKey($productId)->exists()) {
+        if ($productId <= 0 || ! Product::query()
+            // Accept products regardless of storefront visibility but still respect soft-deletes.
+            ->withoutGlobalScopes([ActiveScope::class, PublishedScope::class, VisibleScope::class])
+            ->whereKey($productId)
+            ->exists()) {
             return response()->json(['error' => 'Product not found'], 404);
         }
 
@@ -145,8 +152,10 @@ final class ApiController extends Controller
         $orderedIds = array_values(array_unique(array_slice($recentlyViewed, 0, 10)));
 
         $products = Product::query()
+            // Surface even if drafts/hidden, but still exclude soft-deleted products.
+            ->withoutGlobalScopes([ActiveScope::class, PublishedScope::class, VisibleScope::class])
             ->whereIn('id', $orderedIds)
-            ->get(['id', 'name', 'slug', 'price'])
+            ->get(['id'])
             ->sortBy(static function (Product $product) use ($orderedIds): int {
                 // Preserve the original order from the session store to keep UX expectations intact.
                 $position = array_search($product->id, $orderedIds, true);
@@ -155,14 +164,11 @@ final class ApiController extends Controller
             })
             ->values()
             ->map(static function (Product $product): array {
-                // Mirror the normalized media payload returned from the search endpoint.
+                // The API contract intentionally exposes only the identifier so the
+                // consuming Alpine/Livewire components can fetch the full product
+                // payload lazily without duplicating cacheable data here.
                 return [
-                    'id'         => $product->id,
-                    'name'       => $product->name,
-                    'slug'       => $product->slug,
-                    'price'      => $product->price,
-                    'main_image' => $product->main_image,
-                    'thumbnail'  => $product->thumbnail,
+                    'id' => $product->id,
                 ];
             });
 
