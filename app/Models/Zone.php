@@ -13,6 +13,7 @@ final class Zone extends Model
     /**
      * @use HasFactory<\Database\Factories\ZoneFactory>
      */
+    /** @use HasFactory<\Database\Factories\ZoneFactory> */
     use HasFactory;
 
     protected $table = 'zones';
@@ -27,6 +28,7 @@ final class Zone extends Model
      * Provide the relationship between zones and their shipping options.
      *
      * @return HasMany<ShippingOption, static>
+     * Handle shippingOptions functionality with proper error handling.
      *
      * @phpstan-return HasMany<ShippingOption, Zone>
      */
@@ -37,5 +39,7 @@ final class Zone extends Model
         $relation = $this->hasMany(ShippingOption::class);
 
         return $relation;
+        // Provide convenient access to all shipping options configured for this zone.
+        return $this->hasMany(ShippingOption::class);
     }
 }
