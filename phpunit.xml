@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd"
          bootstrap="tests/bootstrap.php"
+         cacheDirectory=".phpunit.cache"
          colors="true"
          beStrictAboutTestsThatDoNotTestAnything="false"
-         beStrictAboutOutputDuringTests="false"
->
+         beStrictAboutOutputDuringTests="false">
     <extensions>
         <bootstrap class="Tests\\Diagnostics\\Coverage\\MinimumCoverageExtension">
             <parameter name="threshold" value="65"/>
@@ -34,13 +34,13 @@
         </include>
     </source>
     <php>
+        <ini name="auto_prepend_file" value="tests/phpunit-autoload.php"/>
         <ini name="memory_limit" value="512M"/>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_STORE" value="array"/>
         <env name="DB_CONNECTION" value="sqlite"/>
-        <env name="DB_DATABASE" value="database/database.sqlite"/>
         <!-- Persist test data in a dedicated SQLite file so schema refreshes remain available across connections. -->
         <env name="DB_DATABASE" value="database/testing.sqlite"/>
         <env name="MAIL_MAILER" value="array"/>

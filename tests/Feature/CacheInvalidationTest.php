@@ -16,10 +16,9 @@ use App\Services\Shared\ProductService;
 use App\Support\Cache\CacheKeys;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * @covers \App\Services\CacheInvalidationService
- */
+#[CoversClass(CacheInvalidationService::class)]
 final class CacheInvalidationTest extends TestCase
 {
     use RefreshDatabase;
@@ -60,7 +59,7 @@ final class CacheInvalidationTest extends TestCase
     public function test_product_update_flushes_featured_product_cache(): void
     {
         $product = Product::factory()->published()->featured()->create([
-            'name' => 'Original Product',
+            'name'       => 'Original Product',
             'is_visible' => true,
         ]);
 
@@ -79,7 +78,7 @@ final class CacheInvalidationTest extends TestCase
     public function test_category_navigation_cache_is_refreshed_on_update(): void
     {
         $category = Category::factory()->create([
-            'name' => 'Original Category',
+            'name'       => 'Original Category',
             'is_visible' => true,
         ]);
 
@@ -97,8 +96,8 @@ final class CacheInvalidationTest extends TestCase
     public function test_brand_cache_updates_after_edit(): void
     {
         $brand = Brand::factory()->create([
-            'name' => 'Original Brand',
-            'is_visible' => true,
+            'name'        => 'Original Brand',
+            'is_visible'  => true,
             'is_featured' => true,
         ]);
 

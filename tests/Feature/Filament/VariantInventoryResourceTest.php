@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\VariantInventory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
@@ -38,7 +39,7 @@ final class VariantInventoryResourceTest extends TestCase
 
         // Create admin user
         $this->adminUser = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
 
@@ -50,11 +51,11 @@ final class VariantInventoryResourceTest extends TestCase
         $this->location = Location::factory()->create();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_list_variant_inventories(): void
     {
         VariantInventory::factory()->count(3)->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
         ]);
 
@@ -64,50 +65,50 @@ final class VariantInventoryResourceTest extends TestCase
             ->assertCanSeeTableRecords(VariantInventory::all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_create_variant_inventory(): void
     {
         $this->actingAs($this->adminUser);
 
         Livewire::test(VariantInventoryResource\Pages\CreateVariantInventory::class)
             ->fillForm([
-                'variant_id' => $this->variant->id,
-                'location_id' => $this->location->id,
+                'variant_id'     => $this->variant->id,
+                'location_id'    => $this->location->id,
                 'warehouse_code' => 'WH001',
-                'stock' => 100,
-                'reserved' => 10,
-                'available' => 90,
-                'threshold' => 20,
-                'reorder_point' => 15,
-                'cost_per_unit' => 25.50,
-                'is_tracked' => true,
-                'status' => 'active',
+                'stock'          => 100,
+                'reserved'       => 10,
+                'available'      => 90,
+                'threshold'      => 20,
+                'reorder_point'  => 15,
+                'cost_per_unit'  => 25.50,
+                'is_tracked'     => true,
+                'status'         => 'active',
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('variant_inventories', [
-            'variant_id' => $this->variant->id,
-            'location_id' => $this->location->id,
+            'variant_id'     => $this->variant->id,
+            'location_id'    => $this->location->id,
             'warehouse_code' => 'WH001',
-            'stock' => 100,
-            'reserved' => 10,
-            'available' => 90,
-            'threshold' => 20,
-            'reorder_point' => 15,
-            'cost_per_unit' => 25.50,
-            'is_tracked' => true,
-            'status' => 'active',
+            'stock'          => 100,
+            'reserved'       => 10,
+            'available'      => 90,
+            'threshold'      => 20,
+            'reorder_point'  => 15,
+            'cost_per_unit'  => 25.50,
+            'is_tracked'     => true,
+            'status'         => 'active',
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_edit_variant_inventory(): void
     {
         $inventory = VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
-            'stock' => 50,
+            'stock'       => 50,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -116,24 +117,24 @@ final class VariantInventoryResourceTest extends TestCase
             'record' => $inventory->getRouteKey(),
         ])
             ->fillForm([
-                'stock' => 75,
+                'stock'     => 75,
                 'threshold' => 25,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('variant_inventories', [
-            'id' => $inventory->id,
-            'stock' => 75,
+            'id'        => $inventory->id,
+            'stock'     => 75,
             'threshold' => 25,
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_view_variant_inventory(): void
     {
         $inventory = VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
         ]);
 
@@ -145,73 +146,73 @@ final class VariantInventoryResourceTest extends TestCase
             ->assertOk();
     }
 
-    /** @test */
+    #[Test]
     public function it_validates_required_fields(): void
     {
         $this->actingAs($this->adminUser);
 
         Livewire::test(VariantInventoryResource\Pages\CreateVariantInventory::class)
             ->fillForm([
-                'variant_id' => null,
+                'variant_id'  => null,
                 'location_id' => null,
             ])
             ->call('create')
             ->assertHasFormErrors([
-                'variant_id' => 'required',
+                'variant_id'  => 'required',
                 'location_id' => 'required',
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_validates_numeric_fields(): void
     {
         $this->actingAs($this->adminUser);
 
         Livewire::test(VariantInventoryResource\Pages\CreateVariantInventory::class)
             ->fillForm([
-                'variant_id' => $this->variant->id,
-                'location_id' => $this->location->id,
-                'stock' => 'invalid',
+                'variant_id'    => $this->variant->id,
+                'location_id'   => $this->location->id,
+                'stock'         => 'invalid',
                 'cost_per_unit' => 'invalid',
             ])
             ->call('create')
             ->assertHasFormErrors([
-                'stock' => 'numeric',
+                'stock'         => 'numeric',
                 'cost_per_unit' => 'numeric',
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_validates_minimum_values(): void
     {
         $this->actingAs($this->adminUser);
 
         Livewire::test(VariantInventoryResource\Pages\CreateVariantInventory::class)
             ->fillForm([
-                'variant_id' => $this->variant->id,
+                'variant_id'  => $this->variant->id,
                 'location_id' => $this->location->id,
-                'stock' => -1,
-                'threshold' => -1,
+                'stock'       => -1,
+                'threshold'   => -1,
             ])
             ->call('create')
             ->assertHasFormErrors([
-                'stock' => 'min',
+                'stock'     => 'min',
                 'threshold' => 'min',
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_filter_by_variant(): void
     {
         $variant2 = ProductVariant::factory()->create(['product_id' => $this->product->id]);
 
         VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
         ]);
 
         VariantInventory::factory()->create([
-            'variant_id' => $variant2->id,
+            'variant_id'  => $variant2->id,
             'location_id' => $this->location->id,
         ]);
 
@@ -227,18 +228,18 @@ final class VariantInventoryResourceTest extends TestCase
             );
     }
 
-    /** @test */
+    #[Test]
     public function it_can_filter_by_location(): void
     {
         $location2 = Location::factory()->create();
 
         VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
         ]);
 
         VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $location2->id,
         ]);
 
@@ -254,19 +255,19 @@ final class VariantInventoryResourceTest extends TestCase
             );
     }
 
-    /** @test */
+    #[Test]
     public function it_can_filter_by_status(): void
     {
         VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
-            'status' => 'active',
+            'status'      => 'active',
         ]);
 
         VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
-            'status' => 'inactive',
+            'status'      => 'inactive',
         ]);
 
         $this->actingAs($this->adminUser);
@@ -281,22 +282,22 @@ final class VariantInventoryResourceTest extends TestCase
             );
     }
 
-    /** @test */
+    #[Test]
     public function it_can_filter_low_stock_items(): void
     {
         // Low stock item
         VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
-            'location_id' => $this->location->id,
-            'available' => 5,
+            'variant_id'    => $this->variant->id,
+            'location_id'   => $this->location->id,
+            'available'     => 5,
             'reorder_point' => 10,
         ]);
 
         // Normal stock item
         VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
-            'location_id' => $this->location->id,
-            'available' => 50,
+            'variant_id'    => $this->variant->id,
+            'location_id'   => $this->location->id,
+            'available'     => 50,
             'reorder_point' => 10,
         ]);
 
@@ -309,21 +310,21 @@ final class VariantInventoryResourceTest extends TestCase
             );
     }
 
-    /** @test */
+    #[Test]
     public function it_can_filter_out_of_stock_items(): void
     {
         // Out of stock item
         VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
-            'available' => 0,
+            'available'   => 0,
         ]);
 
         // In stock item
         VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
-            'available' => 50,
+            'available'   => 50,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -335,24 +336,24 @@ final class VariantInventoryResourceTest extends TestCase
             );
     }
 
-    /** @test */
+    #[Test]
     public function it_can_adjust_stock(): void
     {
         $inventory = VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
-            'stock' => 100,
-            'available' => 90,
-            'reserved' => 10,
+            'stock'       => 100,
+            'available'   => 90,
+            'reserved'    => 10,
         ]);
 
         $this->actingAs($this->adminUser);
 
         Livewire::test(VariantInventoryResource\Pages\ListVariantInventories::class)
             ->callTableAction('adjust_stock', $inventory, [
-                'quantity' => 20,
+                'quantity'        => 20,
                 'adjustment_type' => 'add',
-                'reason' => 'Stock replenishment',
+                'reason'          => 'Stock replenishment',
             ])
             ->assertNotified('Stock adjusted successfully');
 
@@ -361,15 +362,15 @@ final class VariantInventoryResourceTest extends TestCase
         $this->assertEquals(110, $inventory->available);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_reserve_stock(): void
     {
         $inventory = VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
-            'stock' => 100,
-            'available' => 100,
-            'reserved' => 0,
+            'stock'       => 100,
+            'available'   => 100,
+            'reserved'    => 0,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -377,7 +378,7 @@ final class VariantInventoryResourceTest extends TestCase
         Livewire::test(VariantInventoryResource\Pages\ListVariantInventories::class)
             ->callTableAction('reserve_stock', $inventory, [
                 'quantity' => 25,
-                'reason' => 'Customer order',
+                'reason'   => 'Customer order',
             ])
             ->assertNotified('Stock reserved successfully');
 
@@ -386,15 +387,15 @@ final class VariantInventoryResourceTest extends TestCase
         $this->assertEquals(75, $inventory->available);
     }
 
-    /** @test */
+    #[Test]
     public function it_prevents_reserving_insufficient_stock(): void
     {
         $inventory = VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
-            'stock' => 100,
-            'available' => 10,
-            'reserved' => 90,
+            'stock'       => 100,
+            'available'   => 10,
+            'reserved'    => 90,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -402,27 +403,27 @@ final class VariantInventoryResourceTest extends TestCase
         Livewire::test(VariantInventoryResource\Pages\ListVariantInventories::class)
             ->callTableAction('reserve_stock', $inventory, [
                 'quantity' => 25,
-                'reason' => 'Customer order',
+                'reason'   => 'Customer order',
             ])
             ->assertNotified('Insufficient stock');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_perform_bulk_stock_adjustment(): void
     {
         $inventories = VariantInventory::factory()->count(3)->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
-            'stock' => 50,
+            'stock'       => 50,
         ]);
 
         $this->actingAs($this->adminUser);
 
         Livewire::test(VariantInventoryResource\Pages\ListVariantInventories::class)
             ->callTableBulkAction('bulk_adjust_stock', $inventories, [
-                'quantity' => 10,
+                'quantity'        => 10,
                 'adjustment_type' => 'add',
-                'reason' => 'Bulk restock',
+                'reason'          => 'Bulk restock',
             ])
             ->assertNotified('Successfully adjusted stock for 3 records');
 
@@ -432,13 +433,13 @@ final class VariantInventoryResourceTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_can_perform_bulk_status_update(): void
     {
         $inventories = VariantInventory::factory()->count(3)->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
-            'status' => 'active',
+            'status'      => 'active',
         ]);
 
         $this->actingAs($this->adminUser);
@@ -455,18 +456,18 @@ final class VariantInventoryResourceTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_can_group_by_variant(): void
     {
         $variant2 = ProductVariant::factory()->create(['product_id' => $this->product->id]);
 
         VariantInventory::factory()->count(2)->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
         ]);
 
         VariantInventory::factory()->create([
-            'variant_id' => $variant2->id,
+            'variant_id'  => $variant2->id,
             'location_id' => $this->location->id,
         ]);
 
@@ -479,18 +480,18 @@ final class VariantInventoryResourceTest extends TestCase
             );
     }
 
-    /** @test */
+    #[Test]
     public function it_can_group_by_location(): void
     {
         $location2 = Location::factory()->create();
 
         VariantInventory::factory()->count(2)->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
         ]);
 
         VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $location2->id,
         ]);
 
@@ -503,19 +504,19 @@ final class VariantInventoryResourceTest extends TestCase
             );
     }
 
-    /** @test */
+    #[Test]
     public function it_can_group_by_status(): void
     {
         VariantInventory::factory()->count(2)->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
-            'status' => 'active',
+            'status'      => 'active',
         ]);
 
         VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
-            'status' => 'inactive',
+            'status'      => 'inactive',
         ]);
 
         $this->actingAs($this->adminUser);
@@ -527,13 +528,13 @@ final class VariantInventoryResourceTest extends TestCase
             );
     }
 
-    /** @test */
+    #[Test]
     public function it_shows_calculated_fields_in_form(): void
     {
         $inventory = VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
-            'location_id' => $this->location->id,
-            'available' => 5,
+            'variant_id'    => $this->variant->id,
+            'location_id'   => $this->location->id,
+            'available'     => 5,
             'reorder_point' => 10,
         ]);
 
@@ -543,35 +544,35 @@ final class VariantInventoryResourceTest extends TestCase
             'record' => $inventory->getRouteKey(),
         ])
             ->assertFormSet([
-                'is_low_stock' => true,
+                'is_low_stock'    => true,
                 'is_out_of_stock' => false,
-                'stock_status' => 'low_stock',
+                'stock_status'    => 'low_stock',
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_displays_stock_status_colors_correctly(): void
     {
         // Low stock
         $lowStockInventory = VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
-            'location_id' => $this->location->id,
-            'available' => 5,
+            'variant_id'    => $this->variant->id,
+            'location_id'   => $this->location->id,
+            'available'     => 5,
             'reorder_point' => 10,
         ]);
 
         // Out of stock
         $outOfStockInventory = VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
-            'available' => 0,
+            'available'   => 0,
         ]);
 
         // In stock
         $inStockInventory = VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
-            'location_id' => $this->location->id,
-            'available' => 50,
+            'variant_id'    => $this->variant->id,
+            'location_id'   => $this->location->id,
+            'available'     => 50,
             'reorder_point' => 10,
         ]);
 
@@ -585,11 +586,11 @@ final class VariantInventoryResourceTest extends TestCase
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_delete_variant_inventory(): void
     {
         $inventory = VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
         ]);
 
@@ -604,11 +605,11 @@ final class VariantInventoryResourceTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_bulk_delete_variant_inventories(): void
     {
         $inventories = VariantInventory::factory()->count(3)->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
         ]);
 
@@ -625,11 +626,11 @@ final class VariantInventoryResourceTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_can_export_inventory(): void
     {
         VariantInventory::factory()->count(5)->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
         ]);
 
@@ -640,11 +641,11 @@ final class VariantInventoryResourceTest extends TestCase
             ->assertNotified('Exported successfully');
     }
 
-    /** @test */
+    #[Test]
     public function it_requires_admin_permissions(): void
     {
         $regularUser = User::factory()->create([
-            'email' => 'user@example.com',
+            'email'    => 'user@example.com',
             'is_admin' => false,
         ]);
 
@@ -655,11 +656,11 @@ final class VariantInventoryResourceTest extends TestCase
             ->assertStatus(403);
     }
 
-    /** @test */
+    #[Test]
     public function it_displays_relationships_correctly(): void
     {
         $inventory = VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
         ]);
 
@@ -671,7 +672,7 @@ final class VariantInventoryResourceTest extends TestCase
             ->assertCanSeeTableColumn('location.name');
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_foreign_key_constraints(): void
     {
         $this->actingAs($this->adminUser);
@@ -679,7 +680,7 @@ final class VariantInventoryResourceTest extends TestCase
         // Try to create inventory with non-existent variant
         Livewire::test(VariantInventoryResource\Pages\CreateVariantInventory::class)
             ->fillForm([
-                'variant_id' => 99999,
+                'variant_id'  => 99999,
                 'location_id' => $this->location->id,
             ])
             ->call('create')
@@ -688,7 +689,7 @@ final class VariantInventoryResourceTest extends TestCase
         // Try to create inventory with non-existent location
         Livewire::test(VariantInventoryResource\Pages\CreateVariantInventory::class)
             ->fillForm([
-                'variant_id' => $this->variant->id,
+                'variant_id'  => $this->variant->id,
                 'location_id' => 99999,
             ])
             ->call('create')

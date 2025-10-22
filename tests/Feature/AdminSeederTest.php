@@ -15,6 +15,7 @@ use App\Models\ProductVariant;
 use App\Models\User;
 use Database\Seeders\AdminSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
@@ -32,24 +33,20 @@ final class AdminSeederTest extends TestCase
         parent::setUp();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_run_admin_seeder_successfully(): void
     {
         $this->seed(AdminSeeder::class);
 
         // Verify admin user was created
         $this->assertDatabaseHas('users', [
-            'email' => 'admin@example.com',
-            'is_admin' => true,
+            'email'     => 'admin@example.com',
+            'is_admin'  => true,
             'is_active' => true,
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_creates_countries_correctly(): void
     {
         $this->seed(AdminSeeder::class);
@@ -57,27 +54,25 @@ final class AdminSeederTest extends TestCase
         $this->assertDatabaseCount('countries', 3);
 
         $this->assertDatabaseHas('countries', [
-            'name' => 'Lithuania',
-            'cca2' => 'LT',
+            'name'          => 'Lithuania',
+            'cca2'          => 'LT',
             'currency_code' => 'EUR',
         ]);
 
         $this->assertDatabaseHas('countries', [
-            'name' => 'Latvia',
-            'cca2' => 'LV',
+            'name'          => 'Latvia',
+            'cca2'          => 'LV',
             'currency_code' => 'EUR',
         ]);
 
         $this->assertDatabaseHas('countries', [
-            'name' => 'Estonia',
-            'cca2' => 'EE',
+            'name'          => 'Estonia',
+            'cca2'          => 'EE',
             'currency_code' => 'EUR',
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_creates_zones_correctly(): void
     {
         $this->seed(AdminSeeder::class);
@@ -100,9 +95,7 @@ final class AdminSeederTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_creates_cities_correctly(): void
     {
         $this->seed(AdminSeeder::class);
@@ -110,27 +103,25 @@ final class AdminSeederTest extends TestCase
         $this->assertDatabaseCount('cities', 3);
 
         $this->assertDatabaseHas('cities', [
-            'name' => 'Vilnius',
-            'is_active' => true,
+            'name'       => 'Vilnius',
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
 
         $this->assertDatabaseHas('cities', [
-            'name' => 'Riga',
-            'is_active' => true,
+            'name'       => 'Riga',
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
 
         $this->assertDatabaseHas('cities', [
-            'name' => 'Tallinn',
-            'is_active' => true,
+            'name'       => 'Tallinn',
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_creates_currencies_correctly(): void
     {
         $this->seed(AdminSeeder::class);
@@ -138,30 +129,28 @@ final class AdminSeederTest extends TestCase
         $this->assertDatabaseCount('currencies', 3);
 
         $this->assertDatabaseHas('currencies', [
-            'name' => '{"lt":"Euro","en":"Euro"}',
-            'code' => 'EUR',
-            'symbol' => '€',
+            'name'       => '{"lt":"Euro","en":"Euro"}',
+            'code'       => 'EUR',
+            'symbol'     => '€',
             'is_default' => true,
         ]);
 
         $this->assertDatabaseHas('currencies', [
-            'name' => '{"lt":"US Dollar","en":"US Dollar"}',
-            'code' => 'USD',
-            'symbol' => '$',
+            'name'       => '{"lt":"US Dollar","en":"US Dollar"}',
+            'code'       => 'USD',
+            'symbol'     => '$',
             'is_default' => false,
         ]);
 
         $this->assertDatabaseHas('currencies', [
-            'name' => '{"lt":"British Pound","en":"British Pound"}',
-            'code' => 'GBP',
-            'symbol' => '£',
+            'name'       => '{"lt":"British Pound","en":"British Pound"}',
+            'code'       => 'GBP',
+            'symbol'     => '£',
             'is_default' => false,
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_creates_customer_groups_correctly(): void
     {
         $this->seed(AdminSeeder::class);
@@ -169,33 +158,31 @@ final class AdminSeederTest extends TestCase
         $this->assertDatabaseCount('customer_groups', 4);
 
         $this->assertDatabaseHas('customer_groups', [
-            'name' => '{"lt":"VIP Customers","en":"VIP Customers"}',
-            'code' => 'VIP',
+            'name'                => '{"lt":"VIP Customers","en":"VIP Customers"}',
+            'code'                => 'VIP',
             'discount_percentage' => 15.0,
         ]);
 
         $this->assertDatabaseHas('customer_groups', [
-            'name' => '{"lt":"Regular Customers","en":"Regular Customers"}',
-            'code' => 'REGULAR',
+            'name'                => '{"lt":"Regular Customers","en":"Regular Customers"}',
+            'code'                => 'REGULAR',
             'discount_percentage' => 5.0,
         ]);
 
         $this->assertDatabaseHas('customer_groups', [
-            'name' => '{"lt":"New Customers","en":"New Customers"}',
-            'code' => 'NEW',
+            'name'                => '{"lt":"New Customers","en":"New Customers"}',
+            'code'                => 'NEW',
             'discount_percentage' => 10.0,
         ]);
 
         $this->assertDatabaseHas('customer_groups', [
-            'name' => '{"lt":"Wholesale","en":"Wholesale"}',
-            'code' => 'WHOLESALE',
+            'name'                => '{"lt":"Wholesale","en":"Wholesale"}',
+            'code'                => 'WHOLESALE',
             'discount_percentage' => 20.0,
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_creates_categories_correctly(): void
     {
         $this->seed(AdminSeeder::class);
@@ -228,9 +215,7 @@ final class AdminSeederTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_creates_products_correctly(): void
     {
         $this->seed(AdminSeeder::class);
@@ -238,44 +223,42 @@ final class AdminSeederTest extends TestCase
         $this->assertDatabaseCount('products', 5);
 
         $this->assertDatabaseHas('products', [
-            'name' => 'Smartphone Pro',
-            'sku' => 'SP-001',
+            'name'       => 'Smartphone Pro',
+            'sku'        => 'SP-001',
             'is_visible' => true,
-            'status' => 'published',
+            'status'     => 'published',
         ]);
 
         $this->assertDatabaseHas('products', [
-            'name' => 'Wireless Headphones',
-            'sku' => 'WH-002',
+            'name'       => 'Wireless Headphones',
+            'sku'        => 'WH-002',
             'is_visible' => true,
-            'status' => 'published',
+            'status'     => 'published',
         ]);
 
         $this->assertDatabaseHas('products', [
-            'name' => 'Cotton T-Shirt',
-            'sku' => 'CT-003',
+            'name'       => 'Cotton T-Shirt',
+            'sku'        => 'CT-003',
             'is_visible' => true,
-            'status' => 'published',
+            'status'     => 'published',
         ]);
 
         $this->assertDatabaseHas('products', [
-            'name' => 'Garden Tools Set',
-            'sku' => 'GT-004',
+            'name'       => 'Garden Tools Set',
+            'sku'        => 'GT-004',
             'is_visible' => true,
-            'status' => 'published',
+            'status'     => 'published',
         ]);
 
         $this->assertDatabaseHas('products', [
-            'name' => 'Yoga Mat',
-            'sku' => 'YM-005',
+            'name'       => 'Yoga Mat',
+            'sku'        => 'YM-005',
             'is_visible' => true,
-            'status' => 'published',
+            'status'     => 'published',
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_creates_product_variants_correctly(): void
     {
         $this->seed(AdminSeeder::class);
@@ -292,9 +275,7 @@ final class AdminSeederTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_creates_stock_records_correctly(): void
     {
         $this->seed(AdminSeeder::class);
@@ -309,9 +290,7 @@ final class AdminSeederTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_creates_addresses_correctly(): void
     {
         $this->seed(AdminSeeder::class);
@@ -319,29 +298,27 @@ final class AdminSeederTest extends TestCase
         $this->assertDatabaseCount('addresses', 2);
 
         $this->assertDatabaseHas('addresses', [
-            'first_name' => 'Admin',
-            'last_name' => 'User',
-            'city' => 'Vilnius',
+            'first_name'   => 'Admin',
+            'last_name'    => 'User',
+            'city'         => 'Vilnius',
             'country_code' => 'LT',
-            'is_default' => true,
-            'is_active' => true,
-            'is_shipping' => true,
+            'is_default'   => true,
+            'is_active'    => true,
+            'is_shipping'  => true,
         ]);
 
         $this->assertDatabaseHas('addresses', [
-            'first_name' => 'Admin',
-            'last_name' => 'User',
-            'city' => 'Vilnius',
+            'first_name'   => 'Admin',
+            'last_name'    => 'User',
+            'city'         => 'Vilnius',
             'country_code' => 'LT',
-            'is_default' => false,
-            'is_active' => true,
-            'is_billing' => true,
+            'is_default'   => false,
+            'is_active'    => true,
+            'is_billing'   => true,
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_creates_orders_correctly(): void
     {
         $this->seed(AdminSeeder::class);
@@ -349,34 +326,32 @@ final class AdminSeederTest extends TestCase
         $this->assertDatabaseCount('orders', 5);
 
         $this->assertDatabaseHas('orders', [
-            'number' => 'ORD-000001',
+            'number'   => 'ORD-000001',
             'currency' => 'EUR',
         ]);
 
         $this->assertDatabaseHas('orders', [
-            'number' => 'ORD-000002',
+            'number'   => 'ORD-000002',
             'currency' => 'EUR',
         ]);
 
         $this->assertDatabaseHas('orders', [
-            'number' => 'ORD-000003',
+            'number'   => 'ORD-000003',
             'currency' => 'EUR',
         ]);
 
         $this->assertDatabaseHas('orders', [
-            'number' => 'ORD-000004',
+            'number'   => 'ORD-000004',
             'currency' => 'EUR',
         ]);
 
         $this->assertDatabaseHas('orders', [
-            'number' => 'ORD-000005',
+            'number'   => 'ORD-000005',
             'currency' => 'EUR',
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_creates_order_items_correctly(): void
     {
         $this->seed(AdminSeeder::class);
@@ -396,9 +371,7 @@ final class AdminSeederTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_creates_order_shipping_correctly(): void
     {
         $this->seed(AdminSeeder::class);
@@ -415,9 +388,7 @@ final class AdminSeederTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_creates_documents_correctly(): void
     {
         $this->markTestSkipped('Documents creation is temporarily disabled in the seeder');
@@ -435,9 +406,7 @@ final class AdminSeederTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_creates_discount_codes_correctly(): void
     {
         $this->markTestSkipped('Discount codes creation is temporarily disabled in the seeder');
@@ -447,27 +416,25 @@ final class AdminSeederTest extends TestCase
         $this->assertDatabaseCount('discount_codes', 3);
 
         $this->assertDatabaseHas('discount_codes', [
-            'code' => 'WELCOME10',
+            'code'                => 'WELCOME10',
             'discount_percentage' => 10.0,
-            'is_active' => true,
+            'is_active'           => true,
         ]);
 
         $this->assertDatabaseHas('discount_codes', [
-            'code' => 'SAVE20',
+            'code'                => 'SAVE20',
             'discount_percentage' => 20.0,
-            'is_active' => true,
+            'is_active'           => true,
         ]);
 
         $this->assertDatabaseHas('discount_codes', [
-            'code' => 'FREESHIP',
+            'code'                => 'FREESHIP',
             'discount_percentage' => 0.0,
-            'is_active' => true,
+            'is_active'           => true,
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_creates_sliders_correctly(): void
     {
         $this->seed(AdminSeeder::class);
@@ -475,27 +442,25 @@ final class AdminSeederTest extends TestCase
         $this->assertDatabaseCount('sliders', 3);
 
         $this->assertDatabaseHas('sliders', [
-            'title' => 'Welcome to Our Store',
-            'is_active' => true,
+            'title'      => 'Welcome to Our Store',
+            'is_active'  => true,
             'sort_order' => 1,
         ]);
 
         $this->assertDatabaseHas('sliders', [
-            'title' => 'New Arrivals',
-            'is_active' => true,
+            'title'      => 'New Arrivals',
+            'is_active'  => true,
             'sort_order' => 2,
         ]);
 
         $this->assertDatabaseHas('sliders', [
-            'title' => 'Special Offers',
-            'is_active' => true,
+            'title'      => 'Special Offers',
+            'is_active'  => true,
             'sort_order' => 3,
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_creates_recommendation_blocks_correctly(): void
     {
         $this->seed(AdminSeeder::class);
@@ -503,27 +468,25 @@ final class AdminSeederTest extends TestCase
         $this->assertDatabaseCount('recommendation_blocks', 3);
 
         $this->assertDatabaseHas('recommendation_blocks', [
-            'title' => 'Featured Products',
-            'name' => 'featured',
+            'title'     => 'Featured Products',
+            'name'      => 'featured',
             'is_active' => true,
         ]);
 
         $this->assertDatabaseHas('recommendation_blocks', [
-            'title' => 'Best Sellers',
-            'name' => 'bestsellers',
+            'title'     => 'Best Sellers',
+            'name'      => 'bestsellers',
             'is_active' => true,
         ]);
 
         $this->assertDatabaseHas('recommendation_blocks', [
-            'title' => 'New Arrivals',
-            'name' => 'new_arrivals',
+            'title'     => 'New Arrivals',
+            'name'      => 'new_arrivals',
             'is_active' => true,
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_creates_seo_data_correctly(): void
     {
         $this->seed(AdminSeeder::class);
@@ -532,22 +495,20 @@ final class AdminSeederTest extends TestCase
 
         $this->assertDatabaseHas('seo_data', [
             'seoable_type' => 'App\Models\Page',
-            'seoable_id' => 1,
-            'locale' => 'en',
-            'title' => 'Home - Your Store',
+            'seoable_id'   => 1,
+            'locale'       => 'en',
+            'title'        => 'Home - Your Store',
         ]);
 
         $this->assertDatabaseHas('seo_data', [
             'seoable_type' => 'App\Models\Page',
-            'seoable_id' => 2,
-            'locale' => 'en',
-            'title' => 'Products - Your Store',
+            'seoable_id'   => 2,
+            'locale'       => 'en',
+            'title'        => 'Products - Your Store',
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_creates_subscribers_correctly(): void
     {
         $this->seed(AdminSeeder::class);
@@ -555,34 +516,32 @@ final class AdminSeederTest extends TestCase
         $this->assertDatabaseCount('subscribers', 5);
 
         $this->assertDatabaseHas('subscribers', [
-            'email' => 'subscriber1@example.com',
+            'email'  => 'subscriber1@example.com',
             'status' => 'active',
         ]);
 
         $this->assertDatabaseHas('subscribers', [
-            'email' => 'subscriber2@example.com',
+            'email'  => 'subscriber2@example.com',
             'status' => 'active',
         ]);
 
         $this->assertDatabaseHas('subscribers', [
-            'email' => 'subscriber3@example.com',
+            'email'  => 'subscriber3@example.com',
             'status' => 'active',
         ]);
 
         $this->assertDatabaseHas('subscribers', [
-            'email' => 'subscriber4@example.com',
+            'email'  => 'subscriber4@example.com',
             'status' => 'active',
         ]);
 
         $this->assertDatabaseHas('subscribers', [
-            'email' => 'subscriber5@example.com',
+            'email'  => 'subscriber5@example.com',
             'status' => 'active',
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_creates_referral_rewards_correctly(): void
     {
         $this->markTestSkipped('Referral rewards creation is temporarily disabled in the seeder');
@@ -592,15 +551,13 @@ final class AdminSeederTest extends TestCase
         $this->assertDatabaseCount('referral_rewards', 1);
 
         $this->assertDatabaseHas('referral_rewards', [
-            'reward_type' => 'discount',
+            'reward_type'  => 'discount',
             'reward_value' => 15.0,
-            'is_active' => true,
+            'is_active'    => true,
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_creates_product_histories_correctly(): void
     {
         $this->seed(AdminSeeder::class);
@@ -617,9 +574,7 @@ final class AdminSeederTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_creates_locations_correctly(): void
     {
         $this->seed(AdminSeeder::class);
@@ -627,21 +582,19 @@ final class AdminSeederTest extends TestCase
         $this->assertDatabaseCount('locations', 2);
 
         $this->assertDatabaseHas('locations', [
-            'name' => 'Main Warehouse',
-            'type' => 'warehouse',
+            'name'       => 'Main Warehouse',
+            'type'       => 'warehouse',
             'is_enabled' => true,
         ]);
 
         $this->assertDatabaseHas('locations', [
-            'name' => 'Store Location',
-            'type' => 'store',
+            'name'       => 'Store Location',
+            'type'       => 'store',
             'is_enabled' => true,
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_creates_product_category_relationships(): void
     {
         $this->seed(AdminSeeder::class);
@@ -654,9 +607,7 @@ final class AdminSeederTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_creates_user_address_relationships(): void
     {
         $this->seed(AdminSeeder::class);
@@ -674,9 +625,7 @@ final class AdminSeederTest extends TestCase
         $this->assertNotNull($billingAddress);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_creates_order_user_relationships(): void
     {
         $this->seed(AdminSeeder::class);
@@ -692,9 +641,7 @@ final class AdminSeederTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_creates_order_item_relationships(): void
     {
         $this->seed(AdminSeeder::class);
@@ -712,9 +659,7 @@ final class AdminSeederTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_handles_duplicate_seeding_gracefully(): void
     {
         // Run seeder twice to test idempotency
@@ -735,9 +680,7 @@ final class AdminSeederTest extends TestCase
         $this->assertDatabaseCount('subscribers', 5);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_creates_all_required_data_for_admin_panel(): void
     {
         $this->seed(AdminSeeder::class);

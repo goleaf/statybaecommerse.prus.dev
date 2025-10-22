@@ -13,6 +13,7 @@ use Filament\Actions\CreateAction;
 use Filament\Actions\Testing\TestAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
@@ -32,31 +33,27 @@ final class OrderShippingRelationManagerTest extends TestCase
         $this->order = Order::factory()->create(['user_id' => $this->user->id]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_render_order_shipping_relation_manager(): void
     {
         $this->actingAs($this->user);
 
         $component = Livewire::test(OrderShippingRelationManager::class, [
             'ownerRecord' => $this->order,
-            'pageClass' => EditOrder::class,
+            'pageClass'   => EditOrder::class,
         ]);
 
         $component->assertSuccessful();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_create_order_shipping(): void
     {
         $this->actingAs($this->user);
 
         $component = Livewire::test(OrderShippingRelationManager::class, [
             'ownerRecord' => $this->order,
-            'pageClass' => EditOrder::class,
+            'pageClass'   => EditOrder::class,
         ]);
 
         $component
@@ -65,38 +62,36 @@ final class OrderShippingRelationManagerTest extends TestCase
                 [
                     'shipping_method' => 'express',
                     'tracking_number' => 'TRK123456789',
-                    'carrier' => 'DHL',
-                    'service_type' => 'Express',
-                    'base_cost' => 15.0,
-                    'insurance_cost' => 5.0,
-                    'total_cost' => 20.0,
+                    'carrier'         => 'DHL',
+                    'service_type'    => 'Express',
+                    'base_cost'       => 15.0,
+                    'insurance_cost'  => 5.0,
+                    'total_cost'      => 20.0,
                 ]
             )
             ->assertNotified();
 
         $this->assertDatabaseHas('order_shippings', [
-            'order_id' => $this->order->id,
+            'order_id'        => $this->order->id,
             'shipping_method' => 'express',
             'tracking_number' => 'TRK123456789',
-            'carrier' => 'DHL',
+            'carrier'         => 'DHL',
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_mark_shipping_as_shipped(): void
     {
         $this->actingAs($this->user);
 
         $shipping = OrderShipping::factory()->create([
             'order_id' => $this->order->id,
-            'status' => 'pending',
+            'status'   => 'pending',
         ]);
 
         $component = Livewire::test(OrderShippingRelationManager::class, [
             'ownerRecord' => $this->order,
-            'pageClass' => EditOrder::class,
+            'pageClass'   => EditOrder::class,
         ]);
 
         $component
@@ -104,26 +99,24 @@ final class OrderShippingRelationManagerTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('order_shippings', [
-            'id' => $shipping->id,
+            'id'     => $shipping->id,
             'status' => 'shipped',
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_mark_shipping_as_delivered(): void
     {
         $this->actingAs($this->user);
 
         $shipping = OrderShipping::factory()->create([
             'order_id' => $this->order->id,
-            'status' => 'shipped',
+            'status'   => 'shipped',
         ]);
 
         $component = Livewire::test(OrderShippingRelationManager::class, [
             'ownerRecord' => $this->order,
-            'pageClass' => EditOrder::class,
+            'pageClass'   => EditOrder::class,
         ]);
 
         $component
@@ -131,32 +124,30 @@ final class OrderShippingRelationManagerTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('order_shippings', [
-            'id' => $shipping->id,
-            'status' => 'delivered',
+            'id'           => $shipping->id,
+            'status'       => 'delivered',
             'is_delivered' => true,
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_filter_by_shipping_method(): void
     {
         $this->actingAs($this->user);
 
         OrderShipping::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'        => $this->order->id,
             'shipping_method' => 'standard',
         ]);
 
         OrderShipping::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'        => $this->order->id,
             'shipping_method' => 'express',
         ]);
 
         $component = Livewire::test(OrderShippingRelationManager::class, [
             'ownerRecord' => $this->order,
-            'pageClass' => EditOrder::class,
+            'pageClass'   => EditOrder::class,
         ]);
 
         $component
@@ -166,21 +157,19 @@ final class OrderShippingRelationManagerTest extends TestCase
             );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_perform_bulk_mark_shipped(): void
     {
         $this->actingAs($this->user);
 
         $shippings = OrderShipping::factory()->count(2)->create([
             'order_id' => $this->order->id,
-            'status' => 'pending',
+            'status'   => 'pending',
         ]);
 
         $component = Livewire::test(OrderShippingRelationManager::class, [
             'ownerRecord' => $this->order,
-            'pageClass' => EditOrder::class,
+            'pageClass'   => EditOrder::class,
         ]);
 
         $component
@@ -189,7 +178,7 @@ final class OrderShippingRelationManagerTest extends TestCase
 
         foreach ($shippings as $shipping) {
             $this->assertDatabaseHas('order_shippings', [
-                'id' => $shipping->id,
+                'id'     => $shipping->id,
                 'status' => 'shipped',
             ]);
         }
