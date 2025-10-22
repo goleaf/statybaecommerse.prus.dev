@@ -29,6 +29,7 @@ final class Kernel extends ConsoleKernel
         \App\Console\Commands\I18nAuditCommand::class,
         \App\Console\Commands\ValidateContractCommand::class,
         \App\Console\Commands\ReconcileInventoryCommand::class,
+        \App\Console\Commands\SanitizeHtmlContentCommand::class,
     ];
 
     protected function schedule(Schedule $schedule): void

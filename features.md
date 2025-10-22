@@ -8,6 +8,11 @@
 - Variant stock history tables consolidate destructive change reasons under the `danger` badge, keeping badge colors predictable for both `damage` and `theft` events.
 - User Product Interaction analytics pages restore Filament v4-friendly spacing for interaction filters and rating badges, silencing the concatenation notices flagged while QAing PR #1097.
 
+## Content safety and compliance
+- Established an allow-listed HTML sanitizer that runs on product descriptions, translations, and legal documents to prevent script injection.
+- Added a storefront `<x-sanitized-html>` component so any rendered rich text automatically passes through the sanitizer.
+- Shipped the `php artisan maintenance:sanitize-html` command to reprocess legacy content in bulk.
+
 ## Tooling polish
 - The `data:import` Artisan command now documents its signature and description directly on the command class, improving discoverability via `php artisan list`.
 

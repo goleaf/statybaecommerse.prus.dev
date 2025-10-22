@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models\Translations;
 
 use App\Models\Legal;
+use App\Support\Html\HtmlSanitizer;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -45,6 +46,22 @@ final class LegalTranslation extends Model
     protected $casts = ['legal_id' => 'integer', 'meta_data' => 'array'];
 
     public $timestamps = true;
+
+    protected static function booted(): void
+    {
+        self::saving(static function (LegalTranslation $translation): void {
+            /** @var HtmlSanitizer $sanitizer */
+            $sanitizer = app(HtmlSanitizer::class);
+
+            $content = $translation->content;
+            if (! is_string($content) || trim($content) === '') {
+                return;
+            }
+
+            // Keep legal copy consistent with the sanitizer allow-list as well.
+            $translation->content = $sanitizer->sanitize($content);
+        });
+    }
 
     /**
      * Handle legal functionality with proper error handling.

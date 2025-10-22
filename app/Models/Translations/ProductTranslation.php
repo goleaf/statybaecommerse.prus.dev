@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\Translations;
 
+use App\Support\Html\HtmlSanitizer;
 use Database\Factories\ProductTranslationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -36,6 +37,25 @@ final class ProductTranslation extends Model
     protected $casts = ['product_id' => 'integer', 'meta_keywords' => 'array'];
 
     public $timestamps = true;
+
+    protected static function booted(): void
+    {
+        self::saving(static function (ProductTranslation $translation): void {
+            /** @var HtmlSanitizer $sanitizer */
+            $sanitizer = app(HtmlSanitizer::class);
+
+            foreach (['description', 'short_description', 'summary'] as $field) {
+                $value = $translation->{$field};
+
+                if (! is_string($value) || trim($value) === '') {
+                    continue;
+                }
+
+                // Align translation payloads with the shared sanitizer policy.
+                $translation->{$field} = $sanitizer->sanitize($value);
+            }
+        });
+    }
 
     /**
      * Create a new factory instance for the model.
