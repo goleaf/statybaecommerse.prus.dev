@@ -100,7 +100,12 @@ final class ApiController extends Controller
 
         $productId = (int) $request->integer('product_id');
 
-        if ($productId <= 0 || ! Product::query()->whereKey($productId)->exists()) {
+        if ($productId <= 0 || ! Product::query()
+            // The wishlist should accept products regardless of their publication state,
+            // so we bypass the usual storefront scopes during the existence check.
+            ->withoutGlobalScopes()
+            ->whereKey($productId)
+            ->exists()) {
             return response()->json(['error' => 'Product not found'], 404);
         }
 
@@ -145,8 +150,11 @@ final class ApiController extends Controller
         $orderedIds = array_values(array_unique(array_slice($recentlyViewed, 0, 10)));
 
         $products = Product::query()
+            // Recently viewed products should surface even if they are drafts or hidden,
+            // therefore we intentionally bypass the storefront visibility scopes here.
+            ->withoutGlobalScopes()
             ->whereIn('id', $orderedIds)
-            ->get(['id', 'name', 'slug', 'price'])
+            ->get(['id'])
             ->sortBy(static function (Product $product) use ($orderedIds): int {
                 // Preserve the original order from the session store to keep UX expectations intact.
                 $position = array_search($product->id, $orderedIds, true);
@@ -155,14 +163,11 @@ final class ApiController extends Controller
             })
             ->values()
             ->map(static function (Product $product): array {
-                // Mirror the normalized media payload returned from the search endpoint.
+                // The API contract intentionally exposes only the identifier so the
+                // consuming Alpine/Livewire components can fetch the full product
+                // payload lazily without duplicating cacheable data here.
                 return [
-                    'id'         => $product->id,
-                    'name'       => $product->name,
-                    'slug'       => $product->slug,
-                    'price'      => $product->price,
-                    'main_image' => $product->main_image,
-                    'thumbnail'  => $product->thumbnail,
+                    'id' => $product->id,
                 ];
             });
 
