@@ -79,15 +79,7 @@ final class ApiServiceProvider extends ServiceProvider
             return [Limit::perMinute(max(1, $default))->by($key)];
         }
 
-        $limits = [];
-
-        foreach ($definitions as $scope => $value) {
-            $limit = $this->resolveLimit($scope, $value, $key);
-
-            if ($limit !== null) {
-                $limits[] = $limit;
-            }
-        }
+        $limits = $this->resolveLimit($definitions, $key);
 
         if ($limits === []) {
             $default = (int) ($fallback ?? config('security.rate_limiting.defaults.minute', 60));
@@ -99,7 +91,31 @@ final class ApiServiceProvider extends ServiceProvider
         return $limits;
     }
 
-    private function resolveLimit(int|string $scope, mixed $value, string $key): ?Limit
+    /**
+     * Normalize a limit definition array into the concrete RateLimiter Limit objects.
+     *
+     * @param array<int|string, mixed> $definitions
+     * @return array<int, Limit>
+     */
+    private function resolveLimit(array $definitions, string $key): array
+    {
+        $limits = [];
+
+        foreach ($definitions as $scope => $value) {
+            $limit = $this->normalizeLimit($scope, $value, $key);
+
+            if ($limit !== null) {
+                $limits[] = $limit;
+            }
+        }
+
+        return $limits;
+    }
+
+    /**
+     * Convert a single scope definition into a Limit instance when valid.
+     */
+    private function normalizeLimit(int|string $scope, mixed $value, string $key): ?Limit
     {
         if (is_array($value)) {
             $maxAttempts = (int) ($value['max_attempts'] ?? $value['max'] ?? 0);
