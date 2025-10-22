@@ -7,6 +7,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Bug Fixes
+* Replaced the CampaignCustomerSegment global ActiveScope with targeted query helpers so unit tests can fetch inactive records while dashboards retain expressive filters for campaign, type, and group segmentation.
 * Removed the generic ActiveScope from campaign conversion analytics so status-
   filtered scopes (campaign, type, device, medium, etc.) once again return
   completed records in unit tests and dashboards instead of being filtered out
