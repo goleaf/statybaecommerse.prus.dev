@@ -72,7 +72,9 @@ return new class extends Migration
             $table->text('help_text')->nullable();
             $table->timestamps();
 
-            $table->unique(['system_setting_id', 'locale']);
+            // The translations table allows multiple records per locale to support versioning and drafts,
+            // therefore we only index the combination instead of enforcing a uniqueness constraint.
+            $table->index(['system_setting_id', 'locale'], 'system_setting_locale_index');
             $table->foreign('system_setting_id')->references('id')->on('system_settings')->onDelete('cascade');
         });
 
