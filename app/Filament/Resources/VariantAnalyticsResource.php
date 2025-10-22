@@ -10,7 +10,7 @@ use App\Enums\NavigationGroup;
 use App\Filament\Resources\VariantAnalyticsResource\Pages;
 use App\Models\VariantAnalytics;
 use App\Support\Filament\Components\Flatpickr;
-use BackedEnum;
+use UnitEnum;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
@@ -23,7 +23,7 @@ use Illuminate\Database\Eloquent\Collection;
     /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    /** @var string|\BackedEnum|null Anchor inventory analytics beneath the shared navigation enum. */
+    /** @var UnitEnum|string|null Anchor inventory analytics beneath the shared navigation enum. */
     protected static $navigationGroup = NavigationGroup::Inventory;
 
     public static function getNavigationGroup(): ?string
