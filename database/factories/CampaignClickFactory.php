@@ -7,6 +7,7 @@ namespace Database\Factories;
 use App\Models\Campaign;
 use App\Models\CampaignClick;
 use App\Models\User;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -19,13 +20,15 @@ final class CampaignClickFactory extends Factory
     public function definition(): array
     {
         return [
-            'campaign_id' => Campaign::factory(),
+            // Only create related campaigns when the backing table exists to keep lightweight API tests stable.
+            'campaign_id' => $this->resolveCampaignId(),
             'session_id' => $this->faker->uuid(),
             'ip_address' => $this->faker->ipv4(),
             'user_agent' => $this->faker->userAgent(),
             'click_type' => $this->faker->randomElement(['cta', 'banner', 'link', 'button']),
             'clicked_url' => $this->faker->optional(0.8)->url(),
-            'customer_id' => $this->faker->optional(0.4)->randomElement(User::pluck('id')->toArray()),
+            // Safely associate an existing customer when available without crashing SQLite test databases.
+            'customer_id' => $this->resolveRandomCustomerId(),
             'clicked_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
         ];
     }
@@ -82,5 +85,56 @@ final class CampaignClickFactory extends Factory
             'is_converted' => true,
             'conversion_value' => $this->faker->randomFloat(2, 10, 1000),
         ]);
+    }
+
+    /**
+     * Determine a random existing customer identifier or return null when unavailable.
+     */
+    private function resolveRandomCustomerId(): ?int
+    {
+        // Preserve the original 40% association chance from Faker's optional helper.
+        if (! $this->faker->boolean(40)) {
+            return null;
+        }
+
+        $userIds = $this->availableUserIds();
+
+        if ($userIds === []) {
+            return null;
+        }
+
+        return $this->faker->randomElement($userIds);
+    }
+
+    /**
+     * Cache and return all existing user identifiers while guarding against missing tables during migrations.
+     *
+     * @return array<int, int>
+     */
+    private function availableUserIds(): array
+    {
+        static $cache = null;
+
+        if ($cache !== null) {
+            return $cache;
+        }
+
+        if (! Schema::hasTable('users')) {
+            return $cache = [];
+        }
+
+        return $cache = User::query()->pluck('id')->all();
+    }
+
+    /**
+     * Generate a campaign relationship lazily when discount campaigns are available.
+     */
+    private function resolveCampaignId(): mixed
+    {
+        if (! Schema::hasTable('discount_campaigns')) {
+            return null;
+        }
+
+        return Campaign::factory();
     }
 }
