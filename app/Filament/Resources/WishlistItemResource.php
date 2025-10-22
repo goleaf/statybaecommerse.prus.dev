@@ -16,7 +16,6 @@ use App\Models\UserWishlist;
 use App\Models\WishlistItem;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;
-use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -42,7 +41,6 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use RuntimeException;
@@ -56,22 +54,22 @@ use App\Support\Filament\Components\Flatpickr;
  */
 final class WishlistItemResource extends Resource
 {
+    protected static ?string $model = WishlistItem::class;
+
+    /**
+     * @var string|\BackedEnum|null Navigation icon used for the sidebar entry.
+     */
+    protected static $navigationIcon = 'heroicon-o-heart';
+
+    /**
+     * @var int|null Sidebar order to keep wishlist management near other customer tooling.
+     */
+    protected static ?int $navigationSort = 10;
+
     public static function getNavigationGroup(): UnitEnum|string|null
     {
         return 'Customers';
     }
-
-    protected static ?string $model = WishlistItem::class;
-
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-heart';
-    }
-
-    /**
-     * @var UnitEnum|string|null
-     */
-    protected static ?int $navigationSort = 10;
 
     protected static ?string $recordTitleAttribute = 'product.name';
 
