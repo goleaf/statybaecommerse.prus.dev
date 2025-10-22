@@ -16,6 +16,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -126,6 +127,11 @@ final class CampaignClickResource extends Resource
                         ->url()
                         ->maxLength(500)
                         ->helperText(__('campaign_clicks.clicked_url_help')),
+                    // Ensure editors can specify the exact moment of the click while defaulting to the current time.
+                    DateTimePicker::make('clicked_at')
+                        ->label(__('campaign_clicks.clicked_at'))
+                        ->default(fn (): string => now()->toDateTimeString())
+                        ->required(),
                     TextInput::make('referer')
                         ->label(__('campaign_clicks.referer'))
                         ->helperText(__('campaign_clicks.referer_help')),
@@ -184,6 +190,7 @@ final class CampaignClickResource extends Resource
                         ->prefix('€')
                         ->step(0.01)
                         ->minValue(0)
+                        ->default(0)
                         ->helperText(__('campaign_clicks.conversion_value_help')),
                 ]),
         ]);
