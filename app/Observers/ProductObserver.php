@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Observers;
 
 use App\Models\Product;
+use App\Services\CacheInvalidationService;
 use App\Services\Images\GradientImageService;
-use App\UseCases\Cache\InvalidateProductCache;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Log;
 final class ProductObserver
 {
     public function __construct(
-        private readonly InvalidateProductCache $invalidateProductCache,
+        private readonly CacheInvalidationService $cacheInvalidationService,
     ) {}
 
     /**
@@ -68,6 +68,8 @@ final class ProductObserver
 
     private function flushProductCaches(): void
     {
-        ($this->invalidateProductCache)();
+        // Delegate to the central cache invalidation orchestrator so both taggable
+        // stores and array/file fallbacks are refreshed consistently.
+        $this->cacheInvalidationService->flushProducts();
     }
 }

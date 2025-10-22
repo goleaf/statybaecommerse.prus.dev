@@ -7,6 +7,7 @@ namespace App\Repositories;
 use App\Models\Menu;
 use App\Models\MenuItem;
 use App\Support\Cache\CacheKeys;
+use App\Support\Cache\CacheTagHelper;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
@@ -17,10 +18,18 @@ final class MenuRepository
         $resolvedLocale = $locale ?? app()->getLocale();
         $cacheKey = CacheKeys::menuCollectionKey($location, $resolvedLocale);
 
+        // Tag navigation menus with category + locale identifiers so dashboard
+        // invalidation routines can flush the cache without touching unrelated data.
+        $tags = CacheTagHelper::merge(
+            CacheTagHelper::categories(),
+            CacheTagHelper::locale($resolvedLocale)
+        );
+
         return $this->remember(
             $cacheKey,
             CacheKeys::TTL_FIVE_MINUTES,
             fn (): Collection => $this->loadMenus($location)->map(fn (Menu $menu): array => $this->buildMenuPayload($menu)),
+            $tags,
         );
     }
 
@@ -28,6 +37,11 @@ final class MenuRepository
     {
         $resolvedLocale = $locale ?? app()->getLocale();
         $cacheKey = CacheKeys::menuByKey($key, $resolvedLocale);
+
+        $tags = CacheTagHelper::merge(
+            CacheTagHelper::categories(),
+            CacheTagHelper::locale($resolvedLocale)
+        );
 
         return $this->remember(
             $cacheKey,
@@ -41,6 +55,7 @@ final class MenuRepository
 
                 return $menu ? $this->buildMenuPayload($menu) : null;
             },
+            $tags,
         );
     }
 
@@ -48,6 +63,11 @@ final class MenuRepository
     {
         $resolvedLocale = $locale ?? app()->getLocale();
         $cacheKey = CacheKeys::menuByLocation($location, $resolvedLocale);
+
+        $tags = CacheTagHelper::merge(
+            CacheTagHelper::categories(),
+            CacheTagHelper::locale($resolvedLocale)
+        );
 
         return $this->remember(
             $cacheKey,
@@ -61,6 +81,7 @@ final class MenuRepository
 
                 return $menu ? $this->buildMenuPayload($menu) : null;
             },
+            $tags,
         );
     }
 
@@ -114,12 +135,15 @@ final class MenuRepository
         })->all();
     }
 
-    private function remember(string $key, int $ttlSeconds, callable $callback): mixed
+    /**
+     * @param  array<int, string>  $tags
+     */
+    private function remember(string $key, int $ttlSeconds, callable $callback, array $tags = []): mixed
     {
         $expiresAt = now()->addSeconds($ttlSeconds);
 
-        if (Cache::supportsTags()) {
-            return Cache::tags([CacheKeys::navigationTag()])->remember($key, $expiresAt, $callback);
+        if ($tags !== [] && CacheTagHelper::supportsTags()) {
+            return Cache::tags($tags)->remember($key, $expiresAt, $callback);
         }
 
         return Cache::remember($key, $expiresAt, $callback);
