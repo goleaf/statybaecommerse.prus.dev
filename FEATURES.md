@@ -17,6 +17,9 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
+- Filament dashboard access now defaults to an open posture when no
+  permissions are configured and inline sparkline widgets comply with the
+  nullable model contract, preventing dashboard and widget regressions.
 - Campaign customer segment management now relies on explicit query scopes for
   activity state, campaign, customer group, and segment type so analytics and
   admin listings can intentionally include inactive records without removing

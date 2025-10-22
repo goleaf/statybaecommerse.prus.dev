@@ -16,6 +16,9 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Multilingual experience** across storefront and admin via `spatie/laravel-translatable`, Volt-powered Livewire pages, and localized seed data.
 
 -### Latest updates
+- Filament dashboard access now defaults to permissive access when no
+  abilities are configured and the inline sparkline widgets honour the
+  nullable model contract, keeping admin unit tests green.
 - Campaign customer segment queries now expose dedicated scopes for type,
   campaign, customer group, and activity state, letting unit tests fetch
   inactive records while admin tooling keeps expressive filters without
