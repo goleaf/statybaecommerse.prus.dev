@@ -38,7 +38,14 @@ if [ -s "$TMP_STAGED_PHP" ]; then
     fi
 
     echo "Running PHPStan on staged PHP files..."
-    "$PHPSTAN" analyse -c phpstan.neon --memory-limit=1G --no-progress --paths-file="$TMP_STAGED_PHP"
+    if ! "$PHPSTAN" analyse -c phpstan.neon --memory-limit=1G --no-progress --paths-file="$TMP_STAGED_PHP"; then
+        # PHPStan < 1.11 does not recognise --paths-file, so expand the staged list manually as a fallback.
+        echo "Falling back to manual path expansion for PHPStan"
+        set -- $(cat "$TMP_STAGED_PHP")
+        if [ "$#" -gt 0 ]; then
+            "$PHPSTAN" analyse -c phpstan.neon --memory-limit=1G --no-progress "$@"
+        fi
+    fi
 fi
 
 if [ -s "$TMP_STAGED_PRETTIER" ]; then
