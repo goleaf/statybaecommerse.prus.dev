@@ -17,4 +17,4 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
-- Added a cache invalidation service with locale-aware tag helpers alongside new storefront regression tests so the home widgets, dashboards, and cart/checkout experiences stay consistent release over release.
+- Resolved the open cache invalidation conflicts by tagging navigation, product, and dashboard caches with the shared helper, wiring the invalidation service into global model events, and adding regression tests that prove storefront widgets and stats refresh immediately after catalogue edits.
