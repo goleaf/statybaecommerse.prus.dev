@@ -406,6 +406,20 @@ final class AttributeResourceTest extends TestCase
         ]);
     }
 
+    public function test_validation_rules_field_round_trips_plain_strings(): void
+    {
+        // Arrange
+        $attribute = Attribute::factory()->create([
+            'validation_rules' => 'required|min:3',
+        ]);
+
+        // Act & Assert
+        Livewire::actingAs($this->adminUser)
+            ->test(EditAttribute::class, ['record' => $attribute->id])
+            // The Filament form should hydrate the original string without forcing JSON or array casts.
+            ->assertSet('data.validation_rules', 'required|min:3');
+    }
+
     public function test_can_set_min_max_length_for_text_attributes(): void
     {
         // Arrange

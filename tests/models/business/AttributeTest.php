@@ -16,17 +16,17 @@ final class AttributeTest extends TestCase
     public function test_attribute_can_be_created(): void
     {
         $attribute = Attribute::factory()->create([
-            'name' => 'Test Attribute',
-            'slug' => 'test-attribute',
-            'type' => 'text',
-            'description' => 'Test description',
-            'is_required' => true,
+            'name'          => 'Test Attribute',
+            'slug'          => 'test-attribute',
+            'type'          => 'text',
+            'description'   => 'Test description',
+            'is_required'   => true,
             'is_filterable' => true,
             'is_searchable' => false,
-            'is_visible' => true,
-            'is_enabled' => true,
-            'sort_order' => 1,
-            'group_name' => 'test-group',
+            'is_visible'    => true,
+            'is_enabled'    => true,
+            'sort_order'    => 1,
+            'group_name'    => 'test-group',
         ]);
 
         $this->assertInstanceOf(Attribute::class, $attribute);
@@ -54,14 +54,14 @@ final class AttributeTest extends TestCase
         // Create translations
         $ltTranslation = AttributeTranslation::factory()->create([
             'attribute_id' => $attribute->id,
-            'locale' => 'lt',
-            'name' => 'Testo Atributas',
+            'locale'       => 'lt',
+            'name'         => 'Testo Atributas',
         ]);
 
         $enTranslation = AttributeTranslation::factory()->create([
             'attribute_id' => $attribute->id,
-            'locale' => 'en',
-            'name' => 'Test Attribute EN',
+            'locale'       => 'en',
+            'name'         => 'Test Attribute EN',
         ]);
 
         // Test translation methods
@@ -93,7 +93,7 @@ final class AttributeTest extends TestCase
         $enabledAttribute = Attribute::factory()->create([
             'is_enabled' => true,
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
         $disabledAttribute = Attribute::factory()->create([
             'is_enabled' => false,
@@ -101,33 +101,33 @@ final class AttributeTest extends TestCase
         ]);
         $requiredAttribute = Attribute::factory()->create([
             'is_required' => true,
-            'is_enabled' => true,
-            'is_visible' => true,
-            'is_active' => true,
+            'is_enabled'  => true,
+            'is_visible'  => true,
+            'is_active'   => true,
         ]);
         $filterableAttribute = Attribute::factory()->create([
             'is_filterable' => true,
-            'is_enabled' => true,
-            'is_visible' => true,
-            'is_active' => true,
+            'is_enabled'    => true,
+            'is_visible'    => true,
+            'is_active'     => true,
         ]);
         $searchableAttribute = Attribute::factory()->create([
             'is_searchable' => true,
-            'is_enabled' => true,
-            'is_visible' => true,
-            'is_active' => true,
+            'is_enabled'    => true,
+            'is_visible'    => true,
+            'is_active'     => true,
         ]);
         $orderedAttribute1 = Attribute::factory()->create([
             'sort_order' => 2,
             'is_enabled' => true,
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
         $orderedAttribute2 = Attribute::factory()->create([
             'sort_order' => 1,
             'is_enabled' => true,
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         // Test enabled scope
@@ -248,7 +248,7 @@ final class AttributeTest extends TestCase
     public function test_attribute_with_translations_scope(): void
     {
         $attribute = Attribute::factory()->create([
-            'is_active' => true, // Ensure the attribute is active so it passes the ActiveScope
+            'is_active'  => true, // Ensure the attribute is active so it passes the ActiveScope
             'is_enabled' => true, // Ensure the attribute is enabled so it passes the EnabledScope
             'is_visible' => true, // Ensure the attribute is visible so it passes the VisibleScope
         ]);
@@ -317,12 +317,12 @@ final class AttributeTest extends TestCase
     public function test_attribute_form_component_config(): void
     {
         $attribute = Attribute::factory()->create([
-            'type' => 'select',
-            'is_required' => true,
+            'type'          => 'select',
+            'is_required'   => true,
             'default_value' => 'default',
-            'min_value' => 1,
-            'max_value' => 100,
-            'step_value' => 0.5,
+            'min_value'     => 1,
+            'max_value'     => 100,
+            'step_value'    => 0.5,
         ]);
 
         $config = $attribute->getFormComponentConfig();
@@ -336,5 +336,31 @@ final class AttributeTest extends TestCase
         $this->assertEquals(0.5, $config['step_value']);
         $this->assertArrayHasKey('validation_rules', $config);
         $this->assertArrayHasKey('options', $config);
+    }
+
+    public function test_validation_rules_persist_plain_strings_without_json_encoding(): void
+    {
+        $attribute = Attribute::factory()->create([
+            'validation_rules' => 'required|min:3',
+        ]);
+
+        $attribute->refresh();
+
+        // A plain string should survive hydration untouched so editors see their original input.
+        $this->assertIsString($attribute->getAttribute('validation_rules'));
+        $this->assertSame('required|min:3', $attribute->getAttribute('validation_rules'));
+    }
+
+    public function test_validation_rules_decode_json_arrays_after_storage(): void
+    {
+        $attribute = Attribute::factory()->create([
+            'validation_rules' => ['required', 'min:3'],
+        ]);
+
+        $attribute->refresh();
+
+        // Arrays are JSON encoded at rest, and therefore must round-trip back to PHP arrays on retrieval.
+        $this->assertIsArray($attribute->getAttribute('validation_rules'));
+        $this->assertSame(['required', 'min:3'], $attribute->getAttribute('validation_rules'));
     }
 }
