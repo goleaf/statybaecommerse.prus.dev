@@ -16,6 +16,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Multilingual experience** across storefront and admin via `spatie/laravel-translatable`, Volt-powered Livewire pages, and localized seed data.
 
 ### Latest updates
+- Filament admin resources, relation managers, and bespoke pages now return `Filament\\Schemas\\Schema` instances with documented icon docblocks, aligning every form/table/infolist signature to the v4 API so upstream navigation traits continue to resolve enum-aware metadata without collisions.
 - Product API endpoints now resolve via dedicated application use cases, an Eloquent-backed repository, and a presenter that preserves the public contract while filtering non-displayable catalogue entries.
 - Notification administration now proxies navigation metadata through the shared Nav helper, the helper guards against HasNav recursion, and the Address resource documents its `Schema::components([...])` pipeline so Filament v4 reviewers understand the form container wiring.
 - Menu Item resource navigation icons rely on the shared docblock convention with documented schema/table delegators, keeping Filament v4 reviewers aligned on our configurator pattern.
