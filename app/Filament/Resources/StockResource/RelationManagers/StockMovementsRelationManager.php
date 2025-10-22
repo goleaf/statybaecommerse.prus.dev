@@ -12,6 +12,7 @@ use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -186,7 +187,7 @@ class StockMovementsRelationManager extends BaseRelationManager
 
                         return $data;
                     })
-                    ->after(function ($record) {
+                    ->after(function ($record): void {
                         // Update the variant inventory stock based on movement
                         $variantInventory = $this->ownerRecord;
                         $quantity = $record->quantity;
@@ -209,7 +210,7 @@ class StockMovementsRelationManager extends BaseRelationManager
                 Tables\Actions\ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make()
-                    ->after(function ($record) {
+                    ->after(function ($record): void {
                         // Reverse the stock movement when deleting
                         $variantInventory = $this->ownerRecord;
                         $quantity = $record->quantity;
@@ -224,7 +225,7 @@ class StockMovementsRelationManager extends BaseRelationManager
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     DeleteBulkAction::make()
-                        ->after(function ($records) {
+                        ->after(function ($records): void {
                             // Reverse all stock movements when bulk deleting
                             $variantInventory = $this->ownerRecord;
 

@@ -40,8 +40,10 @@ final class NotificationTemplateResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    /** @var UnitEnum|string|null */
-    protected static $navigationGroup = NavigationGroup::Content;
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Content;
 
     public static function getNavigationLabel(): string
     {

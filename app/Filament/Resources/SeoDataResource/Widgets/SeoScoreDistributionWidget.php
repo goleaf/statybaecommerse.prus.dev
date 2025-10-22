@@ -24,10 +24,10 @@ final class SeoScoreDistributionWidget extends ChartWidget
 
         $good = SeoData::where('is_active', true)
             ->where('is_indexed', true)
-            ->where(function ($query) {
+            ->where(function ($query): void {
                 $query->whereNotNull('title')
                     ->whereNotNull('description')
-                    ->where(function ($q) {
+                    ->where(function ($q): void {
                         $q->whereNull('keywords')
                             ->orWhereNull('meta_title')
                             ->orWhereNull('meta_description');
@@ -36,7 +36,7 @@ final class SeoScoreDistributionWidget extends ChartWidget
             ->count();
 
         $needsImprovement = SeoData::where('is_active', true)
-            ->where(function ($query) {
+            ->where(function ($query): void {
                 $query->where('is_indexed', false)
                     ->orWhereNull('title')
                     ->orWhereNull('description');
@@ -44,7 +44,7 @@ final class SeoScoreDistributionWidget extends ChartWidget
             ->count();
 
         $poor = SeoData::where('is_active', false)
-            ->orWhere(function ($query) {
+            ->orWhere(function ($query): void {
                 $query->where('is_indexed', false)
                     ->whereNull('title')
                     ->whereNull('description');

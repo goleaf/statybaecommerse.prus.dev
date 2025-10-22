@@ -22,7 +22,7 @@ final class LowStockCartItemsWidget extends BaseWidget
         return $table
             ->query(
                 CartItem::query()
-                    ->whereHas('product.inventories', function ($query) {
+                    ->whereHas('product.inventories', function ($query): void {
                         $query->where('quantity', '<=', 10);
                     })
                     ->with(['product', 'user'])

@@ -30,8 +30,10 @@ final class AttributeResource extends Resource
 {
     protected static ?string $model = Attribute::class;
 
-    /** @var string|BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-tag';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
     public static function getNavigationGroup(): ?string
     {

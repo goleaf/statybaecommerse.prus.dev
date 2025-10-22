@@ -34,8 +34,10 @@ final class ProductRequestResource extends Resource
         return 'heroicon-o-clipboard-document-list';
     }
 
-    /** @var UnitEnum|string|null */
-    protected static $navigationGroup = 'Products';
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
+    protected static UnitEnum|string|null $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 16;
 

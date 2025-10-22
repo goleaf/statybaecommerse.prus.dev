@@ -40,8 +40,10 @@ final class StockResource extends Resource
 {
     protected static ?string $model = Inventory::class;
 
-    /** @var UnitEnum|string|null */
-    protected static $navigationGroup = 'Inventory';
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
+    protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 7;
 
@@ -76,7 +78,7 @@ final class StockResource extends Resource
                                 ->preload()
                                 ->required()
                                 ->live()
-                                ->afterStateUpdated(function ($state, callable $set) {
+                                ->afterStateUpdated(function ($state, callable $set): void {
                                     if ($state) {
                                         $product = Product::find($state);
                                         if ($product) {

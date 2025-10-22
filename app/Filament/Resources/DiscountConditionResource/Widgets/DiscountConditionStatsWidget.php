@@ -15,7 +15,7 @@ final class DiscountConditionStatsWidget extends BaseWidget
         $totalConditions = DiscountCondition::count();
         $activeConditions = DiscountCondition::where('is_active', true)->count();
         $currentConditions = DiscountCondition::where('valid_from', '<=', now())
-            ->where(function ($query) {
+            ->where(function ($query): void {
                 $query->whereNull('valid_until')->orWhere('valid_until', '>=', now());
             })->count();
         $expiredConditions = DiscountCondition::where('valid_until', '<', now())->count();

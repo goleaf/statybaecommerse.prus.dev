@@ -13,15 +13,15 @@ final class ProductInventoryWidget extends ChartWidget
 
     protected function getData(): array
     {
-        $inStock = Product::whereHas('inventories', function ($query) {
+        $inStock = Product::whereHas('inventories', function ($query): void {
             $query->where('quantity', '>', 10);
         })->count();
 
-        $lowStock = Product::whereHas('inventories', function ($query) {
+        $lowStock = Product::whereHas('inventories', function ($query): void {
             $query->where('quantity', '<=', 10)->where('quantity', '>', 0);
         })->count();
 
-        $outOfStock = Product::whereHas('inventories', function ($query) {
+        $outOfStock = Product::whereHas('inventories', function ($query): void {
             $query->where('quantity', '=', 0);
         })->count();
 

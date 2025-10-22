@@ -39,9 +39,14 @@ final class VariantCombinationResource extends Resource
 {
     protected static ?string $model = \App\Models\VariantCombination::class;
 
-    /** @var string|BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-squares-2x2';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
 
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 19;

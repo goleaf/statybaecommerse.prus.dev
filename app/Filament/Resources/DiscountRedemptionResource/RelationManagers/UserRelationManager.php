@@ -7,6 +7,7 @@ namespace App\Filament\Resources\DiscountRedemptionResource\RelationManagers;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms;
+use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
