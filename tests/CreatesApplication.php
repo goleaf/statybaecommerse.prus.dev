@@ -11,7 +11,7 @@ trait CreatesApplication
 {
     public function createApplication(): Application
     {
-        $envPath = __DIR__.'/../.env';
+        $envPath = __DIR__ . '/../.env';
 
         if (! file_exists($envPath)) {
             file_put_contents($envPath, '');
@@ -23,16 +23,24 @@ trait CreatesApplication
             });
         }
 
-        $app = require __DIR__.'/../bootstrap/app.php';
+        $app = require __DIR__ . '/../bootstrap/app.php';
 
         $app->make(Kernel::class)->bootstrap();
 
-        // Ensure tests always use in-memory SQLite to avoid file corruption issues
-        config()->set('database.default', 'sqlite');
-        config()->set('database.connections.sqlite.database', ':memory:');
-        // Disable Telescope and force its connection to sqlite during tests to avoid MySQL usage
+        $connection = env('DB_CONNECTION', 'sqlite');
+        $database = env('DB_DATABASE', ':memory:');
+
+        // Make the connection configurable so contributors can point tests at a persistent SQLite file when needed.
+        config()->set('database.default', $connection);
+
+        if ($connection === 'sqlite') {
+            // Respect the chosen SQLite database path (":memory:" by default) to avoid schema mismatches between processes.
+            config()->set('database.connections.sqlite.database', $database);
+        }
+
+        // Disable Telescope and ensure it uses the same database connection during automated tests.
         config()->set('telescope.enabled', false);
-        config()->set('telescope.storage.database.connection', 'sqlite');
+        config()->set('telescope.storage.database.connection', $connection);
         config()->set('debugbar.enabled', false);
 
         return $app;
