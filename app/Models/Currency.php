@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Scopes\ActiveScope;
-use App\Models\Scopes\EnabledScope;
-use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -29,7 +27,6 @@ use Spatie\Translatable\HasTranslations;
  *
  * @mixin \Eloquent
  */
-#[ScopedBy([ActiveScope::class, EnabledScope::class])]
 final class Currency extends Model
 {
     use HasFactory, HasTranslations, SoftDeletes;
@@ -126,31 +123,25 @@ final class Currency extends Model
     // Scopes
 
     /**
-     * Handle scopeEnabled functionality with proper error handling.
-     *
-     * @param  mixed  $query
+     * Scope currencies that are enabled in the back office.
      */
-    public function scopeEnabled($query)
+    public function scopeEnabled(Builder $query): Builder
     {
         return $query->where('is_enabled', true);
     }
 
     /**
-     * Handle scopeDefault functionality with proper error handling.
-     *
-     * @param  mixed  $query
+     * Scope the default currency for storefront fallbacks.
      */
-    public function scopeDefault($query)
+    public function scopeDefault(Builder $query): Builder
     {
         return $query->where('is_default', true);
     }
 
     /**
-     * Handle scopeActive functionality with proper error handling.
-     *
-     * @param  mixed  $query
+     * Scope currencies that are actively selectable.
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
@@ -170,7 +161,16 @@ final class Currency extends Model
      */
     public function getFormattedExchangeRateAttribute(): string
     {
-        return number_format($this->exchange_rate, $this->decimal_places);
+        $decimalPlaces = $this->decimal_places ?? 2;
+        $decimalSeparator = $this->decimal_separator ?? '.';
+        $thousandsSeparator = $this->thousands_separator ?? ',';
+
+        return number_format(
+            $this->exchange_rate,
+            $decimalPlaces,
+            $decimalSeparator,
+            $thousandsSeparator
+        );
     }
 
     // Methods
@@ -204,11 +204,17 @@ final class Currency extends Model
      */
     public function formatAmount(float $amount): string
     {
-        $formattedAmount = number_format($amount, $this->decimal_places);
+        $decimalPlaces = $this->decimal_places ?? 2;
+        $decimalSeparator = $this->decimal_separator ?? '.';
+        $thousandsSeparator = $this->thousands_separator ?? ',';
+        $formattedAmount = number_format($amount, $decimalPlaces, $decimalSeparator, $thousandsSeparator);
+
         if ($this->symbol) {
-            return $this->symbol.' '.$formattedAmount;
+            return $this->symbol_position === 'before'
+                ? sprintf('%s %s', $this->symbol, $formattedAmount)
+                : sprintf('%s %s', $formattedAmount, $this->symbol);
         }
 
-        return $formattedAmount.' '.$this->code;
+        return sprintf('%s %s', $formattedAmount, $this->code);
     }
 }
