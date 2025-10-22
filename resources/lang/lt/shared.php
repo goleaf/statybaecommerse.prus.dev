@@ -13,6 +13,7 @@ return [
     'product_not_available' => 'Produktas neprieinamas',
     'insufficient_stock' => 'Nepakankamas atsargų kiekis',
     'sale' => 'Išpardavimas',
+    'brands' => 'Prekių ženklai',
     'new' => 'Naujas',
     'featured' => 'Rekomenduojamas',
     'out_of_stock' => 'Nėra atsargose',

@@ -44,6 +44,12 @@ final class DemoStoreSeeder extends Seeder
 
             $this->seedOrders($customers, $catalog, $channel, $zone, $country);
         });
+
+        // Populate curated collections after the core catalogue is available.
+        $this->call([
+            CollectionSeeder::class,
+            CollectionProductSeeder::class,
+        ]);
     }
 
     private function seedCountry(): Country
