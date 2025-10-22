@@ -3,7 +3,7 @@
 All JSON API errors now follow the [RFC 7807](https://www.rfc-editor.org/rfc/rfc7807) "problem details" format with additional
 metadata so clients can correlate failures and act on structured context. Responses include the header declared by
 `config('app.correlation_header')` (defaults to `X-Correlation-ID`) and are encoded with the
-`application/problem+json` content type.【F:app/Support/ApiErrorResponse.php†L19-L77】【F:bootstrap/app.php†L66-L231】
+`application/problem+json` content type.【F:app/Support/ApiErrorResponse.php†L19-L77】【F:bootstrap/app.php†L66-L332】
 
 ## Envelope
 
@@ -60,7 +60,7 @@ Example payload:
 ## Shared Error Codes
 
 The following baseline codes are enforced across APIs. Feature tests cover these values to guarantee they remain stable for
-integrators.【F:app/Support/ErrorCodes.php†L15-L79】【F:tests/Feature/Api/ExceptionHandlingTest.php†L18-L102】
+integrators.【F:app/Support/ErrorCodes.php†L15-L84】【F:tests/Feature/Api/ExceptionHandlingTest.php†L18-L123】
 
 | Code | Status | Title | Typical Scenario |
 | --- | --- | --- | --- |
@@ -68,6 +68,7 @@ integrators.【F:app/Support/ErrorCodes.php†L15-L79】【F:tests/Feature/Api/E
 | `error.unauthorized` | 401 | Request lacks valid authentication credentials. | Missing/expired tokens, failed authentication guards. |
 | `error.forbidden` | 403 | Authenticated request lacks permission. | Ability/authorization gate denies access. |
 | `error.not_found` | 404 | Resource requested by the client could not be located. | `abort(404)` and other not-found HTTP exceptions. |
+| `error.rate_limited` | 429 | Requests exceeded the configured rate limits. | `ThrottleRequestsException` and other HTTP 429 responses from middleware. |
 | `error.server` | 500 | Unexpected server exception occurred while handling the request. | Unhandled runtime exceptions bubbled to the renderer. |
 
 Domain-specific exceptions (for example `orders.not_found` or `inventory.insufficient`) continue to populate
@@ -78,7 +79,7 @@ fallback locale.【F:tests/Feature/DomainExceptionResponseTest.php†L29-L104】
 
 When rendering API problems the exception handler pushes the trace identifier, request path, HTTP method and detected locale
 into the logging context before writing structured log entries. This ensures the `trace_id` found in the response correlates to
-log entries captured in Horizon, CloudWatch and other sinks.【F:bootstrap/app.php†L88-L231】
+log entries captured in Horizon, CloudWatch and other sinks.【F:bootstrap/app.php†L88-L332】
 
 Clients **must** propagate the `correlation_id` header value when retrying or escalating incidents. Doing so lets support teams
 join requests to server-side traces without additional metadata.
