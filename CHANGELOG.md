@@ -11,6 +11,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Hardened HTML sanitization by removing entire `<script>`, `<style>`, and `<template>` elements instead of unwrapping them, blocking executable payloads from surfacing in storefront or admin renders while keeping safe markup intact.
 ### Features & Enhancements
 * Refactored the localized search results page with a guided hero, contextual metrics, and refreshed empty states so catalog queries like Makita surface faster insights and recovery actions.
+* Realigned the Discount Redemption Filament resource navigation metadata and status badge styling with the v4 table schema so admin pages and supporting tests use the modern badge helpers without compatibility gaps.
 
 ### Maintenance
 * Fixed the custom Filament edit profile page to import the correct Schema class, eliminating fatal compatibility errors during automated tests.
@@ -29,6 +30,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Resolved the cache tagging conflicts from PR #120 by wiring `CacheInvalidationService` into model events, aligning navigation/menu repositories with locale-aware tags, and extending regression tests that exercise storefront widgets and dashboard stats.
 * Introduced a cache invalidation service with tag-aware fallbacks and updated storefront widgets to honour locale-aware cache tags while adding regression coverage for cart and dashboard flows.
 * Hardened the Filament schema upgrade script so navigation icon docblocks are normalized automatically and every resource/page/widget reflects the v4 schema signature changes.
+* Updated the Discount Redemption resource unit test harness to supply a lightweight `HasTable` stub, keeping the Filament v4 table factory invocations compatible with Pest assertions.
 * Aligned Filament variant pricing and analytics resources with stricter action namespaces, clarified currency formatting, and refreshed navigation icon annotations to streamline BackedEnum usage across admin pages.
 * Synced Collection Rule resource signatures, modal reorder UX, and cache maintenance tooling with Filament v4 to retire legacy array fallbacks.
 * Delivered the Campaign Product Target management resource with localized strings, reinforced widget navigation metadata, and hardened media path migrations for safer marketing workflows.
