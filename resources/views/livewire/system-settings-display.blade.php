@@ -72,7 +72,7 @@
 </div>
 
 @push('scripts')
-<script>
+<script nonce="{{ csp_nonce() }}">
     document.addEventListener('livewire:init', () => {
         Livewire.on('settings-updated', () => {
             // Refresh the component when settings are updated

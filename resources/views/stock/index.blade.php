@@ -305,7 +305,7 @@
     </div>
 </div>
 
-<script>
+<script nonce="{{ csp_nonce() }}">
 let currentStockId = null;
 
 function adjustStock(stockId) {

@@ -89,7 +89,7 @@
     </div>
 </div>
 
-<script>
+<script nonce="{{ csp_nonce() }}">
 document.addEventListener('DOMContentLoaded', function() {
     const stars = document.querySelectorAll('.rating-star');
     const ratingInput = document.getElementById('rating');

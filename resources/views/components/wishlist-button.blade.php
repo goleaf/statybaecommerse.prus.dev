@@ -105,7 +105,7 @@
     </div>
 </div>
 
-<script>
+<script nonce="{{ csp_nonce() }}">
     function wishlistButton(config) {
         return {
             productId: config.productId,
