@@ -6,9 +6,20 @@ namespace Tests;
 
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Config;
 
 trait CreatesApplication
 {
+    /**
+     * Track the lazily created SQLite database path so repeated calls reuse it.
+     */
+    private ?string $sqliteDatabasePath = null;
+
+    /**
+     * Remember whether the SQLite database file existed before the test run.
+     */
+    private bool $sqliteDatabasePreExisted = false;
+
     public function createApplication(): Application
     {
         $envPath = __DIR__.'/../.env';
@@ -27,14 +38,46 @@ trait CreatesApplication
 
         $app->make(Kernel::class)->bootstrap();
 
-        // Ensure tests always use in-memory SQLite to avoid file corruption issues
-        config()->set('database.default', 'sqlite');
-        config()->set('database.connections.sqlite.database', ':memory:');
-        // Disable Telescope and force its connection to sqlite during tests to avoid MySQL usage
-        config()->set('telescope.enabled', false);
-        config()->set('telescope.storage.database.connection', 'sqlite');
-        config()->set('debugbar.enabled', false);
+        // Configure SQLite to use a real file so that migrations persist across connections.
+        $databasePath = $this->resolveSqliteDatabasePath();
+        if (! $this->sqliteDatabasePreExisted) {
+            register_shutdown_function(static function () use ($databasePath): void {
+                if (file_exists($databasePath)) {
+                    unlink($databasePath);
+                }
+            });
+        }
+        Config::set('database.default', 'sqlite');
+        Config::set('database.connections.sqlite.database', $databasePath);
+        Config::set('database.connections.sqlite.foreign_key_constraints', true);
+        // Disable Telescope and Debugbar so tests do not attempt to talk to MySQL.
+        Config::set('telescope.enabled', false);
+        Config::set('telescope.storage.database.connection', 'sqlite');
+        Config::set('activitylog.database_connection', 'sqlite');
+        Config::set('debugbar.enabled', false);
 
         return $app;
+    }
+
+    /**
+     * Resolve the SQLite database path, creating the file if it is missing.
+     */
+    protected function resolveSqliteDatabasePath(): string
+    {
+        if (is_string($this->sqliteDatabasePath) && $this->sqliteDatabasePath !== '') {
+            return $this->sqliteDatabasePath;
+        }
+
+        $databasePath = dirname(__DIR__) . '/database/testing.sqlite';
+        $this->sqliteDatabasePreExisted = file_exists($databasePath);
+
+        if (! $this->sqliteDatabasePreExisted) {
+            // Touch the file so SQLite has a persistent database to migrate against.
+            touch($databasePath);
+        }
+
+        $this->sqliteDatabasePath = $databasePath;
+
+        return $this->sqliteDatabasePath;
     }
 }

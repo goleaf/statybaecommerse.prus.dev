@@ -24,19 +24,26 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        if (! file_exists(base_path('.env'))) {
-            file_put_contents(base_path('.env'), '');
+        $appBasePath = dirname(__DIR__);
+        $envFile = $appBasePath.'/.env';
+
+        if (! file_exists($envFile)) {
+            file_put_contents($envFile, '');
             $this->createdEnvFile = true;
         } else {
             $this->createdEnvFile = false;
         }
 
+        // Ensure runtime configuration stays aligned with the SQLite testing database.
+        $sqliteDatabasePath = $this->resolveSqliteDatabasePath();
         Config::set('database.default', 'sqlite');
-        Config::set('database.connections.sqlite.database', ':memory:');
-        Config::set('app.key', 'base64:'.base64_encode(random_bytes(32)));
-        // Ensure Telescope doesn't use MySQL during tests and avoid watchers overhead
+        Config::set('database.connections.sqlite.database', $sqliteDatabasePath);
+        Config::set('database.connections.sqlite.foreign_key_constraints', true);
         Config::set('telescope.enabled', false);
         Config::set('telescope.storage.database.connection', 'sqlite');
+        Config::set('activitylog.database_connection', 'sqlite');
+        Config::set('app.key', 'base64:'.base64_encode(random_bytes(32)));
+
         $this->refreshTranslationLoader();
         app()->instance('request', Request::create('/'));
         $this->withoutMiddleware([
@@ -56,8 +63,11 @@ abstract class TestCase extends BaseTestCase
             $this->resolvedAdminPanel = null;
         }
 
-        if ($this->createdEnvFile && file_exists(base_path('.env'))) {
-            unlink(base_path('.env'));
+        $appBasePath = dirname(__DIR__);
+        $envFile = $appBasePath.'/.env';
+
+        if ($this->createdEnvFile && file_exists($envFile)) {
+            unlink($envFile);
         }
 
         parent::tearDown();
