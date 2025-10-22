@@ -38,7 +38,11 @@ final class AdminUser extends Authenticatable implements FilamentUser
      */
     protected string $guard_name = 'admin';
 
-    protected $fillable = ['name', 'email', 'password'];
+    /**
+     * Allow mass-assignment for the primary profile fields as well as
+     * verification metadata so table actions can toggle verification state.
+     */
+    protected $fillable = ['name', 'email', 'password', 'email_verified_at'];
 
     protected $hidden = ['password', 'remember_token'];
 
