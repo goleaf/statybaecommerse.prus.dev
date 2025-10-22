@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\StatusScope;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
@@ -28,7 +27,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @mixin \Eloquent
  */
-#[ScopedBy([ActiveScope::class, StatusScope::class])]
+// We avoid the generic ActiveScope because campaign conversions rely on lifecycle
+// statuses like "completed" rather than boolean flags such as "is_active".
+#[ScopedBy([StatusScope::class])]
 final class CampaignConversion extends Model
 {
     use HasFactory, HasTranslations;
@@ -159,7 +160,7 @@ final class CampaignConversion extends Model
      */
     public function getFormattedConversionValueAttribute(): string
     {
-        return '€'.number_format((float) $this->conversion_value, 2);
+        return '€' . number_format((float) $this->conversion_value, 2);
     }
 
     /**
@@ -167,7 +168,7 @@ final class CampaignConversion extends Model
      */
     public function getFormattedRoiAttribute(): string
     {
-        return number_format($this->roi * 100, 2).'%';
+        return number_format($this->roi * 100, 2) . '%';
     }
 
     /**
@@ -175,7 +176,7 @@ final class CampaignConversion extends Model
      */
     public function getFormattedConversionRateAttribute(): string
     {
-        return number_format($this->conversion_rate * 100, 2).'%';
+        return number_format($this->conversion_rate * 100, 2) . '%';
     }
 
     /**
@@ -184,10 +185,10 @@ final class CampaignConversion extends Model
     public function getDeviceTypeDisplayAttribute(): string
     {
         return match ($this->device_type) {
-            'mobile' => __('campaign_conversions.device_types.mobile'),
-            'tablet' => __('campaign_conversions.device_types.tablet'),
+            'mobile'  => __('campaign_conversions.device_types.mobile'),
+            'tablet'  => __('campaign_conversions.device_types.tablet'),
             'desktop' => __('campaign_conversions.device_types.desktop'),
-            default => __('campaign_conversions.device_types.unknown'),
+            default   => __('campaign_conversions.device_types.unknown'),
         };
     }
 
@@ -196,7 +197,7 @@ final class CampaignConversion extends Model
      */
     public function getConversionTypeDisplayAttribute(): string
     {
-        return __('campaign_conversions.conversion_types.'.$this->conversion_type);
+        return __('campaign_conversions.conversion_types.' . $this->conversion_type);
     }
 
     /**
@@ -204,7 +205,7 @@ final class CampaignConversion extends Model
      */
     public function getStatusDisplayAttribute(): string
     {
-        return __('campaign_conversions.statuses.'.$this->status);
+        return __('campaign_conversions.statuses.' . $this->status);
     }
 
     // Methods
@@ -254,12 +255,12 @@ final class CampaignConversion extends Model
     public function getAttributionValue(string $model = 'last_click'): float
     {
         return match ($model) {
-            'first_click' => $this->first_click_attribution ?? 0,
-            'linear' => $this->linear_attribution ?? 0,
-            'time_decay' => $this->time_decay_attribution ?? 0,
+            'first_click'    => $this->first_click_attribution ?? 0,
+            'linear'         => $this->linear_attribution ?? 0,
+            'time_decay'     => $this->time_decay_attribution ?? 0,
             'position_based' => $this->position_based_attribution ?? 0,
-            'data_driven' => $this->data_driven_attribution ?? 0,
-            default => $this->last_click_attribution ?? $this->conversion_value,
+            'data_driven'    => $this->data_driven_attribution ?? 0,
+            default          => $this->last_click_attribution ?? $this->conversion_value,
         };
     }
 }
