@@ -6,12 +6,14 @@ namespace App\Livewire\Home;
 
 use App\Models\Collection as ProductCollection;
 use App\Support\Cache\CacheKeys;
+use App\Support\Cache\CacheTagHelper;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Cache\TaggableStore;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -25,8 +27,9 @@ final class CollectionsShowcase extends Component implements HasSchemas
     {
         $locale = app()->getLocale();
 
-        return Cache::remember(CacheKeys::homeCollections($locale), CacheKeys::TTL_FIVE_MINUTES, function () use ($locale) {
+        $store = Cache::getStore();
 
+        $callback = function () use ($locale) {
             return ProductCollection::query()
                 ->with('media')
                 ->with(['translations' => function ($q) use ($locale) {
@@ -37,7 +40,14 @@ final class CollectionsShowcase extends Component implements HasSchemas
                 ->active()
                 ->ordered()
                 ->get();
-        });
+        };
+
+        if ($store instanceof TaggableStore) {
+            return Cache::tags(CacheTagHelper::merge(CacheTagHelper::collections(), CacheTagHelper::locale($locale)))
+                ->remember(CacheKeys::homeCollections($locale), CacheKeys::TTL_FIVE_MINUTES, $callback);
+        }
+
+        return Cache::remember(CacheKeys::homeCollections($locale), CacheKeys::TTL_FIVE_MINUTES, $callback);
     }
 
     public function collectionsSchema(Schema $schema): Schema
