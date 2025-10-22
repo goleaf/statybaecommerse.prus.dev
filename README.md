@@ -32,6 +32,8 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Multilingual experience** across storefront and admin via `spatie/laravel-translatable`, Volt-powered Livewire pages, and localized seed data.
 
 -### Latest updates
+- Validation fallback logic now syncs the translator to the fallback locale before replaying rules, ensuring the shared English
+  problem reason always resolves placeholders correctly even if the initial validation ran in another language.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
 - Region-aware address tables and the dedicated `customers` dataset are back online for the SQLite harness, letting factories and

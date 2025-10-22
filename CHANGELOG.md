@@ -7,6 +7,8 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Bug Fixes
+* Synced the fallback validator translator locale with the configured fallback language so API problem responses always surface
+  the intended English summary instead of leaking untranslated placeholders or generic "Invalid value." fallbacks.
 * Re-enabled flexible system setting translations by replacing the locale uniqueness constraint with an index, restoring soft delete support, and trimming the fillable contract so replication and counting scenarios match the documented API.
 * Preserved Attribute validation rule strings while still decoding JSON arrays, refreshed the Filament form so arrays render as comma-separated chips, and added regression coverage for both storage paths.
 * Reintroduced the `regions` schema with defensive guards and rebuilt the `customers`/`orders` relationship so SQLite-backed factories and analytics widgets can create location-aware records without missing column errors during tests.

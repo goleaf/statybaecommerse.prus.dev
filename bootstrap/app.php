@@ -21,8 +21,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 // Load the Filament compatibility shims before the application boots so the
 // legacy class aliases are always available during early package discovery.
@@ -134,11 +134,41 @@ return Application::configure(basePath: dirname(__DIR__))
 
             if ($validator instanceof ValidatorContract) {
                 $originalLocale = app()->getLocale();
+                $translator = null;
+                $originalTranslatorLocale = null;
+                $originalTranslatorFallback = null;
+
+                if (app()->bound('translator')) {
+                    /** @var object $translatorInstance */
+                    $translatorInstance = app('translator');
+
+                    $translator = $translatorInstance;
+
+                    if (method_exists($translatorInstance, 'getLocale')) {
+                        $originalTranslatorLocale = $translatorInstance->getLocale();
+                    }
+
+                    if (method_exists($translatorInstance, 'getFallback')) {
+                        $originalTranslatorFallback = $translatorInstance->getFallback();
+                    }
+                }
 
                 try {
                     // Re-run the validator with the fallback locale so we can surface
                     // a predictable English summary alongside the localized messages.
                     app()->setLocale($fallbackLocale);
+
+                    // Ensure the translator aligns with the fallback locale so that
+                    // rule replacements (like :attribute) resolve in English too.
+                    if ($translator !== null) {
+                        if (method_exists($translator, 'setLocale')) {
+                            $translator->setLocale($fallbackLocale);
+                        }
+
+                        if (method_exists($translator, 'setFallback')) {
+                            $translator->setFallback($fallbackLocale);
+                        }
+                    }
 
                     $fallbackValidator = app('validator')->make(
                         $validator->getData(),
@@ -177,6 +207,16 @@ return Application::configure(basePath: dirname(__DIR__))
                     // Always restore the previous locale so downstream formatters keep the
                     // request-scoped language selected by RequestContext.
                     app()->setLocale($originalLocale);
+
+                    if ($translator !== null) {
+                        if ($originalTranslatorLocale !== null && method_exists($translator, 'setLocale')) {
+                            $translator->setLocale($originalTranslatorLocale);
+                        }
+
+                        if ($originalTranslatorFallback !== null && method_exists($translator, 'setFallback')) {
+                            $translator->setFallback($originalTranslatorFallback);
+                        }
+                    }
                 }
             }
 
