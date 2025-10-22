@@ -18,6 +18,7 @@ This snapshot complements the changelog by listing functional capabilities that 
 
 ## Latest Update
 - Product API contract delivery now runs through dedicated application-layer use cases, a presenter, and an Eloquent repository, ensuring storefront consumers receive filtered, displayable catalogue data without breaking schema guarantees.
+- Notification administration delegates navigation metadata to the Nav registry with recursion safeguards, and address management documents its Filament `Schema::components([...])` pipeline for reviewers aligning with v4 expectations.
 - Menu Item administration adopts the shared navigation icon docblock and documents the reusable schema/table configurators so Filament v4 resource reviews stay consistent.
 - Wishlist Item admin navigation metadata now uses the Filament-standard static icon property with a documented sidebar sort value, keeping customer tooling grouped consistently.
 - Diagnostics coverage is now enforced through PHPUnit suites with a configurable minimum coverage extension and Paratest-ready composer scripts, removing the need for bespoke artisan commands when validating seeders and resource metadata.
