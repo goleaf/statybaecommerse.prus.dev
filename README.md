@@ -32,7 +32,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Multilingual experience** across storefront and admin via `spatie/laravel-translatable`, Volt-powered Livewire pages, and localized seed data.
 
 -### Latest updates
-- Campaign click administration now exposes a timestamp picker, defaults conversion values to zero, and backfills missing data during creation so marketing teams can record clicks without tripping database constraints.
+- Recently viewed storefront API calls now bypass visibility scopes and return session-ordered product IDs, keeping wishlist toggles and customer history widgets consistent even when draft catalogue entries populate the session during automated tests.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
 - Attribute group selectors now reuse a shared translation helper so historical slugs render as human-readable labels across Filament forms, filters, and tables instead of exposing raw keys.
