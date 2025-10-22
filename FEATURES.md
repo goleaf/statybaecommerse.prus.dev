@@ -17,6 +17,10 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
+- Campaign customer segment management now relies on explicit query scopes for
+  activity state, campaign, customer group, and segment type so analytics and
+  admin listings can intentionally include inactive records without removing
+  visibility controls from the model entirely.
 - Campaign conversion queries now rely solely on the status-aware scope so
   completed, pending, and other lifecycle records remain accessible to analytics
   tooling without fighting an `is_active` filter that the table never exposed.
