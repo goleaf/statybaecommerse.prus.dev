@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
+# shellcheck shell=sh
 # Husky shim to bootstrap Git hooks with the repository's local toolchain and config.
 # Restores the expected behaviour after accidental replacement with the deprecation banner
 # so that Git hooks execute consistently while still surfacing actionable warnings for v10 upgrades.
@@ -6,6 +7,7 @@
 n=$(basename "$0")
 s=$(dirname "$(dirname "$0")")/$n
 
+# Exit early when the resolved hook cannot be found to avoid noisy errors.
 [ ! -f "$s" ] && exit 0
 
 if [ -f "$HOME/.huskyrc" ]; then
@@ -14,6 +16,7 @@ fi
 i="${XDG_CONFIG_HOME:-$HOME/.config}/husky/init.sh"
 [ -f "$i" ] && . "$i"
 
+# Allow hooks to be disabled explicitly by setting HUSKY=0.
 [ "${HUSKY-}" = "0" ] && exit 0
 
 export PATH="node_modules/.bin:$PATH"

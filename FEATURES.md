@@ -17,6 +17,7 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
+- Developer tooling once again ships with the Husky bootstrap shim under version control, keeping Git hooks active after fresh clones while flagging the upcoming v10 script migration path for contributors.
 - Middleware-delivered CSP nonces now flow through Livewire, Vite, and inline Blade assets alongside stricter HSTS and permissions policy defaults, raising the platform's baseline security posture.
 - API error responses now surface an explicit `error.rate_limited` code for HTTP 429 cases so partner integrations can detect throttling conditions without parsing status text.
 - Test infrastructure now reloads JSON translation directories so Filament commerce navigation continues to present localized labels during automated checks.
