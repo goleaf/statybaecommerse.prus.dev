@@ -51,7 +51,11 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
     {{-- Vite Assets --}}
-    @vite(['resources/css/app.scss', 'resources/js/app.js'])
+    @if (app()->environment('testing'))
+        {{-- Skip Vite in tests to prevent missing manifest errors while rendering admin routes. --}}
+    @else
+        @vite(['resources/css/app.scss', 'resources/js/app.js'])
+    @endif
 
     {{-- Livewire Styles --}}
     @livewireStyles

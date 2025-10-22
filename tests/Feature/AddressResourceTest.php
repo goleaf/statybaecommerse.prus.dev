@@ -27,7 +27,7 @@ final class AddressResourceTest extends TestCase
 
         // Create a test user for authentication
         $this->adminUser = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
 
@@ -35,6 +35,8 @@ final class AddressResourceTest extends TestCase
         $this->country = Country::factory()->create(['cca2' => 'LT']);
 
         Filament::setCurrentPanel('admin');
+        $this->resolveAdminPanel(); // Ensure panel providers register all components before assertions.
+        $this->actingAs($this->adminUser); // Authenticate HTTP requests so panel routes stay accessible during tests.
     }
 
     public function test_can_list_addresses(): void
@@ -53,15 +55,15 @@ final class AddressResourceTest extends TestCase
         // Arrange
         $user = User::factory()->create();
         $addressData = [
-            'user_id' => $user->id,
-            'type' => AddressType::SHIPPING->value,
-            'first_name' => 'John',
-            'last_name' => 'Doe',
+            'user_id'        => $user->id,
+            'type'           => AddressType::SHIPPING->value,
+            'first_name'     => 'John',
+            'last_name'      => 'Doe',
             'address_line_1' => '123 Main St',
-            'city' => 'Vilnius',
-            'postal_code' => '01001',
-            'country_code' => 'LT',
-            'is_active' => true,
+            'city'           => 'Vilnius',
+            'postal_code'    => '01001',
+            'country_code'   => 'LT',
+            'is_active'      => true,
         ];
 
         // Act & Assert
@@ -72,31 +74,35 @@ final class AddressResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('addresses', [
-            'user_id' => $user->id,
-            'first_name' => 'John',
-            'last_name' => 'Doe',
+            'user_id'        => $user->id,
+            'first_name'     => 'John',
+            'last_name'      => 'Doe',
             'address_line_1' => '123 Main St',
-            'city' => 'Vilnius',
-            'postal_code' => '01001',
-            'country_code' => 'LT',
+            'city'           => 'Vilnius',
+            'postal_code'    => '01001',
+            'country_code'   => 'LT',
         ]);
     }
 
     public function test_can_edit_address(): void
     {
         // Arrange
-        $address = Address::factory()->for($this->adminUser)->create();
+        $address = Address::factory()->for($this->adminUser)->create(['country_code' => 'LT']);
         $newCity = 'Kaunas';
 
         // Act & Assert
         Livewire::actingAs($this->adminUser)
             ->test(EditAddress::class, ['record' => $address->id])
-            ->fillForm(['city' => $newCity], 'form')
+            ->fillForm([
+                'user_id'      => (string) $address->user_id,
+                'city'         => $newCity,
+                'country_code' => $address->country_code,
+            ], 'form')
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('addresses', [
-            'id' => $address->id,
+            'id'   => $address->id,
             'city' => $newCity,
         ]);
     }
@@ -104,7 +110,7 @@ final class AddressResourceTest extends TestCase
     public function test_can_view_address(): void
     {
         // Arrange
-        $address = Address::factory()->for($this->adminUser)->create();
+        $address = Address::factory()->for($this->adminUser)->create(['country_code' => 'LT']);
 
         // Act & Assert
         Livewire::actingAs($this->adminUser)
@@ -120,7 +126,7 @@ final class AddressResourceTest extends TestCase
 
         // Act & Assert
         $this
-            ->get('/admin/addresses?tableFilters[type][value]='.AddressType::SHIPPING->value)
+            ->get('/admin/addresses?tableFilters[type][value]=' . AddressType::SHIPPING->value)
             ->assertOk();
     }
 
@@ -148,7 +154,7 @@ final class AddressResourceTest extends TestCase
             ->assertNotified();
 
         $this->assertDatabaseHas('addresses', [
-            'id' => $address->id,
+            'id'         => $address->id,
             'is_default' => true,
         ]);
     }
@@ -165,7 +171,7 @@ final class AddressResourceTest extends TestCase
             ->assertNotified();
 
         $this->assertDatabaseHas('addresses', [
-            'user_id' => $address->user_id,
+            'user_id'    => $address->user_id,
             'first_name' => $address->first_name,
             'is_default' => false,
         ]);
@@ -183,7 +189,7 @@ final class AddressResourceTest extends TestCase
             ->assertNotified();
 
         $this->assertDatabaseHas('addresses', [
-            'id' => $address->id,
+            'id'        => $address->id,
             'is_active' => false,
         ]);
     }
@@ -201,7 +207,7 @@ final class AddressResourceTest extends TestCase
 
         foreach ($addresses as $address) {
             $this->assertDatabaseHas('addresses', [
-                'id' => $address->id,
+                'id'        => $address->id,
                 'is_active' => true,
             ]);
         }
@@ -220,7 +226,7 @@ final class AddressResourceTest extends TestCase
 
         foreach ($addresses as $address) {
             $this->assertDatabaseHas('addresses', [
-                'id' => $address->id,
+                'id'         => $address->id,
                 'is_billing' => true,
             ]);
         }
@@ -263,42 +269,42 @@ final class AddressResourceTest extends TestCase
     public function test_can_export_addresses(): void
     {
         // Arrange
-        Address::factory()->for($this->adminUser)->count(5)->create();
+        $addresses = Address::factory()->for($this->adminUser)->count(5)->create();
 
         // Act & Assert
         Livewire::actingAs($this->adminUser)
             ->test(ListAddresses::class)
-            ->callTableBulkAction('export')
+            ->callTableBulkAction('export', $addresses)
             ->assertNotified();
     }
 
     public function test_can_delete_address(): void
     {
         // Arrange
-        $address = Address::factory()->for($this->adminUser)->create();
+        $address = Address::factory()->for($this->adminUser)->create(['country_code' => 'LT']);
 
         // Act & Assert
         Livewire::actingAs($this->adminUser)
             ->test(ListAddresses::class)
-            ->callTableAction('delete', $address)
+            ->callTableAction('delete', $address, [], ['confirmed' => true])
             ->assertNotified();
 
-        $this->assertDatabaseMissing('addresses', ['id' => $address->id]);
+        $this->assertSoftDeleted('addresses', ['id' => $address->id]);
     }
 
     public function test_can_bulk_delete_addresses(): void
     {
         // Arrange
-        $addresses = Address::factory()->for($this->adminUser)->count(3)->create();
+        $addresses = Address::factory()->for($this->adminUser)->count(3)->create(['country_code' => 'LT']);
 
         // Act & Assert
         Livewire::actingAs($this->adminUser)
             ->test(ListAddresses::class)
-            ->callTableBulkAction('delete', $addresses)
+            ->callTableBulkAction('delete', $addresses, [], ['confirmed' => true])
             ->assertNotified();
 
         foreach ($addresses as $address) {
-            $this->assertDatabaseMissing('addresses', ['id' => $address->id]);
+            $this->assertSoftDeleted('addresses', ['id' => $address->id]);
         }
     }
 

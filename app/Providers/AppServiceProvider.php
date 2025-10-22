@@ -52,6 +52,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
@@ -127,6 +128,11 @@ class AppServiceProvider extends ServiceProvider
             // Ensure generated asset tags from Vite inherit the request-specific nonce value.
             Vite::useCspNonce(static fn (): string => csp_nonce());
         }
+
+        Blade::anonymousComponentNamespace(
+            resource_path('views/filament/components'),
+            'filament'
+        ); // Expose custom Filament Blade components for anonymous <x-filament::*> usage.
 
         if (! Testable::hasMacro('assertCanSeeFormData')) {
             Testable::macro('assertCanSeeFormData', function (array $data): Testable {
