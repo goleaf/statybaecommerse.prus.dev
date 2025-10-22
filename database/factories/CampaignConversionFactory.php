@@ -24,69 +24,70 @@ final class CampaignConversionFactory extends Factory
     public function definition(): array
     {
         return [
-            'campaign_id' => Campaign::factory(),
-            'customer_id' => User::factory(),
-            'conversion_type' => $this->faker->randomElement(['purchase', 'signup', 'download', 'subscription', 'lead', 'custom']),
+            'campaign_id'      => Campaign::factory(),
+            'customer_id'      => User::factory(),
+            'conversion_type'  => $this->faker->randomElement(['purchase', 'signup', 'download', 'subscription', 'lead', 'custom']),
             'conversion_value' => $this->faker->randomFloat(2, 10, 1000),
-            'status' => $this->faker->randomElement(['completed', 'pending', 'confirmed', 'cancelled']),
-            'converted_at' => $this->faker->dateTimeBetween('-30 days', 'now'),
-            'session_id' => $this->faker->uuid(),
+            'status'           => $this->faker->randomElement(['completed', 'pending', 'confirmed', 'cancelled']),
+            // Keep conversion timestamps near "now" so date-based scopes and tests remain stable.
+            'converted_at'    => now()->subHours($this->faker->numberBetween(0, 12)),
+            'session_id'      => $this->faker->uuid(),
             'conversion_data' => [
-                'source' => $this->faker->randomElement(['google', 'facebook', 'twitter', 'linkedin']),
+                'source'        => $this->faker->randomElement(['google', 'facebook', 'twitter', 'linkedin']),
                 'campaign_name' => $this->faker->words(3, true),
-                'referrer' => $this->faker->url(),
+                'referrer'      => $this->faker->url(),
             ],
-            'ip_address' => $this->faker->ipv4(),
-            'user_agent' => $this->faker->userAgent(),
-            'device_type' => $this->faker->randomElement(['mobile', 'tablet', 'desktop']),
-            'browser' => $this->faker->randomElement(['Chrome', 'Firefox', 'Safari', 'Edge']),
-            'os' => $this->faker->randomElement(['Windows', 'macOS', 'Linux', 'iOS', 'Android']),
-            'country' => $this->faker->countryCode(),
-            'city' => $this->faker->city(),
-            'is_mobile' => $this->faker->boolean(30),
-            'is_tablet' => $this->faker->boolean(10),
-            'is_desktop' => $this->faker->boolean(60),
+            'ip_address'          => $this->faker->ipv4(),
+            'user_agent'          => $this->faker->userAgent(),
+            'device_type'         => $this->faker->randomElement(['mobile', 'tablet', 'desktop']),
+            'browser'             => $this->faker->randomElement(['Chrome', 'Firefox', 'Safari', 'Edge']),
+            'os'                  => $this->faker->randomElement(['Windows', 'macOS', 'Linux', 'iOS', 'Android']),
+            'country'             => $this->faker->countryCode(),
+            'city'                => $this->faker->city(),
+            'is_mobile'           => $this->faker->boolean(30),
+            'is_tablet'           => $this->faker->boolean(10),
+            'is_desktop'          => $this->faker->boolean(60),
             'conversion_duration' => $this->faker->numberBetween(10, 3600),
-            'page_views' => $this->faker->numberBetween(1, 20),
-            'time_on_site' => $this->faker->numberBetween(30, 1800),
-            'bounce_rate' => $this->faker->randomFloat(2, 0, 1),
-            'exit_page' => $this->faker->url(),
-            'landing_page' => $this->faker->url(),
-            'funnel_step' => $this->faker->randomElement(['awareness', 'interest', 'consideration', 'purchase', 'retention']),
-            'attribution_model' => $this->faker->randomElement(['last_click', 'first_click', 'linear', 'time_decay', 'position_based', 'data_driven']),
-            'conversion_path' => [
+            'page_views'          => $this->faker->numberBetween(1, 20),
+            'time_on_site'        => $this->faker->numberBetween(30, 1800),
+            'bounce_rate'         => $this->faker->randomFloat(2, 0, 1),
+            'exit_page'           => $this->faker->url(),
+            'landing_page'        => $this->faker->url(),
+            'funnel_step'         => $this->faker->randomElement(['awareness', 'interest', 'consideration', 'purchase', 'retention']),
+            'attribution_model'   => $this->faker->randomElement(['last_click', 'first_click', 'linear', 'time_decay', 'position_based', 'data_driven']),
+            'conversion_path'     => [
                 'touchpoints' => $this->faker->numberBetween(1, 5),
-                'channels' => $this->faker->randomElements(['google', 'facebook', 'email', 'direct'], 2),
+                'channels'    => $this->faker->randomElements(['google', 'facebook', 'email', 'direct'], 2),
             ],
             'touchpoints' => [
                 'first_touch' => $this->faker->dateTimeBetween('-90 days', '-1 day'),
-                'last_touch' => $this->faker->dateTimeBetween('-7 days', 'now'),
+                'last_touch'  => $this->faker->dateTimeBetween('-7 days', 'now'),
             ],
-            'last_click_attribution' => $this->faker->randomFloat(2, 0, 100),
-            'first_click_attribution' => $this->faker->randomFloat(2, 0, 100),
-            'linear_attribution' => $this->faker->randomFloat(2, 0, 100),
-            'time_decay_attribution' => $this->faker->randomFloat(2, 0, 100),
+            'last_click_attribution'     => $this->faker->randomFloat(2, 0, 100),
+            'first_click_attribution'    => $this->faker->randomFloat(2, 0, 100),
+            'linear_attribution'         => $this->faker->randomFloat(2, 0, 100),
+            'time_decay_attribution'     => $this->faker->randomFloat(2, 0, 100),
             'position_based_attribution' => $this->faker->randomFloat(2, 0, 100),
-            'data_driven_attribution' => $this->faker->randomFloat(2, 0, 100),
-            'conversion_window' => $this->faker->numberBetween(1, 90),
-            'lookback_window' => $this->faker->numberBetween(30, 365),
-            'assisted_conversions' => $this->faker->numberBetween(0, 5),
-            'assisted_conversion_value' => $this->faker->randomFloat(2, 0, 500),
-            'total_conversions' => $this->faker->numberBetween(1, 10),
-            'total_conversion_value' => $this->faker->randomFloat(2, 50, 2000),
-            'conversion_rate' => $this->faker->randomFloat(4, 0, 1),
-            'cost_per_conversion' => $this->faker->randomFloat(2, 5, 100),
-            'roi' => $this->faker->randomFloat(4, -0.5, 5),
-            'roas' => $this->faker->randomFloat(4, 0, 10),
-            'lifetime_value' => $this->faker->randomFloat(2, 100, 5000),
-            'customer_acquisition_cost' => $this->faker->randomFloat(2, 10, 200),
-            'payback_period' => $this->faker->numberBetween(1, 365),
-            'notes' => $this->faker->optional(0.3)->sentence(),
-            'tags' => $this->faker->optional(0.4)->randomElements(['high-value', 'new-customer', 'repeat-purchase', 'seasonal'], 2),
-            'custom_attributes' => [
+            'data_driven_attribution'    => $this->faker->randomFloat(2, 0, 100),
+            'conversion_window'          => $this->faker->numberBetween(1, 90),
+            'lookback_window'            => $this->faker->numberBetween(30, 365),
+            'assisted_conversions'       => $this->faker->numberBetween(0, 5),
+            'assisted_conversion_value'  => $this->faker->randomFloat(2, 0, 500),
+            'total_conversions'          => $this->faker->numberBetween(1, 10),
+            'total_conversion_value'     => $this->faker->randomFloat(2, 50, 2000),
+            'conversion_rate'            => $this->faker->randomFloat(4, 0, 1),
+            'cost_per_conversion'        => $this->faker->randomFloat(2, 5, 100),
+            'roi'                        => $this->faker->randomFloat(4, -0.5, 5),
+            'roas'                       => $this->faker->randomFloat(4, 0, 10),
+            'lifetime_value'             => $this->faker->randomFloat(2, 100, 5000),
+            'customer_acquisition_cost'  => $this->faker->randomFloat(2, 10, 200),
+            'payback_period'             => $this->faker->numberBetween(1, 365),
+            'notes'                      => $this->faker->optional(0.3)->sentence(),
+            'tags'                       => $this->faker->optional(0.4)->randomElements(['high-value', 'new-customer', 'repeat-purchase', 'seasonal'], 2),
+            'custom_attributes'          => [
                 'source_campaign' => $this->faker->words(2, true),
-                'ad_group' => $this->faker->words(2, true),
-                'keyword' => $this->faker->words(1, true),
+                'ad_group'        => $this->faker->words(2, true),
+                'keyword'         => $this->faker->words(1, true),
             ],
         ];
     }
@@ -138,9 +139,9 @@ final class CampaignConversionFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'device_type' => 'mobile',
-            'is_mobile' => true,
-            'is_tablet' => false,
-            'is_desktop' => false,
+            'is_mobile'   => true,
+            'is_tablet'   => false,
+            'is_desktop'  => false,
         ]);
     }
 
@@ -151,9 +152,9 @@ final class CampaignConversionFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'device_type' => 'tablet',
-            'is_mobile' => false,
-            'is_tablet' => true,
-            'is_desktop' => false,
+            'is_mobile'   => false,
+            'is_tablet'   => true,
+            'is_desktop'  => false,
         ]);
     }
 
@@ -164,9 +165,9 @@ final class CampaignConversionFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'device_type' => 'desktop',
-            'is_mobile' => false,
-            'is_tablet' => false,
-            'is_desktop' => true,
+            'is_mobile'   => false,
+            'is_tablet'   => false,
+            'is_desktop'  => true,
         ]);
     }
 
@@ -176,7 +177,7 @@ final class CampaignConversionFactory extends Factory
     public function purchase(): static
     {
         return $this->state(fn (array $attributes) => [
-            'conversion_type' => 'purchase',
+            'conversion_type'  => 'purchase',
             'conversion_value' => $this->faker->randomFloat(2, 50, 1000),
         ]);
     }
@@ -187,7 +188,7 @@ final class CampaignConversionFactory extends Factory
     public function signup(): static
     {
         return $this->state(fn (array $attributes) => [
-            'conversion_type' => 'signup',
+            'conversion_type'  => 'signup',
             'conversion_value' => 0,
         ]);
     }
@@ -218,8 +219,8 @@ final class CampaignConversionFactory extends Factory
     public function fromGoogle(): static
     {
         return $this->state(fn (array $attributes) => [
-            'utm_source' => 'google',
-            'utm_medium' => 'cpc',
+            'utm_source'   => 'google',
+            'utm_medium'   => 'cpc',
             'utm_campaign' => $this->faker->words(2, true),
         ]);
     }
@@ -230,8 +231,8 @@ final class CampaignConversionFactory extends Factory
     public function fromFacebook(): static
     {
         return $this->state(fn (array $attributes) => [
-            'utm_source' => 'facebook',
-            'utm_medium' => 'social',
+            'utm_source'   => 'facebook',
+            'utm_medium'   => 'social',
             'utm_campaign' => $this->faker->words(2, true),
         ]);
     }
@@ -242,8 +243,8 @@ final class CampaignConversionFactory extends Factory
     public function fromEmail(): static
     {
         return $this->state(fn (array $attributes) => [
-            'utm_source' => 'email',
-            'utm_medium' => 'email',
+            'utm_source'   => 'email',
+            'utm_medium'   => 'email',
             'utm_campaign' => $this->faker->words(2, true),
         ]);
     }
