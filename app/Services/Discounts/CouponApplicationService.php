@@ -22,7 +22,7 @@ final class CouponApplicationService
     ) {}
 
     /**
-     * @param  array<string, mixed>  $context
+     * @param  array<string, mixed>             $context
      * @return array<int, array<string, mixed>>
      */
     public function getAvailableCoupons(array $context): array
@@ -38,24 +38,24 @@ final class CouponApplicationService
             ->get()
             ->filter(fn (Coupon $coupon): bool => $coupon->minimum_amount === null || $subtotal >= (float) $coupon->minimum_amount)
             ->map(fn (Coupon $coupon): array => [
-                'code' => $coupon->code,
-                'name' => $coupon->name,
-                'description' => $coupon->description,
-                'type' => $coupon->type,
-                'value' => (float) $coupon->value,
-                'minimum_amount' => $coupon->minimum_amount !== null ? (float) $coupon->minimum_amount : null,
+                'code'             => $coupon->code,
+                'name'             => $coupon->name,
+                'description'      => $coupon->description,
+                'type'             => $coupon->type,
+                'value'            => (float) $coupon->value,
+                'minimum_amount'   => $coupon->minimum_amount !== null ? (float) $coupon->minimum_amount : null,
                 'maximum_discount' => $coupon->maximum_discount !== null ? (float) $coupon->maximum_discount : null,
-                'starts_at' => optional($coupon->starts_at)->toIso8601String(),
-                'expires_at' => optional($coupon->expires_at)->toIso8601String(),
-                'is_active' => $coupon->isValid(),
-                'is_usable_now' => $coupon->starts_at === null || $coupon->starts_at->lte($now),
+                'starts_at'        => optional($coupon->starts_at)->toIso8601String(),
+                'expires_at'       => optional($coupon->expires_at)->toIso8601String(),
+                'is_active'        => $coupon->isValid(),
+                'is_usable_now'    => $coupon->starts_at === null || $coupon->starts_at->lte($now),
             ])
             ->values()
             ->all();
     }
 
     /**
-     * @param  array<string, mixed>  $context
+     * @param  array<string, mixed> $context
      * @return array<string, mixed>
      */
     public function apply(string $rawCode, array $context): array
@@ -107,13 +107,14 @@ final class CouponApplicationService
 
         $pricing = (array) $this->discountEngine->evaluate(array_merge($context, ['code' => $code]));
         $existingDiscount = (float) Arr::get($pricing, 'discount_total_amount', 0.0);
-        $pricing['coupon_discount_amount'] = Number::parseFloat($discountAmount);
-        $pricing['discount_total_amount'] = Number::parseFloat($existingDiscount + $discountAmount);
+        // Persist monetary values with a rounded float to avoid parse errors when Number::parseFloat expects strings.
+        $pricing['coupon_discount_amount'] = round($discountAmount, 2);
+        $pricing['discount_total_amount'] = round($existingDiscount + $discountAmount, 2);
 
         $payload = [
-            'code' => $coupon->code,
+            'code'            => $coupon->code,
             'discount_amount' => $pricing['coupon_discount_amount'],
-            'pricing' => $pricing,
+            'pricing'         => $pricing,
         ];
 
         $this->session->put('checkout.coupon', $payload);
@@ -122,12 +123,12 @@ final class CouponApplicationService
         return [
             'success' => true,
             'message' => __('Coupon applied successfully.'),
-            'coupon' => $payload,
+            'coupon'  => $payload,
         ];
     }
 
     /**
-     * @param  array<string, mixed>  $context
+     * @param  array<string, mixed> $context
      * @return array<string, mixed>
      */
     public function remove(array $context): array
@@ -139,7 +140,7 @@ final class CouponApplicationService
         $result = [
             'success' => true,
             'message' => __('Coupon removed.'),
-            'coupon' => $coupon ?? ['code' => null, 'discount_amount' => 0.0],
+            'coupon'  => $coupon ?? ['code' => null, 'discount_amount' => 0.0],
             'pricing' => $pricing,
         ];
 
