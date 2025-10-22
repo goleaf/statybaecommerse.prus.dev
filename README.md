@@ -146,6 +146,7 @@ composer run dev
 ## Configuration notes
 - Environment defaults live in `.env.example`; copy it to `.env` to tweak database/queue/mail settings.
 - SQLite is enabled by default for fast onboarding—switch `DB_CONNECTION` in `.env` if you need MySQL/PostgreSQL.
+- PHPUnit and Pest now point to `database/testing.sqlite`; delete the file if you want a clean slate between manual runs.
 - Storage symlink (`public/storage`) is created by `make setup`; re-run `php artisan storage:link` if you remove it.
 - Horizon, Scout, and media-processing queues expect Redis; local installs default to the sync driver (`QUEUE_CONNECTION=sync`). Update `QUEUE_CONNECTION` to `redis` (or your chosen queue backend) once Redis is available to re-enable Horizon workers.
 - Frontend assets rely on modern Node (20+) with native ESM; ensure `npm install` runs before invoking Vite or Playwright scripts.

@@ -27,9 +27,16 @@ trait CreatesApplication
 
         $app->make(Kernel::class)->bootstrap();
 
-        // Ensure tests always use in-memory SQLite to avoid file corruption issues
+        // Use a dedicated on-disk SQLite database so migrations persist across connections.
+        $testingDatabasePath = database_path('testing.sqlite');
+
+        if (! file_exists($testingDatabasePath)) {
+            // Create the database file if it has not been initialised yet.
+            touch($testingDatabasePath);
+        }
+
         config()->set('database.default', 'sqlite');
-        config()->set('database.connections.sqlite.database', ':memory:');
+        config()->set('database.connections.sqlite.database', $testingDatabasePath);
         // Disable Telescope and force its connection to sqlite during tests to avoid MySQL usage
         config()->set('telescope.enabled', false);
         config()->set('telescope.storage.database.connection', 'sqlite');

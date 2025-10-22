@@ -18,6 +18,7 @@ This snapshot complements the changelog by listing functional capabilities that 
 
 ## Latest Update
 - Search experiences normalise mixed-case `types[]` filters so targeted product/category/brand lookups keep the requested scope even when storefront clients send capitalised identifiers.
+- Developer experience improvements ensure PHPUnit and Pest share a persistent SQLite test database, preventing missing-table failures when exercising product APIs locally.
 - The custom Edit Profile page now imports `Filament\\Schemas\\Schema`, keeping Filament authentication tooling aligned with v4 expectations and eliminating namespace-related fatal errors during automated runs.
 - Pest-powered test helpers now wrap the `login()` helper in a function-existence guard so repeated bootstrap cycles during `php artisan test` runs avoid fatal redeclaration errors.
 - Order lifecycle tooling now recognises the expanded `orders.status` enum (including confirmed, completed, and returned flows), keeping admin filters and demo seeds consistent without MySQL truncation warnings during fresh installs.
