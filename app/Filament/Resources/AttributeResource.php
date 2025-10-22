@@ -143,6 +143,28 @@ final class AttributeResource extends Resource
                     TextInput::make('validation_rules')
                         ->label(__('attributes.validation_rules'))
                         ->helperText(__('attributes.validation_rules_help'))
+                        ->placeholder('required|min:3')
+                        ->formatStateUsing(static function ($state): ?string {
+                            // Avoid leaking raw JSON to the interface by presenting array payloads as comma-separated strings.
+                            if (is_array($state)) {
+                                return implode(', ', array_map(static fn ($rule): string => (string) $rule, $state));
+                            }
+
+                            return $state;
+                        })
+                        ->dehydrateStateUsing(static function ($state) {
+                            // When authors enter multiple rules separated by commas we hydrate them back into an array so the
+                            // Attribute mutator can persist JSON without mangling the string variant.
+                            if (! is_string($state)) {
+                                return $state;
+                            }
+
+                            if (str_contains($state, ',')) {
+                                return array_values(array_filter(array_map(static fn ($rule): string => trim($rule), explode(',', $state)), static fn ($rule): bool => $rule !== ''));
+                            }
+
+                            return $state;
+                        })
                         ->columnSpanFull(),
                 ]),
             Section::make(__('attributes.options'))
