@@ -12,7 +12,10 @@ use App\Models\DiscountRedemption;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
@@ -21,10 +24,6 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -38,14 +37,21 @@ final class DiscountRedemptionResource extends Resource
 {
     protected static ?string $model = DiscountRedemption::class;
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Discounts';
-    }
+    /**
+     * Explicitly declare the marketing navigation group for this resource.
+     */
+    protected static string|UnitEnum|null $navigationGroup = 'Marketing';
 
-    public static function getNavigationIcon(): BackedEnum|string|null
+    // Retain the ticket icon so administrators can spot the redemption resource quickly.
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-ticket';
+
+    // Position the resource prominently within the marketing navigation cluster.
+    protected static ?int $navigationSort = 2;
+
+    public static function getNavigationBadgeColor(): string
     {
-        return 'heroicon-o-ticket';
+        // Highlight the badge with a warning tone to draw attention to pending discount redemptions.
+        return 'warning';
     }
 
     public static function getPluralModelLabel(): string
@@ -177,20 +183,24 @@ final class DiscountRedemptionResource extends Resource
                     ->label(__('discount_redemptions.fields.amount_saved'))
                     ->money(fn (DiscountRedemption $record) => $record->currency_code ?? 'EUR')
                     ->sortable(),
-                BadgeColumn::make('status')
+                TextColumn::make('status')
                     ->label(__('discount_redemptions.fields.status'))
-                    ->colors([
-                        'success' => 'redeemed',
-                        'warning' => 'pending',
-                        'danger'  => 'expired',
-                        'gray'    => 'cancelled',
-                    ])
-                    ->icons([
-                        'heroicon-m-check-circle'         => 'redeemed',
-                        'heroicon-m-clock'                => 'pending',
-                        'heroicon-m-x-mark'               => 'cancelled',
-                        'heroicon-m-exclamation-triangle' => 'expired',
-                    ])
+                    // Use the badge helper to stay compatible with Filament v4 while keeping the visual treatment.
+                    ->badge()
+                    ->color(fn (?string $state): string => match ($state) {
+                        'redeemed'  => 'success',
+                        'pending'   => 'warning',
+                        'expired'   => 'danger',
+                        'cancelled' => 'gray',
+                        default     => 'primary',
+                    })
+                    ->icon(fn (?string $state): ?string => match ($state) {
+                        'redeemed'  => 'heroicon-m-check-circle',
+                        'pending'   => 'heroicon-m-clock',
+                        'cancelled' => 'heroicon-m-x-mark',
+                        'expired'   => 'heroicon-m-exclamation-triangle',
+                        default     => null,
+                    })
                     ->sortable(),
                 TextColumn::make('redeemed_at')
                     ->label(__('discount_redemptions.fields.redeemed_at'))
