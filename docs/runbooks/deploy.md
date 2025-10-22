@@ -17,7 +17,7 @@ A predictable deployment follows a strict order of operations so that each relea
 ## 3. Refresh caches
 - Clear configuration, route, view, and event caches.
 - Rebuild caches: `php artisan config:cache`, `route:cache`, `view:cache`, and `event:cache` as applicable.
-- Prime any application-specific caches documented in `docs/CachePolicy.md`.
+- Prime any application-specific caches documented in `docs/runbooks/CachePolicy.md`.
 
 ## 4. Warm up queues (if used)
 - Scale workers to the new release using zero-downtime rolling updates.

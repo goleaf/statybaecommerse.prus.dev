@@ -52,5 +52,5 @@ Document any intentional deviations (e.g., skipped static analysis) in the commi
 
 - Update `docs/CHANGELOG.md` with user-visible features, migrations, or dependency bumps.
 - For new architectural areas, add a short pointer to `docs/INDEX.md` to keep the navigation fresh.
-- Align cache additions with the [Cache Policy](docs/CachePolicy.md) and mention notable cache keys in PR descriptions when relevant.
+- Align cache additions with the [Cache Policy](docs/runbooks/CachePolicy.md) and mention notable cache keys in PR descriptions when relevant.
 - Record any deferred follow-up work in the memory bank utilities under `memory-bank/` so the team can prioritise them later.
