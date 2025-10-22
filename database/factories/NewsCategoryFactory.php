@@ -17,11 +17,13 @@ final class NewsCategoryFactory extends Factory
     public function definition(): array
     {
         return [
-            'is_visible' => $this->faker->boolean(80),
-            'parent_id' => null,
+            // Default visibility to true so global scopes such as ActiveScope do not
+            // unexpectedly hide categories during tests or seed generation flows.
+            'is_visible' => true,
+            'parent_id'  => null,
             'sort_order' => $this->faker->numberBetween(0, 100),
-            'color' => $this->faker->hexColor(),
-            'icon' => $this->faker->randomElement([
+            'color'      => $this->faker->hexColor(),
+            'icon'       => $this->faker->randomElement([
                 'heroicon-o-rectangle-stack',
                 'heroicon-o-document-text',
                 'heroicon-o-newspaper',
