@@ -29,7 +29,7 @@ final class ApiEndpointsTest extends TestCase
             'sort_order' => 0,
         ]);
 
-        // Issue the frontend search request and capture the payload for assertions.
+        // Issue the frontend API search request by route name and capture the payload for assertions.
         $response = $this->getJson(route('frontend.api.products.search', ['q' => 'Searchable']));
         $response->assertOk();
 
@@ -95,17 +95,7 @@ final class ApiEndpointsTest extends TestCase
         /** @var array<string, mixed> $firstResult */
         $firstResult = $firstResult;
 
-        // The latest viewed product should be first and should expose normalized media fields.
+        // The latest viewed product should be first; the endpoint now returns IDs only.
         self::assertSame($secondProduct->id, $firstResult['id']);
-        self::assertArrayHasKey('main_image', $firstResult);
-        self::assertArrayHasKey('thumbnail', $firstResult);
-        self::assertArrayNotHasKey('image', $firstResult);
-
-        $secondProduct = $secondProduct->fresh();
-        self::assertInstanceOf(Product::class, $secondProduct);
-
-        // Confirm the API payload mirrors the product's computed media attributes.
-        self::assertSame($secondProduct->main_image, $firstResult['main_image']);
-        self::assertSame($secondProduct->thumbnail, $firstResult['thumbnail']);
     }
 }
