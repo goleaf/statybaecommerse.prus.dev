@@ -17,6 +17,7 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
+- Catalog contract docs now capture the streamlined product meta payload and nullable media thumbnails so integrators see the same shape published by the API presenter.
 - Search experiences normalise mixed-case `types[]` filters so targeted product/category/brand lookups keep the requested scope even when storefront clients send capitalised identifiers.
 - The custom Edit Profile page now imports `Filament\\Schemas\\Schema`, keeping Filament authentication tooling aligned with v4 expectations and eliminating namespace-related fatal errors during automated runs.
 - Pest-powered test helpers now wrap the `login()` helper in a function-existence guard so repeated bootstrap cycles during `php artisan test` runs avoid fatal redeclaration errors.
