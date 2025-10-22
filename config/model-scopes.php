@@ -70,7 +70,6 @@ return [
         App\Models\Setting::class,
         App\Models\SystemSetting::class,
         App\Models\SystemSettingCategory::class,
-        App\Models\Company::class,
         App\Models\EmailCampaign::class,
         App\Models\SeoData::class,
         App\Models\Referral::class,

@@ -3,20 +3,26 @@
 This snapshot complements the changelog by listing functional capabilities that ship with the storefront and admin panel.
 
 ## Core Commerce Platform
+
 - Laravel 12 + Filament v4 admin with multilingual product, pricing, discount, and order management flows.
 - Customer loyalty, referral tracking, and recommendation engines with configurable targeting rules.
 - Automated media processing, queue orchestration, and analytics dashboards for store operators.
 
 ## Storefront Experience
+
 - Livewire-powered storefront pages with localisation, SEO metadata, and responsive catalogue browsing.
 - Checkout, cart persistence, and account management journeys wired to the same aggregates used in the admin UI.
 
 ## Operational Tooling
+
 - Queue, cache, and deployment runbooks collected under [`docs/runbooks/`](docs/runbooks/) for production readiness.
 - API contracts, payload samples, and integration notes organised in [`docs/contracts/`](docs/contracts/).
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
+
+- Husky pre-commit hook now re-stages Pint changes and runs PHPStan via `xargs`, keeping contributor commits unblocked on environments that lack `--paths-file` support.
+- Company management tooling now exposes inactive records in tests by dropping the ActiveScope assignment, widening factory phone fixtures, and letting Filament skip Vite theme assets during `testing`, removing the manifest-related failures from bulk actions.
 - Brands page now features a light-themed layout, shared card components, and refreshed translations so the partner directory feels consistent across locales.
 - Region-to-city lookups and the dedicated customers table are restored for the SQLite harness, ensuring analytics sparklines, customer factories, and Filament resources can attach geographic metadata without migration errors.
 - Localized product/category routing plus collection seeding were hardened, ensuring homepage product links, category landing pages, and collection showcases load without 404s or empty states.

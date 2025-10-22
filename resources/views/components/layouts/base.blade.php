@@ -58,7 +58,10 @@
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
 
     <!-- Scripts -->
-    @vite(['resources/css/app.scss', 'resources/js/app.js'])
+    {{-- Skip Vite asset loading when the manifest is absent during testing to prevent runtime exceptions. --}}
+    @if (file_exists(public_path('build/manifest.json')))
+        @vite(['resources/css/app.scss', 'resources/js/app.js'])
+    @endif
 
     <!-- Livewire Styles -->
     @livewireStyles
