@@ -7,7 +7,7 @@
     <!-- Featured Shelf (primary) -->
     <section class="relative">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <livewire:home.product-shelf :preset="'featured'" :limit="8" :title="'Išskirtiniai produktai'" />
+            <livewire:home.product-shelf :preset="'featured'" :limit="8" />
         </div>
     </section>
 
@@ -23,14 +23,14 @@
     <!-- Shelves: Latest / Trending / Sale -->
     <section class="relative">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-20">
-            <livewire:home.product-shelf :preset="'latest'" :limit="8" :title="'Išskirtiniai produktai'" />
-            <livewire:home.product-shelf :preset="'trending'" :limit="8" :title="'Išskirtiniai produktai'" />
-            <livewire:home.product-shelf :preset="'sale'" :limit="12" :title="'Išskirtiniai produktai'" />
+            <livewire:home.product-shelf :preset="'latest'" :limit="8" />
+            <livewire:home.product-shelf :preset="'trending'" :limit="8" />
+            <livewire:home.product-shelf :preset="'sale'" :limit="12" />
         </div>
     </section>
 
     <!-- Full Catalogue Explorer -->
-    <section class="relative bg-slate-950 text-slate-50">
+    <section class="relative bg-slate-100 text-slate-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <livewire:home.product-catalogue />
         </div>

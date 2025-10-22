@@ -51,19 +51,19 @@ final class Index extends AbstractPageComponent implements HasSchemas
     {
         return $schema->components([
             TextInput::make('search')
-                ->label(__('Search brands'))
-                ->placeholder(__('Search brands...'))
+                ->label(__('frontend/brands.filters.search_label'))
+                ->placeholder(__('frontend/brands.filters.search_placeholder'))
                 ->live(debounce: 300)
                 ->afterStateUpdated(fn () => $this->resetPage())
                 ->prefixIcon('heroicon-o-magnifying-glass'),
             Select::make('sortBy')
-                ->label(__('Sort by'))
+                ->label(__('frontend/brands.filters.sort_label'))
                 ->options([
-                    'name' => __('Name A-Z'),
-                    'name_desc' => __('Name Z-A'),
-                    'products_count' => __('Most Products'),
-                    'created_at' => __('Newest'),
-                    'featured' => __('Featured First'),
+                    'name' => __('frontend/brands.filters.options.name'),
+                    'name_desc' => __('frontend/brands.filters.options.name_desc'),
+                    'products_count' => __('frontend/brands.filters.options.products_count'),
+                    'created_at' => __('frontend/brands.filters.options.created_at'),
+                    'featured' => __('frontend/brands.filters.options.featured'),
                 ])
                 ->live()
                 ->afterStateUpdated(fn () => $this->resetPage())
@@ -108,7 +108,7 @@ final class Index extends AbstractPageComponent implements HasSchemas
      */
     protected function getPageTitle(): string
     {
-        return __('shared.brands');
+        return __('frontend/brands.meta.title');
     }
 
     /**
@@ -116,7 +116,7 @@ final class Index extends AbstractPageComponent implements HasSchemas
      */
     protected function getPageDescription(): ?string
     {
-        return __('Browse all our trusted brand partners and discover quality products');
+        return __('frontend/brands.meta.description');
     }
 
     /**
@@ -133,6 +133,6 @@ final class Index extends AbstractPageComponent implements HasSchemas
      */
     public function render(): View
     {
-        return view('livewire.pages.brand.index')->title(__('translations.brands').' - '.config('app.name'));
+        return view('livewire.pages.brand.index')->title(__('frontend/brands.meta.title').' - '.config('app.name'));
     }
 }

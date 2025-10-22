@@ -13,6 +13,7 @@ return [
     'product_not_available' => 'Product not available',
     'insufficient_stock' => 'Insufficient stock',
     'sale' => 'Sale',
+    'brands' => 'Brands',
     'new' => 'New',
     'featured' => 'Featured',
     'out_of_stock' => 'Out of Stock',

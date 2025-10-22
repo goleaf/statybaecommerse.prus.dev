@@ -115,6 +115,34 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
+     * Ensure route model binding honours translated slugs across locales.
+     */
+    public function resolveRouteBinding($value, $field = null)
+    {
+        $field ??= $this->getRouteKeyName();
+
+        if ($field === 'slug' && is_string($value)) {
+            $locale = app()->getLocale();
+            $fallback = config('app.fallback_locale', 'en');
+
+            // Lookup the product by matching the base slug or any translated slug.
+            return $this->newQuery()
+                ->where($field, $value)
+                ->orWhereHas('translations', static function ($query) use ($value, $locale): void {
+                    $query->where('locale', $locale)->where('slug', $value);
+                })
+                ->when($fallback !== $locale, function ($query) use ($value, $fallback): void {
+                    $query->orWhereHas('translations', static function ($query) use ($value, $fallback): void {
+                        $query->where('locale', $fallback)->where('slug', $value);
+                    });
+                })
+                ->firstOrFail();
+        }
+
+        return parent::resolveRouteBinding($value, $field);
+    }
+
+    /**
      * Handle isPublished functionality with proper error handling.
      */
     public function isPublished(): bool
