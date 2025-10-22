@@ -7,6 +7,8 @@ namespace App\Support\Search;
 use App\Models\Product;
 use DefStudio\SearchableInput\DTO\SearchResult;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Schema;
 
 final class ProductSearch
 {
@@ -70,7 +72,8 @@ final class ProductSearch
     {
         $search = trim($term);
 
-        return Product::query()
+        $builder = Product::query()
+            ->withoutGlobalScope(SoftDeletingScope::class)
             ->select(['id', 'sku', 'barcode', 'name', 'price'])
             ->when($search !== '', function (Builder $builder) use ($search): void {
                 $builder->where(function (Builder $query) use ($search): void {
@@ -82,6 +85,13 @@ final class ProductSearch
                 });
             })
             ->orderByDesc('updated_at');
+
+        if (Schema::hasColumn($builder->getModel()->getTable(), 'deleted_at')) {
+            // Respect soft delete semantics when the column exists so storefront queries stay aligned with production data.
+            $builder->whereNull('deleted_at');
+        }
+
+        return $builder;
     }
 
     private static function formatLabel(Product $product): string
