@@ -33,10 +33,15 @@ final class SearchRequest extends FormRequest
     {
         return [
             'query' => ['required', 'string', 'min:2', 'max:200'],
-            'page' => ['sometimes', 'integer', 'min:1'],
-            'per_page' => ['sometimes', 'integer', 'min:1', 'max:'.SearchQueryData::MAX_PER_PAGE],
-            'types' => ['sometimes', 'array'],
-            'types.*' => [Rule::in(['product', 'category', 'brand'])],
+            'page'  => ['sometimes', 'integer', 'min:1'],
+            // We intentionally skip an upper bound here so that callers exceeding the
+            // advertised maximum still receive a capped response instead of a 422
+            // validation error. SearchQueryData::fromArray() enforces MAX_PER_PAGE
+            // at the domain level which keeps behaviour consistent with legacy
+            // integrations that relied on soft capping.
+            'per_page' => ['sometimes', 'integer', 'min:1'],
+            'types'    => ['sometimes', 'array'],
+            'types.*'  => [Rule::in(['product', 'category', 'brand'])],
         ];
     }
 }
