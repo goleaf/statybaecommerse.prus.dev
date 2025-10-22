@@ -6,6 +6,7 @@ namespace App\Repositories;
 
 use App\Models\Category;
 use App\Support\Cache\CacheKeys;
+use App\Support\Cache\CacheTagHelper;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
@@ -49,15 +50,25 @@ final class CategoryRepository
             });
         };
 
-        return $this->remember($cacheKey, CacheKeys::TTL_FIVE_MINUTES, $callback);
+        // Merge category and locale tags so navigation caches respect the
+        // global invalidation service when catalogue data shifts.
+        $tags = CacheTagHelper::merge(
+            CacheTagHelper::categories(),
+            CacheTagHelper::locale($resolvedLocale)
+        );
+
+        return $this->remember($cacheKey, CacheKeys::TTL_FIVE_MINUTES, $callback, $tags);
     }
 
-    private function remember(string $key, int $ttlSeconds, callable $callback): Collection
+    /**
+     * @param  array<int, string>  $tags
+     */
+    private function remember(string $key, int $ttlSeconds, callable $callback, array $tags = []): Collection
     {
         $expiresAt = now()->addSeconds($ttlSeconds);
 
-        if (Cache::supportsTags()) {
-            return Cache::tags([CacheKeys::navigationTag()])->remember($key, $expiresAt, $callback);
+        if ($tags !== [] && CacheTagHelper::supportsTags()) {
+            return Cache::tags($tags)->remember($key, $expiresAt, $callback);
         }
 
         return Cache::remember($key, $expiresAt, $callback);

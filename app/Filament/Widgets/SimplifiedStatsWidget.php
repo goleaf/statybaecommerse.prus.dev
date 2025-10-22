@@ -9,10 +9,13 @@ use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
 use App\Support\Cache\CacheKeys;
+use App\Support\Cache\CacheTagHelper;
 use App\Support\Cache\CacheTags;
+use DateTimeInterface;
 use Carbon\Carbon;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Cache\TaggableStore;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -142,10 +145,11 @@ class SimplifiedStatsWidget extends BaseWidget
         );
 
         // Tagging keeps the cache easy to purge from Filament's maintenance tools.
-        $chartData = Cache::tags([
-            CacheTags::dashboard(),
-            CacheTags::orders(),
-        ])->remember($cacheKey, now()->addSeconds(180), function () use ($startDate, $endDate, $now): array {
+        $chartData = $this->rememberDashboardCache(
+            [CacheTags::dashboard(), CacheTags::orders()],
+            $cacheKey,
+            now()->addSeconds(180),
+            function () use ($startDate, $endDate, $now): array {
             $dateKeys = [];
             for ($i = 6; $i >= 0; $i--) {
                 $dateKeys[] = $now->copy()->subDays($i)->toDateString();
@@ -202,15 +206,19 @@ class SimplifiedStatsWidget extends BaseWidget
         $now = $this->getReferenceTime();
         $lastMonth = $now->copy()->subMonth();
 
-        return Cache::tags([
-            CacheTags::dashboard(),
-            CacheTags::orders(),
-            CacheTags::users(),
-            CacheTags::products(),
-            CacheTags::categories(),
-            CacheTags::brands(),
-            CacheTags::reviews(),
-        ])->remember(CacheKeys::dashboardSimplifiedSummary(), now()->addSeconds(300), function () use ($lastMonth): array {
+        return $this->rememberDashboardCache(
+            [
+                CacheTags::dashboard(),
+                CacheTags::orders(),
+                CacheTags::users(),
+                CacheTags::products(),
+                CacheTags::categories(),
+                CacheTags::brands(),
+                CacheTags::reviews(),
+            ],
+            CacheKeys::dashboardSimplifiedSummary(),
+            now()->addSeconds(300),
+            function () use ($lastMonth): array {
             $orderStats = Order::query()
                 ->selectRaw('
                     SUM(CASE WHEN status != ? THEN total ELSE 0 END) as total_revenue,
@@ -277,5 +285,32 @@ class SimplifiedStatsWidget extends BaseWidget
     protected function getReferenceTime(): Carbon
     {
         return $this->referenceTime ??= Carbon::now();
+    }
+
+    /**
+     * Remember dashboard fragments while gracefully falling back when tags are unsupported.
+     *
+     * @template TValue
+     *
+     * @param  array<int, string>     $tags
+     * @param  callable(): TValue     $callback
+     * @param  DateTimeInterface|int  $ttl
+     * @return TValue
+     */
+    private function rememberDashboardCache(array $tags, string $key, DateTimeInterface|int $ttl, callable $callback): mixed
+    {
+        // Bail out quickly when the cache store cannot work with tags (array, file, etc.).
+        if ($tags !== [] && CacheTagHelper::supportsTags()) {
+            /** @var TaggableStore $store */
+            $store = Cache::getStore();
+
+            // Double-check the store implements the contract before tagging.
+            if ($store instanceof TaggableStore) {
+                return Cache::tags(CacheTagHelper::merge($tags, CacheTagHelper::dashboards()))->remember($key, $ttl, $callback);
+            }
+        }
+
+        // Fallback path keeps tests and array stores functional without tag support.
+        return Cache::remember($key, $ttl, $callback);
     }
 }
