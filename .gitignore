@@ -44,3 +44,4 @@ Thumbs.db
 /storage/app/exports/
 /storage/app/imports/
 /public/
+database/*.sqlite

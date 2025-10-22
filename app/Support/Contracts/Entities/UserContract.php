@@ -32,39 +32,48 @@ final class UserContract
 
     private static function mapUser(User $user): array
     {
-        $user->loadMissing(['addresses', 'orders', 'wishlist']);
+        $user->loadMissing(['addresses', 'orders', 'wishlists.items.product']);
         $safeAttributes = $user->toApiSafeArray();
 
+        $wishlistedProducts = $user->wishlists
+            ->flatMap(static fn ($wishlist) => $wishlist->items->map(static fn ($item) => $item->product)->filter())
+            ->filter()
+            ->unique(static fn ($product) => $product?->getKey())
+            ->map(static fn ($product) => $product ? Arr::except($product->toArray(), ['pivot']) : null)
+            ->filter()
+            ->values()
+            ->all();
+
         return [
-            'id' => $user->getKey(),
+            'id'         => $user->getKey(),
             'first_name' => $user->first_name,
-            'last_name' => $user->last_name,
-            'full_name' => (string) $user->full_name,
-            'initials' => $user->initials,
+            'last_name'  => $user->last_name,
+            'full_name'  => (string) $user->full_name,
+            'initials'   => $user->initials,
             'avatar_url' => $user->avatar_url,
-            'contact' => [
+            'contact'    => [
                 'email' => $safeAttributes['email'] ?? null,
                 'phone' => $safeAttributes['phone_number'] ?? null,
             ],
             'status' => [
-                'is_email_verified' => $user->isEmailVerified(),
-                'is_phone_verified' => $user->isPhoneVerified(),
-                'has_two_factor' => $user->hasTwoFactor(),
-                'is_on_trial' => $user->isOnTrial(),
+                'is_email_verified'       => $user->isEmailVerified(),
+                'is_phone_verified'       => $user->isPhoneVerified(),
+                'has_two_factor'          => $user->hasTwoFactor(),
+                'is_on_trial'             => $user->isOnTrial(),
                 'has_active_subscription' => $user->hasActiveSubscription(),
             ],
             'metrics' => [
-                'orders_count' => (int) $user->orders_count,
-                'reviews_count' => (int) $user->reviews_count,
-                'total_spent' => (float) $user->total_spent,
+                'orders_count'        => (int) $user->orders_count,
+                'reviews_count'       => (int) $user->reviews_count,
+                'total_spent'         => (float) $user->total_spent,
                 'average_order_value' => (float) $user->average_order_value,
-                'last_order_date' => $user->last_order_date ? (string) $user->last_order_date : null,
+                'last_order_date'     => $user->last_order_date ? (string) $user->last_order_date : null,
             ],
             'preferences' => [
                 'preferred_locale' => $user->preferred_locale,
-                'timezone' => $user->timezone,
-                'locale_text' => $user->locale_text,
-                'roles_label' => $user->roles_label,
+                'timezone'         => $user->timezone,
+                'locale_text'      => $user->locale_text,
+                'roles_label'      => $user->roles_label,
             ],
             'addresses' => $user->addresses->map(static function ($address) {
                 return Arr::except($address->toArray(), ['user_id', 'created_at', 'updated_at']);
@@ -72,10 +81,8 @@ final class UserContract
             'orders' => $user->orders->map(static function ($order) {
                 return Arr::except($order->toArray(), ['user_id']);
             })->all(),
-            'wishlist' => $user->wishlist->map(static function ($product) {
-                return Arr::except($product->toArray(), ['pivot']);
-            })->all(),
-            'links' => [
+            'wishlist' => $wishlistedProducts,
+            'links'    => [
                 'self' => route('account'),
             ],
         ];
@@ -89,9 +96,9 @@ final class UserContract
 
         return [
             'contract' => self::CONTRACT,
-            'version' => self::VERSION,
-            'data' => $data,
-            'meta' => $meta,
+            'version'  => self::VERSION,
+            'data'     => $data,
+            'meta'     => $meta,
         ];
     }
 }

@@ -18,34 +18,34 @@ class ProductFactory extends Factory
 
     private const PRESET_PRODUCTS = [
         'hammer-drill' => [
-            'type' => 'simple',
-            'name' => 'Makita HR2475 smūginis perforatorius',
-            'slug' => 'makita-hr2475-smuginis-perforatorius',
-            'sku' => 'MK-HR2475',
-            'price' => 329.00,
+            'type'              => 'simple',
+            'name'              => 'Makita HR2475 smūginis perforatorius',
+            'slug'              => 'makita-hr2475-smuginis-perforatorius',
+            'sku'               => 'MK-HR2475',
+            'price'             => 329.00,
             'short_description' => 'Profesionalus perforatorius betonui ir mūrijimui.',
-            'seo_title' => 'Makita HR2475 smūginis perforatorius',
-            'seo_description' => 'Galingas Makita perforatorius profesionaliems statybos darbams.',
+            'seo_title'         => 'Makita HR2475 smūginis perforatorius',
+            'seo_description'   => 'Galingas Makita perforatorius profesionaliems statybos darbams.',
         ],
         'circular-saw' => [
-            'type' => 'simple',
-            'name' => 'DeWalt DWE576K diskinis pjūklas',
-            'slug' => 'dewalt-dwe576k-diskinis-pjuklas',
-            'sku' => 'DW-DWE576K',
-            'price' => 289.00,
+            'type'              => 'simple',
+            'name'              => 'DeWalt DWE576K diskinis pjūklas',
+            'slug'              => 'dewalt-dwe576k-diskinis-pjuklas',
+            'sku'               => 'DW-DWE576K',
+            'price'             => 289.00,
             'short_description' => 'Tikslaus pjovimo diskinis pjūklas su kreipiančiaja liniuotė.',
-            'seo_title' => 'DeWalt DWE576K diskinis pjūklas',
-            'seo_description' => 'Patikimas DeWalt diskinis pjūklas tiksliems pjūviams.',
+            'seo_title'         => 'DeWalt DWE576K diskinis pjūklas',
+            'seo_description'   => 'Patikimas DeWalt diskinis pjūklas tiksliems pjūviams.',
         ],
         'safety-glasses' => [
-            'type' => 'simple',
-            'name' => 'Bosch apsauginiai akiniai UltraClear',
-            'slug' => 'bosch-apsauginiai-akiniai-ultraclear',
-            'sku' => 'BS-GLASS01',
-            'price' => 29.00,
+            'type'              => 'simple',
+            'name'              => 'Bosch apsauginiai akiniai UltraClear',
+            'slug'              => 'bosch-apsauginiai-akiniai-ultraclear',
+            'sku'               => 'BS-GLASS01',
+            'price'             => 29.00,
             'short_description' => 'Apsauginiai akiniai su antifog danga ir UV apsauga.',
-            'seo_title' => 'Bosch apsauginiai akiniai UltraClear',
-            'seo_description' => 'Patogūs Bosch apsauginiai akiniai saugiam darbui.',
+            'seo_title'         => 'Bosch apsauginiai akiniai UltraClear',
+            'seo_description'   => 'Patogūs Bosch apsauginiai akiniai saugiam darbui.',
         ],
     ];
 
@@ -103,28 +103,32 @@ class ProductFactory extends Factory
         $salePrice = $this->faker->boolean(25) ? $basePrice * 0.8 : null;
 
         return [
-            'type' => 'simple',
-            'name' => $name,
-            'slug' => Str::slug($name.'-'.$this->faker->unique()->randomNumber()),
-            'sku' => 'LT-'.strtoupper(Str::random(8)),
-            'description' => $this->generateLithuanianDescription($name),
-            'short_description' => $this->generateShortDescription($name),
-            'price' => $basePrice,
-            'sale_price' => $salePrice,
-            'brand_id' => Brand::factory(),
-            'stock_quantity' => $this->faker->numberBetween(0, 200),
+            'type'                => 'simple',
+            'name'                => $name,
+            'slug'                => Str::slug($name . '-' . $this->faker->unique()->randomNumber()),
+            'sku'                 => 'LT-' . strtoupper(Str::random(8)),
+            'description'         => $this->generateLithuanianDescription($name),
+            'short_description'   => $this->generateShortDescription($name),
+            'price'               => $basePrice,
+            'sale_price'          => $salePrice,
+            'brand_id'            => Brand::factory(),
+            'stock_quantity'      => $this->faker->numberBetween(0, 200),
             'low_stock_threshold' => $this->faker->numberBetween(5, 20),
-            'weight' => $this->faker->randomFloat(2, 0.1, 25.0),
-            'length' => $this->faker->randomFloat(2, 5, 200),
-            'width' => $this->faker->randomFloat(2, 5, 200),
-            'height' => $this->faker->randomFloat(2, 2, 100),
-            'is_visible' => false,
-            'is_featured' => false,
-            'manage_stock' => $this->faker->boolean(85),
-            'status' => 'draft',
-            'seo_title' => $name.' - Profesionalūs statybos įrankiai',
-            'seo_description' => 'Pirkite '.strtolower($name).' geriausia kaina Lietuvoje. Greitas pristatymas visoje šalyje.',
-            'published_at' => null,
+            'weight'              => $this->faker->randomFloat(2, 0.1, 25.0),
+            'length'              => $this->faker->randomFloat(2, 5, 200),
+            'width'               => $this->faker->randomFloat(2, 5, 200),
+            'height'              => $this->faker->randomFloat(2, 2, 100),
+            // Default products should satisfy the published/visible scopes used by the
+            // API layer so contract tests can rely on generated fixtures without
+            // additional state tweaks.
+            'is_visible'      => true,
+            'is_enabled'      => true,
+            'is_featured'     => false,
+            'manage_stock'    => $this->faker->boolean(85),
+            'status'          => 'published',
+            'seo_title'       => $name . ' - Profesionalūs statybos įrankiai',
+            'seo_description' => 'Pirkite ' . strtolower($name) . ' geriausia kaina Lietuvoje. Greitas pristatymas visoje šalyje.',
+            'published_at'    => now()->subDays(3),
         ];
     }
 
@@ -164,8 +168,8 @@ class ProductFactory extends Factory
     public function published(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'published',
-            'is_visible' => true,
+            'status'       => 'published',
+            'is_visible'   => true,
             'published_at' => now()->subDays(3),
         ]);
     }
@@ -197,13 +201,13 @@ class ProductFactory extends Factory
         $preset = self::PRESET_PRODUCTS[$key] ?? [];
 
         return array_merge([
-            'description' => $this->generateLithuanianDescription($preset['name'] ?? 'Produktas'),
-            'weight' => 1.0,
-            'length' => 10.0,
-            'width' => 10.0,
-            'height' => 10.0,
-            'manage_stock' => true,
-            'stock_quantity' => 25,
+            'description'         => $this->generateLithuanianDescription($preset['name'] ?? 'Produktas'),
+            'weight'              => 1.0,
+            'length'              => 10.0,
+            'width'               => 10.0,
+            'height'              => 10.0,
+            'manage_stock'        => true,
+            'stock_quantity'      => 25,
             'low_stock_threshold' => 5,
         ], $preset);
     }
