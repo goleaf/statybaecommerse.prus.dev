@@ -70,20 +70,7 @@ use Illuminate\Database\Eloquent\Collection;
                                                     ->required()
                                                     ->searchable()
                                                     ->preload()
-                                                    ->live()
-                                                    ->afterStateUpdated(static function (int|string|null $state, callable $set): void {
-                                                        if ($state === null || $state === '') {
-                                                            return;
-                                                        }
-
-                                                        $variant = \App\Models\ProductVariant::find($state);
-                                                        if ($variant === null) {
-                                                            return;
-                                                        }
-
-                                                        $set('variant_name', $variant->name);
-                                                        $set('product_name', $variant->product->name ?? '');
-                                                    }),
+                                                    ->live(),
                                                 Flatpickr::makeDate('date')
                                                     ->label(__('admin.variant_analytics.date'))
                                                     ->required()
@@ -95,12 +82,38 @@ use Illuminate\Database\Eloquent\Collection;
                                             ->schema([
                                                 Forms\Components\Placeholder::make('variant_name')
                                                     ->label(__('admin.variant_analytics.variant_name'))
-                                                    ->content(static fn (?VariantAnalytics $record): string => $record?->variant?->name ?? '')
-                                                    ->visible(static fn (?VariantAnalytics $record): bool => $record !== null),
+                                                    ->content(static function (callable $get, ?VariantAnalytics $record): string {
+                                                        if ($record !== null) {
+                                                            return $record->variant?->name ?? '';
+                                                        }
+                                                        $variantId = $get('variant_id');
+                                                        if (! $variantId) {
+                                                            return '';
+                                                        }
+                                                        $variant = \App\Models\ProductVariant::query()->with('product:id,name')->find($variantId);
+                                                        return $variant?->name ?? '';
+                                                    })
+                                                    ->visible(static function (callable $get, ?VariantAnalytics $record): bool {
+                                                        return ($record !== null) || (bool) $get('variant_id');
+                                                    })
+                                                    ->reactive(),
                                                 Forms\Components\Placeholder::make('product_name')
                                                     ->label(__('admin.variant_analytics.product_name'))
-                                                    ->content(static fn (?VariantAnalytics $record): string => $record?->variant?->product?->name ?? '')
-                                                    ->visible(static fn (?VariantAnalytics $record): bool => $record !== null),
+                                                    ->content(static function (callable $get, ?VariantAnalytics $record): string {
+                                                        if ($record !== null) {
+                                                            return $record->product?->name ?? ($record->variant?->product?->name ?? '');
+                                                        }
+                                                        $variantId = $get('variant_id');
+                                                        if (! $variantId) {
+                                                            return '';
+                                                        }
+                                                        $variant = \App\Models\ProductVariant::query()->with('product:id,name')->find($variantId);
+                                                        return $variant?->product?->name ?? '';
+                                                    })
+                                                    ->visible(static function (callable $get, ?VariantAnalytics $record): bool {
+                                                        return ($record !== null) || (bool) $get('variant_id');
+                                                    })
+                                                    ->reactive(),
                                             ]),
                                     ]),
                             ]),
@@ -244,7 +257,7 @@ use Illuminate\Database\Eloquent\Collection;
                     ->sortable()
                     ->toggleable()
                     ->copyable()
-                    ->description(static fn (?VariantAnalytics $record): ?string => $record?->variant?->product?->name),
+                    ->description(static fn (?VariantAnalytics $record): ?string => $record?->product?->name ?? $record?->variant?->product?->name),
                 Tables\Columns\TextColumn::make('variant.sku')
                     ->label(__('admin.variant_analytics.sku'))
                     ->searchable()
@@ -445,7 +458,7 @@ use Illuminate\Database\Eloquent\Collection;
                     ->multiple(),
                 Tables\Filters\SelectFilter::make('product_id')
                     ->label(__('admin.variant_analytics.product'))
-                    ->relationship('variant.product', 'name')
+                    ->relationship('product', 'name')
                     ->searchable()
                     ->preload()
                     ->multiple(),
