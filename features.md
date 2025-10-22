@@ -29,6 +29,7 @@
 - Search type filters now normalise mixed-case identifiers from clients, ensuring storefront queries stay restricted to the requested product, category, or brand buckets instead of ballooning to every result group.
 
 ## API contracts
+- Partner API middleware now delivers the documented JSON error envelopes for missing credentials, insufficient scopes, and rate limit violations so partner integrations and automated tests can rely on stable status codes.
 - OpenAPI documentation now mirrors the lean product meta payload and nullable media thumbnails emitted by the presenter, keeping schema validators and client SDKs in sync with production responses.
 
 ## Admin panel resilience
