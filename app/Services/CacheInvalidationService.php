@@ -171,6 +171,11 @@ final class CacheInvalidationService
         $store = Cache::getStore();
 
         if (! $store instanceof TaggableStore) {
+            Log::warning('Cache tags unavailable; performing full cache flush', [
+                'tags' => $tags,
+                'reason' => 'no_tags',
+            ]);
+
             return false;
         }
 
