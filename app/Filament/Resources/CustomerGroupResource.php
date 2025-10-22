@@ -6,6 +6,12 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CustomerGroupResource\Pages;
 use App\Models\CustomerGroup;
+use Filament\Actions\Action as TableAction; // Filament v4 exposes the table view action through the global actions namespace.
+use Filament\Actions\BulkAction as TableBulkAction;
+use Filament\Actions\BulkActionGroup as TableBulkActionGroup;
+use Filament\Actions\DeleteBulkAction as TableDeleteBulkAction;
+use Filament\Actions\EditAction as TableEditAction;
+use Filament\Actions\ViewAction as TableViewAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -15,12 +21,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -103,6 +103,8 @@ final class CustomerGroupResource extends Resource
                             TextInput::make('discount_fixed')
                                 ->label(__('customer_groups.discount_fixed'))
                                 ->prefix('€')
+                                ->numeric()
+                                ->default(0)
                                 ->helperText(__('customer_groups.discount_fixed_help')),
                         ]),
                     Grid::make(2)
@@ -263,9 +265,9 @@ final class CustomerGroupResource extends Resource
                     ->native(false),
             ])
             ->actions([
-                ViewAction::make(),
-                EditAction::make(),
-                Action::make('toggle_active')
+                TableViewAction::make(),
+                TableEditAction::make(),
+                TableAction::make('toggle_active')
                     ->label(fn (CustomerGroup $record): string => $record->is_active ? __('customer_groups.deactivate') : __('customer_groups.activate'))
                     ->icon(fn (CustomerGroup $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                     ->color(fn (CustomerGroup $record): string => $record->is_active ? 'warning' : 'success')
@@ -277,7 +279,7 @@ final class CustomerGroupResource extends Resource
                             ->send();
                     })
                     ->requiresConfirmation(),
-                Action::make('set_default')
+                TableAction::make('set_default')
                     ->label(__('customer_groups.set_default'))
                     ->icon('heroicon-o-star')
                     ->color('warning')
@@ -295,9 +297,9 @@ final class CustomerGroupResource extends Resource
                     ->requiresConfirmation(),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                    BulkAction::make('activate')
+                TableBulkActionGroup::make([
+                    TableDeleteBulkAction::make(),
+                    TableBulkAction::make('activate')
                         ->label(__('customer_groups.activate_selected'))
                         ->icon('heroicon-o-eye')
                         ->color('success')
@@ -309,7 +311,7 @@ final class CustomerGroupResource extends Resource
                                 ->send();
                         })
                         ->requiresConfirmation(),
-                    BulkAction::make('deactivate')
+                    TableBulkAction::make('deactivate')
                         ->label(__('customer_groups.deactivate_selected'))
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')

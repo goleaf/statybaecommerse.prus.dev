@@ -135,9 +135,14 @@ final class AdminPanelProvider extends PanelProvider
                     ->url(fn (): string => route('language.switch', ['locale' => app()->getLocale() === 'lt' ? 'en' : 'lt']))
                     ->icon('heroicon-o-language'),
             ])
-            ->when(app()->environment('testing'),
-                fn (Panel $p) => $p->plugins([]),
-                fn (Panel $p) => $p->plugins($this->configuredPlugins()))
+            ->when(
+                app()->environment('testing'),
+                fn (Panel $p) => $p->plugins(array_values(array_filter(
+                    $this->configuredPlugins(),
+                    static fn (FilamentPlugin $plugin): bool => $plugin instanceof SpatieTranslatablePlugin,
+                ))),
+                fn (Panel $p) => $p->plugins($this->configuredPlugins()),
+            )
             // Enable the custom Filament theme so third-party plugin views (like the searchable input)
             // are compiled with Tailwind during the build step.
             ->viteTheme('resources/css/filament/admin/theme.css')
