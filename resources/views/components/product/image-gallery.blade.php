@@ -151,7 +151,7 @@
 </div>
 
 @push('scripts')
-<script>
+<script nonce="{{ csp_nonce() }}">
     // Keyboard navigation for lightbox
     document.addEventListener('keydown', function(e) {
         if (document.querySelector('[x-data*="showLightbox"]').__x?.$data?.showLightbox) {

@@ -632,7 +632,7 @@
     </div>
 </div>
 
-<script>
+<script nonce="{{ csp_nonce() }}">
 function adjustStock() {
     document.getElementById('adjustStockModal').classList.remove('hidden');
 }

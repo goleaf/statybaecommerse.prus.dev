@@ -229,7 +229,7 @@
     </div>
 </div>
 
-<script>
+<script nonce="{{ csp_nonce() }}">
     function wishlistManager() {
         return {
             clearWishlist() {
