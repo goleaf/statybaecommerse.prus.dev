@@ -160,7 +160,7 @@
     </div>
 </div>
 
-<script>
+<script nonce="{{ csp_nonce() }}">
     document.addEventListener('livewire:init', () => {
         // Disabled auto-refresh to prevent background polling on the main page.
     });

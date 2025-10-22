@@ -200,7 +200,7 @@
 </div>
 
 @push('scripts')
-<script>
+<script nonce="{{ csp_nonce() }}">
     document.addEventListener('livewire:init', () => {
         Livewire.on('show-success', (event) => {
             // Show success notification

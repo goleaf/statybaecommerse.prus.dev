@@ -273,7 +273,7 @@
     </div>
 </div>
 
-<script>
+<script nonce="{{ csp_nonce() }}">
     function contactForm() {
         return {
             loading: false,

@@ -113,7 +113,7 @@
         </div>
     </div>
 
-    <script>
+    <script nonce="{{ csp_nonce() }}">
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.copy-coupon').forEach((button) => {
                 button.addEventListener('click', () => {

@@ -227,7 +227,7 @@
     @endif
 </div>
 
-<script>
+<script nonce="{{ csp_nonce() }}">
     function shoppingCart() {
         return {
             loading: false,

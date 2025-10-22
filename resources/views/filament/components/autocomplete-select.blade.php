@@ -82,7 +82,7 @@
 </div>
 
 @push('scripts')
-    <script>
+    <script nonce="{{ csp_nonce() }}">
         function autocompleteSelect(config) {
             return {
                 searchable: config.searchable,

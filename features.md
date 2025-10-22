@@ -17,6 +17,9 @@
 - Added a storefront `<x-sanitized-html>` component so any rendered rich text automatically passes through the sanitizer.
 - Shipped the `php artisan maintenance:sanitize-html` command to reprocess legacy content in bulk.
 
+## Security hardening
+- Request-scoped CSP nonces now propagate through middleware, helpers, Livewire, and Vite so every inline Blade script/style satisfies the stricter nonce-based CSP and updated HSTS/permissions policy headers.
+
 ## Tooling polish
 - `scripts/upgrade_filament_schema.php` now updates navigation icon docblocks automatically while refactoring `form`, `infolist`, and `table` signatures, making repeated schema migrations safe for the entire Filament tree.
 - The `data:import` Artisan command now documents its signature and description directly on the command class, improving discoverability via `php artisan list`.
