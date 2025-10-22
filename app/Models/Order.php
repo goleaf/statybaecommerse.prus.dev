@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\StatusScope;
 use App\Observers\OrderObserver;
+use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -378,21 +379,29 @@ final class Order extends Model
         return number_format((float) $this->total, 2) . ' ' . $this->currency;
     }
 
-    private static function toImmutableCarbon(CarbonInterface|DateTimeInterface|string $value): Carbon
+    /**
+     * Normalise dynamic date inputs into an immutable Carbon instance so scope helpers behave consistently.
+     */
+    private static function toImmutableCarbon(CarbonInterface|DateTimeInterface|string $value): CarbonImmutable
     {
+        if ($value instanceof CarbonImmutable) {
+            return $value;
+        }
+
         if ($value instanceof CarbonInterface) {
-            return $value->copy();
+            return $value->toImmutable();
         }
 
         if ($value instanceof DateTimeInterface) {
-            return Carbon::make($value)?->copy() ?? Carbon::parse($value->format('Y-m-d H:i:s.u'), $value->getTimezone());
+            return CarbonImmutable::make($value)
+                ?? CarbonImmutable::parse($value->format('Y-m-d H:i:s.u'), $value->getTimezone());
         }
 
-        return Carbon::parse((string) $value);
+        return CarbonImmutable::parse((string) $value);
     }
 
     /**
-     * @return array{0: Carbon, 1: Carbon}
+     * @return array{0: CarbonImmutable, 1: CarbonImmutable}
      */
     private static function normalizeRange(CarbonInterface|DateTimeInterface|string $start, CarbonInterface|DateTimeInterface|string $end): array
     {
