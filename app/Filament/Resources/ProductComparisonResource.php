@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ProductComparisonResource\Pages;
 use App\Models\ProductComparison;
+use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Filters\DateRangeFilter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -19,14 +19,12 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section as SchemaSection;
-use App\Support\Filament\Filters\DateRangeFilter;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 /**
  * ProductComparisonResource
@@ -75,9 +73,9 @@ final class ProductComparisonResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             SchemaSection::make(__('product_comparisons.basic_information'))
                 ->components([
                     Grid::make(2)->components([
@@ -105,7 +103,7 @@ final class ProductComparisonResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -151,7 +149,7 @@ final class ProductComparisonResource extends Resource
                     ->form([
                         Flatpickr::makeRange('range')
                             ->label(__('product_comparisons.created_at'))
-                            
+
                             ->format('Y-m-d')
                             ->displayFormat('Y-m-d'),
                     ])
@@ -189,10 +187,10 @@ final class ProductComparisonResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProductComparisons::route('/'),
+            'index'  => Pages\ListProductComparisons::route('/'),
             'create' => Pages\CreateProductComparison::route('/create'),
-            'view' => Pages\ViewProductComparison::route('/{record}'),
-            'edit' => Pages\EditProductComparison::route('/{record}/edit'),
+            'view'   => Pages\ViewProductComparison::route('/{record}'),
+            'edit'   => Pages\EditProductComparison::route('/{record}/edit'),
         ];
     }
 }

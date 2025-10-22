@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\NewsCommentResource\Pages;
 use App\Models\NewsComment;
 use App\Models\Scopes\ActiveScope;
@@ -40,7 +38,8 @@ use UnitEnum;
 final class NewsCommentResource extends Resource
 {
     protected static ?string $model = NewsComment::class;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-chat-bubble-left-ellipsis';
 
     public static function getNavigationGroup(): UnitEnum|string|null
@@ -65,9 +64,9 @@ final class NewsCommentResource extends Resource
         return __('admin.news_comments.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('admin.news_comments.basic_information'))
                 ->description(__('admin.news_comments.basic_information_description'))
                 ->schema([
@@ -146,7 +145,7 @@ final class NewsCommentResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

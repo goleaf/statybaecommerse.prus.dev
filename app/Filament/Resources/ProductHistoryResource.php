@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ProductHistoryResource\Pages;
 use App\Filament\Resources\ProductHistoryResource\Widgets\ProductHistoryStatsWidget;
@@ -32,10 +30,12 @@ use UnitEnum;
 final class ProductHistoryResource extends Resource
 {
     protected static ?string $model = ProductHistory::class;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-clock';
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 11;
 
@@ -54,9 +54,9 @@ final class ProductHistoryResource extends Resource
         return __('product_history.single');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('product_history.basic_information'))
                 ->columns(2)
                 ->schema([
@@ -99,7 +99,7 @@ final class ProductHistoryResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

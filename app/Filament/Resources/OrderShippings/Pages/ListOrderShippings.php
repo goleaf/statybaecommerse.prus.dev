@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\OrderShippings\Pages;
 
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\OrderShippings\OrderShippingResource;
 use Filament\Actions\CreateAction;
-use App\Filament\Pages\Support\BaseListRecords;
 
 class ListOrderShippings extends BaseListRecords
 {

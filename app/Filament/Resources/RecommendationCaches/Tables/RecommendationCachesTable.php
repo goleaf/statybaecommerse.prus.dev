@@ -90,9 +90,9 @@ final class RecommendationCachesTable
                     ->label(__('admin.recommendation_caches.context_type'))
                     ->options([
                         'homepage' => __('admin.recommendation_caches.context_types.homepage'),
-                        'product' => __('admin.recommendation_caches.context_types.product'),
+                        'product'  => __('admin.recommendation_caches.context_types.product'),
                         'category' => __('admin.recommendation_caches.context_types.category'),
-                        'cart' => __('admin.recommendation_caches.context_types.cart'),
+                        'cart'     => __('admin.recommendation_caches.context_types.cart'),
                         'checkout' => __('admin.recommendation_caches.context_types.checkout'),
                     ]),
             ])

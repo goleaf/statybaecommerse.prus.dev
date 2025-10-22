@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\UserManagementResource\RelationManagers;
 
-
-use Filament\Schemas\Schema;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -23,7 +20,7 @@ final class OrdersRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Orders';
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
@@ -32,11 +29,11 @@ final class OrdersRelationManager extends BaseRelationManager
                     ->maxLength(255),
                 Forms\Components\Select::make('status')
                     ->options([
-                        'pending' => 'Pending',
+                        'pending'    => 'Pending',
                         'processing' => 'Processing',
-                        'shipped' => 'Shipped',
-                        'delivered' => 'Delivered',
-                        'cancelled' => 'Cancelled',
+                        'shipped'    => 'Shipped',
+                        'delivered'  => 'Delivered',
+                        'cancelled'  => 'Cancelled',
                     ])
                     ->required(),
                 Forms\Components\TextInput::make('total')
@@ -47,7 +44,7 @@ final class OrdersRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('order_number')
@@ -58,12 +55,12 @@ final class OrdersRelationManager extends BaseRelationManager
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'pending' => 'warning',
+                        'pending'    => 'warning',
                         'processing' => 'info',
-                        'shipped' => 'primary',
-                        'delivered' => 'success',
-                        'cancelled' => 'danger',
-                        default => 'gray',
+                        'shipped'    => 'primary',
+                        'delivered'  => 'success',
+                        'cancelled'  => 'danger',
+                        default      => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('total')
                     ->money('EUR'),

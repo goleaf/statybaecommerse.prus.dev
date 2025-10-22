@@ -4,16 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingCategoryResource\RelationManagers;
 
-
-use Filament\Schemas\Schema;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -24,6 +21,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Str;
 
 final class SettingsRelationManager extends BaseRelationManager
 {
@@ -35,7 +33,7 @@ final class SettingsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Settings';
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema->schema([
             Section::make(__('system_setting_categories.settings.basic_information'))
@@ -47,7 +45,7 @@ final class SettingsRelationManager extends BaseRelationManager
                                 ->required()
                                 ->maxLength(255)
                                 ->live()
-                                ->afterStateUpdated(fn ($state, callable $set) => $set('slug', \Str::slug($state)))
+                                ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state)))
                                 ->helperText(__('system_setting_categories.settings.key_help')),
 
                             TextInput::make('slug')
@@ -76,15 +74,15 @@ final class SettingsRelationManager extends BaseRelationManager
                             Select::make('type')
                                 ->label(__('system_setting_categories.settings.type'))
                                 ->options([
-                                    'string' => 'String',
-                                    'integer' => 'Integer',
-                                    'boolean' => 'Boolean',
-                                    'array' => 'Array',
-                                    'json' => 'JSON',
-                                    'text' => 'Text',
-                                    'email' => 'Email',
-                                    'url' => 'URL',
-                                    'date' => 'Date',
+                                    'string'   => 'String',
+                                    'integer'  => 'Integer',
+                                    'boolean'  => 'Boolean',
+                                    'array'    => 'Array',
+                                    'json'     => 'JSON',
+                                    'text'     => 'Text',
+                                    'email'    => 'Email',
+                                    'url'      => 'URL',
+                                    'date'     => 'Date',
                                     'datetime' => 'DateTime',
                                 ])
                                 ->required()
@@ -127,7 +125,7 @@ final class SettingsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -152,17 +150,17 @@ final class SettingsRelationManager extends BaseRelationManager
                     ->label(__('system_setting_categories.settings.type'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'string' => 'primary',
-                        'integer' => 'info',
-                        'boolean' => 'warning',
-                        'array' => 'success',
-                        'json' => 'danger',
-                        'text' => 'secondary',
-                        'email' => 'info',
-                        'url' => 'primary',
-                        'date' => 'success',
+                        'string'   => 'primary',
+                        'integer'  => 'info',
+                        'boolean'  => 'warning',
+                        'array'    => 'success',
+                        'json'     => 'danger',
+                        'text'     => 'secondary',
+                        'email'    => 'info',
+                        'url'      => 'primary',
+                        'date'     => 'success',
                         'datetime' => 'warning',
-                        default => 'gray',
+                        default    => 'gray',
                     })
                     ->sortable(),
 
@@ -212,15 +210,15 @@ final class SettingsRelationManager extends BaseRelationManager
                 SelectFilter::make('type')
                     ->label(__('system_setting_categories.settings.type'))
                     ->options([
-                        'string' => 'String',
-                        'integer' => 'Integer',
-                        'boolean' => 'Boolean',
-                        'array' => 'Array',
-                        'json' => 'JSON',
-                        'text' => 'Text',
-                        'email' => 'Email',
-                        'url' => 'URL',
-                        'date' => 'Date',
+                        'string'   => 'String',
+                        'integer'  => 'Integer',
+                        'boolean'  => 'Boolean',
+                        'array'    => 'Array',
+                        'json'     => 'JSON',
+                        'text'     => 'Text',
+                        'email'    => 'Email',
+                        'url'      => 'URL',
+                        'date'     => 'Date',
                         'datetime' => 'DateTime',
                     ])
                     ->native(false),

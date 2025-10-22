@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ReferralResource\Pages;
 use App\Models\Referral;
@@ -33,7 +31,8 @@ final class ReferralResource extends Resource
     use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
 
     protected static ?string $model = Referral::class;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-share';
 
     /**
@@ -47,10 +46,10 @@ final class ReferralResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'referral_code';
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
         // Use the schema-based configuration to stay aligned with Filament v4 resource expectations.
-        return $schema
+        return $form
             ->schema([
                 Section::make('Referral Details')
                     ->columns(2)
@@ -137,7 +136,7 @@ final class ReferralResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure table columns using the fluent Table API for Filament v4 compliance.
         return $table

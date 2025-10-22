@@ -24,8 +24,8 @@ final class SystemSettingTranslationChartWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('admin.system_setting_translations.translations_count'),
-                    'data' => $data->pluck('count')->toArray(),
+                    'label'           => __('admin.system_setting_translations.translations_count'),
+                    'data'            => $data->pluck('count')->toArray(),
                     'backgroundColor' => [
                         '#3B82F6', // Blue
                         '#10B981', // Green
@@ -38,13 +38,13 @@ final class SystemSettingTranslationChartWidget extends ChartWidget
                 ],
             ],
             'labels' => $data->pluck('locale')->map(fn ($locale) => match ($locale) {
-                'en' => '🇺🇸 English',
-                'lt' => '🇱🇹 Lithuanian',
-                'de' => '🇩🇪 German',
-                'fr' => '🇫🇷 French',
-                'es' => '🇪🇸 Spanish',
-                'pl' => '🇵🇱 Polish',
-                'ru' => '🇷🇺 Russian',
+                'en'    => '🇺🇸 English',
+                'lt'    => '🇱🇹 Lithuanian',
+                'de'    => '🇩🇪 German',
+                'fr'    => '🇫🇷 French',
+                'es'    => '🇪🇸 Spanish',
+                'pl'    => '🇵🇱 Polish',
+                'ru'    => '🇷🇺 Russian',
                 default => $locale,
             })->toArray(),
         ];
@@ -58,9 +58,9 @@ final class SystemSettingTranslationChartWidget extends ChartWidget
     protected function getOptions(): array
     {
         return [
-            'responsive' => true,
+            'responsive'          => true,
             'maintainAspectRatio' => false,
-            'plugins' => [
+            'plugins'             => [
                 'legend' => [
                     'position' => 'bottom',
                 ],

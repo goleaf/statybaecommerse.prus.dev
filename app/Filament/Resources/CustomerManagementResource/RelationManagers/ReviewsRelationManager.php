@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\CustomerManagementResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\AssociateAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -12,10 +15,7 @@ use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Infolists\Components\TextEntry;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -23,7 +23,7 @@ class ReviewsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'reviews';
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
@@ -33,7 +33,7 @@ class ReviewsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function infolist(Schema $schema): Schema   
+    public function infolist(Schema $schema): Schema
     {
         return $schema
             ->components([
@@ -41,7 +41,7 @@ class ReviewsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('id')

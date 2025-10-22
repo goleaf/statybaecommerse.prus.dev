@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\ReferralRewardResource\Pages;
 use App\Models\ReferralReward;
 use App\Support\Filament\Components\Flatpickr;
@@ -19,7 +17,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
@@ -35,25 +32,28 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use UnitEnum;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
+use UnitEnum;
 
 final class ReferralRewardResource extends Resource
 {
     use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
+
     protected static ?string $model = ReferralReward::class;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-gift';
 
     protected static ?int $navigationSort = 15;
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Referral';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Referral';
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Section::make(__('referral_rewards.sections.reward_details'))
                     ->columns(2)
@@ -164,7 +164,7 @@ final class ReferralRewardResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -271,7 +271,7 @@ final class ReferralRewardResource extends Resource
             ]);
     }
 
-    public static function infolist(Schema $schema): Schema   
+    public static function infolist(Schema $schema): Schema
     {
         return $schema
             ->schema([

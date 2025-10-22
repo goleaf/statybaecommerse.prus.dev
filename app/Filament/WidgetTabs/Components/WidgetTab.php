@@ -4,21 +4,23 @@ declare(strict_types=1);
 
 namespace App\Filament\WidgetTabs\Components;
 
-use Closure;
-use Filament\Support\Components\Component;
-use Filament\Support\Concerns\CanConfigure;
-use Filament\Support\Concerns\EvaluatesClosures;
-use Filament\Support\Concerns\HasExtraAttributes;
-use Illuminate\Database\Eloquent\Builder;
 use App\Filament\WidgetTabs\Components\Concerns\HasIcon;
 use App\Filament\WidgetTabs\Components\Concerns\HasLabel;
 use App\Filament\WidgetTabs\Components\Concerns\HasPercentage;
 use App\Filament\WidgetTabs\Components\Concerns\HasPrecision;
 use App\Filament\WidgetTabs\Components\Concerns\HasTheme;
 use App\Filament\WidgetTabs\Components\Concerns\HasValue;
+use Closure;
+use Filament\Support\Components\Component;
+use Filament\Support\Concerns\CanConfigure;
+use Filament\Support\Concerns\EvaluatesClosures;
+use Filament\Support\Concerns\HasExtraAttributes;
+use Illuminate\Database\Eloquent\Builder;
 
 class WidgetTab extends Component
 {
+    use CanConfigure;
+    use EvaluatesClosures;
     use HasExtraAttributes;
     use HasIcon;
     use HasLabel;
@@ -26,17 +28,15 @@ class WidgetTab extends Component
     use HasPrecision;
     use HasTheme;
     use HasValue;
-    use EvaluatesClosures;
-    use CanConfigure;
 
     protected ?Closure $modifyQueryUsing = null;
 
-    public function __construct(string | Closure | null $label = null)
+    public function __construct(string|Closure|null $label = null)
     {
         $this->label($label);
     }
 
-    public static function make(string | Closure | null $label = null): static
+    public static function make(string|Closure|null $label = null): static
     {
         $static = app(static::class, ['label' => $label]);
         $static->configure();

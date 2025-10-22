@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Sliders;
 
-
-use Filament\Schemas\Schema;
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\Sliders\Pages\CreateSlider;
 use App\Filament\Resources\Sliders\Pages\EditSlider;
 use App\Filament\Resources\Sliders\Pages\ListSliders;
 use App\Filament\Resources\Sliders\Schemas\SliderForm;
 use App\Filament\Resources\Sliders\Tables\SlidersTable;
-use App\Enums\NavigationGroup;
 use App\Models\Slider;
 use BackedEnum;
 use Filament\Forms\Form;
@@ -23,10 +21,12 @@ use UnitEnum;
 final class SliderResource extends Resource
 {
     protected static ?string $model = Slider::class;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Content;
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = NavigationGroup::Content;
 
     /**
      * @var UnitEnum|string|null
@@ -35,12 +35,12 @@ final class SliderResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return SliderForm::configure($schema);
+        return SliderForm::configure($form);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return SlidersTable::configure($table);
     }
@@ -55,9 +55,9 @@ final class SliderResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListSliders::route('/'),
+            'index'  => ListSliders::route('/'),
             'create' => CreateSlider::route('/create'),
-            'edit' => EditSlider::route('/{record}/edit'),
+            'edit'   => EditSlider::route('/{record}/edit'),
         ];
     }
 }

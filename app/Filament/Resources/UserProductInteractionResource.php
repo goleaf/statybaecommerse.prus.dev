@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\UserProductInteractionResource\Pages;
 use App\Models\Product;
 use App\Models\User;
@@ -45,7 +43,8 @@ final class UserProductInteractionResource extends Resource
 {
     protected static ?string $model = UserProductInteraction::class;
 
-    protected static UnitEnum|string|null $navigationGroup = 'Users';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Users';
 
     public static function getNavigationLabel(): string
     {
@@ -65,9 +64,9 @@ final class UserProductInteractionResource extends Resource
     /**
      * Ensure Filament v4 receives a concrete Form instance for schema binding.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 SchemaSection::make(__('admin.user_product_interactions.basic_information'))
                     ->schema([
@@ -198,7 +197,7 @@ final class UserProductInteractionResource extends Resource
     /**
      * Return a Table instance to satisfy Filament v4 table expectations.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->deferLoading(false)

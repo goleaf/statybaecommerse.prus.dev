@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\CampaignClickResource\Pages;
 use App\Models\Campaign;
 use App\Models\CampaignClick;
@@ -18,14 +16,14 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -68,12 +66,12 @@ final class CampaignClickResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      *
-     * @param  Forms\Form  $schema
+     * @param  Forms\Form $schema
      * @return Forms\Form
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('campaign_clicks.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -194,7 +192,7 @@ final class CampaignClickResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -348,10 +346,10 @@ final class CampaignClickResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCampaignClicks::route('/'),
+            'index'  => Pages\ListCampaignClicks::route('/'),
             'create' => Pages\CreateCampaignClick::route('/create'),
-            'view' => Pages\ViewCampaignClick::route('/{record}'),
-            'edit' => Pages\EditCampaignClick::route('/{record}/edit'),
+            'view'   => Pages\ViewCampaignClick::route('/{record}'),
+            'edit'   => Pages\EditCampaignClick::route('/{record}/edit'),
         ];
     }
 }

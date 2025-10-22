@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingDependencies;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\SystemSettingDependencies\Pages\CreateSystemSettingDependency;
 use App\Filament\Resources\SystemSettingDependencies\Pages\EditSystemSettingDependency;
 use App\Filament\Resources\SystemSettingDependencies\Pages\ListSystemSettingDependencies;
@@ -21,15 +19,16 @@ use Filament\Tables\Table;
 class SystemSettingDependencyResource extends Resource
 {
     protected static ?string $model = SystemSettingDependency::class;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return SystemSettingDependencyForm::configure($schema);
+        return SystemSettingDependencyForm::configure($form);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return SystemSettingDependenciesTable::configure($table);
     }
@@ -44,9 +43,9 @@ class SystemSettingDependencyResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListSystemSettingDependencies::route('/'),
+            'index'  => ListSystemSettingDependencies::route('/'),
             'create' => CreateSystemSettingDependency::route('/create'),
-            'edit' => EditSystemSettingDependency::route('/{record}/edit'),
+            'edit'   => EditSystemSettingDependency::route('/{record}/edit'),
         ];
     }
 }

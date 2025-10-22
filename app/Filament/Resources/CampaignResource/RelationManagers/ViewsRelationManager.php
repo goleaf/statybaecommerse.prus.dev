@@ -4,19 +4,16 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CampaignResource\RelationManagers;
 
-
-use Filament\Schemas\Schema;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use App\Support\Filament\Components\Flatpickr;
 
 final class ViewsRelationManager extends BaseRelationManager
 {
@@ -24,7 +21,7 @@ final class ViewsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Campaign Views';
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema->schema([
             TextInput::make('session_id')
@@ -48,7 +45,7 @@ final class ViewsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\BrandResource\Pages;
 use App\Models\Brand;
 use App\Models\Scopes\ActiveScope;
@@ -117,9 +115,9 @@ final class BrandResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->components([
+        return $form->components([
             Section::make(__('brands.basic_information'))
                 ->components([
                     LanguageTabs::make([
@@ -201,7 +199,7 @@ final class BrandResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

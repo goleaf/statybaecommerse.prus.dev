@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\CampaignViewResource\Pages;
 use App\Models\CampaignView;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
@@ -18,7 +17,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 final class CampaignViewResource extends Resource
 {
@@ -48,9 +46,9 @@ final class CampaignViewResource extends Resource
         return __('campaign_views.navigation');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Tabs::make(__('campaign_views.section_title'))
                     ->tabs([
@@ -92,7 +90,7 @@ final class CampaignViewResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

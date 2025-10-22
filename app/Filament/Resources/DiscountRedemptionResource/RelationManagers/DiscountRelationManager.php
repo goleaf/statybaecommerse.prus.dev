@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountRedemptionResource\RelationManagers;
 
-
-use Filament\Schemas\Schema;
-use Filament\Forms;
-use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Forms;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -23,7 +20,7 @@ class DiscountRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Discounts';
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -39,8 +36,8 @@ class DiscountRelationManager extends BaseRelationManager
                             ->columnSpanFull(),
                         Forms\Components\Select::make('type')
                             ->options([
-                                'percentage' => 'Percentage',
-                                'fixed' => 'Fixed Amount',
+                                'percentage'    => 'Percentage',
+                                'fixed'         => 'Fixed Amount',
                                 'free_shipping' => 'Free Shipping',
                             ])
                             ->required(),
@@ -56,7 +53,7 @@ class DiscountRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('name')
@@ -70,10 +67,10 @@ class DiscountRelationManager extends BaseRelationManager
                     ->label('Type')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'percentage' => 'info',
-                        'fixed' => 'success',
+                        'percentage'    => 'info',
+                        'fixed'         => 'success',
                         'free_shipping' => 'warning',
-                        default => 'gray',
+                        default         => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('value')
                     ->label('Value')
@@ -98,8 +95,8 @@ class DiscountRelationManager extends BaseRelationManager
             ->filters([
                 Tables\Filters\SelectFilter::make('type')
                     ->options([
-                        'percentage' => 'Percentage',
-                        'fixed' => 'Fixed Amount',
+                        'percentage'    => 'Percentage',
+                        'fixed'         => 'Fixed Amount',
                         'free_shipping' => 'Free Shipping',
                     ]),
                 Tables\Filters\TernaryFilter::make('is_active')

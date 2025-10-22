@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\CountryResource\Pages;
 use App\Filament\Resources\CountryResource\RelationManagers\AddressesRelationManager;
 use App\Filament\Resources\CountryResource\RelationManagers\CitiesRelationManager;
 use App\Filament\Resources\CountryResource\RelationManagers\CustomersRelationManager;
 use App\Filament\Resources\CountryResource\RelationManagers\UsersRelationManager;
 use App\Models\Country;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
@@ -40,7 +39,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Throwable;
-use App\Support\Filament\Components\Flatpickr;
 
 final class CountryResource extends Resource
 {
@@ -71,9 +69,9 @@ final class CountryResource extends Resource
         return __('countries.models.countries');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Section::make(__('countries.sections.basic_info'))
                     ->schema([
@@ -236,7 +234,7 @@ final class CountryResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

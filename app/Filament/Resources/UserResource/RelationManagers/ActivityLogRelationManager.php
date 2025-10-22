@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\UserResource\RelationManagers;
 
-
-use Filament\Schemas\Schema;
-use Filament\Forms;
-use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Forms;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -18,7 +15,7 @@ final class ActivityLogRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'admin.sections.activity_log';
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
@@ -33,7 +30,7 @@ final class ActivityLogRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('description')
@@ -53,7 +50,7 @@ final class ActivityLogRelationManager extends BaseRelationManager
                         'created' => 'success',
                         'updated' => 'warning',
                         'deleted' => 'danger',
-                        default => 'gray',
+                        default   => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('admin.fields.created_at'))
@@ -63,8 +60,8 @@ final class ActivityLogRelationManager extends BaseRelationManager
             ->filters([
                 Tables\Filters\SelectFilter::make('log_name')
                     ->options([
-                        'user' => 'User',
-                        'order' => 'Order',
+                        'user'    => 'User',
+                        'order'   => 'Order',
                         'product' => 'Product',
                     ]),
                 Tables\Filters\SelectFilter::make('event')

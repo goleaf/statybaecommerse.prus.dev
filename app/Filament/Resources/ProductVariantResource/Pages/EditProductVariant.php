@@ -76,17 +76,17 @@ final class EditProductVariant extends EditRecord
 
         $sku = $baseSku;
         if ($size) {
-            $sku .= '-'.strtoupper($size);
+            $sku .= '-' . strtoupper($size);
         }
         if ($suffix) {
-            $sku .= '-'.strtoupper($suffix);
+            $sku .= '-' . strtoupper($suffix);
         }
 
         // Ensure uniqueness (excluding current record)
         $originalSku = $sku;
         $counter = 1;
         while (\App\Models\ProductVariant::where('sku', $sku)->where('id', '!=', $this->record->id)->exists()) {
-            $sku = $originalSku.'-'.$counter;
+            $sku = $originalSku . '-' . $counter;
             $counter++;
         }
 

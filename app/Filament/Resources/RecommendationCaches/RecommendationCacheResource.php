@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\RecommendationCaches;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\RecommendationCaches\Pages\CreateRecommendationCache;
 use App\Filament\Resources\RecommendationCaches\Pages\EditRecommendationCache;
 use App\Filament\Resources\RecommendationCaches\Pages\ListRecommendationCaches;
@@ -23,7 +21,8 @@ use UnitEnum;
 final class RecommendationCacheResource extends Resource
 {
     protected static ?string $model = RecommendationCache::class;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?int $navigationSort = 20;
@@ -50,12 +49,12 @@ final class RecommendationCacheResource extends Resource
         return __('admin.recommendation_caches.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return RecommendationCacheForm::configure($schema);
+        return RecommendationCacheForm::configure($form);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return RecommendationCachesTable::configure($table);
     }
@@ -68,10 +67,10 @@ final class RecommendationCacheResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListRecommendationCaches::route('/'),
+            'index'  => ListRecommendationCaches::route('/'),
             'create' => CreateRecommendationCache::route('/create'),
-            'view' => ViewRecommendationCache::route('/{record}'),
-            'edit' => EditRecommendationCache::route('/{record}/edit'),
+            'view'   => ViewRecommendationCache::route('/{record}'),
+            'edit'   => EditRecommendationCache::route('/{record}/edit'),
         ];
     }
 }

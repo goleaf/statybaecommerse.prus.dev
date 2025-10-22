@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantStockResource\Pages;
 use App\Models\Location;
 use App\Models\VariantInventory;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -33,19 +32,20 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 final class VariantStockResource extends Resource
 {
     protected static ?string $model = VariantInventory::class;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-archive-box';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Inventory';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Inventory';
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make('Stock Details')
                 ->schema([
                     Grid::make(2)
@@ -118,7 +118,7 @@ final class VariantStockResource extends Resource
         return parent::getEloquentQuery()->withoutGlobalScopes();
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

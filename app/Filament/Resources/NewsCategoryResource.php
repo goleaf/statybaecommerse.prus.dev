@@ -18,7 +18,6 @@ use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -54,9 +53,9 @@ final class NewsCategoryResource extends Resource
 
     protected static ?string $pluralModelLabel = 'News Categories';
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('news_categories.sections.category_information'))
                 ->schema([
                     TextInput::make('name')
@@ -66,7 +65,7 @@ final class NewsCategoryResource extends Resource
                         ->live()
                         ->afterStateUpdated(fn ($state, callable $set) => $set('slug', \Illuminate\Support\Str::slug($state)))
                         ->placeholder(__('news_categories.fields.name'))
-                        ->helperText(__('news_categories.fields.name').' '.__('for all languages')),
+                        ->helperText(__('news_categories.fields.name') . ' ' . __('for all languages')),
                     TextInput::make('slug')
                         ->label(__('news_categories.fields.slug'))
                         ->required()
@@ -106,21 +105,21 @@ final class NewsCategoryResource extends Resource
                     Select::make('icon')
                         ->label(__('news_categories.fields.icon'))
                         ->options([
-                            'heroicon-o-tag' => 'Tag',
-                            'heroicon-o-document-text' => 'Document',
-                            'heroicon-o-newspaper' => 'Newspaper',
-                            'heroicon-o-folder' => 'Folder',
-                            'heroicon-o-rectangle-stack' => 'Stack',
-                            'heroicon-o-squares-2x2' => 'Grid',
-                            'heroicon-o-bookmark' => 'Bookmark',
-                            'heroicon-o-star' => 'Star',
-                            'heroicon-o-fire' => 'Fire',
-                            'heroicon-o-bolt' => 'Bolt',
-                            'heroicon-o-light-bulb' => 'Light Bulb',
-                            'heroicon-o-cog' => 'Settings',
+                            'heroicon-o-tag'                => 'Tag',
+                            'heroicon-o-document-text'      => 'Document',
+                            'heroicon-o-newspaper'          => 'Newspaper',
+                            'heroicon-o-folder'             => 'Folder',
+                            'heroicon-o-rectangle-stack'    => 'Stack',
+                            'heroicon-o-squares-2x2'        => 'Grid',
+                            'heroicon-o-bookmark'           => 'Bookmark',
+                            'heroicon-o-star'               => 'Star',
+                            'heroicon-o-fire'               => 'Fire',
+                            'heroicon-o-bolt'               => 'Bolt',
+                            'heroicon-o-light-bulb'         => 'Light Bulb',
+                            'heroicon-o-cog'                => 'Settings',
                             'heroicon-o-wrench-screwdriver' => 'Tools',
-                            'heroicon-o-building-office' => 'Building',
-                            'heroicon-o-home' => 'Home',
+                            'heroicon-o-building-office'    => 'Building',
+                            'heroicon-o-home'               => 'Home',
                         ])
                         ->searchable()
                         ->preload()
@@ -139,7 +138,7 @@ final class NewsCategoryResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -223,27 +222,27 @@ final class NewsCategoryResource extends Resource
                 SelectFilter::make('has_news')
                     ->label(__('Has News'))
                     ->options([
-                        'with_news' => __('With News'),
+                        'with_news'    => __('With News'),
                         'without_news' => __('Without News'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return match ($data['value']) {
-                            'with_news' => $query->has('news'),
+                            'with_news'    => $query->has('news'),
                             'without_news' => $query->doesntHave('news'),
-                            default => $query,
+                            default        => $query,
                         };
                     }),
                 SelectFilter::make('has_children')
                     ->label(__('Has Children'))
                     ->options([
-                        'with_children' => __('With Children'),
+                        'with_children'    => __('With Children'),
                         'without_children' => __('Without Children'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return match ($data['value']) {
-                            'with_children' => $query->has('children'),
+                            'with_children'    => $query->has('children'),
                             'without_children' => $query->doesntHave('children'),
-                            default => $query,
+                            default            => $query,
                         };
                     }),
             ])
@@ -268,7 +267,7 @@ final class NewsCategoryResource extends Resource
             ->paginated([10, 25, 50, 100]);
     }
 
-    public static function infolist(Schema $schema): Schema   
+    public static function infolist(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -362,10 +361,10 @@ final class NewsCategoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListNewsCategories::route('/'),
+            'index'  => Pages\ListNewsCategories::route('/'),
             'create' => Pages\CreateNewsCategory::route('/create'),
-            'view' => Pages\ViewNewsCategory::route('/{record}'),
-            'edit' => Pages\EditNewsCategory::route('/{record}/edit'),
+            'view'   => Pages\ViewNewsCategory::route('/{record}'),
+            'edit'   => Pages\EditNewsCategory::route('/{record}/edit'),
         ];
     }
 }

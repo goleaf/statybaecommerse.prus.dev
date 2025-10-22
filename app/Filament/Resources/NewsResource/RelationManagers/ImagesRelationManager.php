@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsResource\RelationManagers;
 
-
-use Filament\Schemas\Schema;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Support\Storage\SecureStorage;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -22,7 +19,7 @@ final class ImagesRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Images';
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
@@ -61,7 +58,7 @@ final class ImagesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('alt_text')
@@ -90,10 +87,10 @@ final class ImagesRelationManager extends BaseRelationManager
                     ->badge()
                     ->color(fn (int $state): string => match (true) {
                         $state >= 100 => 'danger',
-                        $state >= 50 => 'warning',
-                        $state >= 20 => 'info',
-                        $state >= 10 => 'success',
-                        default => 'gray',
+                        $state >= 50  => 'warning',
+                        $state >= 20  => 'info',
+                        $state >= 10  => 'success',
+                        default       => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('file_size')
                     ->label(__('news.fields.file_size'))
@@ -147,6 +144,6 @@ final class ImagesRelationManager extends BaseRelationManager
             $bytes /= 1024;
         }
 
-        return round($bytes, 2).' '.$units[$i];
+        return round($bytes, 2) . ' ' . $units[$i];
     }
 }

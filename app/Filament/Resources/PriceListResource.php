@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\PriceListResource\Pages;
 use App\Models\PriceList;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -26,7 +25,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 /**
  * PriceListResource
@@ -37,7 +35,8 @@ final class PriceListResource extends Resource
 {
     protected static ?string $model = PriceList::class;
 
-    protected static UnitEnum|string|null $navigationGroup = 'Products';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 15;
 
@@ -63,9 +62,9 @@ final class PriceListResource extends Resource
         return __('price_lists.single');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('price_lists.basic_information'))
                 ->columns(2)
                 ->schema([
@@ -119,7 +118,7 @@ final class PriceListResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -271,9 +270,9 @@ final class PriceListResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPriceLists::route('/'),
+            'index'  => Pages\ListPriceLists::route('/'),
             'create' => Pages\CreatePriceList::route('/create'),
-            'edit' => Pages\EditPriceList::route('/{record}/edit'),
+            'edit'   => Pages\EditPriceList::route('/{record}/edit'),
         ];
     }
 }

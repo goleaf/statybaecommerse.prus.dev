@@ -36,7 +36,7 @@ final class CartItemsOverviewWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-bookmark')
                 ->color('info'),
 
-            Stat::make(__('cart_items.stats.total_value'), '€'.number_format($totalValue, 2))
+            Stat::make(__('cart_items.stats.total_value'), '€' . number_format($totalValue, 2))
                 ->description(__('cart_items.stats.total_value_description'))
                 ->descriptionIcon('heroicon-m-currency-euro')
                 ->color('warning'),

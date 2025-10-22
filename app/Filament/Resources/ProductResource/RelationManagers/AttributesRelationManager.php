@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
-
-use Filament\Schemas\Schema;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -21,7 +18,7 @@ final class AttributesRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Product Attributes';
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
@@ -39,13 +36,13 @@ final class AttributesRelationManager extends BaseRelationManager
                             ->maxLength(500),
                         Forms\Components\Select::make('type')
                             ->options([
-                                'text' => __('attributes.types.text'),
-                                'number' => __('attributes.types.number'),
-                                'boolean' => __('attributes.types.boolean'),
-                                'select' => __('attributes.types.select'),
+                                'text'        => __('attributes.types.text'),
+                                'number'      => __('attributes.types.number'),
+                                'boolean'     => __('attributes.types.boolean'),
+                                'select'      => __('attributes.types.select'),
                                 'multiselect' => __('attributes.types.multiselect'),
-                                'date' => __('attributes.types.date'),
-                                'file' => __('attributes.types.file'),
+                                'date'        => __('attributes.types.date'),
+                                'file'        => __('attributes.types.file'),
                             ])
                             ->required(),
                     ]),
@@ -74,7 +71,7 @@ final class AttributesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('attribute.name')
@@ -89,14 +86,14 @@ final class AttributesRelationManager extends BaseRelationManager
                     ->formatStateUsing(fn (string $state): string => __("attributes.types.{$state}"))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'text' => 'blue',
-                        'number' => 'green',
-                        'boolean' => 'orange',
-                        'select' => 'purple',
+                        'text'        => 'blue',
+                        'number'      => 'green',
+                        'boolean'     => 'orange',
+                        'select'      => 'purple',
                         'multiselect' => 'pink',
-                        'date' => 'cyan',
-                        'file' => 'gray',
-                        default => 'gray',
+                        'date'        => 'cyan',
+                        'file'        => 'gray',
+                        default       => 'gray',
                     }),
 
                 Tables\Columns\TextColumn::make('value')
@@ -129,13 +126,13 @@ final class AttributesRelationManager extends BaseRelationManager
                     ->label(__('products.attributes.attribute_type'))
                     ->relationship('attribute', 'type')
                     ->options([
-                        'text' => __('attributes.types.text'),
-                        'number' => __('attributes.types.number'),
-                        'boolean' => __('attributes.types.boolean'),
-                        'select' => __('attributes.types.select'),
+                        'text'        => __('attributes.types.text'),
+                        'number'      => __('attributes.types.number'),
+                        'boolean'     => __('attributes.types.boolean'),
+                        'select'      => __('attributes.types.select'),
                         'multiselect' => __('attributes.types.multiselect'),
-                        'date' => __('attributes.types.date'),
-                        'file' => __('attributes.types.file'),
+                        'date'        => __('attributes.types.date'),
+                        'file'        => __('attributes.types.file'),
                     ]),
 
                 Tables\Filters\TernaryFilter::make('is_visible')

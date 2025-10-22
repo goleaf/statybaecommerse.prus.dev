@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CustomerGroupResource\RelationManagers;
 
-
-use Filament\Schemas\Schema;
-use Filament\Forms;
-use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Forms;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -18,7 +15,7 @@ final class CampaignsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'customer_groups.relation_campaigns';
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -27,15 +24,15 @@ final class CampaignsRelationManager extends BaseRelationManager
                     ->maxLength(255),
                 Forms\Components\Select::make('status')
                     ->options([
-                        'draft' => __('campaigns.draft'),
-                        'active' => __('campaigns.active'),
-                        'paused' => __('campaigns.paused'),
+                        'draft'     => __('campaigns.draft'),
+                        'active'    => __('campaigns.active'),
+                        'paused'    => __('campaigns.paused'),
                         'completed' => __('campaigns.completed'),
                     ]),
             ]);
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('name')
@@ -48,11 +45,11 @@ final class CampaignsRelationManager extends BaseRelationManager
                     ->label(__('campaigns.status'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'active' => 'success',
-                        'draft' => 'gray',
-                        'paused' => 'warning',
+                        'active'    => 'success',
+                        'draft'     => 'gray',
+                        'paused'    => 'warning',
                         'completed' => 'info',
-                        default => 'gray',
+                        default     => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('budget')
                     ->label(__('campaigns.budget'))
@@ -67,9 +64,9 @@ final class CampaignsRelationManager extends BaseRelationManager
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'draft' => __('campaigns.draft'),
-                        'active' => __('campaigns.active'),
-                        'paused' => __('campaigns.paused'),
+                        'draft'     => __('campaigns.draft'),
+                        'active'    => __('campaigns.active'),
+                        'paused'    => __('campaigns.paused'),
                         'completed' => __('campaigns.completed'),
                     ]),
             ])

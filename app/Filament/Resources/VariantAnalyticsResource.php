@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\VariantAnalyticsResource\Pages;
 use App\Models\VariantAnalytics;
@@ -20,10 +18,16 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-    /** @var string|\BackedEnum|null */
+use UnitEnum;
+
+final class VariantAnalyticsResource extends Resource
+{
+    protected static ?string $model = VariantAnalytics::class;
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    /** @var string|\BackedEnum|null Anchor inventory analytics beneath the shared navigation enum. */
+    /** @var UnitEnum|string|null */
     protected static $navigationGroup = NavigationGroup::Inventory;
 
     public static function getNavigationGroup(): ?string
@@ -51,9 +55,9 @@ use Illuminate\Database\Eloquent\Collection;
         return __('admin.variant_analytics.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Forms\Components\Tabs::make(__('admin.variant_analytics.tabs'))
                     ->tabs([
@@ -234,7 +238,7 @@ use Illuminate\Database\Eloquent\Collection;
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

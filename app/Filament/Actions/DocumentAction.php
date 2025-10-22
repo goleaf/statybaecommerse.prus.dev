@@ -13,6 +13,7 @@ use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
+use Throwable;
 
 final class DocumentAction
 {
@@ -33,7 +34,7 @@ final class DocumentAction
                     ->label(__('admin.fields.format'))
                     ->options([
                         'html' => __('HTML'),
-                        'pdf' => __('PDF'),
+                        'pdf'  => __('PDF'),
                     ])
                     ->default('pdf')
                     ->required(),
@@ -67,7 +68,7 @@ final class DocumentAction
                     return response($document->content ?? '', 200, [
                         'Content-Type' => 'text/html',
                     ]);
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     Notification::make()
                         ->title(__('admin.notifications.document_generation_failed'))
                         ->body($e->getMessage())
@@ -84,7 +85,7 @@ final class DocumentAction
         $now = now();
 
         $variables = [
-            'MODEL_ID' => $record->getKey(),
+            'MODEL_ID'   => $record->getKey(),
             'MODEL_TYPE' => $record->getMorphClass(),
             'CREATED_AT' => $now->format('d/m/Y H:i'),
             'UPDATED_AT' => $now->format('d/m/Y H:i'),

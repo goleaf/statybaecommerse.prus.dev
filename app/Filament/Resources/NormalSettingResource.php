@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\NormalSettingResource\Pages;
 use App\Models\NormalSetting;
 use Filament\Forms\Components\Select;
@@ -27,7 +25,8 @@ final class NormalSettingResource extends Resource
 {
     protected static ?string $model = NormalSetting::class;
 
-    protected static UnitEnum|string|null $navigationGroup = 'System';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'System';
 
     protected static ?int $navigationSort = 8;
 
@@ -48,9 +47,9 @@ final class NormalSettingResource extends Resource
         return __('normal_settings.navigation');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Tabs::make(__('normal_settings.tabs.label'))
                 ->tabs([
                     Tab::make(__('normal_settings.basic_information'))
@@ -99,7 +98,7 @@ final class NormalSettingResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

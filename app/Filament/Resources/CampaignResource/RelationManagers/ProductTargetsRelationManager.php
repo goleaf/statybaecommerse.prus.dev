@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CampaignResource\RelationManagers;
 
-
-use Filament\Schemas\Schema;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -24,7 +21,7 @@ final class ProductTargetsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Product Targets';
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema->schema([
             Select::make('product_id')
@@ -43,7 +40,7 @@ final class ProductTargetsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -70,9 +67,9 @@ final class ProductTargetsRelationManager extends BaseRelationManager
                 SelectFilter::make('target_type')
                     ->label('Target Type')
                     ->options([
-                        'primary' => 'Primary',
+                        'primary'   => 'Primary',
                         'secondary' => 'Secondary',
-                        'excluded' => 'Excluded',
+                        'excluded'  => 'Excluded',
                     ]),
             ])
             ->actions([

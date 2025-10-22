@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Address;
@@ -16,8 +14,8 @@ use App\Models\User;
 use App\Services\Pricing\PriceCalculator;
 use App\Support\Authorization\AuthorizationMatrix;
 use App\Support\Filament\Components\Flatpickr;
-use App\Support\Filament\SearchableInputHelper;
 use App\Support\Filament\Filters\DateRangeFilter;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\AddressSearch;
 use App\Support\Search\ChannelSearch;
 use App\Support\Search\CustomerSearch;
@@ -171,9 +169,9 @@ final class OrderResource extends Resource
     /**
      * Configure the comprehensive form schema with advanced features.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('orders.sections.order_details'))
                 ->description(__('orders.sections.customer_information'))
                 ->icon('heroicon-o-information-circle')
@@ -207,7 +205,6 @@ final class OrderResource extends Resource
                                                     ->find($value);
                                             }
 
-                        
                                             if (! $user instanceof User) {
                                                 return null;
                                             }
@@ -542,7 +539,7 @@ final class OrderResource extends Resource
     /**
      * Configure the comprehensive table with advanced features.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

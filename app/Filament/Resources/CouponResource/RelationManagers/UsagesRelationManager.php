@@ -4,18 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CouponResource\RelationManagers;
 
-
-use Filament\Schemas\Schema;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use App\Support\Filament\Components\Flatpickr;
 
 final class UsagesRelationManager extends BaseRelationManager
 {
@@ -27,7 +24,7 @@ final class UsagesRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Usages';
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema->schema([
             Forms\Components\Select::make('user_id')
@@ -52,7 +49,7 @@ final class UsagesRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('used_at')

@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use BackedEnum;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Illuminate\Support\Facades\Gate;
 
 class Dashboard extends BaseDashboard
 {
     protected static ?int $navigationSort = 1;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-home';
 
     protected static ?string $title = 'Dashboard';

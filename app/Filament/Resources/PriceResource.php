@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\PriceResource\Pages;
 use App\Models\Price;
 use App\Models\Product;
@@ -27,13 +25,14 @@ final class PriceResource extends Resource
 {
     protected static ?string $model = Price::class;
 
-    protected static UnitEnum|string|null $navigationGroup = 'Products';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 12;
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Section::make(__('admin.prices.basic_information'))
                     ->schema([
@@ -93,7 +92,7 @@ final class PriceResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

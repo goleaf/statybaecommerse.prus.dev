@@ -6,10 +6,11 @@ namespace App\Filament\Pages;
 
 use App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
 use App\Models\Product;
-use Filament\Tables\Actions\BulkAction;
+use BackedEnum;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Pages\Page;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -21,7 +22,8 @@ final class InventoryManagement extends Page implements HasTable
     use ConfiguresToggleableTableLayout;
     use HasToggleableTable;
     use InteractsWithTable;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-archive-box';
 
     public static function getNavigationGroup(): ?string
@@ -39,7 +41,7 @@ final class InventoryManagement extends Page implements HasTable
         return 'Inventory Management';
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         $table = $table
             ->query(Product::query())

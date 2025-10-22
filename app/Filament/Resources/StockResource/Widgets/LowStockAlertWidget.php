@@ -21,8 +21,8 @@ final class LowStockAlertWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('stocks.charts.stock_status'),
-                    'data' => [$normalStock, $lowStock, $criticalStock, $outOfStock],
+                    'label'           => __('stocks.charts.stock_status'),
+                    'data'            => [$normalStock, $lowStock, $criticalStock, $outOfStock],
                     'backgroundColor' => [
                         '#10B981', // emerald (normal)
                         '#F59E0B', // amber (low)

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsTags;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\NewsTags\Pages\CreateNewsTag;
 use App\Filament\Resources\NewsTags\Pages\EditNewsTag;
 use App\Filament\Resources\NewsTags\Pages\ListNewsTags;
@@ -22,15 +20,16 @@ use Filament\Tables\Table;
 class NewsTagResource extends Resource
 {
     protected static ?string $model = NewsTag::class;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return NewsTagForm::configure($schema);
+        return NewsTagForm::configure($form);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return NewsTagsTable::configure($table);
     }
@@ -45,10 +44,10 @@ class NewsTagResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListNewsTags::route('/'),
+            'index'  => ListNewsTags::route('/'),
             'create' => CreateNewsTag::route('/create'),
-            'view' => ViewNewsTag::route('/{record}'),
-            'edit' => EditNewsTag::route('/{record}/edit'),
+            'view'   => ViewNewsTag::route('/{record}'),
+            'edit'   => EditNewsTag::route('/{record}/edit'),
         ];
     }
 }

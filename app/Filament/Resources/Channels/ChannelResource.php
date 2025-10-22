@@ -1,9 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Channels;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\Channels\Pages\CreateChannel;
 use App\Filament\Resources\Channels\Pages\EditChannel;
 use App\Filament\Resources\Channels\Pages\ListChannels;
@@ -27,12 +27,12 @@ class ChannelResource extends Resource
         return 'heroicon-o-rectangle-stack';
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return ChannelForm::configure($schema);
+        return ChannelForm::configure($form);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return ChannelsTable::configure($table);
     }
@@ -49,9 +49,9 @@ class ChannelResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListChannels::route('/'),
+            'index'  => ListChannels::route('/'),
             'create' => CreateChannel::route('/create'),
-            'edit' => EditChannel::route('/{record}/edit'),
+            'edit'   => EditChannel::route('/{record}/edit'),
         ];
     }
 

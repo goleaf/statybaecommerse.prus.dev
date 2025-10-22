@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\MenuResource\Pages;
 use App\Filament\Resources\MenuResource\RelationManagers\MenuItemsRelationManager;
 use App\Models\Menu;
@@ -34,14 +32,16 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use UnitEnum;
 
 final class MenuResource extends Resource
 {
     protected static ?string $model = Menu::class;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Content';
+    protected static UnitEnum|string|null $navigationGroup = 'Content';
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -62,7 +62,7 @@ final class MenuResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
         $locationOptions = [
             'header'  => __('menus.locations.header'),
@@ -71,7 +71,7 @@ final class MenuResource extends Resource
             'mobile'  => __('menus.locations.mobile'),
         ];
 
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('menus.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -110,7 +110,7 @@ final class MenuResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\ProductImageResource\Pages;
 use App\Models\ProductImage;
 use BackedEnum;
@@ -36,9 +34,9 @@ final class ProductImageResource extends Resource
 
     protected static ?int $navigationSort = 14;
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Forms\Components\Select::make('product_id')
                     ->relationship('product', 'name')
@@ -63,7 +61,7 @@ final class ProductImageResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -108,9 +106,9 @@ final class ProductImageResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProductImages::route('/'),
+            'index'  => Pages\ListProductImages::route('/'),
             'create' => Pages\CreateProductImage::route('/create'),
-            'edit' => Pages\EditProductImage::route('/{record}/edit'),
+            'edit'   => Pages\EditProductImage::route('/{record}/edit'),
         ];
     }
 }

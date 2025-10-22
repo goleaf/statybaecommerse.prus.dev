@@ -26,12 +26,12 @@ final class CartItemsChartWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('cart_items.charts.cart_items_over_time'),
-                    'data' => $data->pluck('count')->toArray(),
-                    'borderColor' => '#3B82F6',
+                    'label'           => __('cart_items.charts.cart_items_over_time'),
+                    'data'            => $data->pluck('count')->toArray(),
+                    'borderColor'     => '#3B82F6',
                     'backgroundColor' => 'rgba(59, 130, 246, 0.1)',
-                    'fill' => true,
-                    'tension' => 0.4,
+                    'fill'            => true,
+                    'tension'         => 0.4,
                 ],
             ],
             'labels' => $data->pluck('date')->map(fn ($date) => \Carbon\Carbon::parse($date)->format('M d'))->toArray(),
@@ -49,7 +49,7 @@ final class CartItemsChartWidget extends ChartWidget
             'scales' => [
                 'y' => [
                     'beginAtZero' => true,
-                    'ticks' => [
+                    'ticks'       => [
                         'stepSize' => 1,
                     ],
                 ],

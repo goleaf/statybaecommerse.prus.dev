@@ -49,10 +49,10 @@ final class DiscountResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDiscounts::route('/'),
+            'index'  => Pages\ListDiscounts::route('/'),
             'create' => Pages\CreateDiscount::route('/create'),
-            'view' => Pages\ViewDiscount::route('/{record}'),
-            'edit' => Pages\EditDiscount::route('/{record}/edit'),
+            'view'   => Pages\ViewDiscount::route('/{record}'),
+            'edit'   => Pages\EditDiscount::route('/{record}/edit'),
         ];
     }
 
@@ -82,7 +82,7 @@ final class DiscountResource extends Resource
     private static function generateDuplicateSlug(string $name): string
     {
         $baseSlug = Str::slug($name) ?: 'discount';
-        $candidate = $baseSlug.'-copy';
+        $candidate = $baseSlug . '-copy';
         $suffix = 2;
 
         while (Discount::withoutGlobalScopes()->withTrashed()->where('slug', $candidate)->exists()) {

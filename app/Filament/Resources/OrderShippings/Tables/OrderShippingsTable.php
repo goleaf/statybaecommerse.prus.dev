@@ -6,6 +6,7 @@ namespace App\Filament\Resources\OrderShippings\Tables;
 
 use App\Models\Order;
 use App\Models\OrderShipping;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -21,7 +22,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Number;
-use App\Support\Filament\Components\Flatpickr;
 
 class OrderShippingsTable
 {

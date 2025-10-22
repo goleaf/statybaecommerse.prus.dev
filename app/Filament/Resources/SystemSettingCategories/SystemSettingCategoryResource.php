@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingCategories;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\SystemSettingCategories\Pages\CreateSystemSettingCategory;
 use App\Filament\Resources\SystemSettingCategories\Pages\EditSystemSettingCategory;
 use App\Filament\Resources\SystemSettingCategories\Pages\ListSystemSettingCategories;
@@ -23,15 +21,16 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class SystemSettingCategoryResource extends Resource
 {
     protected static ?string $model = SystemSettingCategory::class;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return SystemSettingCategoryForm::configure($schema);
+        return SystemSettingCategoryForm::configure($form);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return SystemSettingCategoriesTable::configure($table);
     }
@@ -46,9 +45,9 @@ class SystemSettingCategoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListSystemSettingCategories::route('/'),
+            'index'  => ListSystemSettingCategories::route('/'),
             'create' => CreateSystemSettingCategory::route('/create'),
-            'edit' => EditSystemSettingCategory::route('/{record}/edit'),
+            'edit'   => EditSystemSettingCategory::route('/{record}/edit'),
         ];
     }
 

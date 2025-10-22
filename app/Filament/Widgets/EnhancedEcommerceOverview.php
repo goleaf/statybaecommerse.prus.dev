@@ -12,10 +12,11 @@ use BackedEnum;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Carbon;
+use UnitEnum;
 
 final class EnhancedEcommerceOverview extends StatsOverviewWidget
 {
-    /** @var string|\BackedEnum|null */
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-presentation-chart-line';
 
     /** @var string|UnitEnum|null Ensure the widget stays surfaced within the dashboard group. */

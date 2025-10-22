@@ -36,9 +36,9 @@ final class ViewReferralReward extends ViewRecord
         }
 
         $this->record->loadMissing([
-            'user' => fn (Builder $query): Builder => $query->withoutGlobalScopes(),
+            'user'     => fn (Builder $query): Builder => $query->withoutGlobalScopes(),
             'referral' => fn (Builder $query): Builder => $query->withoutGlobalScopes(),
-            'order' => fn (Builder $query): Builder => $query->withoutGlobalScopes(),
+            'order'    => fn (Builder $query): Builder => $query->withoutGlobalScopes(),
         ]);
     }
 
@@ -59,6 +59,6 @@ final class ViewReferralReward extends ViewRecord
             return $headingString;
         }
 
-        return $headingString.' ('.(string) $referralCode.')';
+        return $headingString . ' (' . (string) $referralCode . ')';
     }
 }

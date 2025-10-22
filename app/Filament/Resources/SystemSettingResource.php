@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\SystemSettingResource\Pages;
 use App\Models\SystemSetting;
 use BackedEnum;
@@ -32,7 +30,12 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-    /** @var string|\BackedEnum|null */
+
+final class SystemSettingResource extends Resource
+{
+    protected static ?string $model = \App\Models\SystemSetting::class;
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     protected static UnitEnum|string|null $navigationGroup = 'Settings';
@@ -59,9 +62,9 @@ use UnitEnum;
         return true;
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Section::make(__('system_settings.basic_information'))
                     ->schema([
@@ -215,7 +218,7 @@ use UnitEnum;
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

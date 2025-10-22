@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\PartnerTierResource\Pages;
 use App\Models\PartnerTier;
 use BackedEnum;
@@ -19,18 +17,19 @@ use UnitEnum;
 
 final class PartnerTierResource extends Resource
 {
-    /** @var string|\BackedEnum|null */
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-star';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Marketing';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Marketing';
 
     protected static ?string $model = PartnerTier::class;
 
     protected static ?int $navigationSort = 2;
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Forms\Components\Section::make(__('admin.partner_tiers.sections.basic_information'))
                     ->schema([
@@ -86,7 +85,7 @@ final class PartnerTierResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

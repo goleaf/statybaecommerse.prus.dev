@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\RecommendationAnalytics;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\RecommendationAnalytics\Pages\CreateRecommendationAnalytics;
 use App\Filament\Resources\RecommendationAnalytics\Pages\EditRecommendationAnalytics;
 use App\Filament\Resources\RecommendationAnalytics\Pages\ListRecommendationAnalytics;
@@ -21,7 +19,8 @@ use Filament\Tables\Table;
 final class RecommendationAnalyticsResource extends Resource
 {
     protected static ?string $model = RecommendationAnalytics::class;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?int $navigationSort = 8;
@@ -48,12 +47,12 @@ final class RecommendationAnalyticsResource extends Resource
         return __('recommendation_analytics.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return RecommendationAnalyticsForm::configure($schema);
+        return RecommendationAnalyticsForm::configure($form);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return RecommendationAnalyticsTable::configure($table);
     }

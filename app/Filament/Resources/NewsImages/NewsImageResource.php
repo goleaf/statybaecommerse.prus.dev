@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsImages;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\NewsImages\Pages\CreateNewsImage;
 use App\Filament\Resources\NewsImages\Pages\EditNewsImage;
 use App\Filament\Resources\NewsImages\Pages\ListNewsImages;
@@ -50,9 +48,9 @@ class NewsImageResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Grid::make(2)
                     ->schema([
@@ -108,7 +106,7 @@ class NewsImageResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

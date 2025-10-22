@@ -22,7 +22,7 @@ final class SliderComparisonTable extends BaseWidget
 
     protected int|string|array $columnSpan = 'full';
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         $startDate = $this->pageFilters['startDate'] ?? now()->subDays(30);
         $endDate = $this->pageFilters['endDate'] ?? now();
@@ -104,7 +104,7 @@ final class SliderComparisonTable extends BaseWidget
                     ->color(fn (int $state): string => match (true) {
                         $state >= 80 => 'success',
                         $state >= 60 => 'warning',
-                        default => 'danger',
+                        default      => 'danger',
                     }),
                 IconColumn::make('is_active')
                     ->label('Status')
@@ -159,13 +159,13 @@ final class SliderComparisonTable extends BaseWidget
 
                         $rate = min(100, $baseRate + $featureBonus);
 
-                        return $rate.'%';
+                        return $rate . '%';
                     })
                     ->badge()
                     ->color(fn (string $state): string => match (true) {
                         (int) str_replace('%', '', $state) >= 80 => 'success',
                         (int) str_replace('%', '', $state) >= 60 => 'warning',
-                        default => 'danger',
+                        default                                  => 'danger',
                     }),
                 TextColumn::make('created_at')
                     ->label('Created')

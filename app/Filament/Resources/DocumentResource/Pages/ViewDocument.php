@@ -14,7 +14,6 @@ use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry as InfolistTextEntry;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
 use Stringable;
 
@@ -30,7 +29,7 @@ final class ViewDocument extends ViewRecord
         ];
     }
 
-    public function infolist(Schema $schema): Schema   
+    public function infolist(Schema $schema): Schema
     {
         return $schema->schema([
             InfolistSection::make(__('admin.documents.form.sections.basic_information'))

@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingCategoryResource\RelationManagers;
 
-
-use Filament\Schemas\Schema;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -32,7 +29,7 @@ final class TranslationsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Translations';
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema->schema([
             Section::make(__('system_setting_categories.translations.basic_information'))
@@ -71,7 +68,7 @@ final class TranslationsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -79,14 +76,14 @@ final class TranslationsRelationManager extends BaseRelationManager
                     ->label(__('system_setting_categories.translations.locale'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'lt' => 'info',
-                        'en' => 'success',
-                        'de' => 'warning',
-                        'fr' => 'danger',
-                        'es' => 'primary',
-                        'it' => 'secondary',
-                        'pl' => 'gray',
-                        'ru' => 'dark',
+                        'lt'    => 'info',
+                        'en'    => 'success',
+                        'de'    => 'warning',
+                        'fr'    => 'danger',
+                        'es'    => 'primary',
+                        'it'    => 'secondary',
+                        'pl'    => 'gray',
+                        'ru'    => 'dark',
                         default => 'gray',
                     })
                     ->sortable(),

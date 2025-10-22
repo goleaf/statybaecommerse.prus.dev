@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\SliderResource\Pages;
 use App\Models\Slider;
 use App\Support\Filament\SearchableInputHelper;
@@ -19,7 +17,6 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup as TableBulkActionGroup;
 use Filament\Tables\Actions\DeleteAction as TableDeleteAction;
@@ -32,10 +29,16 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use UnitEnum;
-    /** @var string|\BackedEnum|null */
+
+final class SliderResource extends Resource
+{
+    protected static ?string $model = Slider::class;
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Content';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Content';
 
     protected static ?int $navigationSort = 4;
 
@@ -65,7 +68,7 @@ use UnitEnum;
         return __('sliders.single');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             Section::make(__('sliders.basic_information'))
@@ -147,7 +150,7 @@ use UnitEnum;
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

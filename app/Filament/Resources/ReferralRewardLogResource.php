@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\ReferralRewardLogResource\Pages;
 use App\Models\ReferralReward;
 use App\Models\ReferralRewardLog;
@@ -39,7 +37,8 @@ final class ReferralRewardLogResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'action';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Analytics';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Analytics';
 
     public static function getNavigationLabel(): string
     {
@@ -56,9 +55,9 @@ final class ReferralRewardLogResource extends Resource
         return __('admin.referral_reward_logs.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Section::make(__('admin.referral_reward_logs.basic_information'))
                     ->schema([
@@ -105,7 +104,7 @@ final class ReferralRewardLogResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

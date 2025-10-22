@@ -4,20 +4,17 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CampaignResource\RelationManagers;
 
-
-use Filament\Schemas\Schema;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use App\Support\Filament\Components\Flatpickr;
 
 final class ClicksRelationManager extends BaseRelationManager
 {
@@ -25,15 +22,15 @@ final class ClicksRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Campaign Clicks';
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema->schema([
             Select::make('click_type')
                 ->label('Click Type')
                 ->options([
-                    'cta' => 'CTA',
+                    'cta'    => 'CTA',
                     'banner' => 'Banner',
-                    'link' => 'Link',
+                    'link'   => 'Link',
                     'button' => 'Button',
                 ])
                 ->required(),
@@ -59,7 +56,7 @@ final class ClicksRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -67,11 +64,11 @@ final class ClicksRelationManager extends BaseRelationManager
                     ->label('Click Type')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'cta' => 'success',
+                        'cta'    => 'success',
                         'banner' => 'info',
-                        'link' => 'warning',
+                        'link'   => 'warning',
                         'button' => 'primary',
-                        default => 'gray',
+                        default  => 'gray',
                     })
                     ->sortable(),
                 TextColumn::make('clicked_url')
@@ -102,9 +99,9 @@ final class ClicksRelationManager extends BaseRelationManager
                 SelectFilter::make('click_type')
                     ->label('Click Type')
                     ->options([
-                        'cta' => 'CTA',
+                        'cta'    => 'CTA',
                         'banner' => 'Banner',
-                        'link' => 'Link',
+                        'link'   => 'Link',
                         'button' => 'Button',
                     ]),
                 SelectFilter::make('customer_id')

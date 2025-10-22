@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\Pages;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\DiscountRedemptionResource;
 use App\Filament\Resources\DocumentResource;
 use App\Filament\Resources\OrderResource;
@@ -16,7 +14,6 @@ use App\Models\OrderItem;
 use Filament\Actions;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
 use Icetalker\FilamentTableRepeatableEntry\Infolists\Components\TableRepeatableEntry;
 use Illuminate\Support\Number;
@@ -39,7 +36,7 @@ final class ViewOrder extends ViewRecord
         ];
     }
 
-    public function infolist(Schema $schema): Schema   
+    public function infolist(Schema $schema): Schema
     {
         return $schema->schema([
             ListEntry::make('orderQuickLinks')

@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\ReferralCodeStatisticsResource\Pages;
 use App\Models\ReferralCode;
 use App\Models\ReferralCodeStatistics;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -24,7 +23,6 @@ use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 /**
  * ReferralCodeStatisticsResource
@@ -39,7 +37,8 @@ final class ReferralCodeStatisticsResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'date';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Analytics';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Analytics';
 
     public static function getNavigationLabel(): string
     {
@@ -56,9 +55,9 @@ final class ReferralCodeStatisticsResource extends Resource
         return __('admin.referral_code_statistics.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Section::make(__('admin.referral_code_statistics.basic_information'))
                     ->schema([
@@ -111,7 +110,7 @@ final class ReferralCodeStatisticsResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

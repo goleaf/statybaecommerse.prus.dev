@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\MenuItemResource\Pages;
 use App\Models\Menu;
 use App\Models\MenuItem;
@@ -29,8 +27,12 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
-    /** @var string|\BackedEnum|null */
+
+final class MenuItemResource extends Resource
+{
+    protected static ?string $model = MenuItem::class;
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?int $navigationSort = 5;
@@ -52,9 +54,9 @@ use UnitEnum;
         return __('admin.menu_items.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 FormSection::make(__('admin.menu_items.basic_information'))
                     ->schema([
@@ -126,7 +128,7 @@ use UnitEnum;
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

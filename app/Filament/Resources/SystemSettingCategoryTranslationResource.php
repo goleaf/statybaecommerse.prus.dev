@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\SystemSettingCategoryTranslationResource\Pages;
 use App\Models\SystemSettingCategory;
 use App\Models\SystemSettingCategoryTranslation;
+use BackedEnum;
 use Exception;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -29,11 +28,17 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-    /** @var string|\BackedEnum|null */
+use UnitEnum;
+
+final class SystemSettingCategoryTranslationResource extends Resource
+{
+    protected static ?string $model = \App\Models\SystemSettingCategoryTranslation::class;
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-language';
 
     /**
-     * @var string|\UnitEnum|null Navigation group assignment stored without a typed property to avoid enum collisions.
+     * @var string|UnitEnum|null Navigation group assignment stored without a typed property to avoid enum collisions.
      */
     protected static $navigationGroup = 'Settings';
 
@@ -54,9 +59,9 @@ use Illuminate\Database\Eloquent\Collection;
         return __('admin.system_setting_category_translations.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('admin.system_setting_category_translations.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -98,7 +103,7 @@ use Illuminate\Database\Eloquent\Collection;
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\SystemSettingTranslationResource\Pages;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingTranslation;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -42,8 +41,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Throwable;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
-    /** @var string|\BackedEnum|null */
+
+final class SystemSettingTranslationResource extends Resource
+{
+    protected static ?string $model = \App\Models\SystemSettingTranslation::class;
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-document-text';
 
     protected static UnitEnum|string|null $navigationGroup = 'Settings';
@@ -63,9 +66,9 @@ use App\Support\Filament\Components\Flatpickr;
         return __('admin.system_setting_translations.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Tabs::make('Translation Details')
                     ->tabs([
@@ -184,7 +187,7 @@ use App\Support\Filament\Components\Flatpickr;
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

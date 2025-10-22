@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AttributeResource\RelationManagers;
 
-
-use Filament\Schemas\Schema;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -21,7 +18,7 @@ final class ProductsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Products';
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -59,7 +56,7 @@ final class ProductsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('product.name')
@@ -87,10 +84,10 @@ final class ProductsRelationManager extends BaseRelationManager
                     ->badge()
                     ->color(fn (int $state): string => match (true) {
                         $state >= 100 => 'danger',
-                        $state >= 50 => 'warning',
-                        $state >= 20 => 'info',
-                        $state >= 10 => 'success',
-                        default => 'gray',
+                        $state >= 50  => 'warning',
+                        $state >= 20  => 'info',
+                        $state >= 10  => 'success',
+                        default       => 'gray',
                     }),
                 Tables\Columns\IconColumn::make('is_active')
                     ->label(__('attributes.is_active'))

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\PartnerResource\Pages;
 use App\Models\Partner;
 use BackedEnum;
@@ -24,17 +22,19 @@ use UnitEnum;
 final class PartnerResource extends Resource
 {
     protected static ?string $model = Partner::class;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-user-group';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Marketing';
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = 'Marketing';
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
         // Build the Partner form using the Section helper to keep layouts consistent.
-        return $schema
+        return $form
             ->schema([
                 Section::make(__('admin.partners.sections.basic_information'))
                     ->schema([
@@ -101,7 +101,7 @@ final class PartnerResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

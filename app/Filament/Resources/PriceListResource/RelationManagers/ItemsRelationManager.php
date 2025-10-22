@@ -4,19 +4,16 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\PriceListResource\RelationManagers;
 
-
-use Filament\Schemas\Schema;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use App\Support\Filament\Components\Flatpickr;
 
 final class ItemsRelationManager extends BaseRelationManager
 {
@@ -27,7 +24,7 @@ final class ItemsRelationManager extends BaseRelationManager
         return __('price_lists.relation_managers.items.title');
     }
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
@@ -94,7 +91,7 @@ final class ItemsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('product.name')

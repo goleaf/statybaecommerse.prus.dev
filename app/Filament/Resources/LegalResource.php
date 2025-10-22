@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\LegalResource\Pages;
 use App\Filament\Resources\LegalResource\RelationManagers\TranslationsRelationManager;
 use App\Models\Legal;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -28,7 +27,6 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 final class LegalResource extends Resource
 {
@@ -63,9 +61,9 @@ final class LegalResource extends Resource
         return __('legal.single');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Forms\Components\Section::make(__('legal.basic_information'))
                     ->schema([
@@ -168,7 +166,7 @@ final class LegalResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -192,9 +190,9 @@ final class LegalResource extends Resource
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'published' => 'success',
-                        'draft' => 'warning',
-                        'disabled' => 'danger',
-                        default => 'gray',
+                        'draft'     => 'warning',
+                        'disabled'  => 'danger',
+                        default     => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('published_at')
                     ->label(__('legal.published_at'))
@@ -248,10 +246,10 @@ final class LegalResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListLegals::route('/'),
+            'index'  => Pages\ListLegals::route('/'),
             'create' => Pages\CreateLegal::route('/create'),
-            'view' => Pages\ViewLegal::route('/{record}'),
-            'edit' => Pages\EditLegal::route('/{record}/edit'),
+            'view'   => Pages\ViewLegal::route('/{record}'),
+            'edit'   => Pages\EditLegal::route('/{record}/edit'),
         ];
     }
 

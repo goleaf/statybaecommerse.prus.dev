@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Enums\ApiKeyScope;
 use App\Filament\Resources\ApiKeyResource\Concerns\HandlesApiKeyCredentials;
 use App\Filament\Resources\ApiKeyResource\Pages;
@@ -41,10 +39,12 @@ final class ApiKeyResource extends Resource
     protected static ?string $model = ApiKey::class;
 
     protected static ?string $navigationLabel = 'api_keys.navigation.label';
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-key';
 
-    protected static UnitEnum|string|null $navigationGroup = null;
+    /** @var UnitEnum|string|null */
+    protected static $navigationGroup = null;
 
     protected static ?int $navigationSort = 4;
 
@@ -68,9 +68,9 @@ final class ApiKeyResource extends Resource
         return __('api_keys.navigation.plural');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('api_keys.sections.details'))
                 ->columns(2)
                 ->schema([
@@ -143,7 +143,7 @@ final class ApiKeyResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -221,7 +221,7 @@ final class ApiKeyResource extends Resource
                         $credentials = ApiKey::generateCredentials();
 
                         $record->forceFill([
-                            'key' => $credentials['hashed'],
+                            'key'          => $credentials['hashed'],
                             'last_used_at' => null,
                         ])->save();
 
@@ -243,9 +243,9 @@ final class ApiKeyResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListApiKeys::route('/'),
+            'index'  => Pages\ListApiKeys::route('/'),
             'create' => Pages\CreateApiKey::route('/create'),
-            'edit' => Pages\EditApiKey::route('/{record}/edit'),
+            'edit'   => Pages\EditApiKey::route('/{record}/edit'),
         ];
     }
 }

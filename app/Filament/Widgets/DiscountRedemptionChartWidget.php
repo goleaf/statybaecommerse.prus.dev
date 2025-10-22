@@ -38,20 +38,20 @@ class DiscountRedemptionChartWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Redemptions Count',
-                    'data' => $data->pluck('count')->toArray(),
+                    'label'           => 'Redemptions Count',
+                    'data'            => $data->pluck('count')->toArray(),
                     'backgroundColor' => 'rgba(59, 130, 246, 0.1)',
-                    'borderColor' => 'rgb(59, 130, 246)',
-                    'borderWidth' => 2,
-                    'yAxisID' => 'y',
+                    'borderColor'     => 'rgb(59, 130, 246)',
+                    'borderWidth'     => 2,
+                    'yAxisID'         => 'y',
                 ],
                 [
-                    'label' => 'Amount Saved (€)',
-                    'data' => $data->pluck('total_amount')->toArray(),
+                    'label'           => 'Amount Saved (€)',
+                    'data'            => $data->pluck('total_amount')->toArray(),
                     'backgroundColor' => 'rgba(16, 185, 129, 0.1)',
-                    'borderColor' => 'rgb(16, 185, 129)',
-                    'borderWidth' => 2,
-                    'yAxisID' => 'y1',
+                    'borderColor'     => 'rgb(16, 185, 129)',
+                    'borderWidth'     => 2,
+                    'yAxisID'         => 'y1',
                 ],
             ],
             'labels' => $data->pluck('date')->toArray(),
@@ -68,21 +68,21 @@ class DiscountRedemptionChartWidget extends ChartWidget
         return [
             'scales' => [
                 'y' => [
-                    'type' => 'linear',
-                    'display' => true,
+                    'type'     => 'linear',
+                    'display'  => true,
                     'position' => 'left',
-                    'title' => [
+                    'title'    => [
                         'display' => true,
-                        'text' => 'Redemptions Count',
+                        'text'    => 'Redemptions Count',
                     ],
                 ],
                 'y1' => [
-                    'type' => 'linear',
-                    'display' => true,
+                    'type'     => 'linear',
+                    'display'  => true,
                     'position' => 'right',
-                    'title' => [
+                    'title'    => [
                         'display' => true,
-                        'text' => 'Amount Saved (€)',
+                        'text'    => 'Amount Saved (€)',
                     ],
                     'grid' => [
                         'drawOnChartArea' => false,
@@ -91,17 +91,17 @@ class DiscountRedemptionChartWidget extends ChartWidget
             ],
             'plugins' => [
                 'legend' => [
-                    'display' => true,
+                    'display'  => true,
                     'position' => 'top',
                 ],
                 'tooltip' => [
-                    'mode' => 'index',
+                    'mode'      => 'index',
                     'intersect' => false,
                 ],
             ],
             'interaction' => [
-                'mode' => 'nearest',
-                'axis' => 'x',
+                'mode'      => 'nearest',
+                'axis'      => 'x',
                 'intersect' => false,
             ],
         ];

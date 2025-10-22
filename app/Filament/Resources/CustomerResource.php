@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\CustomerResource\Pages;
 use App\Filament\Widgets\InlineCharts\CustomerOrdersSparkline;
 use App\Models\City;
@@ -38,6 +36,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use LaraZeus\InlineChart\Tables\Columns\InlineChart;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
@@ -45,7 +44,6 @@ use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
-use LaraZeus\InlineChart\Tables\Columns\InlineChart;
 
 final class CustomerResource extends Resource
 {
@@ -90,9 +88,9 @@ final class CustomerResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('customers.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -189,7 +187,7 @@ final class CustomerResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -205,14 +203,14 @@ final class CustomerResource extends Resource
                         return collect([
                             filled($record->email) ? [
                                 'label' => __('Email :email', ['email' => $record->email]),
-                                'url' => 'mailto:'.$record->email,
-                                'icon' => 'heroicon-o-envelope',
+                                'url'   => 'mailto:' . $record->email,
+                                'icon'  => 'heroicon-o-envelope',
                                 'color' => 'info',
                             ] : null,
                             filled($record->phone) ? [
                                 'label' => __('Call :phone', ['phone' => $record->phone]),
-                                'url' => 'tel:'.preg_replace('/[^0-9+]/', '', (string) $record->phone),
-                                'icon' => 'heroicon-o-phone',
+                                'url'   => 'tel:' . preg_replace('/[^0-9+]/', '', (string) $record->phone),
+                                'icon'  => 'heroicon-o-phone',
                                 'color' => 'success',
                             ] : null,
                         ])

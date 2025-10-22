@@ -6,6 +6,7 @@ namespace App\Filament\Pages;
 
 use App\Models\Slider;
 use App\Support\Filament\Components\Flatpickr;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Pages\Dashboard\Actions\FilterAction;
@@ -13,7 +14,13 @@ use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Pages\Dashboard\Concerns\HasFiltersAction;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Illuminate\Database\Eloquent\Builder;
-    /** @var string|\BackedEnum|null */
+
+class SliderAnalytics extends BaseDashboard
+{
+    use HasFiltersAction;
+    use InteractsWithPageFilters;
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?int $navigationSort = 3;

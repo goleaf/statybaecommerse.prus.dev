@@ -54,8 +54,8 @@ final class SeoScoreDistributionWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('seo_data.charts.seo_score_distribution'),
-                    'data' => [$excellent, $good, $needsImprovement, $poor],
+                    'label'           => __('seo_data.charts.seo_score_distribution'),
+                    'data'            => [$excellent, $good, $needsImprovement, $poor],
                     'backgroundColor' => [
                         '#10B981', // emerald (excellent)
                         '#3B82F6', // blue (good)

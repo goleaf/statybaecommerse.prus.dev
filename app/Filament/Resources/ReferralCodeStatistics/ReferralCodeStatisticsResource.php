@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ReferralCodeStatistics;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\ReferralCodeStatistics\Pages\CreateReferralCodeStatistics;
 use App\Filament\Resources\ReferralCodeStatistics\Pages\EditReferralCodeStatistics;
 use App\Filament\Resources\ReferralCodeStatistics\Pages\ListReferralCodeStatistics;
@@ -21,15 +19,16 @@ use Filament\Tables\Table;
 class ReferralCodeStatisticsResource extends Resource
 {
     protected static ?string $model = ReferralCodeStatistics::class;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return ReferralCodeStatisticsForm::configure($schema);
+        return ReferralCodeStatisticsForm::configure($form);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return ReferralCodeStatisticsTable::configure($table);
     }
@@ -44,9 +43,9 @@ class ReferralCodeStatisticsResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListReferralCodeStatistics::route('/'),
+            'index'  => ListReferralCodeStatistics::route('/'),
             'create' => CreateReferralCodeStatistics::route('/create'),
-            'edit' => EditReferralCodeStatistics::route('/{record}/edit'),
+            'edit'   => EditReferralCodeStatistics::route('/{record}/edit'),
         ];
     }
 }

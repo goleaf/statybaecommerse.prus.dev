@@ -26,8 +26,8 @@ final class SeoOptimizationWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('seo_data.charts.optimization_status'),
-                    'data' => [$optimizedSeoData, $needsOptimization],
+                    'label'           => __('seo_data.charts.optimization_status'),
+                    'data'            => [$optimizedSeoData, $needsOptimization],
                     'backgroundColor' => [
                         '#10B981', // emerald (optimized)
                         '#F59E0B', // amber (needs optimization)

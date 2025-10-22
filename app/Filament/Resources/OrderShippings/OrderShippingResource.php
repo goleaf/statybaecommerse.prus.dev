@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderShippings;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\OrderShippings\Pages\CreateOrderShipping;
 use App\Filament\Resources\OrderShippings\Pages\EditOrderShipping;
 use App\Filament\Resources\OrderShippings\Pages\ListOrderShippings;
@@ -28,12 +26,12 @@ class OrderShippingResource extends Resource
         return Heroicon::OutlinedRectangleStack;
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return OrderShippingForm::configure($schema);
+        return OrderShippingForm::configure($form);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return OrderShippingsTable::configure($table);
     }
@@ -48,9 +46,9 @@ class OrderShippingResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListOrderShippings::route('/'),
+            'index'  => ListOrderShippings::route('/'),
             'create' => CreateOrderShipping::route('/create'),
-            'edit' => EditOrderShipping::route('/{record}/edit'),
+            'edit'   => EditOrderShipping::route('/{record}/edit'),
         ];
     }
 }

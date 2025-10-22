@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\CustomerManagementResource\Pages;
 use App\Models\User;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -33,7 +31,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
-use App\Support\Filament\Components\Flatpickr;
 
 final class CustomerManagementResource extends Resource
 {
@@ -58,9 +55,9 @@ final class CustomerManagementResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('customers.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -169,7 +166,7 @@ final class CustomerManagementResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

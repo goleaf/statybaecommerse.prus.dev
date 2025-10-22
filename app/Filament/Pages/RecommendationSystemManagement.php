@@ -12,6 +12,7 @@ use App\Models\RecommendationConfig;
 use App\Models\UserBehavior;
 use App\Models\UserProductInteraction;
 use App\Services\RecommendationService;
+use BackedEnum;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Collection;
@@ -32,7 +33,8 @@ final class RecommendationSystemManagement extends Page
     }
 
     protected static ?int $navigationSort = 40;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-sparkles';
 
     protected string $view = 'filament.pages.recommendation-system-management';

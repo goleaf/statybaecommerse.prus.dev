@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsComments;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\NewsComments\Pages\CreateNewsComment;
 use App\Filament\Resources\NewsComments\Pages\EditNewsComment;
 use App\Filament\Resources\NewsComments\Pages\ListNewsComments;
@@ -21,15 +19,16 @@ use Filament\Tables\Table;
 class NewsCommentResource extends Resource
 {
     protected static ?string $model = NewsComment::class;
-    /** @var string|\BackedEnum|null */
+
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return NewsCommentForm::configure($schema);
+        return NewsCommentForm::configure($form);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return NewsCommentsTable::configure($table);
     }
@@ -44,9 +43,9 @@ class NewsCommentResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListNewsComments::route('/'),
+            'index'  => ListNewsComments::route('/'),
             'create' => CreateNewsComment::route('/create'),
-            'edit' => EditNewsComment::route('/{record}/edit'),
+            'edit'   => EditNewsComment::route('/{record}/edit'),
         ];
     }
 }

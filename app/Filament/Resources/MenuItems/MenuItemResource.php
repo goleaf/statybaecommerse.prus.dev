@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\MenuItems;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\MenuItems\Pages\CreateMenuItem;
 use App\Filament\Resources\MenuItems\Pages\EditMenuItem;
 use App\Filament\Resources\MenuItems\Pages\ListMenuItems;
 use App\Filament\Resources\MenuItems\Schemas\MenuItemForm;
 use App\Filament\Resources\MenuItems\Tables\MenuItemsTable;
 use App\Models\MenuItem;
+use BackedEnum;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
@@ -22,17 +21,17 @@ class MenuItemResource extends Resource
     protected static ?string $model = MenuItem::class;
 
     /**
-     * @var string|\BackedEnum|null Menu item icon aligned with Filament v4 guidance.
+     * @var string|BackedEnum|null Menu item icon aligned with Filament v4 guidance.
      */
     protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     /**
      * Compose the shared form schema for creating and editing menu items.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         // Delegate field layout to the dedicated schema configurator for reuse.
-        return MenuItemForm::configure($schema);
+        return MenuItemForm::configure($form);
     }
 
     /**
@@ -54,9 +53,9 @@ class MenuItemResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListMenuItems::route('/'),
+            'index'  => ListMenuItems::route('/'),
             'create' => CreateMenuItem::route('/create'),
-            'edit' => EditMenuItem::route('/{record}/edit'),
+            'edit'   => EditMenuItem::route('/{record}/edit'),
         ];
     }
 }

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
@@ -38,7 +36,7 @@ use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 
 final class CategoryResource extends Resource
 {
-    /** @var string|\BackedEnum|null */
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-tag';
 
     /** @var string|BackedEnum|null Align the resource under the Products navigation section. */
@@ -100,9 +98,9 @@ final class CategoryResource extends Resource
         return __('categories.single');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('categories.basic_information'))
                 ->components([
                     LanguageTabs::make([
@@ -197,7 +195,7 @@ final class CategoryResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
