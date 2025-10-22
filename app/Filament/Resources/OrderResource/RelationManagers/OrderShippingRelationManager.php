@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
+
+use Filament\Schemas\Schema;
 use App\Models\OrderShipping;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -51,9 +53,9 @@ final class OrderShippingRelationManager extends BaseRelationManager
     /**
      * Configure the form schema for order shipping.
      */
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('orders.shipping_information'))
                     ->description(__('orders.shipping_information_description'))
@@ -157,7 +159,7 @@ final class OrderShippingRelationManager extends BaseRelationManager
     /**
      * Configure the table for order shipping.
      */
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table   
     {
         return $table
             ->columns([

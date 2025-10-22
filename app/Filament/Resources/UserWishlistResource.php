@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\UserWishlistResource\Pages;
 use App\Models\UserWishlist;
 use BackedEnum;
@@ -61,10 +63,10 @@ final class UserWishlistResource extends Resource
         return __('admin.user_wishlists.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         // Configure the wishlist creation and editing form components.
-        return $form
+        return $schema
             ->components([
                 Select::make('user_id')
                     ->label(__('admin.user_wishlists.user'))
@@ -89,7 +91,7 @@ final class UserWishlistResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Define table columns, filters, and actions for wishlist management.
         return $table

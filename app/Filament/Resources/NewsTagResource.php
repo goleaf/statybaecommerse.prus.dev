@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\NewsTagResource\Pages;
 use App\Models\NewsTag;
@@ -63,9 +65,9 @@ final class NewsTagResource extends Resource
         return __('admin.news_tags.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             FormSection::make(__('admin.news_tags.form.sections.basic_information'))
                 ->schema([
                     TextInput::make('name')
@@ -146,7 +148,7 @@ final class NewsTagResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([

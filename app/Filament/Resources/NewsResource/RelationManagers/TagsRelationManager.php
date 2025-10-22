@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsResource\RelationManagers;
 
+
+use Filament\Schemas\Schema;
 use App\Models\NewsTag;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -20,9 +22,9 @@ final class TagsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Tags';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->components([
                 Forms\Components\Select::make('id')
                     ->label(__('news.fields.tag'))
@@ -60,7 +62,7 @@ final class TagsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table   
     {
         return $table
             ->recordTitleAttribute('name')

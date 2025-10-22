@@ -46,11 +46,8 @@ use Novadaemon\FilamentCombobox\Combobox;
 final class DiscountConditionResource extends Resource
 {
     protected static ?string $model = DiscountCondition::class;
-
-    /**
-     * Navigation icon override (string|\BackedEnum|null).
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-adjustments-horizontal';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-adjustments-horizontal';
 
     public static function getNavigationGroup(): ?string
     {
@@ -72,9 +69,9 @@ final class DiscountConditionResource extends Resource
         return __('discount_conditions.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Tabs::make('discount_condition')
                     ->tabs([
@@ -173,7 +170,7 @@ final class DiscountConditionResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([
@@ -297,7 +294,7 @@ final class DiscountConditionResource extends Resource
             ->defaultSort('priority', 'asc');
     }
 
-    public static function infolist(Schema $schema): Schema|array
+    public static function infolist(Schema $schema): Schema   
     {
         return $schema
             ->components([

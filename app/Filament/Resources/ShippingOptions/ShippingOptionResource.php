@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ShippingOptions;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\ShippingOptions\Pages\CreateShippingOption;
 use App\Filament\Resources\ShippingOptions\Pages\EditShippingOption;
 use App\Filament\Resources\ShippingOptions\Pages\ListShippingOptions;
@@ -19,15 +21,15 @@ use Filament\Tables\Table;
 class ShippingOptionResource extends Resource
 {
     protected static ?string $model = ShippingOption::class;
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return ShippingOptionForm::configure($form);
+        return ShippingOptionForm::configure($schema);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return ShippingOptionsTable::configure($table);
     }

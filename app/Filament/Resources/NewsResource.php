@@ -29,9 +29,8 @@ use App\Support\Filament\Components\Flatpickr;
 class NewsResource extends Resource
 {
     protected static ?string $model = News::class;
-
-    /** @phpstan-var string|BackedEnum|null */
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-newspaper';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-newspaper';
 
     protected static ?int $navigationSort = 1;
 
@@ -39,9 +38,9 @@ class NewsResource extends Resource
 
     protected static ?string $pluralModelLabel = 'News Articles';
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form->components([
+        return $schema->components([
             Forms\Components\Section::make('Article Information')
                 ->components([
                     LanguageTabs::make([
@@ -153,7 +152,7 @@ class NewsResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([
@@ -380,7 +379,7 @@ class NewsResource extends Resource
             ->defaultSort('published_at', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema|array
+    public static function infolist(Schema $schema): Schema   
     {
         return $schema
             ->components([

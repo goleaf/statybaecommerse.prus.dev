@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\PriceListResource\Pages;
 use App\Models\PriceList;
 use Filament\Actions\BulkActionGroup;
@@ -61,9 +63,9 @@ final class PriceListResource extends Resource
         return __('price_lists.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('price_lists.basic_information'))
                 ->columns(2)
                 ->schema([
@@ -117,7 +119,7 @@ final class PriceListResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([

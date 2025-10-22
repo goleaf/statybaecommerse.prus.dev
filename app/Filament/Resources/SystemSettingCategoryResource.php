@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\SystemSettingCategoryResource\Pages;
 use App\Filament\Resources\SystemSettingCategoryResource\RelationManagers;
@@ -92,9 +94,9 @@ final class SystemSettingCategoryResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 SchemaSection::make(__('system_setting_categories.basic_information'))
                     ->schema([
@@ -166,7 +168,7 @@ final class SystemSettingCategoryResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([ActiveScope::class]))

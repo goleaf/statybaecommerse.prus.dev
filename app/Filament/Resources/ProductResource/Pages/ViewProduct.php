@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\Pages;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\ProductResource;
 use App\Models\Category;
 use App\Models\Collection;
@@ -30,9 +32,9 @@ final class ViewProduct extends ViewRecord
         ];
     }
 
-    public function infolist(Infolist $infolist): Infolist|array
+    public function infolist(Schema $schema): Schema   
     {
-        return $infolist->schema([
+        return $schema->schema([
             ListEntry::make('productQuickLinks')
                 ->heading(__('Quick links'))
                 ->list()

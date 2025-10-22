@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingCategoryResource\RelationManagers;
 
+
+use Filament\Schemas\Schema;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -33,9 +35,9 @@ final class ChildrenRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Sub Categories';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('system_setting_categories.children.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -90,7 +92,7 @@ final class ChildrenRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table   
     {
         return $table
             ->columns([

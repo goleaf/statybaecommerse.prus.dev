@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\UserResource\RelationManagers;
 
+
+use Filament\Schemas\Schema;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -30,9 +32,9 @@ class AddressesRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Addresses';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->components([
                 TextInput::make('first_name')
                     ->label(__('addresses.fields.first_name'))
@@ -72,7 +74,7 @@ class AddressesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table   
     {
         return $table
             ->columns([

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\VariantStockResource\RelationManagers;
 
+
+use Filament\Schemas\Schema;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
@@ -30,9 +32,9 @@ class StockMovementsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Stock Movements';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->components([
                 TextInput::make('quantity')
                     ->label(__('inventory.quantity'))
@@ -69,7 +71,7 @@ class StockMovementsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table   
     {
         return $table
             ->recordTitleAttribute('quantity')

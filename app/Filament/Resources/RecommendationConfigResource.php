@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\RecommendationConfigResource\Pages;
 use App\Models\RecommendationConfig;
 use Filament\Actions\BulkAction;
@@ -49,9 +51,9 @@ final class RecommendationConfigResource extends Resource
         return __('recommendation_configs.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('recommendation_config.sections.basic_info'))
                 ->schema([
                     Grid::make(2)
@@ -142,7 +144,7 @@ final class RecommendationConfigResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([

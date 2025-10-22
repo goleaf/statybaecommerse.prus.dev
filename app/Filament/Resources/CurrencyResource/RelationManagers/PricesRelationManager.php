@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CurrencyResource\RelationManagers;
 
+
+use Filament\Schemas\Schema;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -26,9 +28,9 @@ final class PricesRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Prices';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->components([
                 Forms\Components\Select::make('priceable_type')
                     ->options([
@@ -65,7 +67,7 @@ final class PricesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table   
     {
         return $table
             ->recordTitleAttribute('amount')

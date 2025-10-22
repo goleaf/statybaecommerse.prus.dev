@@ -8,9 +8,7 @@ use Filament\Pages\Page;
 
 final class AdvancedReports extends Page
 {
-    /**
-     * @var string|\BackedEnum|null Navigation icon override documented for enum compatibility.
-     */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
     public static function getNavigationGroup(): ?string

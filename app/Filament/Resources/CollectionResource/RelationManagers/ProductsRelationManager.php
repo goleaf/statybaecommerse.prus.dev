@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CollectionResource\RelationManagers;
 
+
+use Filament\Schemas\Schema;
 use App\Models\Product;
 use Filament\Actions\EditAction;
 use Filament\Forms;
@@ -19,9 +21,9 @@ final class ProductsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Collection Products';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Select::make('product_id')
                     ->label(__('admin.collections.fields.product'))
@@ -47,7 +49,7 @@ final class ProductsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table   
     {
         return $table
             ->recordTitleAttribute('name')

@@ -13,32 +13,7 @@ use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Pages\Dashboard\Concerns\HasFiltersAction;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Illuminate\Database\Eloquent\Builder;
-
-/**
- * Slider Analytics Dashboard
- *
- * Features:
- * - Comprehensive slider performance analytics
- * - Visual charts and statistics
- * - Date range filtering
- * - Slider performance comparison
- * - Click-through rate analysis
- * - Engagement metrics
- * - Export capabilities
- * - Real-time data updates
- */
-final class SliderAnalytics extends BaseDashboard
-{
-    use HasFiltersAction;
-    use InteractsWithPageFilters;
-
-    protected static ?string $title = 'Slider Analytics';
-
-    protected static ?string $navigationLabel = 'Slider Analytics';
-
-    /**
-     * @var string|\BackedEnum|null Navigation icon override documented for Filament compatibility.
-     */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?int $navigationSort = 3;

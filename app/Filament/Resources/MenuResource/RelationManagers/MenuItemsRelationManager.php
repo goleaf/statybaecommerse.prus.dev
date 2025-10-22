@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\MenuResource\RelationManagers;
 
+
+use Filament\Schemas\Schema;
 use App\Models\MenuItem;
 use App\Models\Scopes\VisibleScope;
 use Filament\Forms\Components\Grid;
@@ -24,9 +26,9 @@ final class MenuItemsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'allItems';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Grid::make(2)
                 ->schema([
                     TextInput::make('label')
@@ -63,7 +65,7 @@ final class MenuItemsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table   
     {
         return $table
             ->columns([

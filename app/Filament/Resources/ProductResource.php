@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers\AttributesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\CategoriesRelationManager;
@@ -145,9 +147,9 @@ final class ProductResource extends Resource
         return __('products.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->components([
                 Tabs::make('Product Information')
                     ->tabs([
@@ -351,7 +353,7 @@ final class ProductResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->defaultPaginationPageOption(25)
