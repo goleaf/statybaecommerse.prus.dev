@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CustomerResource\Pages;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\CustomerResource;
 use App\Filament\Resources\ReviewResource;
 use App\Models\Address;
@@ -31,9 +33,9 @@ final class ViewCustomer extends ViewRecord
         ];
     }
 
-    public function infolist(Infolist $infolist): Infolist|array
+    public function infolist(Schema $schema): Schema   
     {
-        return $infolist->schema([
+        return $schema->schema([
             ListEntry::make('customerQuickLinks')
                 ->heading(__('Quick links'))
                 ->list()

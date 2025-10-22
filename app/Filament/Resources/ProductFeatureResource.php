@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ProductFeatureResource\Pages;
 use App\Models\ProductFeature;
@@ -22,16 +24,16 @@ use UnitEnum;
 final class ProductFeatureResource extends Resource
 {
     protected static ?string $model = ProductFeature::class;
-
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-star';
 
     protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 17;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Forms\Components\Select::make('product_id')
                 ->label('Product')
                 ->relationship('product', 'name')
@@ -67,7 +69,7 @@ final class ProductFeatureResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([

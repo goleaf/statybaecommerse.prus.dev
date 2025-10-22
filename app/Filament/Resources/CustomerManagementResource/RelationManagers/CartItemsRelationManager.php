@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CustomerManagementResource\RelationManagers;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\AssociateAction;
 use Filament\Actions\BulkActionGroup;
@@ -25,9 +27,9 @@ class CartItemsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'cartItems';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 // Keep the identifier locked because the relationship is read-only in this manager.
                 TextInput::make('id')
@@ -38,15 +40,15 @@ class CartItemsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function infolist(Infolist $infolist): Infolist
+    public function infolist(Schema $schema): Schema   
     {
-        return $infolist
+        return $schema
             ->schema([
                 TextEntry::make('id'),
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
         return $table
             ->recordTitleAttribute('id')

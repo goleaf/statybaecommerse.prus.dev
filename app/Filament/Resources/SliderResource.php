@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\SliderResource\Pages;
 use App\Models\Slider;
 use App\Support\Filament\SearchableInputHelper;
@@ -30,17 +32,8 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use UnitEnum;
-
-/**
- * SliderResource
- *
- * Filament v4 resource for Slider management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class SliderResource extends Resource
-{
-    protected static ?string $model = Slider::class;
-
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static UnitEnum|string|null $navigationGroup = 'Content';
 
@@ -72,9 +65,9 @@ final class SliderResource extends Resource
         return __('sliders.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('sliders.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -154,7 +147,7 @@ final class SliderResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([

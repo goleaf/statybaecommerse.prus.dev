@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\SliderTranslationResource\Pages;
 use App\Models\Slider;
 use App\Models\SliderTranslation;
@@ -23,17 +25,8 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
-
-/**
- * SliderTranslationResource
- *
- * Filament v4 resource for SliderTranslation management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class SliderTranslationResource extends Resource
-{
-    protected static ?string $model = SliderTranslation::class;
-
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?int $navigationSort = 3;
 
@@ -56,9 +49,9 @@ final class SliderTranslationResource extends Resource
         return __('admin.slider_translations.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             SchemaSection::make(__('admin.slider_translations.basic_information'))
                 ->components([
                     SchemaGrid::make(2)
@@ -95,7 +88,7 @@ final class SliderTranslationResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([

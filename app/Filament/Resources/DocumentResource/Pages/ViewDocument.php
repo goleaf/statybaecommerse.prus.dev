@@ -30,7 +30,7 @@ final class ViewDocument extends ViewRecord
         ];
     }
 
-    public function infolist(Schema $schema): Schema
+    public function infolist(Schema $schema): Schema   
     {
         return $schema->schema([
             InfolistSection::make(__('admin.documents.form.sections.basic_information'))

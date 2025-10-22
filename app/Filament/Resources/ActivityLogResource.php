@@ -22,12 +22,8 @@ use Illuminate\Database\Eloquent\Model;
 final class ActivityLogResource extends Resource
 {
     protected static ?string $model = ActivityLog::class;
-
-    /**
-     * Align the navigation icon property with Filament's typed base declaration so runtime
-     * package discovery does not crash when reflecting on the resource hierarchy.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-document-text';
 
     protected static ?int $navigationSort = 9;
 
@@ -64,7 +60,7 @@ final class ActivityLogResource extends Resource
      * The resource remains read-only for now, so we still return an empty schema
      * while keeping the hook available for future enhancements.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $schema): Schema   
     {
         return $schema->schema([]);
     }
@@ -72,7 +68,7 @@ final class ActivityLogResource extends Resource
     /**
      * Configure the table that lists activity log records along with filters and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\UserPreferenceResource\Pages;
 use App\Models\UserPreference;
 use BackedEnum;
@@ -28,17 +30,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
-
-/**
- * UserPreferenceResource
- *
- * Filament v4 resource for UserPreference management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class UserPreferenceResource extends Resource
-{
-    protected static ?string $model = UserPreference::class;
-
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-document-text';
 
     protected static UnitEnum|string|null $navigationGroup = 'Users';
 
@@ -59,9 +52,9 @@ final class UserPreferenceResource extends Resource
         return __('admin.user_preferences.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Select::make('user_id')
                     ->label(__('admin.user_preferences.user'))
@@ -103,7 +96,7 @@ final class UserPreferenceResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([

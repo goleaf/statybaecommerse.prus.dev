@@ -14,6 +14,7 @@
 - Shipped the `php artisan maintenance:sanitize-html` command to reprocess legacy content in bulk.
 
 ## Tooling polish
+- `scripts/upgrade_filament_schema.php` now updates navigation icon docblocks automatically while refactoring `form`, `infolist`, and `table` signatures, making repeated schema migrations safe for the entire Filament tree.
 - The `data:import` Artisan command now documents its signature and description directly on the command class, improving discoverability via `php artisan list`.
 
 ## Documentation consolidation

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\EnumValueResource\Pages;
 use App\Models\EnumValue;
@@ -35,8 +37,7 @@ use Illuminate\Database\Eloquent\Collection;
 final class EnumValueResource extends Resource
 {
     protected static ?string $model = EnumValue::class;
-
-    /** @var string|\BackedEnum|null Provide a consistent icon for value maintenance. */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-squares-2x2';
 
     /** @var string|\BackedEnum|null Keep enum value tools inside the System cluster. */
@@ -67,9 +68,9 @@ final class EnumValueResource extends Resource
         return __('admin.enum_values.navigation_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('admin.enum_values.form.sections.basic_information'))
                 ->schema([
                     Select::make('type')
@@ -144,7 +145,7 @@ final class EnumValueResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([

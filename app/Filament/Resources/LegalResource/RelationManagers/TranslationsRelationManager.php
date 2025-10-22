@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\LegalResource\RelationManagers;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Support\Html\HtmlSanitizer;
 use Filament\Forms\Components\Grid;
@@ -42,9 +44,9 @@ class TranslationsRelationManager extends BaseRelationManager
         return $this->sanitizePayload($data);
     }
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make('Translation Details')
                     ->schema([
@@ -125,7 +127,7 @@ class TranslationsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table   
     {
         return $table
             ->recordTitleAttribute('title')

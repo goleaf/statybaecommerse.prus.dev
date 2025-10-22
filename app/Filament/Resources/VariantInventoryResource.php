@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantInventoryResource\Pages;
 use App\Models\Location;
 use App\Models\Product;
@@ -44,23 +46,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-
-/**
- * VariantInventoryResource
- *
- * Filament v4 resource for VariantInventory management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class VariantInventoryResource extends Resource
-{
-    protected static ?string $model = VariantInventory::class;
-
-    protected static ?int $navigationSort = 2;
-
-    protected static ?string $recordTitleAttribute = 'variant_id';
-
-    /**
-     * @var string|BackedEnum|null Navigation icon configured for the inventory module.
-     */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-archive-box';
 
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';
@@ -83,9 +69,9 @@ final class VariantInventoryResource extends Resource
     /**
      * Configure the Variant Inventory form schema for Filament administrators.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.variant_inventory.basic_information'))
                     ->columns(2)
@@ -385,7 +371,7 @@ final class VariantInventoryResource extends Resource
         ];
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([

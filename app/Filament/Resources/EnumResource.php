@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\EnumResource\Pages;
 use App\Models\EnumValue;
@@ -39,8 +41,7 @@ use Illuminate\Database\Eloquent\Collection;
 final class EnumResource extends Resource
 {
     protected static ?string $model = EnumValue::class;
-
-    /** @var string|\BackedEnum|null Align navigation metadata with BackedEnum compatibility. */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-squares-2x2';
 
     /** @var string|\BackedEnum|null Anchor the resource to the System navigation area. */
@@ -71,9 +72,9 @@ final class EnumResource extends Resource
         return trans('admin.enums.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Tabs::make('enum_resource_tabs')
                 ->tabs([
                     Tab::make(trans('admin.enums.form.tabs.basic_information'))
@@ -155,7 +156,7 @@ final class EnumResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([

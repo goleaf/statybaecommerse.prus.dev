@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductSimilarities;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\ProductSimilarities\Pages\CreateProductSimilarity;
 use App\Filament\Resources\ProductSimilarities\Pages\EditProductSimilarity;
 use App\Filament\Resources\ProductSimilarities\Pages\ListProductSimilarities;
@@ -19,15 +21,15 @@ use Filament\Tables\Table;
 class ProductSimilarityResource extends Resource
 {
     protected static ?string $model = ProductSimilarity::class;
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return ProductSimilarityForm::configure($form);
+        return ProductSimilarityForm::configure($schema);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return ProductSimilaritiesTable::configure($table);
     }

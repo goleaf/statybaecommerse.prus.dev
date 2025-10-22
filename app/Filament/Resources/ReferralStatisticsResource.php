@@ -65,9 +65,9 @@ final class ReferralStatisticsResource extends Resource
         return __('referral_statistics.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->columns(3)
             ->schema([
                 Section::make(__('referral_statistics.sections.basic_info'))
@@ -145,7 +145,7 @@ final class ReferralStatisticsResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([
@@ -272,7 +272,7 @@ final class ReferralStatisticsResource extends Resource
             ->defaultSort('date', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema|array
+    public static function infolist(Schema $schema): Schema   
     {
         return $schema
             ->schema([

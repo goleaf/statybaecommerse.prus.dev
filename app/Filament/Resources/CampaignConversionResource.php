@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\CampaignConversionResource\Pages;
 use App\Models\Campaign;
@@ -27,17 +29,8 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Number;
 use UnitEnum;
-
-/**
- * CampaignConversionResource
- *
- * Filament v4 resource for CampaignConversion management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class CampaignConversionResource extends Resource
-{
-    protected static ?string $model = CampaignConversion::class;
-
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rocket-launch';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-rocket-launch';
 
     protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Campaigns;
 
@@ -66,9 +59,9 @@ final class CampaignConversionResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('campaign_conversions.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -141,7 +134,7 @@ final class CampaignConversionResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([

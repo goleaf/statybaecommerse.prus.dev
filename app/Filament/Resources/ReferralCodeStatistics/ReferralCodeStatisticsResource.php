@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ReferralCodeStatistics;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\ReferralCodeStatistics\Pages\CreateReferralCodeStatistics;
 use App\Filament\Resources\ReferralCodeStatistics\Pages\EditReferralCodeStatistics;
 use App\Filament\Resources\ReferralCodeStatistics\Pages\ListReferralCodeStatistics;
@@ -19,15 +21,15 @@ use Filament\Tables\Table;
 class ReferralCodeStatisticsResource extends Resource
 {
     protected static ?string $model = ReferralCodeStatistics::class;
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return ReferralCodeStatisticsForm::configure($form);
+        return ReferralCodeStatisticsForm::configure($schema);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return ReferralCodeStatisticsTable::configure($table);
     }

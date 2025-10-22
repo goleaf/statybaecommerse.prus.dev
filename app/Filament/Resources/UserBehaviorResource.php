@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\UserBehaviorResource\Pages;
 use App\Models\User;
 use App\Models\UserBehavior;
@@ -34,17 +36,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
-
-/**
- * UserBehaviorResource
- *
- * Filament v4 resource for UserBehavior management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class UserBehaviorResource extends Resource
-{
-    protected static ?string $model = UserBehavior::class;
-
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-document-text';
 
     protected static UnitEnum|string|null $navigationGroup = 'Users';
 
@@ -81,9 +74,9 @@ final class UserBehaviorResource extends Resource
         return __('admin.user_behaviors.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.user_behaviors.basic_information'))
                     ->description(__('admin.user_behaviors.basic_information_description'))
@@ -162,7 +155,7 @@ final class UserBehaviorResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\NotificationResource\Pages;
 use App\Models\Notification;
 use App\Support\Filament\Filters\SingleDateFilter;
@@ -69,9 +71,9 @@ final class NotificationResource extends Resource
         return __('admin.notifications.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('admin.notifications.form.sections.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -155,7 +157,7 @@ final class NotificationResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([
