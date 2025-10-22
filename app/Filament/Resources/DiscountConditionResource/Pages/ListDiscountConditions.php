@@ -48,10 +48,10 @@ final class ListDiscountConditions extends BaseListRecords
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'date_range'))
                 ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'date_range')->count()),
             'current' => WidgetTab::make(__('discount_conditions.tabs.current'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('valid_from', '<=', now())->where(function ($q) {
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('valid_from', '<=', now())->where(function ($q): void {
                     $q->whereNull('valid_until')->orWhere('valid_until', '>=', now());
                 }))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('valid_from', '<=', now())->where(function ($q) {
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('valid_from', '<=', now())->where(function ($q): void {
                     $q->whereNull('valid_until')->orWhere('valid_until', '>=', now());
                 })->count()),
         ];

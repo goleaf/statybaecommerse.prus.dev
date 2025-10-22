@@ -36,8 +36,10 @@ use Illuminate\Database\Eloquent\Collection;
 
 final class CartItemResource extends Resource
 {
-    /** @var string|BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-shopping-cart';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static ?string $model = CartItem::class;
 
@@ -144,7 +146,7 @@ final class CartItemResource extends Resource
                         ->searchable()
                         ->preload()
                         ->live()
-                        ->afterStateUpdated(function ($state, Forms\Set $set) {
+                        ->afterStateUpdated(function ($state, Forms\Set $set): void {
                             if ($state) {
                                 $variant = ProductVariant::find($state);
                                 if ($variant) {
@@ -174,7 +176,7 @@ final class CartItemResource extends Resource
                                 ->minValue(1)
                                 ->default(1)
                                 ->required()
-                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
+                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set): void {
                                     $unitPrice = (float) $get('unit_price');
                                     $quantity = (int) $state;
                                     $total = $unitPrice * $quantity;
@@ -205,7 +207,7 @@ final class CartItemResource extends Resource
                                 ->numeric()
                                 ->required()
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
+                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set): void {
                                     $unitPrice = (float) $state;
                                     $quantity = (int) $get('quantity');
                                     $total = $unitPrice * $quantity;
@@ -217,7 +219,7 @@ final class CartItemResource extends Resource
                                 ->numeric()
                                 ->default(0)
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
+                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set): void {
                                     $unitPrice = (float) $get('unit_price');
                                     $quantity = (int) $get('quantity');
                                     $discount = (float) $state;

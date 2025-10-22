@@ -36,8 +36,10 @@ final class CustomerGroupResource extends Resource
 
     protected static ?string $model = CustomerGroup::class;
 
-    /** @var UnitEnum|string|null */
-    protected static $navigationGroup = null;
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
+    protected static UnitEnum|string|null $navigationGroup = null;
 
     public static function getNavigationGroup(): UnitEnum|string|null
     {

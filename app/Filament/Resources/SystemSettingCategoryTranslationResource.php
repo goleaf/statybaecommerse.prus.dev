@@ -34,13 +34,15 @@ final class SystemSettingCategoryTranslationResource extends Resource
 {
     protected static ?string $model = \App\Models\SystemSettingCategoryTranslation::class;
 
-    /** @var string|BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-language';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-language';
 
     /**
      * @var string|UnitEnum|null Navigation group assignment stored without a typed property to avoid enum collisions.
      */
-    protected static $navigationGroup = 'Settings';
+    protected static UnitEnum|string|null $navigationGroup = 'Settings';
 
     protected static bool $shouldRegisterNavigation = false;
 

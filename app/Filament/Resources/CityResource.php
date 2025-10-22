@@ -76,7 +76,7 @@ final class CityResource extends Resource
                                 ->required()
                                 ->maxLength(255)
                                 ->live(onBlur: true)
-                                ->afterStateUpdated(function ($state, Forms\Set $set, $operation) {
+                                ->afterStateUpdated(function ($state, Forms\Set $set, $operation): void {
                                     if ($operation === 'create' && $state) {
                                         $set('slug', Str::slug($state));
                                     }
@@ -95,7 +95,7 @@ final class CityResource extends Resource
                         ->preload()
                         ->required()
                         ->live()
-                        ->afterStateUpdated(function ($state, Forms\Set $set) {
+                        ->afterStateUpdated(function ($state, Forms\Set $set): void {
                             if ($state) {
                                 $country = Country::find($state);
                                 if ($country) {

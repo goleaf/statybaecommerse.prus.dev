@@ -15,16 +15,19 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use UnitEnum;
 
 final class VariantPriceHistoryResource extends Resource
 {
     protected static ?string $model = VariantPriceHistory::class;
 
-    /** @var string|BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-currency-euro';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-currency-euro';
 
     /** @var string|BackedEnum|null Navigation grouping centralized via enum. */
-    protected static $navigationGroup = NavigationGroup::System;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 20;
 

@@ -42,8 +42,10 @@ final class SubscriberResource extends Resource
 {
     protected static ?string $model = Subscriber::class;
 
-    /** @var UnitEnum|string|null */
-    protected static $navigationGroup = 'Users';
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
+    protected static UnitEnum|string|null $navigationGroup = 'Users';
 
     protected static ?int $navigationSort = 1;
 

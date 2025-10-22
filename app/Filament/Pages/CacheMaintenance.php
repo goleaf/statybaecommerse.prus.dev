@@ -19,8 +19,10 @@ use Throwable;
 
 final class CacheMaintenance extends Page
 {
-    /** @var string|BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-server-stack';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-server-stack';
 
     public static function getNavigationGroup(): ?string
     {

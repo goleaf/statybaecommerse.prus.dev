@@ -43,7 +43,7 @@ final class CalendarWidget extends FullCalendarWidget
             ->with('channel')
             ->whereNotNull('starts_at')
             ->where('starts_at', '<=', $end)
-            ->where(function ($query) use ($start) {
+            ->where(function ($query) use ($start): void {
                 $query
                     ->whereNull('ends_at')
                     ->orWhere('ends_at', '>=', $start);
