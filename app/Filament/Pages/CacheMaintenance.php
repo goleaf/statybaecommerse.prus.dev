@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+
+use Filament\Schemas\Schema;
 use App\Services\Shared\ComponentPerformanceService;
 use Filament\Actions\Action;
 use Filament\Forms;
@@ -18,9 +20,7 @@ use Throwable;
 
 final class CacheMaintenance extends Page
 {
-    /**
-     * @var string|\BackedEnum|null Navigation icon override kept untyped for Filament panel compatibility.
-     */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-server-stack';
 
     public static function getNavigationGroup(): ?string
@@ -80,10 +80,10 @@ final class CacheMaintenance extends Page
         return (bool) ($user->is_admin ?? false);
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema   
     {
         // Embrace the Filament v4 return contract so downstream tooling can rely on a `Form` instance.
-        return $form
+        return $schema
             ->schema([
                 Section::make('Targeted Cache Operations')
                     ->description('Use scoped operations before clearing broad cache areas to follow CachePolicy guidance.')

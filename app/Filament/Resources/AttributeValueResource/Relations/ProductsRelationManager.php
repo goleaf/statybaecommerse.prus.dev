@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AttributeValueResource\Relations;
 
+
+use Filament\Schemas\Schema;
 use Filament\Forms;
 use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
@@ -22,9 +24,9 @@ class ProductsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Products';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
@@ -39,7 +41,7 @@ class ProductsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table   
     {
         return $table
             ->recordTitleAttribute('name')

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\StockMovementResource\Pages;
 use App\Models\StockMovement;
 use BackedEnum;
@@ -25,15 +27,8 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
-
-/**
- * StockMovementResource
- *
- * Filament v4 resource for StockMovement management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class StockMovementResource extends Resource
-{
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-archive-box';
 
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
@@ -61,9 +56,9 @@ final class StockMovementResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('stock_movement.sections.basic_information'))
                 ->components([
                     Grid::make(2)
@@ -123,7 +118,7 @@ final class StockMovementResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([

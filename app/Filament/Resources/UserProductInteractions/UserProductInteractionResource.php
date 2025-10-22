@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\UserProductInteractions;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\UserProductInteractions\Pages\CreateUserProductInteraction;
 use App\Filament\Resources\UserProductInteractions\Pages\EditUserProductInteraction;
 use App\Filament\Resources\UserProductInteractions\Pages\ListUserProductInteractions;
@@ -26,12 +28,12 @@ class UserProductInteractionResource extends Resource
         return Heroicon::OutlinedRectangleStack;
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return UserProductInteractionForm::configure($form);
+        return UserProductInteractionForm::configure($schema);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return UserProductInteractionsTable::configure($table);
     }

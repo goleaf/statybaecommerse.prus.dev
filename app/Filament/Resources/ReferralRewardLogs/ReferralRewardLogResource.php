@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\ReferralRewardLogs;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\ReferralRewardLogs\Pages\CreateReferralRewardLog;
 use App\Filament\Resources\ReferralRewardLogs\Pages\EditReferralRewardLog;
 use App\Filament\Resources\ReferralRewardLogs\Pages\ListReferralRewardLogs;
@@ -17,15 +19,15 @@ use Filament\Tables\Table;
 class ReferralRewardLogResource extends Resource
 {
     protected static ?string $model = ReferralRewardLog::class;
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return ReferralRewardLogForm::configure($form);
+        return ReferralRewardLogForm::configure($schema);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return ReferralRewardLogsTable::configure($table);
     }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingDependencies;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\SystemSettingDependencies\Pages\CreateSystemSettingDependency;
 use App\Filament\Resources\SystemSettingDependencies\Pages\EditSystemSettingDependency;
 use App\Filament\Resources\SystemSettingDependencies\Pages\ListSystemSettingDependencies;
@@ -19,15 +21,15 @@ use Filament\Tables\Table;
 class SystemSettingDependencyResource extends Resource
 {
     protected static ?string $model = SystemSettingDependency::class;
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return SystemSettingDependencyForm::configure($form);
+        return SystemSettingDependencyForm::configure($schema);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return SystemSettingDependenciesTable::configure($table);
     }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\RecommendationConfigResourceSimple\Pages;
 use App\Models\RecommendationConfigSimple;
 use Filament\Actions\Action;
@@ -52,9 +54,9 @@ final class RecommendationConfigResourceSimple extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form->components([
+        return $schema->components([
             Section::make(__('recommendation_configs_simple.basic_information'))
                 ->components([
                     Grid::make(2)
@@ -268,7 +270,7 @@ final class RecommendationConfigResourceSimple extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([

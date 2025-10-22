@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\DocumentResource\Pages;
 use App\Models\Document;
 use BackedEnum;
@@ -27,7 +29,8 @@ use UnitEnum;
 
 final class DocumentResource extends Resource
 {
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-document';
 
     protected static ?string $model = Document::class;
 
@@ -55,9 +58,9 @@ final class DocumentResource extends Resource
         return __('admin.documents.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.documents.form.sections.basic_information'))
                     ->schema([
@@ -121,7 +124,7 @@ final class DocumentResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\CouponUsageResource\Pages;
 use App\Models\Coupon;
 use App\Models\CouponUsage;
@@ -56,9 +58,9 @@ final class CouponUsageResource extends Resource
         return __('admin.coupon_usages.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form->components([
+        return $schema->components([
             Tabs::make('coupon_usage_tabs')
                 ->tabs([
                     Tab::make(__('admin.coupon_usages.form.tabs.basic_information'))
@@ -190,7 +192,7 @@ final class CouponUsageResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([

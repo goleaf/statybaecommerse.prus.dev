@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AttributeResource\RelationManagers;
 
+
+use Filament\Schemas\Schema;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -19,9 +21,9 @@ final class ProductsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Products';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Select::make('product_id')
                     ->label(__('attributes.product'))
@@ -57,7 +59,7 @@ final class ProductsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table   
     {
         return $table
             ->recordTitleAttribute('product.name')

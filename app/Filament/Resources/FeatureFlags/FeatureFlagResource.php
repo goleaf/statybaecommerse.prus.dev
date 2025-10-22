@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\FeatureFlags;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\FeatureFlags\Pages\CreateFeatureFlag;
 use App\Filament\Resources\FeatureFlags\Pages\EditFeatureFlag;
 use App\Filament\Resources\FeatureFlags\Pages\ListFeatureFlags;
@@ -18,15 +20,15 @@ use Filament\Tables\Table;
 class FeatureFlagResource extends Resource
 {
     protected static ?string $model = FeatureFlag::class;
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static \BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return FeatureFlagForm::configure($form);
+        return FeatureFlagForm::configure($schema);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return FeatureFlagsTable::configure($table);
     }

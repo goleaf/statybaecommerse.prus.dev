@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantAttributeValueResource\Pages;
 use App\Models\Attribute;
 use App\Models\ProductVariant;
@@ -37,17 +39,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 use UnitEnum;
-
-/**
- * VariantAttributeValueResource
- *
- * Filament v4 resource for VariantAttributeValue management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class VariantAttributeValueResource extends Resource
-{
-    protected static ?string $model = VariantAttributeValue::class;
-
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-tag';
 
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
@@ -68,9 +61,9 @@ final class VariantAttributeValueResource extends Resource
         return __('admin.variant_attribute_values.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('admin.variant_attribute_values.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -188,7 +181,7 @@ final class VariantAttributeValueResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([

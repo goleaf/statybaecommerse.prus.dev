@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Support\Forms\MatrixFactory;
 use App\Filament\Resources\RoleResource\Pages;
 use App\Models\Role;
@@ -30,8 +32,8 @@ final class RoleResource extends Resource
     protected static ?int $navigationSort = 19;
 
     protected static ?string $recordTitleAttribute = 'name';
-
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-shield-check';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-shield-check';
 
     protected static UnitEnum|string|null $navigationGroup = 'System';
 
@@ -90,9 +92,9 @@ final class RoleResource extends Resource
         return __('roles.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('roles.sections.general'))
                     ->schema([
@@ -119,7 +121,7 @@ final class RoleResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([

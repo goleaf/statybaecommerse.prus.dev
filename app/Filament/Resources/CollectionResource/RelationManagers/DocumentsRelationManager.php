@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CollectionResource\RelationManagers;
 
+
+use Filament\Schemas\Schema;
 use App\Models\Document;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -20,9 +22,9 @@ final class DocumentsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Collection Documents';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Select::make('document_template_id')
                     ->label(__('admin.documents.fields.template'))
@@ -72,7 +74,7 @@ final class DocumentsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table   
     {
         return $table
             ->recordTitleAttribute('title')

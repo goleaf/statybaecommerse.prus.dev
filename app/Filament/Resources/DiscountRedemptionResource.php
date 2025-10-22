@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\DiscountRedemptionResource\Pages;
 use App\Filament\Resources\DiscountRedemptionResource\RelationManagers\CodeRelationManager;
 use App\Filament\Resources\DiscountRedemptionResource\RelationManagers\DiscountRelationManager;
@@ -58,9 +60,9 @@ final class DiscountRedemptionResource extends Resource
         return __('discount_redemptions.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('discount_redemptions.sections.associations'))
                 ->schema([
                     Grid::make(2)
@@ -152,7 +154,7 @@ final class DiscountRedemptionResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([

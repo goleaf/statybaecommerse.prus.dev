@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\SystemSettingDependencyResource\Pages;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingDependency;
@@ -65,9 +67,9 @@ final class SystemSettingDependencyResource extends Resource
         return __('admin.system_setting_dependencies.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('admin.system_setting_dependencies.basic_information'))
                 ->description(__('admin.system_setting_dependencies.basic_information_description'))
                 ->schema([
@@ -117,7 +119,7 @@ final class SystemSettingDependencyResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([

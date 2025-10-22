@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantCombinationResource\Pages;
 use App\Models\Product;
 use App\Models\VariantCombination;
@@ -34,17 +36,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-
-/**
- * VariantCombinationResource
- *
- * Filament v4 resource for VariantCombination management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class VariantCombinationResource extends Resource
-{
-    protected static ?string $model = VariantCombination::class;
-
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-squares-2x2';
 
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
@@ -65,9 +58,9 @@ final class VariantCombinationResource extends Resource
         return __('admin.variant_combinations.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->components([
                 Section::make(__('admin.variant_combinations.basic_information'))
                     ->description(__('admin.variant_combinations.basic_information_description'))
@@ -131,7 +124,7 @@ final class VariantCombinationResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([
