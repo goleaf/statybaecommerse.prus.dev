@@ -18,17 +18,19 @@ final class CategorySearchRepository extends AbstractSearchRepository
     {
         $limit = max(1, $limit);
 
+        // Category/product relationships live in the `product_categories` pivot, so we
+        // join through that table to keep MySQL and SQLite test schemas aligned.
         return <<<SQL
 SELECT
     c.id,
     c.name,
     c.slug,
     c.description,
-    COUNT(DISTINCT cp.product_id) AS products_count,
+    COUNT(DISTINCT pc.product_id) AS products_count,
     COALESCE(ct.name, '') AS translated_name,
     COALESCE(ct.description, '') AS translated_description
 FROM categories AS c
-JOIN category_product AS cp ON cp.category_id = c.id
+JOIN product_categories AS pc ON pc.category_id = c.id
 LEFT JOIN category_translations AS ct ON ct.category_id = c.id AND ct.locale = ?
 WHERE c.is_visible = 1
   AND c.slug IS NOT NULL
@@ -74,14 +76,14 @@ SQL;
         $description = $row->description ?: ($row->translated_description ?: null);
 
         return [
-            'id' => (int) $row->id,
-            'type' => 'category',
-            'title' => (string) $row->name,
-            'subtitle' => __('frontend.search.category_with_products', ['count' => $productsCount]),
-            'description' => $description,
-            'image' => null,
-            'url' => route('categories.show', $row->slug),
-            'products_count' => $productsCount,
+            'id'              => (int) $row->id,
+            'type'            => 'category',
+            'title'           => (string) $row->name,
+            'subtitle'        => __('frontend.search.category_with_products', ['count' => $productsCount]),
+            'description'     => $description,
+            'image'           => null,
+            'url'             => route('categories.show', $row->slug),
+            'products_count'  => $productsCount,
             'relevance_score' => $this->calculateRelevanceScore($row, $queryData->query()),
         ];
     }
