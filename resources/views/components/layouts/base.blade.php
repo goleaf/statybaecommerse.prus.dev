@@ -58,7 +58,14 @@
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
 
     <!-- Scripts -->
-    @vite(['resources/css/app.scss', 'resources/js/app.js'])
+    @php
+        $viteManifestPath = public_path('build/manifest.json');
+    @endphp
+    @if (app()->environment('testing') && ! file_exists($viteManifestPath))
+        {{-- Skip loading compiled assets during tests when the Vite manifest is unavailable. --}}
+    @else
+        @vite(['resources/css/app.scss', 'resources/js/app.js'])
+    @endif
 
     <!-- Livewire Styles -->
     @livewireStyles
