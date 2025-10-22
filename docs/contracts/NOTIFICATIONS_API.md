@@ -102,7 +102,6 @@ Marks the notification as read after verifying ownership and returns the normali
 ```json
 {
   "success": true,
-  "message": "Notification marked as read",
   "data": {
     "id": "uuid",
     "notification_type": "App\\Notifications\\OrderNotification",
@@ -119,7 +118,7 @@ Marks the notification as read after verifying ownership and returns the normali
 }
 ```
 
-Ownership violations produce a `404` with `{"success": false, "message": "Notification not found"}`.
+Ownership violations produce a `404` with the shared problem+json contract and `error.code` set to `not_found`.
 
 ## POST `/api/v1/notifications/{notification}/mark-unread`
 
@@ -136,7 +135,6 @@ Marks all unread notifications for the authenticated user as read and returns th
 ```json
 {
   "success": true,
-  "message": "Marked 5 notifications as read",
   "count": 5
 }
 ```
@@ -151,4 +149,4 @@ Marks all read notifications as unread. Response mirrors the `mark-all-read` pay
 
 **Ability:** `notifications.manage`
 
-Deletes the notification after verifying ownership and returns `{ "success": true, "message": "Notification deleted" }` or a `404` error when the record does not belong to the user.
+Deletes the notification after verifying ownership and returns `{ "success": true }` or a `404` error when the record does not belong to the user.

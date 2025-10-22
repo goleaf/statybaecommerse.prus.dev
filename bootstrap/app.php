@@ -21,8 +21,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 // Load the Filament compatibility shims before the application boots so the
 // legacy class aliases are always available during early package discovery.
@@ -363,7 +363,27 @@ return Application::configure(basePath: dirname(__DIR__))
                     );
 
                     foreach ($throwable->getHeaders() as $name => $value) {
-                        $response->headers->set($name, $value);
+                        // Cast header values to Symfony-compatible types to avoid TypeErrors in the test environment.
+                        if (is_array($value)) {
+                            $normalized = array_map(
+                                static fn ($item): string => $item instanceof \DateTimeInterface
+                                    ? $item->format(DATE_RFC7231)
+                                    : (string) $item,
+                                array_filter($value, static fn ($item): bool => $item !== null),
+                            );
+
+                            $response->headers->set($name, $normalized);
+
+                            continue;
+                        }
+
+                        if ($value instanceof \DateTimeInterface) {
+                            $response->headers->set($name, $value->format(DATE_RFC7231));
+
+                            continue;
+                        }
+
+                        $response->headers->set($name, $value === null ? null : (string) $value);
                     }
 
                     return $response;
