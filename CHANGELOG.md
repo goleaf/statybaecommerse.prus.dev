@@ -7,6 +7,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Bug Fixes
+* Preserved Attribute validation rule strings while still decoding JSON arrays, refreshed the Filament form so arrays render as comma-separated chips, and added regression coverage for both storage paths.
 * Resolved localized product and category routing by honouring translated slugs during route model binding and updating storefront links so product detail pages load reliably from the home feed and other localized listings.
 * Restored the dashboard permission guard to default to open access when no abilities are configured and aligned inline sparkline widgets with Filament's nullable model contract, clearing the latest unit test regressions around navigation metadata and dataset checksums.
 * Replaced the CampaignCustomerSegment global ActiveScope with targeted query helpers so unit tests can fetch inactive records while dashboards retain expressive filters for campaign, type, and group segmentation.
@@ -26,6 +27,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Realigned the Discount Redemption Filament resource navigation metadata and status badge styling with the v4 table schema so admin pages and supporting tests use the modern badge helpers without compatibility gaps.
 
 ### Maintenance
+* Registered SearchableInput payload macros lazily with safe defaults and provisioned per-worker SQLite database files during the test bootstrap, eliminating parallel lock contention while keeping hydrate/clear helpers available even when the service provider has not pre-booted macros.
 * Extended the demo store seeder to call the collection seeders, ensuring curated collections ship with featured products for storefront demos and automated tests.
 * Provisioned a reusable SQLite testing harness that seeds the Spatie permission tables, attribute pivots, and variant matrix schema once per process, registered Filament SearchableInput payload macros for v4 containers, and wrapped the ProductVariant attribute matrix suite in transactions so PHPUnit reuses a shared schema without losing isolation.
 * Fixed the custom Filament edit profile page to import the correct Schema class, eliminating fatal compatibility errors during automated tests.
