@@ -25,6 +25,7 @@
 
 ## Security hardening
 - Request-scoped CSP nonces now propagate through middleware, helpers, Livewire, and Vite so every inline Blade script/style satisfies the stricter nonce-based CSP and updated HSTS/permissions policy headers.
+- Layered API throttles introduce per-user and per-IP budgets for read, write, and notification buckets while emitting structured 429 responses and correlation-aware logs to simplify abuse investigations.
 
 ## Tooling polish
 - `scripts/upgrade_filament_schema.php` now updates navigation icon docblocks automatically while refactoring `form`, `infolist`, and `table` signatures, making repeated schema migrations safe for the entire Filament tree.
