@@ -31,9 +31,16 @@ abstract class TestCase extends BaseTestCase
             $this->createdEnvFile = false;
         }
 
+        $sqlitePath = database_path('testing.sqlite');
+
+        if (! file_exists($sqlitePath)) {
+            // Create a dedicated SQLite database file so migrations persist within the test lifecycle.
+            touch($sqlitePath);
+        }
+
         Config::set('database.default', 'sqlite');
-        Config::set('database.connections.sqlite.database', ':memory:');
-        Config::set('app.key', 'base64:'.base64_encode(random_bytes(32)));
+        Config::set('database.connections.sqlite.database', $sqlitePath);
+        Config::set('app.key', 'base64:' . base64_encode(random_bytes(32)));
         // Ensure Telescope doesn't use MySQL during tests and avoid watchers overhead
         Config::set('telescope.enabled', false);
         Config::set('telescope.storage.database.connection', 'sqlite');
@@ -138,5 +145,25 @@ abstract class TestCase extends BaseTestCase
         $locales = array_filter(array_merge($configured, $appConfigured, [$fallback]));
 
         return array_values(array_unique($locales));
+    }
+
+    /**
+     * Force migrate:fresh to target the SQLite testing database.
+     */
+    protected function migrateFreshUsing()
+    {
+        $parameters = [
+            '--database'   => 'sqlite',
+            '--drop-views' => property_exists($this, 'dropViews') ? $this->dropViews : false,
+            '--drop-types' => property_exists($this, 'dropTypes') ? $this->dropTypes : false,
+        ];
+
+        if (property_exists($this, 'seeder') && $this->seeder) {
+            $parameters['--seeder'] = $this->seeder;
+        } else {
+            $parameters['--seed'] = property_exists($this, 'seed') ? $this->seed : false;
+        }
+
+        return $parameters;
     }
 }

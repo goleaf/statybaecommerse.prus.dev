@@ -44,3 +44,5 @@ Thumbs.db
 /storage/app/exports/
 /storage/app/imports/
 /public/
+# SQLite database file generated for testing.
+/database/testing.sqlite
