@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\VariantPriceHistoryResource\Pages;
 use App\Models\VariantPriceHistory;
@@ -18,10 +20,7 @@ use Illuminate\Database\Eloquent\Builder;
 final class VariantPriceHistoryResource extends Resource
 {
     protected static ?string $model = VariantPriceHistory::class;
-
-    /**
-     * Navigation icon override (string|\BackedEnum|null) for Filament v4 alignment.
-     */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-currency-euro';
 
     /** @var string|\BackedEnum|null Navigation grouping centralized via enum. */
@@ -37,9 +36,9 @@ final class VariantPriceHistoryResource extends Resource
         return $group instanceof NavigationGroup ? $group->label() : $group;
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Select::make('variant_id')
                     ->relationship('variant', 'name')
@@ -92,7 +91,7 @@ final class VariantPriceHistoryResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([

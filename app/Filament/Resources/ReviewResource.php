@@ -40,10 +40,7 @@ use Illuminate\Database\Eloquent\Collection;
 final class ReviewResource extends Resource
 {
     protected static ?string $model = Review::class;
-
-    /**
-     * @var string|\BackedEnum|null Normalize Filament icon typing for consistency.
-     */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-star';
 
     protected static ?int $navigationSort = 4;
@@ -78,9 +75,9 @@ final class ReviewResource extends Resource
         return __('reviews.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('reviews.sections.basic_info'))
                     ->description(__('reviews.sections.basic_info_description'))
@@ -151,7 +148,7 @@ final class ReviewResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([
@@ -393,7 +390,7 @@ final class ReviewResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema|array
+    public static function infolist(Schema $schema): Schema   
     {
         return $schema
             ->components([

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Channels;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\Channels\Pages\CreateChannel;
 use App\Filament\Resources\Channels\Pages\EditChannel;
 use App\Filament\Resources\Channels\Pages\ListChannels;
@@ -25,12 +27,12 @@ class ChannelResource extends Resource
         return 'heroicon-o-rectangle-stack';
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return ChannelForm::configure($form);
+        return ChannelForm::configure($schema);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return ChannelsTable::configure($table);
     }

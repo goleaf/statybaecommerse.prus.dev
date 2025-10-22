@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
+
+use Filament\Schemas\Schema;
 use Filament\Actions\AttachAction;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DetachAction;
@@ -27,9 +29,9 @@ class CategoriesRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Categories';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->components([
                 TextInput::make('name')
                     ->label(__('categories.fields.name'))
@@ -48,7 +50,7 @@ class CategoriesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table   
     {
         return $table
             ->columns([

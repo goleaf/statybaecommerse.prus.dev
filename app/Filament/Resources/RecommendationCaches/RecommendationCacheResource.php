@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\RecommendationCaches;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\RecommendationCaches\Pages\CreateRecommendationCache;
 use App\Filament\Resources\RecommendationCaches\Pages\EditRecommendationCache;
 use App\Filament\Resources\RecommendationCaches\Pages\ListRecommendationCaches;
@@ -21,8 +23,8 @@ use UnitEnum;
 final class RecommendationCacheResource extends Resource
 {
     protected static ?string $model = RecommendationCache::class;
-
-    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?int $navigationSort = 20;
 
@@ -48,12 +50,12 @@ final class RecommendationCacheResource extends Resource
         return __('admin.recommendation_caches.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return RecommendationCacheForm::configure($form);
+        return RecommendationCacheForm::configure($schema);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return RecommendationCachesTable::configure($table);
     }

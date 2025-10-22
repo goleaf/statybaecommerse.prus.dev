@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountCodeResource\RelationManagers;
 
+
+use Filament\Schemas\Schema;
 use Filament\Forms;
 use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
@@ -16,9 +18,9 @@ final class OrdersRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'orders';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->components([
                 Forms\Components\TextInput::make('order_number')
                     ->label(__('Order Number'))
@@ -42,7 +44,7 @@ final class OrdersRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table   
     {
         return $table
             ->recordTitleAttribute('order_number')

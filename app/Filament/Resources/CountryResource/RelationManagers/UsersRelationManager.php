@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CountryResource\RelationManagers;
 
+
+use Filament\Schemas\Schema;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -18,9 +20,9 @@ final class UsersRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Users';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Section::make(__('users.title'))
                     ->columns(2)
@@ -75,7 +77,7 @@ final class UsersRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table   
     {
         return $table
             ->recordTitleAttribute('name')

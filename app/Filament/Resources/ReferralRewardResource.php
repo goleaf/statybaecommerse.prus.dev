@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\ReferralRewardResource\Pages;
 use App\Models\ReferralReward;
 use App\Support\Filament\Components\Flatpickr;
@@ -40,8 +42,8 @@ final class ReferralRewardResource extends Resource
 {
     use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
     protected static ?string $model = ReferralReward::class;
-
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-gift';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-gift';
 
     protected static ?int $navigationSort = 15;
 
@@ -49,9 +51,9 @@ final class ReferralRewardResource extends Resource
 
     protected static UnitEnum|string|null $navigationGroup = 'Referral';
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('referral_rewards.sections.reward_details'))
                     ->columns(2)
@@ -162,7 +164,7 @@ final class ReferralRewardResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([
@@ -269,9 +271,9 @@ final class ReferralRewardResource extends Resource
             ]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist|array
+    public static function infolist(Schema $schema): Schema   
     {
-        return $infolist
+        return $schema
             ->schema([
                 InfolistSection::make(__('referral_rewards.sections.reward_details'))
                     ->schema([

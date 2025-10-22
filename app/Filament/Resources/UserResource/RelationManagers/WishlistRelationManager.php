@@ -21,7 +21,7 @@ class WishlistRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Wishlist Items';
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table   
     {
         return $table
             ->columns([

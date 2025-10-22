@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\ProductVariantResource\Pages;
 use App\Support\Forms\MatrixFactory;
 use App\Models\Attribute;
@@ -91,9 +93,9 @@ final class ProductVariantResource extends Resource
         return 'Products';
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Tabs::make('Variant Information')
                     ->tabs([
@@ -359,7 +361,7 @@ final class ProductVariantResource extends Resource
             ->every(fn ($item): bool => is_array($item) && array_key_exists('attribute_id', $item) && array_key_exists('attribute_value_id', $item));
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([

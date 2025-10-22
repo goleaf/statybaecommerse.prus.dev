@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\StockResource\Pages;
 use App\Models\Inventory;
 use App\Models\Product;
@@ -61,9 +63,9 @@ final class StockResource extends Resource
         return __('inventory.single');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('inventory.product_information'))
                 ->schema([
                     Grid::make(2)
@@ -132,7 +134,7 @@ final class StockResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([

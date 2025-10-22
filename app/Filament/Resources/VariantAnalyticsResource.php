@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\VariantAnalyticsResource\Pages;
 use App\Models\VariantAnalytics;
@@ -18,19 +20,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-
-/**
- * VariantAnalyticsResource
- *
- * Filament v4 resource for VariantAnalytics management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class VariantAnalyticsResource extends Resource
-{
-    protected static ?string $model = VariantAnalytics::class;
-
-    /**
-     * @var string|\BackedEnum|null Flag the analytics icon while staying compatible with Filament v4 conventions.
-     */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
     /** @var string|\BackedEnum|null Anchor inventory analytics beneath the shared navigation enum. */
@@ -61,9 +51,9 @@ final class VariantAnalyticsResource extends Resource
         return __('admin.variant_analytics.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Tabs::make(__('admin.variant_analytics.tabs'))
                     ->tabs([
@@ -244,7 +234,7 @@ final class VariantAnalyticsResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\AnalyticsResource\Pages;
 use App\Filament\Resources\OrderResource;
@@ -27,8 +29,8 @@ use UnitEnum;
 final class AnalyticsResource extends Resource
 {
     protected static ?string $model = Order::class;
-
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
     protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Analytics;
 
@@ -65,12 +67,12 @@ final class AnalyticsResource extends Resource
         return 'warning';
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form;
+        return $schema;
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             // Preload frequently accessed relationships so table metrics do not suffer from N+1 queries.

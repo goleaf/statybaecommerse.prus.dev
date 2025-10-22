@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\SystemSettingHistoryResource\Pages;
 use App\Models\SystemSettingHistory;
 use BackedEnum;
@@ -61,9 +63,9 @@ final class SystemSettingHistoryResource extends Resource
         return __('admin.system_setting_histories.model_label');
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.system_setting_histories.basic_information'))
                     ->schema([
@@ -108,7 +110,7 @@ final class SystemSettingHistoryResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->deferFilters(false)

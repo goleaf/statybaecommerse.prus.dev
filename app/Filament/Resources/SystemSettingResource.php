@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\SystemSettingResource\Pages;
 use App\Models\SystemSetting;
 use BackedEnum;
@@ -30,21 +32,8 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-
-/**
- * SystemSettingResource
- *
- * Filament v4 resource for SystemSetting management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-class SystemSettingResource extends Resource
-{
-    protected static ?string $model = SystemSetting::class;
-
-    protected static ?int $navigationSort = 18;
-
-    protected static ?string $recordTitleAttribute = 'key';
-
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-cog-6-tooth';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     protected static UnitEnum|string|null $navigationGroup = 'Settings';
 
@@ -70,9 +59,9 @@ class SystemSettingResource extends Resource
         return true;
     }
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('system_settings.basic_information'))
                     ->schema([
@@ -226,7 +215,7 @@ class SystemSettingResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table   
     {
         return $table
             ->columns([
