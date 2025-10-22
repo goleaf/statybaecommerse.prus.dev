@@ -8,8 +8,10 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 
 ### Enhancements
 * Optimized the storefront autocomplete pipeline by trimming and caching queries, reusing injected services, and exposing sanitized highlight metadata so the dropdown renders without raw `<mark>` tags while delivering faster product, brand, and category lookups.
+* Hardened HTML sanitization by removing entire `<script>`, `<style>`, and `<template>` elements instead of unwrapping them, blocking executable payloads from surfacing in storefront or admin renders while keeping safe markup intact.
 ### Features & Enhancements
 * Refactored the localized search results page with a guided hero, contextual metrics, and refreshed empty states so catalog queries like Makita surface faster insights and recovery actions.
+* Realigned the Discount Redemption Filament resource navigation metadata and status badge styling with the v4 table schema so admin pages and supporting tests use the modern badge helpers without compatibility gaps.
 
 ### Maintenance
 * Fixed the custom Filament edit profile page to import the correct Schema class, eliminating fatal compatibility errors during automated tests.
@@ -28,6 +30,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Resolved the cache tagging conflicts from PR #120 by wiring `CacheInvalidationService` into model events, aligning navigation/menu repositories with locale-aware tags, and extending regression tests that exercise storefront widgets and dashboard stats.
 * Introduced a cache invalidation service with tag-aware fallbacks and updated storefront widgets to honour locale-aware cache tags while adding regression coverage for cart and dashboard flows.
 * Hardened the Filament schema upgrade script so navigation icon docblocks are normalized automatically and every resource/page/widget reflects the v4 schema signature changes.
+* Updated the Discount Redemption resource unit test harness to supply a lightweight `HasTable` stub, keeping the Filament v4 table factory invocations compatible with Pest assertions.
 * Aligned Filament variant pricing and analytics resources with stricter action namespaces, clarified currency formatting, and refreshed navigation icon annotations to streamline BackedEnum usage across admin pages.
 * Synced Collection Rule resource signatures, modal reorder UX, and cache maintenance tooling with Filament v4 to retire legacy array fallbacks.
 * Delivered the Campaign Product Target management resource with localized strings, reinforced widget navigation metadata, and hardened media path migrations for safer marketing workflows.
@@ -39,7 +42,15 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 
 ### Bug Fixes
 - Restored the application exception handler so requests and artisan commands stop crashing with `Whoops\\Run::handleShutdown()` when Laravel bootstraps without the class.
+* Stabilized the SQLite-powered test bootstrap by forcing an on-disk database, guarding factories against optional columns, and eliminating the `no such table: users` regression that blocked the user attribution observer suite.
+* Stabilized analytics event tracking by skipping the user-owned scope in console contexts, gracefully handling missing request/session data, enriching event type listings, and returning float-safe stats so regression suites can assert conversions reliably.
+* Made administrative rate limiting, authorization matrix lookups, and brand metadata diagnostics console-friendly by avoiding container-bound config calls and explicitly removing visibility scopes, which restores the targeted unit tests.
+* Restored the shipping option ↔ zone relationship so orders, factories, and zone aggregations attach carriers without manual
+  attribute overrides during tests.
+* Hardened the API search endpoint to short-circuit suspicious payloads and ensure exact-title matches outrank fuzzy results, keeping injection attempts empty while surfacing precise catalogue hits first.
+- Ensured the customer and product inline sparkline widgets reuse the cached series datasets and publish matching checksums so Filament tables render the same analytics payload verified by unit tests.
 * Normalized search type filters to treat mixed-case input from clients as valid bucket selectors, keeping aggregated storefront results scoped correctly instead of silently reverting to every result category.
+* Updated the data import console command regression test to invoke the protected truncation helper via reflection, preserving foreign key enforcement coverage while respecting the command's final modifier.
 * Prevented Pest test helper redeclaration errors by wrapping the `login()`, `get()`, and `post()` helpers in existence guards so repeated bootstrap phases during `php artisan test` succeed.
 * Expanded the orders status enum and translations to include `confirmed`, `completed`, and return flows so demo seeds and admin filters align with the schema without MySQL truncation warnings during `php artisan migrate:fresh --seed`.
 * Hardened the created_at indexing migration with case-insensitive Doctrine checks and driver-specific fallbacks so repeated deployments no longer trip duplicate key errors on tables that already expose timestamp indexes.
@@ -49,6 +60,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Deferred discount schema user-account foreign keys until after verifying user table compatibility, eliminating the MySQL `discount_codes_created_by_foreign` system-table failure during migrations restored from production dumps.
 * Rebuilt the discount schema migration workflow to toggle MySQL foreign key checks only during data copy, preventing the `discount_codes_created_by_foreign` system-table error encountered when rerunning `php artisan migrate:fresh --seed`.
 * Corrected shipping option delivery window formatting so zero-day estimates and partially filled ranges no longer collapse to a placeholder dash in admin tables.
+* Restored shipping option zone relationships, eligibility guards, and pricing scopes so unit tests can persist delivery logic without triggering mass-assignment or filtering regressions.
 * Ensured the test bootstrap reloads JSON translation directories so Filament commerce navigation labels resolve to localized values instead of falling back to raw keys during regression runs.
 * Ensured the Feature Flag resource surfaces inactive and disabled toggles so administrators can audit rollout states without adjusting global scopes.
 * Fixed the Activity Log Filament resource navigation icon property by adopting the BackedEnum-aware union type required by Filament v4, preventing fatal errors during admin boot.
