@@ -420,7 +420,7 @@ title(__('users.addresses'));
     </div>
 </div>
 
-<script>
+<script nonce="{{ csp_nonce() }}">
 // Address Modal Functions
 function openAddressModal(addressId = null) {
     const modal = document.getElementById('address-modal');

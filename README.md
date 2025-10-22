@@ -16,6 +16,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Multilingual experience** across storefront and admin via `spatie/laravel-translatable`, Volt-powered Livewire pages, and localized seed data.
 
 ### Latest updates
+- Security middleware now shares request-scoped CSP nonces with Livewire and Vite, tightens HSTS/permissions policy headers, and updates inline Blade assets to honour nonce-based CSP directives end-to-end.
 - API error handling now exposes a shared `error.rate_limited` problem code for HTTP 429 responses, giving integrators a stable throttle signal documented in [docs/contracts/ERRORS.md](docs/contracts/ERRORS.md).
 - Test bootstrap now registers both `lang/` and `resources/lang/` JSON translation directories so admin navigation labels render localized text during regression tests.
 - Cache tag conflicts from PR #120 are resolved: dashboard widgets, storefront navigation, and product shelves now share locale-aware tags with automatic invalidation hooks so cached payloads refresh the moment catalogue records change, and new feature tests guard the behaviour.
@@ -68,6 +69,8 @@ composer run dev
 ```
 
 ## Latest maintenance
+
+- 2025-10-24: Hardened content security policies with request-scoped nonces, refreshed inline Blade assets to inject the helper automatically, and expanded rate limiting configuration so API throttles can stack per-minute and per-hour limits.
 
 - 2025-10-23: Wired the cache invalidation service into global model events, updated navigation caches to use shared tag helpers, and expanded regression coverage so dashboard stats and storefront widgets refresh automatically after catalogue edits.
 
