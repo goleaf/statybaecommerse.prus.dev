@@ -38,14 +38,14 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return Cache::tags([
+        return $this->rememberWithTagsFallback([
             CacheTags::home(),
             CacheTags::locale($locale),
             CacheTags::products(),
             CacheTags::categories(),
             CacheTags::brands(),
             CacheTags::reviews(),
-        ])->remember(CacheKeys::homeStats($locale), now()->addSeconds(60), function (): array {
+        ], CacheKeys::homeStats($locale), now()->addSeconds(60), function (): array {
             return [
                 'products_count' => Product::query()->where('is_visible', true)->count(),
                 'categories_count' => Category::query()->where('is_visible', true)->count(),
@@ -64,13 +64,13 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return Cache::tags([
+        return $this->rememberWithTagsFallback([
             CacheTags::home(),
             CacheTags::locale($locale),
             CacheTags::products(),
             CacheTags::brands(),
             CacheTags::categories(),
-        ])->remember(CacheKeys::homeFeaturedProducts($locale), now()->addSeconds(60), static function (): Collection {
+        ], CacheKeys::homeFeaturedProducts($locale), now()->addSeconds(60), static function (): Collection {
             return Product::query()
                 ->withoutGlobalScopes()
                 ->where('is_visible', true)
@@ -89,13 +89,13 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return Cache::tags([
+        return $this->rememberWithTagsFallback([
             CacheTags::home(),
             CacheTags::locale($locale),
             CacheTags::products(),
             CacheTags::brands(),
             CacheTags::categories(),
-        ])->remember(CacheKeys::homeLatestProducts($locale), now()->addSeconds(60), static function (): Collection {
+        ], CacheKeys::homeLatestProducts($locale), now()->addSeconds(60), static function (): Collection {
             return Product::query()
                 ->withoutGlobalScopes()
                 ->where('is_visible', true)
@@ -113,12 +113,12 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return Cache::tags([
+        return $this->rememberWithTagsFallback([
             CacheTags::home(),
             CacheTags::locale($locale),
             CacheTags::reviews(),
             CacheTags::products(),
-        ])->remember(CacheKeys::homeLatestReviews($locale), now()->addSeconds(60), static function (): Collection {
+        ], CacheKeys::homeLatestReviews($locale), now()->addSeconds(60), static function (): Collection {
             return Review::query()
                 ->where('is_approved', true)
                 ->with(['product' => static fn ($query) => $query->select('id', 'name', 'slug')])
@@ -126,6 +126,19 @@ final class Home extends Component
                 ->limit(6)
                 ->get();
         });
+    }
+
+    private function rememberWithTagsFallback(array $tags, string $key, \DateTimeInterface|\DateInterval|int $ttl, callable $callback): mixed
+    {
+        $store = Cache::getStore();
+
+        if ($store instanceof \Illuminate\Cache\TaggableStore) {
+            return Cache::tags($tags)->remember($key, $ttl, $callback);
+        }
+
+        $namespacedKey = implode('|', $tags) . ':' . $key;
+
+        return Cache::remember($namespacedKey, $ttl, $callback);
     }
 
     public function addToCart(int $productId): void
