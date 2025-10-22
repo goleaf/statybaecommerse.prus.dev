@@ -72,7 +72,7 @@
         <div class="space-y-2">
             <h3 id="product-title-{{ $product->id }}"
                 class="text-lg font-semibold leading-tight text-gray-900 line-clamp-2">
-                <a href="{{ route('product.show', $product->slug ?? $product) }}"
+                <a href="{{ route('localized.products.show', ['locale' => app()->getLocale(), 'product' => $product->slug ?? $product]) }}"
                    class="transition hover:text-indigo-600">
                     {{ $product->name }}
                 </a>
@@ -126,7 +126,7 @@
         </div>
 
         <div class="mt-auto flex items-center justify-between gap-3">
-            <a href="{{ route('product.show', $product->slug ?? $product) }}"
+            <a href="{{ route('localized.products.show', ['locale' => app()->getLocale(), 'product' => $product->slug ?? $product]) }}"
                class="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-gray-50 px-4 py-2 text-xs font-semibold text-gray-700">
                 {{ __('frontend/home.products.actions.details') }}
                 <svg class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" fill="none"
