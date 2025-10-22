@@ -23,17 +23,41 @@ trait CreatesApplication
             });
         }
 
+        // Ensure that artisan commands invoked during tests never think the application is in production.
+        putenv('APP_ENV=testing');
+        $_ENV['APP_ENV'] = 'testing';
+        $_SERVER['APP_ENV'] = 'testing';
+
+        $sqlitePath = dirname(__DIR__).'/database/testing.sqlite';
+
+        if (! file_exists($sqlitePath)) {
+            // Provision a dedicated SQLite database file for the test run and clean it up afterwards.
+            touch($sqlitePath);
+
+            register_shutdown_function(static function () use ($sqlitePath): void {
+                if (file_exists($sqlitePath)) {
+                    unlink($sqlitePath);
+                }
+            });
+        }
+
         $app = require __DIR__.'/../bootstrap/app.php';
+
+        // Force the resolved application environment to "testing" before the kernel boots.
+        $app->detectEnvironment(static fn (): string => 'testing');
 
         $app->make(Kernel::class)->bootstrap();
 
-        // Ensure tests always use in-memory SQLite to avoid file corruption issues
+        // Ensure tests always use the dedicated SQLite database to avoid MySQL usage
         config()->set('database.default', 'sqlite');
-        config()->set('database.connections.sqlite.database', ':memory:');
+        config()->set('database.connections.sqlite.database', $sqlitePath);
         // Disable Telescope and force its connection to sqlite during tests to avoid MySQL usage
         config()->set('telescope.enabled', false);
         config()->set('telescope.storage.database.connection', 'sqlite');
         config()->set('debugbar.enabled', false);
+
+        // Align the resolved application environment with the testing expectations.
+        config()->set('app.env', 'testing');
 
         return $app;
     }

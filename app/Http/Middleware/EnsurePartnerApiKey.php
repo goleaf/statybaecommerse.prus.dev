@@ -6,7 +6,7 @@ namespace App\Http\Middleware;
 
 use App\Models\ApiKey;
 use Closure;
-use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -17,17 +17,17 @@ final class EnsurePartnerApiKey
         $providedKey = $this->resolveProvidedKey($request);
 
         if ($providedKey === null) {
-            $this->reject('Missing partner API key.', Response::HTTP_UNAUTHORIZED);
+            return $this->reject('Missing partner API key.', Response::HTTP_UNAUTHORIZED);
         }
 
         $apiKey = $this->findActiveKey($providedKey);
 
         if ($apiKey === null) {
-            $this->reject('Invalid or inactive partner API key.', Response::HTTP_FORBIDDEN);
+            return $this->reject('Invalid or inactive partner API key.', Response::HTTP_FORBIDDEN);
         }
 
         if ($requiredScopes !== [] && ! $apiKey->hasAnyScope($requiredScopes)) {
-            $this->reject('Insufficient partner API permissions.', Response::HTTP_FORBIDDEN);
+            return $this->reject('Insufficient partner API permissions.', Response::HTTP_FORBIDDEN);
         }
 
         $apiKey->forceFill(['last_used_at' => now()])->saveQuietly();
@@ -71,12 +71,13 @@ final class EnsurePartnerApiKey
         return $apiKey;
     }
 
-    private function reject(string $message, int $status): never
+    /**
+     * Issue a standardized JSON error payload for partner API failures.
+     */
+    private function reject(string $message, int $status): JsonResponse
     {
-        throw new HttpResponseException(
-            response()->json([
-                'message' => $message,
-            ], $status)
-        );
+        return response()->json([
+            'message' => $message,
+        ], $status);
     }
 }
