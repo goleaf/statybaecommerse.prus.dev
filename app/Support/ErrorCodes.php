@@ -41,6 +41,11 @@ final class ErrorCodes
     public const FORBIDDEN = 'error.forbidden';
 
     /**
+     * Code returned when clients exceed throttling or rate limit policies.
+     */
+    public const RATE_LIMITED = 'error.rate_limited';
+
+    /**
      * Code returned when an order record cannot be located.
      */
     public const ORDER_NOT_FOUND = 'orders.not_found';
@@ -71,6 +76,7 @@ final class ErrorCodes
         self::VALIDATION_FAILED      => 'Provided data failed validation checks.',
         self::UNAUTHORIZED           => 'Request lacks valid authentication credentials.',
         self::FORBIDDEN              => 'Authenticated request does not have permission to access the resource.',
+        self::RATE_LIMITED           => 'Too many requests were sent in a given amount of time.',
         self::ORDER_NOT_FOUND        => 'Requested order record is missing.',
         self::INVENTORY_INSUFFICIENT => 'Inventory could not satisfy the requested quantity.',
         self::PROFILE_UNAVAILABLE    => 'Authenticated user profile is unavailable.',
