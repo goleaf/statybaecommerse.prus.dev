@@ -9,6 +9,7 @@ use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\VisibleScope;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Casts\Attribute as EloquentAttribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use JsonException;
 
 /**
  * Attribute
@@ -49,7 +51,7 @@ final class Attribute extends Model
      */
     protected function casts(): array
     {
-        return ['is_required' => 'boolean', 'is_filterable' => 'boolean', 'is_searchable' => 'boolean', 'is_visible' => 'boolean', 'is_editable' => 'boolean', 'is_sortable' => 'boolean', 'is_enabled' => 'boolean', 'is_active' => 'boolean', 'sort_order' => 'integer', 'category_id' => 'integer', 'min_length' => 'integer', 'max_length' => 'integer', 'min_value' => 'float', 'max_value' => 'float', 'step_value' => 'float', 'validation_rules' => 'array', 'meta_data' => 'array'];
+        return ['is_required' => 'boolean', 'is_filterable' => 'boolean', 'is_searchable' => 'boolean', 'is_visible' => 'boolean', 'is_editable' => 'boolean', 'is_sortable' => 'boolean', 'is_enabled' => 'boolean', 'is_active' => 'boolean', 'sort_order' => 'integer', 'category_id' => 'integer', 'min_length' => 'integer', 'max_length' => 'integer', 'min_value' => 'float', 'max_value' => 'float', 'step_value' => 'float', 'meta_data' => 'array'];
     }
 
     /**
@@ -62,6 +64,71 @@ final class Attribute extends Model
     protected string $translationModel = \App\Models\Translations\AttributeTranslation::class;
 
     protected $translatable = ['name'];
+
+    /**
+     * Preserve validation rule strings while still decoding JSON arrays for callers that expect them.
+     */
+    protected function validationRules(): EloquentAttribute
+    {
+        return EloquentAttribute::make(
+            get: static function ($value): array|string|null {
+                if ($value === null) {
+                    return null;
+                }
+
+                if (is_array($value)) {
+                    return $value;
+                }
+
+                if (! is_string($value)) {
+                    return $value;
+                }
+
+                $decoded = json_decode($value, true);
+
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    return $decoded;
+                }
+
+                return $value;
+            },
+            set: static function ($value): mixed {
+                if ($value === null) {
+                    return null;
+                }
+
+                if (is_array($value)) {
+                    return self::encodeValidationRules($value);
+                }
+
+                if (is_string($value)) {
+                    $decoded = json_decode($value, true);
+
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        return $value;
+                    }
+
+                    return self::encodeValidationRules($value);
+                }
+
+                return self::encodeValidationRules((string) $value);
+            }
+        );
+    }
+
+    /**
+     * Encode validation rule payloads to JSON while tolerating scalar inputs.
+     */
+    private static function encodeValidationRules(mixed $value): string
+    {
+        try {
+            return json_encode($value, JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            // Fall back to a simple string representation so the JSON column still
+            // stores a valid payload even when custom objects are supplied.
+            return json_encode((string) $value, JSON_THROW_ON_ERROR);
+        }
+    }
 
     /**
      * Handle values functionality with proper error handling.
