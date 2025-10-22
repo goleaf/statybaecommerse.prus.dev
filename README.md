@@ -16,6 +16,8 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Multilingual experience** across storefront and admin via `spatie/laravel-translatable`, Volt-powered Livewire pages, and localized seed data.
 
 ### Latest updates
+- Shipping options now expose explicit zone relationships and fillable references, letting orders and delivery zones surface
+  carrier data consistently during automated regression runs.
 - HTML sanitization now strips entire `<script>`, `<style>`, and `<template>` elements instead of unwrapping them, ensuring
   malicious payloads do not leak into storefront or admin renders while preserving allowed markup for editors.
 - Search API now detects suspicious injection fragments, skips database execution, and keeps exact-title matches at the top of result sets so precise catalogue lookups stay reliable while hostile payloads return empty responses.
