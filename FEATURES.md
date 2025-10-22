@@ -17,6 +17,7 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
+- Introduced a baseline `customer_groups` table so every subsequent enhancement (extra fields, translations, soft deletes) can execute successfully during fresh database provisions and automated refresh cycles.
 - Stock reservation schema guardrails now delay foreign key enforcement until product and variant inventory tables are present, keeping fresh database bootstraps reliable without dropping cascade behaviour.
 - Added a repository analysis snapshot that summarises the 24 open pull requests into themes—Filament Schema migrations, Husky bootstrap shim restorations, and layered rate limiting—so product and engineering stakeholders can digest the queue at a glance.
 - Tracking the open security enhancement proposal from PR #289 that introduces layered API rate limits per user and IP, distinct buckets for read/write/notification/autocomplete flows, and correlation-aware throttling logs so operators can assess the pending protection improvements.
