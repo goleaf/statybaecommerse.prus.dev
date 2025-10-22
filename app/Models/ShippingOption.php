@@ -26,6 +26,7 @@ final class ShippingOption extends Model
     /**
      * @use HasFactory<\Database\Factories\ShippingOptionFactory>
      */
+    /** @use HasFactory<\Database\Factories\ShippingOptionFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -102,10 +103,23 @@ final class ShippingOption extends Model
     }
 
     /**
+     * Handle zone functionality with proper error handling.
+     *
+     * @phpstan-return BelongsTo<Zone, ShippingOption>
+     */
+    public function zone(): BelongsTo
+    {
+        // Link each shipping option to the geographical zone it belongs to for filtering and reporting.
+        return $this->belongsTo(Zone::class);
+    }
+
+    /**
      * Handle scopeEnabled functionality with proper error handling.
      *
      * @param  Builder<self> $query
      * @return Builder<self>
+     * @param  Builder<ShippingOption> $query
+     * @return Builder<ShippingOption>
      */
     public function scopeEnabled(Builder $query): Builder
     {
@@ -117,6 +131,8 @@ final class ShippingOption extends Model
      *
      * @param  Builder<self> $query
      * @return Builder<self>
+     * @param  Builder<ShippingOption> $query
+     * @return Builder<ShippingOption>
      */
     public function scopeDefault(Builder $query): Builder
     {
@@ -128,6 +144,8 @@ final class ShippingOption extends Model
      *
      * @param  Builder<self> $query
      * @return Builder<self>
+     * @param  Builder<ShippingOption> $query
+     * @return Builder<ShippingOption>
      */
     public function scopeByCarrier(Builder $query, string $carrier): Builder
     {
@@ -151,6 +169,8 @@ final class ShippingOption extends Model
      *
      * @param  Builder<self> $query
      * @return Builder<self>
+     * @param  Builder<ShippingOption> $query
+     * @return Builder<ShippingOption>
      */
     public function scopeOrdered(Builder $query): Builder
     {
