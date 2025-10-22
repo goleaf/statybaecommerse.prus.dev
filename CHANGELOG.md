@@ -24,6 +24,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Realigned the Discount Redemption Filament resource navigation metadata and status badge styling with the v4 table schema so admin pages and supporting tests use the modern badge helpers without compatibility gaps.
 
 ### Maintenance
+* Provisioned a reusable SQLite testing harness that seeds the Spatie permission tables, attribute pivots, and variant matrix schema once per process, registered Filament SearchableInput payload macros for v4 containers, and wrapped the ProductVariant attribute matrix suite in transactions so PHPUnit reuses a shared schema without losing isolation.
 * Fixed the custom Filament edit profile page to import the correct Schema class, eliminating fatal compatibility errors during automated tests.
 * Normalized Filament navigation icons and groups across pages, resources, relation managers, and widgets to use the BackedEnum-/UnitEnum-aware union types required by Filament v4 so composer installs no longer crash on PHP 8.3.
 * Captured the Oct 21–22, 2025 pull request triage results in `docs/analysis/CURRENT_SYSTEM_STATUS.md`, outlining merge-ready Husky and feature flag fixes, superseded Filament cleanups to close, and outstanding follow-up work so maintainers can act without revisiting GitHub filters.
