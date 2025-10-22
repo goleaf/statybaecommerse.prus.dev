@@ -41,12 +41,9 @@ final class BrandContract
         $data = ['items' => $mapped];
 
         if ($paginator instanceof LengthAwarePaginator) {
-            $data['pagination'] = [
-                'current_page' => $paginator->currentPage(),
-                'last_page' => $paginator->lastPage(),
-                'per_page' => $paginator->perPage(),
-                'total' => $paginator->total(),
-            ];
+            // Surface pagination totals via meta to keep the payload aligned with the
+            // published schema that disallows additional fields alongside the items
+            // collection.
             $meta['total'] = $paginator->total();
         } else {
             $meta['total'] = count($mapped);
@@ -58,13 +55,13 @@ final class BrandContract
     private static function mapBrand(Brand $brand): array
     {
         return [
-            'id' => $brand->getKey(),
-            'slug' => (string) $brand->slug,
-            'name' => (string) $brand->name,
-            'description' => $brand->description,
-            'website' => $brand->website ? (string) $brand->website : null,
+            'id'             => $brand->getKey(),
+            'slug'           => (string) $brand->slug,
+            'name'           => (string) $brand->name,
+            'description'    => $brand->description,
+            'website'        => $brand->website ? (string) $brand->website : null,
             'products_count' => $brand->products_count ?? null,
-            'links' => [
+            'links'          => [
                 'self' => route('brands.show', $brand->slug),
             ],
         ];
@@ -78,9 +75,9 @@ final class BrandContract
 
         return [
             'contract' => self::CONTRACT,
-            'version' => self::VERSION,
-            'data' => $data,
-            'meta' => $meta,
+            'version'  => self::VERSION,
+            'data'     => $data,
+            'meta'     => $meta,
         ];
     }
 }

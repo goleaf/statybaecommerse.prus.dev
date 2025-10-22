@@ -16,6 +16,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Multilingual experience** across storefront and admin via `spatie/laravel-translatable`, Volt-powered Livewire pages, and localized seed data.
 
 ### Latest updates
+- API contract validation now runs against a persistent SQLite testing database with refreshed factories, keeping the product, brand, category, order, and user endpoints reachable during regression runs.
 - Search endpoints now respect mixed-case `types[]` filters by normalizing them server-side, preventing fallback to all buckets when storefront clients request specific result categories.
 - Storefront autocomplete now trims and caches queries, reuses injected services for faster bucket lookups, and delivers safe highlight markup so Live Search suggestions no longer show raw `<mark>` tags.
 - Localized search results now ship with a guided hero, contextual metrics, and improved empty states so catalog lookups (like Makita) surface faster insights and next steps.
@@ -90,6 +91,9 @@ Need background workers, logs, and Vite in one go? Use the existing dev loop:
 ```bash
 composer run dev
 ```
+
+### Testing & contract validation
+- Run `php artisan test --filter=ContractValidationTest` to verify the public product, category, brand, order, and user contracts. The bootstrap now creates `database/testing.sqlite` automatically so migrations and model factories align with the published schemas even on clean machines.
 
 ## Latest maintenance
 
