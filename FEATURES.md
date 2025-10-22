@@ -17,6 +17,8 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
+- Untitled UI storefront icons now live as dedicated Blade components alongside a Filament grid fallback, eliminating missing-component errors during Blade caching while keeping marketing pages styled correctly.
+- Analytics dashboards now inline their widget tab Blade markup, expand the event type catalogue with scroll tracking, enforce per-user analytics scopes during tests, and deliver audit logs sorted by most recent change for predictable API responses.
 - Brands page now features a light-themed layout, shared card components, and refreshed translations so the partner directory feels consistent across locales.
 - Region-to-city lookups and the dedicated customers table are restored for the SQLite harness, ensuring analytics sparklines, customer factories, and Filament resources can attach geographic metadata without migration errors.
 - Localized product/category routing plus collection seeding were hardened, ensuring homepage product links, category landing pages, and collection showcases load without 404s or empty states.

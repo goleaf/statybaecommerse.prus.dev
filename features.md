@@ -24,6 +24,7 @@
 - Coupon application responses now round computed totals instead of calling `Number::parseFloat` on floats, keeping the discount API stable across PHP 8.3 test runs.
 
 ## Storefront discovery
+- Untitled UI icon components and Filament grid fallbacks now ship in-repo, fixing Blade caching failures and preventing missing icon placeholders across brand, category, and product listings.
 - Brands directory was redesigned with a light-themed layout, shared card components, and refreshed translations for English and Lithuanian so partner browsing feels polished across locales.
 - Search endpoint hardening now rejects suspicious SQL fragments and adds an explicit exact-match boost so precise catalogue queries surface first and malicious payloads return empty buckets.
 - Search type filters now normalise mixed-case identifiers from clients, ensuring storefront queries stay restricted to the requested product, category, or brand buckets instead of ballooning to every result group.
@@ -32,6 +33,7 @@
 - OpenAPI documentation now mirrors the lean product meta payload and nullable media thumbnails emitted by the presenter, keeping schema validators and client SDKs in sync with production responses.
 
 ## Admin panel resilience
+- Analytics event administration now renders widget tabs directly in Blade, exposes the "scroll" event type across filters, enforces per-user query scoping in the `byUser` scope, and returns audit logs sorted by most recent change so QA suites and dashboards stay aligned.
 - Attribute administration keeps validation rule strings verbatim, surfaces array-based rules as comma-separated chips, and pairs with regression tests that prove both paths round-trip correctly through Filament.
 - Filament dashboard access checks now fall back to open access when no
   permissions are configured and inline sparkline widgets respect the base

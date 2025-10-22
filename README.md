@@ -32,6 +32,8 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Multilingual experience** across storefront and admin via `spatie/laravel-translatable`, Volt-powered Livewire pages, and localized seed data.
 
 -### Latest updates
+- Untitled UI marketing icons now ship with first-party Blade wrappers plus Filament grid fallbacks, allowing `php artisan view:cache` to succeed and keeping storefront listings free of missing component placeholders.
+- Analytics event administration now renders its widget tabs without missing components, recognises the "scroll" event type, enforces per-user scoping in tests, and returns audit logs ordered by the latest mutation so dashboards and APIs stay in sync.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
 - Region-aware address tables and the dedicated `customers` dataset are back online for the SQLite harness, letting factories and
