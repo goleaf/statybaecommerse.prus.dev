@@ -41,6 +41,7 @@ return [
                 'script-src'      => [
                     "'self'",
                     '@nonce',
+                    "'unsafe-eval'",
                     'https://unpkg.com',
                 ],
                 'script-src-attr' => ["'none'"],
