@@ -27,6 +27,10 @@
 - OpenAPI documentation now mirrors the lean product meta payload and nullable media thumbnails emitted by the presenter, keeping schema validators and client SDKs in sync with production responses.
 
 ## Admin panel resilience
+- Campaign conversion analytics drop the inherited ActiveScope so the model's
+  own status-aware scopes (campaign, type, device, etc.) surface completed
+  conversions for marketing dashboards and unit coverage without extra query
+  overrides.
 - Toggleable table layout tests now restore the global RefreshDatabase state after seeding bespoke tables and the news category factory defaults to visible records, keeping PHPUnit suites from skipping migrations and ensuring scoped relationships exist for admin coverage.
 - Cart lifecycle unit coverage now builds a dedicated lightweight `cart_items` table per test so checkout cleanup behaviours stay validated without depending on the entire migration suite.
 - Campaign click factories now guard related lookups and PHPUnit targets the shared SQLite database file, eliminating the missing-table exceptions that previously interrupted API campaign listing tests during fresh runs.
