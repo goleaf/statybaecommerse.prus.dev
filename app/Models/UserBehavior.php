@@ -49,7 +49,9 @@ final class UserBehavior extends Model
      */
     public function product(): BelongsTo
     {
-        return $this->belongsTo(Product::class);
+        // Avoid filtering analytics associations by storefront visibility rules so tests and
+        // reporting tools can always resolve the related product instance.
+        return $this->belongsTo(Product::class)->withoutGlobalScopes();
     }
 
     /**
@@ -57,13 +59,15 @@ final class UserBehavior extends Model
      */
     public function category(): BelongsTo
     {
-        return $this->belongsTo(Category::class);
+        // Categories can be archived or hidden, yet their behavioral data remains valuable,
+        // so bypass global scopes when hydrating this relationship.
+        return $this->belongsTo(Category::class)->withoutGlobalScopes();
     }
 
     /**
      * Handle scopeRecent functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeRecent($query, int $days = 30)
     {
@@ -73,7 +77,7 @@ final class UserBehavior extends Model
     /**
      * Handle scopeByType functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByType($query, string $type)
     {
@@ -83,7 +87,7 @@ final class UserBehavior extends Model
     /**
      * Handle scopeByUser functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByUser($query, int $userId)
     {
@@ -93,7 +97,7 @@ final class UserBehavior extends Model
     /**
      * Handle scopeBySession functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeBySession($query, string $sessionId)
     {
