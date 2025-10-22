@@ -70,12 +70,24 @@ if (! function_exists('actingAs')) {
     }
 }
 
-function get($uri, array $headers = [])
-{
-    return test()->get($uri, $headers);
+if (! function_exists('get')) {
+    /**
+     * Provide a helper wrapper around the Pest test() helper for GET requests while
+     * avoiding redeclaration when the file is loaded multiple times by Pest.
+     */
+    function get($uri, array $headers = [])
+    {
+        return test()->get($uri, $headers);
+    }
 }
 
-function post($uri, array $data = [], array $headers = [])
-{
-    return test()->post($uri, $data, $headers);
+if (! function_exists('post')) {
+    /**
+     * Provide a helper wrapper around the Pest test() helper for POST requests while
+     * avoiding redeclaration when the file is loaded multiple times by Pest.
+     */
+    function post($uri, array $data = [], array $headers = [])
+    {
+        return test()->post($uri, $data, $headers);
+    }
 }
