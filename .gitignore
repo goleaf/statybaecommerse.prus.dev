@@ -43,3 +43,4 @@ Thumbs.db
 # Data transfer artifacts
 /storage/app/exports/
 /storage/app/imports/
+/public/
