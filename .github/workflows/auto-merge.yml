@@ -2,7 +2,13 @@ name: CI + Auto Merge
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+    # Listen to review-related events so automerge re-evaluates when status changes.
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+      - labeled
     branches:
       - main
       - master
@@ -15,7 +21,8 @@ jobs:
   automerge:
     name: Auto-merge PR (squash) and delete branch
     runs-on: ubuntu-latest
-    if: github.event.pull_request.draft == false
+    # Require the explicit auto-merge label so only trusted flows are merged automatically.
+    if: github.event.pull_request.draft == false && contains(github.event.pull_request.labels.*.name, 'auto-merge')
     steps:
       - name: Automerge
         uses: pascalgn/automerge-action@v0.15.6
@@ -26,4 +33,4 @@ jobs:
           MERGE_FORKS: false
           MERGE_RETRIES: 10
           MERGE_RETRY_SLEEP: 10000
-          MERGE_LABELS: ""
+          MERGE_LABELS: "auto-merge"
