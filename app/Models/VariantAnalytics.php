@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Models;
 
 use DateTimeInterface;
-use App\Models\Product;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -45,14 +44,14 @@ final class VariantAnalytics extends Model
     protected function casts(): array
     {
         return [
-            'product_id' => 'integer',
-            'date' => 'date',
-            'date_bucket' => 'string',
-            'views' => 'integer',
-            'clicks' => 'integer',
-            'add_to_cart' => 'integer',
-            'purchases' => 'integer',
-            'revenue' => 'decimal:4',
+            'product_id'      => 'integer',
+            'date'            => 'date',
+            'date_bucket'     => 'string',
+            'views'           => 'integer',
+            'clicks'          => 'integer',
+            'add_to_cart'     => 'integer',
+            'purchases'       => 'integer',
+            'revenue'         => 'decimal:4',
             'conversion_rate' => 'decimal:4',
         ];
     }
@@ -197,32 +196,39 @@ final class VariantAnalytics extends Model
         $bucket = self::buildDateBucket($granularity, $normalizedDate);
         $now = now();
 
+        // Ensure the conversion rate always has a safe default because the database column is non-nullable.
+        $conversionRate = array_key_exists('conversion_rate', $data)
+            ? round((float) $data['conversion_rate'], 4)
+            : 0.0;
+
         $payload = [
-            'product_id' => $productId,
-            'variant_id' => $variantId,
-            'date' => $normalizedDate,
+            'product_id'  => $productId,
+            'variant_id'  => $variantId,
+            'date'        => $normalizedDate,
             'date_bucket' => $bucket,
-            'views' => (int) ($data['views'] ?? 0),
-            'clicks' => (int) ($data['clicks'] ?? 0),
+            'views'       => (int) ($data['views'] ?? 0),
+            'clicks'      => (int) ($data['clicks'] ?? 0),
             'add_to_cart' => (int) ($data['add_to_cart'] ?? 0),
-            'purchases' => (int) ($data['purchases'] ?? 0),
-            'revenue' => (float) ($data['revenue'] ?? 0),
-            'conversion_rate' => $data['conversion_rate'] ?? null,
-            'created_at' => $now,
-            'updated_at' => $now,
+            'purchases'   => (int) ($data['purchases'] ?? 0),
+            'revenue'     => (float) ($data['revenue'] ?? 0),
+            // Persist the normalized conversion rate value so inserts never violate the NOT NULL constraint.
+            'conversion_rate' => $conversionRate,
+            'created_at'      => $now,
+            'updated_at'      => $now,
         ];
 
         $updates = [
-            'updated_at' => $now,
-            'date' => $normalizedDate,
-            'views' => self::incrementExpression('views'),
-            'clicks' => self::incrementExpression('clicks'),
+            'updated_at'  => $now,
+            'date'        => $normalizedDate,
+            'views'       => self::incrementExpression('views'),
+            'clicks'      => self::incrementExpression('clicks'),
             'add_to_cart' => self::incrementExpression('add_to_cart'),
-            'purchases' => self::incrementExpression('purchases'),
-            'revenue' => self::incrementExpression('revenue'),
+            'purchases'   => self::incrementExpression('purchases'),
+            'revenue'     => self::incrementExpression('revenue'),
         ];
 
         if (array_key_exists('conversion_rate', $data)) {
+            // When an explicit conversion rate is provided we replace the stored value instead of incrementing.
             $updates['conversion_rate'] = self::replacementExpression('conversion_rate');
         }
 
