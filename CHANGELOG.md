@@ -6,6 +6,9 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 
 ## [Unreleased]
 
+### Features & Enhancements
+* Refactored the localized search results page with a guided hero, contextual metrics, and refreshed empty states so catalog queries like Makita surface faster insights and recovery actions.
+
 ### Maintenance
 * Fixed the custom Filament edit profile page to import the correct Schema class, eliminating fatal compatibility errors during automated tests.
 * Normalized Filament navigation icons and groups across pages, resources, relation managers, and widgets to use the BackedEnum-/UnitEnum-aware union types required by Filament v4 so composer installs no longer crash on PHP 8.3.

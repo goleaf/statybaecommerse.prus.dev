@@ -27,6 +27,9 @@
 - Variant stock history tables consolidate destructive change reasons under the `danger` badge, keeping badge colors predictable for both `damage` and `theft` events.
 - User Product Interaction analytics pages restore Filament v4-friendly spacing for interaction filters and rating badges, silencing the concatenation notices flagged while QAing PR #1097.
 
+## Storefront experience
+- The localized search page now opens with a guided hero, live result metrics, and improved empty states so shoppers can refine Makita-grade queries without leaving the results screen.
+
 ## Caching & performance
 - Cache invalidation conflicts from PR #120 are closed: navigation/menu caches now rely on the shared tag helper, model events invoke the invalidation service automatically, and new storefront/dashboard regression tests confirm cached payloads refresh right after catalogue updates.
 
