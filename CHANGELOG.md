@@ -39,6 +39,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 
 ### Bug Fixes
 * Normalized search type filters to treat mixed-case input from clients as valid bucket selectors, keeping aggregated storefront results scoped correctly instead of silently reverting to every result category.
+* Updated the Attribute Value Filament resource to ignore active/enabled global scopes for admin actions, restoring toggle, duplicate, and bulk activation helpers that previously failed once records were hidden by storefront filters.
 * Prevented Pest test helper redeclaration errors by wrapping the `login()`, `get()`, and `post()` helpers in existence guards so repeated bootstrap phases during `php artisan test` succeed.
 * Expanded the orders status enum and translations to include `confirmed`, `completed`, and return flows so demo seeds and admin filters align with the schema without MySQL truncation warnings during `php artisan migrate:fresh --seed`.
 * Hardened the created_at indexing migration with case-insensitive Doctrine checks and driver-specific fallbacks so repeated deployments no longer trip duplicate key errors on tables that already expose timestamp indexes.
