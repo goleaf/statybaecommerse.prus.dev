@@ -17,6 +17,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 
 ### Latest updates
 - Search endpoints now respect mixed-case `types[]` filters by normalizing them server-side, preventing fallback to all buckets when storefront clients request specific result categories.
+- Company model unit tests now bootstrap the SQLite `companies` table and defer the active scope until migrations complete, eliminating missing-table crashes during `php artisan test` runs.
 - Storefront autocomplete now trims and caches queries, reuses injected services for faster bucket lookups, and delivers safe highlight markup so Live Search suggestions no longer show raw `<mark>` tags.
 - Localized search results now ship with a guided hero, contextual metrics, and improved empty states so catalog lookups (like Makita) surface faster insights and next steps.
 - Corrected the custom Filament edit profile form to import `Filament\\Schemas\\Schema`, preventing namespace resolution fatals during profile updates and automated test runs.
