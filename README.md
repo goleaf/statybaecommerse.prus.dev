@@ -20,10 +20,22 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
   scopes, ensuring inactive or disabled options stay editable and helper
   actions (activate, duplicate, default toggles) behave consistently during
   regression tests and live admin sessions.
+- Restored the missing `App\\Exceptions\\Handler` so Laravel can bootstrap without the fatal `Whoops\\Run::handleShutdown()` error that previously surfaced on every web request and artisan command.
+- Test runs now provision an on-disk SQLite database and guard customer group metadata seeding, eliminating the intermittent `no such table: users` failure encountered by the user attribution observer suite.
+- Shipping options now expose explicit zone relationships and fillable references, letting orders and delivery zones surface
+  carrier data consistently during automated regression runs.
+- HTML sanitization now strips entire `<script>`, `<style>`, and `<template>` elements instead of unwrapping them, ensuring
+  malicious payloads do not leak into storefront or admin renders while preserving allowed markup for editors.
+- Search API now detects suspicious injection fragments, skips database execution, and keeps exact-title matches at the top of result sets so precise catalogue lookups stay reliable while hostile payloads return empty responses.
+- Customer and product inline sparklines now reuse the cached analytics series and publish stable dataset checksums, keeping Filament tables and unit tests aligned on the same Chart.js payloads.
 - Search endpoints now respect mixed-case `types[]` filters by normalizing them server-side, preventing fallback to all buckets when storefront clients request specific result categories.
+- Data import regression coverage now uses reflection to exercise the protected truncation helper on the final Artisan command, keeping foreign key enforcement tests intact without weakening the command's contract.
 - Storefront autocomplete now trims and caches queries, reuses injected services for faster bucket lookups, and delivers safe highlight markup so Live Search suggestions no longer show raw `<mark>` tags.
+- Analytics event tracking now skips restrictive user scopes during console execution, tolerates missing request data, and reports float-safe revenue totals so dashboards and regression suites stay in sync.
+- API rate limiting and authorization helpers now fall back to raw configuration files when container bindings are unavailable, allowing console diagnostics and unit tests to execute without fatal bindings.
 - Localized search results now ship with a guided hero, contextual metrics, and improved empty states so catalog lookups (like Makita) surface faster insights and next steps.
 - Corrected the custom Filament edit profile form to import `Filament\\Schemas\\Schema`, preventing namespace resolution fatals during profile updates and automated test runs.
+- Discount Redemption admin navigation now lives in the Marketing cluster with a warning badge and Filament v4 badge styling, and its Pest harness boots a lightweight `HasTable` stub so table schemas construct cleanly during unit tests.
 - Pest test helpers now guard the `login()`, `get()`, and `post()` helpers with existence checks, preventing redeclaration fatals during repeated `php artisan test` bootstrap cycles.
 - Order seeding now uses the expanded `orders.status` enum (`confirmed`, `completed`, and return-friendly values) so `php artisan migrate:fresh --seed` no longer trips MySQL truncation warnings when loading the demo store checkout history.
 - Hardened the `2025_02_15_120000_add_created_at_indexes` migration with case-insensitive index detection and information schema fallbacks, eliminating duplicate key errors during repeated deploys or fresh seeds.
@@ -32,6 +44,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - Stock reservation migrations now stage foreign keys after their parent tables exist, preventing `php artisan migrate:fresh --seed` from failing on pristine databases while keeping cascade rules in place for live systems.
 - Discount schema rebuild scripts now re-enable foreign key checks before recreating tables and only disable them while copying legacy rows, eliminating the MySQL system-table constraint error triggered during `php artisan migrate:fresh --seed`.
 - Filament admin navigation now standardises every icon and group declaration on the BackedEnum/UnitEnum union types mandated by v4, eliminating the PHP 8.3 fatals that previously surfaced during `composer install`.
+- Shipping option models now expose their zone relationship, eligibility guards, and scoped queries so fulfilment rules stay enforceable across factories, admin listings, and automated tests.
 - Logged the Oct 21–22, 2025 PR triage outcome directly in `docs/analysis/CURRENT_SYSTEM_STATUS.md`, highlighting which Husky and Filament fixes are ready to merge, which legacy branches to close as superseded, and which submissions still need action so maintainers can prioritise reviews without re-scraping GitHub.
 - Curated a high-level repository analysis that catalogues the 24 open pull requests, highlighting the repeated Filament Schema API migrations, Husky bootstrap shim restorations, and the layered rate-limiting proposal so maintainers can prioritise reviews without manually expanding each PR.
 - Documented the open proposal from PR #289 to introduce layered API rate limiting buckets for read, write, notification, and autocomplete endpoints alongside enhanced throttling logs with correlation identifiers, so reviewers can quickly trace the outstanding security hardening work.
@@ -44,6 +57,8 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - Diagnostics coverage moved from bespoke artisan commands to dedicated PHPUnit suites with a minimum coverage extension and Paratest-ready tooling, making the quality gate observable directly from standard test runs.
 - Security middleware now shares request-scoped CSP nonces with Livewire and Vite, tightens HSTS/permissions policy headers, and updates inline Blade assets to honour nonce-based CSP directives end-to-end.
 - API error handling now exposes a shared `error.rate_limited` problem code for HTTP 429 responses, giving integrators a stable throttle signal documented in [docs/contracts/ERRORS.md](docs/contracts/ERRORS.md).
+- Validation problem responses now backfill a fallback English reason while preserving the localized violation list so RFC&nbsp;7807 consumers receive consistent messaging even when validation runs before locale negotiation completes.
+- Forbidden API responses raised by Symfony's `AccessDeniedHttpException` now retain their explicit denial reason in `error.context.reason`, aligning the payload with Laravel's authorization exception handling.
 - Test bootstrap now registers both `lang/` and `resources/lang/` JSON translation directories so admin navigation labels render localized text during regression tests.
 - Cache tag conflicts from PR #120 are resolved: dashboard widgets, storefront navigation, and product shelves now share locale-aware tags with automatic invalidation hooks so cached payloads refresh the moment catalogue records change, and new feature tests guard the behaviour.
 - A new cache invalidation service now coordinates dashboard and storefront tag flushing, and the cart/checkout flows gained JSON regression tests to keep the customer journey stable across releases.
@@ -150,6 +165,7 @@ composer run dev
 ## Configuration notes
 - Environment defaults live in `.env.example`; copy it to `.env` to tweak database/queue/mail settings.
 - SQLite is enabled by default for fast onboarding—switch `DB_CONNECTION` in `.env` if you need MySQL/PostgreSQL.
+- PHPUnit test runs now target the shared `database/database.sqlite` file by default for persistent schema reuse; override `DB_DATABASE` locally if you prefer transient in-memory databases.
 - Storage symlink (`public/storage`) is created by `make setup`; re-run `php artisan storage:link` if you remove it.
 - Horizon, Scout, and media-processing queues expect Redis; local installs default to the sync driver (`QUEUE_CONNECTION=sync`). Update `QUEUE_CONNECTION` to `redis` (or your chosen queue backend) once Redis is available to re-enable Horizon workers.
 - Frontend assets rely on modern Node (20+) with native ESM; ensure `npm install` runs before invoking Vite or Playwright scripts.

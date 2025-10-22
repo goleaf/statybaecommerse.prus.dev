@@ -29,6 +29,12 @@ final class SearchResultPayload
             'label' => $result->label(),
         ], $metadata);
 
+        // Bubble the metadata to the top level so legacy widgets that read flattened keys
+        // continue to function while the normalised payload remains the canonical structure.
+        foreach ($metadata as $key => $value) {
+            $result->withData($key, $value);
+        }
+
         // Persist the payload so JS widgets and PHP callbacks read a predictable structure.
         $result->withData('payload', $payload);
 
@@ -40,6 +46,8 @@ final class SearchResultPayload
      * Legacy providers might still emit flat metadata, so we fall back to the raw `data`
      * bag whenever a nested payload is missing.
      *
+     * @param SearchResult|array{value: string, label?: string, data?: array<string, mixed>} $result Normalised DTO or Livewire array payload.
+     *
      * @return array{id: string, label: string, payload: array<string, mixed>}
      */
     public static function hydrate(SearchResult|array $result): array
@@ -49,12 +57,23 @@ final class SearchResultPayload
             $result = SearchResult::fromArray($result);
         }
 
+        /** @var SearchResult $result */
+        $result = $result;
+
+        /** @phpstan-var string $value */
         $value = $result->value();
         $label = $result->label();
         $data = $result->toArray()['data'] ?? [];
 
         // Respect the normalised payload when it exists; otherwise reuse legacy metadata.
-        $payload = is_array($result->get('payload')) ? $result->get('payload') : (is_array($data) ? $data : []);
+        $payloadSource = is_array($result->get('payload')) ? $result->get('payload') : (is_array($data) ? $data : []);
+
+        // Cast every key to string so PHPStan and downstream consumers consistently handle
+        // associative payloads, even if a legacy provider returns numeric indexes.
+        $payload = [];
+        foreach ($payloadSource as $key => $value) {
+            $payload[(string) $key] = $value;
+        }
 
         if (! array_key_exists('id', $payload)) {
             $payload['id'] = $value;
@@ -64,10 +83,15 @@ final class SearchResultPayload
             $payload['label'] = $label;
         }
 
-        return [
+        $normalised = [
             'id'      => $value,
             'label'   => $label,
             'payload' => $payload,
         ];
+
+        /** @var array{id: string, label: string, payload: array<string, mixed>} $normalised */
+        $normalised = $normalised;
+
+        return $normalised;
     }
 }
