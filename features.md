@@ -6,14 +6,17 @@
 
 ## Data integrity & seeding
 - Orders now seed using the broadened `orders.status` enum (covering confirmed/completed/returned) so MySQL no longer truncates demo data during `php artisan migrate:fresh --seed` and admin analytics stay in sync.
+- Data import tooling keeps its foreign key safety net covered in tests by invoking the protected truncation helper via reflection, allowing the final Artisan command to remain sealed while still exercising failure recovery.
 - Created_at index migrations now detect pre-existing keys case-insensitively (with driver-specific fallbacks) and the demo currency/country seeds align with multilingual schemas, so `php artisan migrate:fresh --seed` completes reliably across supported databases.
 - Discount rebuild migrations now temporarily relax foreign key checks only while replaying legacy rows, preventing the `discount_codes_created_by_foreign` MySQL error during full refreshes without sacrificing referential integrity.
 - User and author foreign keys on rebuilt discount tables now attach after verifying the `users` table compatibility, ensuring MySQL restores with mixed storage engines keep migrating without tripping the `discount_codes_created_by_foreign` system-table check.
 
 ## Storefront discovery
+- Search endpoint hardening now rejects suspicious SQL fragments and adds an explicit exact-match boost so precise catalogue queries surface first and malicious payloads return empty buckets.
 - Search type filters now normalise mixed-case identifiers from clients, ensuring storefront queries stay restricted to the requested product, category, or brand buckets instead of ballooning to every result group.
 
 ## Admin panel resilience
+- Customer and product sparkline widgets now reuse the cached analytics series and expose matching dataset checksums, ensuring inline charts and regression tests evaluate the same trends.
 - The custom Edit Profile page now imports `Filament\\Schemas\\Schema`, keeping the authentication profile form aligned with v4 expectations and preventing namespace-related fatal errors during automated test cycles.
 - Pest test bootstrap helpers now guard the `login()`, `get()`, and `post()` helpers with function-existence checks so repeated includes during `php artisan test` runs no longer trigger fatal redeclaration errors.
 - Added a foundational `customer_groups` migration so later schema updates (extra permissions, soft deletes, translations) apply cleanly during `php artisan migrate:fresh --seed` runs.
@@ -40,6 +43,7 @@
 
 ## Content safety and compliance
 - Established an allow-listed HTML sanitizer that runs on product descriptions, translations, and legal documents to prevent script injection.
+- The sanitizer now removes entire `<script>`, `<style>`, and `<template>` elements instead of leaving their inline payloads behind, keeping sanitized storefront and admin content free from executable remnants.
 - Added a storefront `<x-sanitized-html>` component so any rendered rich text automatically passes through the sanitizer.
 - Shipped the `php artisan maintenance:sanitize-html` command to reprocess legacy content in bulk.
 
