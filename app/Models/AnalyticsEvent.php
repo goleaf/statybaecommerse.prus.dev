@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Str;
 
 /**
  * AnalyticsEvent
@@ -247,7 +248,15 @@ final class AnalyticsEvent extends Model
      */
     public function getEventTypeLabelAttribute(): string
     {
-        return __('admin.analytics.event_types.'.$this->event_type, $this->event_type);
+        $translationKey = 'admin.analytics.event_types.'.$this->event_type;
+
+        // Allow gracefully falling back to the raw event type when the translation
+        // string is missing instead of triggering translator argument exceptions.
+        $translated = __($translationKey);
+
+        return $translated === $translationKey
+            ? Str::of($this->event_type)->replace('_', ' ')->title()->toString()
+            : $translated;
     }
 
     /**
@@ -299,7 +308,7 @@ final class AnalyticsEvent extends Model
      */
     public static function getEventTypes(): array
     {
-        return ['page_view' => __('admin.analytics.event_types.page_view'), 'product_view' => __('admin.analytics.event_types.product_view'), 'add_to_cart' => __('admin.analytics.event_types.add_to_cart'), 'remove_from_cart' => __('admin.analytics.event_types.remove_from_cart'), 'purchase' => __('admin.analytics.event_types.purchase'), 'search' => __('admin.analytics.event_types.search'), 'user_register' => __('admin.analytics.event_types.user_register'), 'user_login' => __('admin.analytics.event_types.user_login'), 'user_logout' => __('admin.analytics.event_types.user_logout'), 'newsletter_signup' => __('admin.analytics.event_types.newsletter_signup'), 'contact_form' => __('admin.analytics.event_types.contact_form'), 'download' => __('admin.analytics.event_types.download'), 'video_play' => __('admin.analytics.event_types.video_play'), 'social_share' => __('admin.analytics.event_types.social_share')];
+        return ['page_view' => __('admin.analytics.event_types.page_view'), 'product_view' => __('admin.analytics.event_types.product_view'), 'add_to_cart' => __('admin.analytics.event_types.add_to_cart'), 'remove_from_cart' => __('admin.analytics.event_types.remove_from_cart'), 'purchase' => __('admin.analytics.event_types.purchase'), 'search' => __('admin.analytics.event_types.search'), 'click' => __('admin.analytics.event_types.click'), 'user_register' => __('admin.analytics.event_types.user_register'), 'user_login' => __('admin.analytics.event_types.user_login'), 'user_logout' => __('admin.analytics.event_types.user_logout'), 'newsletter_signup' => __('admin.analytics.event_types.newsletter_signup'), 'contact_form' => __('admin.analytics.event_types.contact_form'), 'download' => __('admin.analytics.event_types.download'), 'video_play' => __('admin.analytics.event_types.video_play'), 'social_share' => __('admin.analytics.event_types.social_share')];
     }
 
     /**
@@ -371,7 +380,16 @@ final class AnalyticsEvent extends Model
             ->orderBy('date', 'desc')
             ->limit(30)
             ->pluck('revenue', 'date')
+            ->map(fn ($revenue) => (float) $revenue)
             ->toArray();
+    }
+
+    /**
+     * Cast the conversion value to a float for consistent numeric comparisons.
+     */
+    public function getConversionValueAttribute($value): ?float
+    {
+        return $value === null ? null : (float) $value;
     }
 
     /**
@@ -389,14 +407,31 @@ final class AnalyticsEvent extends Model
      */
     public static function track(string $eventType, array $data = [], $trackable = null): self
     {
+        // Resolve the current HTTP request in a defensive way so console-driven
+        // contexts (for example PHPUnit or artisan commands) can still capture
+        // analytics records without encountering missing request bindings.
+        $request = app()->bound('request') ? request() : null;
+
+        // Ensure a stable session identifier even when the session manager is
+        // unavailable by falling back to a deterministic UUID for analytics
+        // correlation inside non-HTTP execution paths.
+        $sessionId = null;
+        if (app()->bound('session')) {
+            $sessionStore = session();
+            if (method_exists($sessionStore, 'getId')) {
+                $sessionId = $sessionStore->getId();
+            }
+        }
+        $sessionId ??= (string) Str::uuid();
+
         $eventData = [
             'event_type' => $eventType,
-            'session_id' => session()->getId(),
+            'session_id' => $sessionId,
             'user_id' => auth()->id(),
-            'url' => request()->url(),
-            'referrer' => request()->header('referer'),
-            'ip_address' => request()->ip(),
-            'user_agent' => request()->userAgent(),
+            'url' => $request?->fullUrl(),
+            'referrer' => $request?->headers->get('referer'),
+            'ip_address' => $request?->ip(),
+            'user_agent' => $request?->userAgent(),
             'created_at' => now(),
             'updated_at' => now(),
         ];

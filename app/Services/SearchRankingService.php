@@ -46,6 +46,12 @@ final class SearchRankingService
     {
         $score = 0.0;
 
+        // Always give an outsized boost to exact matches so customer intent is
+        // respected even when popularity data would otherwise dominate.
+        if (isset($result['title']) && strtolower((string) $result['title']) === strtolower($query)) {
+            $score += 100.0;
+        }
+
         // Base relevance score (if available)
         if (isset($result['relevance_score'])) {
             $score += $result['relevance_score'] * 0.3;

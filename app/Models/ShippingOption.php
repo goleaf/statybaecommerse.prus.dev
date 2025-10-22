@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 // use Illuminate\Database\Eloquent\SoftDeletes;
@@ -22,6 +23,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 // #[ScopedBy([ActiveScope::class, EnabledScope::class])]
 final class ShippingOption extends Model
 {
+    /**
+     * @use HasFactory<\Database\Factories\ShippingOptionFactory>
+     */
+    /** @use HasFactory<\Database\Factories\ShippingOptionFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -32,6 +37,7 @@ final class ShippingOption extends Model
         'service_type',
         'price',
         'currency_code',
+        'zone_id',
         'is_enabled',
         'is_default',
         'sort_order',
@@ -67,14 +73,53 @@ final class ShippingOption extends Model
 
     /**
      * Handle orders functionality with proper error handling.
+     *
+     * @return HasMany<Order, static>
+     *
+     * @phpstan-return HasMany<Order, ShippingOption>
      */
     public function orders(): HasMany
     {
-        return $this->hasMany(Order::class, 'shipping_option_id');
+        /** @var HasMany<Order, ShippingOption> $relation */
+        $relation = $this->hasMany(Order::class, 'shipping_option_id');
+
+        return $relation;
+    }
+
+    /**
+     * Provide direct access to the owning zone relationship.
+     *
+     * @return BelongsTo<Zone, static>
+     *
+     * @phpstan-return BelongsTo<Zone, ShippingOption>
+     */
+    public function zone(): BelongsTo
+    {
+        // Expose the relation used across factories, seeds, and API resources.
+        /** @var BelongsTo<Zone, ShippingOption> $relation */
+        $relation = $this->belongsTo(Zone::class);
+
+        return $relation;
+    }
+
+    /**
+     * Handle zone functionality with proper error handling.
+     *
+     * @phpstan-return BelongsTo<Zone, ShippingOption>
+     */
+    public function zone(): BelongsTo
+    {
+        // Link each shipping option to the geographical zone it belongs to for filtering and reporting.
+        return $this->belongsTo(Zone::class);
     }
 
     /**
      * Handle scopeEnabled functionality with proper error handling.
+     *
+     * @param  Builder<self> $query
+     * @return Builder<self>
+     * @param  Builder<ShippingOption> $query
+     * @return Builder<ShippingOption>
      */
     public function scopeEnabled(Builder $query): Builder
     {
@@ -83,6 +128,11 @@ final class ShippingOption extends Model
 
     /**
      * Handle scopeDefault functionality with proper error handling.
+     *
+     * @param  Builder<self> $query
+     * @return Builder<self>
+     * @param  Builder<ShippingOption> $query
+     * @return Builder<ShippingOption>
      */
     public function scopeDefault(Builder $query): Builder
     {
@@ -91,6 +141,11 @@ final class ShippingOption extends Model
 
     /**
      * Handle scopeByCarrier functionality with proper error handling.
+     *
+     * @param  Builder<self> $query
+     * @return Builder<self>
+     * @param  Builder<ShippingOption> $query
+     * @return Builder<ShippingOption>
      */
     public function scopeByCarrier(Builder $query, string $carrier): Builder
     {
@@ -98,7 +153,24 @@ final class ShippingOption extends Model
     }
 
     /**
+     * Handle scopeByZone functionality with proper error handling.
+     *
+     * @param  Builder<self> $query
+     * @return Builder<self>
+     */
+    public function scopeByZone(Builder $query, int $zoneId): Builder
+    {
+        // Allow filtering by the owning zone so queries remain expressive.
+        return $query->where('zone_id', $zoneId);
+    }
+
+    /**
      * Handle scopeOrdered functionality with proper error handling.
+     *
+     * @param  Builder<self> $query
+     * @return Builder<self>
+     * @param  Builder<ShippingOption> $query
+     * @return Builder<ShippingOption>
      */
     public function scopeOrdered(Builder $query): Builder
     {
@@ -138,10 +210,10 @@ final class ShippingOption extends Model
      */
     public function isEligibleForWeight(float $weight): bool
     {
-        if ($this->min_weight && $weight < $this->min_weight) {
+        if ($this->min_weight !== null && $weight < (float) $this->min_weight) {
             return false;
         }
-        if ($this->max_weight && $weight > $this->max_weight) {
+        if ($this->max_weight !== null && $weight > (float) $this->max_weight) {
             return false;
         }
 
@@ -153,10 +225,10 @@ final class ShippingOption extends Model
      */
     public function isEligibleForOrderAmount(float $amount): bool
     {
-        if ($this->min_order_amount && $amount < $this->min_order_amount) {
+        if ($this->min_order_amount !== null && $amount < (float) $this->min_order_amount) {
             return false;
         }
-        if ($this->max_order_amount && $amount > $this->max_order_amount) {
+        if ($this->max_order_amount !== null && $amount > (float) $this->max_order_amount) {
             return false;
         }
 
