@@ -14,14 +14,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+use function is_string;
+
 /**
  * Country
  *
  * Eloquent model representing the Country entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
  * @property string $translationModel
- * @property mixed $table
- * @property mixed $fillable
+ * @property mixed  $table
+ * @property mixed  $fillable
  *
  * @method static \Illuminate\Database\Eloquent\Builder|Country newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Country newQuery()
@@ -144,7 +146,7 @@ final class Country extends Model
     public function getIsoCodeAttribute(): string
     {
         // Prefer explicit ISO-3 code when stored as a 3-letter value
-        if (! empty($this->attributes['iso_code']) && \is_string($this->attributes['iso_code'])) {
+        if (! empty($this->attributes['iso_code']) && is_string($this->attributes['iso_code'])) {
             $iso = strtoupper($this->attributes['iso_code']);
             if (preg_match('/^[A-Z]{3}$/', $iso) === 1) {
                 return $iso;
@@ -179,7 +181,7 @@ final class Country extends Model
     /**
      * Handle scopeActive functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeActive($query)
     {
@@ -189,7 +191,7 @@ final class Country extends Model
     /**
      * Handle scopeEnabled functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeEnabled($query)
     {
@@ -199,7 +201,7 @@ final class Country extends Model
     /**
      * Handle scopeEuMembers functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeEuMembers($query)
     {
@@ -209,7 +211,7 @@ final class Country extends Model
     /**
      * Handle scopeRequiresVat functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeRequiresVat($query)
     {
@@ -219,7 +221,7 @@ final class Country extends Model
     /**
      * Handle scopeByRegion functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByRegion($query, string $region)
     {
@@ -229,7 +231,7 @@ final class Country extends Model
     /**
      * Handle scopeByCurrency functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByCurrency($query, string $currencyCode)
     {
@@ -257,9 +259,9 @@ final class Country extends Model
     /**
      * Handle requiresVat functionality with proper error handling.
      */
-    public function requiresVat(): bool
+    public function isVatRequired(): bool
     {
-        return $this->requires_vat;
+        return (bool) $this->requires_vat;
     }
 
     /**
@@ -275,7 +277,7 @@ final class Country extends Model
      */
     public function getFormattedVatRate(): string
     {
-        return $this->vat_rate ? number_format((float) $this->vat_rate, 2).'%' : 'N/A';
+        return $this->vat_rate ? number_format((float) $this->vat_rate, 2) . '%' : 'N/A';
     }
 
     /**
@@ -294,7 +296,7 @@ final class Country extends Model
     public function getFlagUrl(): ?string
     {
         if ($this->flag) {
-            return asset('flags/'.$this->flag);
+            return asset('flags/' . $this->flag);
         }
 
         return null;
@@ -306,7 +308,7 @@ final class Country extends Model
     public function getSvgFlagUrl(): ?string
     {
         if ($this->svg_flag) {
-            return asset('flags/svg/'.$this->svg_flag);
+            return asset('flags/svg/' . $this->svg_flag);
         }
 
         return null;
@@ -343,13 +345,13 @@ final class Country extends Model
     /**
      * Handle scopeWithTranslations functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithTranslations($query, ?string $locale = null)
     {
         $locale = $locale ?: app()->getLocale();
 
-        return $query->with(['translations' => function ($q) use ($locale) {
+        return $query->with(['translations' => function ($q) use ($locale): void {
             $q->where('locale', $locale);
         }]);
     }
@@ -471,5 +473,25 @@ final class Country extends Model
     public function getGeographicInfo(): array
     {
         return ['region' => $this->region, 'subregion' => $this->subregion, 'coordinates' => $this->getCoordinatesAttribute(), 'timezone' => $this->timezone];
+    }
+
+    public function __call($method, $parameters)
+    {
+        if ($method === 'requiresVat') {
+            // Preserve backwards compatibility for helpers expecting a method call variant.
+            return $this->isVatRequired();
+        }
+
+        return parent::__call($method, $parameters);
+    }
+
+    public static function __callStatic($method, $parameters)
+    {
+        if ($method === 'requiresVat') {
+            // Allow static scope-style access without clashing with the instance helper above.
+            return self::query()->where('requires_vat', true);
+        }
+
+        return parent::__callStatic($method, $parameters);
     }
 }
