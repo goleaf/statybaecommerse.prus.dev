@@ -22,6 +22,9 @@ abstract class TestCase extends BaseTestCase
 
     protected function setUp(): void
     {
+        // Reset the RefreshDatabase state so each test run rebuilds the SQLite schema.
+        \Illuminate\Foundation\Testing\RefreshDatabaseState::$migrated = false;
+
         parent::setUp();
 
         if (! file_exists(base_path('.env'))) {
@@ -31,8 +34,15 @@ abstract class TestCase extends BaseTestCase
             $this->createdEnvFile = false;
         }
 
+        $testingDatabasePath = database_path('testing.sqlite');
+
+        if (! file_exists($testingDatabasePath)) {
+            // Guarantee the shared SQLite database exists before configuring the connection.
+            touch($testingDatabasePath);
+        }
+
         Config::set('database.default', 'sqlite');
-        Config::set('database.connections.sqlite.database', ':memory:');
+        Config::set('database.connections.sqlite.database', $testingDatabasePath);
         Config::set('app.key', 'base64:'.base64_encode(random_bytes(32)));
         // Ensure Telescope doesn't use MySQL during tests and avoid watchers overhead
         Config::set('telescope.enabled', false);
