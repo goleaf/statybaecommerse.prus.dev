@@ -16,6 +16,9 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
   filtered scopes (campaign, type, device, medium, etc.) once again return
   completed records in unit tests and dashboards instead of being filtered out
   by a non-existent `is_active` flag.
+* Harmonised the campaign conversion translation model wiring, defaulted
+  `converted_at` during factory creation, and kept the SQLite-friendly scopes in
+  sync so ROI/ROAS dashboards and unit tests stop dropping recent conversions.
 * Normalized API validation problem responses to always include a fallback English reason alongside the localized message list so integrators receive consistent messaging even when the initial validation ran before locale negotiation completed.
 * Ensured forbidden problem responses raised through `AccessDeniedHttpException` retain the explicit denial reason in the error context, mirroring the structure used for authorization exceptions and keeping client-side handlers uniform.
 
