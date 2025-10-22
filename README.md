@@ -16,6 +16,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Multilingual experience** across storefront and admin via `spatie/laravel-translatable`, Volt-powered Livewire pages, and localized seed data.
 
 ### Latest updates
+- Stabilized the NewsCategory regression suite by restoring the RefreshDatabase migration flag after the toggleable table Pest harness runs and making news category factories default to visible records so relationship tests load scoped children reliably.
 - Attribute value management in the Filament admin now bypasses storefront
   scopes, ensuring inactive or disabled options stay editable and helper
   actions (activate, duplicate, default toggles) behave consistently during

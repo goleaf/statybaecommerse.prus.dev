@@ -7,6 +7,7 @@ use App\Filament\Tables\Columns\GridLayoutColumn;
 use App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
 use Filament\Facades\Filament;
 use Filament\Panel;
+use Filament\Resources\Pages\PageRegistration;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -37,7 +38,10 @@ final class ToggleableTableTestResource extends Resource
     }
 
     /**
-     * @return array<string, string>
+     * Explicitly document the Filament page registrations returned here so
+     * static analysis understands the shape of the configuration array.
+     *
+     * @return array<string, PageRegistration>
      */
     public static function getPages(): array
     {
@@ -60,7 +64,25 @@ final class ToggleableTableTestPage extends BaseListRecords
     protected static string $resource = ToggleableTableTestResource::class;
 }
 
-RefreshDatabaseState::$migrated = true;
+/**
+ * Capture the original RefreshDatabase state so we can safely restore it after the
+ * bespoke schema setup for this Pest suite completes, preventing interference with
+ * PHPUnit powered test classes that rely on the RefreshDatabase trait to run the
+ * full Laravel migration stack automatically.
+ */
+$originalRefreshDatabaseState = RefreshDatabaseState::$migrated;
+
+beforeAll(function (): void {
+    // Mark the database as migrated for this file to avoid running the full
+    // application migrations; the tables we need are defined explicitly below.
+    RefreshDatabaseState::$migrated = true;
+});
+
+afterAll(function () use (&$originalRefreshDatabaseState): void {
+    // Restore the previous RefreshDatabase flag value so class-based PHPUnit
+    // suites keep executing migrate:fresh and other expected setup routines.
+    RefreshDatabaseState::$migrated = $originalRefreshDatabaseState;
+});
 
 beforeEach(function (): void {
     Schema::dropIfExists('toggleable_table_test_models');
