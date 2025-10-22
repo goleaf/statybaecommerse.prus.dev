@@ -23,6 +23,7 @@ composer.lock
 /storage/app/backups/
 /storage/pail
 /vendor
+database/testing.sqlite
 Homestead.json
 Homestead.yaml
 Thumbs.db
