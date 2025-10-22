@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\NotificationResource\Pages;
 use App\Models\Notification;
+use App\Support\Concerns\HasNav;
 use App\Support\Filament\Filters\SingleDateFilter;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -23,11 +22,11 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
-use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -41,23 +40,20 @@ use Illuminate\Support\Str;
 
 final class NotificationResource extends Resource
 {
+    use HasNav; // Proxy navigation metadata to the centralized Nav registry for consistency.
+
     private const READ_STATE_READ = 'read';
 
     private const READ_STATE_UNREAD = 'unread';
 
     protected static ?string $model = Notification::class;
 
+    /** @var string|BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-bell';
+
+    protected static ?string $navigationGroup = 'System';
+
     protected static bool $shouldRegisterNavigation = false;
-
-    public static function getNavigationIcon(): string
-    {
-        return 'heroicon-o-bell';
-    }
-
-    public static function getNavigationGroup(): string
-    {
-        return 'System';
-    }
 
     protected static ?int $navigationSort = 3;
 
@@ -71,7 +67,7 @@ final class NotificationResource extends Resource
         return __('admin.notifications.single');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             Section::make(__('admin.notifications.form.sections.basic_information'))
@@ -157,7 +153,7 @@ final class NotificationResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

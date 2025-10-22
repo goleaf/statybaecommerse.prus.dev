@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Support;
 
 use App\Enums\NavigationGroup;
+use App\Support\Concerns\HasNav;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Illuminate\Contracts\Support\Htmlable;
@@ -182,7 +183,7 @@ final class Nav
      */
     private static function getRawGroupValue(string $resource): mixed
     {
-        if (method_exists($resource, 'getNavigationGroup')) {
+        if (! self::resourceUsesNavTrait($resource) && method_exists($resource, 'getNavigationGroup')) {
             try {
                 $group = $resource::getNavigationGroup();
 
@@ -204,7 +205,7 @@ final class Nav
      */
     private static function resolveIcon(string $resource): BackedEnum|Htmlable|string|null
     {
-        if (method_exists($resource, 'getNavigationIcon')) {
+        if (! self::resourceUsesNavTrait($resource) && method_exists($resource, 'getNavigationIcon')) {
             try {
                 $icon = $resource::getNavigationIcon();
 
@@ -226,7 +227,7 @@ final class Nav
      */
     private static function resolveSort(string $resource): ?int
     {
-        if (method_exists($resource, 'getNavigationSort')) {
+        if (! self::resourceUsesNavTrait($resource) && method_exists($resource, 'getNavigationSort')) {
             try {
                 $sort = $resource::getNavigationSort();
 
@@ -347,6 +348,19 @@ final class Nav
         }
 
         return self::FALLBACK_GROUP_DEFINITIONS[$group]['sort'] ?? null;
+    }
+
+    /**
+     * Determine whether the resource proxies navigation metadata through the HasNav trait.
+     * When the trait is present we must avoid calling the static accessors directly to
+     * prevent infinite recursion (`Nav::groupForResource()` would otherwise re-enter here).
+     */
+    private static function resourceUsesNavTrait(string $resource): bool
+    {
+        /** @var array<int, class-string> $traits */
+        $traits = class_uses_recursive($resource);
+
+        return in_array(HasNav::class, $traits, true);
     }
 
     /**
