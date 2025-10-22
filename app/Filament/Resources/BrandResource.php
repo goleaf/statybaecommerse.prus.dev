@@ -92,8 +92,15 @@ final class BrandResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
-            ->withoutGlobalScopes([EnabledScope::class, ActiveScope::class]);
+        $query = parent::getEloquentQuery();
+
+        // Explicitly strip the enabled and active visibility scopes so that
+        // diagnostic tooling operating through Filament can inspect every brand
+        // record regardless of the public storefront filters applied at the
+        // model level.
+        return $query
+            ->withoutGlobalScope(new EnabledScope())
+            ->withoutGlobalScope(new ActiveScope());
     }
 
     /**
