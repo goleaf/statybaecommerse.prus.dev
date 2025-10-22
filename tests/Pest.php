@@ -51,11 +51,16 @@ beforeEach(function () {
     }
 });
 
-function login($user = null)
-{
-    $user ??= \App\Models\User::factory()->create();
+if (! function_exists('login')) {
+    /**
+     * Log in a user for Pest tests while preventing duplicate helper declarations.
+     */
+    function login($user = null)
+    {
+        $user ??= \App\Models\User::factory()->create();
 
-    return test()->actingAs($user);
+        return test()->actingAs($user);
+    }
 }
 
 if (! function_exists('actingAs')) {
