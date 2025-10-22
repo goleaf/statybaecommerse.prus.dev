@@ -83,3 +83,15 @@ it('exposes product search results through the form component', function (string
     ProductRequestResource::class,
     WishlistItemResource::class,
 ]);
+
+it('exposes payload macros for standalone searchable inputs', function (): void {
+    $component = SearchableInput::make('standalone')
+        ->fallbackPayload(['id' => null, 'label' => ''])
+        ->payload(['id' => '42', 'label' => 'Standalone']);
+
+    expect($component->getPayload())->toBe(['id' => '42', 'label' => 'Standalone']);
+
+    $component->payload([]);
+
+    expect($component->getPayload())->toBe([]);
+});
