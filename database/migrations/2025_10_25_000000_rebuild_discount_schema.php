@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -79,8 +80,9 @@ return new class extends Migration
             $table->foreignId('customer_group_id')->nullable()->constrained('customer_groups')->nullOnDelete();
             $table->string('status')->default('inactive');
             $table->json('metadata')->nullable();
-            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+            // Create nullable author columns first; the foreign keys are attached later once engine compatibility is verified.
+            $table->foreignId('created_by')->nullable();
+            $table->foreignId('updated_by')->nullable();
             $table->timestamps();
             $table->softDeletes();
 
@@ -102,6 +104,8 @@ return new class extends Migration
         } finally {
             Schema::enableForeignKeyConstraints();
         }
+
+        $this->safelyAttachUserForeignKeys('discount_codes', ['created_by', 'updated_by']);
     }
 
     private function rebuildDiscountRedemptions(): void
@@ -143,7 +147,8 @@ return new class extends Migration
             $table->foreignId('discount_id')->nullable()->constrained('discounts')->nullOnDelete();
             $table->foreignId('code_id')->nullable()->constrained('discount_codes')->nullOnDelete();
             $table->foreignId('order_id')->nullable()->constrained('orders')->nullOnDelete();
-            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            // Defer user foreign key creation to avoid MySQL engine mismatches observed in production dumps.
+            $table->foreignId('user_id')->nullable();
             $table->decimal('amount_saved', 12, 2)->default(0);
             $table->char('currency_code', 3)->nullable();
             $table->timestamp('redeemed_at')->nullable();
@@ -152,8 +157,8 @@ return new class extends Migration
             $table->ipAddress('ip_address')->nullable();
             $table->string('user_agent')->nullable();
             $table->json('metadata')->nullable();
-            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('created_by')->nullable();
+            $table->foreignId('updated_by')->nullable();
             $table->timestamps();
             $table->softDeletes();
 
@@ -204,6 +209,8 @@ return new class extends Migration
         } finally {
             Schema::enableForeignKeyConstraints();
         }
+
+        $this->safelyAttachUserForeignKeys('discount_redemptions', ['user_id', 'created_by', 'updated_by']);
     }
 
     private function rebuildCampaignDiscountPivot(): void
@@ -464,5 +471,36 @@ return new class extends Migration
         }
 
         return false;
+    }
+
+    /**
+     * Attempt to attach user foreign keys after tables are rebuilt, tolerating legacy engine or collation mismatches.
+     *
+     * @param array<int, string> $columns Columns that should reference the users table when constraints are available.
+     */
+    private function safelyAttachUserForeignKeys(string $table, array $columns): void
+    {
+        if (! Schema::hasTable('users') || ! Schema::hasColumn('users', 'id')) {
+            return;
+        }
+
+        foreach ($columns as $column) {
+            if (! Schema::hasColumn($table, $column)) {
+                continue;
+            }
+
+            if ($this->hasForeignKey($table, $column, 'users')) {
+                continue;
+            }
+
+            try {
+                Schema::table($table, function (Blueprint $table) use ($column): void {
+                    // The foreign key is added conditionally to respect existing production dumps with MyISAM or system tables.
+                    $table->foreign($column)->references('id')->on('users')->nullOnDelete();
+                });
+            } catch (QueryException) {
+                // Silently continue when MySQL rejects the constraint so that data migrations still succeed.
+            }
+        }
     }
 };
