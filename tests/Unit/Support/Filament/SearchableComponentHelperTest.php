@@ -4,10 +4,29 @@ declare(strict_types=1);
 
 use App\Support\Filament\SearchableComponentHelper;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Filament\Schemas\Schema;
+use Tests\Fixtures\FakeFilamentComponent;
+
+/**
+ * Helper to bootstrap standalone SearchableInput instances with a fake Filament container.
+ */
+function attachFakeFilamentContainer(SearchableInput $component): void
+{
+    // Attach the component to a lightweight schema so the typed container/livewire
+    // dependencies introduced in Filament v4 are initialised for unit testing.
+    $schema = Schema::make(new FakeFilamentComponent())
+        ->schema([
+            $component,
+        ]);
+
+    // Trigger component evaluation which applies the container relationship.
+    $schema->getComponents();
+}
 
 it('hydrates the searchable component with the canonical payload tuple', function (): void {
     // Arrange: prime the component with a fake record that exposes metadata.
     $component = SearchableInput::make('product_id');
+    attachFakeFilamentContainer($component);
 
     SearchableComponentHelper::hydrate(
         $component,
@@ -41,6 +60,7 @@ it('hydrates the searchable component with the canonical payload tuple', functio
 it('synchronises identifiers and payload metadata when selections change', function (): void {
     // Arrange: mimic Filament\Forms\Set with a closure capturing field updates.
     $component = SearchableInput::make('product_id');
+    attachFakeFilamentContainer($component);
     $fields = [
         'product_id'      => null,
         'product_payload' => ['id' => null, 'label' => '', 'sku' => null],
