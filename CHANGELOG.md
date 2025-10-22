@@ -6,6 +6,10 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 
 ## [Unreleased]
 
+### Bug Fixes
+* Normalized API validation problem responses to always include a fallback English reason alongside the localized message list so integrators receive consistent messaging even when the initial validation ran before locale negotiation completed.
+* Ensured forbidden problem responses raised through `AccessDeniedHttpException` retain the explicit denial reason in the error context, mirroring the structure used for authorization exceptions and keeping client-side handlers uniform.
+
 ### Enhancements
 * Optimized the storefront autocomplete pipeline by trimming and caching queries, reusing injected services, and exposing sanitized highlight metadata so the dropdown renders without raw `<mark>` tags while delivering faster product, brand, and category lookups.
 * Hardened HTML sanitization by removing entire `<script>`, `<style>`, and `<template>` elements instead of unwrapping them, blocking executable payloads from surfacing in storefront or admin renders while keeping safe markup intact.
