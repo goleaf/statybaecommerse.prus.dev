@@ -35,65 +35,73 @@ final class AutocompleteService
 
     private const MAX_LIMIT = 50;
 
+    public function __construct(
+        private readonly SearchCacheService $cacheService,
+        private readonly SearchHighlightingService $highlightingService,
+    ) {
+        // Dependencies are injected so we avoid resolving them repeatedly during hot search paths.
+    }
+
     /**
      * Handle search functionality with proper error handling.
      */
     public function search(string $query, int $limit = self::DEFAULT_LIMIT, array $types = []): array
     {
         // Respect minimum length at the caller level (LiveSearch component). Allow 1-char searches here.
-        if (strlen($query) < 1) {
+        $normalizedQuery = trim($query);
+
+        if ($normalizedQuery === '') {
             return [];
         }
 
         $startTime = microtime(true);
-        $cacheKey = $this->generateCacheKey($query, $limit, $types);
+        $cacheKey = $this->generateCacheKey($normalizedQuery, $limit, $types);
 
         // Try to get from intelligent cache first
-        $cacheService = app(\App\Services\SearchCacheService::class);
-        $results = $cacheService->getCachedResults($cacheKey);
+        $results = $this->cacheService->getCachedResults($cacheKey);
 
         if ($results === null) {
-            $results = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit, $types) {
+            $results = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($normalizedQuery, $limit, $types) {
                 $results = [];
                 $locale = app()->getLocale();
                 // If no specific types requested, search all
-                if (empty($types)) {
-                    $types = ['products', 'categories', 'brands', 'collections', 'attributes'];
-                }
+                $resolvedTypes = empty($types)
+                    ? ['products', 'categories', 'brands', 'collections', 'attributes']
+                    : $types;
                 // Calculate limits for each type based on total limit
-                $typeLimits = $this->calculateTypeLimits($types, $limit);
+                $typeLimits = $this->calculateTypeLimits($resolvedTypes, $limit);
                 // Search each type
-                foreach ($types as $type) {
+                foreach ($resolvedTypes as $type) {
                     $typeLimit = $typeLimits[$type] ?? 0;
                     if ($typeLimit > 0) {
-                        $typeResults = $this->searchByType($type, $query, $typeLimit, $locale);
+                        $typeResults = $this->searchByType($type, $normalizedQuery, $typeLimit, $locale);
                         $results = array_merge($results, $typeResults);
                     }
                 }
 
                 // Sort by relevance and limit final results
-                return $this->sortByRelevance($results, $query, $limit);
+                return $this->sortByRelevance($results, $normalizedQuery, $limit);
             });
 
             // Store in intelligent cache
             $context = [
                 'user_id' => auth()->id(),
-                'types' => $types,
+                'types' => empty($types) ? ['products', 'categories', 'brands', 'collections', 'attributes'] : $types,
                 'limit' => $limit,
             ];
-            $cacheService->cacheSearchResults($cacheKey, $results, $query, $context);
+            $this->cacheService->cacheSearchResults($cacheKey, $results, $normalizedQuery, $context);
         }
 
         $executionTime = microtime(true) - $startTime;
 
         // Track search analytics
-        $this->trackSearchAnalytics($query, count($results));
+        $this->trackSearchAnalytics($normalizedQuery, count($results));
 
         // Track performance metrics
-        $this->trackSearchPerformance($query, $executionTime, count($results), implode(',', $types));
+        $this->trackSearchPerformance($normalizedQuery, $executionTime, count($results), implode(',', $types));
 
         // Apply search highlighting
-        $results = $this->applySearchHighlighting($results, $query);
+        $results = $this->applySearchHighlighting($results, $normalizedQuery);
 
         return $results;
     }
@@ -103,11 +111,17 @@ final class AutocompleteService
      */
     public function searchProducts(string $query, int $limit = self::DEFAULT_LIMIT): array
     {
-        $cacheKey = "autocomplete_products_{$query}_{$limit}_".app()->getLocale();
+        $normalizedQuery = trim($query);
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit) {
+        if ($normalizedQuery === '') {
+            return [];
+        }
+
+        $cacheKey = "autocomplete_products_{$normalizedQuery}_{$limit}_".app()->getLocale();
+
+        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($normalizedQuery, $limit) {
             $locale = app()->getLocale();
-            $searchTerm = $this->prepareSearchTerm($query);
+            $searchTerm = $this->prepareSearchTerm($normalizedQuery);
             $products = Product::query()->with(['media', 'brand', 'categories', 'variants'])->where('is_visible', true)->whereNotNull('published_at')->where('published_at', '<=', now())->where(function ($q) use ($searchTerm, $locale) {
                 // Exact match (highest priority)
                 $q->where('name', 'like', $searchTerm)->orWhere('sku', 'like', $searchTerm)->orWhere('description', 'like', $searchTerm)->orWhereHas('brand', function ($brandQuery) use ($searchTerm) {
@@ -119,13 +133,13 @@ final class AutocompleteService
                         $tw->where('t.name', 'like', $searchTerm)->orWhere('t.description', 'like', $searchTerm);
                     });
                 });
-            })->orderByRaw("\n                    CASE \n                        WHEN name LIKE ? THEN 1\n                        WHEN sku LIKE ? THEN 2\n                        WHEN description LIKE ? THEN 3\n                        ELSE 4\n                    END\n                ", ["%{$query}%", "%{$query}%", "%{$query}%"])->limit($limit)->cursor()->takeUntilTimeout(now()->addSeconds(5))->collect();
+            })->orderByRaw("\n                    CASE \n                        WHEN name LIKE ? THEN 1\n                        WHEN sku LIKE ? THEN 2\n                        WHEN description LIKE ? THEN 3\n                        ELSE 4\n                    END\n                ", [$searchTerm, $searchTerm, $searchTerm])->limit($limit)->cursor()->takeUntilTimeout(now()->addSeconds(5))->collect();
 
-            return Arr::from($products->skipWhile(function (Product $product) {
-                // Skip products that are not properly configured or have missing essential data
-                return empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug);
-            })->map(function (Product $product) use ($query, $locale) {
-                return ['id' => $product->id, 'type' => 'product', 'title' => $product->getTranslatedName($locale), 'subtitle' => $product->brand?->name, 'description' => Str::limit($product->getTranslatedDescription($locale), 100), 'url' => route('localized.products.show', ['locale' => $locale, 'product' => $product->slug]), 'image' => $product->getFirstMediaUrl('images', 'thumb'), 'price' => $product->getPrice(), 'formatted_price' => $product->getFormattedPrice(), 'sku' => $product->sku, 'in_stock' => $product->isInStock(), 'relevance_score' => $this->calculateRelevanceScore($product->getTranslatedName($locale), $query)];
+                return Arr::from($products->skipWhile(function (Product $product) {
+                    // Skip products that are not properly configured or have missing essential data
+                    return empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug);
+            })->map(function (Product $product) use ($normalizedQuery, $locale) {
+                return ['id' => $product->id, 'type' => 'product', 'title' => $product->getTranslatedName($locale), 'subtitle' => $product->brand?->name, 'description' => Str::limit($product->getTranslatedDescription($locale), 100), 'url' => route('localized.products.show', ['locale' => $locale, 'product' => $product->slug]), 'image' => $product->getFirstMediaUrl('images', 'thumb'), 'price' => $product->getPrice(), 'formatted_price' => $product->getFormattedPrice(), 'sku' => $product->sku, 'in_stock' => $product->isInStock(), 'relevance_score' => $this->calculateRelevanceScore($product->getTranslatedName($locale), $normalizedQuery)];
             }));
         });
     }
@@ -135,23 +149,48 @@ final class AutocompleteService
      */
     public function searchCategories(string $query, int $limit = self::DEFAULT_LIMIT): array
     {
-        $cacheKey = "autocomplete_categories_{$query}_{$limit}_".app()->getLocale();
+        $normalizedQuery = trim($query);
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit) {
+        if ($normalizedQuery === '') {
+            return [];
+        }
+
+        $cacheKey = "autocomplete_categories_{$normalizedQuery}_{$limit}_".app()->getLocale();
+
+        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($normalizedQuery, $limit) {
             $locale = app()->getLocale();
-            $searchTerm = $this->prepareSearchTerm($query);
-            $categories = Category::query()->with(['parent', 'children', 'media'])->where('is_visible', true)->where(function ($q) use ($searchTerm, $locale) {
-                $q->where('name', 'like', $searchTerm)->orWhere('description', 'like', $searchTerm)->orWhereExists(function ($sq) use ($searchTerm, $locale) {
-                    $sq->selectRaw('1')->from('category_translations as t')->whereColumn('t.category_id', 'categories.id')->where('t.locale', $locale)->where(function ($tw) use ($searchTerm) {
-                        $tw->where('t.name', 'like', $searchTerm)->orWhere('t.description', 'like', $searchTerm);
-                    });
-                });
-            })->orderByRaw("\n                    CASE \n                        WHEN name LIKE ? THEN 1\n                        WHEN description LIKE ? THEN 2\n                        ELSE 3\n                    END\n                ", ["%{$query}%", "%{$query}%"])->limit($limit)->cursor()->takeUntilTimeout(now()->addSeconds(5))->collect();
+            $searchTerm = $this->prepareSearchTerm($normalizedQuery);
+            $categories = Category::query()
+                ->with(['parent', 'media'])
+                ->withCount(['products', 'children'])
+                ->where('is_visible', true)
+                ->where(function ($q) use ($searchTerm, $locale) {
+                    $q->where('name', 'like', $searchTerm)
+                        ->orWhere('description', 'like', $searchTerm)
+                        ->orWhereExists(function ($sq) use ($searchTerm, $locale) {
+                            $sq->selectRaw('1')
+                                ->from('category_translations as t')
+                                ->whereColumn('t.category_id', 'categories.id')
+                                ->where('t.locale', $locale)
+                                ->where(function ($tw) use ($searchTerm) {
+                                    $tw->where('t.name', 'like', $searchTerm)
+                                        ->orWhere('t.description', 'like', $searchTerm);
+                                });
+                        });
+                })
+                ->orderByRaw(
+                    "\n                    CASE \n                        WHEN name LIKE ? THEN 1\n                        WHEN description LIKE ? THEN 2\n                        ELSE 3\n                    END\n                ",
+                    [$searchTerm, $searchTerm]
+                )
+                ->limit($limit)
+                ->cursor()
+                ->takeUntilTimeout(now()->addSeconds(5))
+                ->collect();
 
             return Arr::from($categories->skipWhile(function (Category $category) {
                 // Skip categories that are not properly configured or have missing essential data
                 return empty($category->name) || ! $category->is_visible || empty($category->slug);
-            })->map(function (Category $category) use ($query, $locale) {
+            })->map(function (Category $category) use ($normalizedQuery, $locale) {
                 $title = method_exists($category, 'getTranslatedName') ? $category->getTranslatedName($locale) : ($category->name ?? '');
                 $subtitle = $category->parent ? (method_exists($category->parent, 'getTranslatedName') ? $category->parent->getTranslatedName($locale) : ($category->parent->name ?? null)) : null;
                 $description = method_exists($category, 'getTranslatedDescription') ? $category->getTranslatedDescription($locale) : ($category->description ?? '');
@@ -165,9 +204,9 @@ final class AutocompleteService
                     'description' => Str::limit($description, 100),
                     'url' => $url,
                     'image' => $category->getFirstMediaUrl('images', 'thumb'),
-                    'products_count' => $category->products()->count(),
-                    'children_count' => $category->children()->count(),
-                    'relevance_score' => $this->calculateRelevanceScore($title, $query),
+                    'products_count' => (int) ($category->products_count ?? 0),
+                    'children_count' => (int) ($category->children_count ?? 0),
+                    'relevance_score' => $this->calculateRelevanceScore($title, $normalizedQuery),
                 ];
             }));
         });
@@ -178,23 +217,48 @@ final class AutocompleteService
      */
     public function searchBrands(string $query, int $limit = self::DEFAULT_LIMIT): array
     {
-        $cacheKey = "autocomplete_brands_{$query}_{$limit}_".app()->getLocale();
+        $normalizedQuery = trim($query);
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit) {
+        if ($normalizedQuery === '') {
+            return [];
+        }
+
+        $cacheKey = "autocomplete_brands_{$normalizedQuery}_{$limit}_".app()->getLocale();
+
+        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($normalizedQuery, $limit) {
             $locale = app()->getLocale();
-            $searchTerm = $this->prepareSearchTerm($query);
-            $brands = Brand::query()->with(['media'])->where('is_visible', true)->where(function ($q) use ($searchTerm, $locale) {
-                $q->where('name', 'like', $searchTerm)->orWhere('description', 'like', $searchTerm)->orWhereExists(function ($sq) use ($searchTerm, $locale) {
-                    $sq->selectRaw('1')->from('brand_translations as t')->whereColumn('t.brand_id', 'brands.id')->where('t.locale', $locale)->where(function ($tw) use ($searchTerm) {
-                        $tw->where('t.name', 'like', $searchTerm)->orWhere('t.description', 'like', $searchTerm);
-                    });
-                });
-            })->orderByRaw("\n                    CASE \n                        WHEN name LIKE ? THEN 1\n                        WHEN description LIKE ? THEN 2\n                        ELSE 3\n                    END\n                ", ["%{$query}%", "%{$query}%"])->limit($limit)->cursor()->takeUntilTimeout(now()->addSeconds(5))->collect();
+            $searchTerm = $this->prepareSearchTerm($normalizedQuery);
+            $brands = Brand::query()
+                ->with(['media'])
+                ->withCount(['products'])
+                ->where('is_visible', true)
+                ->where(function ($q) use ($searchTerm, $locale) {
+                    $q->where('name', 'like', $searchTerm)
+                        ->orWhere('description', 'like', $searchTerm)
+                        ->orWhereExists(function ($sq) use ($searchTerm, $locale) {
+                            $sq->selectRaw('1')
+                                ->from('brand_translations as t')
+                                ->whereColumn('t.brand_id', 'brands.id')
+                                ->where('t.locale', $locale)
+                                ->where(function ($tw) use ($searchTerm) {
+                                    $tw->where('t.name', 'like', $searchTerm)
+                                        ->orWhere('t.description', 'like', $searchTerm);
+                                });
+                        });
+                })
+                ->orderByRaw(
+                    "\n                    CASE \n                        WHEN name LIKE ? THEN 1\n                        WHEN description LIKE ? THEN 2\n                        ELSE 3\n                    END\n                ",
+                    [$searchTerm, $searchTerm]
+                )
+                ->limit($limit)
+                ->cursor()
+                ->takeUntilTimeout(now()->addSeconds(5))
+                ->collect();
 
             return Arr::from($brands->skipWhile(function (Brand $brand) {
                 // Skip brands that are not properly configured or have missing essential data
                 return empty($brand->name) || ! $brand->is_visible || empty($brand->slug);
-            })->map(function (Brand $brand) use ($query, $locale) {
+            })->map(function (Brand $brand) use ($normalizedQuery, $locale) {
                 $title = method_exists($brand, 'getTranslatedName') ? $brand->getTranslatedName($locale) : ($brand->name ?? '');
                 $description = method_exists($brand, 'getTranslatedDescription') ? $brand->getTranslatedDescription($locale) : ($brand->description ?? '');
                 $url = Route::has('localized.brand.show') ? route('localized.brand.show', ['locale' => $locale, 'brand' => $brand->slug]) : url('/brand/'.$brand->slug);
@@ -207,8 +271,8 @@ final class AutocompleteService
                     'description' => Str::limit($description, 100),
                     'url' => $url,
                     'image' => $brand->getFirstMediaUrl('images', 'thumb'),
-                    'products_count' => $brand->products()->count(),
-                    'relevance_score' => $this->calculateRelevanceScore($title, $query),
+                    'products_count' => (int) ($brand->products_count ?? 0),
+                    'relevance_score' => $this->calculateRelevanceScore($title, $normalizedQuery),
                 ];
             }));
         });
@@ -219,24 +283,59 @@ final class AutocompleteService
      */
     public function searchCollections(string $query, int $limit = self::DEFAULT_LIMIT): array
     {
-        $cacheKey = "autocomplete_collections_{$query}_{$limit}_".app()->getLocale();
+        $normalizedQuery = trim($query);
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit) {
+        if ($normalizedQuery === '') {
+            return [];
+        }
+
+        $cacheKey = "autocomplete_collections_{$normalizedQuery}_{$limit}_".app()->getLocale();
+
+        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($normalizedQuery, $limit) {
             $locale = app()->getLocale();
-            $searchTerm = $this->prepareSearchTerm($query);
-            $collections = Collection::query()->with(['media'])->where('is_visible', true)->where(function ($q) use ($searchTerm, $locale) {
-                $q->where('name', 'like', $searchTerm)->orWhere('description', 'like', $searchTerm)->orWhereExists(function ($sq) use ($searchTerm, $locale) {
-                    $sq->selectRaw('1')->from('collection_translations as t')->whereColumn('t.collection_id', 'collections.id')->where('t.locale', $locale)->where(function ($tw) use ($searchTerm) {
-                        $tw->where('t.name', 'like', $searchTerm)->orWhere('t.description', 'like', $searchTerm);
-                    });
-                });
-            })->orderByRaw("\n                    CASE \n                        WHEN name LIKE ? THEN 1\n                        WHEN description LIKE ? THEN 2\n                        ELSE 3\n                    END\n                ", ["%{$query}%", "%{$query}%"])->limit($limit)->cursor()->takeUntilTimeout(now()->addSeconds(5))->collect();
+            $searchTerm = $this->prepareSearchTerm($normalizedQuery);
+            $collections = Collection::query()
+                ->with(['media'])
+                ->withCount(['products'])
+                ->where('is_visible', true)
+                ->where(function ($q) use ($searchTerm, $locale) {
+                    $q->where('name', 'like', $searchTerm)
+                        ->orWhere('description', 'like', $searchTerm)
+                        ->orWhereExists(function ($sq) use ($searchTerm, $locale) {
+                            $sq->selectRaw('1')
+                                ->from('collection_translations as t')
+                                ->whereColumn('t.collection_id', 'collections.id')
+                                ->where('t.locale', $locale)
+                                ->where(function ($tw) use ($searchTerm) {
+                                    $tw->where('t.name', 'like', $searchTerm)
+                                        ->orWhere('t.description', 'like', $searchTerm);
+                                });
+                        });
+                })
+                ->orderByRaw(
+                    "\n                    CASE \n                        WHEN name LIKE ? THEN 1\n                        WHEN description LIKE ? THEN 2\n                        ELSE 3\n                    END\n                ",
+                    [$searchTerm, $searchTerm]
+                )
+                ->limit($limit)
+                ->cursor()
+                ->takeUntilTimeout(now()->addSeconds(5))
+                ->collect();
 
             return Arr::from($collections->skipWhile(function (Collection $collection) {
                 // Skip collections that are not properly configured or have missing essential data
                 return empty($collection->name) || ! $collection->is_visible || empty($collection->slug);
-            })->map(function (Collection $collection) use ($query, $locale) {
-                return ['id' => $collection->id, 'type' => 'collection', 'title' => $collection->getTranslatedName($locale), 'subtitle' => $collection->is_automatic ? __('frontend.collection.automatic') : __('frontend.collection.manual'), 'description' => Str::limit($collection->getTranslatedDescription($locale), 100), 'url' => route('localized.collection.show', ['locale' => $locale, 'collection' => $collection->slug]), 'image' => $collection->getFirstMediaUrl('images', 'thumb'), 'products_count' => $collection->products()->count(), 'relevance_score' => $this->calculateRelevanceScore($collection->getTranslatedName($locale), $query)];
+            })->map(function (Collection $collection) use ($normalizedQuery, $locale) {
+                return [
+                    'id' => $collection->id,
+                    'type' => 'collection',
+                    'title' => $collection->getTranslatedName($locale),
+                    'subtitle' => $collection->is_automatic ? __('frontend.collection.automatic') : __('frontend.collection.manual'),
+                    'description' => Str::limit($collection->getTranslatedDescription($locale), 100),
+                    'url' => route('localized.collection.show', ['locale' => $locale, 'collection' => $collection->slug]),
+                    'image' => $collection->getFirstMediaUrl('images', 'thumb'),
+                    'products_count' => (int) ($collection->products_count ?? 0),
+                    'relevance_score' => $this->calculateRelevanceScore($collection->getTranslatedName($locale), $normalizedQuery),
+                ];
             }));
         });
     }
@@ -246,29 +345,72 @@ final class AutocompleteService
      */
     public function searchAttributes(string $query, int $limit = self::DEFAULT_LIMIT): array
     {
-        $cacheKey = "autocomplete_attributes_{$query}_{$limit}_".app()->getLocale();
+        $normalizedQuery = trim($query);
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit) {
+        if ($normalizedQuery === '') {
+            return [];
+        }
+
+        $cacheKey = "autocomplete_attributes_{$normalizedQuery}_{$limit}_".app()->getLocale();
+
+        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($normalizedQuery, $limit) {
             $locale = app()->getLocale();
-            $searchTerm = $this->prepareSearchTerm($query);
+            $searchTerm = $this->prepareSearchTerm($normalizedQuery);
             // Search attributes
-            $attributes = Attribute::query()->with(['values'])->where('is_visible', true)->where(function ($q) use ($searchTerm, $locale) {
-                $q->where('name', 'like', $searchTerm)->orWhere('description', 'like', $searchTerm)->orWhereExists(function ($sq) use ($searchTerm, $locale) {
-                    $sq->selectRaw('1')->from('attribute_translations as t')->whereColumn('t.attribute_id', 'attributes.id')->where('t.locale', $locale)->where(function ($tw) use ($searchTerm) {
-                        $tw->where('t.name', 'like', $searchTerm);
-                    });
-                });
-            })->limit($limit)->get();
+            $attributes = Attribute::query()
+                ->with(['values'])
+                ->withCount(['values'])
+                ->where('is_visible', true)
+                ->where(function ($q) use ($searchTerm, $locale) {
+                    $q->where('name', 'like', $searchTerm)
+                        ->orWhere('description', 'like', $searchTerm)
+                        ->orWhereExists(function ($sq) use ($searchTerm, $locale) {
+                            $sq->selectRaw('1')
+                                ->from('attribute_translations as t')
+                                ->whereColumn('t.attribute_id', 'attributes.id')
+                                ->where('t.locale', $locale)
+                                ->where(function ($tw) use ($searchTerm) {
+                                    $tw->where('t.name', 'like', $searchTerm);
+                                });
+                        });
+                })
+                ->limit($limit)
+                ->get();
             // Search attribute values
-            $attributeValues = AttributeValue::query()->with(['attribute'])->where('is_visible', true)->where('value', 'like', $searchTerm)->limit($limit)->get();
+            $attributeValues = AttributeValue::query()
+                ->with(['attribute'])
+                ->where('is_visible', true)
+                ->where('value', 'like', $searchTerm)
+                ->limit($limit)
+                ->get();
             $results = [];
             // Add attributes
             foreach ($attributes as $attribute) {
-                $results[] = ['id' => $attribute->id, 'type' => 'attribute', 'title' => $attribute->getTranslatedName($locale), 'subtitle' => $attribute->group_name, 'description' => Str::limit($attribute->getTranslatedDescription($locale), 100), 'url' => route('localized.attribute.show', ['locale' => $locale, 'attribute' => $attribute->slug]), 'image' => null, 'values_count' => $attribute->values()->count(), 'relevance_score' => $this->calculateRelevanceScore($attribute->getTranslatedName($locale), $query)];
+                $results[] = [
+                    'id' => $attribute->id,
+                    'type' => 'attribute',
+                    'title' => $attribute->getTranslatedName($locale),
+                    'subtitle' => $attribute->group_name,
+                    'description' => Str::limit($attribute->getTranslatedDescription($locale), 100),
+                    'url' => route('localized.attribute.show', ['locale' => $locale, 'attribute' => $attribute->slug]),
+                    'image' => null,
+                    'values_count' => (int) ($attribute->values_count ?? $attribute->values->count()),
+                    'relevance_score' => $this->calculateRelevanceScore($attribute->getTranslatedName($locale), $normalizedQuery),
+                ];
             }
             // Add attribute values
             foreach ($attributeValues as $value) {
-                $results[] = ['id' => $value->id, 'type' => 'attribute_value', 'title' => $value->getDisplayValue(), 'subtitle' => $value->attribute->getTranslatedName($locale), 'description' => Str::limit($value->getDisplayDescription(), 100), 'url' => route('localized.attribute.value.show', ['locale' => $locale, 'attribute' => $value->attribute->slug, 'value' => $value->id]), 'image' => null, 'color_code' => $value->color_code, 'relevance_score' => $this->calculateRelevanceScore($value->getDisplayValue(), $query)];
+                $results[] = [
+                    'id' => $value->id,
+                    'type' => 'attribute_value',
+                    'title' => $value->getDisplayValue(),
+                    'subtitle' => $value->attribute->getTranslatedName($locale),
+                    'description' => Str::limit($value->getDisplayDescription(), 100),
+                    'url' => route('localized.attribute.value.show', ['locale' => $locale, 'attribute' => $value->attribute->slug, 'value' => $value->id]),
+                    'image' => null,
+                    'color_code' => $value->color_code,
+                    'relevance_score' => $this->calculateRelevanceScore($value->getDisplayValue(), $normalizedQuery),
+                ];
             }
 
             return $results;
@@ -324,14 +466,16 @@ final class AutocompleteService
      */
     public function addToRecentSearches(string $query): void
     {
-        if (strlen($query) < 2) {
+        $normalizedQuery = trim($query);
+
+        if (strlen($normalizedQuery) < 2) {
             return;
         }
         $recentSearches = session('recent_searches', []);
         // Remove if already exists
-        $recentSearches = array_filter($recentSearches, fn ($term) => $term !== $query);
+        $recentSearches = array_filter($recentSearches, fn ($term) => $term !== $normalizedQuery);
         // Add to beginning
-        array_unshift($recentSearches, $query);
+        array_unshift($recentSearches, $normalizedQuery);
         // Keep only last 10 searches
         $recentSearches = array_slice($recentSearches, 0, 10);
         session(['recent_searches' => $recentSearches]);
@@ -478,10 +622,26 @@ final class AutocompleteService
      */
     private function applySearchHighlighting(array $results, string $query): array
     {
-        try {
-            $highlightingService = app(\App\Services\SearchHighlightingService::class);
+        if ($query === '') {
+            return $results;
+        }
 
-            return $highlightingService->highlightResults($results, $query, ['title', 'subtitle', 'description']);
+        try {
+            return array_map(function (array $result) use ($query) {
+                foreach (['title', 'subtitle', 'description'] as $field) {
+                    if (! isset($result[$field]) || ! is_string($result[$field]) || $result[$field] === '') {
+                        continue;
+                    }
+
+                    // Highlight the original field while keeping a plain-text variant for safe UI rendering.
+                    $highlightedRaw = $this->highlightingService->highlightSearchTerms($result[$field], $query);
+                    $highlighted = strip_tags($highlightedRaw, '<mark>');
+                    $result['highlighted_'.$field] = trim($highlighted);
+                    $result[$field] = trim(strip_tags($highlighted));
+                }
+
+                return $result;
+            }, $results);
         } catch (\Exception $e) {
             // Silently fail highlighting to not break search functionality
             \Log::warning('Search highlighting failed: '.$e->getMessage());
@@ -748,7 +908,7 @@ final class AutocompleteService
                         WHEN phone LIKE ? THEN 3
                         ELSE 4
                     END
-                ', ["%{$query}%", "%{$query}%", "%{$query}%"])
+                ', [$searchTerm, $searchTerm, $searchTerm])
                 ->limit($limit)
                 ->cursor()
                 ->takeUntilTimeout(now()->addSeconds(5))
@@ -803,7 +963,7 @@ final class AutocompleteService
                         WHEN postal_code LIKE ? THEN 3
                         ELSE 4
                     END
-                ', ["%{$query}%", "%{$query}%", "%{$query}%"])
+                ', [$searchTerm, $searchTerm, $searchTerm])
                 ->limit($limit)
                 ->cursor()
                 ->takeUntilTimeout(now()->addSeconds(5))
@@ -854,7 +1014,7 @@ final class AutocompleteService
                         WHEN city LIKE ? THEN 3
                         ELSE 4
                     END
-                ', ["%{$query}%", "%{$query}%", "%{$query}%"])
+                ', [$searchTerm, $searchTerm, $searchTerm])
                 ->limit($limit)
                 ->cursor()
                 ->takeUntilTimeout(now()->addSeconds(5))
@@ -904,7 +1064,7 @@ final class AutocompleteService
                         WHEN cca2 LIKE ? THEN 3
                         ELSE 4
                     END
-                ', ["%{$query}%", "%{$query}%", "%{$query}%"])
+                ', [$searchTerm, $searchTerm, $searchTerm])
                 ->limit($limit)
                 ->cursor()
                 ->takeUntilTimeout(now()->addSeconds(5))

@@ -152,9 +152,16 @@
                             
                             {{-- Result Content --}}
                             <div class="flex-1 min-w-0">
+                                @php
+                                    $titleHtml = $result['highlighted_title'] ?? e($result['title'] ?? '');
+                                    $subtitleHtml = $result['highlighted_subtitle'] ?? e($result['subtitle'] ?? '');
+                                    $descriptionText = $result['description'] ?? null;
+                                    $descriptionPreview = $descriptionText !== null ? Str::limit($descriptionText, 60) : null;
+                                @endphp
+
                                 <div class="flex items-center justify-between">
                                     <h3 class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                        {{ $result['title'] }}
+                                        {!! $titleHtml !!}
                                     </h3>
                                     @if(isset($result['formatted_price']))
                                         <span class="text-sm font-semibold text-blue-600 dark:text-blue-400">
@@ -162,16 +169,16 @@
                                         </span>
                                     @endif
                                 </div>
-                                
-                                @if($result['subtitle'])
+
+                                @if(! empty($result['subtitle']))
                                     <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                        {{ $result['subtitle'] }}
+                                        {!! $subtitleHtml !!}
                                     </p>
                                 @endif
-                                
-                                @if($result['description'])
+
+                                @if($descriptionPreview)
                                     <p class="text-xs text-gray-400 truncate dark:text-gray-500">
-                                        {{ Str::limit($result['description'], 60) }}
+                                        {{ $descriptionPreview }}
                                     </p>
                                 @endif
                                 
