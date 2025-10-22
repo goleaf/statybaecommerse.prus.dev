@@ -138,9 +138,10 @@ final class AdminPanelProvider extends PanelProvider
             ->when(app()->environment('testing'),
                 fn (Panel $p) => $p->plugins([]),
                 fn (Panel $p) => $p->plugins($this->configuredPlugins()))
-            // Enable the custom Filament theme so third-party plugin views (like the searchable input)
-            // are compiled with Tailwind during the build step.
-            ->viteTheme('resources/css/filament/admin/theme.css')
+            // Enable the custom Filament theme during normal execution, but fall back to the bundled app theme during tests to avoid Vite manifest lookups.
+            ->when(app()->environment('testing'),
+                fn (Panel $p) => $p->theme('app'),
+                fn (Panel $p) => $p->viteTheme('resources/css/filament/admin/theme.css'))
             ->spa();
     }
 

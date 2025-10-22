@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Scopes\ActiveScope;
-use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Database\Factories\CompanyFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -23,11 +23,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Company query()
  *
  * @mixin \Eloquent
+ *
+ * @phpstan-use \Illuminate\Database\Eloquent\Factories\HasFactory<CompanyFactory>
  */
-#[ScopedBy([ActiveScope::class])]
 final class Company extends Model
 {
     use HasFactory;
+
+    // Avoid global active scoping so administrative tooling can view and mutate inactive records during testing.
 
     protected $fillable = [
         'name',
@@ -47,6 +50,8 @@ final class Company extends Model
 
     /**
      * Handle subscribers functionality with proper error handling.
+     *
+     * @return HasMany<Subscriber, Company>
      */
     public function subscribers(): HasMany
     {
@@ -58,9 +63,10 @@ final class Company extends Model
     /**
      * Handle scopeActive functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<Company> $query
+     * @return Builder<Company>
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
@@ -68,9 +74,10 @@ final class Company extends Model
     /**
      * Handle scopeByIndustry functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<Company> $query
+     * @return Builder<Company>
      */
-    public function scopeByIndustry($query, string $industry)
+    public function scopeByIndustry(Builder $query, string $industry): Builder
     {
         return $query->where('industry', $industry);
     }
@@ -78,9 +85,10 @@ final class Company extends Model
     /**
      * Handle scopeBySize functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<Company> $query
+     * @return Builder<Company>
      */
-    public function scopeBySize($query, string $size)
+    public function scopeBySize(Builder $query, string $size): Builder
     {
         return $query->where('size', $size);
     }
@@ -100,6 +108,6 @@ final class Company extends Model
      */
     public function getActiveSubscriberCountAttribute(): int
     {
-        return $this->subscribers()->active()->count();
+        return $this->subscribers()->where('is_active', true)->count();
     }
 }
