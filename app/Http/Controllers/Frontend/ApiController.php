@@ -7,6 +7,9 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\PublishedScope;
+use App\Models\Scopes\VisibleScope;
 use App\Models\UserWishlist;
 use App\Models\WishlistItem;
 use App\Services\Cart\CartService;
@@ -101,9 +104,8 @@ final class ApiController extends Controller
         $productId = (int) $request->integer('product_id');
 
         if ($productId <= 0 || ! Product::query()
-            // The wishlist should accept products regardless of their publication state,
-            // so we bypass the usual storefront scopes during the existence check.
-            ->withoutGlobalScopes()
+            // Accept products regardless of storefront visibility but still respect soft-deletes.
+            ->withoutGlobalScopes([ActiveScope::class, PublishedScope::class, VisibleScope::class])
             ->whereKey($productId)
             ->exists()) {
             return response()->json(['error' => 'Product not found'], 404);
@@ -150,9 +152,8 @@ final class ApiController extends Controller
         $orderedIds = array_values(array_unique(array_slice($recentlyViewed, 0, 10)));
 
         $products = Product::query()
-            // Recently viewed products should surface even if they are drafts or hidden,
-            // therefore we intentionally bypass the storefront visibility scopes here.
-            ->withoutGlobalScopes()
+            // Surface even if drafts/hidden, but still exclude soft-deleted products.
+            ->withoutGlobalScopes([ActiveScope::class, PublishedScope::class, VisibleScope::class])
             ->whereIn('id', $orderedIds)
             ->get(['id'])
             ->sortBy(static function (Product $product) use ($orderedIds): int {
