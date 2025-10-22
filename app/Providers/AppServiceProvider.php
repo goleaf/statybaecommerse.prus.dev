@@ -17,6 +17,7 @@ use App\Models\SystemSetting;
 use App\Observers\UserAttributionObserver;
 use App\Services\DocumentService;
 use App\Support\Health\HealthReporter;
+use App\Support\Html\HtmlSanitizer;
 use App\Support\Storage\SecureStorage;
 use App\Support\Tracing\Trace;
 use App\Support\Tracing\TraceContext;
@@ -69,6 +70,9 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(HealthReporterContract::class, HealthReporter::class);
         $this->app->bind(DocumentServiceContract::class, DocumentService::class);
+
+        // Share a single sanitizer instance so every consumer reuses the same allow-list configuration.
+        $this->app->singleton(HtmlSanitizer::class, static fn (): HtmlSanitizer => new HtmlSanitizer());
 
         if ($this->app->runningInConsole()) {
             // Register import utilities and override the core db:seed command with a profiled variant.
