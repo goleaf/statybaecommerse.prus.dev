@@ -17,45 +17,45 @@ class CategoryFactory extends Factory
 
     private const PRESET_CATEGORIES = [
         'tools' => [
-            'name' => 'Elektriniai įrankiai',
-            'slug' => 'elektriniai-irankiai',
-            'description' => 'Profesionalūs elektriniai įrankiai statybos darbams.',
-            'seo_title' => 'Elektriniai įrankiai',
+            'name'            => 'Elektriniai įrankiai',
+            'slug'            => 'elektriniai-irankiai',
+            'description'     => 'Profesionalūs elektriniai įrankiai statybos darbams.',
+            'seo_title'       => 'Elektriniai įrankiai',
             'seo_description' => 'Platus elektrinių įrankių pasirinkimas profesionalams.',
         ],
         'fasteners' => [
-            'name' => 'Tvirtinimo elementai',
-            'slug' => 'tvirtinimo-elementai',
-            'description' => 'Varžtai, medsraigčiai ir kiti tvirtinimo elementai.',
-            'seo_title' => 'Tvirtinimo elementai',
+            'name'            => 'Tvirtinimo elementai',
+            'slug'            => 'tvirtinimo-elementai',
+            'description'     => 'Varžtai, medsraigčiai ir kiti tvirtinimo elementai.',
+            'seo_title'       => 'Tvirtinimo elementai',
             'seo_description' => 'Atraskite tvirtinimo elementus įvairiems projektams.',
         ],
         'safety' => [
-            'name' => 'Saugos priemonės',
-            'slug' => 'saugos-priemones',
-            'description' => 'Darbo saugos priemonės statyboms.',
-            'seo_title' => 'Saugos priemonės',
+            'name'            => 'Saugos priemonės',
+            'slug'            => 'saugos-priemones',
+            'description'     => 'Darbo saugos priemonės statyboms.',
+            'seo_title'       => 'Saugos priemonės',
             'seo_description' => 'Apsauginiai drabužiai, akiniai ir kitos saugos priemonės.',
         ],
         'power-tools' => [
-            'name' => 'Smūginiai perforatoriai',
-            'slug' => 'smuginiai-perforatoriai',
-            'description' => 'Profesionalūs perforatoriai betonui ir mūrijimui.',
-            'seo_title' => 'Smūginiai perforatoriai',
+            'name'            => 'Smūginiai perforatoriai',
+            'slug'            => 'smuginiai-perforatoriai',
+            'description'     => 'Profesionalūs perforatoriai betonui ir mūrijimui.',
+            'seo_title'       => 'Smūginiai perforatoriai',
             'seo_description' => 'Galingi smūginiai perforatoriai intensyviam darbui.',
         ],
         'hand-tools' => [
-            'name' => 'Rankiniai įrankiai',
-            'slug' => 'rankiniai-irankiai',
-            'description' => 'Kasdieniam darbui skirti rankiniai įrankiai.',
-            'seo_title' => 'Rankiniai įrankiai',
+            'name'            => 'Rankiniai įrankiai',
+            'slug'            => 'rankiniai-irankiai',
+            'description'     => 'Kasdieniam darbui skirti rankiniai įrankiai.',
+            'seo_title'       => 'Rankiniai įrankiai',
             'seo_description' => 'Rankinių įrankių pasirinkimas profesionalams ir mėgėjams.',
         ],
         'protective-gear' => [
-            'name' => 'Apsauginiai akiniai',
-            'slug' => 'apsauginiai-akiniai',
-            'description' => 'Apsauginiai akiniai darbui statybvietėje.',
-            'seo_title' => 'Apsauginiai akiniai',
+            'name'            => 'Apsauginiai akiniai',
+            'slug'            => 'apsauginiai-akiniai',
+            'description'     => 'Apsauginiai akiniai darbui statybvietėje.',
+            'seo_title'       => 'Apsauginiai akiniai',
             'seo_description' => 'Patikimi apsauginiai akiniai saugiam darbui.',
         ],
     ];
@@ -87,16 +87,18 @@ class CategoryFactory extends Factory
         ];
 
         $name = $this->faker->randomElement($lithuanianCategories);
+        $uniqueSuffix = $this->faker->unique()->numerify('###');
 
         return [
             'name' => $name,
-            'slug' => Str::slug($name),
-            'description' => $this->generateCategoryDescription($name),
-            'parent_id' => null, // Will be set by seeder for subcategories
-            'sort_order' => $this->faker->numberBetween(0, 100),
-            'is_visible' => true,
-            'seo_title' => $name.' - Profesionalūs sprendimai statybininkams',
-            'seo_description' => 'Platus '.strtolower($name).' asortimentas geriausiomis kainomis. Greitas pristatymas visoje Lietuvoje.',
+            // Append a short unique suffix to keep database constraints happy during dense factory usage.
+            'slug'            => Str::slug($name . '-' . $uniqueSuffix),
+            'description'     => $this->generateCategoryDescription($name),
+            'parent_id'       => null, // Will be set by seeder for subcategories
+            'sort_order'      => $this->faker->numberBetween(0, 100),
+            'is_visible'      => true,
+            'seo_title'       => $name . ' - Profesionalūs sprendimai statybininkams',
+            'seo_description' => 'Platus ' . strtolower($name) . ' asortimentas geriausiomis kainomis. Greitas pristatymas visoje Lietuvoje.',
         ];
     }
 
@@ -155,7 +157,7 @@ class CategoryFactory extends Factory
         $preset = self::PRESET_CATEGORIES[$key] ?? [];
 
         return array_merge([
-            'parent_id' => null,
+            'parent_id'  => null,
             'sort_order' => 0,
             'is_visible' => true,
         ], $preset);
