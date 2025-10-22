@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\DocumentTemplateCategory;
+use App\Enums\DocumentTemplateType;
 use App\Models\DocumentTemplate;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -17,23 +19,24 @@ class DocumentTemplateFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->words(3, true),
-            'slug' => fake()->unique()->slug(),
+            'name'        => fake()->words(3, true),
+            'slug'        => fake()->unique()->slug(),
             'description' => fake()->sentence(10),
-            'content' => fake()->randomHtml(3, 5),
-            'variables' => [
+            'content'     => fake()->randomHtml(3, 5),
+            'variables'   => [
                 'customer_name' => 'Customer Name',
-                'order_number' => 'Order Number',
-                'total_amount' => 'Total Amount',
+                'order_number'  => 'Order Number',
+                'total_amount'  => 'Total Amount',
             ],
-            'type' => fake()->randomElement(['invoice', 'receipt', 'quote', 'contract', 'report']),
-            'category' => fake()->randomElement(['financial', 'legal', 'marketing', 'operational']),
+            'type'     => fake()->randomElement(DocumentTemplateType::cases())->value,
+            'category' => fake()->randomElement(DocumentTemplateCategory::cases())->value,
             'settings' => [
                 'header_enabled' => fake()->boolean(),
                 'footer_enabled' => fake()->boolean(),
-                'watermark' => fake()->boolean(),
+                'watermark'      => fake()->boolean(),
             ],
-            'is_active' => fake()->boolean(80),
+            // Default to active so admin CRUD flows and tests consistently surface the record.
+            'is_active' => true,
         ];
     }
 
@@ -54,40 +57,40 @@ class DocumentTemplateFactory extends Factory
     public function invoice(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'invoice',
-            'category' => 'financial',
+            'type'     => DocumentTemplateType::Invoice->value,
+            'category' => DocumentTemplateCategory::Financial->value,
         ]);
     }
 
     public function receipt(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'receipt',
-            'category' => 'financial',
+            'type'     => DocumentTemplateType::Receipt->value,
+            'category' => DocumentTemplateCategory::Financial->value,
         ]);
     }
 
     public function quote(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'quote',
-            'category' => 'marketing',
+            'type'     => DocumentTemplateType::Quote->value,
+            'category' => DocumentTemplateCategory::Marketing->value,
         ]);
     }
 
     public function contract(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'contract',
-            'category' => 'legal',
+            'type'     => DocumentTemplateType::Contract->value,
+            'category' => DocumentTemplateCategory::Legal->value,
         ]);
     }
 
     public function report(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'report',
-            'category' => 'operational',
+            'type'     => DocumentTemplateType::Report->value,
+            'category' => DocumentTemplateCategory::Technical->value,
         ]);
     }
 }
