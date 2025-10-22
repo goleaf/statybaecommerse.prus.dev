@@ -84,6 +84,11 @@ jobs:
             await commentIssue(1035, "Verify sequencing after other workflow merges and ensure CI is green. Merge once CI passes.");
             await commentIssue(1045, "OK once Schema-signature PRs are closed so the suite runs. Merge after closures.");
 
+            // Attempt merges for small-fix PRs as well; if conditions aren't met, this will no-op or error harmlessly.
+            for (const n of [1035, 1045]) {
+              await mergePR(n);
+            }
+
             // 4) Keep open — targeted follow-ups
             await commentIssue(1031, "Hooks source the env twice causing early exits. Source once and chain commands (set -euo pipefail; . \"$(dirname \"$0\")/_/husky.sh\"; cmd1 && cmd2).");
             await commentIssue(1011, "Relax overly narrow types so existing resources compile; add one integration test.");
