@@ -19,6 +19,10 @@ python main.py
 pytest test_main.py
 ```
 
+### Recent Maintenance
+
+- Autocomplete selects in the Filament admin now bypass model-level global scopes when searching so freshly created products and supporting records appear immediately in the dropdown suggestions.
+
 ## What it is
 A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing construction-product catalogues, analytics, and operations for statybaecommerse.prus.dev. The repository ships extensive Filament resources, analytics dashboards, and seeders so you can explore the platform locally without extra setup.
 
