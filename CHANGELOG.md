@@ -21,6 +21,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Fixed the custom Filament edit profile page to import the correct Schema class, eliminating fatal compatibility errors during automated tests.
 * Normalized Filament navigation icons and groups across pages, resources, relation managers, and widgets to use the BackedEnum-/UnitEnum-aware union types required by Filament v4 so composer installs no longer crash on PHP 8.3.
 * Captured the Oct 21–22, 2025 pull request triage results in `docs/analysis/CURRENT_SYSTEM_STATUS.md`, outlining merge-ready Husky and feature flag fixes, superseded Filament cleanups to close, and outstanding follow-up work so maintainers can act without revisiting GitHub filters.
+* Updated the test harness configuration to respect the configured database connection so PHPUnit now boots against the shared `database/database.sqlite` datastore by default while remaining overridable for contributors who prefer in-memory runs.
 * Captured a repository-wide analysis summary that enumerates the 24 open pull requests, clustering the Filament Schema migrations, Husky shim fixes, and layered rate-limiting work so reviewers can triage without scraping the GitHub UI.
 * Documented the open security hardening proposal from PR #289 covering layered API rate limits, per-identity throttling buckets, and correlation-aware logging so stakeholders can track the pending review scope from within the repository knowledge base.
 * Migrated Filament resources, relation managers, custom pages, and widgets to the v4 Schema API while normalizing navigation icon docblocks so BackedEnum-powered metadata stays compatible with upstream traits (#1070).
@@ -45,6 +46,8 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Introduced a reusable HTML sanitization pipeline with a maintenance command, model hooks, and storefront renderer updates to harden product and legal content.
 
 ### Bug Fixes
+* Added the missing coupon schema columns (maximum discount caps, per-user limits, and scoped product/category JSON fields) so Laravel migrations and factories align, restoring the API coupon application test suite.
+* Rounded coupon discount calculations inside the application service to prevent `Number::parseFloat` type errors when returning pricing payloads during checkout flows.
 - Restored the application exception handler so requests and artisan commands stop crashing with `Whoops\\Run::handleShutdown()` when Laravel bootstraps without the class.
 * Stabilized the SQLite-powered test bootstrap by forcing an on-disk database, guarding factories against optional columns, and eliminating the `no such table: users` regression that blocked the user attribution observer suite.
 * Stabilized analytics event tracking by skipping the user-owned scope in console contexts, gracefully handling missing request/session data, enriching event type listings, and returning float-safe stats so regression suites can assert conversions reliably.
