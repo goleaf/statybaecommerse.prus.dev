@@ -7,6 +7,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Bug Fixes
+* Restored the dashboard permission guard to default to open access when no abilities are configured and aligned inline sparkline widgets with Filament's nullable model contract, clearing the latest unit test regressions around navigation metadata and dataset checksums.
 * Replaced the CampaignCustomerSegment global ActiveScope with targeted query helpers so unit tests can fetch inactive records while dashboards retain expressive filters for campaign, type, and group segmentation.
 * Removed the generic ActiveScope from campaign conversion analytics so status-
   filtered scopes (campaign, type, device, medium, etc.) once again return
