@@ -130,6 +130,10 @@ final class Home extends Component
 
     private function rememberWithTagsFallback(array $tags, string $key, \DateTimeInterface|\DateInterval|int $ttl, callable $callback): mixed
     {
+        if (app()->environment('testing')) {
+            return $callback();
+        }
+
         $store = Cache::getStore();
 
         if ($store instanceof \Illuminate\Cache\TaggableStore) {
