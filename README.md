@@ -16,6 +16,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Multilingual experience** across storefront and admin via `spatie/laravel-translatable`, Volt-powered Livewire pages, and localized seed data.
 
 ### Latest updates
+- Campaign click factories now guard optional relationships and lean on the dedicated SQLite test database configuration, eliminating the missing-table errors that previously interrupted the API listing regression suite.
 - Restored the missing `App\\Exceptions\\Handler` so Laravel can bootstrap without the fatal `Whoops\\Run::handleShutdown()` error that previously surfaced on every web request and artisan command.
 - Test runs now provision an on-disk SQLite database and guard customer group metadata seeding, eliminating the intermittent `no such table: users` failure encountered by the user attribution observer suite.
 - Shipping options now expose explicit zone relationships and fillable references, letting orders and delivery zones surface
