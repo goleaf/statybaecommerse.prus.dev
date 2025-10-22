@@ -12,15 +12,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * CampaignClick
  *
  * Eloquent model representing the CampaignClick entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property mixed $timestamps
- * @property mixed $table
- * @property mixed $fillable
+ * @property mixed  $timestamps
+ * @property mixed  $table
+ * @property mixed  $fillable
  * @property string $translationModel
  *
  * @method static \Illuminate\Database\Eloquent\Builder|CampaignClick newModelQuery()
@@ -49,6 +50,24 @@ final class CampaignClick extends Model
     }
 
     protected string $translationModel = \App\Models\Translations\CampaignClickTranslation::class;
+
+    /**
+     * Automatically populate the clicked_at timestamp when missing to satisfy database constraints.
+     */
+    protected static function booted(): void
+    {
+        self::creating(function (CampaignClick $click): void {
+            // Guarantee that persisted records always record when the click occurred.
+            if ($click->clicked_at === null) {
+                $click->clicked_at = Carbon::now();
+            }
+
+            // Ensure the monetary value gracefully defaults when no amount is provided by the UI.
+            if ($click->conversion_value === null) {
+                $click->conversion_value = 0.0;
+            }
+        });
+    }
 
     /**
      * Handle campaign functionality with proper error handling.
@@ -152,12 +171,12 @@ final class CampaignClick extends Model
     public function getClickTypeLabelAttribute(): string
     {
         return match ($this->click_type) {
-            'cta' => __('campaign_clicks.click_type.cta'),
+            'cta'    => __('campaign_clicks.click_type.cta'),
             'banner' => __('campaign_clicks.click_type.banner'),
-            'link' => __('campaign_clicks.click_type.link'),
+            'link'   => __('campaign_clicks.click_type.link'),
             'button' => __('campaign_clicks.click_type.button'),
-            'image' => __('campaign_clicks.click_type.image'),
-            default => __('campaign_clicks.click_type.unknown'),
+            'image'  => __('campaign_clicks.click_type.image'),
+            default  => __('campaign_clicks.click_type.unknown'),
         };
     }
 
@@ -168,9 +187,9 @@ final class CampaignClick extends Model
     {
         return match ($this->device_type) {
             'desktop' => __('campaign_clicks.device_type.desktop'),
-            'mobile' => __('campaign_clicks.device_type.mobile'),
-            'tablet' => __('campaign_clicks.device_type.tablet'),
-            default => __('campaign_clicks.device_type.unknown'),
+            'mobile'  => __('campaign_clicks.device_type.mobile'),
+            'tablet'  => __('campaign_clicks.device_type.tablet'),
+            default   => __('campaign_clicks.device_type.unknown'),
         };
     }
 
@@ -180,12 +199,12 @@ final class CampaignClick extends Model
     public function getBrowserLabelAttribute(): string
     {
         return match ($this->browser) {
-            'chrome' => __('campaign_clicks.browser.chrome'),
+            'chrome'  => __('campaign_clicks.browser.chrome'),
             'firefox' => __('campaign_clicks.browser.firefox'),
-            'safari' => __('campaign_clicks.browser.safari'),
-            'edge' => __('campaign_clicks.browser.edge'),
-            'opera' => __('campaign_clicks.browser.opera'),
-            default => $this->browser ?? __('campaign_clicks.browser.unknown'),
+            'safari'  => __('campaign_clicks.browser.safari'),
+            'edge'    => __('campaign_clicks.browser.edge'),
+            'opera'   => __('campaign_clicks.browser.opera'),
+            default   => $this->browser ?? __('campaign_clicks.browser.unknown'),
         };
     }
 
@@ -196,11 +215,11 @@ final class CampaignClick extends Model
     {
         return match ($this->os) {
             'windows' => __('campaign_clicks.os.windows'),
-            'macos' => __('campaign_clicks.os.macos'),
-            'linux' => __('campaign_clicks.os.linux'),
+            'macos'   => __('campaign_clicks.os.macos'),
+            'linux'   => __('campaign_clicks.os.linux'),
             'android' => __('campaign_clicks.os.android'),
-            'ios' => __('campaign_clicks.os.ios'),
-            default => $this->os ?? __('campaign_clicks.os.unknown'),
+            'ios'     => __('campaign_clicks.os.ios'),
+            default   => $this->os ?? __('campaign_clicks.os.unknown'),
         };
     }
 
