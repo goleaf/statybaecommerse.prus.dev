@@ -6,6 +6,7 @@ namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Concerns\InteractsWithTranslationTabs;
 use App\Filament\Resources\ProductResource;
+use App\Support\Html\HtmlSanitizer;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Str;
@@ -37,13 +38,13 @@ final class CreateProduct extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         [$data, $translations] = $this->extractTranslationsFromForm($data);
-        $this->languageTabsPayload = $translations;
+        $this->languageTabsPayload = $this->sanitizeTranslatablePayload($translations);
 
-        $data = $this->mutateMainDataWithDefaultLocale($data, $translations);
+        $data = $this->mutateMainDataWithDefaultLocale($data, $this->languageTabsPayload);
 
         $defaultLocale = $this->getDefaultLocale();
-        $defaultName = $translations[$defaultLocale]['name'] ?? $data['name'] ?? null;
-        $defaultSlug = $translations[$defaultLocale]['slug'] ?? null;
+        $defaultName = $this->languageTabsPayload[$defaultLocale]['name'] ?? $data['name'] ?? null;
+        $defaultSlug = $this->languageTabsPayload[$defaultLocale]['slug'] ?? null;
 
         if (blank($defaultSlug) && filled($defaultName)) {
             $slug = Str::slug($defaultName);
@@ -67,5 +68,30 @@ final class CreateProduct extends CreateRecord
         $this->syncTranslationRecords($this->record, $this->languageTabsPayload);
 
         parent::afterCreate();
+    }
+
+    /**
+     * @param  array<string, array<string, mixed>> $translations
+     * @return array<string, array<string, mixed>>
+     */
+    private function sanitizeTranslatablePayload(array $translations): array
+    {
+        /** @var HtmlSanitizer $sanitizer */
+        $sanitizer = app(HtmlSanitizer::class);
+
+        foreach ($translations as $locale => $payload) {
+            foreach (['description', 'short_description'] as $field) {
+                $value = $payload[$field] ?? null;
+
+                if (! is_string($value) || trim($value) === '') {
+                    continue;
+                }
+
+                // Guard each locale entry with the same sanitizer used at the model level.
+                $translations[$locale][$field] = $sanitizer->sanitize($value);
+            }
+        }
+
+        return $translations;
     }
 }

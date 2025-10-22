@@ -71,7 +71,10 @@
     </div>
 
     @if ($collection->trans('description') ?? $collection->description)
-        <div class="prose max-w-none mb-8">{!! $collection->trans('description') ?? $collection->description !!}</div>
+        @php
+            $collectionDescription = $collection->trans('description') ?? $collection->description ?? '';
+        @endphp
+        <x-sanitized-html class="prose max-w-none mb-8" :content="$collectionDescription" />
     @endif
 
     <div class="mb-4">

@@ -4,9 +4,7 @@
             <div class="max-w-4xl mx-auto">
                 <h1 class="text-3xl font-bold text-gray-900 mb-8">{{ $translation->title }}</h1>
                 
-                <div class="prose prose-lg max-w-none">
-                    {!! $translation->content !!}
-                </div>
+                <x-sanitized-html class="prose prose-lg max-w-none" :content="$translation->content" />
                 
                 <div class="mt-8 pt-8 border-t border-gray-200">
                     <p class="text-sm text-gray-500">
