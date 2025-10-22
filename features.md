@@ -33,6 +33,7 @@
 
 ## Admin panel resilience
 - Attribute administration keeps validation rule strings verbatim, surfaces array-based rules as comma-separated chips, and pairs with regression tests that prove both paths round-trip correctly through Filament.
+- Collection resource navigation metadata, translations, and fillable casts now mirror the Filament v4 schema so admin menus, factories, and the comprehensive resource tests target the same contract.
 - Filament dashboard access checks now fall back to open access when no
   permissions are configured and inline sparkline widgets respect the base
   nullable model contract, eliminating the latest regression tests failures.

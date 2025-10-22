@@ -36,7 +36,25 @@ use UnitEnum;
 
 final class CollectionResource extends Resource
 {
+    /**
+     * @var string|null Navigation group displayed in the Filament sidebar.
+     */
+    protected static ?string $navigationGroup = 'Products';
+
+    /**
+     * @var string|null Explicit navigation label to avoid relying on defaults.
+     */
+    protected static ?string $navigationLabel = 'Collections';
+
     protected static ?string $model = Collection::class;
+
+    /**
+     * Provide the localized navigation label for the resource menu entry.
+     */
+    public static function getNavigationLabel(): string
+    {
+        return __('collections.navigation_label');
+    }
 
     public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
@@ -45,7 +63,7 @@ final class CollectionResource extends Resource
 
     public static function getNavigationGroup(): UnitEnum|string|null
     {
-        return 'Products';
+        return static::$navigationGroup;
     }
 
     protected static ?int $navigationSort = 2;
