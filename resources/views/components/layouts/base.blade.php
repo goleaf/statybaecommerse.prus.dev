@@ -58,7 +58,11 @@
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
 
     <!-- Scripts -->
-    @vite(['resources/css/app.scss', 'resources/js/app.js'])
+    @if (app()->environment('testing'))
+        <!-- Skip Vite during automated tests to avoid missing manifest errors while still serving the rest of the layout. -->
+    @else
+        @vite(['resources/css/app.scss', 'resources/js/app.js'])
+    @endif
 
     <!-- Livewire Styles -->
     @livewireStyles
