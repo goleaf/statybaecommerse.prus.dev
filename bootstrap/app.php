@@ -21,8 +21,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 // Load the Filament compatibility shims before the application boots so the
 // legacy class aliases are always available during early package discovery.
@@ -363,7 +363,9 @@ return Application::configure(basePath: dirname(__DIR__))
                     );
 
                     foreach ($throwable->getHeaders() as $name => $value) {
-                        $response->headers->set($name, $value);
+                        // Symfony's header bag expects scalar values to be strings, so normalise integers from rate limiting
+                        // exceptions to avoid type errors while preserving array headers untouched.
+                        $response->headers->set($name, is_array($value) ? $value : (string) $value);
                     }
 
                     return $response;

@@ -6,8 +6,11 @@ namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use App\Traits\HasTranslations;
+use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,9 +21,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *
  * Eloquent model representing the CampaignClick entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property mixed $timestamps
- * @property mixed $table
- * @property mixed $fillable
+ * @property mixed  $timestamps
+ * @property mixed  $table
+ * @property mixed  $fillable
  * @property string $translationModel
  *
  * @method static \Illuminate\Database\Eloquent\Builder|CampaignClick newModelQuery()
@@ -45,7 +48,33 @@ final class CampaignClick extends Model
      */
     protected function casts(): array
     {
-        return ['clicked_at' => 'datetime', 'conversion_value' => 'decimal:2', 'is_converted' => 'boolean', 'conversion_data' => 'array'];
+        // Keep scalar casts while the clicked_at mutator manages timezone normalisation separately.
+        return ['conversion_value' => 'decimal:2', 'is_converted' => 'boolean', 'conversion_data' => 'array'];
+    }
+
+    /**
+     * Normalise clicked_at timestamps to UTC on read/write to ensure deterministic API snapshots.
+     */
+    protected function clickedAt(): Attribute
+    {
+        return Attribute::make(
+            get: fn (mixed $value): ?CarbonImmutable => $value === null
+                ? null
+                : CarbonImmutable::parse((string) $value, 'UTC'),
+            set: function (mixed $value): ?string {
+                if ($value instanceof CarbonInterface) {
+                    return $value->copy()->setTimezone('UTC')->format('Y-m-d H:i:s');
+                }
+
+                if ($value === null || $value === '') {
+                    return null;
+                }
+
+                return CarbonImmutable::parse((string) $value, config('app.timezone', 'UTC'))
+                    ->setTimezone('UTC')
+                    ->format('Y-m-d H:i:s');
+            }
+        );
     }
 
     protected string $translationModel = \App\Models\Translations\CampaignClickTranslation::class;
@@ -152,12 +181,12 @@ final class CampaignClick extends Model
     public function getClickTypeLabelAttribute(): string
     {
         return match ($this->click_type) {
-            'cta' => __('campaign_clicks.click_type.cta'),
+            'cta'    => __('campaign_clicks.click_type.cta'),
             'banner' => __('campaign_clicks.click_type.banner'),
-            'link' => __('campaign_clicks.click_type.link'),
+            'link'   => __('campaign_clicks.click_type.link'),
             'button' => __('campaign_clicks.click_type.button'),
-            'image' => __('campaign_clicks.click_type.image'),
-            default => __('campaign_clicks.click_type.unknown'),
+            'image'  => __('campaign_clicks.click_type.image'),
+            default  => __('campaign_clicks.click_type.unknown'),
         };
     }
 
@@ -168,9 +197,9 @@ final class CampaignClick extends Model
     {
         return match ($this->device_type) {
             'desktop' => __('campaign_clicks.device_type.desktop'),
-            'mobile' => __('campaign_clicks.device_type.mobile'),
-            'tablet' => __('campaign_clicks.device_type.tablet'),
-            default => __('campaign_clicks.device_type.unknown'),
+            'mobile'  => __('campaign_clicks.device_type.mobile'),
+            'tablet'  => __('campaign_clicks.device_type.tablet'),
+            default   => __('campaign_clicks.device_type.unknown'),
         };
     }
 
@@ -180,12 +209,12 @@ final class CampaignClick extends Model
     public function getBrowserLabelAttribute(): string
     {
         return match ($this->browser) {
-            'chrome' => __('campaign_clicks.browser.chrome'),
+            'chrome'  => __('campaign_clicks.browser.chrome'),
             'firefox' => __('campaign_clicks.browser.firefox'),
-            'safari' => __('campaign_clicks.browser.safari'),
-            'edge' => __('campaign_clicks.browser.edge'),
-            'opera' => __('campaign_clicks.browser.opera'),
-            default => $this->browser ?? __('campaign_clicks.browser.unknown'),
+            'safari'  => __('campaign_clicks.browser.safari'),
+            'edge'    => __('campaign_clicks.browser.edge'),
+            'opera'   => __('campaign_clicks.browser.opera'),
+            default   => $this->browser ?? __('campaign_clicks.browser.unknown'),
         };
     }
 
@@ -196,11 +225,11 @@ final class CampaignClick extends Model
     {
         return match ($this->os) {
             'windows' => __('campaign_clicks.os.windows'),
-            'macos' => __('campaign_clicks.os.macos'),
-            'linux' => __('campaign_clicks.os.linux'),
+            'macos'   => __('campaign_clicks.os.macos'),
+            'linux'   => __('campaign_clicks.os.linux'),
             'android' => __('campaign_clicks.os.android'),
-            'ios' => __('campaign_clicks.os.ios'),
-            default => $this->os ?? __('campaign_clicks.os.unknown'),
+            'ios'     => __('campaign_clicks.os.ios'),
+            default   => $this->os ?? __('campaign_clicks.os.unknown'),
         };
     }
 

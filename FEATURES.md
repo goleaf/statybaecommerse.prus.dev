@@ -38,6 +38,7 @@ This snapshot complements the changelog by listing functional capabilities that 
 - API validation errors now bundle localized violation lists with a fallback English reason so partner integrations can act on stable messaging even when the initial validation precedes locale negotiation.
 - Access denied problem responses produced by Symfony's HTTP layer now echo the denial reason inside `error.context.reason`, matching Laravel's authorization payloads and keeping client handlers consistent.
 - Test infrastructure now provisions an on-disk SQLite database and conditionally seeds customer group metadata, preventing the observer test suite from failing with missing table or column errors.
+- Campaign click analytics respect deterministic UTC timestamps, the authenticated user endpoint keeps Sanctum ability messaging within the RFC 7807 schema, and factory-generated categories use collision-free slugs so SQLite feature suites exercise the same flows as MySQL.
 - System setting translation workflows regained soft delete, restore, and replication support thanks to a relaxed locale index and streamlined fillable contract that better reflects the documented API surface.
 - API search now short-circuits suspicious payloads and boosts exact-title matches so catalogue lookups stay precise while SQL injection attempts return empty responses.
 - Search experiences normalise mixed-case `types[]` filters so targeted product/category/brand lookups keep the requested scope even when storefront clients send capitalised identifiers.
