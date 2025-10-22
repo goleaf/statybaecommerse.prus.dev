@@ -9,6 +9,7 @@ use Filament\FilamentManager;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
+use Throwable;
 
 final class AuthorizationMatrix
 {
@@ -19,7 +20,7 @@ final class AuthorizationMatrix
      */
     public static function ability(string $resource, string $ability): string
     {
-        $abilities = config(sprintf('%s.abilities.%s', self::CONFIG_KEY, $resource));
+        $abilities = self::configValue(sprintf('%s.abilities.%s', self::CONFIG_KEY, $resource));
 
         if (! is_array($abilities) || ! array_key_exists($ability, $abilities)) {
             throw new InvalidArgumentException(sprintf('Unknown ability [%s.%s] requested.', $resource, $ability));
@@ -90,7 +91,7 @@ final class AuthorizationMatrix
      */
     public static function allPermissions(): array
     {
-        $configuredAbilities = config(sprintf('%s.abilities', self::CONFIG_KEY), []);
+        $configuredAbilities = self::configValue(sprintf('%s.abilities', self::CONFIG_KEY), []);
 
         if (! is_array($configuredAbilities)) {
             return [];
@@ -113,7 +114,7 @@ final class AuthorizationMatrix
      */
     public static function permissionsForRole(AuthorizationRole $role): array
     {
-        $roles = config(sprintf('%s.roles', self::CONFIG_KEY), []);
+        $roles = self::configValue(sprintf('%s.roles', self::CONFIG_KEY), []);
 
         if (! is_array($roles)) {
             return [];
@@ -144,7 +145,7 @@ final class AuthorizationMatrix
     public static function roles(): array
     {
         $roleDefinitions = [];
-        $configuredRoles = config(sprintf('%s.roles', self::CONFIG_KEY), []);
+        $configuredRoles = self::configValue(sprintf('%s.roles', self::CONFIG_KEY), []);
 
         if (! is_array($configuredRoles)) {
             return [];
@@ -180,12 +181,69 @@ final class AuthorizationMatrix
      */
     public static function guardNames(): array
     {
-        $guards = config(sprintf('%s.guards', self::CONFIG_KEY), []);
+        $guards = self::configValue(sprintf('%s.guards', self::CONFIG_KEY), []);
+
+        if ($guards === []) {
+            return [];
+        }
 
         if (! is_array($guards)) {
             return [];
         }
 
         return array_values(array_filter($guards, fn ($guard) => is_string($guard) && $guard !== ''));
+    }
+
+    /**
+     * Safely fetch authorization configuration regardless of the Laravel helper context.
+     */
+    private static function configValue(string $key, mixed $default = null): mixed
+    {
+        if (function_exists('config')) {
+            try {
+                if (! function_exists('app') || ! app()->bound('config')) {
+                    throw new InvalidArgumentException('Config repository not bound.');
+                }
+
+                return config($key, $default);
+            } catch (Throwable) {
+                // Swallow the exception and fall back to the raw configuration file below.
+            }
+        }
+
+        // Load and cache the raw authorization configuration when helper functions
+        // are unavailable (for example in isolated PHPUnit unit tests).
+        static $authorizationConfig;
+
+        if ($authorizationConfig === null) {
+            $basePath = dirname(__DIR__, 3);
+            $configPath = $basePath.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'authorization.php';
+
+            $authorizationConfig = file_exists($configPath) ? (require $configPath) : [];
+        }
+
+        if (! str_starts_with($key, self::CONFIG_KEY)) {
+            return $default;
+        }
+
+        $relativeKey = substr($key, strlen(self::CONFIG_KEY));
+        $relativeKey = ltrim($relativeKey, '.');
+
+        if ($relativeKey === '') {
+            return $authorizationConfig;
+        }
+
+        $segments = explode('.', $relativeKey);
+        $value = $authorizationConfig;
+
+        foreach ($segments as $segment) {
+            if (! is_array($value) || ! array_key_exists($segment, $value)) {
+                return $default;
+            }
+
+            $value = $value[$segment];
+        }
+
+        return $value;
     }
 }
