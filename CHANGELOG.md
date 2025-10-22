@@ -13,6 +13,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Resolved localized product and category routing by honouring translated slugs during route model binding and updating storefront links so product detail pages load reliably from the home feed and other localized listings.
 * Restored the dashboard permission guard to default to open access when no abilities are configured and aligned inline sparkline widgets with Filament's nullable model contract, clearing the latest unit test regressions around navigation metadata and dataset checksums.
 * Replaced the CampaignCustomerSegment global ActiveScope with targeted query helpers so unit tests can fetch inactive records while dashboards retain expressive filters for campaign, type, and group segmentation.
+* Repaired the Document Template admin workflow by adopting Filament v4 schema components, normalizing template factories, preserving plain-text content, and widening model scopes so CRUD tests cover documents, filters, and slug generation without missing records.
 * Removed the generic ActiveScope from campaign conversion analytics so status-
   filtered scopes (campaign, type, device, medium, etc.) once again return
   completed records in unit tests and dashboards instead of being filtered out
