@@ -8,6 +8,7 @@
 - Shipping option entities once again declare their zone relationship, eligibility checks, and filter scopes, ensuring fulfilment automation and tests can target the correct carrier records without custom query shims.
 
 ## Data integrity & seeding
+- Products now persist the expanded status enum by migrating the column to a string-based implementation, allowing values like `active` to survive fresh installs and SQLite-powered test suites without CHECK constraint failures.
 - Demo store seeder now calls the collection and collection-product seeders, ensuring curated collections always feature representative products during fresh installs and automated demos.
 - PHPUnit harness now provisions a shared `database/testing.sqlite` file, runs a focused SQLite migration that seeds Spatie permission tables and variant attribute pivots, and registers Filament SearchableInput payload macros so suites share deterministic schema state without losing compatibility.
 - Region hierarchies and the `customers` table now provision automatically during SQLite migrations, ensuring factories, analytics widgets, and Filament resources can persist customer journeys without manual schema patches.
@@ -32,6 +33,7 @@
 - OpenAPI documentation now mirrors the lean product meta payload and nullable media thumbnails emitted by the presenter, keeping schema validators and client SDKs in sync with production responses.
 
 ## Admin panel resilience
+- The HTML sanitization maintenance command now honours Laravel 12's component signature changes while reporting chunked progress, keeping CLI invocations error-free as translations and product copy are cleaned in bulk.
 - Attribute administration keeps validation rule strings verbatim, surfaces array-based rules as comma-separated chips, and pairs with regression tests that prove both paths round-trip correctly through Filament.
 - Filament dashboard access checks now fall back to open access when no
   permissions are configured and inline sparkline widgets respect the base
