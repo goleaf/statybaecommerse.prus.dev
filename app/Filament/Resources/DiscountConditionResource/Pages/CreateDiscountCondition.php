@@ -18,9 +18,8 @@ final class CreateDiscountCondition extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        // Set default values
+        // Guarantee an explicit boolean flag while avoiding unsupported columns like `valid_from`.
         $data['is_active'] = $data['is_active'] ?? true;
-        $data['valid_from'] = $data['valid_from'] ?? now();
 
         return $data;
     }
