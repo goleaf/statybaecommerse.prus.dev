@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 // use Illuminate\Database\Eloquent\SoftDeletes;
@@ -22,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 // #[ScopedBy([ActiveScope::class, EnabledScope::class])]
 final class ShippingOption extends Model
 {
+    /** @use HasFactory<\Database\Factories\ShippingOptionFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -32,6 +34,7 @@ final class ShippingOption extends Model
         'service_type',
         'price',
         'currency_code',
+        'zone_id',
         'is_enabled',
         'is_default',
         'sort_order',
@@ -67,6 +70,8 @@ final class ShippingOption extends Model
 
     /**
      * Handle orders functionality with proper error handling.
+     *
+     * @phpstan-return HasMany<Order, ShippingOption>
      */
     public function orders(): HasMany
     {
@@ -74,7 +79,21 @@ final class ShippingOption extends Model
     }
 
     /**
+     * Handle zone functionality with proper error handling.
+     *
+     * @phpstan-return BelongsTo<Zone, ShippingOption>
+     */
+    public function zone(): BelongsTo
+    {
+        // Link each shipping option to the geographical zone it belongs to for filtering and reporting.
+        return $this->belongsTo(Zone::class);
+    }
+
+    /**
      * Handle scopeEnabled functionality with proper error handling.
+     *
+     * @param  Builder<ShippingOption> $query
+     * @return Builder<ShippingOption>
      */
     public function scopeEnabled(Builder $query): Builder
     {
@@ -83,6 +102,9 @@ final class ShippingOption extends Model
 
     /**
      * Handle scopeDefault functionality with proper error handling.
+     *
+     * @param  Builder<ShippingOption> $query
+     * @return Builder<ShippingOption>
      */
     public function scopeDefault(Builder $query): Builder
     {
@@ -91,6 +113,9 @@ final class ShippingOption extends Model
 
     /**
      * Handle scopeByCarrier functionality with proper error handling.
+     *
+     * @param  Builder<ShippingOption> $query
+     * @return Builder<ShippingOption>
      */
     public function scopeByCarrier(Builder $query, string $carrier): Builder
     {
@@ -99,6 +124,9 @@ final class ShippingOption extends Model
 
     /**
      * Handle scopeOrdered functionality with proper error handling.
+     *
+     * @param  Builder<ShippingOption> $query
+     * @return Builder<ShippingOption>
      */
     public function scopeOrdered(Builder $query): Builder
     {
