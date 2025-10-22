@@ -9,11 +9,16 @@ use App\Support\Search\AddressSearch;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Illuminate\Support\Facades\Schema;
+use Spatie\Activitylog\Facades\Activity;
 
 uses()->group('searchable-input');
 
 beforeEach(function (): void {
     RefreshDatabaseState::$migrated = true;
+
+    // Silence activity logging hooks so our lightweight schema definitions do not require
+    // the vendor activity_log table that exists in the main application migration set.
+    Activity::disableLogging();
 
     Schema::dropIfExists('addresses');
     Schema::dropIfExists('cities');
@@ -26,6 +31,7 @@ beforeEach(function (): void {
         $table->string('phone')->nullable();
         $table->boolean('is_active')->default(true);
         $table->timestamps();
+        $table->softDeletes();
     });
 
     Schema::create('cities', function (Blueprint $table): void {
@@ -36,6 +42,7 @@ beforeEach(function (): void {
         $table->boolean('is_active')->default(true);
         $table->boolean('is_enabled')->default(true);
         $table->timestamps();
+        $table->softDeletes();
     });
 
     Schema::create('addresses', function (Blueprint $table): void {
@@ -47,6 +54,7 @@ beforeEach(function (): void {
         $table->string('country_code')->nullable();
         $table->boolean('is_active')->default(true);
         $table->timestamps();
+        $table->softDeletes();
     });
 });
 
