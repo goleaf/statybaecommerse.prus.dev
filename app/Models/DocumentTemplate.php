@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
+use Database\Factories\DocumentTemplateFactory;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
+use Stringable;
 
 /**
  * DocumentTemplate
@@ -28,6 +31,7 @@ use Illuminate\Support\Str;
 #[ScopedBy([ActiveScope::class])]
 final class DocumentTemplate extends Model
 {
+    /** @use HasFactory<DocumentTemplateFactory> */
     use HasFactory;
 
     protected $fillable = ['name', 'slug', 'description', 'content', 'variables', 'type', 'category', 'settings', 'is_active'];
@@ -54,18 +58,26 @@ final class DocumentTemplate extends Model
 
     /**
      * Handle documents functionality with proper error handling.
+     *
+     * @return HasMany<Document, DocumentTemplate>
      */
     public function documents(): HasMany
     {
-        return $this->hasMany(Document::class);
+        /** @var HasMany<Document, DocumentTemplate> $relation */
+        $relation = $this->hasMany(Document::class);
+
+        // Bypass all global scopes to surface drafts and archived documents linked to the template.
+        return $relation->withoutGlobalScopes();
     }
 
     /**
      * Handle getAvailableVariables functionality with proper error handling.
+     *
+     * @return array<int|string, mixed>
      */
     public function getAvailableVariables(): array
     {
-        return $this->variables ?? [];
+        return is_array($this->variables) ? $this->variables : [];
     }
 
     /**
@@ -78,30 +90,41 @@ final class DocumentTemplate extends Model
 
     /**
      * Handle getSettings functionality with proper error handling.
+     *
+     * @return array<string, mixed>
      */
     public function getSettings(): array
     {
-        return $this->settings ?? [];
+        return is_array($this->settings) ? $this->settings : [];
     }
 
     /**
      * Handle getSetting functionality with proper error handling.
-     *
-     * @param  mixed  $default
      */
-    public function getSetting(string $key, $default = null)
+    public function getSetting(string $key, mixed $default = null): mixed
     {
         return $this->getSettings()[$key] ?? $default;
     }
 
     /**
      * Render the Livewire component view with current state.
+     *
+     * @param array<string, scalar|Stringable|null> $variables
      */
     public function render(array $variables = []): string
     {
         $content = $this->content;
         foreach ($variables as $key => $value) {
-            $content = str_replace('{{'.$key.'}}', (string) $value, $content);
+            if ($value === null) {
+                continue;
+            }
+
+            if (! is_scalar($value) && ! $value instanceof Stringable) {
+                continue;
+            }
+
+            $placeholder = '{{' . (string) $key . '}}';
+            $content = str_replace($placeholder, (string) $value, $content);
         }
 
         return $content;
@@ -110,9 +133,12 @@ final class DocumentTemplate extends Model
     /**
      * Handle scopeOfType functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param Builder<DocumentTemplate> $query
      */
-    public function scopeOfType($query, string $type)
+    /**
+     * @return Builder<DocumentTemplate>
+     */
+    public function scopeOfType(Builder $query, string $type): Builder
     {
         return $query->where('type', $type);
     }
@@ -120,27 +146,55 @@ final class DocumentTemplate extends Model
     /**
      * Handle scopeOfCategory functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param Builder<DocumentTemplate> $query
      */
-    public function scopeOfCategory($query, string $category)
+    /**
+     * @return Builder<DocumentTemplate>
+     */
+    public function scopeOfCategory(Builder $query, string $category): Builder
     {
         return $query->where('category', $category);
     }
 
     /**
      * Handle getPrintSettings functionality with proper error handling.
+     *
+     * @return array<string, mixed>
      */
     public function getPrintSettings(): array
     {
-        return $this->settings ?? ['header' => null, 'footer' => null, 'css' => null, 'page_size' => 'A4', 'orientation' => 'portrait', 'margins' => ['top' => 20, 'right' => 20, 'bottom' => 20, 'left' => 20]];
+        $defaults = [
+            'header'      => null,
+            'footer'      => null,
+            'css'         => null,
+            'page_size'   => 'A4',
+            'orientation' => 'portrait',
+            'margins'     => [
+                'top'    => 20,
+                'right'  => 20,
+                'bottom' => 20,
+                'left'   => 20,
+            ],
+        ];
+
+        $settings = is_array($this->settings) ? $this->settings : [];
+
+        // Merge persisted settings with sensible defaults to avoid missing keys in downstream consumers.
+        /** @var array<string, mixed> $merged */
+        $merged = array_replace_recursive($defaults, $settings);
+
+        return $merged;
     }
 
     /**
      * Handle scopeActive functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param Builder<DocumentTemplate> $query
      */
-    public function scopeActive($query)
+    /**
+     * @return Builder<DocumentTemplate>
+     */
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
@@ -148,9 +202,12 @@ final class DocumentTemplate extends Model
     /**
      * Handle scopeByType functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param Builder<DocumentTemplate> $query
      */
-    public function scopeByType($query, string $type)
+    /**
+     * @return Builder<DocumentTemplate>
+     */
+    public function scopeByType(Builder $query, string $type): Builder
     {
         return $query->where('type', $type);
     }
@@ -158,9 +215,12 @@ final class DocumentTemplate extends Model
     /**
      * Handle scopeByCategory functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param Builder<DocumentTemplate> $query
      */
-    public function scopeByCategory($query, string $category)
+    /**
+     * @return Builder<DocumentTemplate>
+     */
+    public function scopeByCategory(Builder $query, string $category): Builder
     {
         return $query->where('category', $category);
     }
