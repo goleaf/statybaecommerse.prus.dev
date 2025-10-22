@@ -31,7 +31,12 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Feature flag governance** with Filament listings that expose inactive and disabled toggles for quick rollout audits and remediation.
 - **Multilingual experience** across storefront and admin via `spatie/laravel-translatable`, Volt-powered Livewire pages, and localized seed data.
 
--### Latest updates
+### Latest updates
+- Customer group administration honours Filament v4 action namespaces, keeps the create modal compatible with legacy Livewire
+  helpers, and persists single-locale names/descriptions as plain strings so the legacy database assertions and new tests stay
+  green without losing translation data.
+- Customer group activation toggles now sync `is_active` and `is_enabled` in both directions, normalising boolean-like inputs so
+  factories, admin forms, and scoped queries all observe the same state regardless of which flag a caller persists.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
 - Region-aware address tables and the dedicated `customers` dataset are back online for the SQLite harness, letting factories and
