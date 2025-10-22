@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
@@ -31,24 +32,20 @@ final class OrderDocumentsRelationManagerTest extends TestCase
         $this->order = Order::factory()->create(['user_id' => $this->user->id]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_render_order_documents_relation_manager(): void
     {
         $this->actingAs($this->user);
 
         $component = Livewire::test(OrderDocumentsRelationManager::class, [
             'ownerRecord' => $this->order,
-            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
+            'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component->assertSuccessful();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_create_order_document(): void
     {
         $this->actingAs($this->user);
@@ -58,7 +55,7 @@ final class OrderDocumentsRelationManagerTest extends TestCase
 
         $component = Livewire::test(OrderDocumentsRelationManager::class, [
             'ownerRecord' => $this->order,
-            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
+            'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
@@ -66,42 +63,40 @@ final class OrderDocumentsRelationManagerTest extends TestCase
             ->assertFormExists()
             ->fillForm([
                 'document_template_id' => $template->id,
-                'name' => 'Test Document',
-                'type' => 'invoice',
-                'version' => '1.0',
-                'status' => 'draft',
-                'is_public' => false,
-                'is_downloadable' => true,
-                'description' => 'Test document description',
+                'name'                 => 'Test Document',
+                'type'                 => 'invoice',
+                'version'              => '1.0',
+                'status'               => 'draft',
+                'is_public'            => false,
+                'is_downloadable'      => true,
+                'description'          => 'Test document description',
             ])
             ->callMountedTableAction()
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('documents', [
             'documentable_type' => \App\Models\Order::class,
-            'documentable_id' => $this->order->id,
-            'name' => 'Test Document',
-            'type' => 'invoice',
-            'status' => 'draft',
+            'documentable_id'   => $this->order->id,
+            'name'              => 'Test Document',
+            'type'              => 'invoice',
+            'status'            => 'draft',
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_approve_document(): void
     {
         $this->actingAs($this->user);
 
         $document = Document::factory()->create([
             'documentable_type' => \App\Models\Order::class,
-            'documentable_id' => $this->order->id,
-            'status' => 'pending',
+            'documentable_id'   => $this->order->id,
+            'status'            => 'pending',
         ]);
 
         $component = Livewire::test(OrderDocumentsRelationManager::class, [
             'ownerRecord' => $this->order,
-            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
+            'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
@@ -109,27 +104,25 @@ final class OrderDocumentsRelationManagerTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('documents', [
-            'id' => $document->id,
+            'id'     => $document->id,
             'status' => 'approved',
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_reject_document(): void
     {
         $this->actingAs($this->user);
 
         $document = Document::factory()->create([
             'documentable_type' => \App\Models\Order::class,
-            'documentable_id' => $this->order->id,
-            'status' => 'pending',
+            'documentable_id'   => $this->order->id,
+            'status'            => 'pending',
         ]);
 
         $component = Livewire::test(OrderDocumentsRelationManager::class, [
             'ownerRecord' => $this->order,
-            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
+            'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
@@ -137,33 +130,31 @@ final class OrderDocumentsRelationManagerTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('documents', [
-            'id' => $document->id,
+            'id'     => $document->id,
             'status' => 'rejected',
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_filter_by_document_type(): void
     {
         $this->actingAs($this->user);
 
         Document::factory()->create([
             'documentable_type' => \App\Models\Order::class,
-            'documentable_id' => $this->order->id,
-            'type' => 'invoice',
+            'documentable_id'   => $this->order->id,
+            'type'              => 'invoice',
         ]);
 
         Document::factory()->create([
             'documentable_type' => \App\Models\Order::class,
-            'documentable_id' => $this->order->id,
-            'type' => 'receipt',
+            'documentable_id'   => $this->order->id,
+            'type'              => 'receipt',
         ]);
 
         $component = Livewire::test(OrderDocumentsRelationManager::class, [
             'ownerRecord' => $this->order,
-            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
+            'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
@@ -173,22 +164,20 @@ final class OrderDocumentsRelationManagerTest extends TestCase
             );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_perform_bulk_approve(): void
     {
         $this->actingAs($this->user);
 
         $documents = Document::factory()->count(2)->create([
             'documentable_type' => \App\Models\Order::class,
-            'documentable_id' => $this->order->id,
-            'status' => 'pending',
+            'documentable_id'   => $this->order->id,
+            'status'            => 'pending',
         ]);
 
         $component = Livewire::test(OrderDocumentsRelationManager::class, [
             'ownerRecord' => $this->order,
-            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
+            'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
@@ -197,28 +186,26 @@ final class OrderDocumentsRelationManagerTest extends TestCase
 
         foreach ($documents as $document) {
             $this->assertDatabaseHas('documents', [
-                'id' => $document->id,
+                'id'     => $document->id,
                 'status' => 'approved',
             ]);
         }
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_perform_bulk_make_public(): void
     {
         $this->actingAs($this->user);
 
         $documents = Document::factory()->count(2)->create([
             'documentable_type' => \App\Models\Order::class,
-            'documentable_id' => $this->order->id,
-            'is_public' => false,
+            'documentable_id'   => $this->order->id,
+            'is_public'         => false,
         ]);
 
         $component = Livewire::test(OrderDocumentsRelationManager::class, [
             'ownerRecord' => $this->order,
-            'pageClass' => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
+            'pageClass'   => \App\Filament\Resources\OrderResource\Pages\ViewOrder::class,
         ]);
 
         $component
@@ -227,7 +214,7 @@ final class OrderDocumentsRelationManagerTest extends TestCase
 
         foreach ($documents as $document) {
             $this->assertDatabaseHas('documents', [
-                'id' => $document->id,
+                'id'        => $document->id,
                 'is_public' => true,
             ]);
         }

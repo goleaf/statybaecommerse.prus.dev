@@ -13,6 +13,7 @@ use App\Support\Filament\ProductVariantFieldHelper;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
@@ -34,9 +35,7 @@ final class OrderItemsRelationManagerTest extends TestCase
         $this->productVariant = ProductVariant::factory()->create();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_render_order_items_relation_manager(): void
     {
         $this->actingAs($this->user);
@@ -49,9 +48,7 @@ final class OrderItemsRelationManagerTest extends TestCase
         $component->assertSuccessful();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_create_order_item(): void
     {
         $this->actingAs($this->user);
@@ -80,9 +77,7 @@ final class OrderItemsRelationManagerTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_edit_order_item(): void
     {
         $this->actingAs($this->user);
@@ -111,9 +106,7 @@ final class OrderItemsRelationManagerTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_delete_order_item(): void
     {
         $this->actingAs($this->user);
@@ -136,9 +129,7 @@ final class OrderItemsRelationManagerTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_duplicate_order_item(): void
     {
         $this->actingAs($this->user);
@@ -160,9 +151,7 @@ final class OrderItemsRelationManagerTest extends TestCase
         $this->assertDatabaseCount('order_items', 2);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_filter_order_items_by_status(): void
     {
         $this->actingAs($this->user);
@@ -189,9 +178,7 @@ final class OrderItemsRelationManagerTest extends TestCase
             );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_filter_order_items_by_discount(): void
     {
         $this->actingAs($this->user);
@@ -218,9 +205,7 @@ final class OrderItemsRelationManagerTest extends TestCase
             );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_perform_bulk_mark_completed(): void
     {
         $this->actingAs($this->user);
@@ -247,9 +232,7 @@ final class OrderItemsRelationManagerTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_perform_bulk_apply_discount(): void
     {
         $this->actingAs($this->user);
@@ -277,9 +260,7 @@ final class OrderItemsRelationManagerTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_calculates_total_correctly(): void
     {
         $this->actingAs($this->user);
@@ -304,9 +285,7 @@ final class OrderItemsRelationManagerTest extends TestCase
         $this->assertEquals($expectedTotal, $orderItem->total);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_validates_required_fields(): void
     {
         $this->actingAs($this->user);
@@ -325,9 +304,7 @@ final class OrderItemsRelationManagerTest extends TestCase
             ->assertHasFormErrors(['product_variant_id', 'quantity', 'unit_price']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_validates_minimum_quantity(): void
     {
         $this->actingAs($this->user);
@@ -346,9 +323,7 @@ final class OrderItemsRelationManagerTest extends TestCase
             ->assertHasFormErrors(['quantity']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_clears_variant_lookup_and_snapshot_fields_when_selection_is_removed(): void
     {
         $this->actingAs($this->user);
