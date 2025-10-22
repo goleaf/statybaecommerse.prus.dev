@@ -116,7 +116,7 @@ final class AnalyticsEventResource extends Resource
                         ->searchable()
                         ->preload()
                         ->live()
-                        ->afterStateUpdated(function ($state, \Filament\Schemas\Components\Utilities\Set $set) {
+                        ->afterStateUpdated(function ($state, \Filament\Schemas\Components\Utilities\Set $set): void {
                             if ($state) {
                                 $user = User::find($state);
                                 if ($user) {

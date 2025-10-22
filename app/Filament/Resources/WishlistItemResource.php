@@ -60,7 +60,7 @@ final class WishlistItemResource extends Resource
     /**
      * @var string|BackedEnum|null Navigation icon used for the sidebar entry.
      */
-    protected static $navigationIcon = 'heroicon-o-heart';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-heart';
 
     /**
      * @var int|null Sidebar order to keep wishlist management near other customer tooling.

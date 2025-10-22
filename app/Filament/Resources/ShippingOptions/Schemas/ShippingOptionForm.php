@@ -7,6 +7,7 @@ namespace App\Filament\Resources\ShippingOptions\Schemas;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Schema;
 
 class ShippingOptionForm
 {

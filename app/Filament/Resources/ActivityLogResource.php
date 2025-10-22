@@ -24,10 +24,10 @@ final class ActivityLogResource extends Resource
     protected static ?string $model = ActivityLog::class;
 
     /**
-     * Use a union type to satisfy the Filament Resource contract while retaining the heroicon identifier.
+     * Use the explicit union type required by Filament v4 so the resource remains compatible with the
+     * framework's typed base property while still documenting the accepted icon formats.
      */
-    /** @var string|BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-document-text';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
 
     protected static ?int $navigationSort = 9;
 

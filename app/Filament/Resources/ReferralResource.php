@@ -32,15 +32,15 @@ final class ReferralResource extends Resource
 
     protected static ?string $model = Referral::class;
 
-    /** @var string|BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-share';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-share';
 
     /**
      * Navigation group for organizing the resource in the admin panel.
-     *
-     * @var UnitEnum|string|null
      */
-    protected static $navigationGroup = NavigationGroup::Marketing; // Keep referrals with other marketing touchpoints.
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Marketing; // Keep referrals with other marketing touchpoints.
 
     protected static ?int $navigationSort = 17;
 

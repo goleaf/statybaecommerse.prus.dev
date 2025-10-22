@@ -20,8 +20,10 @@ final class NewsCategoryResource extends Resource
 {
     protected static ?string $model = NewsCategory::class;
 
-    /** @var string|BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function getNavigationGroup(): UnitEnum|string|null
     {

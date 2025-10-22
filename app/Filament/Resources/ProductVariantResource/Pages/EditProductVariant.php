@@ -20,7 +20,7 @@ final class EditProductVariant extends EditRecord
             Actions\Action::make('set_default')
                 ->label(__('product_variants.actions.set_default'))
                 ->icon('heroicon-o-star')
-                ->action(function () {
+                ->action(function (): void {
                     $this->record->setAsDefault();
                     Notification::make()
                         ->title(__('product_variants.messages.set_as_default_success'))

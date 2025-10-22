@@ -90,7 +90,7 @@ final class LocationResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                ->afterStateUpdated(function ($state, Forms\Set $set): void {
                                     if ($state) {
                                         $country = Country::find($state);
                                         if ($country) {
@@ -104,7 +104,7 @@ final class LocationResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                ->afterStateUpdated(function ($state, Forms\Set $set): void {
                                     if ($state) {
                                         $city = City::find($state);
                                         if ($city) {
@@ -360,7 +360,7 @@ final class LocationResource extends Resource
                         if ($value === 'yes') {
                             $query->whereNotNull('latitude')->whereNotNull('longitude');
                         } elseif ($value === 'no') {
-                            $query->where(function ($q) {
+                            $query->where(function ($q): void {
                                 $q->whereNull('latitude')->orWhereNull('longitude');
                             });
                         }

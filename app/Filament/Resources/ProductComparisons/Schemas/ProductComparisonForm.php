@@ -6,6 +6,7 @@ namespace App\Filament\Resources\ProductComparisons\Schemas;
 
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Schema;
 
 class ProductComparisonForm
 {

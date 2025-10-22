@@ -20,8 +20,10 @@ class SliderAnalytics extends BaseDashboard
     use HasFiltersAction;
     use InteractsWithPageFilters;
 
-    /** @var string|BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-chart-bar';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?int $navigationSort = 3;
 

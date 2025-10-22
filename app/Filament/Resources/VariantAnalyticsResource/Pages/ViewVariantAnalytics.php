@@ -11,6 +11,7 @@ use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\TextEntry;
+use Filament\Schemas\Schema;
 
 final class ViewVariantAnalytics extends ViewRecord
 {

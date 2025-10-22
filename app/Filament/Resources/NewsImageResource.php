@@ -92,7 +92,7 @@ final class NewsImageResource extends Resource
                                             ->searchable()
                                             ->preload()
                                             ->live()
-                                            ->afterStateUpdated(function ($state, callable $set) {
+                                            ->afterStateUpdated(function ($state, callable $set): void {
                                                 if ($state) {
                                                     $news = News::find($state);
                                                     if ($news) {
@@ -116,7 +116,7 @@ final class NewsImageResource extends Resource
                                                 '1:1',
                                             ])
                                             ->live()
-                                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                            ->afterStateUpdated(function ($state, callable $set, callable $get): void {
                                                 if (! $state) {
                                                     return;
                                                 }
@@ -411,7 +411,7 @@ final class NewsImageResource extends Resource
                     Action::make('duplicate')
                         ->label(__('admin.news_images.duplicate'))
                         ->icon('heroicon-o-document-duplicate')
-                        ->action(function (NewsImage $record) {
+                        ->action(function (NewsImage $record): void {
                             $newRecord = $record->replicate();
                             $newRecord->sort_order = $record->news->images()->max('sort_order') + 1;
                             $newRecord->save();
@@ -443,7 +443,7 @@ final class NewsImageResource extends Resource
                     BulkAction::make('set_featured')
                         ->label(__('admin.news_images.set_featured'))
                         ->icon('heroicon-o-star')
-                        ->action(function (Collection $records) {
+                        ->action(function (Collection $records): void {
                             $records->each->update(['is_featured' => true]);
                         })
                         ->requiresConfirmation()
@@ -451,7 +451,7 @@ final class NewsImageResource extends Resource
                     BulkAction::make('unset_featured')
                         ->label(__('admin.news_images.unset_featured'))
                         ->icon('heroicon-o-star')
-                        ->action(function (Collection $records) {
+                        ->action(function (Collection $records): void {
                             $records->each->update(['is_featured' => false]);
                         })
                         ->requiresConfirmation()
@@ -459,8 +459,8 @@ final class NewsImageResource extends Resource
                     BulkAction::make('reorder')
                         ->label(__('admin.news_images.reorder'))
                         ->icon('heroicon-o-arrows-up-down')
-                        ->action(function (Collection $records) {
-                            $records->each(function ($record, $index) {
+                        ->action(function (Collection $records): void {
+                            $records->each(function ($record, $index): void {
                                 $record->update(['sort_order' => $index + 1]);
                             });
                         })

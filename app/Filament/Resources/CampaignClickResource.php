@@ -83,7 +83,7 @@ final class CampaignClickResource extends Resource
                                 ->preload()
                                 ->required()
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                ->afterStateUpdated(function ($state, Forms\Set $set): void {
                                     if ($state) {
                                         $campaign = Campaign::find($state);
                                         if ($campaign) {
@@ -104,7 +104,7 @@ final class CampaignClickResource extends Resource
                         ->searchable()
                         ->preload()
                         ->live()
-                        ->afterStateUpdated(function ($state, Forms\Set $set) {
+                        ->afterStateUpdated(function ($state, Forms\Set $set): void {
                             if ($state) {
                                 $user = User::find($state);
                                 if ($user) {

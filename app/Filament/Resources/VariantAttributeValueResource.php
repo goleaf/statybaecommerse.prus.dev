@@ -42,9 +42,14 @@ final class VariantAttributeValueResource extends Resource
 {
     protected static ?string $model = \App\Models\VariantAttributeValue::class;
 
-    /** @var string|BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-tag';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 18;

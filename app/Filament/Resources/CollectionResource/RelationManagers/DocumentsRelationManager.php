@@ -10,6 +10,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -187,7 +188,7 @@ final class DocumentsRelationManager extends BaseRelationManager
                             ->keyLabel(__('admin.documents.fields.variable_key'))
                             ->valueLabel(__('admin.documents.fields.variable_value')),
                     ])
-                    ->action(function (array $data, $record) {
+                    ->action(function (array $data, $record): void {
                         $record->documents()->create([
                             'document_template_id' => $data['template_id'],
                             'title'                => 'Generated Document',
@@ -236,7 +237,7 @@ final class DocumentsRelationManager extends BaseRelationManager
                                 ])
                                 ->required(),
                         ])
-                        ->action(function ($records, array $data) {
+                        ->action(function ($records, array $data): void {
                             $records->each->update(['status' => $data['status']]);
                         })
                         ->requiresConfirmation()
