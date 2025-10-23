@@ -5,86 +5,71 @@ return [
     'plural' => 'Прайс-листы',
     'single' => 'Прайс-лист',
 
-    // Sections
     'basic_information' => 'Основная информация',
-    'availability' => 'Доступность и условия',
     'settings' => 'Настройки',
 
-    // Fields
     'name' => 'Название',
-    'code' => 'Код',
-    'currency' => 'Валюта',
-    'priority' => 'Приоритет',
     'description' => 'Описание',
-    'is_enabled' => 'Включён',
+    'pricing_type' => 'Тип ценообразования',
+    'fixed' => 'Фиксированная цена',
+    'tiered' => 'Ступенчатая цена',
+    'volume' => 'Объемная цена',
+    'tiered_pricing' => 'Ступенчатое ценообразование',
+    'tiers' => 'Ценовые ступени',
+    'min_quantity' => 'Минимальное количество',
+    'max_quantity' => 'Максимальное количество',
+    'price' => 'Цена за единицу',
+    'add_tier' => 'Добавить ступень',
+    'volume_pricing' => 'Ценообразование по объему',
+    'volume_tiers' => 'Объемные ступени',
+    'is_active' => 'Активен',
+    'is_enabled' => 'Включен',
+    'valid_from' => 'Действует с',
+    'valid_until' => 'Действует до',
+    'valid_from_from' => 'Дата начала (с)',
+    'valid_from_until' => 'Дата начала (по)',
+    'notes' => 'Внутренние заметки',
+    'currency' => 'Валюта',
     'is_default' => 'По умолчанию',
-    'auto_apply' => 'Автоприменение',
-    'starts_at' => 'Дата начала',
-    'ends_at' => 'Дата окончания',
-    'starts_at_from' => 'Дата начала с',
-    'starts_at_until' => 'Дата начала до',
-    'ends_at_from' => 'Дата окончания с',
-    'ends_at_until' => 'Дата окончания до',
-    'min_order_amount' => 'Минимальная сумма заказа',
-    'max_order_amount' => 'Максимальная сумма заказа',
+    'customer_group' => 'Группа клиентов',
+    'discount_percentage' => 'Скидка (%)',
+    'priority' => 'Приоритет',
+    'partner' => 'Партнер',
+    'commission_percentage' => 'Комиссия (%)',
+    'email' => 'Email',
+    'phone' => 'Телефон',
+
     'created_at' => 'Создано',
     'updated_at' => 'Обновлено',
 
-    // Filters & options
     'all_records' => 'Все записи',
-    'enabled_only' => 'Только включённые',
-    'disabled_only' => 'Только отключённые',
-    'default_only' => 'Только по умолчанию',
-    'non_default_only' => 'Только нестандартные',
-    'auto_apply_only' => 'Только с автоприменением',
-    'manual_only' => 'Только с ручным применением',
+    'active_only' => 'Только активные',
+    'inactive_only' => 'Только неактивные',
+    'valid_now' => 'Действует сейчас',
+    'expired' => 'Просрочено',
 
-    // Relation data
-    'customer_group' => 'Группа клиентов',
-    'discount_percentage' => 'Процент скидки',
-    'is_active' => 'Активно',
-    'partner' => 'Партнёр',
-    'email' => 'E-mail',
-    'phone' => 'Телефон',
-    'commission_rate' => 'Ставка комиссии',
-
-    // Tabs
     'tabs' => [
         'all' => 'Все прайс-листы',
         'active' => 'Активные',
+        'public' => 'Публичные',
         'default' => 'По умолчанию',
-        'auto_apply' => 'С автоприменением',
+        'wholesale' => 'Оптовые',
+        'retail' => 'Розничные',
+        'promotional' => 'Промоакции',
     ],
 
-    // Relation managers
-    'relation_managers' => [
-        'customer_groups' => [
-            'title' => 'Группы клиентов',
-        ],
-        'partners' => [
-            'title' => 'Партнёры',
-        ],
-        'items' => [
-            'title' => 'Позиции прайс-листа',
-        ],
-    ],
-
-    // Widgets & stats
     'stats' => [
         'total_price_lists' => 'Всего прайс-листов',
-        'total_price_lists_description' => 'Все прайс-листы в каталоге',
-        'enabled_price_lists' => 'Включённые прайс-листы',
-        'enabled_price_lists_description' => 'Прайс-листы, которые сейчас включены',
+        'total_price_lists_description' => 'Количество всех прайс-листов в системе',
         'active_price_lists' => 'Активные прайс-листы',
-        'active_price_lists_description' => 'Прайс-листы, которые действуют в данный момент',
+        'active_price_lists_description' => 'Сейчас включенные и используемые',
+        'public_price_lists' => 'Публичные прайс-листы',
+        'public_price_lists_description' => 'Доступные всем клиентам',
         'default_price_lists' => 'Прайс-листы по умолчанию',
-        'default_price_lists_description' => 'Прайс-листы, применяемые автоматически',
-        'auto_apply_price_lists' => 'Прайс-листы с автоприменением',
-        'auto_apply_price_lists_description' => 'Прайс-листы, которые назначаются клиентам автоматически',
+        'default_price_lists_description' => 'Применяются автоматически, если не выбран другой',
     ],
 
     'charts' => [
-        'activity_over_time' => 'Активность прайс-листов во времени',
         'price_lists_created' => 'Созданные прайс-листы',
     ],
 ];
