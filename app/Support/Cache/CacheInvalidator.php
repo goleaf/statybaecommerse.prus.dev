@@ -34,8 +34,10 @@ final class CacheInvalidator
             CacheKeys::productTag($productId),
         ];
 
-        if (is_numeric($product->brand_id)) {
-            $tags[] = CacheKeys::brandTag((int) $product->brand_id);
+        // Include both the new and previous brand identifiers so cached brand widgets
+        // are always refreshed when a product is reassigned between brands.
+        foreach ($this->resolveBrandIds($product) as $brandId) {
+            $tags[] = CacheKeys::brandTag($brandId);
         }
 
         foreach ($categoryIds as $categoryId) {
@@ -109,6 +111,45 @@ final class CacheInvalidator
         $categoryIds = $categoriesRelation->pluck('categories.id')->all();
 
         return $this->mapCategoryIds($categoryIds);
+    }
+
+    /**
+     * Normalise the current and original brand identifiers into a unique set of IDs.
+     *
+     * @return array<int, int>
+     */
+    private function resolveBrandIds(Product $product): array
+    {
+        $brandIds = [];
+
+        $currentBrandId = $this->normalizeIdentifier($product->brand_id);
+
+        if ($currentBrandId !== null) {
+            $brandIds[$currentBrandId] = $currentBrandId;
+        }
+
+        $originalBrandId = $this->normalizeIdentifier($product->getOriginal('brand_id'));
+
+        if ($originalBrandId !== null) {
+            $brandIds[$originalBrandId] = $originalBrandId;
+        }
+
+        return array_values($brandIds);
+    }
+
+    /**
+     * Attempt to convert the provided identifier into an integer when possible.
+     */
+    private function normalizeIdentifier(mixed $value): ?int
+    {
+        // Guard against non-numeric values that cannot be safely cast.
+        if (! is_numeric($value)) {
+            return null;
+        }
+
+        $normalized = (int) $value;
+
+        return $normalized > 0 ? $normalized : null;
     }
 
     /**
