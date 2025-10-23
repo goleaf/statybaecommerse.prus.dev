@@ -10,7 +10,8 @@ use App\Filament\Resources\ReferralCodeStatisticsResource\Pages;
 use App\Models\ReferralCode;
 use App\Models\ReferralCodeStatistics;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -63,7 +64,7 @@ final class ReferralCodeStatisticsResource extends Resource
             ->schema([
                 Section::make(__('admin.referral_code_statistics.basic_information'))
                     ->schema([
-                        FormGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 Select::make('referral_code_id')
                                     ->label(__('admin.referral_code_statistics.referral_code'))
@@ -79,7 +80,7 @@ final class ReferralCodeStatisticsResource extends Resource
                     ]),
                 Section::make(__('admin.referral_code_statistics.metrics'))
                     ->schema([
-                        FormGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 TextInput::make('total_views')
                                     ->label(__('admin.referral_code_statistics.total_views'))
