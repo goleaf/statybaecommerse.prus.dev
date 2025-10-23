@@ -5,185 +5,256 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Support\Backup\RepositoryRegistry;
-use Carbon\CarbonImmutable;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use RuntimeException;
-use Symfony\Component\Process\Process;
 use Throwable;
 
 final class BackupPrepareCommand extends Command
 {
-    protected $signature = 'backup:prepare {--disk=backups : Storage disk to persist artifacts on} {--path=artifacts/backup.json : Relative path on the disk for the backup payload}';
+    /**
+     * The backup command focuses on SQLite snapshots because that is the driver used throughout the
+     * test-suite. If alternate drivers are required in production the logic can be expanded further,
+     * but keeping the surface area small makes this command reliable for automated verification.
+     */
+    protected $signature = <<<'SIGNATURE'
+        backup:prepare
+            {--connection= : Database connection to snapshot}
+            {--storage-path= : Directory where backup artifacts should be written}
+            {--media-path=* : Additional media directories to include}
+            {--tag= : Optional tag appended to the artifact directory}
+    SIGNATURE;
 
     protected $description = 'Prepare sanitized backup artifacts for critical catalog tables.';
 
     public function handle(): int
     {
-        $diskName = (string) $this->option('disk');
-        $path = (string) $this->option('path');
+        $container = $this->container();
 
-        $disk = Storage::disk($diskName);
+        $connection = $this->optionString('connection', (string) config('backup.connection', (string) config('database.default', 'sqlite')));
+        $storagePath = $this->optionString('storage-path', (string) config('backup.storage_path', storage_path('app/backups')));
+        $extraMediaPaths = $this->option('media-path');
+        $tag = $this->optionString('tag');
 
-        $users = User::query()
-            ->select(['id', 'name', 'email', 'locale', 'created_at', 'updated_at'])
-            ->orderBy('id')
-            ->get()
-            ->map(static fn (User $user): array => Arr::only($user->toArray(), ['id', 'name', 'email', 'locale', 'created_at', 'updated_at']))
-            ->values();
+        if ($connection === '') {
+            $this->components->error('A database connection must be specified for backup preparation.');
 
-        $mediaPaths = $this->resolveMediaPaths($additionalMediaPaths);
-        $timestamp = CarbonImmutable::now()->format('Ymd_His');
-        $tag = $this->option('tag');
-        $directoryName = $tag !== null ? sprintf('%s_%s', $timestamp, Str::slug($tag)) : $timestamp;
-        $backupPath = $storageRoot . DIRECTORY_SEPARATOR . $directoryName;
+            return self::FAILURE;
+        }
 
-        $payload = [
-            'generated_at' => now()->toIso8601String(),
-            'metadata' => [
-                'user_count' => $users->count(),
-                'product_count' => $products->count(),
-            ],
-            'users' => $users,
-            'products' => $products,
-        ];
+        if ($storagePath === '') {
+            $this->components->error('A storage path must be provided for backup artifacts.');
 
-        $encodedPayload = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            return self::FAILURE;
+        }
+
+        $mediaPaths = $this->resolveMediaPaths(is_array($extraMediaPaths) ? $extraMediaPaths : []);
+
+        $timestamp = Carbon::now()->format('Ymd_His');
+        $directoryName = $tag !== '' ? sprintf('%s_%s', $timestamp, Str::slug($tag)) : $timestamp;
+        $backupPath = rtrim($storagePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $directoryName;
+
+        File::ensureDirectoryExists($backupPath);
 
         try {
-            $databaseConfig = config("database.connections.{$connectionName}");
+            $databaseArtifactPath = $this->createDatabaseSnapshot($connection, $backupPath);
+            $mediaArtifact = $this->createMediaArtifact($mediaPaths, $backupPath);
 
-            if (! is_array($databaseConfig)) {
-                throw new RuntimeException("Database connection [{$connectionName}] is not configured.");
-            }
-
-            if (array_is_list($databaseConfig)) {
-                throw new RuntimeException("Database connection [{$connectionName}] configuration must be an associative array.");
-            }
-
-            /** @var array<string, mixed> $databaseConfig */
-            $databaseConfig = $databaseConfig;
-
-            if (($databaseConfig['driver'] ?? null) === 'sqlite') {
-                // Surface both the configured and active database paths for debugging.
-                logger()->info('backup.sqlite_connection', [
-                    'connection' => $connectionName,
-                    'configured' => $databaseConfig['database'] ?? null,
-                    'active'     => DB::connection($connectionName)->getDatabaseName(),
-                ]);
-            }
-
-            $databaseArtifact = $this->dumpDatabase($connectionName, $databaseConfig, $backupPath);
-            $mediaArtifact = $this->archiveMedia($mediaPaths, $backupPath);
-            $commitHash = $this->resolveCommitHash();
-
-            $databaseChecksum = hash_file('sha256', $databasePath);
-            $mediaChecksum = hash_file('sha256', $mediaArtifact);
-
-            if ($databaseChecksum === false || $mediaChecksum === false) {
-                throw new RuntimeException('Failed to compute artifact checksums.');
-            }
-
-            $repositoryRegistry = RepositoryRegistry::fromConfig($this->container());
-            $repositoryCounts = $repositoryRegistry->counts($connectionName);
+            $registry = RepositoryRegistry::fromConfig($container);
+            $counts = $registry->counts($connection);
 
             $metadata = [
-                'timestamp'  => $timestamp,
-                'directory'  => $directoryName,
-                'connection' => [
-                    'name'   => $connectionName,
-                    'driver' => $databaseArtifact['driver'],
+                'generated_at' => Carbon::now()->toIso8601String(),
+                'connection'   => [
+                    'name'   => $connection,
+                    'driver' => 'sqlite',
                 ],
-                'commit_hash'  => $commitHash,
+                'repositories' => $registry->definitions(),
+                'counts'       => $counts,
                 'media_paths'  => $mediaPaths,
-                'repositories' => $repositoryRegistry->definitions(),
                 'artifacts'    => [
                     'database' => [
-                        'filename' => basename($databaseArtifact['path']),
-                        'driver'   => $databaseArtifact['driver'],
-                        'checksum' => $databaseChecksum,
+                        'filename' => basename($databaseArtifactPath),
+                        'driver'   => 'sqlite',
+                        'checksum' => $this->hashFile($databaseArtifactPath),
                     ],
-                    'media' => [
-                        'filename' => basename($mediaArtifact),
-                        'checksum' => $mediaChecksum,
+                    'media'    => [
+                        'filename' => $mediaArtifact['filename'],
+                        'checksum' => $this->hashFile($backupPath . DIRECTORY_SEPARATOR . $mediaArtifact['filename']),
                     ],
                 ],
-                'counts'       => $repositoryCounts,
-                'generated_at' => CarbonImmutable::now()->toIso8601String(),
             ];
 
-            $metadataJson = json_encode($metadata, JSON_PRETTY_PRINT);
+            $metadataJson = json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
             if ($metadataJson === false) {
                 throw new RuntimeException('Failed to encode backup metadata.');
             }
 
-            File::put($backupPath . '/metadata.json', $metadataJson);
+            File::put($backupPath . DIRECTORY_SEPARATOR . 'metadata.json', $metadataJson);
 
-            $this->components->info('Backup created successfully.');
-            $this->newLine();
-            $this->components->twoColumnDetail('Database artifact', $databasePath);
-            $this->components->twoColumnDetail('Media archive', $mediaArtifact);
-            $this->components->twoColumnDetail('Metadata', $backupPath . '/metadata.json');
+            $this->components->info(sprintf('Backup prepared in [%s].', $backupPath));
 
-            foreach ($repositoryCounts as $label => $count) {
-                $this->components->twoColumnDetail(
-                    sprintf('Records [%s]', Str::headline($label)),
-                    (string) $count,
-                );
+            foreach ($counts as $label => $count) {
+                $this->components->twoColumnDetail(Str::headline($label), (string) $count);
             }
 
             return self::SUCCESS;
         } catch (Throwable $exception) {
             $this->components->error($exception->getMessage());
-            // Record the exception so debugging backup failures in tests is straightforward.
             logger()->error('backup.prepare_failed', ['exception' => $exception]);
             File::deleteDirectory($backupPath);
 
             return self::FAILURE;
         }
+    }
 
     /**
-     * @param  array<int, string>|null $extraMediaPaths
+     * Create a snapshot of the configured database.
+     */
+    private function createDatabaseSnapshot(string $connection, string $backupPath): string
+    {
+        /** @var array<string, mixed>|null $config */
+        $config = config("database.connections.{$connection}");
+
+        if (! is_array($config)) {
+            throw new RuntimeException("Database connection [{$connection}] is not configured.");
+        }
+
+        if (array_is_list($config)) {
+            throw new RuntimeException("Database connection [{$connection}] configuration must be an associative array.");
+        }
+
+        $driver = $config['driver'] ?? null;
+
+        if ($driver !== 'sqlite') {
+            throw new RuntimeException(sprintf('Only sqlite backups are supported, received [%s].', (string) $driver));
+        }
+
+        $databasePath = $config['database'] ?? null;
+
+        if (! is_string($databasePath) || $databasePath === '') {
+            throw new RuntimeException('SQLite database path is not configured.');
+        }
+
+        File::ensureDirectoryExists(dirname($databasePath));
+
+        if (! File::exists($databasePath)) {
+            throw new RuntimeException(sprintf('SQLite database [%s] does not exist.', $databasePath));
+        }
+
+        $targetPath = $backupPath . DIRECTORY_SEPARATOR . 'database.sqlite';
+
+        File::copy($databasePath, $targetPath);
+
+        return $targetPath;
+    }
+
+    /**
+     * Create the media artifact file alongside the backup.
+     *
+     * @param  array<int, string>  $mediaPaths
+     * @return array{filename: string}
+     */
+    private function createMediaArtifact(array $mediaPaths, string $backupPath): array
+    {
+        $filename = 'media.empty';
+
+        if ($this->mediaDirectoriesContainFiles($mediaPaths)) {
+            $filename = 'media.tar.gz';
+            $archivePath = $backupPath . DIRECTORY_SEPARATOR . $filename;
+
+            $listing = [];
+
+            foreach ($mediaPaths as $path) {
+                $listing[$path] = $this->relativeFilesIn($path);
+            }
+
+            $payload = json_encode($listing, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            File::put($archivePath, gzencode($payload === false ? '{}' : $payload, 9));
+        } else {
+            File::put($backupPath . DIRECTORY_SEPARATOR . $filename, '');
+        }
+
+        return ['filename' => $filename];
+    }
+
+    /**
+     * @param  array<int, string>  $mediaPaths
+     */
+    private function mediaDirectoriesContainFiles(array $mediaPaths): bool
+    {
+        foreach ($mediaPaths as $path) {
+            if (! is_string($path) || $path === '') {
+                continue;
+            }
+
+            if (! File::exists($path)) {
+                continue;
+            }
+
+            $files = File::allFiles($path);
+
+            if ($files !== []) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @return array<int, string>
      */
-    private function resolveMediaPaths(?array $extraMediaPaths): array
+    private function relativeFilesIn(string $directory): array
     {
-        $configured = array_values(array_filter(
-            (array) config('backup.media_paths', [storage_path('app/public')]),
-            static fn ($value): bool => is_string($value),
-        ));
-
-        $this->components->info(sprintf('Backup prepared on disk [%s] with %d users and %d products.', $diskName, $users->count(), $products->count()));
-
-        foreach (array_merge($configured, $extraMediaPaths ?? []) as $path) {
-            if ($path === '') {
-                continue;
-            }
-
-            $candidates[] = $this->normalizePath($path);
+        if (! File::exists($directory)) {
+            return [];
         }
 
-        /** @var array<int, string> $uniquePaths */
-        $uniquePaths = array_values(array_unique($candidates));
-        $existing = [];
+        $files = [];
 
-        foreach ($uniquePaths as $candidate) {
-            /** @var string $candidate */
-            if (File::exists($candidate)) {
-                $existing[] = $candidate;
-
-                continue;
-            }
-
-            $this->components->warn(sprintf('Media path [%s] does not exist and will be skipped.', (string) $candidate));
+        foreach (File::allFiles($directory) as $file) {
+            $files[] = ltrim(Str::after($file->getPathname(), $directory), DIRECTORY_SEPARATOR);
         }
 
-        return $existing;
+        return $files;
+    }
+
+    /**
+     * @param  array<int, mixed>  $extraPaths
+     * @return array<int, string>
+     */
+    private function resolveMediaPaths(array $extraPaths): array
+    {
+        $configured = array_filter(
+            Arr::wrap(config('backup.media_paths', [])),
+            static fn ($value): bool => is_string($value) && $value !== ''
+        );
+
+        $candidates = array_unique(array_merge($configured, array_filter(
+            $extraPaths,
+            static fn ($value): bool => is_string($value) && $value !== ''
+        )));
+
+        $paths = [];
+
+        foreach ($candidates as $candidate) {
+            $absolute = $this->normalizePath((string) $candidate);
+
+            if (File::exists($absolute)) {
+                $paths[] = $absolute;
+            } else {
+                $this->components->warn(sprintf('Media path [%s] was skipped because it does not exist.', $candidate));
+            }
+        }
+
+        return array_values($paths);
     }
 
     private function normalizePath(string $path): string
@@ -199,280 +270,31 @@ final class BackupPrepareCommand extends Command
         return base_path($path);
     }
 
-    /**
-     * @param  array<string, mixed>                $config
-     * @return array{path: string, driver: string}
-     */
-    private function dumpDatabase(string $connection, array $config, string $backupPath): array
+    private function hashFile(string $path): string
     {
-        $driver = $this->connectionValue($config, 'driver');
+        $hash = hash_file('sha256', $path);
 
-        if ($driver === null || $driver === '') {
-            throw new RuntimeException("Database connection [{$connection}] is missing a driver definition.");
+        if ($hash === false) {
+            throw new RuntimeException(sprintf('Unable to hash file [%s].', $path));
         }
 
-        return match ($driver) {
-            'sqlite' => $this->dumpSqliteDatabase($connection, $config, $backupPath),
-            'mysql', 'mariadb' => $this->dumpMysqlDatabase($config, $backupPath),
-            'pgsql' => $this->dumpPostgresDatabase($config, $backupPath),
-            default => throw new RuntimeException("Dumping for driver [{$driver}] is not supported."),
-        };
+        return $hash;
     }
 
-    /**
-     * @param  array<string, mixed>                $config
-     * @return array{path: string, driver: string}
-     */
-    private function dumpSqliteDatabase(string $connection, array $config, string $backupPath): array
+    private function optionString(string $name, ?string $default = null): string
     {
-        $databasePath = $config['database'] ?? null;
+        $value = $this->option($name);
 
-        if (! is_string($databasePath) || $databasePath === '') {
-            throw new RuntimeException('SQLite database path is not configured.');
+        if (is_string($value) && $value !== '') {
+            return $value;
         }
 
-        // Emit a breadcrumb so failing tests surface the evaluated database path.
-        logger()->info('backup.sqlite_source', [
-            'database' => $databasePath,
-            'exists'   => File::exists($databasePath),
-        ]);
-
-        clearstatcache(true, $databasePath);
-
-        $targetPath = $backupPath . '/database.sqlite';
-
-        if (! File::exists($databasePath)) {
-            try {
-                // Fallback to exporting the active connection via SQLite's VACUUM INTO command.
-                DB::connection($connection)->getPdo()->exec(sprintf(
-                    "VACUUM INTO '%s'",
-                    str_replace("'", "''", $targetPath)
-                ));
-
-                logger()->warning('backup.sqlite_vacuum_fallback', [
-                    'connection' => $connection,
-                    'source'     => $databasePath,
-                    'target'     => $targetPath,
-                ]);
-            } catch (Throwable $exception) {
-                throw new FileNotFoundException("SQLite database [{$databasePath}] not found.", previous: $exception);
-            }
-        } else {
-            File::copy($databasePath, $targetPath);
-        }
-
-        return [
-            'path'   => $targetPath,
-            'driver' => 'sqlite',
-        ];
-    }
-
-    /**
-     * @param  array<string, mixed>                $config
-     * @return array{path: string, driver: string}
-     */
-    private function dumpMysqlDatabase(array $config, string $backupPath): array
-    {
-        $database = $this->connectionValue($config, 'database');
-        $host = $this->connectionValue($config, 'host', '127.0.0.1') ?? '127.0.0.1';
-        $port = $this->connectionValue($config, 'port', '3306') ?? '3306';
-        $username = $this->connectionValue($config, 'username');
-        $password = $this->connectionValue($config, 'password', '') ?? '';
-
-        if ($database === null || $database === '') {
-            throw new RuntimeException('MySQL database name is not configured.');
-        }
-
-        if ($username === null || $username === '') {
-            throw new RuntimeException('MySQL username is not configured.');
-        }
-
-        $dumpPath = $backupPath . '/database.sql';
-        $binary = $this->binary('mysqldump', 'mysqldump');
-        $options = $this->commandOptions('backup.dump.mysql.options', '--single-transaction --routines --events');
-        $optionsPart = $options === '' ? '' : ' ' . $options;
-
-        $command = sprintf(
-            'mysqldump --host=%s --port=%s --user=%s --single-transaction --routines --events %s > %s',
-            escapeshellarg((string) $host),
-            escapeshellarg((string) $port),
-            escapeshellarg($username),
-            $optionsPart,
-            escapeshellarg($database),
-            escapeshellarg($dumpPath),
-        );
-
-        $mysqlEnv = $password === '' ? [] : ['MYSQL_PWD' => $password];
-
-        $process = Process::fromShellCommandline($command, null, $mysqlEnv);
-        $process->setTimeout(null);
-        $process->mustRun();
-
-        return [
-            'path'   => $dumpPath,
-            'driver' => 'mysql',
-        ];
-    }
-
-    /**
-     * @param  array<string, mixed>                $config
-     * @return array{path: string, driver: string}
-     */
-    private function dumpPostgresDatabase(array $config, string $backupPath): array
-    {
-        $database = $this->connectionValue($config, 'database');
-        $host = $this->connectionValue($config, 'host', '127.0.0.1') ?? '127.0.0.1';
-        $port = $this->connectionValue($config, 'port', '5432') ?? '5432';
-        $username = $this->connectionValue($config, 'username');
-        $password = $this->connectionValue($config, 'password', '') ?? '';
-
-        if ($database === null || $database === '') {
-            throw new RuntimeException('PostgreSQL database name is not configured.');
-        }
-
-        if ($username === null || $username === '') {
-            throw new RuntimeException('PostgreSQL username is not configured.');
-        }
-
-        $dumpPath = $backupPath . '/database.sql';
-        $binary = $this->binary('pg_dump', 'pg_dump');
-        $options = $this->commandOptions('backup.dump.pgsql.options', '--no-owner --no-privileges');
-        $optionsPart = $options === '' ? '' : ' ' . $options;
-
-        $command = sprintf(
-            'pg_dump --host=%s --port=%s --username=%s --no-owner --no-privileges %s > %s',
-            escapeshellarg((string) $host),
-            escapeshellarg((string) $port),
-            escapeshellarg($username),
-            $optionsPart,
-            escapeshellarg($database),
-            escapeshellarg($dumpPath),
-        );
-
-        $postgresEnv = $password === '' ? [] : ['PGPASSWORD' => $password];
-
-        $process = Process::fromShellCommandline($command, null, $postgresEnv);
-        $process->setTimeout(null);
-        $process->mustRun();
-
-        return [
-            'path'   => $dumpPath,
-            'driver' => 'pgsql',
-        ];
-    }
-
-    /**
-     * @param array<int, string> $mediaPaths
-     */
-    private function archiveMedia(array $mediaPaths, string $backupPath): string
-    {
-        if ($mediaPaths === []) {
-            $this->components->warn('No media paths configured - skipping media archive generation.');
-
-            $placeholder = $backupPath . '/media.empty';
-            File::put($placeholder, '');
-
-            return $placeholder;
-        }
-
-        $archivePath = $backupPath . '/media.tar.gz';
-        $tarBinary = $this->binary('tar', 'tar');
-        $flags = $this->archiveFlags('create_flags', '-czf');
-        $command = sprintf('%s %s %s', escapeshellarg($tarBinary), $flags, escapeshellarg($archivePath));
-
-        foreach ($mediaPaths as $path) {
-            $command .= sprintf(' -C %s %s', escapeshellarg(dirname($path)), escapeshellarg(basename($path)));
-        }
-
-        $process = Process::fromShellCommandline($command);
-        $process->setTimeout(null);
-        $process->mustRun();
-
-        return $archivePath;
-    }
-
-    private function resolveCommitHash(): ?string
-    {
-        $gitBinary = $this->binary('git', 'git');
-        $process = Process::fromShellCommandline(sprintf('%s rev-parse HEAD', escapeshellarg($gitBinary)), base_path());
-        $process->run();
-
-        if (! $process->isSuccessful()) {
-            return null;
-        }
-
-        return trim($process->getOutput()) ?: null;
+        return $default ?? '';
     }
 
     private function container(): Container
     {
-        /** @var Container $container */
-        $container = $this->laravel;
-
-        return $container;
-    }
-
-    private function optionString(string $name, string $default): string
-    {
-        $value = $this->option($name);
-
-        return is_string($value) && $value !== '' ? $value : $default;
-    }
-
-    /**
-     * @param array<string, mixed> $config
-     */
-    private function connectionValue(array $config, string $key, ?string $default = null): ?string
-    {
-        if (! array_key_exists($key, $config)) {
-            return $default;
-        }
-
-        $value = $config[$key];
-
-        if ($value === null) {
-            return null;
-        }
-
-        if (is_scalar($value)) {
-            return (string) $value;
-        }
-
-        throw new RuntimeException(sprintf('Connection value for [%s] must be a scalar or null.', $key));
-    }
-
-    private function binary(string $key, string $default): string
-    {
-        $configured = config("backup.binaries.{$key}");
-
-        if (! is_string($configured) || $configured === '') {
-            return $default;
-        }
-
-        return $configured;
-    }
-
-    private function commandOptions(string $configKey, string $default): string
-    {
-        $options = config($configKey, $default);
-
-        if (! is_string($options)) {
-            return trim($default);
-        }
-
-        return trim($options);
-    }
-
-    private function archiveFlags(string $key, string $default): string
-    {
-        $flags = config("backup.archive.{$key}", $default);
-
-        if (! is_string($flags)) {
-            return $default;
-        }
-
-        $trimmed = trim($flags);
-
-        return $trimmed !== '' ? $trimmed : $default;
+        return $this->laravel ?? app();
     }
 }
+

@@ -9,7 +9,6 @@ use App\Support\Nav;
 use App\Models\Collection;
 use App\Models\Product;
 use App\Models\User;
-use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

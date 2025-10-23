@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\Filament\Resources\SliderResource;
 use App\Support\Nav;
 use App\Models\Slider;
-use App\Support\Nav;
 
 it('can load SliderResource class', function () {
     expect(class_exists(SliderResource::class))->toBeTrue();

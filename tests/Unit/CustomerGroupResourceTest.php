@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\Filament\Resources\CustomerGroupResource;
-use App\Support\Nav;
 use App\Models\CustomerGroup;
 use App\Support\Nav;
 

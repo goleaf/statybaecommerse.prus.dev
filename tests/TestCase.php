@@ -22,8 +22,6 @@ abstract class TestCase extends BaseTestCase
 
     private bool $createdEnvFile = false;
 
-    private string $sqliteDatabasePath;
-
     private ?Panel $resolvedAdminPanel = null;
 
     private bool $createdViteManifest = false;
