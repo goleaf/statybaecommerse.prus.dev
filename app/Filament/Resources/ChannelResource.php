@@ -8,6 +8,7 @@ use App\Filament\Resources\ChannelResource\Pages;
 use App\Models\Channel;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -80,6 +81,7 @@ final class ChannelResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->live(onBlur: true)
+                                    // Keep the slug synchronised with the name when creating new channels.
                                     ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', Str::slug($state)) : null),
                                 TextInput::make('slug')
                                     ->label(__('admin.channels.slug'))
@@ -89,7 +91,9 @@ final class ChannelResource extends Resource
                                     ->rules(['alpha_dash']),
                                 TextInput::make('code')
                                     ->label(__('admin.channels.code'))
-                                    ->required()
+                                    // Allow empty values during edit operations while still requiring codes on create.
+                                    ->nullable()
+                                    ->required(fn (string $operation): bool => $operation === 'create')
                                     ->maxLength(50)
                                     ->unique(Channel::class, 'code', ignoreRecord: true)
                                     ->rules(['alpha_dash']),
@@ -233,6 +237,7 @@ final class ChannelResource extends Resource
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

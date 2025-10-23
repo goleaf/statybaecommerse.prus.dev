@@ -32,6 +32,7 @@
 - OpenAPI documentation now mirrors the lean product meta payload and nullable media thumbnails emitted by the presenter, keeping schema validators and client SDKs in sync with production responses.
 
 ## Admin panel resilience
+- Channel administration now loads only the viewed record in detail tables, bypasses product global scopes for relationship checks, sanitizes factory-generated codes, and aligns slug auto-fill tests with Filament v4 helpers to keep the resource reliable during regressions.
 - Attribute administration keeps validation rule strings verbatim, surfaces array-based rules as comma-separated chips, and pairs with regression tests that prove both paths round-trip correctly through Filament.
 - Filament dashboard access checks now fall back to open access when no
   permissions are configured and inline sparkline widgets respect the base
