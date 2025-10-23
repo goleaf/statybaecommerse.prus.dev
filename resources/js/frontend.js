@@ -223,6 +223,9 @@ function initializeSearchEnhancements() {
     searchInputs.forEach((input) => {
         const inputParent = input.parentElement;
 
+    searchInputs.forEach(input => {
+        const inputParent = input.parentElement;
+
         // Add search icon animation
         input.addEventListener('focus', function () {
             if (inputParent) {
@@ -292,8 +295,8 @@ function initializeThemeSystem() {
 // Image lazy loading
 function initializeImageLazyLoading() {
     if ('IntersectionObserver' in window) {
-        const imageObserver = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
+        const imageObserver = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
                 if (!entry.isIntersecting) {
                     return;
                 }
@@ -314,7 +317,7 @@ function initializeImageLazyLoading() {
             });
         });
 
-        document.querySelectorAll('img[data-src], img[data-srcset]').forEach((img) => {
+        document.querySelectorAll('img[data-src], img[data-srcset]').forEach(img => {
             imageObserver.observe(img);
         });
     }
