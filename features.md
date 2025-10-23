@@ -21,6 +21,7 @@
 - Search type filters now normalise mixed-case identifiers from clients, ensuring storefront queries stay restricted to the requested product, category, or brand buckets instead of ballooning to every result group.
 
 ## Admin panel resilience
+- Filament searchable input helpers now register fallback payload macros and include a fake Livewire schema harness so v4 container requirements no longer break standalone unit tests.
 - Cart lifecycle unit coverage now builds a dedicated lightweight `cart_items` table per test so checkout cleanup behaviours stay validated without depending on the entire migration suite.
 - Campaign click factories now guard related lookups and PHPUnit targets the shared SQLite database file, eliminating the missing-table exceptions that previously interrupted API campaign listing tests during fresh runs.
 - Reintroduced the core `App\\Exceptions\\Handler` class so the application reports exceptions normally instead of crashing with `Whoops\\Run::handleShutdown()` during bootstrap.
