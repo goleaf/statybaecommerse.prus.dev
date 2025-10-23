@@ -6,11 +6,7 @@ namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\StatusScope;
-use App\Observers\OrderObserver;
-use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
-use DateTimeInterface;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -21,7 +17,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
-use Schema;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Translatable\HasTranslations;
@@ -38,11 +33,10 @@ use Spatie\Translatable\HasTranslations;
  * @method static \Illuminate\Database\Eloquent\Builder|Order newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Order newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Order query()
- * @method static \Illuminate\Database\Eloquent\Builder|Order createdBetween(CarbonInterface|DateTimeInterface|string $start, CarbonInterface|DateTimeInterface|string $end)
- * @method static \Illuminate\Database\Eloquent\Builder|Order createdSince(CarbonInterface|DateTimeInterface|string $start)
- * @method static \Illuminate\Database\Eloquent\Builder|Order createdOn(CarbonInterface|DateTimeInterface|string $date)
- * @method static \Illuminate\Database\Eloquent\Builder|Order createdToday()
+ * @method static \Illuminate\Database\Eloquent\Builder|Order createdBetween(CarbonInterface $start, CarbonInterface $end)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order createdSince(CarbonInterface $start)
  * @method static \Illuminate\Database\Eloquent\Builder|Order createdThisMonth()
+ * @method static \Illuminate\Database\Eloquent\Builder|Order createdOnDate(CarbonInterface $date)
  *
  * @mixin \Eloquent
  */
@@ -329,6 +323,42 @@ final class Order extends Model
 
         // Also include lifecycle statuses that imply payment captured
         return $query->orWhereIn('status', ['processing', 'confirmed', 'shipped', 'delivered', 'completed']);
+    }
+
+    public function scopeCreatedBetween(Builder $query, CarbonInterface $start, CarbonInterface $end): Builder
+    {
+        $column = $this->qualifyCreatedAtColumn();
+
+        $startBound = $start->toImmutable()->startOfSecond();
+        $endBound = $end->toImmutable()->endOfSecond();
+
+        return $query->whereBetween($column, [$startBound, $endBound]);
+    }
+
+    public function scopeCreatedSince(Builder $query, CarbonInterface $start): Builder
+    {
+        $column = $this->qualifyCreatedAtColumn();
+
+        return $query->where($column, '>=', $start->toImmutable()->startOfSecond());
+    }
+
+    public function scopeCreatedThisMonth(Builder $query): Builder
+    {
+        $now = Carbon::now();
+
+        return $query->createdBetween($now->copy()->startOfMonth(), $now);
+    }
+
+    public function scopeCreatedOnDate(Builder $query, CarbonInterface $date): Builder
+    {
+        $day = $date->toImmutable();
+
+        return $query->createdBetween($day->startOfDay(), $day->endOfDay());
+    }
+
+    private function qualifyCreatedAtColumn(): string
+    {
+        return $this->qualifyColumn($this->getCreatedAtColumn());
     }
 
     /**

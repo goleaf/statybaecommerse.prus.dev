@@ -49,8 +49,8 @@ final class EcommerceStatsWidget extends BaseWidget
     private function getMonthlyRevenue(): string
     {
         $now = Carbon::now();
-
-        $revenue = (float) (Order::where('status', '!=', 'cancelled')
+        $revenue = (float) (Order::query()
+            ->where('status', '!=', 'cancelled')
             ->createdBetween($now->copy()->startOfMonth(), $now)
             ->sum('total') ?? 0);
 
@@ -66,9 +66,8 @@ final class EcommerceStatsWidget extends BaseWidget
 
     private function getOrdersChart(): array
     {
-        $since = Carbon::now()->subDays(7);
-
-        return Order::createdSince($since)
+        return Order::query()
+            ->createdSince(Carbon::now()->subDays(7))
             ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
             ->groupBy('date')
             ->orderBy('date')
@@ -78,10 +77,9 @@ final class EcommerceStatsWidget extends BaseWidget
 
     private function getRevenueChart(): array
     {
-        $since = Carbon::now()->subDays(7);
-
-        return Order::where('status', '!=', 'cancelled')
-            ->createdSince($since)
+        return Order::query()
+            ->where('status', '!=', 'cancelled')
+            ->createdSince(Carbon::now()->subDays(7))
             ->selectRaw('DATE(created_at) as date, SUM(total) as total')
             ->groupBy('date')
             ->orderBy('date')

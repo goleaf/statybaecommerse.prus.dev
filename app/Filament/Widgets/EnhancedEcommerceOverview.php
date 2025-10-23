@@ -103,12 +103,12 @@ final class EnhancedEcommerceOverview extends StatsOverviewWidget
 
         $current = Order::query()
             ->where('status', '!=', 'cancelled')
-            ->createdBetween($now->copy()->startOfMonth(), $now)
+            ->createdBetween(now()->startOfMonth(), now())
             ->sum('total');
 
         $previous = Order::query()
             ->where('status', '!=', 'cancelled')
-            ->createdBetween($previousMonth->copy()->startOfMonth(), $previousMonth->copy()->endOfMonth())
+            ->createdBetween(now()->subMonth()->startOfMonth(), now()->subMonth()->endOfMonth())
             ->sum('total');
 
         return $this->calculateDelta($current, $previous);
@@ -116,13 +116,10 @@ final class EnhancedEcommerceOverview extends StatsOverviewWidget
 
     private function getOrderDelta(): float
     {
-        $now = Carbon::now();
-        $previousMonth = $now->copy()->subMonth();
-
-        $current = Order::query()->createdBetween($now->copy()->startOfMonth(), $now)->count();
+        $current = Order::query()->createdBetween(now()->startOfMonth(), now())->count();
 
         $previous = Order::query()
-            ->createdBetween($previousMonth->copy()->startOfMonth(), $previousMonth->copy()->endOfMonth())
+            ->createdBetween(now()->subMonth()->startOfMonth(), now()->subMonth()->endOfMonth())
             ->count();
 
         return $this->calculateDelta($current, $previous);

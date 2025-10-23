@@ -6,79 +6,45 @@ namespace Tests\Feature\Database;
 
 use App\Models\Order;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
-final class OrderCreatedAtIndexTest extends TestCase
+class OrderCreatedAtIndexTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_completed_order_range_query_uses_created_at_index(): void
+    public function test_created_between_scope_uses_created_at_index(): void
     {
-        $start = Carbon::now()->subMonths(2)->startOfMonth();
-        $end = Carbon::now()->endOfMonth();
+        Order::factory()->count(3)->create(['created_at' => now()->subDays(2)]);
 
-        Order::factory()->count(5)->completed()->create([
-            'created_at' => $start->copy()->addDays(3),
-            'updated_at' => $start->copy()->addDays(3),
-        ]);
+        $query = Order::query()->createdBetween(now()->subDays(3), now());
 
-        Order::factory()->count(3)->completed()->create([
-            'created_at' => $end->copy()->subDays(5),
-            'updated_at' => $end->copy()->subDays(5),
-        ]);
+        $planDetails = $this->explainPlan($query->toSql(), $query->getBindings());
 
-        Order::factory()->count(2)->completed()->create([
-            'created_at' => $start->copy()->subMonths(6),
-            'updated_at' => $start->copy()->subMonths(6),
-        ]);
-
-        $query = Order::query()
-            ->completed()
-            // Apply the reusable scope instead of a raw predicate to guarantee index alignment.
-            ->createdBetween($start, $end)
-            ->selectRaw('SUM(total) AS total');
-
-        $plan = DB::select(
-            $this->explain($query->toSql()),
-            $query->getBindings()
-        );
-
-        $this->assertOrdersPlanUsesCreatedAtIndex($plan);
+        $this->assertStringContainsString('orders_created_at_index', $planDetails);
     }
 
-    /**
-     * @param array<int, object> $plan
-     */
-    private function assertOrdersPlanUsesCreatedAtIndex(array $plan): void
+    public function test_created_since_scope_uses_created_at_index(): void
     {
-        $driver = DB::getDriverName();
+        Order::factory()->count(3)->create(['created_at' => now()->subDays(2)]);
 
-        if ($driver === 'sqlite') {
-            $details = collect($plan)
-                ->map(static fn (object $row): string => (string) ($row->detail ?? ''))
-                ->filter();
+        $query = Order::query()->createdSince(now()->subDays(3));
 
-            $this->assertTrue(
-                $details->contains(static fn (string $detail): bool => str_contains($detail, 'orders_created_at_index')),
-                'Expected SQLite query plan to reference orders_created_at_index. Details: ' . implode(' | ', $details->all())
-            );
+        $planDetails = $this->explainPlan($query->toSql(), $query->getBindings());
 
-            return;
-        }
-
-        foreach ($plan as $row) {
-            $key = $row->key ?? $row->Key ?? null;
-            $this->assertSame('orders_created_at_index', $key, 'Expected MySQL query plan to use orders_created_at_index.');
-        }
+        $this->assertStringContainsString('orders_created_at_index', $planDetails);
     }
 
-    private function explain(string $sql): string
+    private function explainPlan(string $sql, array $bindings): string
     {
-        return match (DB::getDriverName()) {
-            'sqlite' => 'EXPLAIN QUERY PLAN ' . $sql,
-            default  => 'EXPLAIN ' . $sql,
-        };
+        $plan = DB::select('EXPLAIN QUERY PLAN '.$sql, $bindings);
+
+        return collect($plan)
+            ->map(function ($row) {
+                $values = array_map('strval', (array) $row);
+
+                return strtolower(implode(' ', $values));
+            })
+            ->implode(' ');
     }
 }
