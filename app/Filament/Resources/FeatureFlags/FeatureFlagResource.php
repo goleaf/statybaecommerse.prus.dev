@@ -25,12 +25,12 @@ class FeatureFlagResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form
+    public static function form(Form $form): Form|array
     {
         return FeatureFlagForm::configure($form);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table|array
     {
         return FeatureFlagsTable::configure($table);
     }

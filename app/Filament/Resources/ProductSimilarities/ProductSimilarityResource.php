@@ -24,12 +24,12 @@ class ProductSimilarityResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form
+    public static function form(Form $form): Form|array
     {
         return ProductSimilarityForm::configure($form);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table|array
     {
         return ProductSimilaritiesTable::configure($table);
     }

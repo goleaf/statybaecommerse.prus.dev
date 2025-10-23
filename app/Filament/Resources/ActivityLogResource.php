@@ -61,25 +61,12 @@ final class ActivityLogResource extends Resource
         return __('activity_logs.plural');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Form $form): Form|array
     {
         return $form->schema([]);
     }
 
-    /**
-     * Define the create/edit form schema using the Filament v4 Schema contract.
-     * The resource remains read-only for now, so we still return an empty schema
-     * while keeping the hook available for future enhancements.
-     */
-    public static function form(Form $form): Form
-    {
-        return $form->schema([]);
-    }
-
-    /**
-     * Configure the table that lists activity log records along with filters and actions.
-     */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table|array
     {
         $modelClass = self::getModel();
 

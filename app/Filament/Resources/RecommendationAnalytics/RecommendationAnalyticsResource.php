@@ -51,12 +51,12 @@ final class RecommendationAnalyticsResource extends Resource
         return __('recommendation_analytics.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Form $form): Form|array
     {
         return RecommendationAnalyticsForm::configure($form);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table|array
     {
         return RecommendationAnalyticsTable::configure($table);
     }

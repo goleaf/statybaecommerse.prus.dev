@@ -56,7 +56,7 @@ final class RecommendationConfigResource extends Resource
         return __('recommendation_configs.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Form $form): Form|array
     {
         return $form->schema([
             Section::make(__('recommendation_config.sections.basic_info'))
@@ -147,7 +147,7 @@ final class RecommendationConfigResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table|array
     {
         /** @var \Filament\Actions\BulkAction $activateAction */
         $activateAction = BulkAction::make('activate')

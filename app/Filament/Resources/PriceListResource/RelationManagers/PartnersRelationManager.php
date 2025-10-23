@@ -20,12 +20,7 @@ final class PartnersRelationManager extends BaseRelationManager
         return __('price_lists.relation_managers.partners.title');
     }
 
-    public function form(Form $form): Form
-    {
-        return $form->schema([]);
-    }
-
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         return $table
             ->recordTitleAttribute('name')

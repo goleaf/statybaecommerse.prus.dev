@@ -50,7 +50,9 @@ class NewsImageResource extends Resource
         return 'heroicon-o-photo';
     }
 
-    public static function form(Form $form): Form
+    protected static ?int $navigationSort = 1;
+
+    public static function form(Form $form): Form|array
     {
         return $form
             ->schema([
@@ -111,7 +113,7 @@ class NewsImageResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table|array
     {
         return $table
             ->columns([

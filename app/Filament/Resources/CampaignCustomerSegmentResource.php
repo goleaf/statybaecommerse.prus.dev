@@ -71,7 +71,7 @@ final class CampaignCustomerSegmentResource extends Resource
         return __('campaign_customer_segments.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Form $form): Form|array
     {
         return $form->schema([
             Section::make(__('campaign_customer_segments.tabs.basic_information'))
@@ -142,7 +142,7 @@ final class CampaignCustomerSegmentResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table|array
     {
         return $table
             ->columns([
@@ -247,7 +247,7 @@ final class CampaignCustomerSegmentResource extends Resource
             ->paginated([10, 25, 50, 100]);
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Schema $schema): Schema|array
     {
         return $schema->schema([
             InfolistSection::make(__('campaign_customer_segments.tabs.basic_information'))

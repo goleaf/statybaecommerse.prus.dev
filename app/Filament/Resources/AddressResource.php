@@ -98,7 +98,7 @@ final class AddressResource extends Resource
      * definitions. Returning the schema keeps the resource compatible with Filament's
      * stricter signature expectations while documenting the component wiring strategy.
      */
-    public static function form(Form $form): Form
+    public static function form(Form $form): Form|array
     {
         return $form->schema([
             Section::make(__('translations.address_information'))
@@ -329,7 +329,7 @@ final class AddressResource extends Resource
      * Configure the Filament table while returning the provided Table instance so the
      * resource method signature aligns with Filament v4's stricter contract.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table|array
     {
         return $table
             ->columns([

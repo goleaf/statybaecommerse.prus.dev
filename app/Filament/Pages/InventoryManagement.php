@@ -41,7 +41,7 @@ final class InventoryManagement extends Page implements HasTable
         return 'Inventory Management';
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         $table = $table
             ->query(Product::query())
