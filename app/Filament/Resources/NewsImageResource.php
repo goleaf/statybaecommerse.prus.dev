@@ -369,7 +369,9 @@ final class NewsImageResource extends Resource
                     ->toggle(),
                 Filter::make('no_alt_text')
                     ->label(__('admin.news_images.no_alt_text'))
-                    ->query(fn (Builder $query): Builder => $query->whereNull('alt_text')->orWhere('alt_text', ''))
+                    ->query(fn (Builder $query): Builder => $query->where(
+                        fn (Builder $q): Builder => $q->whereNull('alt_text')->orWhere('alt_text', '')
+                    ))
                     ->toggle(),
             ])
             ->actions([
