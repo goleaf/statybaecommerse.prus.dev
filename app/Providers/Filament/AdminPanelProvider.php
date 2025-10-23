@@ -70,10 +70,10 @@ final class AdminPanelProvider extends PanelProvider
                 fn (Panel $p) => $p->authGuard('web'),
                 fn (Panel $p) => $p->authGuard('admin'))
             ->authPasswordBroker('admin_users')
-            ->brandName($this->translate('admin.brand_name'))
-            ->brandLogo($this->assetUrl('images/logo-admin.svg'))
+            ->brandName(__('admin.brand_name'))
+            ->brandLogo(fn (): string => asset('images/logo-admin.svg'))
             ->brandLogoHeight('2rem')
-            ->favicon($this->assetUrl('favicon.ico'))
+            ->favicon(fn (): string => asset('favicon.ico'))
             ->colors([
                 'primary' => Color::Blue,
                 'gray'    => Color::Slate,

@@ -6,6 +6,7 @@ namespace App\Support\Media;
 
 use Illuminate\Support\Arr;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use function safe_asset;
 
 final class PlaceholderResolver
 {
@@ -89,6 +90,10 @@ final class PlaceholderResolver
         }
 
         if (str_starts_with($fallback, 'http://') || str_starts_with($fallback, 'https://')) {
+            return $fallback;
+        }
+
+        if (str_starts_with($fallback, '/')) {
             return $fallback;
         }
 
