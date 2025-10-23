@@ -63,9 +63,9 @@ final class ShippingOption extends Model
             'max_order_amount'   => 'decimal:2',
             'estimated_days_min' => 'integer',
             'estimated_days_max' => 'integer',
-            'sort_order'         => 'integer',
-            'metadata'           => 'array',
-            'shipping_matrix'    => 'array',
+            'sort_order' => 'integer',
+            'metadata' => 'array',
+            'shipping_matrix' => 'array',
         ];
     }
 
