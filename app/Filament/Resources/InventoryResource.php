@@ -31,7 +31,10 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use LaraZeus\Quantity\Components\Quantity;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use pxlrbt\FilamentExcel\Columns\Column;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use UnitEnum;
 
 final class InventoryResource extends Resource
@@ -237,6 +240,13 @@ final class InventoryResource extends Resource
                         return $query->where('is_tracked', (bool) (int) $value);
                     }),
             ])
+            ->headerActions([
+                ExportAction::make()
+                    ->label(__('Export'))
+                    ->exports([
+                        self::makeInventoryExport(),
+                    ]),
+            ])
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
@@ -356,6 +366,11 @@ final class InventoryResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
+                    ExportBulkAction::make()
+                        ->label(__('Export selected'))
+                        ->exports([
+                            self::makeInventoryExport(),
+                        ]),
                     DeleteBulkAction::make(),
                     BulkAction::make('adjust_stock')
                         ->label(__('Adjust Stock'))
@@ -441,6 +456,37 @@ final class InventoryResource extends Resource
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    private static function makeInventoryExport(): ExcelExport
+    {
+        return ExcelExport::make('stock_snapshot')
+            ->fromTable()
+            ->queue()
+            ->withChunkSize(500)
+            ->withColumns([
+                Column::make('product.sku')
+                    ->heading(__('SKU')),
+                Column::make('product.name')
+                    ->heading(__('Product')),
+                Column::make('location.name')
+                    ->heading(__('Location')),
+                Column::make('quantity')
+                    ->heading(__('Quantity'))
+                    ->formatStateUsing(static fn (?int $state): string => number_format((int) $state)),
+                Column::make('reserved')
+                    ->heading(__('Reserved'))
+                    ->formatStateUsing(static fn (?int $state): string => number_format((int) $state)),
+                Column::make('available_quantity')
+                    ->heading(__('Available'))
+                    ->formatStateUsing(static fn (?int $state): string => number_format((int) $state)),
+                Column::make('incoming')
+                    ->heading(__('Incoming'))
+                    ->formatStateUsing(static fn (?int $state): string => number_format((int) $state)),
+                Column::make('threshold')
+                    ->heading(__('Threshold'))
+                    ->formatStateUsing(static fn (?int $state): string => number_format((int) $state)),
+            ]);
     }
 
     public static function getRelations(): array
