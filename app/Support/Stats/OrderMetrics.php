@@ -57,8 +57,6 @@ final class OrderMetrics
         $cacheKey = self::cacheKey('orders.range', $from, $to);
 
         return Cache::remember($cacheKey, self::CACHE_TTL_SECONDS, static function () use ($from, $to): array {
-            // Build the shared paid orders query using the created_at scope so MySQL can
-            // consistently rely on the orders_created_at_index for the downstream aggregations.
             $ordersQuery = self::paidOrdersQuery($from, $to);
 
             $ordersCount = (clone $ordersQuery)->count();
@@ -196,8 +194,7 @@ final class OrderMetrics
                 ->selectRaw('order_items.name, SUM(order_items.quantity) as quantity, SUM(order_items.total) as revenue')
                 ->whereHas('order', function (Builder $query) use ($from, $to): void {
                     $query
-                        // Reuse the indexed created_at scope to keep the nested order filter efficient.
-                        ->createdBetween($from, $to)
+                        ->whereBetween('created_at', [$from, $to])
                         ->where(static function (Builder $builder): void {
                             $builder
                                 ->whereIn('status', self::PAID_STATUSES)
@@ -236,8 +233,7 @@ final class OrderMetrics
     private static function paidOrdersQuery(CarbonInterface $from, CarbonInterface $to): Builder
     {
         return Order::query()
-            // Scope the base query through created_at to align with the standalone index.
-            ->createdBetween($from, $to)
+            ->whereBetween('created_at', [$from, $to])
             ->where(static function (Builder $query): void {
                 $query
                     ->whereIn('status', self::PAID_STATUSES)

@@ -7,6 +7,8 @@ namespace App\Filament\Resources\NewsResource\Pages;
 use App\Enums\ModerationState;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\NewsResource;
+use App\Filament\Resources\NewsResource\Widgets\NewsPerformanceChart;
+use App\Filament\Resources\NewsResource\Widgets\NewsResourceStats;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
@@ -24,6 +26,20 @@ final class ListNews extends BaseListRecords
     {
         return [
             Actions\CreateAction::make(),
+        ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            NewsResourceStats::class,
+        ];
+    }
+
+    protected function getFooterWidgets(): array
+    {
+        return [
+            NewsPerformanceChart::class,
         ];
     }
 

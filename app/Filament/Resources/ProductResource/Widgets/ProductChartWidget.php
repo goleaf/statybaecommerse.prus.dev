@@ -6,8 +6,9 @@ namespace App\Filament\Resources\ProductResource\Widgets;
 
 use App\Filament\Support\InteractsWithDateFilter;
 use App\Models\Product;
-use Filament\Widgets\ChartWidget;
-use Illuminate\Support\Carbon;
+use Carbon\CarbonImmutable;
+use EightyNine\FilamentAdvancedWidget\AdvancedChartWidget;
+use Flowframe\Trend\Trend;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -34,47 +35,37 @@ final class ProductChartWidget extends AdvancedChartWidget
         ];
     }
 
-    protected static bool $isLazy = true;
-
     protected function getData(): array
     {
-        $startDate = Carbon::now()->subDays(29)->startOfDay();
-        $cacheKey = sprintf('filament:widgets:product-chart:%s', $startDate->toDateString());
+        [$from, $to] = $this->getDateRange($this->filter);
+        $diff = $from->diffInDays($to);
+        $granularityMethod = $diff > 90 ? 'perMonth' : 'perDay';
 
         /** @var array{labels: array<int, string>, data: array<int, int>} $chart */
         $chart = Cache::remember(
-            $cacheKey,
+            sprintf('filament:widgets:product-chart:%s:%s:%s', $this->filter, $from->format('Ymd'), $to->format('Ymd')),
             now()->addMinutes(30),
-            static function () use ($startDate): array {
-                $endDate = Carbon::now()->endOfDay();
-
-                /** @var array<string, int> $counts */
-                $counts = Product::query()
-                    ->selectRaw('DATE(created_at) as date, COUNT(*) as aggregate')
-                    ->where('created_at', '>=', $startDate)
-                    ->groupBy('date')
-                    ->orderBy('date')
-                    ->pluck('aggregate', 'date')
-                    ->mapWithKeys(static function ($count, string $date): array {
-                        $value = is_numeric($count) ? (int) $count : 0;
-
-                        return [$date => $value];
-                    })
-                    ->all();
+            static function () use ($from, $to, $granularityMethod, $diff): array {
+                $trend = Trend::query(
+                    Product::query()->whereBetween('created_at', [$from, $to])
+                )
+                    ->between($from, $to)
+                    ->{$granularityMethod}()
+                    ->count();
 
                 $labels = [];
                 $data = [];
 
-                $cursor = $startDate->copy();
-                while ($cursor->lte($endDate)) {
-                    $labels[] = $cursor->format('M d');
-                    $data[] = $counts[$cursor->toDateString()] ?? 0;
-                    $cursor->addDay();
+                foreach ($trend as $value) {
+                    $labels[] = $diff > 90
+                        ? CarbonImmutable::parse($value->date)->isoFormat('MMM YYYY')
+                        : CarbonImmutable::parse($value->date)->isoFormat('MMM D');
+                    $data[] = (int) $value->aggregate;
                 }
 
                 return [
                     'labels' => $labels,
-                    'data' => $data,
+                    'data'   => $data,
                 ];
             }
         );
@@ -82,12 +73,13 @@ final class ProductChartWidget extends AdvancedChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('products.widgets.products_created'),
-                    'data' => $chart['data'],
-                    'backgroundColor' => 'rgba(59, 130, 246, 0.1)',
-                    'borderColor' => 'rgba(59, 130, 246, 1)',
-                    'borderWidth' => 2,
-                    'fill' => true,
+                    'label'           => __('products.widgets.products_created'),
+                    'data'            => $chart['data'],
+                    'backgroundColor' => 'rgba(59, 130, 246, 0.15)',
+                    'borderColor'     => '#3b82f6',
+                    'borderWidth'     => 2,
+                    'fill'            => true,
+                    'tension'         => 0.4,
                 ],
             ],
             'labels' => $chart['labels'],

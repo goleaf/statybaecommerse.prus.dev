@@ -16,6 +16,7 @@
         "bezhansalleh/filament-shield": "^4.0",
         "defstudio/filament-searchable-input": "^4.0",
         "dutchcodingcompany/filament-socialite": "^3.0",
+        "eightynine/filament-advanced-widgets": "^4.0",
         "encoredigitalgroup/filament-helpers": "^4.0@rc",
         "filament/filament": "^4.1",
         "filament/spatie-laravel-media-library-plugin": "^4.0",
