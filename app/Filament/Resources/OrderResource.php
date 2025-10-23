@@ -237,6 +237,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                                     ->find($value);
                                             }
 
+                        
                                             if (! $user instanceof User) {
                                                 return null;
                                             }

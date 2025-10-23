@@ -71,30 +71,32 @@ final class OrderItemsRelationManager extends BaseRelationManager
                             ->components([
                                 SearchableInput::make('product_variant_id')
                                     ->label(__('orders.product_variant'))
-                                    ->placeholder(__('orders.placeholders.product_variant'))
-                                    ->searchUsing(fn (string $term): array => ProductVariantSearch::results($term))
-                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                    // Refer to docs/filament/searchable-inputs.md for helper usage guidance and payload expectations.
-                                    ->afterStateHydrated(fn (SearchableInput $component, ?int $state) => ProductVariantFieldHelper::hydrateSearchableVariant($component, $state))
-                                    ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set, Get $get): void {
-                                        if ($state === null || $state === '') {
-                                            // Clear dependent pricing fields when the variant selection resets.
-                                            SearchableInputHelper::clear($set, [
-                                                'product_variant_id' => null,
-                                                'product_id' => null,
-                                                'name' => null,
-                                                'sku' => null,
-                                                'unit_price' => null,
-                                                'total' => 0,
-                                            ]);
+                                    ->placeholder(__('orders.lookups.variant_placeholder'))
+                                    ->required()
+                                    ->reactive()
+                                ->searchUsing(fn (string $value): array => ProductVariantSearch::results($value))
+                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                // Refer to docs/filament/searchable-inputs.md for helper usage guidance and payload expectations.
+                                ->afterStateHydrated(fn (SearchableInput $component, ?int $state) => ProductVariantFieldHelper::hydrateSearchableVariant($component, $state))
+                                ->afterStateUpdated(function (?string $state, Set $set, Get $get): void {
+                                    if ($state === null || $state === '') {
+                                        // Reset dependent fields when the variant lookup clears.
+                                        SearchableInputHelper::clear($set, [
+                                            'product_variant_id' => null,
+                                            'product_id'         => null,
+                                            'name'               => null,
+                                            'sku'                => null,
+                                            'unit_price'         => null,
+                                            'total'              => 0,
+                                        ]);
 
-                                            ProductVariantFieldHelper::handleVariantSelection(null, $set, $get, $component);
+                                        ProductVariantFieldHelper::handleVariantSelection(null, $set, $get);
 
-                                            return;
-                                        }
+                                        return;
+                                    }
 
-                                        ProductVariantFieldHelper::handleVariantSelection($state, $set, $get, $component);
-                                    }),
+                                    ProductVariantFieldHelper::handleVariantSelection($state, $set, $get);
+                                }),
                                 TextInput::make('quantity')
                                     ->label(__('orders.quantity'))
                                     ->numeric()

@@ -128,12 +128,30 @@ final class VariantInventoryResource extends Resource
                             })
                             ->afterStateUpdated(function (?string $state, Set $set): void {
                                 if ($state === null || $state === '') {
-                                    SearchableInputHelper::clear($set, ['variant_id' => null]);
+                                    SearchableInputHelper::clear($set, [
+                                        'variant_id'      => null,
+                                        'variant_payload' => [],
+                                    ]);
 
                                     return;
                                 }
 
-                                $set('variant_id', (int) $state);
+                                $variant = ProductVariant::query()
+                                    ->select(['id', 'product_id', 'sku', 'name', 'price'])
+                                    ->with(['product:id,sku,name'])
+                                    ->find((int) $state);
+
+                                if (! $variant instanceof ProductVariant) {
+                                    SearchableInputHelper::clear($set, [
+                                        'variant_id'      => null,
+                                        'variant_payload' => [],
+                                    ]);
+
+                                    return;
+                                }
+
+                                $set('variant_id', $variant->getKey());
+                                $set('variant_payload', self::normaliseVariantPayload($variant));
                             }),
                         Hidden::make('variant_payload')
                             ->default([])
@@ -168,12 +186,29 @@ final class VariantInventoryResource extends Resource
                             })
                             ->afterStateUpdated(function (?string $state, Set $set): void {
                                 if ($state === null || $state === '') {
-                                    SearchableInputHelper::clear($set, ['location_id' => null]);
+                                    SearchableInputHelper::clear($set, [
+                                        'location_id'      => null,
+                                        'location_payload' => [],
+                                    ]);
 
                                     return;
                                 }
 
-                                $set('location_id', (int) $state);
+                                $location = Location::query()
+                                    ->select(['id', 'name', 'code', 'city', 'country_code'])
+                                    ->find((int) $state);
+
+                                if (! $location instanceof Location) {
+                                    SearchableInputHelper::clear($set, [
+                                        'location_id'      => null,
+                                        'location_payload' => [],
+                                    ]);
+
+                                    return;
+                                }
+
+                                $set('location_id', $location->getKey());
+                                $set('location_payload', self::normaliseLocationPayload($location));
                             }),
                         Hidden::make('location_payload')
                             ->default([])
