@@ -142,8 +142,9 @@ final class AdminPanelProvider extends PanelProvider
                     FilamentShieldPlugin::make(),
                     ResizedColumnPlugin::make()->preserveOnDB(),
                 ]))
-            // Load the enhanced theme so third-party component styles (e.g. searchable inputs) compile correctly.
-            ->viteTheme('resources/css/filament-enhancements.css')
+            // Enable the custom Filament theme so third-party plugin views (like the searchable input)
+            // are compiled with Tailwind during the build step.
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->spa();
     }
 

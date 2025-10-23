@@ -12,6 +12,9 @@ use App\Filament\Resources\ProductHistoryResource\Widgets\ProductHistoryStatsWid
 use App\Filament\Resources\ProductHistoryResource\Widgets\RecentProductChangesWidget;
 use App\Models\ProductHistory;
 use BackedEnum;
+use DateTimeInterface;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\Select as SelectInput;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
@@ -77,8 +80,8 @@ final class ProductHistoryResource extends Resource
                     SearchableInput::make('field_name')
                         ->label(__('product_history.field_name'))
                         ->maxLength(255)
-                        ->searchUsing(fn (string $search): array => self::fieldNameSuggestions($search))
-                        ->options(fn (): array => self::fieldNameSuggestions()),
+                        ->searchUsing(fn (string $search): array => self::searchFieldNames($search))
+                        ->options(fn (): array => self::fieldNameOptions()),
                 ]),
             Section::make(__('product_history.details'))
                 ->columns(2)
@@ -339,6 +342,55 @@ final class ProductHistoryResource extends Resource
         $encoded = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 
         return is_string($encoded) ? $encoded : '';
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function fieldNameOptions(): array
+    {
+        return ProductHistory::query()
+            ->select('field_name')
+            ->whereNotNull('field_name')
+            ->distinct()
+            ->orderBy('field_name')
+            ->pluck('field_name')
+            ->mapWithKeys(static fn (mixed $field): array => [
+                (string) $field => self::fieldLabel((string) $field),
+            ])
+            ->all();
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function searchFieldNames(string $search): array
+    {
+        $term = trim($search);
+
+        if ($term === '') {
+            return [];
+        }
+
+        return ProductHistory::query()
+            ->select('field_name')
+            ->whereNotNull('field_name')
+            ->where('field_name', 'like', "%{$term}%")
+            ->distinct()
+            ->orderBy('field_name')
+            ->limit(20)
+            ->pluck('field_name')
+            ->map(static fn (mixed $field): string => self::fieldLabel((string) $field))
+            ->values()
+            ->all();
+    }
+
+    private static function fieldLabel(string $field): string
+    {
+        $translationKey = 'admin.product_history.fields.' . $field;
+        $translated = __($translationKey);
+
+        return $translated === $translationKey ? $field : $translated;
     }
 
     private static function formatDateFilterValue(mixed $value): ?string
