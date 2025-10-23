@@ -14,32 +14,27 @@ final class SystemSettingDependencyFactory extends Factory
 
     public function definition(): array
     {
-        $operator = $this->faker->randomElement([
-            'equals',
-            'not_equals',
-            'greater_than',
-            'less_than',
-            'contains',
-            'not_contains',
-            'is_empty',
-            'is_not_empty',
-            'is_true',
-            'is_false',
-        ]);
+        $conditions = [
+            ['operator' => 'equals', 'value' => 'enabled'],
+            ['operator' => 'equals', 'value' => 'disabled'],
+            ['operator' => 'greater_than', 'value' => '0'],
+            ['operator' => 'less_than', 'value' => '100'],
+            ['operator' => 'contains', 'value' => 'test'],
+            ['operator' => 'not_contains', 'value' => 'test'],
+            ['operator' => 'is_empty', 'value' => null],
+            ['operator' => 'is_not_empty', 'value' => null],
+            ['operator' => 'is_true', 'value' => null],
+            ['operator' => 'is_false', 'value' => null],
+        ];
 
-        $value = match ($operator) {
-            'equals', 'not_equals' => $this->faker->word(),
-            'greater_than', 'less_than' => (string) $this->faker->numberBetween(1, 100),
-            'contains', 'not_contains' => $this->faker->word(),
-            default => null,
-        };
+        $selected = $this->faker->randomElement($conditions);
 
         return [
             'setting_id'            => SystemSetting::factory(),
             'depends_on_setting_id' => SystemSetting::factory(),
-            'condition'             => $operator,
-            'condition_value'       => $value,
-            'is_active'             => $this->faker->boolean(90), // 90% chance of being active
+            'condition' => $selected['operator'],
+            'condition_value' => $selected['value'],
+            'is_active' => $this->faker->boolean(90), // 90% chance of being active
         ];
     }
 
@@ -60,7 +55,7 @@ final class SystemSettingDependencyFactory extends Factory
     public function equals(string $value): static
     {
         return $this->state(fn (array $attributes) => [
-            'condition'       => 'equals',
+            'condition' => 'equals',
             'condition_value' => $value,
         ]);
     }
@@ -68,7 +63,7 @@ final class SystemSettingDependencyFactory extends Factory
     public function notEquals(string $value): static
     {
         return $this->state(fn (array $attributes) => [
-            'condition'       => 'not_equals',
+            'condition' => 'not_equals',
             'condition_value' => $value,
         ]);
     }
@@ -76,7 +71,7 @@ final class SystemSettingDependencyFactory extends Factory
     public function greaterThan(string $value): static
     {
         return $this->state(fn (array $attributes) => [
-            'condition'       => 'greater_than',
+            'condition' => 'greater_than',
             'condition_value' => $value,
         ]);
     }
@@ -84,7 +79,7 @@ final class SystemSettingDependencyFactory extends Factory
     public function lessThan(string $value): static
     {
         return $this->state(fn (array $attributes) => [
-            'condition'       => 'less_than',
+            'condition' => 'less_than',
             'condition_value' => $value,
         ]);
     }
@@ -92,7 +87,7 @@ final class SystemSettingDependencyFactory extends Factory
     public function contains(string $value): static
     {
         return $this->state(fn (array $attributes) => [
-            'condition'       => 'contains',
+            'condition' => 'contains',
             'condition_value' => $value,
         ]);
     }
@@ -100,7 +95,7 @@ final class SystemSettingDependencyFactory extends Factory
     public function notContains(string $value): static
     {
         return $this->state(fn (array $attributes) => [
-            'condition'       => 'not_contains',
+            'condition' => 'not_contains',
             'condition_value' => $value,
         ]);
     }
@@ -108,7 +103,7 @@ final class SystemSettingDependencyFactory extends Factory
     public function isEmpty(): static
     {
         return $this->state(fn (array $attributes) => [
-            'condition'       => 'is_empty',
+            'condition' => 'is_empty',
             'condition_value' => null,
         ]);
     }
@@ -116,7 +111,7 @@ final class SystemSettingDependencyFactory extends Factory
     public function isNotEmpty(): static
     {
         return $this->state(fn (array $attributes) => [
-            'condition'       => 'is_not_empty',
+            'condition' => 'is_not_empty',
             'condition_value' => null,
         ]);
     }
@@ -124,7 +119,7 @@ final class SystemSettingDependencyFactory extends Factory
     public function isTrue(): static
     {
         return $this->state(fn (array $attributes) => [
-            'condition'       => 'is_true',
+            'condition' => 'is_true',
             'condition_value' => null,
         ]);
     }
@@ -132,7 +127,7 @@ final class SystemSettingDependencyFactory extends Factory
     public function isFalse(): static
     {
         return $this->state(fn (array $attributes) => [
-            'condition'       => 'is_false',
+            'condition' => 'is_false',
             'condition_value' => null,
         ]);
     }
