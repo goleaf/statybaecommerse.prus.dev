@@ -31,7 +31,8 @@ use App\View\Creators\LocalizationCreator;
 use App\View\Creators\NavigationCreator;
 use App\View\Creators\SeoDataCreator;
 use App\View\Creators\UserDataCreator;
-use Artisan;
+use DateInterval;
+use DateTimeInterface;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Console\Scheduling\Schedule;
@@ -45,19 +46,25 @@ use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
-use Illuminate\Support\Facades\Vite;
+use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
 
 use function in_array;
+
+use InvalidArgumentException;
+
 use function is_array;
 
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
-use Storage;
 use Throwable;
 
 class AppServiceProvider extends ServiceProvider
@@ -102,6 +109,8 @@ class AppServiceProvider extends ServiceProvider
 
         $this->registerModelObservers();
         $this->registerQueueMonitoring();
+
+        $this->registerCollectionTimeoutMacros();
 
         $this->registerQueueTracing();
 
@@ -409,6 +418,66 @@ class AppServiceProvider extends ServiceProvider
         Queue::failing(function (JobFailed $event) use ($cleanup): void {
             $cleanup();
         });
+    }
+
+    /**
+     * Register collection macros that honour execution timeouts across eager and lazy enumerables.
+     */
+    private function registerCollectionTimeoutMacros(): void
+    {
+        $resolveDeadline = static function (mixed $timeout): Carbon {
+            if ($timeout instanceof Carbon) {
+                // Clone Carbon instances so downstream consumers cannot mutate the original reference.
+                return $timeout->copy();
+            }
+
+            if ($timeout instanceof DateTimeInterface) {
+                return Carbon::instance($timeout);
+            }
+
+            if ($timeout instanceof DateInterval) {
+                return Carbon::now()->add($timeout);
+            }
+
+            if (is_numeric($timeout)) {
+                return Carbon::now()->addSeconds((int) $timeout);
+            }
+
+            throw new InvalidArgumentException('Unsupported timeout value supplied to takeUntilTimeout.');
+        };
+
+        if (! LazyCollection::hasMacro('takeUntilTimeout')) {
+            LazyCollection::macro('takeUntilTimeout', function (mixed $timeout) use ($resolveDeadline) {
+                /** @var LazyCollection $this */
+                $deadline = $resolveDeadline($timeout);
+
+                // Use takeWhile to stop yielding values as soon as the deadline is exceeded.
+                return $this->takeWhile(static function () use ($deadline) {
+                    return Carbon::now()->lte($deadline);
+                });
+            });
+        }
+
+        if (! Collection::hasMacro('takeUntilTimeout')) {
+            Collection::macro('takeUntilTimeout', function (mixed $timeout) use ($resolveDeadline) {
+                /** @var Collection $this */
+                $collection = $this;
+
+                $lazySource = LazyCollection::make(function () use ($collection, $timeout, $resolveDeadline) {
+                    $deadline = $resolveDeadline($timeout);
+
+                    foreach ($collection as $key => $value) {
+                        if (Carbon::now()->gt($deadline)) {
+                            break;
+                        }
+
+                        yield $key => $value;
+                    }
+                });
+
+                return $lazySource;
+            });
+        }
     }
 
     private function registerModelObservers(): void
