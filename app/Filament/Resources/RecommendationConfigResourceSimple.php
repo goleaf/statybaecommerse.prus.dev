@@ -13,6 +13,7 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Combobox;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -128,6 +129,10 @@ final class RecommendationConfigResourceSimple extends Resource
                             Combobox::make('products')
                                 ->label(__('recommendation_configs_simple.products'))
                                 ->relationship('products', 'name')
+                                ->multiple()
+                                ->searchable()
+                                ->boxSearchs(true)
+                                ->height('360px')
                                 ->preload()
                                 ->afterStateHydrated(fn (Combobox $component, ?array $state) => $component->state(collect($state)->filter()->sort()->values()->toArray()))
                                 ->dehydrateStateUsing(fn (?array $state) => collect($state)->filter()->sort()->values()->toArray())
@@ -141,6 +146,10 @@ final class RecommendationConfigResourceSimple extends Resource
                             Combobox::make('categories')
                                 ->label(__('recommendation_configs_simple.categories'))
                                 ->relationship('categories', 'name')
+                                ->multiple()
+                                ->searchable()
+                                ->boxSearchs(true)
+                                ->height('360px')
                                 ->preload()
                                 ->afterStateHydrated(fn (Combobox $component, ?array $state) => $component->state(collect($state)->filter()->sort()->values()->toArray()))
                                 ->dehydrateStateUsing(fn (?array $state) => collect($state)->filter()->sort()->values()->toArray())
