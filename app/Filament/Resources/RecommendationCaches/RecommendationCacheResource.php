@@ -18,13 +18,37 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use UnitEnum;
 
-class RecommendationCacheResource extends Resource
+final class RecommendationCacheResource extends Resource
 {
     use HasNav;
 
     protected static ?string $model = RecommendationCache::class;
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static ?int $navigationSort = 20;
+
+    protected static ?string $recordTitleAttribute = 'cache_key';
+
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Analytics';
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.recommendation_caches.navigation_label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.recommendation_caches.plural_model_label');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.recommendation_caches.model_label');
+    }
 
     public static function form(Form $form): Form
     {
@@ -46,8 +70,8 @@ class RecommendationCacheResource extends Resource
         return [
             'index'  => ListRecommendationCaches::route('/'),
             'create' => CreateRecommendationCache::route('/create'),
-            'view'   => ViewRecommendationCache::route('/{record}'),
-            'edit'   => EditRecommendationCache::route('/{record}/edit'),
+            'view' => ViewRecommendationCache::route('/{record}'),
+            'edit' => EditRecommendationCache::route('/{record}/edit'),
         ];
     }
 }
