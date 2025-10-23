@@ -19,22 +19,15 @@ final class NormalSettingFactory extends Factory
         $type = $this->faker->randomElement(['text', 'number', 'boolean', 'json', 'array']);
 
         return [
-            'group' => $this->faker->randomElement(['general', 'email', 'payment', 'shipping', 'system']),
-            'key' => $this->faker->unique()->slug(2),
-            'locale' => $this->faker->randomElement(['en', 'lt', 'de', 'fr', 'es']),
-            'value' => match ($type) {
-                'number' => $this->faker->randomFloat(2, 0, 1000),
-                'boolean' => $this->faker->boolean(),
-                'json', 'array' => [
-                    'sample' => $this->faker->words(3, true),
-                    'enabled' => $this->faker->boolean(),
-                ],
-                default => $this->faker->sentence(),
-            },
-            'type' => $type,
-            'description' => $this->faker->sentence(),
-            'is_public' => $this->faker->boolean(70),
-            'is_encrypted' => $this->faker->boolean(20),
+            'group'            => $this->faker->randomElement(['general', 'email', 'payment', 'shipping', 'system']),
+            'key'              => $this->faker->unique()->slug(2),
+            'locale'           => $this->faker->randomElement(['en', 'lt', 'de', 'fr', 'es']),
+            'value'            => $this->faker->sentence(),
+            'type'             => $this->faker->randomElement(['text', 'number', 'boolean', 'json', 'array']),
+            'description'      => $this->faker->sentence(),
+            'is_public'        => $this->faker->boolean(70),
+            'is_encrypted'     => $this->faker->boolean(20),
+            'is_active'        => $this->faker->boolean(),
             'validation_rules' => $this->faker->optional(0.3)->randomElements(['required', 'min:1', 'max:255'], 2),
             'sort_order'       => $this->faker->numberBetween(1, 100),
         ];
