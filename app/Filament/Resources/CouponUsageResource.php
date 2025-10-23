@@ -13,11 +13,7 @@ use App\Support\Filament\Components\Flatpickr;
 use App\Support\Search\CouponSearch;
 use App\Support\Search\CustomerSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
-use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
 use Filament\Schemas\Components\Section;
@@ -29,8 +25,13 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -251,15 +252,27 @@ final class CouponUsageResource extends Resource
                     ->relationship('order', 'id')
                     ->searchable()
                     ->preload(),
-                Filter::make('used_at_range')
+                Filter::make('used_at')
                     ->label(__('admin.coupon_usages.filters.used_at'))
                     ->form([
                         Flatpickr::makeDateTime('from')->label(__('admin.coupon_usages.filters.used_at_from')),
                         Flatpickr::makeDateTime('until')->label(__('admin.coupon_usages.filters.used_at_until')),
                     ])
-                    ->query(fn (Builder $query, array $data): Builder => $query
-                        ->when($data['from'] ?? null, fn (Builder $q, $date): Builder => $q->where('used_at', '>=', $date))
-                        ->when($data['until'] ?? null, fn (Builder $q, $date): Builder => $q->where('used_at', '<=', $date))),
+                    ->query(function (Builder $query, array|string|null $data): Builder {
+                        // Allow both the range picker (array payload) and the single date test helper string.
+                        $exactDate = is_array($data) ? null : $data;
+
+                        if (filled($exactDate)) {
+                            return $query->whereDate('used_at', '=', $exactDate);
+                        }
+
+                        $from = is_array($data) ? ($data['from'] ?? null) : null;
+                        $until = is_array($data) ? ($data['until'] ?? null) : null;
+
+                        return $query
+                            ->when($from, fn (Builder $q, $date): Builder => $q->where('used_at', '>=', $date))
+                            ->when($until, fn (Builder $q, $date): Builder => $q->where('used_at', '<=', $date));
+                    }),
                 TernaryFilter::make('used_today')
                     ->label(__('admin.coupon_usages.filters.used_today'))
                     ->queries(
@@ -282,6 +295,8 @@ final class CouponUsageResource extends Resource
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
+                // Surface the standard delete button so Livewire table actions stay in sync with the feature tests.
+                DeleteAction::make(),
                 Action::make('export_usage_report')
                     ->label(__('admin.coupon_usages.actions.export_usage_report'))
                     ->icon('heroicon-o-document-arrow-down')

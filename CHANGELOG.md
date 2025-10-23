@@ -7,8 +7,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Bug Fixes
-* Auto-generated customer group slugs from provided codes or localized names, resolving the NOT NULL constraint failures trigger
-  ed during factory-driven test runs and ensuring consistent identifiers across admin resources and storefront targeting flows.
+* Realigned the Coupon Usage Filament resource with its Livewire test harness by renaming the used-at filter, tolerating direct date strings, and surfacing the single-record delete action so CRUD flows match the documented scenarios.
 * Re-enabled flexible system setting translations by replacing the locale uniqueness constraint with an index, restoring soft delete support, and trimming the fillable contract so replication and counting scenarios match the documented API.
 * Preserved Attribute validation rule strings while still decoding JSON arrays, refreshed the Filament form so arrays render as comma-separated chips, and added regression coverage for both storage paths.
 * Reintroduced the `regions` schema with defensive guards and rebuilt the `customers`/`orders` relationship so SQLite-backed factories and analytics widgets can create location-aware records without missing column errors during tests.
