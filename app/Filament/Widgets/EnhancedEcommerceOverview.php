@@ -19,7 +19,7 @@ final class EnhancedEcommerceOverview extends StatsOverviewWidget
 
     protected static $navigationLabel = 'Enh. E-commerce Overview';
 
-    /** @var string|null Ensure the widget stays grouped under the dashboard section. */
+    /** @var string|\BackedEnum|null Keep the widget under the dashboard navigation cluster. */
     protected static $navigationGroup = 'Dashboard';
 
     protected string $maxHeight = '32rem';
