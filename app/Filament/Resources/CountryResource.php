@@ -12,7 +12,7 @@ use App\Filament\Resources\CountryResource\RelationManagers\CitiesRelationManage
 use App\Filament\Resources\CountryResource\RelationManagers\CustomersRelationManager;
 use App\Filament\Resources\CountryResource\RelationManagers\UsersRelationManager;
 use App\Models\Country;
-use App\Support\Filament\Components\Flatpickr;
+use Exception;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
@@ -283,7 +283,7 @@ final class CountryResource extends Resource
                     ->getStateUsing(fn ($record) => $record->is_active ? __('countries.statuses.active') : __('countries.statuses.inactive'))
                     ->colors([
                         'success' => fn ($state) => $state === __('countries.statuses.active'),
-                        'danger' => fn ($state) => $state === __('countries.statuses.inactive'),
+                        'danger'  => fn ($state) => $state === __('countries.statuses.inactive'),
                     ])
                     ->toggleable(),
                 TextColumn::make('cities_count')
@@ -383,7 +383,7 @@ final class CountryResource extends Resource
                         ->label(__('countries.actions.activate'))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->action(function (EloquentCollection $records): void {
+                        ->action(function ($records): void {
                             $records->each->update(['is_active' => true]);
                             Notification::make()
                                 ->title(__('countries.notifications.bulk_activated'))
@@ -394,7 +394,7 @@ final class CountryResource extends Resource
                         ->label(__('countries.actions.deactivate'))
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
-                        ->action(function (EloquentCollection $records): void {
+                        ->action(function ($records): void {
                             $records->each->update(['is_active' => false]);
                             Notification::make()
                                 ->title(__('countries.notifications.bulk_deactivated'))
@@ -436,6 +436,8 @@ final class CountryResource extends Resource
 
     /**
      * Handle getGlobalSearchResultDetails functionality with proper error handling.
+     *
+     * @param mixed $record
      */
     public static function getGlobalSearchResultDetails(Model $record): array
     {
@@ -466,8 +468,8 @@ final class CountryResource extends Resource
             $actions[] = Action::make('view')
                 ->label(__('countries.actions.view'))
                 ->icon('heroicon-o-eye')
-                ->url(self::getUrl('view', ['record' => $record->getKey()]));
-        } catch (Throwable) {
+                ->url(self::getUrl('view', ['record' => $record]));
+        } catch (Exception $e) {
             // Route might not exist, skip this action
         }
 
@@ -475,8 +477,8 @@ final class CountryResource extends Resource
             $actions[] = Action::make('edit')
                 ->label(__('countries.actions.edit'))
                 ->icon('heroicon-o-pencil')
-                ->url(self::getUrl('edit', ['record' => $record->getKey()]));
-        } catch (Throwable) {
+                ->url(self::getUrl('edit', ['record' => $record]));
+        } catch (Exception $e) {
             // Route might not exist, skip this action
         }
 
