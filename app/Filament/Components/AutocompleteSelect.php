@@ -61,11 +61,9 @@ final class AutocompleteSelect extends Select
     {
         parent::searchable($condition);
 
-        $evaluatedCondition = $this->evaluate($condition);
-
-        $this->searchable = is_array($evaluatedCondition)
-            ? true
-            : (bool) $evaluatedCondition;
+        $this->searchable = is_array($condition)
+            ? $condition !== []
+            : (bool) $this->evaluate($condition);
 
         return $this;
     }
@@ -173,29 +171,19 @@ final class AutocompleteSelect extends Select
         return $this->modelClass;
     }
 
-    /**
-     * @return array<string, string>
-     */
     public function getSearchResults(string $search = ''): array
     {
-        $results = func_num_args() === 0
-            ? $this->resolveSearchResults()
-            : $this->resolveSearchResults($search);
+        if ($search !== '') {
+            $this->setSearchQuery($search);
+        } elseif ($this->searchQuery === null || $this->searchQuery === '') {
+            $this->searchResults = collect();
 
-        return $this->mapSearchResultsForOptions($results);
-    }
+            return [];
+        } else {
+            $this->performSearch();
+        }
 
-    public function getSearchResultsCollection(?string $search = null): Collection
-    {
-        return $this->resolveSearchResults($search);
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    protected function mapSearchResultsForOptions(Collection $results): array
-    {
-        return $results
+        return ($this->searchResults ?? collect())
             ->mapWithKeys(function (array $item): array {
                 $value = $item['value'] ?? null;
                 $label = $item['label']
@@ -303,8 +291,8 @@ final class AutocompleteSelect extends Select
         $labelField = $this->getLabelField();
 
         $query = $model
-            ->query()
-            ->where($searchField, 'like', '%' . $this->searchQuery . '%')
+            ->newQueryWithoutScopes()
+            ->where($searchField, 'like', '%'.$this->searchQuery.'%')
             ->limit($this->maxSearchResults);
 
         $this->searchResults = $query->get()->map(function (Model $item) use ($valueField, $labelField) {
