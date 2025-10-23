@@ -6,71 +6,39 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use App\Services\Frontend\CategoryPageDataProvider;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 final class CategoryController extends Controller
 {
+    public function __construct(private readonly CategoryPageDataProvider $dataProvider)
+    {
+    }
+
     public function index(Request $request): View
     {
-        $search = Str::of((string) $request->input('search'))->trim()->whenEmpty(fn () => null)->toString();
-
-        $categoriesQuery = Category::query()
-            ->withCount(['products as visible_products_count' => fn ($query) => $query->where('is_visible', true)])
-            ->orderBy('name');
-
-        if ($search) {
-            $categoriesQuery->where(function ($query) use ($search): void {
-                $query->where('name', 'like', '%'.$search.'%')
-                    ->orWhere('slug', 'like', '%'.$search.'%');
-            });
-        }
-
-        /** @var LengthAwarePaginator $categories */
-        $categories = $categoriesQuery->paginate(12)->withQueryString();
-
         return view('frontend.categories.index', [
-            'categories' => $categories,
-            'search' => $search,
+            'categories' => $this->dataProvider->indexCategories(),
         ]);
     }
 
-    public function show(Category $category, Request $request): View
+    public function show(Request $request, Category $category): View
     {
-        $category->load(['children' => fn ($query) => $query->orderBy('name')]);
-
-        $productsQuery = $category->products()
-            ->with(['brand', 'media'])
-            ->where('is_visible', true);
-
-        $sort = $request->input('sort', 'latest');
-
-        switch ($sort) {
-            case 'price_asc':
-                $productsQuery->orderBy('price');
-                break;
-            case 'price_desc':
-                $productsQuery->orderByDesc('price');
-                break;
-            case 'name_asc':
-                $productsQuery->orderBy('name');
-                break;
-            case 'name_desc':
-                $productsQuery->orderByDesc('name');
-                break;
-            default:
-                $productsQuery->latest();
-        }
-
-        /** @var LengthAwarePaginator $products */
-        $products = $productsQuery->paginate(12)->withQueryString();
+        $category = $this->dataProvider->loadCategory($category);
+        $filters = $this->dataProvider->resolveFilters($request);
+        $products = $this->dataProvider->products($category, $filters, 12)->withQueryString();
 
         return view('frontend.categories.show', [
             'category' => $category,
+            'breadcrumbs' => $this->dataProvider->breadcrumbs($category),
+            'childCategories' => $this->dataProvider->childCategories($category),
             'products' => $products,
-            'sort' => $sort,
+            'availableSorts' => $this->dataProvider->availableSorts(),
+            'activeFilters' => $filters,
+            'brands' => $this->dataProvider->brands(),
         ]);
     }
 }

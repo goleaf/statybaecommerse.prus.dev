@@ -1,80 +1,104 @@
 @extends('frontend.layouts.app')
 
+@section('title', $product->name)
+
 @section('content')
-    <div class="max-w-5xl mx-auto px-4 py-10 space-y-10">
-        <nav aria-label="{{ __('Breadcrumb') }}" class="text-sm text-slate-500 dark:text-slate-400">
-            <a href="{{ route('home') }}" class="hover:text-primary-600 dark:hover:text-primary-400">{{ __('Home') }}</a>
-            <span class="mx-2">/</span>
-            <a href="{{ route('frontend.products.index') }}" class="hover:text-primary-600 dark:hover:text-primary-400">{{ __('Products') }}</a>
-            <span class="mx-2">/</span>
-            <span class="text-slate-700 dark:text-slate-200">{{ $product->name }}</span>
-        </nav>
+    <div class="bg-gray-50 py-12">
+        <div class="mx-auto max-w-6xl space-y-12 px-6">
+            <nav class="text-sm text-gray-500">
+                <ol class="flex flex-wrap items-center gap-2">
+                    <li>
+                        <a href="{{ route('home') }}" class="hover:text-indigo-600">{{ __('Home') }}</a>
+                        <span aria-hidden="true">/</span>
+                    </li>
+                    <li>
+                        <a href="{{ route('frontend.products.index') }}" class="hover:text-indigo-600">{{ __('Products') }}</a>
+                        <span aria-hidden="true">/</span>
+                    </li>
+                    <li class="text-gray-700">{{ $product->name }}</li>
+                </ol>
+            </nav>
 
-        <header class="space-y-4">
-            <h1 class="text-3xl font-semibold text-slate-900 dark:text-slate-100">{{ $product->name }}</h1>
-            @if ($product->brand)
-                <p class="text-slate-600 dark:text-slate-300">{{ __('Brand') }}: <span class="font-medium">{{ $product->brand->name }}</span></p>
-            @endif
-            <p class="text-2xl font-semibold text-primary-600">{{ number_format((float) $product->price, 2) }} {{ config('app.currency', 'EUR') }}</p>
-        </header>
+            <div class="grid gap-10 lg:grid-cols-2">
+                <div class="space-y-4">
+                    @php
+                        $primaryImage = $product->getFirstMediaUrl('images', 'large') ?: $product->getFirstMediaUrl('images') ?: asset('images/placeholder-product.png');
+                    @endphp
+                    <div class="overflow-hidden rounded-2xl bg-white shadow">
+                        <img src="{{ $primaryImage }}" alt="{{ $product->name }}" class="h-full w-full object-cover" loading="lazy">
+                    </div>
+                    @if($product->media->count() > 1)
+                        <div class="grid grid-cols-4 gap-4">
+                            @foreach($product->media->take(4) as $media)
+                                <img src="{{ $media->getUrl('thumb') }}" alt="{{ $product->name }}" class="h-24 w-full rounded-xl object-cover" loading="lazy">
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
 
-        <section class="space-y-4">
-            <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100">{{ __('Description') }}</h2>
-            <p class="text-slate-700 dark:text-slate-300 leading-relaxed">{{ $product->description ?: __('This product does not have a description yet.') }}</p>
-        </section>
+                <div class="space-y-6">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900">{{ $product->name }}</h1>
+                        @if($product->brand)
+                            <p class="mt-1 text-sm text-gray-600">{{ __('Brand:') }} <a href="{{ route('frontend.brands.show', $product->brand) }}" class="font-semibold text-indigo-600 hover:text-indigo-500">{{ $product->brand->name }}</a></p>
+                        @endif
+                        @if($product->categories->isNotEmpty())
+                            <p class="mt-1 text-xs text-gray-500">
+                                {{ __('Categories:') }}
+                                @foreach($product->categories as $category)
+                                    <a href="{{ route('frontend.categories.show', $category) }}" class="mr-2 text-indigo-600 hover:text-indigo-500">{{ $category->name }}</a>
+                                @endforeach
+                            </p>
+                        @endif
+                    </div>
 
-        @if ($reviews->isNotEmpty())
-            <section class="space-y-4">
-                <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100">{{ __('Latest reviews') }}</h2>
-                <ul class="space-y-4">
-                    @foreach ($reviews as $review)
-                        <li class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
-                            <div class="flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">
-                                <span class="font-medium text-slate-900 dark:text-slate-100">{{ $review->reviewer_name }}</span>
-                                <span>{{ __('Rating') }}: {{ $review->rating }}/5</span>
+                    @php
+                        $priceRecord = $product->prices->first();
+                        $priceAmount = $priceRecord->amount ?? $product->price;
+                        $currencySymbol = $priceRecord?->currency?->symbol ?? $priceRecord?->currency?->code ?? '€';
+                        $compareAmount = $priceRecord?->compare_amount ?? $product->compare_price;
+                        $saleAmount = $product->sale_price ?? null;
+                    @endphp
+
+                    <div class="rounded-xl bg-white p-6 shadow">
+                        <div class="flex items-center gap-4">
+                            @if($priceAmount !== null)
+                                <span class="text-3xl font-bold text-gray-900">{{ $currencySymbol }}{{ number_format((float) $priceAmount, 2) }}</span>
+                            @endif
+                            <div class="flex flex-col text-sm text-gray-500">
+                                @if($compareAmount && $priceAmount !== null && (float) $compareAmount > (float) $priceAmount)
+                                    <span class="line-through">{{ $currencySymbol }}{{ number_format((float) $compareAmount, 2) }}</span>
+                                @endif
+                                @if($saleAmount && (float) $saleAmount < (float) $priceAmount)
+                                    <span class="text-sm font-semibold text-emerald-600">{{ __('Sale price:') }} {{ $currencySymbol }}{{ number_format((float) $saleAmount, 2) }}</span>
+                                @endif
                             </div>
-                            <p class="mt-2 text-slate-700 dark:text-slate-300">{{ $review->content ?? __('No additional comments provided.') }}</p>
-                        </li>
-                    @endforeach
-                </ul>
-            </section>
-        @endif
+                        </div>
+                        <p class="mt-4 text-sm text-gray-600">{{ __('SKU:') }} {{ $product->sku }}</p>
+                        <p class="text-sm text-gray-600">{{ __('Availability:') }}
+                            <span class="font-semibold text-gray-900">
+                                {{ $product->is_in_stock ? __('In stock') : __('Out of stock') }}
+                            </span>
+                        </p>
+                    </div>
 
-        @if ($relatedProducts->isNotEmpty())
-            <section class="space-y-4">
-                <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100">{{ __('You might also like') }}</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    @foreach ($relatedProducts as $related)
-                        <article class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
-                            <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                                <a class="hover:text-primary-600 dark:hover:text-primary-400" href="{{ route('frontend.products.show', $related) }}">{{ $related->name }}</a>
-                            </h3>
-                            <p class="text-sm text-slate-500 dark:text-slate-400">{{ optional($related->brand)->name }}</p>
-                            <p class="mt-2 text-slate-700 dark:text-slate-300">{{ number_format((float) $related->price, 2) }} {{ config('app.currency', 'EUR') }}</p>
-                        </article>
-                    @endforeach
+                    <div class="prose max-w-none rounded-xl bg-white p-6 shadow">
+                        {!! $product->description ?? '<p class="text-sm text-gray-600">'.__('Product description will be updated soon.').'</p>' !!}
+                    </div>
                 </div>
-            </section>
-        @endif
+            </div>
 
-        <section class="space-y-4">
-            <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100">{{ __('Add a review') }}</h2>
-            <form method="post" action="{{ route('frontend.products.add-review', $product) }}" class="space-y-4">
-                @csrf
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300" for="rating">{{ __('Rating') }}</label>
-                    <select id="rating" name="rating" class="mt-1 w-full rounded-md border-slate-300 dark:border-slate-600 dark:bg-slate-900">
-                        @for ($i = 1; $i <= 5; $i++)
-                            <option value="{{ $i }}">{{ $i }}</option>
-                        @endfor
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300" for="content">{{ __('Comment') }}</label>
-                    <textarea id="content" name="content" rows="4" class="mt-1 w-full rounded-md border-slate-300 dark:border-slate-600 dark:bg-slate-900"></textarea>
-                </div>
-                <button type="submit" class="inline-flex items-center px-4 py-2 rounded-lg bg-primary-600 text-white hover:bg-primary-700">{{ __('Submit review') }}</button>
-            </form>
-        </section>
+            @if($relatedProducts->count() > 0)
+                <section class="space-y-6">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-2xl font-bold text-gray-900">{{ __('You may also like') }}</h2>
+                        <a href="{{ route('frontend.products.index', ['brand' => $product->brand?->slug]) }}" class="text-sm font-semibold text-indigo-600 hover:text-indigo-500">
+                            {{ __('View more') }}
+                        </a>
+                    </div>
+                    @include('frontend.products.partials.grid', ['products' => $relatedProducts, 'emptyMessage' => __('More recommendations will appear soon.')])
+                </section>
+            @endif
+        </div>
     </div>
 @endsection
