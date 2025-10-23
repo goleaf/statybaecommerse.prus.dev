@@ -48,7 +48,10 @@ final class CampaignProductTargetResource extends Resource
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-bullseye-arrow';
+    /**
+     * Use a heroicon that still ships with the current Filament distribution to avoid runtime lookup failures.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?string $recordTitleAttribute = 'target_type';
 

@@ -7,6 +7,10 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\VariantAttributeValueResource\Pages;
 use App\Models\Attribute;
 use App\Models\ProductVariant;
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\EnabledScope;
+use App\Models\Scopes\StatusScope;
+use App\Models\Scopes\VisibleScope;
 use App\Models\VariantAttributeValue;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -78,7 +82,17 @@ final class VariantAttributeValueResource extends Resource
                         ->schema([
                             Select::make('variant_id')
                                 ->label(__('admin.variant_attribute_values.variant'))
-                                ->relationship('variant', 'name')
+                                // Allow administrators to pick variants regardless of storefront-only scopes so fixtures created
+                                // inside the test suite remain selectable.
+                                ->relationship(
+                                    'variant',
+                                    'name',
+                                    fn (Builder $query): Builder => $query->withoutGlobalScopes([
+                                        ActiveScope::class,
+                                        EnabledScope::class,
+                                        StatusScope::class,
+                                    ])
+                                )
                                 ->required()
                                 ->searchable()
                                 ->preload()
@@ -105,7 +119,16 @@ final class VariantAttributeValueResource extends Resource
                         ->schema([
                             Select::make('attribute_id')
                                 ->label(__('admin.variant_attribute_values.attribute'))
-                                ->relationship('attribute', 'name')
+                                // Mirror the variant behaviour by dropping the attribute visibility scopes when resolving options.
+                                ->relationship(
+                                    'attribute',
+                                    'name',
+                                    fn (Builder $query): Builder => $query->withoutGlobalScopes([
+                                        ActiveScope::class,
+                                        EnabledScope::class,
+                                        VisibleScope::class,
+                                    ])
+                                )
                                 ->required()
                                 ->searchable()
                                 ->preload()
@@ -266,12 +289,30 @@ final class VariantAttributeValueResource extends Resource
             ->filters([
                 SelectFilter::make('variant_id')
                     ->label(__('admin.variant_attribute_values.variant'))
-                    ->relationship('variant', 'name')
+                    // Ensure admin filters ignore storefront-only scopes so inactive variants stay manageable.
+                    ->relationship(
+                        'variant',
+                        'name',
+                        fn (Builder $query): Builder => $query->withoutGlobalScopes([
+                            ActiveScope::class,
+                            EnabledScope::class,
+                            StatusScope::class,
+                        ])
+                    )
                     ->searchable()
                     ->preload(),
                 SelectFilter::make('attribute_id')
                     ->label(__('admin.variant_attribute_values.attribute'))
-                    ->relationship('attribute', 'name')
+                    // Match the variant behaviour by removing visibility scopes to expose dormant attributes when filtering.
+                    ->relationship(
+                        'attribute',
+                        'name',
+                        fn (Builder $query): Builder => $query->withoutGlobalScopes([
+                            ActiveScope::class,
+                            EnabledScope::class,
+                            VisibleScope::class,
+                        ])
+                    )
                     ->searchable()
                     ->preload(),
                 Filter::make('has_translations')

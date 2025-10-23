@@ -1,3 +1,4 @@
+{{-- Compose the responsive container that hosts widget tabs with dynamic column counts across breakpoints. --}}
 @php
     $widgetsPerRow = $this->getWidgetsPerRow();
 

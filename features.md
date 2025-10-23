@@ -67,6 +67,9 @@
   the Filament resource, letting administrators toggle availability, set
   defaults, and bulk-activate options without reaching for raw database
   queries.
+- Variant Attribute Value listings extend that behaviour to the table filters,
+  removing variant and attribute storefront scopes so QA can reliably surface
+  inactive fixtures when narrowing results by attribute or variant.
 - Test bootstrapping now adds both JSON translation directories so Filament's commerce navigation label renders localized copy during PHPUnit runs.
 - Filament navigation icons once again use docblock overrides so enum-aware navigation metadata loads without typed property collisions introduced in PR #1098.
 - Analytics dashboards now declare navigation metadata via the shared docblock convention and keep the resource form signature aligned with Filament v4 expectations, preventing BackedEnum type collisions during admin boot.
