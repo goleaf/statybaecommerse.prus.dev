@@ -25,7 +25,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - The Filament schema upgrade tooling now normalizes navigation icon docblocks and reruns cleanly across every resource, keeping the v4 Schema migration safe to execute repeatedly without manual cleanup.
 - Reusable HTML sanitization now protects product and legal descriptions end-to-end, complete with a maintenance command and storefront Blade helper for rendering cleaned markup.
 - User Product Interaction analytics tables now present rating badges and interaction filters with Filament v4-aligned formatting, keeping admin seeding from tripping PHP concatenation notices observed in upstream PR #1097 testing.
-- Developer tooling regained the full Husky bootstrap shim, ensuring local Git hooks run automatically after installs while still reminding contributors about the upcoming v10 script changes.
+- Developer tooling regained the full Husky bootstrap shim with its executable bit restored, ensuring local Git hooks run automatically after installs while still reminding contributors about the upcoming v10 script changes.
 - Shipping option management screens now present accurate delivery windows even when the minimum day value is zero or one side of the range is missing, giving merchandisers clearer expectations when auditing carriers.
 - Filament admin navigation icons once again rely on docblock-based overrides, preventing BackedEnum collisions, while variant stock history badges group destructive events under the shared danger palette and the `data:import` command advertises its purpose directly in Artisan listings.
 
@@ -79,6 +79,7 @@ composer run dev
 
 ## Latest maintenance
 
+- 2025-10-24: Reinstated the Husky bootstrap shim file contents and permissions so Git hooks execute using the local toolchain again while continuing to surface the upstream v10 deprecation warning banner for contributor awareness.
 - 2025-10-24: Hardened content security policies with request-scoped nonces, refreshed inline Blade assets to inject the helper automatically, and expanded rate limiting configuration so API throttles can stack per-minute and per-hour limits.
 
 - 2025-10-23: Wired the cache invalidation service into global model events, updated navigation caches to use shared tag helpers, and expanded regression coverage so dashboard stats and storefront widgets refresh automatically after catalogue edits.
