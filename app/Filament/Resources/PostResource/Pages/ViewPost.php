@@ -9,8 +9,8 @@ use App\Filament\Resources\UserResource;
 use App\Models\Post;
 use App\Models\PostApproval;
 use Filament\Actions;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Schemas\Schema;
 use LaraZeus\ListGroup\Entries\ListItem;
 use LaraZeus\ListGroup\Infolists\ListEntry;
 
@@ -25,104 +25,78 @@ final class ViewPost extends ViewRecord
         ];
     }
 
-    public function infolist(Schema $schema): Schema
+    public function infolist(Infolist $infolist): Infolist
     {
-        return $schema->schema([
-            ListEntry::make('postQuickLinks')
+        $post = $this->record->loadMissing([
+            'user.posts' => fn ($query) => $query->where('status', 'published')->latest('published_at')->limit(5),
+        ]);
+
+        $locale = app()->getLocale();
+
+        $resolveTranslation = static function (mixed $model, string $field) use ($locale): mixed {
+            if (method_exists($model, 'getTranslation')) {
+                $value = $model->getTranslation($field, $locale);
+                if (filled($value)) {
+                    return $value;
+                }
+            }
+
+            if (method_exists($model, 'trans')) {
+                $value = $model->trans($field, $locale);
+                if (filled($value)) {
+                    return $value;
+                }
+            }
+
+            $translationsProperty = $field.'_translations';
+            if (property_exists($model, $translationsProperty)) {
+                $translations = $model->{$translationsProperty} ?? [];
+                if (is_array($translations) && filled($translations[$locale] ?? null)) {
+                    return $translations[$locale];
+                }
+            }
+
+            return $model->{$field} ?? null;
+        };
+
+        $postTitle = $resolveTranslation($post, 'title') ?? $post->title;
+
+        $quickLinks = [
+            ListItem::make()
+                ->id('storefront-post-'.$post->getKey())
+                ->label(__('View blog post'))
+                ->icon('heroicon-o-arrow-top-right-on-square')
+                ->color('primary')
+                ->url(route('posts.show', $post))
+                ->tooltip(__('Open the storefront page for :title', ['title' => $postTitle ?? __('this post')])),
+        ];
+
+        $authorPosts = $post->user?->posts ?? collect();
+
+        $relatedItems = $authorPosts
+            ->filter(fn ($related) => $related->getKey() !== $post->getKey())
+            ->map(function ($related) use ($resolveTranslation) {
+                $title = $resolveTranslation($related, 'title') ?? $related->title ?? __('Untitled post');
+
+                return ListItem::make()
+                    ->id('related-post-'.$related->getKey())
+                    ->label($title)
+                    ->icon('heroicon-o-document-text')
+                    ->color('info')
+                    ->url(route('posts.show', $related))
+                    ->tooltip(__('Open :title on the storefront blog', ['title' => $title]));
+            })
+            ->values()
+            ->all();
+
+        return $infolist->schema([
+            ListEntry::make('post_quick_links')
                 ->heading(__('Quick links'))
+                ->state(fn () => $quickLinks),
+            ListEntry::make('author_posts')
+                ->heading(__('More from this author'))
                 ->list()
-                ->state(function (Post $record): array {
-                    // Honour the active locale when building storefront and author shortcuts.
-                    $locale = app()->getLocale();
-                    $record->loadMissing(['user']);
-
-                    $items = [
-                        ListItem::make()
-                            ->id('post-storefront-' . $record->getKey())
-                            ->label(__('View on storefront'))
-                            ->icon('heroicon-m-globe-alt')
-                            ->color('primary')
-                            ->url(route('frontend.posts.show', $record))
-                            ->tooltip(__('Open the public article for :title', [
-                                'title' => $record->getTranslatedTitle($locale),
-                            ]))
-                            ->toArray(),
-                    ];
-
-                    if ($record->user !== null) {
-                        $items[] = ListItem::make()
-                            ->id('post-author-' . $record->user->getKey())
-                            ->label(__('posts.view_author_profile'))
-                            ->icon('heroicon-m-user-circle')
-                            ->color('info')
-                            ->url(UserResource::getUrl('view', ['record' => $record->user]))
-                            ->tooltip(__('posts.browse_by_author', [
-                                'author' => $record->user->name ?? __('users.single'),
-                            ]))
-                            ->toArray();
-                    }
-
-                    return $items;
-                }),
-            ListEntry::make('postTags')
-                ->heading(__('posts.tags'))
-                ->list()
-                ->state(function (Post $record): array {
-                    // Split translated tag strings into individual localized quick filters.
-                    $tags = collect(explode(',', (string) $record->getTranslatedTags(app()->getLocale())))
-                        ->map(fn (string $tag): string => trim($tag))
-                        ->filter()
-                        ->values();
-
-                    return $tags
-                        ->map(function (string $tag, int $index) use ($record): array {
-                            return ListItem::make()
-                                ->id('post-tag-' . $record->getKey() . '-' . $index)
-                                ->label($tag)
-                                ->icon('heroicon-m-hashtag')
-                                ->color('warning')
-                                ->url(route('frontend.search.index', ['q' => $tag]))
-                                ->tooltip(__('posts.search_tagged', ['tag' => $tag]))
-                                ->toArray();
-                        })
-                        ->all();
-                }),
-            ListEntry::make('postApprovals')
-                ->heading(__('Moderation history'))
-                ->list()
-                ->state(function (Post $record): array {
-                    // Present moderation decisions with localized labels and timestamps.
-                    $locale = app()->getLocale();
-                    $record->loadMissing(['approvals.user']);
-
-                    return $record->approvals
-                        ->sortByDesc('decided_at')
-                        ->map(function (PostApproval $approval) use ($record, $locale): array {
-                            $decision = $approval->decision;
-                            $color = match ($decision) {
-                                'approved' => 'success',
-                                'rejected', 'declined' => 'danger',
-                                default => 'warning',
-                            };
-
-                            $user = $approval->user;
-                            $userUrl = $user !== null
-                                ? UserResource::getUrl('view', ['record' => $user])
-                                : route('frontend.posts.show', $record);
-
-                            return ListItem::make()
-                                ->id('post-approval-' . $approval->getKey())
-                                ->label(__('Decision: :decision', ['decision' => __($decision, [], $locale)]))
-                                ->icon('heroicon-m-check-badge')
-                                ->color($color)
-                                ->url($userUrl)
-                                ->tooltip(__('Decided on :date', [
-                                    'date' => optional($approval->decided_at)->toDayDateTimeString(),
-                                ]))
-                                ->toArray();
-                        })
-                        ->all();
-                }),
+                ->state(fn () => $relatedItems),
         ]);
     }
 }

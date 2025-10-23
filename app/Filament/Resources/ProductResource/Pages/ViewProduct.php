@@ -9,11 +9,10 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\VariantAttributeValue;
 use Filament\Actions;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Schemas\Schema;
-use Icetalker\FilamentTableRepeatableEntry\Infolists\Components\TableRepeatableEntry;
+use LaraZeus\ListGroup\Entries\ListItem;
+use LaraZeus\ListGroup\Infolists\ListEntry;
 
 final class ViewProduct extends ViewRecord
 {
@@ -26,54 +25,72 @@ final class ViewProduct extends ViewRecord
         ];
     }
 
-    public function infolist(Schema $schema): Schema
+    public function infolist(Infolist $infolist): Infolist
     {
-        return $schema->components([
-            Section::make(__('ecommerce.variants'))
-                ->schema([
-                    TableRepeatableEntry::make('variants')
-                        ->label(__('ecommerce.variants'))
-                        ->translateLabel()
-                        ->state(function (Product $record): array {
-                            $record->loadMissing(['variants.variantAttributeValues']);
+        $product = $this->record->loadMissing(['categories.translations']);
 
-                            return $record->variants
-                                ->map(fn (ProductVariant $variant): array => [
-                                    'name' => $variant->display_name,
-                                    'sku' => $variant->sku,
-                                    'price' => $variant->price,
-                                    'stock' => $variant->available_quantity ?? $variant->stock_quantity,
-                                    'attributes' => $variant->variantAttributeValues
-                                        ->map(fn (VariantAttributeValue $value): string => sprintf('%s: %s', $value->attribute_name, $value->display_value))
-                                        ->filter()
-                                        ->implode(', '),
-                                ])
-                                ->values()
-                                ->all();
-                        })
-                        ->schema([
-                            TextEntry::make('name')
-                                ->label(__('ecommerce.name'))
-                                ->translateLabel(),
-                            TextEntry::make('sku')
-                                ->label(__('ecommerce.sku'))
-                                ->translateLabel(),
-                            TextEntry::make('price')
-                                ->label(__('ecommerce.price'))
-                                ->translateLabel()
-                                ->money(fn () => config('shared.localization.default_currency', 'EUR'), decimalPlaces: 2),
-                            TextEntry::make('stock')
-                                ->label(__('ecommerce.stock'))
-                                ->translateLabel()
-                                ->numeric(),
-                            TextEntry::make('attributes')
-                                ->label(__('ecommerce.attributes'))
-                                ->translateLabel(),
-                        ])
-                        ->striped()
-                        ->showIndex(),
-                ])
-                ->columns(1),
+        $locale = app()->getLocale();
+
+        $resolveTranslation = static function (mixed $model, string $field) use ($locale): mixed {
+            if (method_exists($model, 'getTranslation')) {
+                $value = $model->getTranslation($field, $locale);
+                if (filled($value)) {
+                    return $value;
+                }
+            }
+
+            if (method_exists($model, 'trans')) {
+                $value = $model->trans($field, $locale);
+                if (filled($value)) {
+                    return $value;
+                }
+            }
+
+            return $model->{$field} ?? null;
+        };
+
+        $productName = $resolveTranslation($product, 'name');
+        $productSlug = $resolveTranslation($product, 'slug') ?? $product->slug;
+
+        $quickLinks = [
+            ListItem::make()
+                ->id('storefront-product-'.$product->getKey())
+                ->label(__('View on storefront'))
+                ->icon('heroicon-o-arrow-top-right-on-square')
+                ->color('primary')
+                ->url(route('products.show', $productSlug))
+                ->tooltip(__('Open the storefront page for :name', ['name' => $productName ?? $product->name])),
+        ];
+
+        $categoryItems = $product->categories
+            ->map(function ($category) use ($resolveTranslation) {
+                $name = $resolveTranslation($category, 'name');
+                $slug = $resolveTranslation($category, 'slug') ?? $category->slug;
+
+                if (blank($slug)) {
+                    return null;
+                }
+
+                return ListItem::make()
+                    ->id('category-'.$category->getKey())
+                    ->label($name ?? __('Unnamed category'))
+                    ->icon('heroicon-o-tag')
+                    ->color('warning')
+                    ->url(route('categories.show', $slug))
+                    ->tooltip(__('View the :name category', ['name' => $name ?? __('category')]));
+            })
+            ->filter()
+            ->values()
+            ->all();
+
+        return $infolist->schema([
+            ListEntry::make('product_quick_links')
+                ->heading(__('Quick links'))
+                ->state(fn () => $quickLinks),
+            ListEntry::make('product_categories')
+                ->heading(__('Related categories'))
+                ->list()
+                ->state(fn () => $categoryItems),
         ]);
     }
 }
