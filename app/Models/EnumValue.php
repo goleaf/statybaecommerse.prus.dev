@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 /**
  * EnumValue
@@ -100,9 +101,9 @@ final class EnumValue extends Model
     // Methods
     public function getUsageCount(): int
     {
-        // This would be implemented based on actual usage tracking
-        // For now, return a random number for demonstration
-        return rand(0, 100);
+        $usageCount = data_get($this->metadata, 'usage_count', 0);
+
+        return is_numeric($usageCount) ? (int) $usageCount : 0;
     }
 
     public function activate(): bool
@@ -137,21 +138,33 @@ final class EnumValue extends Model
     // Static methods
     public static function getTypes(): array
     {
-        return [
-            'navigation_group' => 'Navigation Group',
-            'order_status' => 'Order Status',
-            'payment_status' => 'Payment Status',
-            'shipping_status' => 'Shipping Status',
-            'user_role' => 'User Role',
-            'product_status' => 'Product Status',
-            'campaign_type' => 'Campaign Type',
-            'discount_type' => 'Discount Type',
-            'notification_type' => 'Notification Type',
-            'document_type' => 'Document Type',
-            'address_type' => 'Address Type',
-            'priority' => 'Priority',
-            'status' => 'Status',
+        $defaultTypes = [
+            'navigation_group' => __('admin.enum_values.types.navigation_group'),
+            'order_status' => __('admin.enum_values.types.order_status'),
+            'payment_status' => __('admin.enum_values.types.payment_status'),
+            'shipping_status' => __('admin.enum_values.types.shipping_status'),
+            'user_role' => __('admin.enum_values.types.user_role'),
+            'product_status' => __('admin.enum_values.types.product_status'),
+            'campaign_type' => __('admin.enum_values.types.campaign_type'),
+            'discount_type' => __('admin.enum_values.types.discount_type'),
+            'notification_type' => __('admin.enum_values.types.notification_type'),
+            'document_type' => __('admin.enum_values.types.document_type'),
+            'address_type' => __('admin.enum_values.types.address_type'),
+            'priority' => __('admin.enum_values.types.priority'),
+            'status' => __('admin.enum_values.types.status'),
         ];
+
+        $existingTypes = self::query()->distinct()->pluck('type')->all();
+
+        foreach ($existingTypes as $type) {
+            if (! isset($defaultTypes[$type])) {
+                $defaultTypes[$type] = Str::headline(str_replace('_', ' ', $type));
+            }
+        }
+
+        ksort($defaultTypes);
+
+        return $defaultTypes;
     }
 
     public static function getValuesByType(string $type): array
@@ -174,8 +187,14 @@ final class EnumValue extends Model
 
     public static function cleanupUnused(): int
     {
-        return self::where('usage_count', 0)
-            ->where('created_at', '<', now()->subMonths(6))
+        return self::query()
+            ->where('is_active', false)
+            ->where(function (Builder $query): void {
+                $query
+                    ->whereNull('metadata->usage_count')
+                    ->orWhere('metadata->usage_count', 0);
+            })
+            ->where('updated_at', '<', now()->subMonths(6))
             ->delete();
     }
 }
