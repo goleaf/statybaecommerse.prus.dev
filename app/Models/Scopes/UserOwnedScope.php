@@ -42,16 +42,16 @@ final class UserOwnedScope implements Scope
         $userColumns = $this->getUserColumns($model);
         if (! empty($userColumns)) {
             $userId = auth()->id();
-            if ($userId) {
-                $builder->where(function ($query) use ($userColumns, $userId) {
-                    foreach ($userColumns as $column) {
-                        $query->orWhere($column, $userId);
-                    }
-                });
-            } else {
-                // No authenticated user: ensure no records are returned
-                $builder->whereRaw('1 = 0');
+
+            if (! $userId) {
+                return;
             }
+
+            $builder->where(function ($query) use ($userColumns, $userId) {
+                foreach ($userColumns as $column) {
+                    $query->orWhere($column, $userId);
+                }
+            });
         }
     }
 
