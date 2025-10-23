@@ -60,13 +60,9 @@ final class ProductFeatureResource extends Resource
                 ->searchable()
                 ->preload(),
             Forms\Components\Select::make('feature_type')
-                ->options([
-                    'specification' => 'Specification',
-                    'benefit'       => 'Benefit',
-                    'feature'       => 'Feature',
-                    'technical'     => 'Technical',
-                    'performance'   => 'Performance',
-                ])
+                ->label('Feature Type')
+                ->options(self::getFeatureTypeOptions())
+                ->required()
                 ->searchable(),
             Forms\Components\TextInput::make('feature_key')
                 ->label('Feature Key')
@@ -140,6 +136,10 @@ final class ProductFeatureResource extends Resource
                     ->options(self::FEATURE_TYPE_OPTIONS),
                 Tables\Filters\SelectFilter::make('product_id')
                     ->relationship('product', 'name'),
+                Tables\Filters\TernaryFilter::make('is_active')
+                    ->label('Active')
+                    ->trueLabel('Active')
+                    ->falseLabel('Inactive'),
             ])
             ->actions([
                 TablesEditAction::make(),
