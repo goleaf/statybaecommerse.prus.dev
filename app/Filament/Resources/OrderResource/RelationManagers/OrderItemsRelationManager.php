@@ -16,7 +16,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -239,7 +239,47 @@ final class OrderItemsRelationManager extends BaseRelationManager
                     ),
             ])
             ->headerActions([
-                RelationManagerRepeaterAction::make(),
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit items')
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit order items')
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        return $repeater
+                            ->collapsible()
+                            ->defaultItems(0)
+                            ->schema([
+                                Hidden::make('id'),
+                                Hidden::make('product_variant_id'),
+                                TextInput::make('name')
+                                    ->label(__('orders.fields.product'))
+                                    ->readOnly()
+                                    ->dehydrated(false),
+                                TextInput::make('sku')
+                                    ->label(__('orders.fields.sku'))
+                                    ->readOnly()
+                                    ->dehydrated(false),
+                                TextInput::make('quantity')
+                                    ->label(__('orders.fields.quantity'))
+                                    ->numeric()
+                                    ->minValue(1)
+                                    ->required(),
+                                TextInput::make('unit_price')
+                                    ->label(__('orders.fields.unit_price'))
+                                    ->numeric()
+                                    ->prefix('€')
+                                    ->required(),
+                                TextInput::make('discount_amount')
+                                    ->label(__('orders.fields.discount_amount'))
+                                    ->numeric()
+                                    ->prefix('€')
+                                    ->default(0),
+                                Textarea::make('notes')
+                                    ->label(__('orders.item_notes'))
+                                    ->rows(2)
+                                    ->columnSpanFull(),
+                            ]);
+                    }),
                 \Filament\Actions\CreateAction::make()
                     ->label(__('orders.add_item'))
                     ->icon('heroicon-o-plus')
