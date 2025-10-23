@@ -17,6 +17,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 ### Latest updates
+- Automated dependency maintenance now runs weekly via Dependabot with dedicated labels and guarded auto-merge workflows so bot-driven updates stay visible yet low-touch for maintainers.
 - Test bootstrap now registers both `lang/` and `resources/lang/` JSON translation directories so admin navigation labels render localized text during regression tests.
 - Cache tag conflicts from PR #120 are resolved: dashboard widgets, storefront navigation, and product shelves now share locale-aware tags with automatic invalidation hooks so cached payloads refresh the moment catalogue records change, and new feature tests guard the behaviour.
 - A new cache invalidation service now coordinates dashboard and storefront tag flushing, and the cart/checkout flows gained JSON regression tests to keep the customer journey stable across releases.
@@ -76,6 +77,8 @@ composer run dev
 ```
 
 ## Latest maintenance
+
+- 2025-10-24: Introduced Dependabot scheduling, dependency/auto-merge labels, and workflow guards so automated updates remain auditable while staying current.
 
 - 2025-10-23: Wired the cache invalidation service into global model events, updated navigation caches to use shared tag helpers, and expanded regression coverage so dashboard stats and storefront widgets refresh automatically after catalogue edits.
 
