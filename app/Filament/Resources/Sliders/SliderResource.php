@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\Sliders;
+use App\Support\Concerns\HasNav;
 
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\Sliders\Pages\CreateSlider;
@@ -20,6 +21,8 @@ use UnitEnum;
 
 final class SliderResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Slider::class;
 
     /**

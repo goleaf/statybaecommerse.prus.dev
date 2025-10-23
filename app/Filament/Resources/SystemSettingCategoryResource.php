@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\SystemSettingCategoryResource\Pages;
 use App\Filament\Resources\SystemSettingCategoryResource\RelationManagers;
 use App\Models\Scopes\ActiveScope;
@@ -46,20 +47,11 @@ use UnitEnum;
  */
 final class SystemSettingCategoryResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = SystemSettingCategory::class;
 
-    /**
-     * @var string|BackedEnum|null Keep navigation grouping aligned with the shared enum helper.
-     */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
-
-    public static function getNavigationGroup(): ?string
-    {
-        // Harmonize enum and string groups to avoid leaking raw enum values in the UI.
-        $group = self::$navigationGroup;
-
-        return $group instanceof NavigationGroup ? $group->label() : $group;
-    }
+    
 
     protected static ?int $navigationSort = 2;
 

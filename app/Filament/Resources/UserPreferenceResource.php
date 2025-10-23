@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\UserPreferenceResource\Pages;
 use App\Models\UserPreference;
 use App\Support\Filament\Components\Flatpickr;
@@ -31,7 +33,9 @@ use UnitEnum;
 
 final class UserPreferenceResource extends Resource
 {
-    protected static ?string $model = \App\Models\UserPreference::class;
+    use HasNav;
+
+    protected static ?string $model = UserPreference::class;
 
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.

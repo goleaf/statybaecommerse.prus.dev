@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\CartItemResource\Pages;
 use App\Models\CartItem;
 use App\Models\Product;
@@ -36,8 +38,7 @@ use Illuminate\Support\Str;
 
 final class CartItemResource extends Resource
 {
-    /** @var string|BackedEnum|null Navigation icon configured per Filament v4 guidance. */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-shopping-cart';
+    use HasNav;
 
     protected static ?string $model = CartItem::class;
 

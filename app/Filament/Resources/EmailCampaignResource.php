@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\EmailCampaignResource\Pages;
 use App\Models\EmailCampaign;
 use App\Support\Filament\Components\Flatpickr;
@@ -27,14 +29,13 @@ use Filament\Tables\Table;
 
 final class EmailCampaignResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = EmailCampaign::class;
 
     protected static ?int $navigationSort = 4;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-envelope';
+    
 
     public static function getNavigationLabel(): string
     {

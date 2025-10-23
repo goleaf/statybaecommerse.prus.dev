@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Data\ExportRequestData;
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
 use App\Services\Export\ExportColumn;
@@ -47,7 +48,7 @@ use UnitEnum;
  */
 final class UserResource extends Resource
 {
-    use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
+    use HasNav;
 
     protected static ?string $model = User::class;
 

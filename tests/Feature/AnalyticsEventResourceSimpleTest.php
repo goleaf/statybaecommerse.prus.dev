@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Filament\Resources\AnalyticsEventResource;
 use App\Models\AnalyticsEvent;
 use App\Models\User;
+use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -51,7 +52,9 @@ it('can get analytics event resource model', function () {
 });
 
 it('can get analytics event resource navigation group', function () {
-    expect(AnalyticsEventResource::getNavigationGroup())->toBe('Analytics');
+    expect(AnalyticsEventResource::getNavigationGroup())->toBe(
+        Nav::groupForResource(AnalyticsEventResource::class)
+    );
 });
 
 it('can get analytics event resource navigation label', function () {

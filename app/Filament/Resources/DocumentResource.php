@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\DocumentResource\Pages;
 use App\Models\Document;
 use BackedEnum;
@@ -27,21 +29,23 @@ use UnitEnum;
 
 final class DocumentResource extends Resource
 {
+    use HasNav;
+
+    protected static ?string $model = Document::class;
+
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document';
-
-    protected static ?string $model = Document::class;
+    
 
     protected static ?int $navigationSort = 20;
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'System';
-    }
+    /**
+     * @var UnitEnum|string|null
+     */
+    
 
     public static function getNavigationLabel(): string
     {

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsImages;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\NewsImages\Pages\CreateNewsImage;
 use App\Filament\Resources\NewsImages\Pages\EditNewsImage;
@@ -39,12 +40,11 @@ use Illuminate\Support\Collection;
 
 class NewsImageResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = NewsImage::class;
 
-    public static function getNavigationIcon(): BackedEnum|string|null
-    {
-        return 'heroicon-o-photo';
-    }
+    
 
     protected static ?int $navigationSort = 1;
 

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\StockMovementResource\Pages;
 use App\Models\StockMovement;
 use App\Support\Filament\Components\Flatpickr;
@@ -28,10 +30,10 @@ use UnitEnum;
 
 final class StockMovementResource extends Resource
 {
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
+    use HasNav;
+
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-archive-box';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.

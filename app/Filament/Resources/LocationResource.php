@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\LocationResource\Pages;
 use App\Models\City;
 use App\Models\Country;
@@ -37,6 +39,8 @@ use Illuminate\Database\Eloquent\Collection;
 
 final class LocationResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Location::class;
 
     /**

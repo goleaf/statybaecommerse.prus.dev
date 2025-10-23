@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\DocumentTemplateCategory;
-use App\Enums\DocumentTemplateType;
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\DocumentTemplateResource\Pages;
 use App\Models\DocumentTemplate;
 use BackedEnum;
@@ -38,15 +38,9 @@ use Illuminate\Support\Str;
 
 final class DocumentTemplateResource extends Resource
 {
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
+    use HasNav;
 
-    public static function getNavigationGroup(): string
-    {
-        return 'Documents';
-    }
+    
 
     protected static ?string $model = DocumentTemplate::class;
 

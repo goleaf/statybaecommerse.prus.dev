@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\PartnerTierResource\Pages;
 use App\Models\PartnerTier;
 use BackedEnum;
@@ -17,17 +19,13 @@ use UnitEnum;
 
 final class PartnerTierResource extends Resource
 {
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
-
-    /**
-     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
-     */
-    protected static UnitEnum|string|null $navigationGroup = 'Marketing';
+    use HasNav;
 
     protected static ?string $model = PartnerTier::class;
+
+    
+
+    
 
     protected static ?int $navigationSort = 2;
 

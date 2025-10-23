@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\SystemResource\Pages;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
@@ -45,6 +47,8 @@ use Illuminate\Support\Facades\DB;
 
 final class SystemResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = SystemSetting::class;
 
     /**
@@ -71,10 +75,7 @@ final class SystemResource extends Resource
     /**
      * Handle getNavigationGroup functionality with proper error handling.
      */
-    public static function getNavigationGroup(): ?string
-    {
-        return 'System';
-    }
+    
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\MenuItemResource\Pages;
 use App\Models\Menu;
 use App\Models\MenuItem;
@@ -30,6 +32,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 final class MenuItemResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = MenuItem::class;
 
     /**

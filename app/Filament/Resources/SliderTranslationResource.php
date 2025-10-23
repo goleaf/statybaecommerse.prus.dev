@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\SliderTranslationResource\Pages;
 use App\Models\Slider;
 use BackedEnum;
@@ -25,7 +27,9 @@ use UnitEnum;
 
 final class SliderTranslationResource extends Resource
 {
-    protected static ?string $model = \App\Models\SliderTranslation::class;
+    use HasNav;
+
+    protected static ?string $model = SliderTranslation::class;
 
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.

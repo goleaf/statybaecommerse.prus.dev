@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\ReferralCodeUsageLogResource\Pages;
 use App\Filament\Resources\ReferralCodeUsageLogs\Schemas\ReferralCodeUsageLogForm as ReferralCodeUsageLogFormSchema;
 use App\Filament\Resources\ReferralCodeUsageLogs\Tables\ReferralCodeUsageLogsTable as ReferralCodeUsageLogsTableSchema;
@@ -20,6 +22,8 @@ use UnitEnum;
  */
 final class ReferralCodeUsageLogResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = ReferralCodeUsageLog::class;
 
     protected static ?int $navigationSort = 18;

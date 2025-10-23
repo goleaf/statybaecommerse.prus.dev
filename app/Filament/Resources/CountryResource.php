@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\CountryResource\Pages;
 use App\Filament\Resources\CountryResource\RelationManagers\AddressesRelationManager;
 use App\Filament\Resources\CountryResource\RelationManagers\CitiesRelationManager;
@@ -42,6 +44,8 @@ use Throwable;
 
 final class CountryResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Country::class;
 
     protected static ?int $navigationSort = 1;

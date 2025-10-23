@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsCategories;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\NewsCategories\Pages\CreateNewsCategory;
 use App\Filament\Resources\NewsCategories\Pages\EditNewsCategory;
@@ -18,6 +19,8 @@ use UnitEnum;
 
 final class NewsCategoryResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = NewsCategory::class;
 
     /**
@@ -25,10 +28,7 @@ final class NewsCategoryResource extends Resource
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'News';
-    }
+    
 
     public static function form(Form $form): Form
     {

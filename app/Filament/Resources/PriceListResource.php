@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\PriceListResource\Pages;
 use App\Models\PriceList;
 use App\Support\Filament\Components\Flatpickr;
@@ -33,6 +35,8 @@ use UnitEnum;
  */
 final class PriceListResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = PriceList::class;
 
     /**
@@ -49,10 +53,7 @@ final class PriceListResource extends Resource
         return __('price_lists.title');
     }
 
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Products';
-    }
+    
 
     public static function getPluralModelLabel(): string
     {

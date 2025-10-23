@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\AdminUserResource\Pages;
 use App\Models\AdminUser;
 use App\Support\Filament\Components\Flatpickr;
@@ -33,19 +35,15 @@ use UnitEnum;
 
 final class AdminUserResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = AdminUser::class;
 
     protected static ?int $navigationSort = 1;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-document-text';
-    }
+    
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Users';
-    }
+    
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

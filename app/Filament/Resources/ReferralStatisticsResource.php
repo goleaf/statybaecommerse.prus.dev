@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\ReferralStatisticsResource\Pages;
 use App\Models\ReferralStatistics;
 use App\Support\Filament\Components\Flatpickr;
@@ -34,17 +36,13 @@ use Illuminate\Database\Eloquent\Collection;
 
 final class ReferralStatisticsResource extends Resource
 {
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Referral';
-    }
+    use HasNav;
+
+    
 
     protected static ?string $model = ReferralStatistics::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-chart-bar-square';
-    }
+    
 
     protected static ?int $navigationSort = 14;
 

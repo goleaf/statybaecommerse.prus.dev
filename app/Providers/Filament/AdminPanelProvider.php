@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
-use Andreia\FilamentNordTheme\FilamentNordThemePlugin;
 use App\Support\Nav;
-use Asmit\ResizedColumn\ResizedColumnPlugin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 
 use function class_exists;
@@ -88,8 +86,17 @@ final class AdminPanelProvider extends PanelProvider
                 'gray'    => Color::Slate,
                 'success' => Color::Green,
                 'warning' => Color::Amber,
-                'danger'  => Color::Red,
-                'info'    => Color::Sky,
+                'danger' => Color::Red,
+                'info' => Color::Sky,
+            ])
+            ->resources(Nav::orderedResources())
+            ->pages([
+                \App\Filament\Pages\Dashboard::class,
+                \App\Filament\Pages\SliderAnalytics::class,
+                \App\Filament\Pages\SliderManagement::class,
+                \App\Filament\Pages\InventoryManagement::class,
+                \App\Filament\Pages\AdvancedReports::class,
+                \App\Filament\Pages\UserImpersonation::class,
             ])
             ->resources($resourceClasses)
             ->pages($pageClasses)
@@ -123,8 +130,18 @@ final class AdminPanelProvider extends PanelProvider
             ->unsavedChangesAlerts()
             ->databaseTransactions()
             ->readOnlyRelationManagersOnResourceViewPagesByDefault()
-            ->navigationGroups($this->configuredNavigationGroups())
-            ->userMenu(position: UserMenuPosition::Sidebar)
+            ->navigationGroups(array_map(
+                static function (array $group): NavigationGroup {
+                    $navigationGroup = NavigationGroup::make()->label($group['label']);
+
+                    if ($group['icon']) {
+                        $navigationGroup->icon($group['icon']);
+                    }
+
+                    return $navigationGroup;
+                },
+                Nav::navigationGroups()
+            ))
             ->userMenuItems([
                 'profile' => \Filament\Navigation\MenuItem::make()
                     ->label(__('admin.navigation.profile'))

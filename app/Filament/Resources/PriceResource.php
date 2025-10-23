@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\PriceResource\Pages;
 use App\Models\Price;
 use App\Models\Product;
@@ -23,6 +25,8 @@ use UnitEnum;
 
 final class PriceResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Price::class;
 
     /**

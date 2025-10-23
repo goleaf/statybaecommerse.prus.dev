@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\CustomerManagementResource\Pages;
 use App\Models\User;
 use App\Support\Filament\Components\Flatpickr;
@@ -34,6 +36,8 @@ use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 
 final class CustomerManagementResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = User::class;
 
     /**

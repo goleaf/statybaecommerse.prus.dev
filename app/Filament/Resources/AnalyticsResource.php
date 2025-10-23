@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\AnalyticsResource\Pages;
 use App\Models\Order;
@@ -26,6 +28,8 @@ use UnitEnum;
 
 final class AnalyticsResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Order::class;
 
     /**

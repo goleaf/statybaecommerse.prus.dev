@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\CollectionRuleResource\Pages;
 use App\Models\CollectionRule;
 use BackedEnum;
@@ -36,19 +38,13 @@ use UnitEnum;
 
 final class CollectionRuleResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = CollectionRule::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        // Surface a mechanical icon so merchandisers immediately identify automation tooling entries.
-        return 'heroicon-o-cog-6-tooth';
-    }
+    
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        // Keep the resource collocated with product configuration utilities for quicker discovery.
-        return 'Products';
-    }
+    
 
     protected static ?int $navigationSort = 3;
 

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\CampaignViewResource\Pages;
 use App\Models\CampaignView;
 use App\Support\Filament\Components\Flatpickr;
@@ -20,10 +22,9 @@ use UnitEnum;
 
 final class CampaignViewResource extends Resource
 {
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Marketing';
-    }
+    use HasNav;
+
+    
 
     protected static ?string $model = CampaignView::class;
 

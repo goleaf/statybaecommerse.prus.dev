@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\ModerationState;
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\PostResource\Pages;
 use App\Filament\Resources\PostResource\RelationManagers;
 use App\Models\Post;
@@ -59,10 +60,9 @@ use UnitEnum;
  */
 final class PostResource extends Resource
 {
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Content';
-    }
+    use HasNav;
+
+    
 
     protected static ?string $model = Post::class;
 
@@ -73,10 +73,7 @@ final class PostResource extends Resource
     /**
      * @var string|BackedEnum|null
      */
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-document-text';
-    }
+    
 
     /**
      * Handle getNavigationLabel functionality with proper error handling.

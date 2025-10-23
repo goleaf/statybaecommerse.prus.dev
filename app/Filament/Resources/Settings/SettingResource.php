@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\Settings;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\Settings\Pages\CreateSetting;
 use App\Filament\Resources\Settings\Pages\EditSetting;
@@ -18,6 +19,8 @@ use Filament\Tables\Table;
 
 class SettingResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Setting::class;
 
     /**

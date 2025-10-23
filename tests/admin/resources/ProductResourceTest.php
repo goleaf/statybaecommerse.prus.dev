@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Filament\Resources\ProductResource;
+use App\Support\Nav;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
@@ -116,7 +117,10 @@ class ProductResourceTest extends TestCase
 
     public function test_product_resource_navigation_group(): void
     {
-        $this->assertEquals('Products', ProductResource::getNavigationGroup());
+        $this->assertEquals(
+            Nav::groupForResource(ProductResource::class),
+            ProductResource::getNavigationGroup(),
+        );
     }
 
     public function test_product_resource_navigation_label(): void

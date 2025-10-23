@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\ReferralRewardLogs;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\ReferralRewardLogs\Pages\CreateReferralRewardLog;
 use App\Filament\Resources\ReferralRewardLogs\Pages\EditReferralRewardLog;
@@ -18,6 +19,8 @@ use Filament\Tables\Table;
 
 class ReferralRewardLogResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = ReferralRewardLog::class;
 
     /**

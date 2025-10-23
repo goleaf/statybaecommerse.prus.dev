@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\ReportResource\Pages;
 use App\Models\Report;
 use App\Support\Filament\Components\Flatpickr;
@@ -44,20 +47,19 @@ use Throwable;
 
 final class ReportResource extends Resource
 {
-    public static function getNavigationGroup(): string
-    {
-        return __('navigation.groups.analytics');
-    }
+    use HasNav;
+
+    /**
+     * @var UnitEnum|string|null
+     */
+    
 
     protected static ?string $model = Report::class;
 
     /**
      * @var string|BackedEnum|null
      */
-    public static function getNavigationIcon(): BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
-    {
-        return 'heroicon-o-document-chart-bar';
-    }
+    
 
     protected static ?int $navigationSort = 17;
 

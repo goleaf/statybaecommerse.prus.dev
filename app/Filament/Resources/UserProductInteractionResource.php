@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\UserProductInteractionResource\Pages;
 use App\Models\Product;
 use App\Models\User;
@@ -41,11 +43,8 @@ use UnitEnum;
 
 final class UserProductInteractionResource extends Resource
 {
-    protected static ?string $model = UserProductInteraction::class;
+    use HasNav;
 
-    /**
-     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
-     */
     protected static UnitEnum|string|null $navigationGroup = 'Users';
 
     public static function getNavigationLabel(): string

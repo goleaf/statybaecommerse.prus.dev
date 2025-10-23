@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\RecommendationBlockResource\Pages;
 use App\Models\RecommendationBlock;
 use App\Models\Scopes\ActiveScope;
@@ -36,6 +37,8 @@ use UnitEnum;
  */
 final class RecommendationBlockResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = RecommendationBlock::class;
 
     /**
@@ -55,14 +58,7 @@ final class RecommendationBlockResource extends Resource
         return __('recommendation_blocks.title');
     }
 
-    public static function getNavigationGroup(): BackedEnum|string|null
-    {
-        // Delegates to the enum value so Filament keeps grouping consistent while still
-        // accepting plain strings when Filament expects a literal label.
-        return self::$navigationGroup instanceof BackedEnum
-            ? self::$navigationGroup->value
-            : self::$navigationGroup;
-    }
+    
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

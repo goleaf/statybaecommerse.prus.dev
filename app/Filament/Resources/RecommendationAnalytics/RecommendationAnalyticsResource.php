@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\RecommendationAnalytics;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\RecommendationAnalytics\Pages\CreateRecommendationAnalytics;
 use App\Filament\Resources\RecommendationAnalytics\Pages\EditRecommendationAnalytics;
@@ -18,6 +19,8 @@ use Filament\Tables\Table;
 
 final class RecommendationAnalyticsResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = RecommendationAnalytics::class;
 
     /**

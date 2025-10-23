@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\ProductRequestResource\Pages;
 use App\Models\Product;
 use App\Models\ProductRequest;
@@ -27,12 +29,11 @@ use UnitEnum;
 
 final class ProductRequestResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = ProductRequest::class;
 
-    public static function getNavigationIcon(): BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
-    {
-        return 'heroicon-o-clipboard-document-list';
-    }
+    
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.

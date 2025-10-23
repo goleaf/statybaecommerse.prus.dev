@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\SystemSettingHistories\Pages\CreateSystemSettingHistory;
-use App\Filament\Resources\SystemSettingHistories\Pages\EditSystemSettingHistory;
-use App\Filament\Resources\SystemSettingHistories\Pages\ListSystemSettingHistories;
-use App\Filament\Resources\SystemSettingHistories\SystemSettingHistoryResource;
+use App\Filament\Resources\SystemSettingHistoryResource;
+use App\Support\Nav;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
 use App\Models\SystemSettingHistory;
@@ -314,7 +312,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
     public function test_navigation_group_is_settings(): void
     {
         $this->assertEquals(
-            'Settings',
+            Nav::groupForResource(SystemSettingHistoryResource::class),
             SystemSettingHistoryResource::getNavigationGroup()
         );
     }
@@ -350,7 +348,10 @@ final class SystemSettingHistoryResourceTest extends TestCase
 
     public function test_navigation_sort_is_thirteen(): void
     {
-        $this->assertEquals(13, SystemSettingHistoryResource::getNavigationSort());
+        $this->assertEquals(
+            Nav::sortForResource(SystemSettingHistoryResource::class),
+            SystemSettingHistoryResource::getNavigationSort()
+        );
     }
 
     public function test_form_sections_are_organized(): void

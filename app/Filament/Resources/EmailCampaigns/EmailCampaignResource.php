@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\EmailCampaigns;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\EmailCampaigns\Pages\CreateEmailCampaign;
 use App\Filament\Resources\EmailCampaigns\Pages\EditEmailCampaign;
@@ -19,6 +20,8 @@ use Filament\Tables\Table;
 
 class EmailCampaignResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = EmailCampaign::class;
 
     /**

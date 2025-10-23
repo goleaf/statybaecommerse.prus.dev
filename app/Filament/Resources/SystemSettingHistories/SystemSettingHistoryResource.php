@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingHistories;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\SystemSettingHistories\Pages\CreateSystemSettingHistory;
 use App\Filament\Resources\SystemSettingHistories\Pages\EditSystemSettingHistory;
@@ -18,6 +19,8 @@ use Filament\Tables\Table;
 
 class SystemSettingHistoryResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = SystemSettingHistory::class;
 
     /**

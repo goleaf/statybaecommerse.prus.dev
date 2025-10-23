@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\VariantPricingRuleResource\Pages;
 use App\Models\VariantPricingRule;
 use App\Support\Filament\Components\Flatpickr;
@@ -39,11 +41,8 @@ use UnitEnum;
  */
 final class VariantPricingRuleResource extends Resource
 {
-    protected static ?string $model = VariantPricingRule::class;
+    use HasNav;
 
-    /**
-     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
-     */
     protected static UnitEnum|string|null $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 10;
@@ -61,10 +60,7 @@ final class VariantPricingRuleResource extends Resource
     /**
      * Handle getNavigationGroup functionality with proper error handling.
      */
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Products';
-    }
+    
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

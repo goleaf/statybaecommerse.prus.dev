@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\MenuResource\Pages;
 use App\Filament\Resources\MenuResource\RelationManagers\MenuItemsRelationManager;
 use App\Models\Menu;
@@ -36,17 +38,13 @@ use UnitEnum;
 
 final class MenuResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Menu::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    
 
-    /**
-     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
-     */
-    protected static UnitEnum|string|null $navigationGroup = 'Content';
+    
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

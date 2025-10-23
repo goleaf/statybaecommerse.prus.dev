@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\ReferralRewardLogResource\Pages;
 use App\Models\ReferralReward;
 use App\Models\ReferralRewardLog;
@@ -31,6 +33,8 @@ use UnitEnum;
  */
 final class ReferralRewardLogResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = ReferralRewardLog::class;
 
     protected static ?int $navigationSort = 10;

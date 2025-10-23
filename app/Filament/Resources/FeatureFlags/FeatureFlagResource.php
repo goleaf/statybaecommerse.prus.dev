@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\FeatureFlags;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\FeatureFlags\Pages\CreateFeatureFlag;
 use App\Filament\Resources\FeatureFlags\Pages\EditFeatureFlag;
@@ -18,6 +19,8 @@ use Filament\Tables\Table;
 
 class FeatureFlagResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = FeatureFlag::class;
 
     /**

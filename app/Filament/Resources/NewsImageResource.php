@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\NewsImageResource\Pages;
 use App\Models\News;
 use App\Models\NewsImage;
@@ -44,17 +46,13 @@ use UnitEnum;
 
 final class NewsImageResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = NewsImage::class;
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Content';
-    }
+    
 
-    public static function getNavigationIcon(): BackedEnum|string|null
-    {
-        return 'heroicon-o-photo';
-    }
+    
 
     protected static ?int $navigationSort = 4;
 

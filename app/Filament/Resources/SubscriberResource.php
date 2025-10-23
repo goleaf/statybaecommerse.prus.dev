@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\SubscriberResource\Pages;
 use App\Models\Subscriber;
 use App\Support\Filament\Components\Flatpickr;
@@ -40,6 +42,8 @@ use UnitEnum;
  */
 final class SubscriberResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Subscriber::class;
 
     /**
