@@ -15,7 +15,9 @@ return [
     // Sections
     'sections' => [
         'basic_information' => 'Basic Information',
+        'media' => 'Media',
         'seo' => 'SEO Settings',
+        'settings' => 'Settings',
         'translations' => 'Translations',
     ],
 
@@ -26,6 +28,11 @@ return [
         'description' => 'Description',
         'website' => 'Website',
         'is_enabled' => 'Enabled',
+        'is_active' => 'Active',
+        'is_visible' => 'Visible',
+        'is_featured' => 'Featured',
+        'logo' => 'Logo',
+        'banner' => 'Banner',
         'seo_title' => 'SEO Title',
         'seo_description' => 'SEO Description',
         'translations' => 'Translations',
@@ -55,6 +62,12 @@ return [
         'disable' => 'Disable',
         'enable_selected' => 'Enable Selected',
         'disable_selected' => 'Disable Selected',
+        'activate' => 'Activate',
+        'deactivate' => 'Deactivate',
+        'feature' => 'Feature',
+        'unfeature' => 'Unfeature',
+        'feature_selected' => 'Feature Selected',
+        'unfeature_selected' => 'Unfeature Selected',
         'manage_translations' => 'Manage Translations',
         'bulk_actions' => 'Bulk Actions',
     ],
@@ -62,9 +75,29 @@ return [
     // Filters
     'filters' => [
         'enabled_only' => 'Enabled Only',
+        'featured_only' => 'Featured Only',
+        'not_featured' => 'Not Featured',
+        'visible_only' => 'Visible Only',
+        'hidden_only' => 'Hidden Only',
+        'with_products' => 'With Products',
+        'without_products' => 'Without Products',
+        'with_website' => 'With Website',
+        'recent' => 'Recent',
         'has_products' => 'Has Products',
         'has_translations' => 'Has Translations',
         'translation_locale' => 'Translation Language',
+    ],
+
+    // Notifications
+    'notifications' => [
+        'activated' => 'Brand activated successfully',
+        'deactivated' => 'Brand deactivated successfully',
+        'featured_enabled' => 'Brand marked as featured',
+        'featured_disabled' => 'Brand unfeatured successfully',
+        'bulk_enabled' => 'Selected brands enabled successfully',
+        'bulk_disabled' => 'Selected brands disabled successfully',
+        'bulk_featured' => 'Selected brands featured successfully',
+        'bulk_unfeatured' => 'Selected brands unfeatured successfully',
     ],
 
     // Statistics
