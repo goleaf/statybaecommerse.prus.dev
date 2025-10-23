@@ -26,15 +26,16 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-          cache-dependency-path: package-lock.json
+          node-version: '20'
+          cache: 'yarn'
 
       - name: Install PHP dependencies
         run: composer install --no-interaction --prefer-dist
 
       - name: Install Node dependencies
-        run: npm ci
+        run: |
+          corepack enable
+          yarn install --immutable
 
       - name: Prepare application environment
         run: |
@@ -94,45 +95,7 @@ jobs:
           php artisan view:cache
 
       - name: Build frontend assets
-        run: npm run build
+        run: yarn build
 
-      - name: Run unit tests
-        id: full-unit-tests
-        continue-on-error: true
-        run: |
-          set +e
-          php artisan test --testsuite=Unit
-          status=$?
-          echo "exit_code=${status}" >> "$GITHUB_OUTPUT"
-          exit ${status}
-
-      - name: Run feature tests
-        id: full-feature-tests
-        continue-on-error: true
-        run: |
-          set +e
-          php artisan test --testsuite=Feature
-          status=$?
-          echo "exit_code=${status}" >> "$GITHUB_OUTPUT"
-          exit ${status}
-
-      - name: Evaluate test results
-        if: always()
-        run: |
-          unit_status="${{ steps.full-unit-tests.outputs.exit_code }}"
-          feature_status="${{ steps.full-feature-tests.outputs.exit_code }}"
-
-          if [ -z "${unit_status}" ]; then
-            echo "::error::Unit test suite did not report a status."
-            exit 1
-          fi
-
-          if [ -z "${feature_status}" ]; then
-            echo "::error::Feature test suite did not report a status."
-            exit 1
-          fi
-
-          if [ "${unit_status}" != "0" ] || [ "${feature_status}" != "0" ]; then
-            echo "::error::One or more Laravel test suites failed during full verification."
-            exit 1
-          fi
+      - name: Run full test suite
+        run: php artisan test
