@@ -6,7 +6,7 @@ namespace App\Filament\Resources\Countries\Tables;
 
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup as TableBulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;

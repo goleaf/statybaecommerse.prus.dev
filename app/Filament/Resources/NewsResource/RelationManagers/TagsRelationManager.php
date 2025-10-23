@@ -6,7 +6,7 @@ namespace App\Filament\Resources\NewsResource\RelationManagers;
 
 use App\Models\NewsTag;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Forms\Form;

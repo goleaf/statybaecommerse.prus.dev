@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ReferralCodeUsageLogs\Tables;
 
-use App\Models\ReferralCode;
-use App\Models\User;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
