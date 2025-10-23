@@ -11,16 +11,15 @@ return [
     'content'           => 'Content',
     'settings'          => 'Settings',
 
-    'name'            => 'Name',
-    'slug'            => 'Slug',
-    'description'     => 'Description',
-    'content'         => 'Content',
-    'type'            => 'Type',
-    'category'        => 'Category',
-    'is_active'       => 'Active',
-    'documents_count' => 'Documents',
-    'created_at'      => 'Created At',
-    'updated_at'      => 'Updated At',
+    'name'        => 'Name',
+    'slug'        => 'Slug',
+    'description' => 'Description',
+    'content'     => 'Content',
+    'type'        => 'Type',
+    'category'    => 'Category',
+    'is_active'   => 'Active',
+    'created_at'  => 'Created At',
+    'updated_at'  => 'Updated At',
 
     'types' => [
         'invoice'  => 'Invoice',
@@ -37,20 +36,10 @@ return [
         'operational' => 'Operational',
     ],
 
-    'actions' => [
-        'preview'    => 'Preview',
-        'duplicate'  => 'Duplicate',
-        'activate'   => 'Activate',
-        'deactivate' => 'Deactivate',
-        'export'     => 'Export',
-    ],
-
     'notifications' => [
-        'previewed'   => 'Template preview opened successfully.',
-        'duplicated'  => 'Template duplicated successfully.',
-        'activated'   => 'Selected templates activated successfully.',
-        'deactivated' => 'Selected templates deactivated successfully.',
+        'delete_has_documents' => [
+            'title' => 'Cannot delete template',
+            'body'  => 'This template is used by existing documents. Please remove the documents first.',
+        ],
     ],
-
-    'copy_suffix' => '(Copy)',
 ];
