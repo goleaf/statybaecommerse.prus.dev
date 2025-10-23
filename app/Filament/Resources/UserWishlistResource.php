@@ -65,7 +65,7 @@ final class UserWishlistResource extends Resource
         return __('admin.user_wishlists.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Form $form): Form|array
     {
         // Configure the wishlist creation and editing form components.
         return $form
@@ -93,7 +93,7 @@ final class UserWishlistResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table|array
     {
         // Define table columns, filters, and actions for wishlist management.
         return $table

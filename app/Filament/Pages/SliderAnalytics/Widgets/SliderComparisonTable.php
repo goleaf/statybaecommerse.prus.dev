@@ -22,7 +22,7 @@ final class SliderComparisonTable extends BaseWidget
 
     protected int|string|array $columnSpan = 'full';
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         $startDate = $this->pageFilters['startDate'] ?? now()->subDays(30);
         $endDate = $this->pageFilters['endDate'] ?? now();

@@ -37,12 +37,12 @@ final class CountryResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function form(Form $form): Form
+    public static function form(Form $form): Form|array
     {
         return CountryForm::configure($form);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table|array
     {
         return CountriesTable::configure($table);
     }

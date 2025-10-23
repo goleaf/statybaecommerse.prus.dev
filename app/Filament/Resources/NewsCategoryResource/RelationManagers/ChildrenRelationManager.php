@@ -22,7 +22,7 @@ final class ChildrenRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Sub Categories';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form|array
     {
         return $schema
             ->schema([
@@ -74,7 +74,7 @@ final class ChildrenRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         return $table
             ->recordTitleAttribute('name')

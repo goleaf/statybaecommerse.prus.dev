@@ -73,7 +73,10 @@ final class CampaignConversionResource extends Resource
         return __('campaign_conversions.single');
     }
 
-    public static function form(Form $form): Form
+    /**
+     * Configure the Filament form schema with fields and validation.
+     */
+    public static function form(Form $form): Form|array
     {
         return $form->schema([
             Section::make(__('campaign_conversions.form.basic_information'))
@@ -219,7 +222,7 @@ final class CampaignConversionResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table|array
     {
         return $table
             ->columns([

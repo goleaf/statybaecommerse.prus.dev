@@ -63,7 +63,7 @@ final class DiscountRedemptionResource extends Resource
         return __('admin.discount_redemptions.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Form $form): Form|array
     {
         return $form->schema([
             Section::make(__('admin.discount_redemptions.form.sections.basic_information'))
@@ -148,7 +148,7 @@ final class DiscountRedemptionResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table|array
     {
         return $table
             ->defaultSort('redeemed_at', 'desc')

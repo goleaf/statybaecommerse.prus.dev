@@ -62,10 +62,7 @@ final class UserProductInteractionResource extends Resource
         return __('admin.user_product_interactions.model_label');
     }
 
-    /**
-     * Ensure Filament v4 receives a concrete Form instance for schema binding.
-     */
-    public static function form(Form $form): Form
+    public static function form(Form $form): Form|array
     {
         $basicInformationSection = SchemaSection::make(__('admin.user_product_interactions.basic_information'))
             ->schema([
@@ -228,10 +225,7 @@ final class UserProductInteractionResource extends Resource
         ]);
     }
 
-    /**
-     * Return a Table instance to satisfy Filament v4 table expectations.
-     */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table|array
     {
         return $table
             ->deferLoading(false)

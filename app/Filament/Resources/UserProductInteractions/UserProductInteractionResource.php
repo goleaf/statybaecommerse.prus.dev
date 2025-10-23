@@ -42,12 +42,12 @@ class UserProductInteractionResource extends Resource
         return LegacyUserProductInteractionResource::getModelLabel();
     }
 
-    public static function form(Form $form): Form
+    public static function form(Form $form): Form|array
     {
         return LegacyUserProductInteractionResource::form($form);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table|array
     {
         return LegacyUserProductInteractionResource::table($table);
     }

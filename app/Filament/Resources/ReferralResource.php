@@ -48,7 +48,7 @@ final class ReferralResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'referral_code';
 
-    public static function form(Form $form): Form
+    public static function form(Form $form): Form|array
     {
         // Use the schema-based configuration to stay aligned with Filament v4 resource expectations.
         return $form
@@ -138,7 +138,7 @@ final class ReferralResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table|array
     {
         // Configure table columns using the fluent Table API for Filament v4 compliance.
         return $table

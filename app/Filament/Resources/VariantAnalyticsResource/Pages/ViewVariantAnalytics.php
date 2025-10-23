@@ -26,7 +26,7 @@ final class ViewVariantAnalytics extends ViewRecord
         ];
     }
 
-    public function infolist(Schema $schema): Schema
+    public function infolist(Schema $schema): Schema|array
     {
         return $schema
             ->components([

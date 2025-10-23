@@ -32,7 +32,7 @@ final class ReviewsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Reviews';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form|array
     {
         return $form->schema([
             Select::make('product_id')
@@ -62,7 +62,7 @@ final class ReviewsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         return $table
             ->recordTitleAttribute('title')

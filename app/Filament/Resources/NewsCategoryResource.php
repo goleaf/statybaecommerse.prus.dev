@@ -52,7 +52,7 @@ final class NewsCategoryResource extends Resource
 
     protected static ?string $pluralModelLabel = 'News Categories';
 
-    public static function form(Form $form): Form
+    public static function form(Form $form): Form|array
     {
         return $form->schema([
             Section::make(__('news_categories.sections.category_information'))
@@ -137,7 +137,7 @@ final class NewsCategoryResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table|array
     {
         return $table
             ->columns([
@@ -266,7 +266,7 @@ final class NewsCategoryResource extends Resource
             ->paginationPageOptions([10, 25, 50, 100]);
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Schema $schema): Schema|array
     {
         return $schema
             ->schema([

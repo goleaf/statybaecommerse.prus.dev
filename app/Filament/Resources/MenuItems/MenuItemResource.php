@@ -23,19 +23,13 @@ class MenuItemResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    /**
-     * Compose the shared form schema for creating and editing menu items.
-     */
-    public static function form(Form $form): Form
+    public static function form(Form $form): Form|array
     {
         // Delegate field layout to the dedicated schema configurator for reuse.
         return MenuItemForm::configure($form);
     }
 
-    /**
-     * Build the reusable table definition for listing menu items.
-     */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table|array
     {
         // Centralise column configuration in the shared table builder.
         return MenuItemsTable::configure($table);

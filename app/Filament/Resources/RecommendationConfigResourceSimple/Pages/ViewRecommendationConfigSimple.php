@@ -39,7 +39,7 @@ final class ViewRecommendationConfigSimple extends ViewRecord implements HasTabl
         ];
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         $table = $table
             ->paginated([10])

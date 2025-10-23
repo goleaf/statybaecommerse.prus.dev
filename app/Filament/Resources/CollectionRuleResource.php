@@ -66,7 +66,7 @@ final class CollectionRuleResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Form $form): Form|array
     {
         // Expose the schema via the Filament v4 `Form` instance to drop the deprecated array fallback.
         return $form->schema([
@@ -149,7 +149,7 @@ final class CollectionRuleResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table|array
     {
         // Publish the full table definition through the Filament v4 `Table` signature for consistency.
         return $table

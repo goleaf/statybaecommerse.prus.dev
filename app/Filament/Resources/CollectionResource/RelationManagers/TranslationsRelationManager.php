@@ -20,7 +20,7 @@ final class TranslationsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Collection Translations';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form|array
     {
         return $schema
             ->schema([
@@ -56,7 +56,7 @@ final class TranslationsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         return $table
             ->recordTitleAttribute('name')

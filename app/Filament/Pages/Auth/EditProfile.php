@@ -18,10 +18,7 @@ use App\Support\Filament\Components\Flatpickr;
 
 class EditProfile extends BaseEditProfile
 {
-    /**
-     * Build the edit profile form schema while retaining Filament v4 compatibility.
-     */
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form|array
     {
         return $schema
             ->components([

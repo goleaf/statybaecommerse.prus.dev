@@ -22,7 +22,7 @@ final class CustomerSegmentsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Customer Segments';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form|array
     {
         return $schema->schema([
             Select::make('customer_group_id')
@@ -40,7 +40,7 @@ final class CustomerSegmentsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         return $table
             ->columns([

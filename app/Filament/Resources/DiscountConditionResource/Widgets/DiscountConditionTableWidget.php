@@ -23,7 +23,7 @@ final class DiscountConditionTableWidget extends BaseWidget
         return __('discount_conditions.widgets.recent_conditions');
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         return $table
             ->query(

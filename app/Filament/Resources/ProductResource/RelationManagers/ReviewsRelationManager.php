@@ -21,7 +21,7 @@ class ReviewsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Reviews';
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table|array
     {
         return $table
             ->columns([
