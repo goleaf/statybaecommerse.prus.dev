@@ -47,8 +47,8 @@ class NewsTagResource extends Resource
         return [
             'index'  => ListNewsTags::route('/'),
             'create' => CreateNewsTag::route('/create'),
-            'view'   => ViewNewsTag::route('/{record}'),
-            'edit'   => EditNewsTag::route('/{record}/edit'),
+            'view' => ViewNewsTag::route('/{record}'),
+            'edit' => EditNewsTag::route('/{record}/edit'),
         ];
     }
 }
