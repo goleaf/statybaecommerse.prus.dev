@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\AttributeResource\Pages;
 use App\Models\Attribute;
 use App\Support\Concerns\HasNav;
 use BackedEnum;
 use Filament\Actions;
-use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Repeater;
-use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
@@ -36,7 +35,7 @@ final class AttributeResource extends Resource
     use HasNav;
 
     /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while respecting the parent type hint.
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
@@ -64,12 +63,13 @@ final class AttributeResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
-            SchemaSection::make(__('attributes.basic_information'))
+        // Leveraging the standard Filament Form pipeline keeps Livewire hydration predictable in tests.
+        return $form->schema([
+            Section::make(__('attributes.basic_information'))
                 ->schema([
-                    SchemaGrid::make(2)
+                    Grid::make(2)
                         ->schema([
                             TextInput::make('name')
                                 ->label(__('attributes.name'))
@@ -87,7 +87,7 @@ final class AttributeResource extends Resource
                         ->maxLength(500)
                         ->columnSpanFull(),
                 ]),
-            SchemaSection::make(__('attributes.type_settings'))
+            Section::make(__('attributes.type_settings'))
                 ->schema([
                     Select::make('type')
                         ->label(__('attributes.type'))
@@ -127,9 +127,9 @@ final class AttributeResource extends Resource
                         ->label(__('attributes.is_filterable'))
                         ->default(true),
                 ]),
-            SchemaSection::make(__('attributes.validation'))
+            Section::make(__('attributes.validation'))
                 ->schema([
-                    SchemaGrid::make(2)
+                    Grid::make(2)
                         ->schema([
                             TextInput::make('min_length')
                                 ->label(__('attributes.min_length'))
@@ -206,14 +206,14 @@ final class AttributeResource extends Resource
                             }
 
                             if (str_contains($state, ',')) {
-                                return array_values(array_filter(array_map(static fn ($rule): string => trim($rule), explode(',', $state)), static fn ($rule): bool => $rule !== ''));
+                                return array_values(array_filter(array_map(trim(...), explode(',', $state)), static fn ($rule): bool => $rule !== ''));
                             }
 
                             return $state;
                         })
                         ->columnSpanFull(),
                 ]),
-            SchemaSection::make(__('attributes.options'))
+            Section::make(__('attributes.options'))
                 ->schema([
                     Repeater::make('options')
                         ->label(__('attributes.options'))
@@ -236,9 +236,9 @@ final class AttributeResource extends Resource
                         ->columns(4)
                         ->addActionLabel(__('attributes.add_option')),
                 ]),
-            SchemaSection::make(__('attributes.settings'))
+            Section::make(__('attributes.settings'))
                 ->schema([
-                    SchemaGrid::make(2)
+                    Grid::make(2)
                         ->schema([
                             Toggle::make('is_active')
                                 ->label(__('attributes.is_active'))
@@ -252,7 +252,7 @@ final class AttributeResource extends Resource
                                 ->default(0),
                             Select::make('group_name')
                                 ->label(__('attributes.group'))
-                                ->options(static fn (): array => self::getGroupOptions())
+                                ->options(self::getGroupOptions(...))
                                 ->default('general'),
                         ]),
                 ]),
@@ -262,7 +262,7 @@ final class AttributeResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -298,7 +298,7 @@ final class AttributeResource extends Resource
                     }),
                 TextColumn::make('group_name')
                     ->label(__('attributes.group'))
-                    ->formatStateUsing(static fn (?string $state): string => self::translateGroupName($state))
+                    ->formatStateUsing(self::translateGroupName(...))
                     ->color('gray')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('options_count')
@@ -352,7 +352,7 @@ final class AttributeResource extends Resource
                         'url'         => __('attributes.types.url'),
                     ]),
                 SelectFilter::make('group_name')
-                    ->options(static fn (): array => self::getGroupOptions()),
+                    ->options(self::getGroupOptions(...)),
                 TernaryFilter::make('is_required')
                     ->trueLabel(__('attributes.required_only'))
                     ->falseLabel(__('attributes.optional_only'))
