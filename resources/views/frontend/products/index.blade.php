@@ -1,81 +1,107 @@
-@extends('components.layouts.base')
-
-@section('title', __('Products'))
+@extends('frontend.layouts.app')
 
 @section('content')
-    <x-container class="py-8 space-y-8">
-        <div>
-            <h1 class="text-3xl font-semibold text-gray-900">{{ __('Products') }}</h1>
-            <p class="mt-2 text-gray-600">{{ __('Browse our catalogue of available products.') }}</p>
-        </div>
+    <div class="max-w-6xl mx-auto px-4 py-10 space-y-8">
+        <header class="space-y-2">
+            <h1 class="text-3xl font-semibold text-slate-900 dark:text-slate-100">{{ __('Product catalog') }}</h1>
+            <p class="text-slate-600 dark:text-slate-300">{{ __('Browse our latest products and discover new favourites.') }}</p>
+        </header>
 
-        <div class="grid gap-6 lg:grid-cols-[16rem_auto]">
-            <aside class="space-y-4">
-                <form method="get" action="{{ route('frontend.products.index') }}" class="space-y-4">
-                    <x-input label="{{ __('Search') }}" name="q" value="{{ $filters['search'] ?? '' }}" />
+        <section aria-label="{{ __('Filters') }}" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-6 shadow-sm">
+            <div class="flex flex-wrap gap-4 text-sm text-slate-600 dark:text-slate-300">
+                <div>
+                    <strong class="font-medium text-slate-900 dark:text-slate-100">{{ __('Search') }}:</strong>
+                    {{ $filters['search'] ?: __('Any') }}
+                </div>
+                <div>
+                    <strong class="font-medium text-slate-900 dark:text-slate-100">{{ __('Category') }}:</strong>
+                    {{ optional($currentCategory)->name ?: __('All categories') }}
+                </div>
+                <div>
+                    <strong class="font-medium text-slate-900 dark:text-slate-100">{{ __('Brand') }}:</strong>
+                    {{ optional($currentBrand)->name ?: __('All brands') }}
+                </div>
+                <div>
+                    <strong class="font-medium text-slate-900 dark:text-slate-100">{{ __('Sort by') }}:</strong>
+                    {{ str_replace('_', ' ', $filters['sort']) }}
+                </div>
+            </div>
+        </section>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ __('Categories') }}</label>
-                        <select name="category" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500">
-                            <option value="">{{ __('All categories') }}</option>
-                            @foreach ($categories as $category)
-                                <option value="{{ $category->slug }}" @selected(($filters['category'] ?? '') === $category->slug)>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <aside class="md:col-span-1 space-y-6" aria-label="{{ __('Catalog navigation') }}">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
+                    <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-3">{{ __('Categories') }}</h2>
+                    <ul class="space-y-2 text-sm">
+                        @foreach ($categories as $category)
+                            <li>
+                                <a class="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300" href="{{ route('frontend.products.index', array_filter(array_merge(request()->query(), ['category' => $category->slug]))) }}">
                                     {{ $category->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ __('Brands') }}</label>
-                        <select name="brand" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500">
-                            <option value="">{{ __('All brands') }}</option>
-                            @foreach ($brands as $brand)
-                                <option value="{{ $brand->slug }}" @selected(($filters['brand'] ?? '') === $brand->slug)>
-                                    {{ $brand->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <x-button type="submit" class="w-full">{{ __('Apply filters') }}</x-button>
-                </form>
-            </aside>
-
-            <section class="space-y-4">
-                <p class="text-sm text-gray-600">
-                    {{ trans_choice(':count product|:count products', $products->total(), ['count' => $products->total()]) }}
-                </p>
-
-                <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    @forelse ($products as $product)
-                        <article class="rounded-lg border border-gray-200 bg-white shadow-sm">
-                            <a href="{{ route('frontend.products.show', $product) }}" class="block">
-                                @php($media = $product->getFirstMedia(config('media.storage.collection_name')))
-                                @if ($media)
-                                    <img src="{{ $media->getFullUrl() }}" alt="{{ $product->name }}" class="h-48 w-full rounded-t-lg object-cover">
-                                @else
-                                    <div class="h-48 w-full rounded-t-lg bg-gray-100"></div>
-                                @endif
-
-                                <div class="space-y-2 p-4">
-                                    <h2 class="text-lg font-medium text-gray-900">{{ $product->trans('name') ?? $product->name }}</h2>
-                                    <p class="text-sm text-gray-600 line-clamp-2">{{ $product->trans('short_description') ?? $product->short_description }}</p>
-                                    <p class="text-base font-semibold text-primary-600">
-                                        {{ optional($product->prices->first())->formatted ?? \Illuminate\Support\Number::currency((float) ($product->price ?? 0), current_currency(), app()->getLocale()) }}
-                                    </p>
-                                </div>
-                            </a>
-                        </article>
-                    @empty
-                        <div class="col-span-full rounded-lg border border-dashed border-gray-300 p-12 text-center text-gray-500">
-                            {{ __('No products matched your filters.') }}
-                        </div>
-                    @endforelse
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
                 </div>
 
-                {{ $products->links() }}
-            </section>
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
+                    <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-3">{{ __('Brands') }}</h2>
+                    <ul class="space-y-2 text-sm">
+                        @foreach ($brands as $brand)
+                            <li>
+                                <a class="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300" href="{{ route('frontend.products.index', array_filter(array_merge(request()->query(), ['brand' => $brand->slug]))) }}">
+                                    {{ $brand->name }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            </aside>
+
+            <div class="md:col-span-2">
+                @if ($products->isEmpty())
+                    <div class="rounded-xl border border-dashed border-slate-300 dark:border-slate-600 p-12 text-center text-slate-600 dark:text-slate-300">
+                        {{ __('No products matched your filters. Try adjusting the criteria and search again.') }}
+                    </div>
+                @else
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        @foreach ($products as $product)
+                            <article class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm overflow-hidden">
+                                <div class="p-5 space-y-4">
+                                    <header class="space-y-1">
+                                        <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                                            <a href="{{ route('frontend.products.show', $product) }}" class="hover:text-primary-600 dark:hover:text-primary-400">
+                                                {{ $product->name }}
+                                            </a>
+                                        </h3>
+                                        <p class="text-sm text-slate-500 dark:text-slate-400">{{ optional($product->brand)->name }}</p>
+                                    </header>
+
+                                    <p class="text-sm text-slate-600 dark:text-slate-300 line-clamp-3">{{ \Illuminate\Support\Str::limit($product->short_description ?: $product->description, 140) }}</p>
+
+                                    <dl class="text-sm text-slate-600 dark:text-slate-300 grid grid-cols-2 gap-2">
+                                        <div>
+                                            <dt class="font-medium text-slate-900 dark:text-slate-100">{{ __('Price') }}</dt>
+                                            <dd>{{ number_format((float) $product->price, 2) }} {{ config('app.currency', 'EUR') }}</dd>
+                                        </div>
+                                        <div>
+                                            <dt class="font-medium text-slate-900 dark:text-slate-100">{{ __('Reviews') }}</dt>
+                                            <dd>{{ $product->reviews_count }}</dd>
+                                        </div>
+                                    </dl>
+
+                                    <a href="{{ route('frontend.products.show', $product) }}" class="inline-flex items-center justify-center rounded-lg border border-primary-200 dark:border-primary-500 px-4 py-2 text-sm font-medium text-primary-700 dark:text-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900/20">
+                                        {{ __('View details') }}
+                                    </a>
+                                </div>
+                            </article>
+                        @endforeach
+                    </div>
+
+                    <div class="mt-8">
+                        {{ $products->links() }}
+                    </div>
+                @endif
+            </div>
         </div>
-    </x-container>
+    </div>
 @endsection

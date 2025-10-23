@@ -5,13 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Models\CartItem;
-use App\Models\Order;
-use App\Models\OrderItem;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -19,106 +15,96 @@ final class CheckoutController extends Controller
 {
     public function index(Request $request): View
     {
-        $items = $this->getCartItems($request);
+        $items = collect($request->session()->get('cart', []));
+        $summary = $this->calculateSummary($items);
 
         return view('frontend.checkout.index', [
-            'cartItems' => $items,
-            'summary' => $this->summarize($items),
+            'items' => $items,
+            'summary' => $summary,
+            'user' => $request->user(),
         ]);
     }
 
     public function process(Request $request): RedirectResponse
     {
-        $items = $this->getCartItems($request);
+        $items = collect($request->session()->get('cart', []));
+
         if ($items->isEmpty()) {
-            return redirect()->route('frontend.cart.index')->with('error', __('Your cart is empty.'));
+            return redirect()->route('frontend.cart.index')->withErrors([
+                'cart' => __('Your cart is empty.'),
+            ]);
         }
 
-        $validated = $request->validate([
-            'payment_method' => ['required', 'string', 'max:255'],
-            'confirm' => ['accepted'],
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email'],
+            'phone' => ['nullable', 'string', 'max:50'],
+            'billing_address' => ['required', 'string', 'max:500'],
+            'shipping_address' => ['nullable', 'string', 'max:500'],
+            'payment_method' => ['required', 'string', 'max:50'],
+            'notes' => ['nullable', 'string'],
         ]);
 
-        $order = DB::transaction(function () use ($items, $request, $validated) {
-            $subtotal = (float) $items->sum(fn (CartItem $item) => $item->calculateSubtotal());
+        $summary = $this->calculateSummary($items);
+        $orderNumber = Str::upper(Str::random(10));
 
-            $order = Order::query()->create([
-                'number' => Str::upper(Str::random(10)),
-                'user_id' => $request->user()?->id,
-                'status' => 'processing',
-                'subtotal' => $subtotal,
-                'tax_amount' => 0,
-                'shipping_amount' => 0,
-                'discount_amount' => 0,
-                'total' => $subtotal,
-                'currency' => current_currency(),
-                'billing_address' => [],
-                'shipping_address' => [],
-                'payment_status' => 'paid',
-                'payment_method' => $validated['payment_method'],
-                'payment_reference' => (string) Str::uuid(),
-            ]);
+        $checkoutData = [
+            'order_number' => $orderNumber,
+            'customer' => [
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'phone' => $data['phone'] ?? null,
+            ],
+            'billing_address' => $data['billing_address'],
+            'shipping_address' => $data['shipping_address'] ?? $data['billing_address'],
+            'payment_method' => $data['payment_method'],
+            'notes' => $data['notes'] ?? null,
+            'summary' => $summary,
+            'items' => $items,
+            'placed_at' => now(),
+        ];
 
-            foreach ($items as $item) {
-                OrderItem::query()->create([
-                    'order_id' => $order->getKey(),
-                    'product_id' => $item->product_id,
-                    'product_variant_id' => $item->product_variant_id,
-                    'name' => $item->product_snapshot['name'] ?? $item->product?->name,
-                    'sku' => $item->product_snapshot['sku'] ?? $item->product?->sku,
-                    'quantity' => $item->quantity,
-                    'unit_price' => (float) $item->price,
-                    'price' => (float) $item->price,
-                    'total' => $item->calculateSubtotal(),
-                    'notes' => $item->notes,
-                ]);
+        $request->session()->put('checkout.completed', $checkoutData);
+        $request->session()->forget('cart');
 
-                $item->forceDelete();
-            }
-
-            return $order;
-        });
-
-        $request->session()->put('checkout.last_order_id', $order->getKey());
-
-        return redirect()->route('frontend.checkout.success')->with('status', __('Order placed successfully.'));
+        return redirect()->route('frontend.checkout.success');
     }
 
     public function success(Request $request): View|RedirectResponse
     {
-        $orderId = $request->session()->pull('checkout.last_order_id');
-        if (! $orderId) {
-            return redirect()->route('frontend.cart.index')->with('info', __('No recent checkout found.'));
+        if (! $request->session()->has('checkout.completed')) {
+            return redirect()->route('frontend.cart.index');
         }
 
-        $order = Order::withoutGlobalScopes()->with('items')->findOrFail($orderId);
+        $checkout = $request->session()->get('checkout.completed');
 
         return view('frontend.checkout.success', [
-            'order' => $order,
+            'checkout' => $checkout,
         ]);
     }
 
-    public function cancel(): View
+    public function cancel(Request $request): View
     {
-        return view('frontend.checkout.cancel');
+        return view('frontend.checkout.cancel', [
+            'items' => collect($request->session()->get('cart', [])),
+        ]);
     }
 
-    private function getCartItems(Request $request): Collection
+    private function calculateSummary(Collection $items): array
     {
-        return CartItem::query()
-            ->where('session_id', $request->session()->getId())
-            ->orderBy('created_at')
-            ->get();
-    }
-
-    private function summarize(Collection $items): array
-    {
-        $subtotal = (float) $items->sum(fn (CartItem $item) => $item->calculateSubtotal());
+        $subtotal = $items->sum(fn ($item) => ($item['price'] ?? 0) * ($item['quantity'] ?? 0));
+        $taxRate = (float) config('shared.tax.default_rate', 0.21);
+        $tax = $subtotal * $taxRate;
+        $shipping = $subtotal > 50 ? 0 : 5.99;
+        $discount = (float) session('cart_discount', 0);
+        $total = $subtotal + $tax + $shipping - $discount;
 
         return [
-            'item_count' => (int) $items->sum('quantity'),
-            'subtotal' => $subtotal,
-            'formatted_subtotal' => app_money_format($subtotal),
+            'subtotal' => round($subtotal, 2),
+            'tax' => round($tax, 2),
+            'shipping' => round($shipping, 2),
+            'discount' => round($discount, 2),
+            'total' => round(max($total, 0), 2),
         ];
     }
 }

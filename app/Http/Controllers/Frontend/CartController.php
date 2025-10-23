@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Models\CartItem;
 use App\Models\Product;
-use App\Models\ProductVariant;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
@@ -17,163 +15,118 @@ final class CartController extends Controller
 {
     public function index(Request $request): View
     {
-        $items = $this->getCartItems($request);
+        $cartItems = collect($request->session()->get('cart', []));
+        $summary = $this->calculateSummary($cartItems);
 
         return view('frontend.cart.index', [
-            'cartItems' => $items,
-            'summary' => $this->summarize($items),
+            'items' => $cartItems,
+            'summary' => $summary,
         ]);
     }
 
-    public function add(Request $request): JsonResponse
+    public function add(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
+        $data = $request->validate([
             'product_id' => ['required', 'integer', 'exists:products,id'],
-            'product_variant_id' => ['nullable', 'integer', 'exists:product_variants,id'],
-            'quantity' => ['sometimes', 'integer', 'min:1'],
+            'quantity' => ['nullable', 'integer', 'min:1'],
         ]);
 
-        $quantity = (int) ($validated['quantity'] ?? 1);
-        $sessionId = $request->session()->getId();
-        $userId = $request->user()?->id;
+        $product = Product::query()->findOrFail($data['product_id']);
+        $quantity = $data['quantity'] ?? 1;
 
-        /** @var Product $product */
-        $product = Product::query()->findOrFail($validated['product_id']);
-        $variant = null;
-        if (! empty($validated['product_variant_id'])) {
-            $variant = ProductVariant::query()
-                ->where('product_id', $product->getKey())
-                ->findOrFail($validated['product_variant_id']);
-        }
+        $cart = collect($request->session()->get('cart', []));
 
-        $unitPrice = (float) ($variant?->price ?? $product->sale_price ?? $product->price ?? 0.0);
+        $existing = $cart->firstWhere('id', $product->id);
 
-        $cartItem = CartItem::query()
-            ->where('session_id', $sessionId)
-            ->where('product_id', $product->getKey())
-            ->when($variant, fn ($query) => $query->where('product_variant_id', $variant?->getKey()))
-            ->first();
+        if ($existing) {
+            $cart = $cart->map(function (array $item) use ($product, $quantity) {
+                if ((int) $item['id'] === $product->id) {
+                    $item['quantity'] += $quantity;
+                    $item['total'] = $item['price'] * $item['quantity'];
+                }
 
-        if ($cartItem) {
-            $cartItem->incrementQuantity($quantity);
+                return $item;
+            });
         } else {
-            $cartItem = CartItem::query()->create([
-                'session_id' => $sessionId,
-                'user_id' => $userId,
-                'product_id' => $product->getKey(),
-                'product_variant_id' => $variant?->getKey(),
+            $cart->push([
+                'id' => $product->id,
+                'name' => $product->name,
+                'price' => (float) $product->price,
                 'quantity' => $quantity,
-                'minimum_quantity' => $product->getMinimumQuantity(),
-                'unit_price' => $unitPrice,
-                'price' => $unitPrice,
-                'total_price' => $unitPrice * $quantity,
-                'product_snapshot' => $this->snapshotProduct($product, $variant),
+                'sku' => $product->sku,
+                'total' => (float) $product->price * $quantity,
             ]);
         }
 
-        $items = $this->getCartItems($request);
+        $request->session()->put('cart', $cart->values()->all());
 
-        return response()->json([
-            'message' => __('Item added to cart.'),
-            'cart_item' => [
-                'id' => $cartItem->getKey(),
-                'quantity' => $cartItem->quantity,
-                'total_price' => $cartItem->calculateSubtotal(),
-            ],
-            'summary' => $this->summarize($items),
-        ], $cartItem->wasRecentlyCreated ? 201 : 200);
+        return redirect()->route('frontend.cart.index')->with('status', __('Product added to cart.'));
     }
 
-    public function update(Request $request, CartItem $cartItem): JsonResponse
+    public function update(Request $request): RedirectResponse
     {
-        $cartItem = $this->ensureOwnership($request, $cartItem);
-
-        $validated = $request->validate([
-            'quantity' => ['required', 'integer', 'min:1'],
+        $data = $request->validate([
+            'items' => ['required', 'array'],
+            'items.*.id' => ['required', 'integer'],
+            'items.*.quantity' => ['required', 'integer', 'min:1'],
         ]);
 
-        $cartItem->updateQuantity((int) $validated['quantity']);
-        $items = $this->getCartItems($request);
+        $cart = collect($request->session()->get('cart', []));
+        $quantityUpdates = collect($data['items'])->keyBy(fn ($item) => (int) $item['id']);
 
-        return response()->json([
-            'message' => __('Cart item updated.'),
-            'cart_item' => [
-                'id' => $cartItem->getKey(),
-                'quantity' => $cartItem->quantity,
-                'total_price' => $cartItem->calculateSubtotal(),
-            ],
-            'summary' => $this->summarize($items),
+        $cart = $cart->map(function (array $item) use ($quantityUpdates) {
+            $productId = (int) ($item['id'] ?? 0);
+            if ($quantityUpdates->has($productId)) {
+                $newQuantity = (int) $quantityUpdates[$productId]['quantity'];
+                $item['quantity'] = $newQuantity;
+                $item['total'] = ($item['price'] ?? 0) * $newQuantity;
+            }
+
+            return $item;
+        });
+
+        $request->session()->put('cart', $cart->values()->all());
+
+        return redirect()->route('frontend.cart.index')->with('status', __('Cart updated successfully.'));
+    }
+
+    public function remove(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'id' => ['required', 'integer'],
         ]);
+
+        $cart = collect($request->session()->get('cart', []))
+            ->reject(fn (array $item) => (int) $item['id'] === (int) $data['id'])
+            ->values();
+
+        $request->session()->put('cart', $cart->all());
+
+        return redirect()->route('frontend.cart.index')->with('status', __('Item removed from cart.'));
     }
 
-    public function remove(Request $request, CartItem $cartItem): JsonResponse
+    public function clear(Request $request): RedirectResponse
     {
-        $cartItem = $this->ensureOwnership($request, $cartItem);
-        $cartItem->forceDelete();
-        $items = $this->getCartItems($request);
+        $request->session()->forget(['cart', 'cart_discount', 'applied_coupon']);
 
-        return response()->json([
-            'message' => __('Cart item removed.'),
-            'summary' => $this->summarize($items),
-        ]);
+        return redirect()->route('frontend.cart.index')->with('status', __('Cart cleared.'));
     }
 
-    public function clear(Request $request): JsonResponse
+    private function calculateSummary(Collection $items): array
     {
-        $items = $this->getCartItems($request);
-        $items->each->forceDelete();
-
-        return response()->json([
-            'message' => __('Cart cleared.'),
-            'summary' => $this->summarize(collect()),
-        ]);
-    }
-
-    private function getCartItems(Request $request): Collection
-    {
-        return CartItem::query()
-            ->where('session_id', $request->session()->getId())
-            ->with(['product.media', 'product.brand'])
-            ->orderBy('created_at')
-            ->get();
-    }
-
-    private function summarize(Collection $items): array
-    {
-        $subtotal = (float) $items->sum(fn (CartItem $item) => $item->calculateSubtotal());
+        $subtotal = $items->sum(fn ($item) => ($item['price'] ?? 0) * ($item['quantity'] ?? 0));
+        $taxRate = (float) config('shared.tax.default_rate', 0.21);
+        $tax = $subtotal * $taxRate;
+        $shipping = $subtotal > 50 ? 0 : 5.99;
+        $discount = (float) session('cart_discount', 0);
+        $total = $subtotal + $tax + $shipping - $discount;
 
         return [
-            'item_count' => (int) $items->sum('quantity'),
-            'subtotal' => $subtotal,
-            'formatted_subtotal' => app_money_format($subtotal),
+            'subtotal' => round($subtotal, 2),
+            'tax' => round($tax, 2),
+            'shipping' => round($shipping, 2),
+            'discount' => round($discount, 2),
+            'total' => round(max($total, 0), 2),
         ];
-    }
-
-    private function ensureOwnership(Request $request, CartItem $cartItem): CartItem
-    {
-        $sessionId = $request->session()->getId();
-        $userId = $request->user()?->id;
-
-        if ($cartItem->session_id !== $sessionId || ($userId && $cartItem->user_id !== $userId)) {
-            abort(404);
-        }
-
-        return $cartItem;
-    }
-
-    private function snapshotProduct(Product $product, ?ProductVariant $variant): array
-    {
-        $image = null;
-        if (method_exists($product, 'getFirstMediaUrl')) {
-            $image = $product->getFirstMediaUrl(config('media.storage.collection_name'))
-                ?: $product->getFirstMediaUrl(config('media.storage.thumbnail_collection'));
-        }
-
-        return array_filter([
-            'name' => $variant?->name ?? $product->name,
-            'sku' => $variant?->sku ?? $product->sku,
-            'price' => $variant?->price ?? $product->price,
-            'image' => $image,
-        ], static fn ($value) => $value !== null);
     }
 }

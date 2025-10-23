@@ -5,113 +5,72 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Models\Brand;
 use App\Models\Category;
-use App\Services\Shared\ProductService;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 final class CategoryController extends Controller
 {
-    public function __construct(private readonly ProductService $productService) {}
-
-    public function index(): View
+    public function index(Request $request): View
     {
-        return view('categories.index', [
-            'categories' => $this->categoryTree(),
+        $search = Str::of((string) $request->input('search'))->trim()->whenEmpty(fn () => null)->toString();
+
+        $categoriesQuery = Category::query()
+            ->withCount(['products as visible_products_count' => fn ($query) => $query->where('is_visible', true)])
+            ->orderBy('name');
+
+        if ($search) {
+            $categoriesQuery->where(function ($query) use ($search): void {
+                $query->where('name', 'like', '%'.$search.'%')
+                    ->orWhere('slug', 'like', '%'.$search.'%');
+            });
+        }
+
+        /** @var LengthAwarePaginator $categories */
+        $categories = $categoriesQuery->paginate(12)->withQueryString();
+
+        return view('frontend.categories.index', [
+            'categories' => $categories,
+            'search' => $search,
         ]);
     }
 
-    public function show(Request $request, Category $category): View
+    public function show(Category $category, Request $request): View
     {
-        $category->load(['translations', 'children' => fn ($query) => $query->ordered()]);
+        $category->load(['children' => fn ($query) => $query->orderBy('name')]);
 
-        $filters = [
-            'search' => trim((string) $request->input('q', '')),
-            'brands' => $this->normalizeFilterValues($request->input('brand')),
-            'sort' => $request->input('sort', 'latest'),
-        ];
+        $productsQuery = $category->products()
+            ->with(['brand', 'media'])
+            ->where('is_visible', true);
 
-        [$sortBy, $direction] = $this->resolveSort($filters['sort']);
+        $sort = $request->input('sort', 'latest');
 
-        $brandIds = $this->resolveBrandIds($filters['brands']);
+        switch ($sort) {
+            case 'price_asc':
+                $productsQuery->orderBy('price');
+                break;
+            case 'price_desc':
+                $productsQuery->orderByDesc('price');
+                break;
+            case 'name_asc':
+                $productsQuery->orderBy('name');
+                break;
+            case 'name_desc':
+                $productsQuery->orderByDesc('name');
+                break;
+            default:
+                $productsQuery->latest();
+        }
 
-        $products = $this->productService->getProductsByCategory($category->id, [
-            'search' => $filters['search'] !== '' ? $filters['search'] : null,
-            'brands' => $brandIds,
-            'sort_by' => $sortBy,
-            'sort_direction' => $direction,
-        ], 12);
+        /** @var LengthAwarePaginator $products */
+        $products = $productsQuery->paginate(12)->withQueryString();
 
-        $products->appends($request->query());
-
-        return view('categories.show', [
+        return view('frontend.categories.show', [
             'category' => $category,
             'products' => $products,
-            'filters' => $filters,
-            'availableBrands' => $this->brandOptions(),
+            'sort' => $sort,
         ]);
-    }
-
-    private function categoryTree(): Collection
-    {
-        return Category::query()
-            ->roots()
-            ->ordered()
-            ->with('children')
-            ->get();
-    }
-
-    private function normalizeFilterValues(mixed $value): array
-    {
-        if ($value === null) {
-            return [];
-        }
-
-        return collect(is_array($value) ? $value : [$value])
-            ->map(fn ($item) => is_string($item) ? trim($item) : $item)
-            ->filter(fn ($item) => $item !== '' && $item !== null)
-            ->values()
-            ->all();
-    }
-
-    private function resolveBrandIds(array $values): array
-    {
-        $collection = collect($values);
-
-        if ($collection->isEmpty()) {
-            return [];
-        }
-
-        [$idValues, $slugValues] = $collection->partition(fn ($value) => is_numeric($value));
-
-        $ids = Brand::query()->whereIn('id', $idValues->all())->pluck('id')->all();
-
-        if ($slugValues->isNotEmpty()) {
-            $ids = array_merge($ids, Brand::query()->whereIn('slug', $slugValues->all())->pluck('id')->all());
-        }
-
-        return array_values(array_unique($ids));
-    }
-
-    private function brandOptions(): Collection
-    {
-        return Brand::query()
-            ->whereHas('products', fn (Builder $query) => $query->published())
-            ->orderBy('name')
-            ->get();
-    }
-
-    private function resolveSort(string $sort): array
-    {
-        return match ($sort) {
-            'price_asc' => ['price', 'asc'],
-            'price_desc' => ['price', 'desc'],
-            'name_asc' => ['name', 'asc'],
-            'name_desc' => ['name', 'desc'],
-            default => ['published_at', 'desc'],
-        };
     }
 }

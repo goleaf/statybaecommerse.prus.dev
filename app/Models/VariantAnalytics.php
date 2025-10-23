@@ -265,13 +265,23 @@ final class VariantAnalytics extends Model
         return self::query()->getConnection()->getDriverName();
     }
 
-    private static function normalizeDate(string|DateTimeInterface $date): string
+    private static function normalizeDate(string|DateTimeInterface|int|float|null $date): string
     {
+        $timezone = config('app.timezone');
+
         if ($date instanceof DateTimeInterface) {
-            return Carbon::instance($date)->toDateString();
+            return Carbon::instance($date)->setTimezone($timezone)->toDateString();
         }
 
-        return Carbon::parse($date)->toDateString();
+        if (is_numeric($date)) {
+            return Carbon::createFromTimestamp((int) $date, $timezone)->toDateString();
+        }
+
+        if (is_string($date) && trim($date) !== '') {
+            return Carbon::parse($date, $timezone)->toDateString();
+        }
+
+        return now()->setTimezone($timezone)->toDateString();
     }
 
     /**
