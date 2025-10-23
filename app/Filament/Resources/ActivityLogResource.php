@@ -7,28 +7,23 @@ namespace App\Filament\Resources;
 use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\ActivityLogResource\Pages;
 use App\Models\ActivityLog;
+use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Filters\DateRangeFilter;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
-use App\Support\Filament\Filters\DateRangeFilter;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
 
 final class ActivityLogResource extends Resource
 {
     protected static ?string $model = ActivityLog::class;
 
-    /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-document-text';
 
     protected static ?int $navigationSort = 9;
@@ -63,9 +58,13 @@ final class ActivityLogResource extends Resource
         return __('activity_logs.plural');
     }
 
+    /**
+     * Define the create/edit form schema using the Filament v4 Form API.
+     * The resource remains read-only for now, so we return an empty schema
+     * while keeping the hook available for future enhancements.
+     */
     public static function form(Form $form): Form
     {
-        // Filament 4 expects returning the Form builder instance.
         return $form->schema([]);
     }
 
