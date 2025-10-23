@@ -8,8 +8,8 @@ use App\Enums\ModerationState;
 use App\Filament\Resources\PostResource\Pages;
 use App\Filament\Resources\PostResource\RelationManagers;
 use App\Models\Post;
-use App\Support\Filament\Components\Flatpickr;
-use App\Support\Seo\LocaleUrlGenerator;
+use Awcodes\BadgeableColumn\Components\Badge;
+use Awcodes\BadgeableColumn\Components\BadgeableColumn;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Components\DateTimePicker;
@@ -25,12 +25,12 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\Size;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -127,7 +127,17 @@ final class PostResource extends Resource
                                 ->columnSpanFull(),
                         ]),
                         Grid::make(2)
-                            ->components([
+                            ->schema([
+                                TextInput::make('title')
+                                    ->label(__('posts.fields.title'))
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->live()
+                                    ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set, ?string $state): void {
+                                        if (! $get('slug') && filled($state)) {
+                                            $set('slug', Str::slug($state));
+                                        }
+                                    }),
                                 TextInput::make('slug')
                                     ->label(__('posts.fields.slug'))
                                     ->required()
@@ -257,32 +267,64 @@ final class PostResource extends Resource
                     ->conversion('thumb')
                     ->circular()
                     ->size(50),
-                TextColumn::make('title')
+                BadgeableColumn::make('title')
                     ->label(__('posts.fields.title'))
                     ->searchable()
                     ->sortable()
-                    ->limit(50)
-                    ->formatStateUsing(fn (?string $state, Post $record): ?string => $record->getTranslatedTitle()),
+                    ->prefixBadges([
+                        Badge::make('status')
+                            ->label(fn (Post $record): string => __('posts.status.' . ($record->status ?? 'draft')))
+                            ->color(fn (Post $record): string => match ($record->status) {
+                                'published' => 'success',
+                                'review'    => 'info',
+                                'archived'  => 'gray',
+                                default     => 'warning',
+                            }),
+                        Badge::make('moderation')
+                            ->label(fn (Post $record): string => $record->moderation_state?->label() ?? __('posts.status.draft'))
+                            ->color(fn (Post $record): string => match ($record->moderation_state) {
+                                ModerationState::Published => 'success',
+                                ModerationState::Review    => 'info',
+                                ModerationState::Draft     => 'warning',
+                                default                    => 'gray',
+                            }),
+                    ])
+                    ->suffixBadges(function (Post $record): array {
+                        $badges = [];
+                        $locale = app()->getLocale();
+
+                        if ($record->featured) {
+                            $badges[] = Badge::make('featured')
+                                ->label(__('posts.fields.featured'))
+                                ->color('warning');
+                        }
+
+                        if ($record->is_pinned) {
+                            $badges[] = Badge::make('pinned')
+                                ->label(__('posts.fields.is_pinned'))
+                                ->color('primary');
+                        }
+
+                        $tags = (string) ($record->getTranslatedTags($locale) ?? $record->tags);
+                        $tagItems = collect(preg_split('/[,;]+/', $tags))
+                            ->map(static fn (?string $tag): string => trim((string) $tag))
+                            ->filter(fn (string $tag): bool => $tag !== '');
+
+                        foreach ($tagItems as $index => $tag) {
+                            $badges[] = Badge::make('tag-' . $index)
+                                ->label($tag)
+                                ->color('secondary');
+                        }
+
+                        return $badges;
+                    })
+                    ->asPills()
+                    ->separator('•')
+                    ->size(Size::Small),
                 TextColumn::make('user.name')
                     ->label(__('posts.fields.user_id'))
                     ->sortable()
                     ->searchable(),
-                BadgeColumn::make('moderation_state')
-                    ->label(__('posts.fields.moderation_state'))
-                    ->formatStateUsing(fn (?ModerationState $state): ?string => $state?->label())
-                    ->colors([
-                        'warning' => fn (?ModerationState $state): bool => $state === ModerationState::Draft,
-                        'info'    => fn (?ModerationState $state): bool => $state === ModerationState::Review,
-                        'success' => fn (?ModerationState $state): bool => $state === ModerationState::Published,
-                    ])
-                    ->sortable(),
-                BadgeColumn::make('status')
-                    ->label(__('posts.fields.status'))
-                    ->colors([
-                        'warning' => 'draft',
-                        'success' => 'published',
-                        'danger'  => 'archived',
-                    ]),
                 IconColumn::make('featured')
                     ->label(__('posts.fields.featured'))
                     ->boolean()
@@ -623,6 +665,11 @@ final class PostResource extends Resource
                 ]),
             ])
             ->defaultSort('published_at', 'desc');
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with(['user:id,name']);
     }
 
     /**
