@@ -179,7 +179,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         if (! Testable::hasMacro('assertCanSeeText')) {
-            // Provide a convenience assertion that respects unescaped content, matching Filament v3's testing API.
+            // Provide a backwards-compatible assertion alias expected by legacy Filament tests.
             Testable::macro('assertCanSeeText', function (string $text): Testable {
                 $this->assertSee($text, escape: false);
 

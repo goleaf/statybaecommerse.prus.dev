@@ -9,27 +9,32 @@ use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\CouponResource\Pages;
 use App\Models\Coupon;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Notifications\Notification;
-use Filament\Resources\Resource;
+use App\Models\Scopes\ActiveScope;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
+use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
@@ -51,6 +56,22 @@ final class CouponResource extends Resource
     public static function getPluralModelLabel(): string
     {
         return __('coupons.plural');
+    }
+
+    /**
+     * Expose key fields in the read-only view so tests can assert against rendered values.
+     */
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist->schema([
+            TextEntry::make('code')
+                ->label(__('coupons.code')),
+            TextEntry::make('name')
+                ->label(__('coupons.name')),
+            TextEntry::make('type')
+                ->label(__('coupons.type'))
+                ->formatStateUsing(fn (?string $state): string => $state ? __("coupons.types.{$state}") : '—'),
+        ]);
     }
 
     /**
@@ -150,21 +171,22 @@ final class CouponResource extends Resource
                                 ->disabled(),
                             Quantity::make('remaining_uses')
                                 ->label(__('coupons.remaining_uses'))
-                                ->minValue(0)
-                                ->steps(1)
-                                ->default(0)
-                                ->disabled(),
+                                ->numeric()
+                                ->default(fn (?Coupon $record): int => $record?->remaining_uses ?? 0)
+                                ->disabled()
+                                ->dehydrated(false),
                         ]),
                 ]),
             Section::make(__('coupons.validity'))
                 ->schema([
                     Grid::make(2)
                         ->schema([
-                            Flatpickr::makeDateTime('valid_from')
+                            // Bind to starts_at so form submissions map directly to the persisted columns that power scopes.
+                            Flatpickr::makeDateTime('starts_at')
                                 ->label(__('coupons.valid_from'))
                                 ->default(now())
                                 ->displayFormat('d/m/Y H:i'),
-                            Flatpickr::makeDateTime('valid_until')
+                            Flatpickr::makeDateTime('expires_at')
                                 ->label(__('coupons.valid_until'))
                                 ->displayFormat('d/m/Y H:i'),
                         ]),
@@ -288,12 +310,42 @@ final class CouponResource extends Resource
                         return '€' . number_format((float) $state, 2);
                     })
                     ->sortable(),
-                TextColumn::make('valid_from')
+                TextColumn::make('usage_limit')
+                    ->label(__('coupons.usage_limit'))
+                    ->numeric()
+                    ->alignCenter()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('used_count')
+                    ->label(__('coupons.used_count'))
+                    ->color(fn ($state, Coupon $record): string => $record->usage_limit && $state >= $record->usage_limit ? 'danger' : 'success'),
+                TextColumn::make('remaining_uses')
+                    ->label(__('coupons.remaining_uses'))
+                    ->color(fn ($state): string => $state <= 0 ? 'danger' : 'success'),
+                TextColumn::make('customerGroup.name')
+                    ->label(__('coupons.customer_group'))
+                    ->color('gray'),
+                BadgeColumn::make('is_active')
+                    ->label(__('coupons.status'))
+                    ->formatStateUsing(fn (bool $state): string => $state ? __('coupons.active') : __('coupons.inactive'))
+                    ->colors([
+                        'success' => true,
+                        'danger'  => false,
+                    ]),
+                IconColumn::make('is_public')
+                    ->label(__('coupons.is_public'))
+                    ->boolean(),
+                IconColumn::make('is_auto_apply')
+                    ->label(__('coupons.is_auto_apply'))
+                    ->boolean(),
+                IconColumn::make('is_stackable')
+                    ->label(__('coupons.is_stackable'))
+                    ->boolean(),
+                TextColumn::make('starts_at')
                     ->label(__('coupons.valid_from'))
                     ->dateTime()
                     ->sortable(),
                 TextColumn::make('expires_at')
-                    ->label(__('coupons.expires_at'))
+                    ->label(__('coupons.valid_until'))
                     ->dateTime()
                     ->sortable(),
                 TextColumn::make('created_at')
@@ -348,7 +400,8 @@ final class CouponResource extends Resource
                     ->label(__('Export'))
                     ->exports(self::getCouponExportPresets()),
             ])
-            ->actions([
+            ->recordActions([
+                // Re-register the core CRUD actions using the shared Actions package to stay compatible with Filament v4.
                 ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
@@ -356,8 +409,18 @@ final class CouponResource extends Resource
                     ->label(fn (?Coupon $record): string => $record && $record->is_active ? __('coupons.deactivate') : __('coupons.activate'))
                     ->icon(fn (?Coupon $record): string => $record && $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                     ->color(fn (?Coupon $record): string => $record && $record->is_active ? 'warning' : 'success')
-                    ->action(function (Coupon $record): void {
-                        $record->update(['is_active' => ! $record->is_active]);
+                    ->action(function (?Coupon $record): void {
+                        if (! $record) {
+                            return;
+                        }
+
+                        $updated = ! $record->is_active;
+
+                        Coupon::withoutGlobalScopes()
+                            ->whereKey($record->getKey())
+                            ->update(['is_active' => $updated]);
+
+                        $record->forceFill(['is_active' => $updated])->syncOriginalAttribute('is_active', $updated);
 
                         Notification::make()
                             ->title($record->is_active ? __('coupons.activated_successfully') : __('coupons.deactivated_successfully'))
@@ -369,12 +432,24 @@ final class CouponResource extends Resource
                     ->label(__('coupons.duplicate'))
                     ->icon('heroicon-o-document-duplicate')
                     ->color('info')
-                    ->action(function (Coupon $record): void {
+                    ->action(function (?Coupon $record): void {
+                        if (! $record) {
+                            return;
+                        }
+
                         $newCoupon = $record->replicate();
-                        $newCoupon->code = $record->code . '_copy_' . time();
+                        $timestamp = time();
+                        $newCoupon->code = $record->code . '_copy_' . $timestamp;
                         $newCoupon->name = $record->name . ' (Copy)';
                         $newCoupon->used_count = 0;
                         $newCoupon->save();
+
+                        $latestTimestamp = time();
+                        Coupon::withoutGlobalScopes()
+                            ->whereKey($newCoupon->getKey())
+                            ->update(['code' => $record->code . '_copy_' . $latestTimestamp]);
+
+                        $newCoupon->forceFill(['code' => $record->code . '_copy_' . $latestTimestamp])->syncOriginal();
 
                         Notification::make()
                             ->title(__('coupons.duplicated_successfully'))
@@ -383,38 +458,50 @@ final class CouponResource extends Resource
                     })
                     ->requiresConfirmation(),
             ])
-            ->bulkActions([
-                BulkActionGroup::make([
-                    ExportBulkAction::make()
-                        ->label(__('Export selected'))
-                        ->exports(self::getCouponExportPresets()),
-                    DeleteBulkAction::make(),
-                    BulkAction::make('activate')
-                        ->label(__('coupons.activate_selected'))
-                        ->icon('heroicon-o-eye')
-                        ->color('success')
-                        ->action(function (Collection $records): void {
-                            $records->each->update(['is_active' => true]);
-                            Notification::make()
-                                ->title(__('coupons.bulk_activated_success'))
-                                ->success()
-                                ->send();
-                        })
-                        ->requiresConfirmation(),
-                    BulkAction::make('deactivate')
-                        ->label(__('coupons.deactivate_selected'))
-                        ->icon('heroicon-o-eye-slash')
-                        ->color('warning')
-                        ->action(function (Collection $records): void {
-                            $records->each->update(['is_active' => false]);
+            ->groupedBulkActions([
+                // Keep export and status toggling actions available in the toolbar for batch moderation flows.
+                ExportBulkAction::make()
+                    ->label(__('Export selected'))
+                    ->exports(self::getCouponExportPresets()),
+                DeleteBulkAction::make(),
+                BulkAction::make('activate')
+                    ->label(__('coupons.activate_selected'))
+                    ->icon('heroicon-o-eye')
+                    ->color('success')
+                    ->action(function (Collection $records): void {
+                        $ids = $records->pluck('id')->all();
 
-                            Notification::make()
-                                ->title(__('coupons.bulk_deactivated_success'))
-                                ->success()
-                                ->send();
-                        })
-                        ->requiresConfirmation(),
-                ]),
+                        Coupon::withoutGlobalScopes()->whereIn('id', $ids)->update(['is_active' => true]);
+
+                        $records->each(static function (Coupon $coupon): void {
+                            $coupon->forceFill(['is_active' => true])->syncOriginalAttribute('is_active', true);
+                        });
+
+                        Notification::make()
+                            ->title(__('coupons.bulk_activated_success'))
+                            ->success()
+                            ->send();
+                    })
+                    ->requiresConfirmation(),
+                BulkAction::make('deactivate')
+                    ->label(__('coupons.deactivate_selected'))
+                    ->icon('heroicon-o-eye-slash')
+                    ->color('warning')
+                    ->action(function (Collection $records): void {
+                        $ids = $records->pluck('id')->all();
+
+                        Coupon::withoutGlobalScopes()->whereIn('id', $ids)->update(['is_active' => false]);
+
+                        $records->each(static function (Coupon $coupon): void {
+                            $coupon->forceFill(['is_active' => false])->syncOriginalAttribute('is_active', false);
+                        });
+
+                        Notification::make()
+                            ->title(__('coupons.bulk_deactivated_success'))
+                            ->success()
+                            ->send();
+                    })
+                    ->requiresConfirmation(),
             ])
             ->defaultSort('created_at', 'desc');
     }
@@ -478,5 +565,13 @@ final class CouponResource extends Resource
             'view'   => Pages\ViewCoupon::route('/{record}'),
             'edit'   => Pages\EditCoupon::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * Ensure the admin listing can manage both active and inactive coupons.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes([ActiveScope::class]);
     }
 }
