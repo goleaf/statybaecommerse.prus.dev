@@ -4,14 +4,16 @@ use App\Http\Middleware\AttachCorrelationId;
 use App\Http\Middleware\AddSecurityHeaders;
 use App\Providers\SecurityServiceProvider;
 use App\Services\TranslationService;
+use App\Support\ErrorCodes;
+use App\Support\RequestContext;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
-use Laravel\Sanctum\Http\Middleware\CheckAbilities;
-use Laravel\Sanctum\Http\Middleware\CheckForAnyAbility;
+use Throwable;
 
 require_once __DIR__.'/../app/Support/filament_compat.php';
 
@@ -51,14 +53,106 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->shouldRenderJsonWhen(static fn (Request $request): bool => $request->expectsJson());
+        $exceptions->render(function (DomainException $exception, Request $request) {
+            $locale = RequestContext::resolveLocale($request);
+            $traceId = RequestContext::resolveTraceId($request);
+            $correlationHeader = RequestContext::correlationHeader();
 
-        $exceptions->render(static function (Throwable $throwable, Request $request) {
-            if (! $request->expectsJson()) {
+            $message = TranslationService::get($exception->translationKey(), $exception->context(), $locale);
+
+            Log::withContext([
+                'trace_id' => $traceId,
+                'correlation_id' => $traceId,
+                'locale' => $locale,
+                'error_code' => $exception->errorCode(),
+                'request_path' => $request->path(),
+                'request_method' => $request->method(),
+            ]);
+
+            Log::warning('Domain exception rendered.', [
+                'exception' => $exception::class,
+                'status' => $exception->status(),
+                'translation_key' => $exception->translationKey(),
+                'context' => $exception->context(),
+            ]);
+
+            $payload = [
+                'error' => [
+                    'code' => $exception->errorCode(),
+                    'message' => $message,
+                    'locale' => $locale,
+                ],
+                'meta' => [
+                    'trace_id' => $traceId,
+                    'correlation_id' => $traceId,
+                    'timestamp' => now()->toIso8601String(),
+                ],
+            ];
+
+            if ($exception->context() !== []) {
+                $payload['error']['context'] = $exception->context();
+            }
+
+            return response()
+                ->json($payload, $exception->status())
+                ->header($correlationHeader, $traceId)
+                ->header('Content-Language', $locale);
+        });
+
+        $exceptions->render(function (Throwable $throwable, Request $request) {
+            if ($throwable instanceof DomainException) {
                 return null;
             }
 
-            return ApiErrorResponse::fromThrowable($throwable, $request);
+            $locale = RequestContext::resolveLocale($request);
+            $traceId = RequestContext::resolveTraceId($request);
+            $correlationHeader = RequestContext::correlationHeader();
+
+            Log::withContext([
+                'trace_id' => $traceId,
+                'correlation_id' => $traceId,
+                'locale' => $locale,
+                'request_path' => $request->path(),
+                'request_method' => $request->method(),
+            ]);
+
+            Log::error('Unhandled exception rendered.', [
+                'exception' => $throwable::class,
+                'message' => $throwable->getMessage(),
+            ]);
+
+            if (RequestContext::isApiRequest($request)) {
+                $message = Lang::get('errors.messages.server_error', [], $locale);
+                if ($message === 'errors.messages.server_error') {
+                    $message = __('Something went wrong. Please try again later.', [], $locale);
+                }
+
+                $payload = [
+                    'error' => [
+                        'code' => ErrorCodes::SERVER_ERROR,
+                        'message' => $message,
+                        'locale' => $locale,
+                    ],
+                    'meta' => [
+                        'trace_id' => $traceId,
+                        'correlation_id' => $traceId,
+                        'timestamp' => now()->toIso8601String(),
+                    ],
+                ];
+
+                return response()
+                    ->json($payload, 500)
+                    ->header($correlationHeader, $traceId)
+                    ->header('Content-Language', $locale);
+            }
+
+            return response()
+                ->view('errors.unexpected', [
+                    'traceId' => $traceId,
+                    'correlationId' => $traceId,
+                ], 500)
+                ->header($correlationHeader, $traceId)
+                ->header('Content-Language', $locale);
         });
     })
     ->withProviders(function (): array {

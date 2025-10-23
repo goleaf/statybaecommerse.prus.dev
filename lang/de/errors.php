@@ -25,8 +25,24 @@ return [
         'not_found' => 'Bestellung :order wurde nicht gefunden.',
     ],
 
-    'inventory' => [
-        // @translators: Hinweis darauf, dass nicht genügend Bestand für die angeforderte SKU vorhanden ist.
-        'insufficient' => 'Für SKU :sku ist nicht genügend Bestand verfügbar.',
+    // @translators: Hinweis darauf, dass nicht genügend Bestand für die angeforderte SKU vorhanden ist.
+    ErrorCodes::INVENTORY_INSUFFICIENT => 'Für SKU :sku ist nicht genügend Bestand verfügbar.',
+
+    'messages' => [
+        // @translators: Generische Meldung für API-Antworten bei unerwarteten Serverfehlern.
+        'server_error' => 'Etwas ist schiefgelaufen. Bitte versuche es später erneut.',
+    ],
+
+    'pages' => [
+        'unexpected' => [
+            // @translators: Überschrift auf der globalen Fehlerseite bei unerwarteten Fehlern.
+            'title' => 'Ein unerwarteter Fehler ist aufgetreten',
+            // @translators: Beschreibung auf der globalen Fehlerseite bei unerwarteten Fehlern.
+            'description' => 'Unser Team wurde informiert und untersucht das Problem. Wenn es erneut auftritt, teilen Sie dem Support die Trace-ID mit.',
+            // @translators: Text des primären Aktionsbuttons auf der Fehlerseite.
+            'primary' => 'Zur Startseite',
+            // @translators: Text des sekundären Aktionsbuttons auf der Fehlerseite.
+            'secondary' => 'Support kontaktieren',
+        ],
     ],
 ];
