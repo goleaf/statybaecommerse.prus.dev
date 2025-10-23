@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Filament\Facades\Filament;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
@@ -124,6 +125,32 @@ expect()->extend('toHaveCountLessThan', function (int $expected) {
     $actualCount = is_countable($value) ? count($value) : count((array) $value);
 
     expect($actualCount)->toBeLessThan($expected);
+
+    return $this;
+});
+
+expect()->extend('toContainModel', function (Model $model) {
+    $value = $this->value;
+
+    // Normalise the assertion target into a collection for consistent comparisons.
+    $items = $value instanceof \Illuminate\Support\Collection ? $value : collect($value);
+
+    $contains = $items->contains(function ($item) use ($model) {
+        if (! $item instanceof Model) {
+            return false;
+        }
+
+        // Use the is() helper so soft deleted or cached instances still match strictly.
+        return $item->is($model);
+    });
+
+    if ($this->negated) {
+        expect($contains)->toBeFalse();
+
+        return $this;
+    }
+
+    expect($contains)->toBeTrue();
 
     return $this;
 });
