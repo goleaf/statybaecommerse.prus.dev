@@ -31,13 +31,10 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 
-use Filament\Schemas\Schema;
-use BackedEnum;
 final class CartItemResource extends Resource
 {
     /** @var string|BackedEnum|null Navigation icon configured per Filament v4 guidance. */

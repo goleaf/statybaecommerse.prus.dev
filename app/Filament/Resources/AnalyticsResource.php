@@ -23,12 +23,9 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class AnalyticsResource extends Resource
 {
     use TranslatableResource;
@@ -41,7 +38,7 @@ final class AnalyticsResource extends Resource
     /**
      * Preserve the typed navigation group union to keep enum-backed grouping working across PHP upgrades.
      */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Analytics;
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Analytics;
 
     public static function getNavigationLabel(): string
     {

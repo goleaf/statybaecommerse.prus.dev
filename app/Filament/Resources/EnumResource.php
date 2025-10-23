@@ -11,7 +11,6 @@ use BackedEnum;
 use UnitEnum;
 use App\Filament\Resources\EnumResource\Pages;
 use App\Models\EnumValue;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -31,21 +30,15 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
-use Filament\Schemas\Schema;
-use BackedEnum;
-use UnitEnum;
 final class EnumResource extends Resource
 {
     protected static ?string $model = EnumValue::class;
@@ -56,7 +49,7 @@ final class EnumResource extends Resource
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
 
     /** @var string|BackedEnum|null Anchor the resource to the System navigation area. */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 2;
 

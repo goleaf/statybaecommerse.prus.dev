@@ -194,7 +194,7 @@ class FixFilamentV4Command extends Command
         // Update navigation property type hints
         $content = str_replace(
             'protected static ?NavigationGroup $navigationGroup',
-            '/** @var UnitEnum|string|null */'."\n    protected static \$navigationGroup",
+            '/** @var \UnitEnum|string|null */'."\n    protected static \$navigationGroup",
             $content
         );
 

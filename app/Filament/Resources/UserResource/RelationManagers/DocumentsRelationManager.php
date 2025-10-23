@@ -10,12 +10,9 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class DocumentsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'documents';

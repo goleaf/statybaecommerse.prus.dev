@@ -17,18 +17,14 @@ use Filament\Actions;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
-use Filament\Schemas\Schema;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Schemas\Schema;
 use Icetalker\FilamentTableRepeatableEntry\Infolists\Components\TableRepeatableEntry;
 use Illuminate\Support\Number;
 use LaraZeus\ListGroup\Entries\ListItem;
 use LaraZeus\ListGroup\Infolists\ListEntry;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
 use LaraZeus\SpatieTranslatable\Resources\Pages\ViewRecord\Concerns\Translatable as SpatieTranslatableViewRecord;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class ViewOrder extends ViewRecord
 {
     use SpatieTranslatableViewRecord; // Keep the detail view synchronized with the active locale.

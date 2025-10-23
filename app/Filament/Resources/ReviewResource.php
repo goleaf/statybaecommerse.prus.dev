@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
 use UnitEnum;
 use BackedEnum;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ReviewResource\Pages;
 use App\Models\Review;
-use BackedEnum;
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\NumericScale;
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\Select as SelectInput;
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Text\TextInput as TextInputInput;
@@ -38,10 +38,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
-use BackedEnum;
-use UnitEnum;
 final class ReviewResource extends Resource
 {
     use HasNav;
@@ -58,7 +55,7 @@ final class ReviewResource extends Resource
     /**
      * @var string|BackedEnum|null Allow enum-backed navigation grouping.
      */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::ContentManagement;
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::ContentManagement;
 
     public static function getNavigationGroup(): ?string
     {

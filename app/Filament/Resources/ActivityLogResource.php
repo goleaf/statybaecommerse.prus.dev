@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\ActivityLogResource\Pages;
 use App\Models\ActivityLog;
 use App\Support\Filament\Components\Flatpickr;
@@ -39,8 +38,6 @@ final class ActivityLogResource extends Resource
 
     protected static ?string $pluralModelLabel = null;
 
-    protected static ?string $recordTitleAttribute = 'description';
-
     public static function getNavigationGroup(): string
     {
         return __('navigation.groups.system');
@@ -61,14 +58,9 @@ final class ActivityLogResource extends Resource
         return __('activity_logs.plural');
     }
 
-    /**
-     * Define the create/edit form schema using the Filament v4 Schema contract.
-     * The resource remains read-only for now, so we still return an empty schema
-     * while keeping the hook available for future enhancements.
-     */
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([]);
+        return $form->schema([]);
     }
 
     /**

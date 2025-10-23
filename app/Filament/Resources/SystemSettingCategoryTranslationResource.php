@@ -26,7 +26,6 @@ use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
@@ -43,7 +42,7 @@ final class SystemSettingCategoryTranslationResource extends Resource
     /**
      * @var string|\UnitEnum|null Navigation group assignment stored without a typed property to avoid enum collisions.
      */
-    protected static UnitEnum|string|null $navigationGroup = 'Settings';
+    protected static \UnitEnum|string|null $navigationGroup = 'Settings';
 
     protected static bool $shouldRegisterNavigation = false;
 

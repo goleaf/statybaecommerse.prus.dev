@@ -21,17 +21,12 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class ReferralResource extends Resource
 {
     use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
@@ -46,7 +41,7 @@ final class ReferralResource extends Resource
     /**
      * Navigation group for organizing the resource in the admin panel.
      */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Marketing; // Keep referrals with other marketing touchpoints.
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Marketing; // Keep referrals with other marketing touchpoints.
 
     protected static ?int $navigationSort = 17;
 

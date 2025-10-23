@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Support\Concerns\HasNav;
-
+use BackedEnum;
 use App\Enums\AddressType;
 use App\Filament\Resources\AddressResource\Pages;
 use App\Models\Address;
@@ -46,9 +46,7 @@ use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 /**
  * AddressResource
  *
@@ -64,9 +62,9 @@ final class AddressResource extends Resource
     protected static ?int $navigationSort = 3;
 
     /**
-     * @var string|\BackedEnum|null Explicit navigation icon keeps the Address menu visually distinct.
+     * Explicit navigation icon keeps the Address menu visually distinct.
      */
-    protected static $navigationIcon = 'heroicon-o-map-pin';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-map-pin';
 
     /**
      * Get navigation label
@@ -79,7 +77,7 @@ final class AddressResource extends Resource
     /**
      * Get navigation group
      */
-    public static function getNavigationGroup(): string|UnitEnum|null
+    public static function getNavigationGroup(): string|\UnitEnum|null
     {
         return 'Orders';
     }

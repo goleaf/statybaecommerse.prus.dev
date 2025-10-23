@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\NewsImageResource\Pages;
 use App\Models\News;
@@ -36,14 +37,11 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Storage;
 use UnitEnum;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class NewsImageResource extends Resource
 {
     use HasNav;
@@ -52,7 +50,7 @@ final class NewsImageResource extends Resource
 
     
 
-    public static function getNavigationIcon(): BackedEnum|\UnitEnum|string|null
+    public static function getNavigationIcon(): BackedEnum|string|null
     {
         return 'heroicon-o-photo';
     }

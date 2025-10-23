@@ -16,9 +16,7 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
-use BackedEnum;
 
-use BackedEnum;
 final class InventoryManagement extends Page implements HasTable
 {
     use ConfiguresToggleableTableLayout;

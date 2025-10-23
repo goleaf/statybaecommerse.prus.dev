@@ -13,12 +13,9 @@ use App\Filament\Resources\ProductSimilarities\Pages\ListProductSimilarities;
 use App\Models\ProductSimilarity;
 use BackedEnum;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 class ProductSimilarityResource extends Resource
 {
     use HasNav;

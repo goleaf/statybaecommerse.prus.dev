@@ -12,14 +12,10 @@ use App\Models\Post;
 use App\Models\PostApproval;
 use Filament\Actions;
 use Filament\Infolists\Infolist;
-use Filament\Schemas\Schema;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Schemas\Schema;
 use LaraZeus\ListGroup\Entries\ListItem;
 use LaraZeus\ListGroup\Infolists\ListEntry;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class ViewPost extends ViewRecord
 {
     protected static string $resource = PostResource::class;

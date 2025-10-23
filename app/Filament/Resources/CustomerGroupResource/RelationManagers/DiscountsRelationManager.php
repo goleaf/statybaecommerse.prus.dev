@@ -8,13 +8,9 @@ namespace App\Filament\Resources\CustomerGroupResource\RelationManagers;
 use Filament\Schemas\Schema;
 use Filament\Forms;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
-use Filament\Forms;
-use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class DiscountsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'discounts';

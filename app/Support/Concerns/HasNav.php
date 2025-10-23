@@ -20,7 +20,7 @@ trait HasNav
     /**
      * Resolve the translated navigation group label for the resource.
      */
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): \UnitEnum|string|null
     {
         return Nav::groupForResource(static::class);
     }

@@ -30,14 +30,11 @@ use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use UnitEnum;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class CollectionRuleResource extends Resource
 {
     /**
@@ -47,13 +44,13 @@ final class CollectionRuleResource extends Resource
 
     protected static ?string $model = CollectionRule::class;
 
-    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
         // Surface a mechanical icon so merchandisers immediately identify automation tooling entries.
         return 'heroicon-o-cog-6-tooth';
     }
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): \UnitEnum|string|null
     {
         // Keep the resource collocated with product configuration utilities for quicker discovery.
         return 'Products';

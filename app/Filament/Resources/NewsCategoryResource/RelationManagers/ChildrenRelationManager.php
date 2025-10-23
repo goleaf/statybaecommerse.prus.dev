@@ -8,12 +8,9 @@ namespace App\Filament\Resources\NewsCategoryResource\RelationManagers;
 use Filament\Schemas\Schema;
 use App\Models\NewsCategory;
 use Filament\Forms;
-use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class ChildrenRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'children';

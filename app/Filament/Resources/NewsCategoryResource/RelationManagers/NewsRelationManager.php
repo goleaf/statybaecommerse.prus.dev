@@ -9,19 +9,12 @@ use Filament\Schemas\Schema;
 use App\Models\News;
 use Filament\Forms;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
-use App\Models\News;
 use App\Support\Filament\Components\Flatpickr;
-use Filament\Forms;
-use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class NewsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'news';

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\RecommendationCaches\Schemas;
 
-use App\Forms\Components\Flatpickr;
 use App\Models\RecommendationCache;
 use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\KeyValue;

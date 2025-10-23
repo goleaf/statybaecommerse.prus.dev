@@ -32,15 +32,11 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Carbon;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class DiscountRedemptionResource extends Resource
 {
     protected static ?string $model = DiscountRedemption::class;
@@ -48,7 +44,7 @@ final class DiscountRedemptionResource extends Resource
     /**
      * Explicitly declare the marketing navigation group for this resource.
      */
-    protected static string|UnitEnum|null $navigationGroup = 'Marketing';
+    protected static string|\UnitEnum|null $navigationGroup = 'Marketing';
 
     // Retain the ticket icon so administrators can spot the redemption resource quickly.
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-ticket';

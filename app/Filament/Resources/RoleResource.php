@@ -10,7 +10,6 @@ use App\Support\Forms\MatrixFactory;
 use App\Filament\Resources\RoleResource\Pages;
 use App\Models\Role;
 use App\Support\Authorization\AuthorizationMatrix;
-use App\Support\Forms\MatrixFactory;
 use BackedEnum;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
@@ -21,13 +20,10 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use UnitEnum;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class RoleResource extends Resource
 {
     protected static ?string $model = Role::class;
@@ -44,7 +40,7 @@ final class RoleResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static UnitEnum|string|null $navigationGroup = 'System';
+    protected static \UnitEnum|string|null $navigationGroup = 'System';
 
     public static function shouldRegisterNavigation(): bool
     {

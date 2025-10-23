@@ -7,9 +7,9 @@ namespace App\Providers;
 use App\Services\Debug\DiscountDebugCollector;
 use App\Services\Debug\EcommerceDebugCollector;
 use App\Services\Debug\LivewireDebugCollector;
-use App\Services\Debug\NPlusOneDetector;
+use App\Services\Debug\NPlusOneDetector as QueryInspector;
 use App\Services\Debug\TranslationDebugCollector;
-use App\Support\Debug\NPlusOneDetector;
+use App\Support\Debug\NPlusOneDetector as AggregatedInspector;
 use Illuminate\Support\ServiceProvider;
 
 class DebugServiceProvider extends ServiceProvider
@@ -21,8 +21,8 @@ class DebugServiceProvider extends ServiceProvider
             $this->app->singleton('debugbar.translation', fn () => new TranslationDebugCollector);
             $this->app->singleton('debugbar.livewire', fn () => new LivewireDebugCollector);
             $this->app->singleton('debugbar.ecommerce', fn () => new EcommerceDebugCollector);
-            $this->app->singleton(NPlusOneDetector::class, function () {
-                $detector = new NPlusOneDetector;
+            $this->app->singleton(AggregatedInspector::class, function () {
+                $detector = new AggregatedInspector();
                 $detector->boot();
 
                 return $detector;
@@ -30,17 +30,8 @@ class DebugServiceProvider extends ServiceProvider
         }
 
         if ($this->app->environment('local')) {
-            $this->app->singleton(NPlusOneDetector::class, static function (): NPlusOneDetector {
-                $detector = new NPlusOneDetector();
-                $detector->register();
-
-                return $detector;
-            });
-        }
-
-        if ($this->app->environment('local')) {
-            $this->app->singleton(NPlusOneDetector::class, static function (): NPlusOneDetector {
-                $detector = new NPlusOneDetector();
+            $this->app->singleton(QueryInspector::class, static function (): QueryInspector {
+                $detector = new QueryInspector();
                 $detector->register();
 
                 return $detector;
@@ -50,8 +41,12 @@ class DebugServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        if ($this->app->environment('local', 'staging')) {
+            $this->app->make(AggregatedInspector::class);
+        }
+
         if ($this->app->environment('local')) {
-            $this->app->make(NPlusOneDetector::class);
+            $this->app->make(QueryInspector::class);
         }
     }
 }

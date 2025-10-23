@@ -10,15 +10,11 @@ use App\Filament\Resources\PartnerTierResource\Pages;
 use App\Models\PartnerTier;
 use Filament\Forms;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Support\Number;
 use UnitEnum;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class PartnerTierResource extends Resource
 {
     /**
@@ -29,7 +25,7 @@ final class PartnerTierResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static UnitEnum|string|null $navigationGroup = 'Marketing';
+    protected static \UnitEnum|string|null $navigationGroup = 'Marketing';
 
     protected static ?string $model = PartnerTier::class;
 

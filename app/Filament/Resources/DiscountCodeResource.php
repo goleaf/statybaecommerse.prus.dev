@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\DiscountCodeResource\Pages;
 use App\Models\DiscountCode;
@@ -31,7 +32,6 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
-use Filament\Schemas\Schema;
 final class DiscountCodeResource extends Resource
 {
     use HasNav;

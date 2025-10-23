@@ -16,15 +16,11 @@ use Filament\Actions;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
-use Filament\Schemas\Schema;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Schemas\Schema;
 use Icetalker\FilamentTableRepeatableEntry\Infolists\Components\TableRepeatableEntry;
 use LaraZeus\ListGroup\Entries\ListItem;
 use LaraZeus\ListGroup\Infolists\ListEntry;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class ViewProduct extends ViewRecord
 {
     protected static string $resource = ProductResource::class;

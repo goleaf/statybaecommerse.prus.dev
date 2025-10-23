@@ -12,14 +12,11 @@ use Filament\Forms;
 use Filament\Forms\Components\Section;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Filament\Schemas\Schema;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Throwable;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class CacheMaintenance extends Page
 {
     /**

@@ -15,14 +15,10 @@ use App\Filament\Resources\Sliders\Tables\SlidersTable;
 use App\Models\Slider;
 use BackedEnum;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use UnitEnum;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class SliderResource extends Resource
 {
     use HasNav;
@@ -35,7 +31,7 @@ final class SliderResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Content;
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Content;
 
     /**
      * @var \UnitEnum|string|null
