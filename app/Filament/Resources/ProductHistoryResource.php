@@ -10,6 +10,7 @@ use App\Filament\Resources\ProductHistoryResource\Pages;
 use App\Filament\Resources\ProductHistoryResource\Widgets\ProductHistoryStatsWidget;
 use App\Filament\Resources\ProductHistoryResource\Widgets\RecentProductChangesWidget;
 use App\Models\ProductHistory;
+use App\Support\Filament\Components\Flatpickr; // Custom Flatpickr helper keeps date filters consistent with the admin UI
 use BackedEnum;
 use DateTimeInterface;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
@@ -25,8 +26,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
 
 final class ProductHistoryResource extends Resource
 {
