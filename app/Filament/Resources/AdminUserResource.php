@@ -18,7 +18,8 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification as FilamentNotification;
@@ -117,6 +118,22 @@ final class AdminUserResource extends Resource
                         ->content(fn ($record) => $record?->updated_at?->format('Y-m-d H:i:s') ?? '-'),
                 ])
                 ->columns(2),
+            SchemaSection::make(__('admin.admin_users.form.sections.roles_permissions'))
+                ->schema([
+                    Select::make('roles')
+                        ->label(__('admin.admin_users.form.fields.roles'))
+                        ->relationship('roles', 'name')
+                        ->multiple()
+                        ->preload()
+                        ->searchable()
+                        ->helperText(__('admin.admin_users.form.helpers.roles')),
+                    Textarea::make('audit_reason')
+                        ->label(__('admin.admin_users.form.fields.audit_reason'))
+                        ->helperText(__('admin.admin_users.form.helpers.audit_reason'))
+                        ->visible(fn (?AdminUser $record): bool => (bool) ($record?->exists))
+                        ->columnSpanFull(),
+                ])
+                ->columns(1),
         ]);
     }
 
