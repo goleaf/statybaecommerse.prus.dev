@@ -6,9 +6,10 @@ namespace App\Filament\Resources\PriceListResource\Pages;
 
 use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\PriceListResource;
-use App\Filament\WidgetTabs\Components\WidgetTab;
-use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
+use App\Models\PriceList;
 use Filament\Actions;
+use Filament\Resources\Pages\ListRecords;
+use Filament\Schemas\Components\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListPriceLists extends BaseListRecords
@@ -35,15 +36,19 @@ final class ListPriceLists extends BaseListRecords
 
             'active' => Tab::make(__('price_lists.tabs.active'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->active())
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->active()->count()),
+                ->badge(fn () => PriceList::query()->active()->count()),
+
+            'enabled' => Tab::make(__('price_lists.tabs.enabled'))
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('is_enabled', true))
+                ->badge(fn () => PriceList::query()->where('is_enabled', true)->count()),
 
             'default' => Tab::make(__('price_lists.tabs.default'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_default', true))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_default', true)->count()),
+                ->badge(fn () => PriceList::query()->where('is_default', true)->count()),
 
             'auto_apply' => Tab::make(__('price_lists.tabs.auto_apply'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('auto_apply', true))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('auto_apply', true)->count()),
+                ->badge(fn () => PriceList::query()->where('auto_apply', true)->count()),
         ];
     }
 }

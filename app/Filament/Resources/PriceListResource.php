@@ -78,46 +78,47 @@ final class PriceListResource extends Resource
                     TextInput::make('code')
                         ->label(__('price_lists.code'))
                         ->required()
-                        ->maxLength(255)
+                        ->maxLength(64)
                         ->unique(ignoreRecord: true),
                     Select::make('currency_id')
                         ->label(__('price_lists.currency'))
-                        ->relationship('currency', 'code')
+                        ->relationship('currency', 'name')
                         ->searchable()
                         ->preload()
                         ->required(),
-                    TextInput::make('priority')
-                        ->label(__('price_lists.priority'))
-                        ->numeric()
-                        ->default(0),
                     Textarea::make('description')
                         ->label(__('price_lists.description'))
                         ->columnSpanFull()
                         ->rows(3),
-                ]),
-            Section::make(__('price_lists.availability'))
-                ->columns(2)
+                    TextInput::make('priority')
+                        ->label(__('price_lists.priority'))
+                        ->numeric()
+                        ->default(0),
+                ])
+                ->columns(2),
+            Section::make(__('price_lists.settings'))
                 ->schema([
                     Toggle::make('is_enabled')
-                        ->label(__('price_lists.is_enabled'))
+                        ->label(__('price_lists.is_active'))
                         ->default(true),
                     Toggle::make('is_default')
                         ->label(__('price_lists.is_default')),
                     Toggle::make('auto_apply')
                         ->label(__('price_lists.auto_apply')),
                     DateTimePicker::make('starts_at')
-                        ->label(__('price_lists.starts_at')),
+                        ->label(__('price_lists.valid_from')),
                     DateTimePicker::make('ends_at')
-                        ->label(__('price_lists.ends_at')),
+                        ->label(__('price_lists.valid_until')),
                     TextInput::make('min_order_amount')
                         ->label(__('price_lists.min_order_amount'))
                         ->numeric()
-                        ->inputMode('decimal'),
+                        ->prefix('€'),
                     TextInput::make('max_order_amount')
                         ->label(__('price_lists.max_order_amount'))
                         ->numeric()
-                        ->inputMode('decimal'),
-                ]),
+                        ->prefix('€'),
+                ])
+                ->columns(2),
         ]);
     }
 
@@ -137,9 +138,21 @@ final class PriceListResource extends Resource
                 TextColumn::make('currency.code')
                     ->label(__('price_lists.currency'))
                     ->sortable()
+                    ->badge(),
+                TextColumn::make('description')
+                    ->label(__('price_lists.description'))
+                    ->limit(50)
+                    ->tooltip(function (TextColumn $column): ?string {
+                        $state = $column->getState();
+                        if (strlen($state) <= 50) {
+                            return null;
+                        }
+
+                        return $state;
+                    })
                     ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('is_enabled')
-                    ->label(__('price_lists.is_enabled'))
+                    ->label(__('price_lists.is_active'))
                     ->boolean()
                     ->trueIcon('heroicon-o-check-circle')
                     ->falseIcon('heroicon-o-x-circle')
@@ -148,26 +161,27 @@ final class PriceListResource extends Resource
                 IconColumn::make('is_default')
                     ->label(__('price_lists.is_default'))
                     ->boolean()
-                    ->trueColor('warning')
-                    ->falseColor('gray'),
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('danger'),
                 IconColumn::make('auto_apply')
                     ->label(__('price_lists.auto_apply'))
                     ->boolean()
-                    ->trueColor('info')
-                    ->falseColor('gray')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->trueColor('primary')
+                    ->falseColor('gray'),
                 TextColumn::make('priority')
                     ->label(__('price_lists.priority'))
                     ->numeric()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('starts_at')
-                    ->label(__('price_lists.starts_at'))
+                    ->label(__('price_lists.valid_from'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('ends_at')
-                    ->label(__('price_lists.ends_at'))
+                    ->label(__('price_lists.valid_until'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -198,58 +212,34 @@ final class PriceListResource extends Resource
             ->filters([
                 SelectFilter::make('currency_id')
                     ->label(__('price_lists.currency'))
-                    ->relationship('currency', 'code'),
+                    ->relationship('currency', 'name'),
                 TernaryFilter::make('is_enabled')
-                    ->label(__('price_lists.is_enabled'))
+                    ->label(__('price_lists.is_active'))
                     ->placeholder(__('price_lists.all_records'))
-                    ->trueLabel(__('price_lists.enabled_only'))
-                    ->falseLabel(__('price_lists.disabled_only')),
+                    ->trueLabel(__('price_lists.active_only'))
+                    ->falseLabel(__('price_lists.inactive_only')),
                 TernaryFilter::make('is_default')
                     ->label(__('price_lists.is_default'))
                     ->placeholder(__('price_lists.all_records'))
                     ->trueLabel(__('price_lists.default_only'))
                     ->falseLabel(__('price_lists.non_default_only')),
-                TernaryFilter::make('auto_apply')
-                    ->label(__('price_lists.auto_apply'))
-                    ->placeholder(__('price_lists.all_records'))
-                    ->trueLabel(__('price_lists.auto_apply_only'))
-                    ->falseLabel(__('price_lists.manual_only')),
                 Filter::make('starts_at')
-                    ->label(__('price_lists.starts_at'))
+                    ->label(__('price_lists.valid_from'))
                     ->form([
                         DateTimePicker::make('starts_from')
-                            ->label(__('price_lists.starts_at_from')),
+                            ->label(__('price_lists.valid_from_from')),
                         DateTimePicker::make('starts_until')
-                            ->label(__('price_lists.starts_at_until')),
+                            ->label(__('price_lists.valid_from_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
                             ->when(
-                                $data['starts_from'] ?? null,
+                                $data['starts_from'],
                                 fn (Builder $query, $date): Builder => $query->whereDate('starts_at', '>=', $date),
                             )
                             ->when(
-                                $data['starts_until'] ?? null,
+                                $data['starts_until'],
                                 fn (Builder $query, $date): Builder => $query->whereDate('starts_at', '<=', $date),
-                            );
-                    }),
-                Filter::make('ends_at')
-                    ->label(__('price_lists.ends_at'))
-                    ->form([
-                        DateTimePicker::make('ends_from')
-                            ->label(__('price_lists.ends_at_from')),
-                        DateTimePicker::make('ends_until')
-                            ->label(__('price_lists.ends_at_until')),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['ends_from'] ?? null,
-                                fn (Builder $query, $date): Builder => $query->whereDate('ends_at', '>=', $date),
-                            )
-                            ->when(
-                                $data['ends_until'] ?? null,
-                                fn (Builder $query, $date): Builder => $query->whereDate('ends_at', '<=', $date),
                             );
                     }),
             ])
