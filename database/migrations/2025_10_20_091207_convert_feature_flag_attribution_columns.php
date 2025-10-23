@@ -24,27 +24,19 @@ return new class extends Migration
             if ($shouldAddCreatedBy) {
                 $createdByColumn = $table->foreignId('created_by')->nullable();
 
-                if (Schema::hasColumn('feature_flags', 'created_by_name')) {
-                    $createdByColumn->after('created_by_name');
-                } elseif (Schema::hasColumn('feature_flags', 'approval_notes')) {
-                    $createdByColumn->after('approval_notes');
+                if ($afterColumn = $this->getCreatedByPositionColumn()) {
+                    $createdByColumn->after($afterColumn);
                 }
 
                 $createdByColumn
                     ->constrained('users')
                     ->nullOnDelete();
-
-                if ($afterColumn = $this->getCreatedByPositionColumn()) {
-                    $createdByColumn->after($afterColumn);
-                }
             }
 
             if (! Schema::hasColumn('feature_flags', 'updated_by')) {
                 $updatedByColumn = $table->foreignId('updated_by')->nullable();
 
-                if ($shouldAddCreatedBy) {
-                    $updatedByColumn->after('created_by');
-                } elseif (Schema::hasColumn('feature_flags', 'created_by')) {
+                if ($shouldAddCreatedBy || Schema::hasColumn('feature_flags', 'created_by')) {
                     $updatedByColumn->after('created_by');
                 } elseif (Schema::hasColumn('feature_flags', 'created_by_name')) {
                     $updatedByColumn->after('created_by_name');
