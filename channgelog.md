@@ -1,4 +1,5 @@
-# Changelog
+# Changelog (legacy stub)
 
-## [Unreleased]
-- Resolve cart session clearing conflict by ensuring fallback guest sessions are cleared alongside authenticated sessions.
+> **Consolidated into [`readme.md`](readme.md)**
+>
+> The quick log previously kept here now resides alongside the main changelog entries inside the merged README.
