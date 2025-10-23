@@ -16,7 +16,6 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
 
 class NotificationTemplateResource extends Resource
 {
@@ -24,7 +23,7 @@ class NotificationTemplateResource extends Resource
 
     protected static ?string $model = NotificationTemplate::class;
 
-    
+    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Form $form): Form
     {
