@@ -72,7 +72,7 @@ class CategoryResourceIsolatedTest extends TestCase
 
     public function test_category_resource_navigation_group(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             Nav::groupForResource(CategoryResource::class),
             CategoryResource::getNavigationGroup(),
         );
@@ -80,7 +80,7 @@ class CategoryResourceIsolatedTest extends TestCase
 
     public function test_category_resource_navigation_sort(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             Nav::sortForResource(CategoryResource::class),
             CategoryResource::getNavigationSort(),
         );

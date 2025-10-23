@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Support\Nav;
 use App\Models\NotificationTemplate;
 use App\Models\User;
+use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -323,7 +323,7 @@ final class NotificationTemplateResourceTest extends TestCase
     {
         $this->assertEquals(
             Nav::groupForResource(\App\Filament\Resources\NotificationTemplateResource::class),
-            \App\Filament\Resources\NotificationTemplateResource::getNavigationGroup(),
+            \App\Filament\Resources\NotificationTemplateResource::getNavigationGroup()
         );
     }
 
@@ -331,7 +331,7 @@ final class NotificationTemplateResourceTest extends TestCase
     {
         $this->assertEquals(
             Nav::sortForResource(\App\Filament\Resources\NotificationTemplateResource::class),
-            \App\Filament\Resources\NotificationTemplateResource::getNavigationSort(),
+            \App\Filament\Resources\NotificationTemplateResource::getNavigationSort()
         );
     }
 

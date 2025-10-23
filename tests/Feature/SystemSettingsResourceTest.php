@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Support\Nav;
 use App\Filament\Resources\SystemSettingsResource;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
 use App\Models\User;
+use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 

@@ -18,7 +18,7 @@ class ActivityLogResourceUnitTest extends TestCase
 
     public function test_activity_log_resource_has_navigation_group(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             Nav::groupForResource(ActivityLogResource::class),
             ActivityLogResource::getNavigationGroup(),
         );
@@ -26,7 +26,7 @@ class ActivityLogResourceUnitTest extends TestCase
 
     public function test_activity_log_resource_has_navigation_sort(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             Nav::sortForResource(ActivityLogResource::class),
             ActivityLogResource::getNavigationSort(),
         );

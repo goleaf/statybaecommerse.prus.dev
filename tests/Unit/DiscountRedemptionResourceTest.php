@@ -42,7 +42,9 @@ it('has correct model', function (): void {
 });
 
 it('has correct navigation group', function (): void {
-    expect(DiscountRedemptionResource::getNavigationGroup())->toBe('Discounts');
+    expect(DiscountRedemptionResource::getNavigationGroup())->toBe(
+        Nav::groupForResource(DiscountRedemptionResource::class)
+    );
 });
 
 it('has correct navigation icon', function (): void {

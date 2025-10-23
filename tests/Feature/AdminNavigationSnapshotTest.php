@@ -5,39 +5,80 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Support\Nav;
-use PHPUnit\Framework\Attributes\CoversClass;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-#[CoversClass(Nav::class)]
+/**
+ * @coversNothing
+ */
 final class AdminNavigationSnapshotTest extends TestCase
 {
-    public function test_it_reads_navigation_metadata_from_resources(): void
-    {
-        $resource = \App\Filament\Resources\NotificationResource::class;
+    use RefreshDatabase;
 
-        // The helper should mirror the values exposed by the resource itself.
-        $this->assertSame($resource::getNavigationGroup(), Nav::groupForResource($resource));
-        $this->assertSame($resource::getNavigationIcon(), Nav::iconForResource($resource));
-        $this->assertSame($resource::getNavigationSort(), Nav::sortForResource($resource));
+    public function test_admin_navigation_matches_snapshot(): void
+    {
+        $panel = $this->resolveAdminPanel();
+
+        // Ensure the panel registered resources using the deterministic helper.
+        $this->assertSame(Nav::orderedResources(), $panel->getResources());
+
+        $navigation = $this->buildNavigationTree();
+        $snapshotPath = base_path('tests/__snapshots__/admin-navigation.json');
+        $expected = json_decode((string) file_get_contents($snapshotPath), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertSame($expected, $navigation);
     }
 
-    public function test_it_caches_metadata_between_calls(): void
+    /**
+     * Build the navigation structure in a serialisable format for snapshot comparison.
+     *
+     * @return array{groups: array<int, array{label: string, icon: string|null, sort: int|null, resources: array<int, array{class: class-string, icon: string|null, sort: int|null}>}>, ungrouped: array<int, array{class: class-string, icon: string|null, sort: int|null}>}
+     */
+    private function buildNavigationTree(): array
     {
-        $resource = \App\Filament\Resources\OrderItemResource::class;
+        $groups = Nav::navigationGroups();
+        $orderedResources = Nav::orderedResources();
 
-        $first = [
-            Nav::groupForResource($resource),
-            Nav::iconForResource($resource),
-            Nav::sortForResource($resource),
+        $grouped = array_map(
+            static function (array $group) use ($orderedResources): array {
+                $resources = array_values(array_filter(
+                    $orderedResources,
+                    static fn (string $resource): bool => Nav::groupKeyForResource($resource) === $group['key'],
+                ));
+
+                return [
+                    'label' => $group['label'],
+                    'label_key' => $group['label_key'],
+                    'icon' => $group['icon'],
+                    'sort' => $group['sort'],
+                    'resources' => array_map(
+                        static fn (string $resource): array => [
+                            'class' => $resource,
+                            'icon' => Nav::iconForResource($resource),
+                            'sort' => Nav::sortForResource($resource),
+                        ],
+                        $resources,
+                    ),
+                ];
+            },
+            $groups,
+        );
+
+        $ungrouped = array_values(array_filter(
+            $orderedResources,
+            static fn (string $resource): bool => Nav::groupKeyForResource($resource) === null,
+        ));
+
+        return [
+            'groups' => $grouped,
+            'ungrouped' => array_map(
+                static fn (string $resource): array => [
+                    'class' => $resource,
+                    'icon' => Nav::iconForResource($resource),
+                    'sort' => Nav::sortForResource($resource),
+                ],
+                $ungrouped,
+            ),
         ];
-
-        $second = [
-            Nav::groupForResource($resource),
-            Nav::iconForResource($resource),
-            Nav::sortForResource($resource),
-        ];
-
-        // A simple equality assertion verifies that repeated calls hit the cached data.
-        $this->assertSame($first, $second);
     }
 }
