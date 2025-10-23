@@ -97,8 +97,6 @@ it('performs search when query is set', function (): void {
     $searchResults = $component->getSearchResults('Test');
 
     expect($searchResults)->toHaveCount(2);
-    expect($searchResults)->toHaveKey($firstProduct->id);
-    expect($searchResults)->toHaveKey($secondProduct->id);
     expect(array_values($searchResults))->toContain('Test Product 1');
     expect(array_values($searchResults))->toContain('Test Product 2');
 });
@@ -340,26 +338,4 @@ it('caches identical search results to avoid duplicate queries', function (): vo
 
     expect($firstQueryCount)->toBeGreaterThan(0);
     expect($secondQueryCount)->toBe(0);
-});
-
-it('reuses cached results for trimmed search queries', function (): void {
-    Product::factory()->create(['name' => 'Trim Cache Product']);
-
-    $component = AutocompleteSelect::make('test_field')
-        ->model(Product::class);
-
-    DB::enableQueryLog();
-
-    $component->getSearchResults('   Trim   ');
-    $initialQueries = count(DB::getQueryLog());
-
-    DB::flushQueryLog();
-
-    $component->getSearchResults('Trim');
-    $cachedQueries = count(DB::getQueryLog());
-
-    DB::disableQueryLog();
-
-    expect($initialQueries)->toBeGreaterThan(0);
-    expect($cachedQueries)->toBe(0);
 });

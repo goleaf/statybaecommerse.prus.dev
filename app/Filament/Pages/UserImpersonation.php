@@ -23,7 +23,7 @@ final class UserImpersonation extends Page implements HasTable
     use HasToggleableTable;
     use InteractsWithTable;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-user';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user';
 
     public static function getNavigationGroup(): string|UnitEnum|null
     {
