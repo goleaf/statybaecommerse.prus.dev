@@ -13,10 +13,7 @@ final class SliderAnalyticsTest extends BaseDashboard
 
     protected static ?string $navigationLabel = 'Slider Analytics Test';
 
-    public static function getNavigationIcon(): BackedEnum|string|null
-    {
-        return 'heroicon-o-chart-bar';
-    }
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?int $navigationSort = 3;
 
