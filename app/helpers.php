@@ -310,11 +310,23 @@ if (! function_exists('debug_order')) {
 if (! function_exists('safe_asset')) {
     function safe_asset(string $path): string
     {
-        if (! app()->bound('request') || ! app('request') instanceof \Illuminate\Http\Request) {
-            return '/'.ltrim($path, '/');
+        $relativePath = '/'.ltrim($path, '/');
+
+        try {
+            $app = app();
+        } catch (\Throwable $exception) {
+            return $relativePath;
         }
 
-        return asset($path);
+        if (! method_exists($app, 'bound') || ! $app->bound('url') || ! $app->bound('request')) {
+            return $relativePath;
+        }
+
+        try {
+            return asset($path);
+        } catch (\Throwable $exception) {
+            return $relativePath;
+        }
     }
 }
 
@@ -326,10 +338,6 @@ if (! function_exists('media_placeholder_url')) {
 
             return $resolver->resolve($key, $variant, $default) ?? ($default ?? '');
         } catch (\Throwable $exception) {
-            if (! app()->runningInConsole()) {
-                report($exception);
-            }
-
             return $default ?? '';
         }
     }

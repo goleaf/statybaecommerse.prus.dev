@@ -25,26 +25,9 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
-use Throwable;
 
 require_once __DIR__ . '/../app/Support/filament_compat.php';
 
-$appEnvironment = (string) env('APP_ENV', 'production');
-$queueConnection = (string) env('QUEUE_CONNECTION', 'sync');
-
-$providers = [
-    App\Providers\AuthServiceProvider::class,
-    App\Providers\ApiServiceProvider::class,
-];
-
-if ($appEnvironment !== 'local' || $queueConnection !== 'sync') {
-    $providers[] = App\Providers\HorizonServiceProvider::class;
-}
-
-$providers[] = App\Providers\LocaleServiceProvider::class;
-$providers[] = App\Providers\Filament\AdminPanelProvider::class;
-$providers[] = SecurityServiceProvider::class;
-
 $providers = [
     App\Providers\AuthServiceProvider::class,
     App\Providers\ApiServiceProvider::class,
@@ -61,7 +44,16 @@ $providers[] = App\Providers\LocaleServiceProvider::class;
 $providers[] = App\Providers\Filament\AdminPanelProvider::class;
 $providers[] = SecurityServiceProvider::class;
 
-$application = Application::configure(basePath: dirname(__DIR__))
+return Application::configure(basePath: dirname(__DIR__))
+    ->registered(function (Application $app): void {
+        if (! $app->bound('request')) {
+            $app->singleton('request', static fn (): Request => Request::capture());
+        }
+
+        if (! $app->bound(Request::class)) {
+            $app->singleton(Request::class, static fn (Application $app): Request => $app->make('request'));
+        }
+    })
     ->withRouting(
         web: __DIR__ . '/../routes/web.php',
         api: __DIR__ . '/../routes/api.php',
@@ -423,53 +415,5 @@ $application = Application::configure(basePath: dirname(__DIR__))
                 ->header('Content-Language', $locale);
         });
     })
-    ->withSingletons([
-        Request::class => static fn (): Request => Request::capture(),
-        'request'      => static fn (): Request => Request::capture(),
-    ])
-    ->registered(function (Application $app) use ($providers): void {
-        if (! $app->bound('request')) {
-            $app->instance('request', Request::capture());
-        }
-
-        $app->make('request');
-
-        $app->singleton('url', function ($app): UrlGenerator {
-            $routes = $app['router']->getRoutes();
-
-            $request = $app->bound('request')
-                ? $app->make('request')
-                : Request::capture();
-
-            if (! $app->bound('request')) {
-                $app->instance('request', $request);
-            }
-
-            $url = new UrlGenerator(
-                $routes,
-                $request,
-                $app['config']['app.asset_url']
-            );
-
-            $url->setSessionResolver(static function () use ($app) {
-                return $app['session'] ?? null;
-            });
-
-            $url->setKeyResolver(static function () use ($app) {
-                $config = $app->make('config');
-
-                return [$config->get('app.key'), ...($config->get('app.previous_keys') ?? [])];
-            });
-
-            $app->rebinding('routes', static function ($app, $routes): void {
-                $app['url']->setRoutes($routes);
-            });
-
-            return $url;
-        });
-
-        foreach ($providers as $provider) {
-            $app->register($provider);
-        }
-    })
+    ->withProviders($providers)
     ->create();
