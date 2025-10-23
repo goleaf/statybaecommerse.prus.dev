@@ -45,6 +45,8 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -216,35 +218,18 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                 ->placeholder('Name, email or phone')
                                 ->required()
                                 ->searchUsing(fn (string $search): array => CustomerSearch::byEmailPhoneName($search))
-                                ->dehydrateStateUsing(static fn (int|string|null $state): ?int => SearchableComponentHelper::normaliseIdentifier($state))
-                                // Refer to docs/forms/SEARCHABLE_INPUT_HELPER.md for helper usage patterns.
+                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
+                                // Reference docs/forms/SEARCHABLE_INPUT_HELPER.md for helper behaviour nuances.
                                 ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?Order $record): void {
-                                    $user = $record?->user;
-
-                                    if (! $user instanceof User && $state !== null) {
-                                        $user = User::query()
-                                            ->select(['id', 'name', 'email'])
-                                            ->find($state);
-                                    }
-
-                                    SearchableComponentHelper::hydrateFromModel(
-                                        $component,
-                                        $state,
-                                        $user,
-                                        static function (User $resolvedUser): string {
-                                            $name = (string) ($resolvedUser->name ?? '');
-                                            $email = (string) ($resolvedUser->email ?? '');
-
-                                            return trim(sprintf('%s <%s>', $name, $email));
-                                        },
+                                    SearchableComponentHelper::hydrateFromRecord(
+                                        component: $component,
+                                        state: $state,
+                                        record: $record?->user,
+                                        labelResolver: fn (User $user): string => trim(sprintf('%s <%s>', (string) ($user->name ?? ''), (string) ($user->email ?? ''))),
                                     );
                                 })
-                                ->afterStateUpdated(function (SearchableInput $component, int|string|null $state, Set $set): void {
-                                    if (SearchableComponentHelper::normaliseIdentifier($state) === null) {
-                                        SearchableComponentHelper::clearComponent($component);
-                                    }
-
-                                    SearchableComponentHelper::syncNullableIntState($state, $set, 'user_id');
+                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                    SearchableComponentHelper::assignNullableId($set, 'user_id', $state);
                                 }),
                             Select::make('status')
                                 ->label(__('orders.fields.status'))
@@ -392,23 +377,26 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                 ->label(__('orders.lookups.billing_address'))
                                 ->placeholder(__('orders.lookups.address_placeholder'))
                                 ->searchUsing(fn (string $value): array => AddressSearch::results($value))
-                                ->dehydrateStateUsing(static fn (int|string|null $state): ?int => SearchableComponentHelper::normaliseIdentifier($state))
-                                // Helper workflows documented in docs/forms/SEARCHABLE_INPUT_HELPER.md.
+                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                // See docs/forms/SEARCHABLE_INPUT_HELPER.md for helper-driven hydration + clearing.
                                 // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
-                                ->afterStateUpdated(function (SearchableInput $component, int|string|null $state, Set $set): void {
+                                ->afterStateUpdated(function (?string $state, Set $set): void {
                                     SearchableComponentHelper::syncLookupPayload(
-                                        $component,
-                                        $state,
-                                        $set,
-                                        'billing_address',
-                                        static function (int $identifier): ?Address {
-                                            return Address::query()
+                                        set: $set,
+                                        lookupField: 'billing_address_lookup',
+                                        payloadField: 'billing_address',
+                                        state: $state,
+                                        payloadResolver: function (int $addressId): ?array {
+                                            $address = Address::query()
                                                 ->select(['id', 'address_line_1', 'address_line_2', 'city', 'state', 'postal_code', 'country_code'])
-                                                ->find($identifier);
+                                                ->find($addressId);
+
+                                            if (! $address instanceof Address) {
+                                                return null;
+                                            }
+
+                                            return AddressSearch::payload($address);
                                         },
-                                        static fn (Address $address): array => AddressSearch::payload($address),
-                                        static fn (Address $address): string => self::formatAddress($address),
-                                        [],
                                     );
                                 })
                                 ->dehydrated(false),
@@ -416,23 +404,26 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                 ->label(__('orders.lookups.shipping_address'))
                                 ->placeholder(__('orders.lookups.address_placeholder'))
                                 ->searchUsing(fn (string $value): array => AddressSearch::results($value))
-                                ->dehydrateStateUsing(static fn (int|string|null $state): ?int => SearchableComponentHelper::normaliseIdentifier($state))
-                                // Helper workflows documented in docs/forms/SEARCHABLE_INPUT_HELPER.md.
+                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                // See docs/forms/SEARCHABLE_INPUT_HELPER.md for helper-driven hydration + clearing.
                                 // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
-                                ->afterStateUpdated(function (SearchableInput $component, int|string|null $state, Set $set): void {
+                                ->afterStateUpdated(function (?string $state, Set $set): void {
                                     SearchableComponentHelper::syncLookupPayload(
-                                        $component,
-                                        $state,
-                                        $set,
-                                        'shipping_address',
-                                        static function (int $identifier): ?Address {
-                                            return Address::query()
+                                        set: $set,
+                                        lookupField: 'shipping_address_lookup',
+                                        payloadField: 'shipping_address',
+                                        state: $state,
+                                        payloadResolver: function (int $addressId): ?array {
+                                            $address = Address::query()
                                                 ->select(['id', 'address_line_1', 'address_line_2', 'city', 'state', 'postal_code', 'country_code'])
-                                                ->find($identifier);
+                                                ->find($addressId);
+
+                                            if (! $address instanceof Address) {
+                                                return null;
+                                            }
+
+                                            return AddressSearch::payload($address);
                                         },
-                                        static fn (Address $address): array => AddressSearch::payload($address),
-                                        static fn (Address $address): string => self::formatAddress($address),
-                                        [],
                                     );
                                 })
                                 ->dehydrated(false),
@@ -485,51 +476,39 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                 ->label(__('orders.fields.channel'))
                                 ->placeholder(__('orders.lookups.channel_placeholder'))
                                 ->searchUsing(fn (string $value): array => ChannelSearch::results($value))
-                                ->dehydrateStateUsing(static fn (int|string|null $state): ?int => SearchableComponentHelper::normaliseIdentifier($state))
-                                // Helper guidance: docs/forms/SEARCHABLE_INPUT_HELPER.md.
+                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                // Reference docs/forms/SEARCHABLE_INPUT_HELPER.md for helper behaviour nuances.
                                 ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                    SearchableComponentHelper::hydrateUsingFinder(
-                                        $component,
-                                        $state,
-                                        static function (int $identifier): ?Channel {
-                                            return Channel::query()
-                                                ->select(['id', 'name', 'code', 'type'])
-                                                ->find($identifier);
-                                        },
-                                        static fn (Channel $channel): string => ChannelSearch::label($channel),
+                                    SearchableComponentHelper::hydrateUsingResolver(
+                                        component: $component,
+                                        state: $state,
+                                        resolver: fn (int $id): ?Channel => Channel::query()
+                                            ->select(['id', 'name', 'code', 'type'])
+                                            ->find($id),
+                                        labelResolver: fn (Channel $channel): string => ChannelSearch::label($channel),
                                     );
                                 })
-                                ->afterStateUpdated(function (SearchableInput $component, int|string|null $state, Set $set): void {
-                                    if (SearchableComponentHelper::normaliseIdentifier($state) === null) {
-                                        SearchableComponentHelper::clearComponent($component);
-                                    }
-
-                                    SearchableComponentHelper::syncNullableIntState($state, $set, 'channel_id');
+                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                    SearchableComponentHelper::assignNullableId($set, 'channel_id', $state);
                                 }),
                             SearchableInput::make('partner_id')
                                 ->label(__('orders.fields.partner'))
                                 ->placeholder(__('orders.lookups.partner_placeholder'))
                                 ->searchUsing(fn (string $value): array => PartnerSearch::results($value))
-                                ->dehydrateStateUsing(static fn (int|string|null $state): ?int => SearchableComponentHelper::normaliseIdentifier($state))
-                                // Helper guidance: docs/forms/SEARCHABLE_INPUT_HELPER.md.
+                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                // Reference docs/forms/SEARCHABLE_INPUT_HELPER.md for helper behaviour nuances.
                                 ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                    SearchableComponentHelper::hydrateUsingFinder(
-                                        $component,
-                                        $state,
-                                        static function (int $identifier): ?Partner {
-                                            return Partner::query()
-                                                ->select(['id', 'name', 'code', 'contact_email'])
-                                                ->find($identifier);
-                                        },
-                                        static fn (Partner $partner): string => PartnerSearch::label($partner),
+                                    SearchableComponentHelper::hydrateUsingResolver(
+                                        component: $component,
+                                        state: $state,
+                                        resolver: fn (int $id): ?Partner => Partner::query()
+                                            ->select(['id', 'name', 'code', 'contact_email'])
+                                            ->find($id),
+                                        labelResolver: fn (Partner $partner): string => PartnerSearch::label($partner),
                                     );
                                 })
-                                ->afterStateUpdated(function (SearchableInput $component, int|string|null $state, Set $set): void {
-                                    if (SearchableComponentHelper::normaliseIdentifier($state) === null) {
-                                        SearchableComponentHelper::clearComponent($component);
-                                    }
-
-                                    SearchableComponentHelper::syncNullableIntState($state, $set, 'partner_id');
+                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                    SearchableComponentHelper::assignNullableId($set, 'partner_id', $state);
                                 }),
                         ]),
                 ])

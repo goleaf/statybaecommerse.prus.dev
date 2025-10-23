@@ -1,33 +1,18 @@
-# Searchable Input Helper
+# SearchableInput Helper Reference
 
-The `App\Support\Filament\Components\SearchableComponentHelper` centralises common state management tasks for [`DefStudio\SearchableInput`](https://github.com/defstudio/searchable-input) components so Filament resources stay concise.
+The `App\\Support\\Filament\\Components\\SearchableComponentHelper` centralizes the repetitive wiring that our Filament `SearchableInput` fields need when hydrating existing records or clearing lookups.
 
-## Core scenarios
+## Available Utilities
 
-| Scenario | Helper | Notes |
-| --- | --- | --- |
-| Hydrating an edit form with an existing model | `hydrateFromModel()` or `hydrateUsingFinder()` | Restores the component state and option list from a model instance without duplicating query logic. |
-| Persisting nullable foreign keys | `syncNullableIntState()` | Normalises blank values to `null` before saving integer IDs. |
-| Propagating lookup payloads to dependent fields | `syncLookupPayload()` | Keeps downstream payload arrays in sync and clears the lookup component when state is removed. |
+- **`hydrateFromRecord()`** – accepts an already-loaded model and injects the correct option/state pair so Filament renders a selected value during form hydration.
+- **`hydrateUsingResolver()`** – lazily resolves a model by identifier before deferring to `hydrateFromRecord()`. Use this whenever the resource only has an ID column at hydrate time.
+- **`assignNullableId()`** – normalizes component state into nullable integer identifiers, ensuring blank states save as `null` instead of `0` or empty strings.
+- **`syncLookupPayload()`** – keeps lookup components and their structured payloads (e.g., billing/shipping address metadata) in sync. When cleared, it resets both the lookup field and payload array to avoid stale UI state.
 
-## Usage checklist
+## Usage Notes
 
-1. Normalise raw component values with `normaliseIdentifier()` before casting to integers.
-2. Clear the lookup via `clearComponent()` whenever the helper determines the state is empty.
-3. Use the optional label resolver in `syncLookupPayload()` when a component needs its option list rebuilt (e.g. editing existing orders).
+1. Always add a short inline comment referencing this page near helper-powered callbacks so future contributors know where to find behavioural details.
+2. When a lookup controls derivative payload (addresses, contact payloads, etc.), wrap your domain-specific fetch logic in the resolver closure and return the normalized array (see `App\\Support\\Search\\AddressSearch::payload`).
+3. Helper methods intentionally avoid emitting events; Filament's `Set` injection keeps dependent totals and key-value components in sync with the fresh payload data.
 
-> **Tip:** The helper intentionally returns payload arrays untouched, so dependent totals, key-value components, or computed summaries continue to consume the normalised data emitted by search payload builders like `AddressSearch::payload()`.
-
-## Example
-
-```php
-SearchableInput::make('customer_id')
-    ->searchUsing(fn (string $search) => CustomerSearch::byEmailPhoneName($search))
-    ->dehydrateStateUsing(static fn ($state) => SearchableComponentHelper::normaliseIdentifier($state))
-    ->afterStateHydrated(fn (SearchableInput $component, ?int $state) =>
-        SearchableComponentHelper::hydrateUsingFinder($component, $state, $finder, $labelResolver)
-    )
-    ->afterStateUpdated(fn (SearchableInput $component, $state, Set $set) =>
-        SearchableComponentHelper::syncNullableIntState($state, $set, 'customer_id')
-    );
-```
+For metadata structure guidelines, continue to reference [`docs/forms/SEARCHABLE_INPUT_METADATA.md`](./SEARCHABLE_INPUT_METADATA.md).

@@ -4,160 +4,110 @@ declare(strict_types=1);
 
 namespace App\Support\Filament\Components;
 
+use Closure;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Set;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Centralises SearchableInput state helpers so resources can stay lean and readable.
+ * Helper utilities to normalize SearchableInput hydration and clearing logic.
  */
 final class SearchableComponentHelper
 {
+    /**
+     * Guarded constructor to prevent instantiation.
+     */
     private function __construct()
     {
-        // Intentionally left empty because this helper exposes only static utility methods.
+        // Helper only exposes static APIs.
     }
 
     /**
-     * Normalise the identifier into an integer or null when the component is empty.
-     */
-    public static function normaliseIdentifier(int|string|null $state): ?int
-    {
-        if ($state === null) {
-            return null;
-        }
-
-        if (is_string($state)) {
-            $state = trim($state);
-
-            if ($state === '') {
-                return null;
-            }
-        }
-
-        return (int) $state;
-    }
-
-    /**
-     * Reset a SearchableInput component to its pristine state (no state and no options).
-     */
-    public static function clearComponent(SearchableInput $component): void
-    {
-        $component->state(null);
-        $component->options([]);
-    }
-
-    /**
-     * Hydrate a SearchableInput component using a resolved Eloquent model instance.
+     * Hydrate a SearchableInput component using an already loaded model instance.
      *
-     * @template TModel of Model
-     *
-     * @param TModel|null $model
-     * @param callable(TModel): string $labelResolver Resolve the label for the hydrated option.
+     * @param Closure(Model): string $labelResolver
      */
-    public static function hydrateFromModel(
+    public static function hydrateFromRecord(
         SearchableInput $component,
         ?int $state,
-        ?Model $model,
-        callable $labelResolver
+        ?Model $record,
+        Closure $labelResolver,
     ): void {
-        if ($state === null || ! $model instanceof Model) {
+        if ($state === null || $record === null) {
             return;
         }
 
         $component
-            ->state((string) $state)
+            ->state((string) $record->getKey())
             ->options([
-                (string) $model->getKey() => $labelResolver($model),
+                (string) $record->getKey() => $labelResolver($record),
             ]);
     }
 
     /**
-     * Hydrate a SearchableInput component by resolving the model through a finder callback.
+     * Hydrate a SearchableInput component by resolving a model lazily.
      *
-     * @template TModel of Model
-     *
-     * @param callable(int): (TModel|null) $finder Retrieve the model from a persisted store.
-     * @param callable(TModel): string $labelResolver Resolve the label for the hydrated option.
+     * @param Closure(int): (Model|null) $resolver
+     * @param Closure(Model): string     $labelResolver
      */
-    public static function hydrateUsingFinder(
+    public static function hydrateUsingResolver(
         SearchableInput $component,
         ?int $state,
-        callable $finder,
-        callable $labelResolver
+        Closure $resolver,
+        Closure $labelResolver,
     ): void {
         if ($state === null) {
             return;
         }
 
-        $model = $finder($state);
+        $record = $resolver($state);
 
-        if (! $model instanceof Model) {
+        if (! $record instanceof Model) {
             return;
         }
 
-        self::hydrateFromModel($component, $state, $model, $labelResolver);
+        self::hydrateFromRecord($component, $state, $record, $labelResolver);
     }
 
     /**
-     * Persist a nullable relation identifier by normalising the raw component state first.
+     * Assign a nullable integer identifier based on the raw SearchableInput state.
      */
-    public static function syncNullableIntState(int|string|null $state, Set $set, string $field): void
+    public static function assignNullableId(Set $set, string $property, ?string $state): void
     {
-        $set($field, self::normaliseIdentifier($state));
+        if ($state === null || $state === '') {
+            $set($property, null);
+
+            return;
+        }
+
+        $set($property, (int) $state);
     }
 
     /**
-     * Synchronise a lookup component with its downstream payload consumer.
+     * Synchronize a lookup component with an associated payload array (e.g. address metadata).
      *
-     * @template TModel of Model
-     *
-     * @param int|string|null $state Raw component state that may be null, empty, or a string identifier.
-     * @param callable(int): (TModel|null) $finder Resolve the model backing the lookup.
-     * @param callable(TModel): array<string, mixed> $payloadResolver Build the normalized payload for dependent components.
-     * @param callable(TModel): string|null $labelResolver Optionally resolve an explicit label for the lookup component.
-     * @param array<string, mixed> $emptyPayload Provide the default payload when no selection exists.
+     * @param Closure(int): (?array) $payloadResolver
      */
     public static function syncLookupPayload(
-        SearchableInput $component,
-        int|string|null $state,
         Set $set,
+        string $lookupField,
         string $payloadField,
-        callable $finder,
-        callable $payloadResolver,
-        ?callable $labelResolver = null,
-        array $emptyPayload = []
+        ?string $state,
+        Closure $payloadResolver,
     ): void {
-        $identifier = self::normaliseIdentifier($state);
-
-        if ($identifier === null) {
-            self::clearComponent($component);
-            $set($payloadField, $emptyPayload);
+        if ($state === null || $state === '') {
+            $set($lookupField, null);
+            $set($payloadField, []);
 
             return;
         }
 
-        $model = $finder($identifier);
+        $payload = $payloadResolver((int) $state);
 
-        if (! $model instanceof Model) {
-            self::clearComponent($component);
-            $set($payloadField, $emptyPayload);
-
+        if ($payload === null) {
             return;
         }
 
-        $component->state((string) $identifier);
-
-        if ($labelResolver !== null) {
-            $label = $labelResolver($model);
-
-            if (is_string($label) && $label !== '') {
-                $component->options([
-                    (string) $identifier => $label,
-                ]);
-            }
-        }
-
-        $set($payloadField, $payloadResolver($model));
+        $set($payloadField, $payload);
     }
 }
