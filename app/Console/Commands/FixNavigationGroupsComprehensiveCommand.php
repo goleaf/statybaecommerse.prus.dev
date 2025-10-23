@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Support\Filament\Constants\NavigationGroupConstants;
 use Illuminate\Console\Command;
 
 final class FixNavigationGroupsComprehensiveCommand extends Command
@@ -38,10 +39,11 @@ final class FixNavigationGroupsComprehensiveCommand extends Command
                 $content = preg_replace($pattern, $replacement, $content);
             }
 
-            if (str_contains($content, 'protected static $navigationGroup') && ! str_contains($content, self::UNIT_ENUM_IMPORT)) {
+            // Ensure the unified UnitEnum import is available prior to adding typed properties.
+            if (str_contains($content, 'protected static $navigationGroup') && ! str_contains($content, NavigationGroupConstants::UNIT_ENUM_USE)) {
                 $content = preg_replace(
                     '/(use [^;]+;\s*\n)(class \w+ extends Resource)/',
-                    '$1'.self::UNIT_ENUM_IMPORT."\n\n$2",
+                    '$1'.NavigationGroupConstants::UNIT_ENUM_USE."\n\n$2",
                     $content,
                 );
             }

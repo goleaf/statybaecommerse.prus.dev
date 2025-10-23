@@ -178,7 +178,8 @@ class FixFilamentV4Command extends Command
     private function updateNavigationProperties(string $content): string
     {
         // Add UnitEnum import if needed
-        if (str_contains($content, 'NavigationGroup') && ! str_contains($content, self::UNIT_ENUM_IMPORT)) {
+        // Add the shared UnitEnum import when navigation groups are present but not yet typed correctly.
+        if (str_contains($content, 'NavigationGroup') && ! str_contains($content, NavigationGroupConstants::UNIT_ENUM_USE)) {
             $lines = explode("\n", $content);
             $insertIndex = 0;
             foreach ($lines as $index => $line) {
@@ -186,7 +187,7 @@ class FixFilamentV4Command extends Command
                     $insertIndex = $index + 1;
                 }
             }
-            array_splice($lines, $insertIndex, 0, [self::UNIT_ENUM_IMPORT]);
+            array_splice($lines, $insertIndex, 0, [NavigationGroupConstants::UNIT_ENUM_USE]);
             $content = implode("\n", $lines);
         }
 

@@ -33,6 +33,7 @@ return [
     'total' => 'Suma',
     'created' => 'Sukurta',
     'updated' => 'Atnaujinta',
+    'channel' => 'Kanalas',
     // Summary Labels
     'total_revenue' => 'Bendros pajamos',
     'avg_order_value' => 'Vidutinė užsakymo vertė',
@@ -70,32 +71,7 @@ return [
     'export_report' => 'Eksportuoti ataskaitą',
     'refresh_data' => 'Atnaujinti duomenis',
     'view' => 'Peržiūrėti',
-    'actions' => [
-        'view_order' => 'Peržiūrėti užsakymą',
-    ],
-    'columns' => [
-        'order_date' => 'Užsakymo data',
-        'order_number' => 'Užsakymo numeris',
-        'customer_name' => 'Klientas',
-        'customer_email' => 'Kliento el. paštas',
-        'items_count' => 'Prekių kiekis',
-        'order_total' => 'Užsakymo suma',
-        'status' => 'Būsena',
-        'sales_channel' => 'Pardavimo kanalas',
-        'placed_at' => 'Sukurta',
-        'updated_at' => 'Atnaujinta',
-    ],
-    'filters' => [
-        'status' => 'Užsakymų būsena',
-        'status_placeholder' => 'Pasirinkite būseną',
-        'date_range' => 'Užsakymų data',
-        'high_value' => 'Aukštos vertės užsakymai',
-        'this_month' => 'Šio mėnesio užsakymai',
-    ],
-    'groups' => [
-        'status' => 'Grupuoti pagal būseną',
-        'placed_at' => 'Grupuoti pagal mėnesį',
-    ],
+    'view_order' => 'Peržiūrėti užsakymą',
     // Chart Types
     'line_chart' => 'Linijų Diagrama',
     'bar_chart' => 'Stulpelių Diagrama',

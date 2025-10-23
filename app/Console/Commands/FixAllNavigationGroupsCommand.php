@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Support\Filament\Constants\NavigationGroupConstants;
 use Illuminate\Console\Command;
 
 final class FixAllNavigationGroupsCommand extends Command
@@ -53,17 +54,18 @@ final class FixAllNavigationGroupsCommand extends Command
                 $content,
             );
 
-            if (str_contains($content, 'protected static $navigationGroup') && ! str_contains($content, self::UNIT_ENUM_IMPORT)) {
+            // Guarantee the shared UnitEnum import is present whenever we normalize navigation groups.
+            if (str_contains($content, 'protected static $navigationGroup') && ! str_contains($content, NavigationGroupConstants::UNIT_ENUM_USE)) {
                 $content = preg_replace(
                     '/(use [^;]+;\s*\n)(class \w+ extends Resource)/',
-                    '$1'.self::UNIT_ENUM_IMPORT."\n\n$2",
+                    '$1'.NavigationGroupConstants::UNIT_ENUM_USE."\n\n$2",
                     $content,
                 );
             }
 
             $content = preg_replace(
-                '/('.preg_quote(self::UNIT_ENUM_IMPORT, '/').'\s*\n)+/',
-                self::UNIT_ENUM_IMPORT."\n",
+                sprintf('/(%s\s*\n)+/', NavigationGroupConstants::unitEnumImportPattern()),
+                NavigationGroupConstants::UNIT_ENUM_USE."\n",
                 $content,
             );
 

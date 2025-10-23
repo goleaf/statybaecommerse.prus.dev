@@ -33,6 +33,7 @@ return [
     'total' => 'Total',
     'created' => 'Created',
     'updated' => 'Updated',
+    'channel' => 'Channel',
     // Summary Labels
     'total_revenue' => 'Total Revenue',
     'avg_order_value' => 'Avg Order Value',
@@ -70,32 +71,7 @@ return [
     'export_report' => 'Export Report',
     'refresh_data' => 'Refresh Data',
     'view' => 'View',
-    'actions' => [
-        'view_order' => 'View order',
-    ],
-    'columns' => [
-        'order_date' => 'Order date',
-        'order_number' => 'Order number',
-        'customer_name' => 'Customer',
-        'customer_email' => 'Customer email',
-        'items_count' => 'Items',
-        'order_total' => 'Order total',
-        'status' => 'Status',
-        'sales_channel' => 'Sales channel',
-        'placed_at' => 'Placed at',
-        'updated_at' => 'Updated at',
-    ],
-    'filters' => [
-        'status' => 'Order status',
-        'status_placeholder' => 'Select status',
-        'date_range' => 'Order date range',
-        'high_value' => 'High value orders',
-        'this_month' => 'Orders this month',
-    ],
-    'groups' => [
-        'status' => 'Group by status',
-        'placed_at' => 'Group by month',
-    ],
+    'view_order' => 'View Order',
     // Chart Types
     'line_chart' => 'Line Chart',
     'bar_chart' => 'Bar Chart',
