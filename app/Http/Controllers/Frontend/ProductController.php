@@ -8,245 +8,203 @@ use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\Review;
-use App\Services\Shared\ProductService;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 final class ProductController extends Controller
 {
-    public function __construct(private readonly ProductService $productService) {}
-
     public function index(Request $request): View
     {
-        $filters = $this->extractFilters($request);
-        $filtersForService = $this->mapFiltersForService($filters);
-
-        $products = $this->productService->searchProducts($filtersForService, 12);
-        $products->appends($request->query());
-
-        return view('products.index', [
-            'products' => $products,
-            'filters' => $filters,
-            'availableCategories' => $this->categoryOptions(),
-            'availableBrands' => $this->brandOptions(),
-            'pageTitle' => __('Product catalogue'),
-            'context' => 'catalogue',
-        ]);
-    }
-
-    public function search(Request $request): View
-    {
-        $request->validate([
-            'q' => ['nullable', 'string', 'max:120'],
-        ]);
+        $query = Product::query()
+            ->with(['brand', 'media'])
+            ->withCount('reviews');
 
         $filters = $this->extractFilters($request);
-        $filtersForService = $this->mapFiltersForService($filters);
 
-        $products = $this->productService->searchProducts($filtersForService, 12);
-        $products->appends($request->query());
+        if ($filters['search']) {
+            $query->where(function ($innerQuery) use ($filters): void {
+                $innerQuery
+                    ->where('name', 'like', '%'.$filters['search'].'%')
+                    ->orWhere('slug', 'like', '%'.$filters['search'].'%');
+            });
+        }
 
-        return view('products.index', [
+        if ($filters['category']) {
+            $query->whereHas('categories', function ($innerQuery) use ($filters): void {
+                $innerQuery->where('slug', $filters['category']);
+            });
+        }
+
+        if ($filters['brand']) {
+            $query->whereHas('brand', function ($innerQuery) use ($filters): void {
+                $innerQuery->where('slug', $filters['brand']);
+            });
+        }
+
+        $this->applySorting($query, $filters['sort']);
+
+        /** @var LengthAwarePaginator $products */
+        $products = $query->paginate(12)->withQueryString();
+
+        return view('frontend.products.index', [
             'products' => $products,
             'filters' => $filters,
-            'availableCategories' => $this->categoryOptions(),
-            'availableBrands' => $this->brandOptions(),
-            'pageTitle' => __('Search results'),
-            'context' => 'search',
-        ]);
-    }
-
-    public function byCategory(Request $request, Category $category): View
-    {
-        $category->load(['translations', 'children' => fn ($query) => $query->ordered()]);
-
-        $filters = $this->extractFilters($request);
-        $filtersForService = $this->mapFiltersForService($filters);
-
-        $products = $this->productService->getProductsByCategory($category->id, $filtersForService, 12);
-        $products->appends($request->query());
-
-        return view('categories.show', [
-            'category' => $category,
-            'products' => $products,
-            'filters' => $filters,
-            'availableBrands' => $this->brandOptions(),
-        ]);
-    }
-
-    public function byBrand(Request $request, Brand $brand): View
-    {
-        $brand->load('translations');
-
-        $filters = $this->extractFilters($request);
-        $filtersForService = $this->mapFiltersForService($filters);
-
-        $products = $this->productService->getProductsByBrand($brand->id, $filtersForService, 12);
-        $products->appends($request->query());
-
-        return view('brands.show', [
-            'brand' => $brand,
-            'products' => $products,
-            'filters' => $filters,
-            'availableCategories' => $this->categoryOptions(),
+            'brands' => $this->loadBrands(),
+            'categories' => $this->loadCategories(),
+            'currentCategory' => $this->resolveCurrentCategory($filters['category']),
+            'currentBrand' => $this->resolveCurrentBrand($filters['brand']),
         ]);
     }
 
     public function show(Product $product): View
     {
-        abort_unless($product->isPublished(), 404);
+        $product->load([
+            'brand',
+            'categories',
+            'media',
+            'variants.media',
+        ]);
 
-        $product = Product::query()
-            ->whereKey($product)
-            ->with(['brand.translations', 'categories.translations', 'translations'])
-            ->firstOrFail();
+        $relatedProducts = $product->categories()
+            ->with(['products' => fn ($query) => $query->with('brand')->where('products.id', '!=', $product->id)->limit(8)])
+            ->get()
+            ->pluck('products')
+            ->flatten()
+            ->unique('id')
+            ->take(8);
 
-        return view('products.show', [
+        $reviews = $product->reviews()
+            ->withoutGlobalScopes()
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return view('frontend.products.show', [
             'product' => $product,
+            'relatedProducts' => $relatedProducts,
+            'reviews' => $reviews,
         ]);
     }
 
-    public function addReview(Request $request, Product $product): RedirectResponse
+    public function search(Request $request): View
     {
-        abort_unless($product->isPublished(), 404);
-
-        $rules = [
-            'rating' => ['required', 'integer', 'between:1,5'],
-            'title' => ['nullable', 'string', 'max:255'],
-            'content' => ['required', 'string', 'max:5000'],
-            'reviewer_name' => ['nullable', 'string', 'max:255'],
-            'reviewer_email' => ['nullable', 'email', 'max:255'],
-        ];
-
-        if (! $request->user()) {
-            $rules['reviewer_name'][0] = 'required';
-            $rules['reviewer_email'][0] = 'required';
+        if ($request->filled('q') && ! $request->filled('search')) {
+            $request->merge(['search' => $request->input('q')]);
         }
 
-        $validated = $request->validate($rules);
+        return $this->index($request);
+    }
 
-        $user = $request->user();
+    public function byCategory(Category $category, Request $request): View
+    {
+        $request->merge(['category' => $category->slug]);
 
-        Review::query()->create([
-            'product_id' => $product->id,
-            'user_id' => $user?->id,
-            'reviewer_name' => $validated['reviewer_name'] ?? $user?->name ?? 'Guest',
-            'reviewer_email' => $validated['reviewer_email'] ?? $user?->email ?? 'guest@example.com',
-            'rating' => (int) $validated['rating'],
-            'title' => $validated['title'] ?? null,
-            'content' => $validated['content'],
-            'is_approved' => false,
-            'locale' => app()->getLocale(),
+        return $this->index($request);
+    }
+
+    public function byBrand(Brand $brand, Request $request): View
+    {
+        $request->merge(['brand' => $brand->slug]);
+
+        return $this->index($request);
+    }
+
+    public function addReview(Product $product, Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'rating' => ['required', 'integer', 'min:1', 'max:5'],
+            'title' => ['nullable', 'string', 'max:255'],
+            'content' => ['nullable', 'string'],
         ]);
+
+        $reviewAttributes = [
+            'rating' => $data['rating'],
+            'title' => $data['title'] ?? null,
+            'content' => $data['content'] ?? null,
+            'reviewer_name' => $request->user()?->name ?? $request->input('name', 'Guest'),
+            'reviewer_email' => $request->user()?->email ?? $request->input('email', 'guest@example.com'),
+            'is_approved' => true,
+        ];
+
+        if ($request->user()) {
+            $reviewAttributes['user_id'] = $request->user()->id;
+        }
+
+        $product->reviews()->create($reviewAttributes);
 
         return redirect()
             ->route('frontend.products.show', $product)
-            ->with('status', __('Your review has been submitted and will appear once approved.'));
+            ->with('status', __('Thank you for reviewing :product', ['product' => $product->name]));
     }
 
     private function extractFilters(Request $request): array
     {
         return [
-            'search' => trim((string) $request->input('q', '')),
-            'categories' => $this->normalizeFilterValues($request->input('category')),
-            'brands' => $this->normalizeFilterValues($request->input('brand')),
+            'search' => Str::of((string) $request->input('search'))->trim()->whenEmpty(fn () => null)->toString(),
+            'category' => Str::of((string) $request->input('category'))->trim()->whenEmpty(fn () => null)->toString(),
+            'brand' => Str::of((string) $request->input('brand'))->trim()->whenEmpty(fn () => null)->toString(),
             'sort' => $request->input('sort', 'latest'),
         ];
     }
 
-    private function mapFiltersForService(array $filters): array
+    private function applySorting($query, string $sort): void
     {
-        [$sortBy, $direction] = $this->resolveSort($filters['sort']);
+        $direction = 'desc';
 
-        return [
-            'search' => $filters['search'] !== '' ? $filters['search'] : null,
-            'categories' => $this->resolveCategoryIds($filters['categories']),
-            'brands' => $this->resolveBrandIds($filters['brands']),
-            'sort_by' => $sortBy,
-            'sort_direction' => $direction,
-        ];
-    }
-
-    private function normalizeFilterValues(mixed $value): array
-    {
-        if ($value === null) {
-            return [];
+        switch ($sort) {
+            case 'price_asc':
+                $query->orderBy('price');
+                break;
+            case 'price_desc':
+                $query->orderByDesc('price');
+                break;
+            case 'name_asc':
+                $query->orderBy('name');
+                break;
+            case 'name_desc':
+                $query->orderByDesc('name');
+                break;
+            default:
+                $query->orderBy('created_at', $direction);
+                break;
         }
-
-        return collect(is_array($value) ? $value : [$value])
-            ->map(fn ($item) => is_string($item) ? trim($item) : $item)
-            ->filter(fn ($item) => $item !== '' && $item !== null)
-            ->values()
-            ->all();
     }
 
-    private function resolveCategoryIds(array $values): array
-    {
-        $collection = collect($values);
-
-        if ($collection->isEmpty()) {
-            return [];
-        }
-
-        [$idValues, $slugValues] = $collection->partition(fn ($value) => is_numeric($value));
-
-        $ids = Category::query()->whereIn('id', $idValues->all())->pluck('id')->all();
-
-        if ($slugValues->isNotEmpty()) {
-            $ids = array_merge($ids, Category::query()->whereIn('slug', $slugValues->all())->pluck('id')->all());
-        }
-
-        return array_values(array_unique($ids));
-    }
-
-    private function resolveBrandIds(array $values): array
-    {
-        $collection = collect($values);
-
-        if ($collection->isEmpty()) {
-            return [];
-        }
-
-        [$idValues, $slugValues] = $collection->partition(fn ($value) => is_numeric($value));
-
-        $ids = Brand::query()->whereIn('id', $idValues->all())->pluck('id')->all();
-
-        if ($slugValues->isNotEmpty()) {
-            $ids = array_merge($ids, Brand::query()->whereIn('slug', $slugValues->all())->pluck('id')->all());
-        }
-
-        return array_values(array_unique($ids));
-    }
-
-    private function resolveSort(string $sort): array
-    {
-        return match ($sort) {
-            'price_asc' => ['price', 'asc'],
-            'price_desc' => ['price', 'desc'],
-            'name_asc' => ['name', 'asc'],
-            'name_desc' => ['name', 'desc'],
-            default => ['published_at', 'desc'],
-        };
-    }
-
-    private function categoryOptions(): Collection
-    {
-        return Category::query()
-            ->roots()
-            ->ordered()
-            ->with('children')
-            ->get();
-    }
-
-    private function brandOptions(): Collection
+    private function loadBrands(): Collection
     {
         return Brand::query()
-            ->whereHas('products', fn (Builder $query) => $query->published())
+            ->select(['id', 'name', 'slug'])
             ->orderBy('name')
             ->get();
+    }
+
+    private function loadCategories(): Collection
+    {
+        return Category::query()
+            ->select(['id', 'name', 'slug'])
+            ->orderBy('name')
+            ->get();
+    }
+
+    private function resolveCurrentCategory(?string $slug): ?Category
+    {
+        if (! $slug) {
+            return null;
+        }
+
+        return Category::query()->where('slug', $slug)->first();
+    }
+
+    private function resolveCurrentBrand(?string $slug): ?Brand
+    {
+        if (! $slug) {
+            return null;
+        }
+
+        return Brand::query()->where('slug', $slug)->first();
     }
 }

@@ -1,36 +1,60 @@
-@extends('components.layouts.base')
-
-@section('title', __('Discounts'))
+@extends('frontend.layouts.app')
 
 @section('content')
-    <x-container class="py-8 space-y-6">
-        <div>
-            <h1 class="text-3xl font-semibold text-gray-900">{{ __('Discounts') }}</h1>
-            <p class="mt-2 text-gray-600">{{ __('Active promotions you can use during checkout.') }}</p>
-        </div>
+    <div class="max-w-5xl mx-auto px-4 py-10 space-y-8">
+        <header class="space-y-2">
+            <h1 class="text-3xl font-semibold text-slate-900 dark:text-slate-100">{{ __('Discounts and promotions') }}</h1>
+            <p class="text-slate-600 dark:text-slate-300">{{ __('Take advantage of our current offers to save on your order.') }}</p>
+        </header>
 
-        <div class="space-y-4">
-            @forelse ($discounts as $discount)
-                <article class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-xl font-semibold text-gray-900">{{ $discount->name }}</h2>
-                        <span class="text-sm text-gray-500">{{ ucfirst($discount->type) }}</span>
-                    </div>
-                    <p class="mt-2 text-sm text-gray-600">{{ $discount->description }}</p>
-                    <div class="mt-4 text-sm text-gray-500">
-                        @if ($discount->starts_at)
-                            <p>{{ __('Starts at :date', ['date' => $discount->starts_at->format('Y-m-d')]) }}</p>
-                        @endif
-                        @if ($discount->ends_at)
-                            <p>{{ __('Ends at :date', ['date' => $discount->ends_at->format('Y-m-d')]) }}</p>
-                        @endif
-                    </div>
-                </article>
-            @empty
-                <div class="rounded-lg border border-dashed border-gray-300 p-12 text-center text-gray-500">
-                    {{ __('No discounts are currently available.') }}
+        <section class="space-y-4">
+            <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100">{{ __('Active discounts') }}</h2>
+            @if ($activeDiscounts->isEmpty())
+                <p class="text-slate-600 dark:text-slate-300">{{ __('No active discounts at the moment.') }}</p>
+            @else
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    @foreach ($activeDiscounts as $discount)
+                        <article class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5 shadow-sm">
+                            <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">{{ $discount->name }}</h3>
+                            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">{{ $discount->description }}</p>
+                            <a href="{{ route('frontend.discounts.show', $discount) }}" class="mt-3 inline-flex items-center text-sm text-primary-600 hover:text-primary-700">{{ __('View details') }}</a>
+                        </article>
+                    @endforeach
                 </div>
-            @endforelse
+            @endif
+        </section>
+
+        <section class="space-y-4">
+            <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100">{{ __('Upcoming discounts') }}</h2>
+            @if ($upcomingDiscounts->isEmpty())
+                <p class="text-slate-600 dark:text-slate-300">{{ __('No scheduled discounts yet.') }}</p>
+            @else
+                <ul class="space-y-3 text-sm text-slate-600 dark:text-slate-300">
+                    @foreach ($upcomingDiscounts as $discount)
+                        <li>
+                            <strong class="text-slate-900 dark:text-slate-100">{{ $discount->name }}</strong>
+                            — {{ __('Starts on :date', ['date' => optional($discount->starts_at)->toFormattedDateString()]) }}
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+        </section>
+
+        <section class="space-y-4">
+            <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100">{{ __('Recently expired') }}</h2>
+            @if ($expiredDiscounts->isEmpty())
+                <p class="text-slate-600 dark:text-slate-300">{{ __('No expired discounts to show.') }}</p>
+            @else
+                <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-300">
+                    @foreach ($expiredDiscounts as $discount)
+                        <li>{{ $discount->name }} — {{ __('Ended on :date', ['date' => optional($discount->ends_at)->toFormattedDateString()]) }}</li>
+                    @endforeach
+                </ul>
+            @endif
+        </section>
+
+        <div>
+            <a href="{{ route('frontend.discounts.coupons') }}" class="inline-flex items-center px-4 py-2 rounded-lg bg-primary-600 text-white hover:bg-primary-700">{{ __('Browse available coupons') }}</a>
         </div>
-    </x-container>
+    </div>
 @endsection

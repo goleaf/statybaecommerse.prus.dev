@@ -7,313 +7,126 @@ namespace App\Http\Controllers\Frontend;
 use App\Enums\AddressType;
 use App\Http\Controllers\Controller;
 use App\Models\Address;
-use App\Models\City;
-use App\Models\Customer;
-use App\Models\Country;
-use App\Models\User;
-use App\Support\Database\TableAvailability;
-use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Exists;
+use Illuminate\View\View;
 
 final class ProfileController extends Controller
 {
-    public function __construct(
-        private readonly TableAvailability $tableAvailability,
-    ) {
-    }
-
     public function index(Request $request): View
     {
-        /** @var User $user */
         $user = $request->user();
-        $user->loadMissing([
-            'addresses' => static fn ($query) => $query->orderByDesc('is_default')->orderByDesc('created_at'),
-        ]);
 
-        return view('profile.index', [
+        $orders = $user?->orders()->latest()->limit(5)->get() ?? collect();
+        $addresses = $user?->addresses()->latest()->limit(3)->get() ?? collect();
+
+        $stats = [
+            'orders_count' => $user?->orders()->count() ?? 0,
+            'total_spent' => $user?->orders()->sum('total') ?? 0,
+        ];
+
+        return view('frontend.profile.index', [
             'user' => $user,
-            'customer' => $this->resolveCustomerForUser($user),
-            'addresses' => $user->addresses,
+            'orders' => $orders,
+            'addresses' => $addresses,
+            'stats' => $stats,
         ]);
     }
 
     public function edit(Request $request): View
     {
-        /** @var User $user */
-        $user = $request->user();
-        $user->loadMissing('addresses');
-
-        return view('profile.edit', [
-            'user' => $user,
-            'customer' => $this->resolveCustomerForUser($user),
-            'countries' => $this->resolveCountries(),
+        return view('frontend.profile.edit', [
+            'user' => $request->user(),
         ]);
     }
 
     public function update(Request $request): RedirectResponse
     {
-        /** @var User $user */
         $user = $request->user();
-        $originalEmail = (string) $user->email;
 
-        $validated = $request->validate([
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255'],
             'phone' => ['nullable', 'string', 'max:50'],
-            'address' => ['nullable', 'string', 'max:500'],
-            'postal_code' => ['nullable', 'string', 'max:20'],
-            'country_id' => $this->countryRule(),
-            'city_id' => $this->cityRule(),
         ]);
 
-        $user->forceFill([
-            'first_name' => $validated['first_name'],
-            'last_name' => $validated['last_name'],
-            'name' => trim($validated['first_name'].' '.$validated['last_name']),
-            'email' => $validated['email'],
-            'phone' => $validated['phone'] ?? null,
-            'phone_number' => $validated['phone'] ?? null,
-        ])->save();
+        $user->update($data);
 
-        $this->updateCustomerRecord($user, $validated, $originalEmail);
-
-        return redirect()
-            ->route('frontend.profile.index')
-            ->with('success', __('translations.profile_updated_successfully'));
+        return redirect()->route('frontend.profile.index')->with('status', __('Profile updated successfully.'));
     }
 
     public function addresses(Request $request): View
     {
-        /** @var User $user */
-        $user = $request->user();
-
-        $addresses = $user->addresses()
-            ->orderByDesc('is_default')
-            ->orderByDesc('created_at')
-            ->get();
-
-        return view('profile.addresses', [
-            'user' => $user,
-            'addresses' => $addresses,
-            'addressTypes' => AddressType::options(),
-            'countries' => $this->resolveCountries(),
+        return view('frontend.profile.addresses', [
+            'user' => $request->user(),
+            'addresses' => $request->user()->addresses()->latest()->get(),
         ]);
     }
 
     public function storeAddress(Request $request): RedirectResponse
     {
-        /** @var User $user */
+        $addressData = $this->validateAddress($request);
+
         $user = $request->user();
-        $validated = $this->validateAddress($request);
 
-        $address = new Address($validated);
-        $address->user_id = $user->id;
-        $address->is_active = true;
-        $address->save();
+        if ($addressData['is_default']) {
+            $user->addresses()->update(['is_default' => false]);
+        }
 
-        $this->synchroniseAddressFlags($user, $address);
+        $user->addresses()->create($addressData);
 
-        return redirect()
-            ->route('frontend.profile.addresses')
-            ->with('success', __('translations.address_created_successfully'));
+        return redirect()->route('frontend.profile.addresses')->with('status', __('Address added successfully.'));
     }
 
     public function updateAddress(Request $request, Address $address): RedirectResponse
     {
-        /** @var User $user */
-        $user = $request->user();
-        $this->ensureAddressOwner($user->id, $address);
+        abort_unless($request->user()->is($address->user), 403);
 
-        $validated = $this->validateAddress($request);
-        $address->fill($validated);
-        $address->save();
+        $addressData = $this->validateAddress($request);
 
-        $this->synchroniseAddressFlags($user, $address);
+        if ($addressData['is_default']) {
+            $request->user()->addresses()->where('id', '!=', $address->id)->update(['is_default' => false]);
+        }
 
-        return redirect()
-            ->route('frontend.profile.addresses')
-            ->with('success', __('translations.address_updated_successfully'));
+        $address->update($addressData);
+
+        return redirect()->route('frontend.profile.addresses')->with('status', __('Address updated successfully.'));
     }
 
     public function deleteAddress(Request $request, Address $address): RedirectResponse
     {
-        /** @var User $user */
-        $user = $request->user();
-        $this->ensureAddressOwner($user->id, $address);
+        abort_unless($request->user()->is($address->user), 403);
 
         $address->delete();
 
-        return redirect()
-            ->route('frontend.profile.addresses')
-            ->with('success', __('translations.address_deleted_successfully'));
+        return redirect()->route('frontend.profile.addresses')->with('status', __('Address removed.'));
     }
 
     private function validateAddress(Request $request): array
     {
-        $rules = [
-            'type' => ['required', Rule::in(AddressType::values())],
+        $validated = $request->validate([
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'company_name' => ['nullable', 'string', 'max:255'],
-            'company_vat' => ['nullable', 'string', 'max:50'],
+            'company' => ['nullable', 'string', 'max:255'],
             'address_line_1' => ['required', 'string', 'max:255'],
             'address_line_2' => ['nullable', 'string', 'max:255'],
-            'apartment' => ['nullable', 'string', 'max:100'],
-            'floor' => ['nullable', 'string', 'max:100'],
-            'building' => ['nullable', 'string', 'max:100'],
-            'city' => ['required', 'string', 'max:100'],
-            'state' => ['nullable', 'string', 'max:100'],
-            'postal_code' => ['required', 'string', 'max:20'],
+            'city' => ['required', 'string', 'max:255'],
+            'state' => ['nullable', 'string', 'max:255'],
+            'postal_code' => ['required', 'string', 'max:50'],
             'country_code' => ['required', 'string', 'size:2'],
-            'country_id' => $this->countryRule(),
-            'city_id' => $this->cityRule(),
-            'phone' => ['nullable', 'string', 'max:20'],
-            'email' => ['nullable', 'email', 'max:255'],
-            'notes' => ['nullable', 'string', 'max:1000'],
-            'instructions' => ['nullable', 'string', 'max:1000'],
-            'landmark' => ['nullable', 'string', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:50'],
+            'type' => ['nullable', 'string', 'max:50'],
             'is_default' => ['sometimes', 'boolean'],
             'is_billing' => ['sometimes', 'boolean'],
             'is_shipping' => ['sometimes', 'boolean'],
-        ];
-
-        $data = $request->validate($rules);
-
-        foreach (['is_default', 'is_billing', 'is_shipping'] as $field) {
-            $data[$field] = (bool) ($data[$field] ?? false);
-        }
-
-        return $data;
-    }
-
-    private function synchroniseAddressFlags(User $user, Address $address): void
-    {
-        if ($address->is_default) {
-            $user->addresses()
-                ->whereKeyNot($address->getKey())
-                ->update(['is_default' => false]);
-        }
-
-        if ($address->is_billing) {
-            $user->addresses()
-                ->whereKeyNot($address->getKey())
-                ->update(['is_billing' => false]);
-        }
-
-        if ($address->is_shipping) {
-            $user->addresses()
-                ->whereKeyNot($address->getKey())
-                ->update(['is_shipping' => false]);
-        }
-    }
-
-    private function ensureAddressOwner(int $userId, Address $address): void
-    {
-        if ($address->user_id !== $userId) {
-            abort(403, __('translations.unauthorized_action'));
-        }
-    }
-
-    private function resolveCustomerForUser(User $user): ?Customer
-    {
-        if (! $this->customersTableExists()) {
-            return null;
-        }
-
-        return Customer::query()
-            ->where('email', $user->email)
-            ->first();
-    }
-
-    private function updateCustomerRecord(User $user, array $validated, string $originalEmail): void
-    {
-        if (! $this->customersTableExists()) {
-            return;
-        }
-
-        $customer = Customer::query()->where('email', $originalEmail)->first();
-
-        if (! $customer) {
-            $customer = Customer::query()->firstOrNew(['email' => $validated['email']]);
-        }
-
-        $customer->fill([
-            'name' => $user->name,
-            'email' => $validated['email'],
-            'phone' => $validated['phone'] ?? null,
-            'address' => $validated['address'] ?? null,
-            'postal_code' => $validated['postal_code'] ?? null,
-            'country_id' => $validated['country_id'] ?? null,
-            'city_id' => $validated['city_id'] ?? null,
         ]);
 
-        if (! $customer->exists) {
-            $customer->is_active = true;
-        }
+        $validated['is_default'] = $request->boolean('is_default');
+        $validated['is_billing'] = $request->boolean('is_billing');
+        $validated['is_shipping'] = $request->boolean('is_shipping');
+        $validated['type'] = $validated['type'] ?? 'shipping';
+        $validated['user_id'] = $request->user()->id;
 
-        $customer->save();
-    }
-
-    /**
-     * @return array<int, string|Exists>
-     */
-    private function countryRule(): array
-    {
-        $rules = ['nullable', 'integer'];
-
-        if ($this->countriesTableExists()) {
-            $rules[] = Rule::exists('countries', 'id');
-        }
-
-        return $rules;
-    }
-
-    /**
-     * @return array<int, string|Exists>
-     */
-    private function cityRule(): array
-    {
-        $rules = ['nullable', 'integer'];
-
-        if ($this->citiesTableExists()) {
-            $rules[] = Rule::exists('cities', 'id');
-        }
-
-        return $rules;
-    }
-
-    private function resolveCountries(): Collection
-    {
-        if (! $this->countriesTableExists()) {
-            return collect();
-        }
-
-        return Country::query()->orderBy('name')->get(['id', 'name', 'cca2']);
-    }
-
-    private function countriesTableExists(): bool
-    {
-        $model = new Country();
-
-        return $this->tableAvailability->has('countries', $model->getConnectionName());
-    }
-
-    private function citiesTableExists(): bool
-    {
-        $model = new City();
-
-        return $this->tableAvailability->has('cities', $model->getConnectionName());
-    }
-
-    private function customersTableExists(): bool
-    {
-        $model = new Customer();
-
-        return $this->tableAvailability->has('customers', $model->getConnectionName());
+        return $validated;
     }
 }

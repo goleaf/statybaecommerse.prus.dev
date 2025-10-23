@@ -1,61 +1,46 @@
-@extends('components.layouts.base')
-
-@section('title', $category->trans('name') ?? $category->name)
+@extends('frontend.layouts.app')
 
 @section('content')
-    <x-container class="py-8 space-y-8">
+    <div class="max-w-6xl mx-auto px-4 py-10 space-y-8">
         <header class="space-y-2">
-            <p class="text-sm text-gray-500">{{ __('Category') }}</p>
-            <h1 class="text-3xl font-semibold text-gray-900">{{ $category->trans('name') ?? $category->name }}</h1>
-            @if ($category->description)
-                <p class="text-gray-600">{{ $category->description }}</p>
-            @endif
+            <h1 class="text-3xl font-semibold text-slate-900 dark:text-slate-100">{{ $category->name }}</h1>
+            <p class="text-slate-600 dark:text-slate-300">{{ $category->description ?? __('This category does not have a description yet.') }}</p>
         </header>
 
-        @if ($childCategories->isNotEmpty())
-            <section class="space-y-4">
-                <h2 class="text-2xl font-semibold text-gray-900">{{ __('Subcategories') }}</h2>
-                <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    @foreach ($childCategories as $child)
-                        <a href="{{ route('frontend.categories.show', $child) }}" class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:border-primary-300">
-                            <p class="font-medium text-gray-900">{{ $child->name }}</p>
-                        </a>
-                    @endforeach
-                </div>
-            </section>
+        <div class="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
+            <div class="text-sm text-slate-600 dark:text-slate-300">
+                {{ trans_choice(':count product|:count products', $products->total(), ['count' => $products->total()]) }}
+            </div>
+            <form method="get">
+                <label for="sort" class="sr-only">{{ __('Sort') }}</label>
+                <select id="sort" name="sort" class="rounded-lg border-slate-300 dark:border-slate-600 dark:bg-slate-900" onchange="this.form.submit()">
+                    <option value="latest" @selected($sort === 'latest')>{{ __('Newest first') }}</option>
+                    <option value="price_asc" @selected($sort === 'price_asc')>{{ __('Price: Low to high') }}</option>
+                    <option value="price_desc" @selected($sort === 'price_desc')>{{ __('Price: High to low') }}</option>
+                    <option value="name_asc" @selected($sort === 'name_asc')>{{ __('Name A–Z') }}</option>
+                    <option value="name_desc" @selected($sort === 'name_desc')>{{ __('Name Z–A') }}</option>
+                </select>
+            </form>
+        </div>
+
+        @if ($products->isEmpty())
+            <div class="rounded-xl border border-dashed border-slate-300 dark:border-slate-600 p-12 text-center text-slate-600 dark:text-slate-300">
+                {{ __('No products available in this category right now.') }}
+            </div>
+        @else
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach ($products as $product)
+                    <article class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-5 shadow-sm">
+                        <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                            <a class="hover:text-primary-600 dark:hover:text-primary-400" href="{{ route('frontend.products.show', $product) }}">{{ $product->name }}</a>
+                        </h2>
+                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ optional($product->brand)->name }}</p>
+                        <p class="mt-3 text-base font-semibold text-primary-600">{{ number_format((float) $product->price, 2) }} {{ config('app.currency', 'EUR') }}</p>
+                    </article>
+                @endforeach
+            </div>
+
+            <div class="mt-8">{{ $products->links() }}</div>
         @endif
-
-        <section class="space-y-4">
-            <div class="flex items-center justify-between">
-                <h2 class="text-2xl font-semibold text-gray-900">{{ __('Products') }}</h2>
-                <span class="text-sm text-gray-500">{{ trans_choice(':count product|:count products', $products->total(), ['count' => $products->total()]) }}</span>
-            </div>
-
-            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                @forelse ($products as $product)
-                    <a href="{{ route('frontend.products.show', $product) }}" class="rounded-lg border border-gray-200 bg-white shadow-sm">
-                        @php($media = $product->getFirstMedia(config('media.storage.collection_name')))
-                        @if ($media)
-                            <img src="{{ $media->getFullUrl() }}" alt="{{ $product->name }}" class="h-40 w-full rounded-t-lg object-cover">
-                        @else
-                            <div class="h-40 w-full rounded-t-lg bg-gray-100"></div>
-                        @endif
-                        <div class="space-y-1 p-3">
-                            <h3 class="font-medium text-gray-900">{{ $product->trans('name') ?? $product->name }}</h3>
-                            <p class="text-sm text-gray-600">{{ optional($product->brand)->name }}</p>
-                            <p class="text-sm font-semibold text-primary-600">
-                                {{ optional($product->prices->first())->formatted ?? \Illuminate\Support\Number::currency((float) ($product->price ?? 0), current_currency(), app()->getLocale()) }}
-                            </p>
-                        </div>
-                    </a>
-                @empty
-                    <div class="col-span-full rounded-lg border border-dashed border-gray-300 p-12 text-center text-gray-500">
-                        {{ __('No products in this category yet.') }}
-                    </div>
-                @endforelse
-            </div>
-
-            {{ $products->links() }}
-        </section>
-    </x-container>
+    </div>
 @endsection
