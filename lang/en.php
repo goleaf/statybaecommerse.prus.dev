@@ -4,6 +4,11 @@ return [
     // Common
     'exceptions_orders_not_found' => 'Order :order could not be found.',
     'exceptions_inventory_insufficient' => 'Inventory for SKU :sku is unavailable.',
+    'errors_not_found' => 'Page not found',
+    'errors_server_error' => 'Server error',
+    'errors_validation_failed' => 'Please check your input',
+    'errors_unauthorized' => 'Unauthorized',
+    'errors_forbidden' => 'Access forbidden',
     'common' => [
         'back_to_list' => 'Back to List',
         'back_to_list_tooltip' => 'Return to the list view',

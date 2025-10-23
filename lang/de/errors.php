@@ -2,47 +2,27 @@
 
 declare(strict_types=1);
 
+use App\Support\ErrorCode;
+
 return [
-    'error' => [
-        // @translators: Wird angezeigt, wenn die angeforderte Seite oder Ressource fehlt (HTTP 404).
-        'not_found' => 'Seite nicht gefunden',
+    // @translators: Displayed when a requested page or record is missing (HTTP 404).
+    ErrorCode::NotFound->value => 'Seite nicht gefunden',
 
-        // @translators: Hinweis auf einen unerwarteten Serverfehler (HTTP 500).
-        'server' => 'Serverfehler',
+    // @translators: Shown when the system encounters an unexpected failure (HTTP 500).
+    ErrorCode::ServerError->value => 'Serverfehler',
 
-        // @translators: Verwenden, wenn Benutzereingaben die Validierung nicht bestehen.
-        'validation' => 'Bitte überprüfen Sie Ihre Eingaben',
+    // @translators: Used when form submission fails validation and users must review inputs.
+    ErrorCode::ValidationFailed->value => 'Bitte überprüfen Sie Ihre Eingaben',
 
-        // @translators: Bedeutet, dass der Benutzer sich anmelden muss, um fortzufahren.
-        'unauthorized' => 'Nicht autorisiert',
+    // @translators: Indicates the user needs to log in before accessing the requested content.
+    ErrorCode::Unauthorized->value => 'Nicht autorisiert',
 
-        // @translators: Bedeutet, dass dem angemeldeten Benutzer die Berechtigung fehlt.
-        'forbidden' => 'Zugriff verweigert',
-    ],
+    // @translators: Indicates the user is logged in but does not have permission for the action.
+    ErrorCode::Forbidden->value => 'Zugriff verweigert',
 
-    'orders' => [
-        // @translators: Wird angezeigt, wenn eine Bestellung mit der angegebenen Nummer nicht gefunden wurde.
-        'not_found' => 'Bestellung :order wurde nicht gefunden.',
-    ],
+    // @translators: Displayed when an order number could not be located in the system.
+    ErrorCode::OrderNotFound->value => 'Bestellung :order wurde nicht gefunden.',
 
-    // @translators: Hinweis darauf, dass nicht genügend Bestand für die angeforderte SKU vorhanden ist.
-    ErrorCodes::INVENTORY_INSUFFICIENT => 'Für SKU :sku ist nicht genügend Bestand verfügbar.',
-
-    'messages' => [
-        // @translators: Generische Meldung für API-Antworten bei unerwarteten Serverfehlern.
-        'server_error' => 'Etwas ist schiefgelaufen. Bitte versuche es später erneut.',
-    ],
-
-    'pages' => [
-        'unexpected' => [
-            // @translators: Überschrift auf der globalen Fehlerseite bei unerwarteten Fehlern.
-            'title' => 'Ein unerwarteter Fehler ist aufgetreten',
-            // @translators: Beschreibung auf der globalen Fehlerseite bei unerwarteten Fehlern.
-            'description' => 'Unser Team wurde informiert und untersucht das Problem. Wenn es erneut auftritt, teilen Sie dem Support die Trace-ID mit.',
-            // @translators: Text des primären Aktionsbuttons auf der Fehlerseite.
-            'primary' => 'Zur Startseite',
-            // @translators: Text des sekundären Aktionsbuttons auf der Fehlerseite.
-            'secondary' => 'Support kontaktieren',
-        ],
-    ],
+    // @translators: Shown when there is not enough stock to fulfill a request for a SKU.
+    ErrorCode::InventoryInsufficient->value => 'Für SKU :sku ist nicht genügend Bestand verfügbar.',
 ];
