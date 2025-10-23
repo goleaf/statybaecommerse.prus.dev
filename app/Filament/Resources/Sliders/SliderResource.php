@@ -11,6 +11,7 @@ use App\Filament\Resources\Sliders\Pages\EditSlider;
 use App\Filament\Resources\Sliders\Pages\ListSliders;
 use App\Filament\Resources\Sliders\Schemas\SliderForm;
 use App\Filament\Resources\Sliders\Tables\SlidersTable;
+use App\Enums\NavigationGroup;
 use App\Models\Slider;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -25,6 +26,8 @@ final class SliderResource extends Resource
     protected static ?string $model = Slider::class;
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Content;
 
     /**
      * @var UnitEnum|string|null
