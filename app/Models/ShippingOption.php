@@ -48,7 +48,7 @@ final class ShippingOption extends Model
         'estimated_days_min',
         'estimated_days_max',
         'metadata',
-        'shipping_matrix',
+        'zone_id',
     ];
 
     protected function casts(): array
@@ -65,7 +65,6 @@ final class ShippingOption extends Model
             'estimated_days_max' => 'integer',
             'sort_order'         => 'integer',
             'metadata'           => 'array',
-            'shipping_matrix'    => 'array',
         ];
     }
 
@@ -100,6 +99,11 @@ final class ShippingOption extends Model
         $relation = $this->belongsTo(Zone::class);
 
         return $relation;
+    }
+
+    public function zone(): BelongsTo
+    {
+        return $this->belongsTo(Zone::class);
     }
 
     /**
@@ -141,6 +145,15 @@ final class ShippingOption extends Model
         return $query->where('carrier_name', $carrier);
     }
 
+    public function scopeByZone(Builder $query, null|int|string $zoneId): Builder
+    {
+        if ($zoneId === null || $zoneId === '') {
+            return $query;
+        }
+
+        return $query->where('zone_id', $zoneId);
+    }
+
     /**
      * Handle scopeByZone functionality with proper error handling.
      *
@@ -179,16 +192,12 @@ final class ShippingOption extends Model
      */
     public function getEstimatedDeliveryTextAttribute(): string
     {
-        // Mirror the admin listing logic by treating nulls as missing while preserving zero-day scenarios.
-        $minimum = is_numeric($this->estimated_days_min) ? (int) $this->estimated_days_min : null;
-        $maximum = is_numeric($this->estimated_days_max) ? (int) $this->estimated_days_max : null;
-
-        if ($minimum !== null && $maximum !== null) {
-            if ($minimum === $maximum) {
-                return $minimum . ' ' . __('days');
+        if ($this->estimated_days_min && $this->estimated_days_max) {
+            if ($this->estimated_days_min === $this->estimated_days_max) {
+                return $this->estimated_days_min . ' ' . __('days');
             }
 
-            return $minimum . '-' . $maximum . ' ' . __('days');
+            return $this->estimated_days_min . '-' . $this->estimated_days_max . ' ' . __('days');
         }
 
         return __('Standard delivery');

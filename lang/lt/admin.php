@@ -34,6 +34,7 @@ return [
         'name' => 'Pavadinimas',
         'slug' => 'Slug',
         'carrier_name' => 'Vežėjo pavadinimas',
+        'zone' => 'Zona',
         'service_type' => 'Paslaugos tipas',
         'service_types' => [
             'standard' => 'Standartinis',
