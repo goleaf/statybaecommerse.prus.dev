@@ -7,6 +7,13 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\EnumManagementResource\Pages;
 use App\Models\EnumValue;
 use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -40,7 +47,7 @@ final class EnumManagementResource extends Resource
 {
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
 
-    protected static ?string $model = EnumValue::class;
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
 
     protected static ?int $navigationSort = 2;
 
