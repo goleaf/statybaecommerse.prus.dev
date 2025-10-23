@@ -21,11 +21,11 @@ use Illuminate\Support\Number;
 use LaraZeus\ListGroup\Entries\ListItem;
 use LaraZeus\ListGroup\Infolists\ListEntry;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\ViewRecord\Concerns\Translatable as TranslatableViewRecord;
+use LaraZeus\SpatieTranslatable\Resources\Pages\ViewRecord\Concerns\Translatable;
 
 final class ViewOrder extends ViewRecord
 {
-    use TranslatableViewRecord;
+    use Translatable;
 
     protected static string $resource = OrderResource::class;
 

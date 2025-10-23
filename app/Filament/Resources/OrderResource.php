@@ -56,7 +56,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
-use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as TranslatableResource;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
@@ -79,7 +79,7 @@ use UnitEnum;
  */
 final class OrderResource extends Resource implements DefinesExportColumns
 {
-    use TranslatableResource;
+    use Translatable;
 
     protected static ?string $model = Order::class;
 

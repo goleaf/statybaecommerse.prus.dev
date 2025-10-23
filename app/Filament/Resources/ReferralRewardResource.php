@@ -33,12 +33,12 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Collection;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use UnitEnum;
 
 final class ReferralRewardResource extends Resource
 {
-    use TranslatableResource;
+    use Translatable;
 
     protected static ?string $model = ReferralReward::class;
 
