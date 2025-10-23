@@ -7,6 +7,8 @@ namespace App\Filament\Resources;
 use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\UserProductInteractionResource\Pages;
+use App\Models\Product;
+use App\Models\User;
 use App\Models\UserProductInteraction;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\Action as TableAction;
@@ -130,7 +132,6 @@ final class UserProductInteractionResource extends Resource
 
                                         return Product::create($data)->getKey();
                                     }),
-                                // Map each interaction type to its localized label for admins.
                                 Select::make('interaction_type')
                                     ->label(__('admin.user_product_interactions.interaction_type'))
                                     ->options([
