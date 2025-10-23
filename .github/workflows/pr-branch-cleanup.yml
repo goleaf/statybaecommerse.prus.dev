@@ -27,20 +27,8 @@ jobs:
           script: |
             const branchRef = `heads/${context.payload.pull_request.head.ref}`;
             core.info(`Removing branch ${branchRef} because the PR closed without merging.`);
-            try {
-              // Attempt to delete the reference; this is a no-op when the branch was already removed.
-              await github.git.deleteRef({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                ref: branchRef,
-              });
-              core.info(`Successfully removed ${branchRef}.`);
-            } catch (error) {
-              // Octokit throws HttpError when the branch reference no longer exists; ignore 404/422 statuses.
-              if (error.status === 404 || error.status === 422) {
-                core.info(`Branch ${branchRef} is already absent; no further action required.`);
-                return;
-              }
-
-              throw error;
-            }
+            await github.git.deleteRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: branchRef,
+            });
