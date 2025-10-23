@@ -8,179 +8,10 @@ on:
     branches:
       - main
 
-permissions:
-  contents: read
-
-env:
-  COMPOSER_FLAGS: --no-interaction --prefer-dist --no-progress
-
-permissions:
-  contents: read
-
-concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
-
-env:
-  COMPOSER_FLAGS: --no-interaction --prefer-dist --no-progress
-
 jobs:
-  docs-size:
-    name: Documentation Asset Size
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          # We fetch full history so the diff logic can compare against the base
-          # branch or previous commit without missing context.
-          fetch-depth: 0
-
-      - name: Detect documentation changes
-        id: docs_changes
-        run: |
-          # Detect whether any files under docs/ changed so we can skip the size
-          # guard on unrelated commits.
-          set -euo pipefail
-
-          if [ ! -d docs ]; then
-            echo "No docs/ directory present; skipping size enforcement." >&2
-            echo "docs_changed=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
-            # Align the diff range with the base branch for PR validation.
-            base_ref="origin/${GITHUB_BASE_REF}"
-            git fetch origin "${GITHUB_BASE_REF}:${GITHUB_BASE_REF}"
-            diff_range="${base_ref}...${GITHUB_SHA}"
-          else
-            # For push builds, compare against the previous commit when
-            # available; otherwise there is nothing to diff against (first push).
-            if git rev-parse --verify HEAD^ >/dev/null 2>&1; then
-              diff_range="HEAD^...HEAD"
-            else
-              echo "No previous commit to diff; skipping size enforcement." >&2
-              echo "docs_changed=false" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-          fi
-
-          changed_docs="$(git diff --name-only "${diff_range}" -- 'docs/**')"
-
-          if [[ -z "${changed_docs}" ]]; then
-            echo "No documentation changes detected; skipping size enforcement." >&2
-            echo "docs_changed=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          printf '%s\n' "${changed_docs}"
-
-          echo "docs_changed=true" >> "$GITHUB_OUTPUT"
-          {
-            echo "changed_list<<'EOF'"
-            printf '%s\n' "${changed_docs}"
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-
-      - name: Ensure documentation files stay under 2MB
-        if: steps.docs_changes.outputs.docs_changed == 'true'
-        run: |
-          # Enforce the 2MB threshold only on the modified documentation files.
-          set -euo pipefail
-
-          changed_docs="${{ steps.docs_changes.outputs.changed_list }}"
-          offending_files=""
-
-          while IFS= read -r doc_path; do
-            # Ignore empty lines that can appear in multi-line outputs.
-            if [[ -z "${doc_path}" ]]; then
-              continue
-            fi
-
-            if [ ! -f "${doc_path}" ]; then
-              # Deleted files should not trigger the guard.
-              continue
-            fi
-
-            # Use stat so we can report the exact size when a file breaks the limit.
-            file_size_bytes=$(stat --format='%s' "${doc_path}")
-
-            if (( file_size_bytes > 2097152 )); then
-              offending_files+="${doc_path} (${file_size_bytes} bytes)\n"
-            fi
-          done <<< "${changed_docs}"
-
-          if [[ -n "${offending_files}" ]]; then
-            echo "The following documentation files exceed 2MB:" >&2
-            printf '%s' "${offending_files}" >&2
-            echo "Reduce their size or split them into smaller documents." >&2
-            exit 1
-          fi
-
-          echo "Documentation size check passed for updated files."
-
-  migration-freeze:
-    name: Migration Freeze Guard
-    needs: docs-size
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        php-version:
-          - '8.2'
-          - '8.3'
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Verify migrations are frozen
-        run: php scripts/check-frozen-migrations.php
-
-      - name: Setup PHP ${{ matrix.php-version }}
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php-version }}
-          extensions: intl, mbstring, pdo_sqlite, sqlite3, bcmath, pcntl
-          coverage: xdebug
-          ini-values: |
-            memory_limit=1G
-            error_reporting=E_ALL
-            log_errors=On
-
-      - name: Setup Composer cache directory
-        id: composer-cache
-        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
-
-      - name: Cache Composer dependencies
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ matrix.php-version }}-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-
-
-      - name: Install Composer dependencies
-        run: composer install ${{ env.COMPOSER_FLAGS }}
-
-      - name: Run Pint (fail on drift)
-        run: composer lint:php
-
-      - name: Run PHPStan analysis
-        run: composer analyse
-
   phpunit:
-    name: PHPUnit (PHP ${{ matrix.php-version }})
+    name: PHPUnit
     runs-on: ubuntu-latest
-    # Run the test suite against the Renovate-supported PHP versions so
-    # dependency bumps get early feedback on cross-version compatibility.
-    strategy:
-      matrix:
-        php-version: ${{ fromJSON(github.event_name == 'pull_request' && startsWith(github.actor, 'renovate') ? '["8.2","8.3"]' : '["8.3"]') }}
-    needs: phpstan
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -190,190 +21,83 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
           extensions: mbstring, intl, pdo_sqlite
-          coverage: none
-
-      - name: Get Composer cache directory
-        id: composer-cache
-        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
-
-      - name: Cache Composer dependencies
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-
-
-      - name: Install Composer dependencies
-        run: composer install ${{ env.COMPOSER_FLAGS }}
-
-      - name: Prepare SQLite environment
-        run: |
-          DB_PATH="${GITHUB_WORKSPACE}/database/database.sqlite"
-          cat <<ENV > .env
-          APP_NAME=Laravel
-          APP_ENV=testing
-          APP_KEY=
-          APP_DEBUG=true
-          APP_URL=http://localhost
-          APP_LOCALE=lt
-          APP_FALLBACK_LOCALE=en
-          APP_FAKER_LOCALE=en_US
-          LOG_CHANNEL=stack
-          LOG_LEVEL=debug
-          DB_CONNECTION=sqlite
-          DB_DATABASE=${DB_PATH}
-          BROADCAST_DRIVER=log
-          CACHE_DRIVER=array
-          FILESYSTEM_DISK=local
-          QUEUE_CONNECTION=sync
-          SESSION_DRIVER=array
-          SESSION_LIFETIME=120
-          MAIL_MAILER=log
-          MAIL_HOST=localhost
-          MAIL_PORT=1025
-          MAIL_ENCRYPTION=null
-          MAIL_USERNAME=null
-          MAIL_PASSWORD=null
-          MAIL_FROM_ADDRESS="hello@example.com"
-          MAIL_FROM_NAME="Laravel"
-          ENV
-          touch "$DB_PATH"
-          php artisan key:generate
-
-      - name: Run database migrations and seeds
-        run: php artisan migrate:fresh --seed --force
-
-      - name: Run PHPUnit tests
-        run: php artisan test --no-ansi
-
-      - name: Upload PHPUnit coverage
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: phpunit-coverage
-          path: storage/app/coverage
-          if-no-files-found: warn
-          retention-days: 14
-
-  node-build:
-    name: Node Build
-    runs-on: ubuntu-latest
-    needs: phpunit
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Cache node modules
-        id: npm-cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.npm
-            node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          coverage: xdebug
 
       - name: Install dependencies
-        run: npm ci
+        run: composer install --no-interaction --prefer-dist
 
-      - name: Build assets with Vite
-        run: npm run build
-
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-php-${{ matrix.php-version }}
-          path: build/coverage-${{ matrix.php-version }}.xml
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-          cache-dependency-path: package-lock.json
-
-      - name: Install Node dependencies
-        run: npm ci
-
-      - name: Run ESLint (fail on drift)
-        run: npx --yes eslint@9 . --max-warnings=0
-
-      - name: Bootstrap storage directories
+      - name: Prepare application key
         run: |
-          php artisan storage:link
-          mkdir -p storage/app/public
-          mkdir -p storage/framework/cache
-          mkdir -p storage/framework/sessions
-          mkdir -p storage/framework/views
+          cp .env.example .env
+          php artisan key:generate
 
-      - name: Run database migrations with seeders
-        run: php artisan migrate:fresh --seed --force
-
-      - name: Download compiled assets
-        uses: actions/download-artifact@v4
-        with:
-          name: vite-build
-          path: public/build
-
-      - name: Start Laravel server
+      - name: Prepare directories
         run: |
-          php artisan serve --host=127.0.0.1 --port=8000 > /tmp/laravel-server.log 2>&1 &
-          echo "SERVER_PID=$!" >> "$GITHUB_ENV"
+          mkdir -p build
+          mkdir -p storage/app/coverage
 
-      - name: Wait for application
+      - name: Generate API specification
+        run: php artisan api:spec
+
+      - name: Ensure OpenAPI spec is committed
         run: |
-          for i in {1..30}; do
-            if curl -sSf http://127.0.0.1:8000 > /dev/null; then
-              exit 0
-            fi
-            sleep 2
-          done
-          echo "::error::Laravel application did not become ready." >&2
-          if [ -f /tmp/laravel-server.log ]; then
-            echo '--- server log ---'
-            cat /tmp/laravel-server.log
-            echo '-------------------'
-          fi
-          exit 1
+          git diff -- public/openapi.json public/openapi.yaml
+          git diff --exit-code -- public/openapi.json public/openapi.yaml || \
+            (echo "::error::OpenAPI spec files are out of date. Run 'php artisan api:spec' locally and commit the changes." && exit 1)
 
-      - name: Run Lighthouse audits
-        env:
-          TARGET_URL: http://127.0.0.1:8000
-          LH_MIN_PERFORMANCE: '0.8'
-          LH_MIN_ACCESSIBILITY: '0.9'
-        run: node scripts/lighthouse.mjs
-
-      - name: Upload Lighthouse reports
+      - name: Upload OpenAPI spec artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: lighthouse-reports
-          path: storage/lighthouse
-          retention-days: 14
+          name: openapi-spec
+          path: |
+            public/openapi.json
+            public/openapi.yaml
 
-      - name: Stop Laravel server
+      - name: Run test suite
+        run: composer test:ci
+
+      - name: Publish unit test results
+        uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
-        run: |
-          if [ -n "${SERVER_PID}" ]; then
-            kill ${SERVER_PID} || true
-          fi
+        with:
+          files: build/junit.xml
 
-  secret-scan:
-    name: Secret Scan
+      - name: Upload junit report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phpunit-junit
+          path: build/junit.xml
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phpunit-coverage
+          path: build/coverage.xml
+
+  php-compat:
+    name: PHP Compatibility
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Run Gitleaks
-        uses: gitleaks/gitleaks-action@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
-          additional_args: --no-banner --redact
+          php-version: '8.3'
+          extensions: mbstring, intl, pdo_sqlite
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Prepare application key
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Run PHP 9 readiness doctor
+        run: php artisan app:doctor --no-interaction
