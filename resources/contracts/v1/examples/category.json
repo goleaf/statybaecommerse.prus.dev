@@ -1,21 +1,21 @@
 {
-  "contract": "category",
-  "version": "v1",
-  "data": {
-    "item": {
-      "id": 9,
-      "slug": "demo-category",
-      "name": "Demo Category",
-      "description": "Example category used in API contracts.",
-      "parent": null,
-      "children": [],
-      "product_count": 12,
-      "links": {
-        "self": "https://example.com/categories/demo-category"
-      }
+    "contract": "category",
+    "version": "v1",
+    "data": {
+        "item": {
+            "id": 9,
+            "slug": "demo-category",
+            "name": "Demo Category",
+            "description": "Example category used in API contracts.",
+            "parent": null,
+            "children": [],
+            "product_count": 12,
+            "links": {
+                "self": "https://example.com/categories/demo-category"
+            }
+        }
+    },
+    "meta": {
+        "generated_at": "2024-01-01T00:00:00+00:00"
     }
-  },
-  "meta": {
-    "generated_at": "2024-01-01T00:00:00+00:00"
-  }
 }

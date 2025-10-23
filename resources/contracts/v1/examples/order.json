@@ -1,55 +1,55 @@
 {
-  "contract": "order",
-  "version": "v1",
-  "data": {
-    "item": {
-      "id": 4001,
-      "number": "ORD-2024-0001",
-      "status": {
-        "state": "processing",
-        "payment_state": "paid"
-      },
-      "totals": {
-        "subtotal": 120.00,
-        "tax": 21.00,
-        "shipping": 5.00,
-        "discount": 10.00,
-        "total": 136.00,
-        "currency": "EUR"
-      },
-      "items": [
-        {
-          "id": 1,
-          "product_id": 1,
-          "name": "Demo Product",
-          "quantity": 1,
-          "unit_price": 120.00,
-          "total": 120.00
+    "contract": "order",
+    "version": "v1",
+    "data": {
+        "item": {
+            "id": 4001,
+            "number": "ORD-2024-0001",
+            "status": {
+                "state": "processing",
+                "payment_state": "paid"
+            },
+            "totals": {
+                "subtotal": 120.0,
+                "tax": 21.0,
+                "shipping": 5.0,
+                "discount": 10.0,
+                "total": 136.0,
+                "currency": "EUR"
+            },
+            "items": [
+                {
+                    "id": 1,
+                    "product_id": 1,
+                    "name": "Demo Product",
+                    "quantity": 1,
+                    "unit_price": 120.0,
+                    "total": 120.0
+                }
+            ],
+            "billing_address": {
+                "first_name": "Alex",
+                "last_name": "Doe",
+                "line1": "123 Demo Street",
+                "city": "Vilnius",
+                "country": "LT",
+                "postal_code": "LT-01100"
+            },
+            "shipping_address": {
+                "first_name": "Alex",
+                "last_name": "Doe",
+                "line1": "123 Demo Street",
+                "city": "Vilnius",
+                "country": "LT",
+                "postal_code": "LT-01100"
+            },
+            "placed_at": "2024-01-01T12:00:00+00:00",
+            "links": {
+                "self": "https://example.com/orders/ORD-2024-0001"
+            }
         }
-      ],
-      "billing_address": {
-        "first_name": "Alex",
-        "last_name": "Doe",
-        "line1": "123 Demo Street",
-        "city": "Vilnius",
-        "country": "LT",
-        "postal_code": "LT-01100"
-      },
-      "shipping_address": {
-        "first_name": "Alex",
-        "last_name": "Doe",
-        "line1": "123 Demo Street",
-        "city": "Vilnius",
-        "country": "LT",
-        "postal_code": "LT-01100"
-      },
-      "placed_at": "2024-01-01T12:00:00+00:00",
-      "links": {
-        "self": "https://example.com/orders/ORD-2024-0001"
-      }
+    },
+    "meta": {
+        "generated_at": "2024-01-01T00:00:00+00:00"
     }
-  },
-  "meta": {
-    "generated_at": "2024-01-01T00:00:00+00:00"
-  }
 }
