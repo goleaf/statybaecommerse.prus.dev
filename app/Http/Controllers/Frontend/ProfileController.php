@@ -15,6 +15,12 @@ use Illuminate\View\View;
 
 final class ProfileController extends Controller
 {
+    private ?bool $customersTableExists = null;
+
+    private ?bool $countriesTableExists = null;
+
+    private ?bool $citiesTableExists = null;
+
     public function index(Request $request): View
     {
         return view('frontend.profile.index', [
@@ -109,7 +115,76 @@ final class ProfileController extends Controller
             'is_default' => ['sometimes', 'boolean'],
             'is_billing' => ['sometimes', 'boolean'],
             'is_shipping' => ['sometimes', 'boolean'],
-            'notes' => ['nullable', 'string'],
+        ];
+
+        $data = $request->validate($rules);
+
+        foreach (['is_default', 'is_billing', 'is_shipping'] as $field) {
+            $data[$field] = (bool) ($data[$field] ?? false);
+        }
+
+        return $data;
+    }
+
+    private function synchroniseAddressFlags(User $user, Address $address): void
+    {
+        if ($address->is_default) {
+            $user->addresses()
+                ->whereKeyNot($address->getKey())
+                ->update(['is_default' => false]);
+        }
+
+        if ($address->is_billing) {
+            $user->addresses()
+                ->whereKeyNot($address->getKey())
+                ->update(['is_billing' => false]);
+        }
+
+        if ($address->is_shipping) {
+            $user->addresses()
+                ->whereKeyNot($address->getKey())
+                ->update(['is_shipping' => false]);
+        }
+    }
+
+    private function ensureAddressOwner(int $userId, Address $address): void
+    {
+        if ($address->user_id !== $userId) {
+            abort(403, __('translations.unauthorized_action'));
+        }
+    }
+
+    private function resolveCustomerForUser(User $user): ?Customer
+    {
+        if (! $this->customersTableExists()) {
+            return null;
+        }
+
+        return Customer::query()
+            ->where('email', $user->email)
+            ->first();
+    }
+
+    private function updateCustomerRecord(User $user, array $validated, string $originalEmail): void
+    {
+        if (! $this->customersTableExists()) {
+            return;
+        }
+
+        $customer = Customer::query()->where('email', $originalEmail)->first();
+
+        if (! $customer) {
+            $customer = Customer::query()->firstOrNew(['email' => $validated['email']]);
+        }
+
+        $customer->fill([
+            'name' => $user->name,
+            'email' => $validated['email'],
+            'phone' => $validated['phone'] ?? null,
+            'address' => $validated['address'] ?? null,
+            'postal_code' => $validated['postal_code'] ?? null,
+            'country_id' => $validated['country_id'] ?? null,
+            'city_id' => $validated['city_id'] ?? null,
         ]);
 
         $validated['is_default'] = (bool) ($validated['is_default'] ?? false);
@@ -121,8 +196,62 @@ final class ProfileController extends Controller
 
     private function ensureSingleDefault(Request $request, Address $address): void
     {
-        $request->user()->addresses()
-            ->whereKeyNot($address->getKey())
-            ->update(['is_default' => false]);
+        $rules = ['nullable', 'integer'];
+
+        if ($this->countriesTableExists()) {
+            $rules[] = Rule::exists('countries', 'id');
+        }
+
+        return $rules;
+    }
+
+    /**
+     * @return array<int, string|Exists>
+     */
+    private function cityRule(): array
+    {
+        $rules = ['nullable', 'integer'];
+
+        if ($this->citiesTableExists()) {
+            $rules[] = Rule::exists('cities', 'id');
+        }
+
+        return $rules;
+    }
+
+    private function resolveCountries(): Collection
+    {
+        if (! $this->countriesTableExists()) {
+            return collect();
+        }
+
+        return Country::query()->orderBy('name')->get(['id', 'name', 'cca2']);
+    }
+
+    private function customersTableExists(): bool
+    {
+        if ($this->customersTableExists === null) {
+            $this->customersTableExists = Schema::hasTable('customers');
+        }
+
+        return $this->customersTableExists;
+    }
+
+    private function countriesTableExists(): bool
+    {
+        if ($this->countriesTableExists === null) {
+            $this->countriesTableExists = Schema::hasTable('countries');
+        }
+
+        return $this->countriesTableExists;
+    }
+
+    private function citiesTableExists(): bool
+    {
+        if ($this->citiesTableExists === null) {
+            $this->citiesTableExists = Schema::hasTable('cities');
+        }
+
+        return $this->citiesTableExists;
     }
 }
