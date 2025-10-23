@@ -27,6 +27,84 @@ jobs:
       - name: Build assets
         run: npm run build
 
+      - name: Assert deterministic frontend build artifacts
+        run: |
+          set -euo pipefail
+
+          baseline="$(mktemp -d)"
+          cp -a public/build/. "${baseline}/"
+
+          rm -rf node_modules
+          npm ci
+
+          rm -rf public/build
+          npm run build
+
+          export BASELINE_DIR="${baseline}"
+          export TARGET_DIR="public/build"
+          python <<'PY'
+import hashlib
+import os
+import sys
+
+
+def manifest(root: str) -> dict[str, tuple[int, str]]:
+    results: dict[str, tuple[int, str]] = {}
+    for current_root, _dirs, files in os.walk(root):
+        files.sort()
+        for filename in files:
+            path = os.path.join(current_root, filename)
+            relpath = os.path.relpath(path, root).replace(os.sep, "/")
+            size = os.path.getsize(path)
+            digest = hashlib.sha256()
+            with open(path, "rb") as handle:
+                for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                    digest.update(chunk)
+            results[relpath] = (size, digest.hexdigest())
+    return results
+
+
+baseline_manifest = manifest(os.environ["BASELINE_DIR"])
+target_manifest = manifest(os.environ["TARGET_DIR"])
+
+if baseline_manifest != target_manifest:
+    baseline_files = set(baseline_manifest)
+    target_files = set(target_manifest)
+
+    missing = sorted(baseline_files - target_files)
+    extra = sorted(target_files - baseline_files)
+    mismatched = sorted(
+        name for name in baseline_files & target_files
+        if baseline_manifest[name] != target_manifest[name]
+    )
+
+    if missing:
+        print("Missing files compared to baseline:", file=sys.stderr)
+        for name in missing:
+            print(f"  {name}", file=sys.stderr)
+
+    if extra:
+        print("Unexpected files in rebuilt artifacts:", file=sys.stderr)
+        for name in extra:
+            print(f"  {name}", file=sys.stderr)
+
+    for name in mismatched:
+        base_size, base_hash = baseline_manifest[name]
+        target_size, target_hash = target_manifest[name]
+        print(
+            "Artifact drift detected for {name}: baseline size/hash {base_size}/{base_hash}, "
+            "rebuilt size/hash {target_size}/{target_hash}".format(
+                name=name, base_size=base_size, base_hash=base_hash,
+                target_size=target_size, target_hash=target_hash,
+            ),
+            file=sys.stderr,
+        )
+
+    sys.exit(1)
+PY
+
+          rm -rf "${baseline}"
+
       - name: Upload compiled assets
         uses: actions/upload-artifact@v4
         with:
