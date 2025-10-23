@@ -20,12 +20,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -167,7 +161,7 @@ final class SubscriberResource extends Resource
                             ]),
                         Flatpickr::makeDateTime('subscribed_at')
                             ->label(__('subscribers.subscribed_at'))
-                            ->default(now()),
+                            ->default(fn () => now()),
                     ]),
                 Section::make(__('subscribers.additional_information'))
                     ->schema([
@@ -280,12 +274,12 @@ final class SubscriberResource extends Resource
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
                             ->when(
-                                $data['subscribed_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('subscribed_at', '>=', $date),
+                                $from = $data['subscribed_from'] ?? null,
+                                fn (Builder $query, string $date): Builder => $query->whereDate('subscribed_at', '>=', $date),
                             )
                             ->when(
-                                $data['subscribed_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('subscribed_at', '<=', $date),
+                                $until = $data['subscribed_until'] ?? null,
+                                fn (Builder $query, string $date): Builder => $query->whereDate('subscribed_at', '<=', $date),
                             );
                     }),
             ])
@@ -298,7 +292,7 @@ final class SubscriberResource extends Resource
                     ->color('success')
                     ->visible(fn (Subscriber $record): bool => ! $record->is_verified)
                     ->action(function (Subscriber $record): void {
-                        \App\Models\Subscriber::withoutGlobalScopes()
+                        Subscriber::withoutGlobalScopes()
                             ->whereKey($record->getKey())
                             ->update(['is_verified' => true]);
                         Notification::make()
@@ -347,7 +341,7 @@ final class SubscriberResource extends Resource
                         ->color('success')
                         ->action(function (Collection $records): void {
                             $ids = $records->pluck('id');
-                            \App\Models\Subscriber::withoutGlobalScopes()
+                            Subscriber::withoutGlobalScopes()
                                 ->whereIn('id', $ids)
                                 ->update(['is_verified' => true]);
                             Notification::make()
@@ -361,7 +355,7 @@ final class SubscriberResource extends Resource
                         ->color('danger')
                         ->action(function (Collection $records): void {
                             $ids = $records->pluck('id');
-                            \App\Models\Subscriber::withoutGlobalScopes()
+                            Subscriber::withoutGlobalScopes()
                                 ->whereIn('id', $ids)
                                 ->update([
                                     'status'          => 'unsubscribed',

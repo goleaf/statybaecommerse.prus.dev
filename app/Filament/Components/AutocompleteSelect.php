@@ -57,7 +57,7 @@ final class AutocompleteSelect extends Select
         return parent::make($name);
     }
 
-    public function searchable(Closure|array|bool $condition = true): static
+    public function searchable(bool|array|Closure $condition = true): static
     {
         parent::searchable($condition);
 

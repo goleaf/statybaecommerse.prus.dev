@@ -133,41 +133,6 @@ final class SystemSettingDependency extends Model
     }
 
     /**
-     * Scope the query to dependencies matching the given condition operator.
-     *
-     * Supports case-insensitive matches on both the JSON `condition->operator`
-     * key and the legacy string `condition` column representation for operators
-     * such as `equals_to`, `greater_than`, and `contains`.
-     */
-    public function scopeByCondition(Builder $query, string $operator): Builder
-    {
-        // Normalize the operator and account for legacy uppercase values.
-        $normalizedOperator = strtolower($operator);
-
-        $acceptedOperators = array_unique([
-            $operator,
-            $normalizedOperator,
-            strtoupper($normalizedOperator),
-        ]);
-
-        return $query->where(function (Builder $builder) use ($acceptedOperators): void {
-            $builder
-                ->whereIn('condition->operator', $acceptedOperators)
-                ->orWhereIn('condition', $acceptedOperators);
-        });
-    }
-
-    /**
-     * Scope the query to dependencies matching the given condition operator.
-     */
-    public function scopeByCondition(Builder $query, string $operator): Builder
-    {
-        $normalizedOperator = strtolower($operator);
-
-        return $query->whereRaw('LOWER(condition) = ?', [$normalizedOperator]);
-    }
-
-    /**
      * Handle scopeCreatedBetween functionality with proper error handling.
      *
      * @param mixed $query
