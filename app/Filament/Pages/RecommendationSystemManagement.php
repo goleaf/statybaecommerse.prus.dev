@@ -18,7 +18,6 @@ use Filament\Pages\Page;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Throwable;
-
 final class RecommendationSystemManagement extends Page
 {
     protected static ?string $title = 'Recommendation System Management';
