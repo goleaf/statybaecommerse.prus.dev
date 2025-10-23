@@ -40,16 +40,13 @@ Use this page to discover the project's internal documentation. The content is o
 - [Security playbook](runbooks/SECURITY.md) – incident response and secrets management expectations.
 - [Terminal freezing fixes](TERMINAL_FREEZING_FIXES.md) – remedies for local environment hiccups.
 
-## Contracts & closure artefacts
-- [Project gospel document](contracts/PROJECT_GOSPEL_DOCUMENT.md) – executive summary of business goals and outcomes.
-- [Project handover documentation](contracts/PROJECT_HANDOVER_DOCUMENTATION.md) – administrative context for new maintainers.
-- [Project testament document](contracts/PROJECT_TESTAMENT_DOCUMENT.md) – legal close-out package.
-- [Partner API contract](contracts/PARTNER_API.md) – storefront integration schema.
-- [Notifications API contract](contracts/NOTIFICATIONS_API.md) – messaging payload shapes and retry semantics.
-- [Routes contract](contracts/ROUTES.md) – canonical route inventory for storefront and admin entry points.
-- [Error catalogue](contracts/ERRORS.md) & [error codes reference](contracts/ERROR_CODES.md) – shared failure modes.
-- [Authorization matrix](contracts/AUTHORIZATION.md) – role/permission commitments.
-- [User profile dataset sample (CSV)](contracts/user_profiles.sample.csv) & [JSON variant](contracts/user_profiles.sample.json) – reference payloads for analytics importers.
+### 5. Troubleshoot & Maintain
+- [TERMINAL_FREEZING_FIXES](TERMINAL_FREEZING_FIXES.md) – remedies for common local environment hiccups.
+- [Cache Policy](CachePolicy.md) – cache key conventions, TTLs, and when to refresh derived data.
+- [CURRENT_SYSTEM_STATUS](CURRENT_SYSTEM_STATUS.md) – snapshot of live issues, mitigations, and follow-up owners.
+- [Dependency automation schedule](operations/RENOVATE_OVERVIEW.md) – explains the Renovate rollup cadence and CI expectations.
+- [PR Branch Cleanup Workflow](../.github/workflows/pr-branch-cleanup.yml) – documents the automation that deletes local branches when pull requests close without merging; the job now ignores already-removed branches after validating the reference.
+- [Husky hook maintenance tips](../.husky/README.md) – outlines the shim script structure to keep Git hooks healthy and compatible with Husky v10 deprecation changes.
 
 ## Contribution checklist
 - Review the [Documentation Style Guide](CONTRIBUTING_DOCS.md) before adding or updating any files in this directory.
