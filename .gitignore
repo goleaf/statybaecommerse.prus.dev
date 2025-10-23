@@ -45,6 +45,9 @@ Thumbs.db
 *.tar
 !/storage/app/backups/.gitignore
 
-# Local PHP runtime overrides
-php.ini
-.php-unlimited.ini
+# Data transfer artifacts
+/storage/app/exports/
+/storage/app/imports/
+/public/
+# SQLite database file generated for testing.
+/database/testing.sqlite

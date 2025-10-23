@@ -9,12 +9,27 @@ use App\Models\AttributeValue;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Services\ProductVariantAttributeMatrixService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 final class ProductVariantAttributeMatrixServiceTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        static $migrated = false;
+
+        if (! $migrated) {
+            // Build the SQLite schema once to ensure factories have the expected tables during tests.
+            $this->artisan('migrate:fresh', ['--database' => 'sqlite']);
+            $migrated = true;
+        }
+
+        $this->beginDatabaseTransaction();
+    }
 
     public function test_sync_creates_and_clears_pivot_relations(): void
     {
@@ -25,32 +40,32 @@ final class ProductVariantAttributeMatrixServiceTest extends TestCase
         $product = Product::factory()->create();
         $variant = ProductVariant::factory()->create(['product_id' => $product->id, 'variant_attribute_matrix' => null]);
 
-        ProductVariantAttributeMatrixService::sync($variant, ['attribute_'.$attribute->getKey() => $valueCotton->getKey()]);
+        ProductVariantAttributeMatrixService::sync($variant, ['attribute_' . $attribute->getKey() => $valueCotton->getKey()]);
 
         $this->assertDatabaseHas('product_variant_attributes', [
-            'variant_id' => $variant->getKey(),
-            'attribute_id' => $attribute->getKey(),
+            'variant_id'         => $variant->getKey(),
+            'attribute_id'       => $attribute->getKey(),
             'attribute_value_id' => $valueCotton->getKey(),
         ]);
 
-        ProductVariantAttributeMatrixService::sync($variant->fresh(), ['attribute_'.$attribute->getKey() => $valueSilk->getKey()]);
+        ProductVariantAttributeMatrixService::sync($variant->fresh(), ['attribute_' . $attribute->getKey() => $valueSilk->getKey()]);
 
         $this->assertDatabaseHas('product_variant_attributes', [
-            'variant_id' => $variant->getKey(),
-            'attribute_id' => $attribute->getKey(),
+            'variant_id'         => $variant->getKey(),
+            'attribute_id'       => $attribute->getKey(),
             'attribute_value_id' => $valueSilk->getKey(),
         ]);
 
         $this->assertDatabaseMissing('product_variant_attributes', [
-            'variant_id' => $variant->getKey(),
-            'attribute_id' => $attribute->getKey(),
+            'variant_id'         => $variant->getKey(),
+            'attribute_id'       => $attribute->getKey(),
             'attribute_value_id' => $valueCotton->getKey(),
         ]);
 
         ProductVariantAttributeMatrixService::sync($variant->fresh(), []);
 
         $this->assertDatabaseMissing('product_variant_attributes', [
-            'variant_id' => $variant->getKey(),
+            'variant_id'   => $variant->getKey(),
             'attribute_id' => $attribute->getKey(),
         ]);
     }
