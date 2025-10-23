@@ -32,7 +32,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use UnitEnum;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 final class VariantStockResource extends Resource
 {
@@ -96,7 +96,7 @@ final class VariantStockResource extends Resource
                         ]),
                     Grid::make(2)
                         ->schema([
-                            Flatpickr::make('expiry_date')->datePicker(),
+                            Flatpickr::make('expiry_date')->asDate(),
                             Select::make('status')
                                 ->options([
                                     'active'       => 'active',

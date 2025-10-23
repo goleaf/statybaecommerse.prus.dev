@@ -25,7 +25,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use UnitEnum;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 final class ReferralResource extends Resource
 {
@@ -75,9 +75,9 @@ final class ReferralResource extends Resource
                                 'cancelled' => 'Cancelled',
                             ])
                             ->required(),
-                        Flatpickr::make('completed_at')->datePicker()
+                        Flatpickr::make('completed_at')->asDate()
                             ->nullable(),
-                        Flatpickr::make('expires_at')->datePicker()
+                        Flatpickr::make('expires_at')->asDate()
                             ->nullable(),
                         TextInput::make('source')
                             ->maxLength(255)

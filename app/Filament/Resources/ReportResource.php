@@ -39,7 +39,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 final class ReportResource extends Resource
 {
@@ -178,14 +178,14 @@ final class ReportResource extends Resource
                     ->description(__('reports.sections.date_range_description'))
                     ->columns(2)
                     ->schema([
-                        Flatpickr::make('start_date')->datePicker()
+                        Flatpickr::make('start_date')->asDate()
                             ->label(__('reports.fields.start_date'))
                             ->nullable(),
-                        Flatpickr::make('end_date')->datePicker()
+                        Flatpickr::make('end_date')->asDate()
                             ->label(__('reports.fields.end_date'))
                             ->nullable()
                             ->after('start_date'),
-                        Flatpickr::make('last_generated_at')->dateTimePicker()
+                        Flatpickr::make('last_generated_at')->asDateTime()
                             ->label(__('reports.fields.last_generated_at'))
                             ->nullable()
                             ->disabled(),

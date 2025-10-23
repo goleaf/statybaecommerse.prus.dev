@@ -40,7 +40,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use UnitEnum;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 /**
  * PriceListItemResource
@@ -153,11 +153,11 @@ final class PriceListItemResource extends Resource
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                                Flatpickr::make('valid_from')->dateTimePicker()
+                                Flatpickr::make('valid_from')->asDateTime()
                                     ->label(__('price_list_items.valid_from'))
                                     ->default(now())
                                     ->helperText(__('price_list_items.valid_from_help')),
-                                Flatpickr::make('valid_until')->dateTimePicker()
+                                Flatpickr::make('valid_until')->asDateTime()
                                     ->label(__('price_list_items.valid_until'))
                                     ->after('valid_from')
                                     ->helperText(__('price_list_items.valid_until_help')),

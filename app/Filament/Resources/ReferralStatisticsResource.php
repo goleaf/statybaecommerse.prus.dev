@@ -33,7 +33,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 final class ReferralStatisticsResource extends Resource
 {
@@ -79,7 +79,7 @@ final class ReferralStatisticsResource extends Resource
                             ->searchable()
                             ->preload()
                             ->required(),
-                        Flatpickr::make('date')->datePicker()
+                        Flatpickr::make('date')->asDate()
                             ->label(__('referral_statistics.fields.date'))
                             ->required()
                             ->default(now()),
@@ -213,8 +213,10 @@ final class ReferralStatisticsResource extends Resource
                 Filter::make('date_range')
                     ->label(__('referral_statistics.filters.date_range'))
                     ->form([
-                        Flatpickr::make('from')->dateRangePicker()
-                            ->label(__('referral_statistics.filters.date_range')),
+                        Flatpickr::make('from')->asDate()
+                            ->label(__('referral_statistics.filters.from_date')),
+                        Flatpickr::make('until')->asDate()
+                            ->label(__('referral_statistics.filters.until_date')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         [$from, $until] = DateRange::extract($data, 'from', 'until');

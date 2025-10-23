@@ -17,7 +17,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 final class CampaignViewResource extends Resource
 {
@@ -81,7 +81,7 @@ final class CampaignViewResource extends Resource
                                 TextInput::make('session_id')
                                     ->label(__('campaign_views.session_id'))
                                     ->maxLength(255),
-                                Flatpickr::make('viewed_at')->dateTimePicker()
+                                Flatpickr::make('viewed_at')->asDateTime()
                                     ->label(__('campaign_views.viewed_at'))
                                     ->seconds(false)
                                     ->required(),

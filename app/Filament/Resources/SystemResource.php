@@ -45,7 +45,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use UnitEnum;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 /**
  * System Resource - Comprehensive System Management
@@ -330,11 +330,11 @@ final class SystemResource extends Resource
                                             ->label(__('system.color_value'))
                                             ->visible(fn (callable $get) => $get('type') === 'color')
                                             ->helperText(__('system.color_value_help')),
-                                        Flatpickr::make('value')->dateTimePicker()
+                                        Flatpickr::make('value')->asDateTime()
                                             ->label(__('system.date_time'))
                                             ->visible(fn (callable $get) => $get('type') === 'datetime')
                                             ->helperText(__('system.date_time_help')),
-                                        Flatpickr::make('value')->dateTimePicker()
+                                        Flatpickr::make('value')->asDateTime()
                                             ->label(__('system.date'))
                                             ->displayFormat('Y-m-d')
                                             ->visible(fn (callable $get) => $get('type') === 'date')

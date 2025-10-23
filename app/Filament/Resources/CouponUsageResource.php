@@ -35,7 +35,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 final class CouponUsageResource extends Resource
 {
@@ -153,7 +153,7 @@ final class CouponUsageResource extends Resource
                                                 ->prefix('€')
                                                 ->required(),
                                         ]),
-                                    Flatpickr::make('used_at')->dateTimePicker()
+                                    Flatpickr::make('used_at')->asDateTime()
                                         ->label(__('admin.coupon_usages.form.fields.used_at'))
                                         ->required()
                                         ->default(now())
@@ -245,8 +245,8 @@ final class CouponUsageResource extends Resource
                 Filter::make('used_at_range')
                     ->label(__('admin.coupon_usages.filters.used_at'))
                     ->form([
-                        Flatpickr::make('from')->dateTimePicker()->label(__('admin.coupon_usages.filters.used_at_from')),
-                        Flatpickr::make('until')->dateTimePicker()->label(__('admin.coupon_usages.filters.used_at_until')),
+                        Flatpickr::make('from')->asDateTime()->label(__('admin.coupon_usages.filters.used_at_from')),
+                        Flatpickr::make('until')->asDateTime()->label(__('admin.coupon_usages.filters.used_at_until')),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => $query
                         ->when($data['from'] ?? null, fn (Builder $q, $date): Builder => $q->where('used_at', '>=', $date))

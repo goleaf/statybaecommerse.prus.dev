@@ -28,7 +28,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use UnitEnum;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 final class ReferralCampaignResource extends Resource
 {
@@ -83,10 +83,10 @@ final class ReferralCampaignResource extends Resource
                                     ->label(__('admin.referral_campaigns.is_active'))
                                     ->inline(false)
                                     ->default(true),
-                                Flatpickr::make('start_date')->datePicker()
+                                Flatpickr::make('start_date')->asDate()
                                     ->label(__('admin.referral_campaigns.start_date'))
                                     ->nullable(),
-                                Flatpickr::make('end_date')->datePicker()
+                                Flatpickr::make('end_date')->asDate()
                                     ->label(__('admin.referral_campaigns.end_date'))
                                     ->nullable(),
                             ]),

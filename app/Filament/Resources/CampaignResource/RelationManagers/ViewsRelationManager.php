@@ -15,7 +15,7 @@ use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 final class ViewsRelationManager extends BaseRelationManager
 {
@@ -41,7 +41,7 @@ final class ViewsRelationManager extends BaseRelationManager
             TextInput::make('customer_id')
                 ->label('Customer ID')
                 ->numeric(),
-            Flatpickr::make('viewed_at')->dateTimePicker()
+            Flatpickr::make('viewed_at')->asDateTime()
                 ->label('Viewed At')
                 ->required(),
         ]);

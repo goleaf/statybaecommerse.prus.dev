@@ -25,7 +25,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 /**
  * SubscriberResource
@@ -156,7 +156,7 @@ final class SubscriberResource extends Resource
                                     ->label(__('subscribers.newsletter_subscription'))
                                     ->default(true),
                             ]),
-                        Flatpickr::make('subscribed_at')->dateTimePicker()
+                        Flatpickr::make('subscribed_at')->asDateTime()
                             ->label(__('subscribers.subscribed_at'))
                             ->default(fn () => now()),
                     ]),
@@ -263,9 +263,9 @@ final class SubscriberResource extends Resource
                     ->native(false),
                 Filter::make('subscribed_at')
                     ->form([
-                        Flatpickr::make('subscribed_from')->datePicker()
+                        Flatpickr::make('subscribed_from')->asDate()
                             ->label(__('subscribers.subscribed_from')),
-                        Flatpickr::make('subscribed_until')->datePicker()
+                        Flatpickr::make('subscribed_until')->asDate()
                             ->label(__('subscribers.subscribed_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

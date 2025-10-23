@@ -31,7 +31,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use UnitEnum;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 final class ReferralCodeResource extends Resource
 {
@@ -76,7 +76,7 @@ final class ReferralCodeResource extends Resource
                             ->label(__('referral.form.is_active'))
                             ->inline(false)
                             ->default(true),
-                        Flatpickr::make('expires_at')->datePicker()
+                        Flatpickr::make('expires_at')->asDate()
                             ->label(__('referral.form.expires_at'))
                             ->nullable(),
                         TextInput::make('usage_limit')

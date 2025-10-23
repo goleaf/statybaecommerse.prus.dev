@@ -15,7 +15,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 final class PricesRelationManager extends BaseRelationManager
 {
@@ -57,8 +57,8 @@ final class PricesRelationManager extends BaseRelationManager
                         'wholesale' => 'Wholesale',
                     ])
                     ->default('regular'),
-                Flatpickr::make('starts_at')->dateTimePicker(),
-                Flatpickr::make('ends_at')->dateTimePicker(),
+                Flatpickr::make('starts_at')->asDateTime(),
+                Flatpickr::make('ends_at')->asDateTime(),
                 Forms\Components\Toggle::make('is_enabled')
                     ->default(true),
                 Forms\Components\KeyValue::make('metadata')

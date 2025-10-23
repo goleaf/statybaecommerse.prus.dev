@@ -35,7 +35,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 class OrdersRelationManager extends BaseRelationManager
 {
@@ -122,9 +122,9 @@ class OrdersRelationManager extends BaseRelationManager
                         TextInput::make('tracking_number')
                             ->label(__('orders.tracking_number'))
                             ->maxLength(255),
-                        Flatpickr::make('shipped_at')->dateTimePicker()
+                        Flatpickr::make('shipped_at')->asDateTime()
                             ->label(__('orders.shipped_at')),
-                        Flatpickr::make('delivered_at')->dateTimePicker()
+                        Flatpickr::make('delivered_at')->asDateTime()
                             ->label(__('orders.delivered_at')),
                     ]),
                 Section::make(__('orders.additional_information'))
@@ -283,9 +283,9 @@ class OrdersRelationManager extends BaseRelationManager
                     ]),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::make('created_from')->datePicker()
+                        Flatpickr::make('created_from')->asDate()
                             ->label(__('orders.created_from')),
-                        Flatpickr::make('created_until')->datePicker()
+                        Flatpickr::make('created_until')->asDate()
                             ->label(__('orders.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

@@ -14,7 +14,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 class EditProfile extends BaseEditProfile
 {
@@ -56,7 +56,7 @@ class EditProfile extends BaseEditProfile
                                 'other'  => __('admin.gender.other'),
                             ])
                             ->native(false),
-                        Flatpickr::make('birth_date')->datePicker()
+                        Flatpickr::make('birth_date')->asDate()
                             ->label(__('admin.profile.birth_date'))
                             ->displayFormat('Y-m-d')
                             ->maxDate(now()),

@@ -26,7 +26,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 /**
  * RecommendationCacheResource
@@ -100,7 +100,7 @@ final class RecommendationCacheResource extends Resource
                                     ->default([])
                                     ->columnSpanFull(),
                             ]),
-                        Flatpickr::make('expires_at')->dateTimePicker()
+                        Flatpickr::make('expires_at')->asDateTime()
                             ->label(__('admin.recommendation_caches.expires_at'))
                             ->required()
                             ->default(now()->addHours(24)),

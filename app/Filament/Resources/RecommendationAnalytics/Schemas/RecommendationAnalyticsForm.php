@@ -15,7 +15,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 final class RecommendationAnalyticsForm
 {
@@ -57,7 +57,7 @@ final class RecommendationAnalyticsForm
                                     ])
                                     ->required()
                                     ->default('view'),
-                                Flatpickr::make('date')->datePicker()
+                                Flatpickr::make('date')->asDate()
                                     ->label(__('recommendation_analytics.date'))
                                     ->required()
                                     ->default(now()),

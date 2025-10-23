@@ -31,7 +31,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 final class AdminUserResource extends Resource
 {
@@ -187,9 +187,9 @@ final class AdminUserResource extends Resource
                 Filter::make('created_at')
                     ->label(__('admin.admin_users.filters.created_at'))
                     ->form([
-                        Flatpickr::make('from')->datePicker()
+                        Flatpickr::make('from')->asDate()
                             ->label(__('admin.admin_users.filters.created_from')),
-                        Flatpickr::make('until')->datePicker()
+                        Flatpickr::make('until')->asDate()
                             ->label(__('admin.admin_users.filters.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
