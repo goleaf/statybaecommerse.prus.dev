@@ -114,7 +114,11 @@ return [
         'description'        => 'Aprašymas',
         'button_text'        => 'Mygtuko tekstas',
     ],
-    'menu_items'      => require __DIR__ . '/admin/menu_items.php',
+    'sliders' => [
+        'button_link_lookup' => 'Pasirinkti mygtuko nuorodą',
+        'button_link_lookup_placeholder' => 'Ieškokite produktų, kategorijų, kolekcijų, naujienų arba įklijuokite URL',
+    ],
+    'menu_items' => require __DIR__ . '/admin/menu_items.php',
     'product_history' => require __DIR__ . '/admin/product_history.php',
     'sliders'         => [
         'basic_information'             => 'Pagrindinė informacija',
@@ -225,6 +229,11 @@ return [
         'location'          => 'Vieta',
         'warehouse_code'    => 'Sandėlio kodas',
         'batch_number'      => 'Partijos numeris',
+
+        'placeholders' => [
+            'variant' => 'Ieškokite varianto...',
+            'location' => 'Ieškokite vietos...',
+        ],
 
         // Stock Levels
         'stock_levels'                => 'Atsargų lygiai',
