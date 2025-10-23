@@ -10,7 +10,6 @@ use App\Filament\Resources\CollectionResource\Pages;
 use App\Models\Collection;
 use BackedEnum;
 use Filament\Forms;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -79,34 +78,16 @@ final class CollectionResource extends Resource
                                 ->required()
                                 ->maxLength(255)
                                 ->live(onBlur: true)
-                                ->afterStateUpdated(function ($state, Forms\Set $set, $operation): void {
-                                    if ($operation === 'create' && filled($state)) {
-                                        $set('slug', Str::slug($state));
-                                    }
-                                }),
+                                ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', Str::slug((string) $state)) : null),
                             TextInput::make('slug')
                                 ->label(__('collections.slug'))
-                                ->unique(ignoreRecord: true)
-                                ->rules(['alpha_dash']),
+                                ->unique(table: Collection::class, column: 'slug', ignoreRecord: true)
+                                ->rules(['alpha_dash'])
+                                ->helperText(__('collections.help.slug')),
                         ]),
-                    Grid::make(3)
-                        ->components([
-                            TextInput::make('sort_order')
-                                ->label(__('collections.sort_order'))
-                                ->numeric()
-                                ->default(0)
-                                ->helperText(__('collections.help.sort_order')),
-                            TextInput::make('max_products')
-                                ->label(__('collections.max_products'))
-                                ->numeric()
-                                ->minValue(0)
-                                ->helperText(__('collections.help.max_products')),
-                            Textarea::make('rules')
-                                ->label(__('collections.rules'))
-                                ->rows(3)
-                                ->columnSpanFull()
-                                ->helperText(__('collections.help.rules')),
-                        ])
+                    Textarea::make('description')
+                        ->label(__('collections.description'))
+                        ->rows(4)
                         ->columnSpanFull(),
                 ])
                 ->columns(1),
@@ -133,34 +114,84 @@ final class CollectionResource extends Resource
                                 ->default(true),
                         ]),
                 ]),
+            Section::make(__('collections.business_info'))
+                ->schema([
+                    Grid::make(3)
+                        ->schema([
+                            Toggle::make('is_visible')
+                                ->label(__('collections.is_visible'))
+                                ->default(true),
+                            Toggle::make('is_active')
+                                ->label(__('collections.is_active'))
+                                ->default(true),
+                            Toggle::make('is_automatic')
+                                ->label(__('collections.is_automatic'))
+                                ->default(false),
+                        ]),
+                    Grid::make(3)
+                        ->schema([
+                            TextInput::make('sort_order')
+                                ->label(__('collections.sort_order'))
+                                ->numeric()
+                                ->default(0)
+                                ->helperText(__('collections.help.sort_order')),
+                            TextInput::make('max_products')
+                                ->label(__('collections.max_products'))
+                                ->numeric()
+                                ->minValue(0)
+                                ->helperText(__('collections.help.max_products')),
+                            Textarea::make('rules')
+                                ->label(__('collections.rules'))
+                                ->rows(3)
+                                ->columnSpanFull()
+                                ->helperText(__('collections.help.rules')),
+                        ])
+                        ->columnSpanFull(),
+                ])
+                ->columns(1),
+            Section::make(__('collections.display_type'))
+                ->schema([
+                    Grid::make(3)
+                        ->schema([
+                            Select::make('display_type')
+                                ->label(__('collections.display_type'))
+                                ->options([
+                                    'grid'     => __('collections.display_types.grid'),
+                                    'list'     => __('collections.display_types.list'),
+                                    'carousel' => __('collections.display_types.carousel'),
+                                ])
+                                ->default('grid')
+                                ->required(),
+                            TextInput::make('products_per_page')
+                                ->label(__('collections.products_per_page'))
+                                ->numeric()
+                                ->minValue(1)
+                                ->default(12),
+                            Toggle::make('show_filters')
+                                ->label(__('collections.show_filters'))
+                                ->default(true),
+                        ]),
+                ]),
             Section::make(__('collections.media'))
-                ->components([
+                ->schema([
                     SpatieMediaLibraryFileUpload::make('images')
                         ->collection('images')
                         ->label(__('collections.image'))
                         ->image()
                         ->imageEditor()
-                        ->imageEditorAspectRatios([
-                            '1:1',
-                            '16:9',
-                            '4:3',
-                        ])
-                        ->directory('collections/images')
-                        ->visibility('private'),
-                    FileUpload::make('banner')
+                        ->maxFiles(1),
+                    SpatieMediaLibraryFileUpload::make('banner')
+                        ->collection('banner')
                         ->label(__('collections.banner'))
                         ->image()
                         ->imageEditor()
-                        ->imageEditorAspectRatios([
-                            '21:9',
-                        ])
-                        ->directory('collections/banners')
-                        ->visibility('private'),
-                ]),
-            Section::make(__('collections.products'))
+                        ->maxFiles(1),
+                ])
+                ->columns(2),
+            Section::make(__('collections.collection_info'))
                 ->schema([
                     Select::make('products')
-                        ->label(__('collections.products'))
+                        ->label(__('translations.products'))
                         ->relationship('products', 'name')
                         ->multiple()
                         ->searchable()
@@ -168,38 +199,28 @@ final class CollectionResource extends Resource
                         ->height('350px')
                         ->preload(),
                 ]),
-            Section::make(__('collections.seo'))
+            Section::make(__('collections.seo_info'))
                 ->schema([
-                    TextInput::make('seo_title')
-                        ->label(__('collections.seo_title'))
-                        ->maxLength(255),
-                    Textarea::make('seo_description')
-                        ->label(__('collections.seo_description'))
-                        ->rows(2)
-                        ->maxLength(500),
-                ]),
-            Section::make(__('collections.settings'))
-                ->schema([
-                    Toggle::make('is_active')
-                        ->label(__('collections.is_active'))
-                        ->default(true),
-                    Toggle::make('is_featured')
-                        ->label(__('collections.is_featured')),
-                    Select::make('sort_order')
-                        ->label(__('collections.sort_order'))
-                        ->options([
-                            'manual'       => __('collections.sort_orders.manual'),
-                            'name_asc'     => __('collections.sort_orders.name_asc'),
-                            'name_desc'    => __('collections.sort_orders.name_desc'),
-                            'price_asc'    => __('collections.sort_orders.price_asc'),
-                            'price_desc'   => __('collections.sort_orders.price_desc'),
-                            'created_asc'  => __('collections.sort_orders.created_asc'),
-                            'created_desc' => __('collections.sort_orders.created_desc'),
-                        ])
-                        ->default('manual'),
-                    Toggle::make('auto_update')
-                        ->label(__('collections.auto_update'))
-                        ->default(false),
+                    Grid::make(2)
+                        ->schema([
+                            TextInput::make('seo_title')
+                                ->label(__('collections.seo_title'))
+                                ->maxLength(255),
+                            TextInput::make('meta_title')
+                                ->label(__('collections.meta_title'))
+                                ->maxLength(255),
+                            Textarea::make('seo_description')
+                                ->label(__('collections.seo_description'))
+                                ->rows(2)
+                                ->columnSpan(2),
+                            Textarea::make('meta_description')
+                                ->label(__('collections.meta_description'))
+                                ->rows(2)
+                                ->columnSpan(2),
+                            TextInput::make('meta_keywords')
+                                ->label(__('collections.meta_keywords'))
+                                ->helperText(__('collections.help.meta_keywords')),
+                        ]),
                 ]),
         ]);
     }
@@ -231,9 +252,13 @@ final class CollectionResource extends Resource
                     ->sortable(),
                 TextColumn::make('sort_order')
                     ->label(__('collections.sort_order'))
-                    ->formatStateUsing(fn (?string $state): string => $state
-                        ? __('collections.sort_orders.' . $state)
-                        : __('collections.sort_orders.manual')),
+                    ->sortable(),
+                TextColumn::make('display_type')
+                    ->label(__('collections.display_type'))
+                    ->formatStateUsing(fn (?string $state): string => $state ? __('collections.display_types.' . $state) : '-'),
+                IconColumn::make('is_visible')
+                    ->label(__('collections.is_visible'))
+                    ->boolean(),
                 IconColumn::make('is_active')
                     ->label(__('collections.is_active'))
                     ->boolean(),
