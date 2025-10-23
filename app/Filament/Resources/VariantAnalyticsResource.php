@@ -54,11 +54,6 @@ final class VariantAnalyticsResource extends Resource
 {
     use HasNav;
 
-    /**
-     * Icon displayed in the navigation menu.
-     *
-     * @var string|BackedEnum|null Icon identifier used within navigation.
-     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
     protected static BackedEnum|UnitEnum|string|null $navigationGroup = 'Inventory';
