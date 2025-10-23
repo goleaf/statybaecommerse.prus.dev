@@ -40,7 +40,12 @@ use UnitEnum;
 
 final class SystemSettingDependencyResource extends Resource
 {
-    use HasNav;
+    protected static ?string $model = SystemSettingDependency::class;
+
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-link';
+    }
 
     
 
