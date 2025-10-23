@@ -164,7 +164,7 @@ final class ApiKeyResource extends Resource
                     ->toggleable(),
                 TextColumn::make('rate_limit')
                     ->label(__('api_keys.fields.rate_limit'))
-                    ->formatStateUsing(fn (ApiKey $record): string => $record->formattedRateLimit())
+                    ->formatStateUsing(fn ($state, ApiKey $record): string => $record->formattedRateLimit())
                     ->sortable(),
                 IconColumn::make('active')
                     ->label(__('api_keys.fields.active'))

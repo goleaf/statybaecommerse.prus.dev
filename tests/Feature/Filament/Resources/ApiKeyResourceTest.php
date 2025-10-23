@@ -35,12 +35,15 @@ final class ApiKeyResourceTest extends TestCase
 
     public function test_admin_can_list_api_keys(): void
     {
-        $apiKeys = ApiKey::factory()->count(3)->create();
+        $apiKeys = ApiKey::factory()->count(2)->create();
+        $unlimitedKey = ApiKey::factory()->unlimited()->create();
+        $apiKeys->push($unlimitedKey);
 
         $this->actingAs($this->admin);
 
         Livewire::test(ListApiKeys::class)
-            ->assertCanSeeTableRecords($apiKeys);
+            ->assertCanSeeTableRecords($apiKeys)
+            ->assertSee(__('api_keys.rate_limit.unlimited'));
     }
 
     public function test_admin_can_create_api_key_with_normalized_rate_limit(): void
