@@ -11,6 +11,7 @@ use App\Filament\Resources\FeatureFlags\Pages\ListFeatureFlags;
 use App\Filament\Resources\FeatureFlags\Schemas\FeatureFlagForm;
 use App\Filament\Resources\FeatureFlags\Tables\FeatureFlagsTable;
 use App\Models\FeatureFlag;
+use BackedEnum;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
@@ -22,10 +23,7 @@ class FeatureFlagResource extends Resource
 
     protected static ?string $model = FeatureFlag::class;
 
-    public static function getNavigationIcon(): string|\BackedEnum|null
-    {
-        return Heroicon::OutlinedRectangleStack;
-    }
+    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Form $form): Form
     {
