@@ -9,7 +9,8 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\OrderShippingResource\Pages;
 use App\Models\Order;
 use App\Models\OrderShipping;
-use App\Support\Filament\Components\Flatpickr;
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\StatusScope;
 use BackedEnum;
 use Filament\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -72,24 +73,15 @@ final class OrderShippingResource extends Resource
                         ->relationship(
                             name: 'order',
                             titleAttribute: 'number',
-                            modifyQueryUsing: static fn (Builder $query): Builder => $query->withoutGlobalScopes(),
+                            modifyQueryUsing: fn (Builder $query) => $query
+                                ->withoutGlobalScopes([ActiveScope::class, StatusScope::class])
+                                ->select('id', 'number'),
                         )
-                        ->getOptionLabelFromRecordUsing(
-                            static fn (Order $record): string => $record->number ?? __('Order #:id', ['id' => $record->getKey()]),
-                        )
-                        ->getOptionLabelUsing(
-                            static fn (int|string|null $value): ?string => match (true) {
-                                $value === null => null,
-                                default         => optional(
-                                    Order::query()
-                                        ->withoutGlobalScopes()
-                                        ->find($value),
-                                )->number ?? __('Order #:id', ['id' => $value]),
-                            },
-                        )
+                        ->getOptionLabelFromRecordUsing(fn (Order $order): string => $order->number ?? sprintf('Order #%s', $order->getKey()))
                         ->required()
                         ->searchable()
-                        ->preload(),
+                        ->preload()
+                        ->placeholder(__('shared.select_option')),
                     Grid::make(2)
                         ->schema([
                             TextInput::make('carrier_name')
@@ -213,38 +205,28 @@ final class OrderShippingResource extends Resource
             ->filters([
                 SelectFilter::make('order_id')
                     ->label(__('admin.order_shippings.order'))
-                    ->relationship(
-                        name: 'order',
-                        titleAttribute: 'number',
-                        modifyQueryUsing: static fn (Builder $query): Builder => $query->withoutGlobalScopes(),
-                    )
-                    ->getOptionLabelFromRecordUsing(
-                        static fn (Order $record): string => $record->number ?? __('Order #:id', ['id' => $record->getKey()]),
-                    )
-                    ->getOptionLabelUsing(
-                        static fn (int|string|null $value): ?string => match (true) {
-                            $value === null => null,
-                            default         => optional(
-                                Order::query()
-                                    ->withoutGlobalScopes()
-                                    ->find($value),
-                            )->number ?? __('Order #:id', ['id' => $value]),
-                        },
-                    )
+                    ->options(function () {
+                        return Order::query()
+                            ->withoutGlobalScopes([ActiveScope::class, StatusScope::class])
+                            ->select(['id', 'number'])
+                            ->orderBy('number')
+                            ->get()
+                            ->mapWithKeys(fn (Order $order): array => [
+                                $order->getKey() => $order->number ?? sprintf('Order #%s', $order->getKey()),
+                            ])
+                            ->all();
+                    })
                     ->searchable()
                     ->preload(),
                 SelectFilter::make('carrier_name')
                     ->label(__('admin.order_shippings.carrier_name'))
-                    ->options(
-                        fn () => OrderShipping::query()
-                            ->select('carrier_name')
-                            ->whereNotNull('carrier_name')
-                            ->distinct()
-                            ->orderBy('carrier_name')
-                            ->pluck('carrier_name', 'carrier_name')
-                            ->filter()
-                            ->all(),
-                    )
+                    ->options(fn () => OrderShipping::query()
+                        ->select('carrier_name')
+                        ->distinct()
+                        ->whereNotNull('carrier_name')
+                        ->orderBy('carrier_name')
+                        ->pluck('carrier_name', 'carrier_name')
+                        ->all())
                     ->searchable(),
                 Filter::make('shipped_at')
                     ->label(__('admin.order_shippings.shipped_at'))

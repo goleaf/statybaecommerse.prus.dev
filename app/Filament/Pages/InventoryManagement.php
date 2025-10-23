@@ -25,9 +25,15 @@ final class InventoryManagement extends Page implements HasTable
     use HasToggleableTable;
     use InteractsWithTable;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
+    public static function getNavigationIcon(): BackedEnum|string|null
+    {
+        return 'heroicon-o-archive-box';
+    }
 
-    protected static UnitEnum|string|null $navigationGroup = 'Products';
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Products';
+    }
 
     public static function getSlug(?\Filament\Panel $panel = null): string
     {
