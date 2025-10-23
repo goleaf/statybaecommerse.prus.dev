@@ -8,9 +8,9 @@ use App\Forms\Components\Flatpickr;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\AnalyticsResource\Pages;
 use App\Models\Order;
+use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
 use BackedEnum;
-use Filament\Forms\Components\Flatpickr;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\ViewAction;
@@ -24,7 +24,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as TranslatableResource;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 final class AnalyticsResource extends Resource
 {
@@ -155,7 +154,7 @@ final class AnalyticsResource extends Resource
                     ->form([
                         Flatpickr::makeRange('range')
                             ->label(__('analytics.from_date'))
-                            
+
                             ->format('Y-m-d')
                             ->displayFormat('Y-m-d'),
                     ])

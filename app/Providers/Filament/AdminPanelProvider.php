@@ -27,6 +27,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\URL;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use LaraZeus\SpatieTranslatable\SpatieTranslatablePlugin;
 use pxlrbt\FilamentExcel\FilamentExport;
 use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
 
@@ -57,12 +58,20 @@ final class AdminPanelProvider extends PanelProvider
         ));
 
         /** @var array<class-string> $pageClasses */
-        $configuredLocales = config('app.supported_locales', []);
-        $supportedLocales = collect(is_array($configuredLocales) ? $configuredLocales : explode(',', (string) $configuredLocales))
+        $supportedLocales = config('app.supported_locales', []);
+        $defaultLocale = config('app.locale', 'en');
+
+        $defaultLocales = collect(is_array($supportedLocales) ? $supportedLocales : explode(',', (string) $supportedLocales))
             ->map(static fn (mixed $locale): string => trim((string) $locale))
             ->filter()
+            ->unique()
             ->values()
+            ->whenEmpty(static fn ($locales) => $locales->push($defaultLocale))
             ->all();
+
+        $translatablePlugin = SpatieTranslatablePlugin::make()
+            ->defaultLocales($defaultLocales)
+            ->persist();
 
         return $panel
             ->default()
@@ -138,40 +147,37 @@ final class AdminPanelProvider extends PanelProvider
                     ]))
                     ->icon('heroicon-o-language'),
             ])
-            ->plugin(
-                SpatieTranslatablePlugin::make()
-                    ->defaultLocales($defaultLocales)
-                    ->persist()
+            ->when(
+                app()->environment('testing'),
+                fn (Panel $p) => $p->plugins([$translatablePlugin]),
+                fn (Panel $p) => $p->plugins(
+                    array_values(array_filter([
+                        $translatablePlugin,
+                        FilamentShieldPlugin::make(),
+                        class_exists(FilamentFullCalendarPlugin::class)
+                            ? FilamentFullCalendarPlugin::make()
+                                ->selectable(true)
+                                ->editable(true)
+                                ->timezone('Europe/Vilnius')
+                                ->locale('lt')
+                            : null,
+                        TableLayoutTogglePlugin::make()
+                            ->setDefaultLayout('grid')
+                            ->persistLayoutUsing(
+                                persister: LocalStoragePersister::class,
+                                cacheStore: 'redis',
+                                cacheTtl: 60 * 24,
+                            )
+                            ->shareLayoutBetweenPages(false)
+                            ->displayToggleAction()
+                            ->toggleActionHook('tables::toolbar.search.after')
+                            ->listLayoutButtonIcon('heroicon-o-list-bullet')
+                            ->gridLayoutButtonIcon('heroicon-o-squares-2x2'),
+                        FilamentNordThemePlugin::make(),
+                        ResizedColumnPlugin::make()->preserveOnDB(),
+                    ]))
+                ),
             )
-            ->when(app()->environment('testing'),
-                fn (Panel $p) => $p->plugins([]),
-                fn (Panel $p) => $p->plugins(array_values(array_filter([
-                    FilamentShieldPlugin::make(),
-                    class_exists(FilamentFullCalendarPlugin::class)
-                        ? FilamentFullCalendarPlugin::make()
-                            ->selectable(true)
-                            ->editable(true)
-                            ->timezone('Europe/Vilnius')
-                            ->locale('lt')
-                        : null,
-                    TableLayoutTogglePlugin::make()
-                        ->setDefaultLayout('grid')
-                        ->persistLayoutUsing(
-                            persister: LocalStoragePersister::class,
-                            cacheStore: 'redis',
-                            cacheTtl: 60 * 24,
-                        )
-                        ->shareLayoutBetweenPages(false)
-                        ->displayToggleAction()
-                        ->toggleActionHook('tables::toolbar.search.after')
-                        ->listLayoutButtonIcon('heroicon-o-list-bullet')
-                        ->gridLayoutButtonIcon('heroicon-o-squares-2x2'),
-                    SpatieTranslatablePlugin::make()
-                        ->defaultLocales($supportedLocales ?: null)
-                        ->persist(),
-                    FilamentNordThemePlugin::make(),
-                    ResizedColumnPlugin::make()->preserveOnDB(),
-                ], static fn ($plugin) => $plugin !== null))))
             // Enable the custom Filament theme so third-party plugin views (like the searchable input)
             // are compiled with Tailwind during the build step.
             ->viteTheme('resources/css/filament/admin/theme.scss')
