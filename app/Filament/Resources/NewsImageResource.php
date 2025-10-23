@@ -7,6 +7,7 @@ namespace App\Filament\Resources;
 use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\NewsImageResource\Pages;
+use App\Filament\Resources\NewsResource;
 use App\Models\News;
 use App\Models\NewsImage;
 use BackedEnum;
@@ -304,13 +305,11 @@ final class NewsImageResource extends Resource
 
                         return strlen($state) > 40 ? $state : null;
                     })
-                    ->url(function (NewsImage $record): ?string {
-                        if (! $record->news_id) {
-                            return null;
-                        }
-
-                        return route('filament.admin.resources.news.edit', ['record' => $record->news_id]);
-                    })
+                    ->url(
+                        fn (NewsImage $record): ?string => $record->news_id
+                            ? NewsResource::getUrl('edit', ['record' => $record->news])
+                            : null
+                    )
                     ->color('primary'),
                 TextColumn::make('alt_text')
                     ->label(__('admin.news_images.alt_text'))
