@@ -14,6 +14,7 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
@@ -23,21 +24,12 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Infolists\Components\IconEntry;
-use Filament\Infolists\Components\KeyValueEntry;
-use Filament\Schemas\Components\Section as InfolistSection;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Number;
+use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 use UnitEnum;
 
 final class ReferralCampaignResource extends Resource
@@ -77,14 +69,18 @@ final class ReferralCampaignResource extends Resource
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                                TextInput::make('name')
-                                    ->label(__('admin.referral_campaigns.name'))
-                                    ->required()
-                                    ->maxLength(255),
-                                Textarea::make('description')
-                                    ->label(__('admin.referral_campaigns.description'))
-                                    ->maxLength(65535)
-                                    ->nullable(),
+                                LanguageTabs::make([
+                                    TextInput::make('name')
+                                        ->label(__('admin.referral_campaigns.name'))
+                                        ->required()
+                                        ->maxLength(255)
+                                        ->translatable(),
+                                    Textarea::make('description')
+                                        ->label(__('admin.referral_campaigns.description'))
+                                        ->maxLength(65535)
+                                        ->nullable()
+                                        ->translatable(),
+                                ])->columnSpanFull(),
                                 Toggle::make('is_active')
                                     ->label(__('admin.referral_campaigns.is_active'))
                                     ->inline(false)
