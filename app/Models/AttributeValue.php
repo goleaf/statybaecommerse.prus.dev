@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -39,14 +40,39 @@ final class AttributeValue extends Model
 
     protected $table = 'attribute_values';
 
-    protected $fillable = ['attribute_id', 'value', 'slug', 'color_code', 'sort_order', 'is_enabled', 'description', 'hex_color', 'image', 'metadata', 'display_value', 'is_active', 'is_default'];
+    protected $fillable = [
+        'attribute_id',
+        'value',
+        'slug',
+        'attribute_value_type',
+        'valueable_type',
+        'valueable_id',
+        'color_code',
+        'sort_order',
+        'is_enabled',
+        'description',
+        'hex_color',
+        'image',
+        'metadata',
+        'display_value',
+        'is_active',
+        'is_default',
+        'is_searchable',
+    ];
 
     /**
      * Handle casts functionality with proper error handling.
      */
     protected function casts(): array
     {
-        return ['sort_order' => 'integer', 'is_enabled' => 'boolean', 'is_active' => 'boolean', 'is_default' => 'boolean'];
+        return [
+            'sort_order' => 'integer',
+            'is_enabled' => 'boolean',
+            'is_active' => 'boolean',
+            'is_default' => 'boolean',
+            'is_searchable' => 'boolean',
+            'metadata' => 'array',
+        ];
     }
 
     protected string $translationModel = \App\Models\Translations\AttributeValueTranslation::class;
@@ -73,6 +99,14 @@ final class AttributeValue extends Model
     public function variants(): BelongsToMany
     {
         return $this->belongsToMany(ProductVariant::class, 'product_variant_attributes', 'attribute_value_id', 'variant_id')->withTimestamps();
+    }
+
+    /**
+     * Handle valueable functionality with proper error handling.
+     */
+    public function valueable(): MorphTo
+    {
+        return $this->morphTo();
     }
 
     /**
