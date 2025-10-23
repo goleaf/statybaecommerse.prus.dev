@@ -17,7 +17,7 @@
                 <svg class="w-12 h-12 mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h18M3 19h18M4 5l2 14m12-14 2 14M8 5l1 14m6-14-1 14" />
                 </svg>
-                {{ __('frontend.search.no_image_available') }}
+                {{ __('No image available') }}
             </div>
         @endif
     </a>
@@ -44,7 +44,7 @@
                 href="{{ $productUrl }}"
                 class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-500"
             >
-                {{ __('frontend.search.view_product') }}
+                {{ __('View product') }}
             </a>
         </div>
     </div>
