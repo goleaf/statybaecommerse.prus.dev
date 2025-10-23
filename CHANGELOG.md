@@ -7,7 +7,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Bug Fixes
-* Rebuilt the VariantImage model scopes, accessors, and metadata helpers so admin pages and tests can toggle activation, format file information, and keep variant image ordering consistent.
+* Prevented variant analytics upserts from writing `NULL` conversion rates so daily and weekly tracking rows insert cleanly on SQLite-backed test runs.
 * Preserved Attribute validation rule strings while still decoding JSON arrays, refreshed the Filament form so arrays render as comma-separated chips, and added regression coverage for both storage paths.
 * Reintroduced the `regions` schema with defensive guards and rebuilt the `customers`/`orders` relationship so SQLite-backed factories and analytics widgets can create location-aware records without missing column errors during tests.
 * Resolved localized product and category routing by honouring translated slugs during route model binding and updating storefront links so product detail pages load reliably from the home feed and other localized listings.

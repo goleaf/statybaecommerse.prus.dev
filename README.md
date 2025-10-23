@@ -17,7 +17,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 -### Latest updates
-- Variant image management regained active/primary scopes, formatted metadata accessors, and ordering helpers so Filament resources and unit tests can confidently toggle visibility and display image details.
+- Variant analytics upserts now default conversion rates to zero so daily and weekly tracking rows save without violating SQLite constraints during automated analytics tests.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
 - Region-aware address tables and the dedicated `customers` dataset are back online for the SQLite harness, letting factories and

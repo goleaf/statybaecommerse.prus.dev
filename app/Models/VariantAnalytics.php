@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Models;
 
 use DateTimeInterface;
-use App\Models\Product;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -197,17 +196,23 @@ final class VariantAnalytics extends Model
         $bucket = self::buildDateBucket($granularity, $normalizedDate);
         $now = now();
 
+        // Ensure the conversion rate always has a safe default because the database column is non-nullable.
+        $conversionRate = array_key_exists('conversion_rate', $data)
+            ? round((float) $data['conversion_rate'], 4)
+            : 0.0;
+
         $payload = [
-            'product_id'      => $productId,
-            'variant_id'      => $variantId,
-            'date'            => $normalizedDate,
-            'date_bucket'     => $bucket,
-            'views'           => (int) ($data['views'] ?? 0),
-            'clicks'          => (int) ($data['clicks'] ?? 0),
-            'add_to_cart'     => (int) ($data['add_to_cart'] ?? 0),
-            'purchases'       => (int) ($data['purchases'] ?? 0),
-            'revenue'         => (float) ($data['revenue'] ?? 0),
-            'conversion_rate' => $data['conversion_rate'] ?? null,
+            'product_id'  => $productId,
+            'variant_id'  => $variantId,
+            'date'        => $normalizedDate,
+            'date_bucket' => $bucket,
+            'views'       => (int) ($data['views'] ?? 0),
+            'clicks'      => (int) ($data['clicks'] ?? 0),
+            'add_to_cart' => (int) ($data['add_to_cart'] ?? 0),
+            'purchases'   => (int) ($data['purchases'] ?? 0),
+            'revenue'     => (float) ($data['revenue'] ?? 0),
+            // Persist the normalized conversion rate value so inserts never violate the NOT NULL constraint.
+            'conversion_rate' => $conversionRate,
             'created_at'      => $now,
             'updated_at'      => $now,
         ];
@@ -223,6 +228,7 @@ final class VariantAnalytics extends Model
         ];
 
         if (array_key_exists('conversion_rate', $data)) {
+            // When an explicit conversion rate is provided we replace the stored value instead of incrementing.
             $updates['conversion_rate'] = self::replacementExpression('conversion_rate');
         }
 
