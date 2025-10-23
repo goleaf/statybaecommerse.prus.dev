@@ -11,7 +11,9 @@ use Log;
 
 final class Kernel extends ConsoleKernel
 {
-    /** @var array<int, class-string<Command>> */
+    /**
+     * @var array<int, class-string>
+     */
     protected $commands = [
         \App\Console\Commands\BackupPrepareCommand::class,
         \App\Console\Commands\BackupVerifyCommand::class,
@@ -48,18 +50,22 @@ final class Kernel extends ConsoleKernel
                 \Log::info('Weekly code style fix completed successfully');
             });
 
-        if ($prepareCron = config('backup.schedule.prepare')) {
+        $prepareSchedule = config('backup.schedule.prepare');
+        if (is_string($prepareSchedule) && $prepareSchedule !== '') {
             $schedule
                 ->command('backup:prepare')
-                ->cron($prepareCron)
-                ->withoutOverlapping();
+                ->cron($prepareSchedule)
+                ->withoutOverlapping()
+                ->runInBackground();
         }
 
-        if ($verifyCron = config('backup.schedule.verify')) {
+        $verifySchedule = config('backup.schedule.verify');
+        if (is_string($verifySchedule) && $verifySchedule !== '') {
             $schedule
                 ->command('backup:verify')
-                ->cron($verifyCron)
-                ->withoutOverlapping();
+                ->cron($verifySchedule)
+                ->withoutOverlapping()
+                ->runInBackground();
         }
     }
 

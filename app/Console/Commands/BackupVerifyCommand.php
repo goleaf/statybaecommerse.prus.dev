@@ -4,219 +4,366 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Support\Repositories\ProductRepository;
+use App\Support\Repositories\UserRepository;
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Filesystem\FilesystemAdapter;
-use Illuminate\Support\Facades\Config;
+use Illuminate\Database\ConnectionInterface;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Storage;
-use InvalidArgumentException;
-use Throwable;
+use Illuminate\Support\Str;
+use RuntimeException;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
 
 final class BackupVerifyCommand extends Command
 {
-    /**
-     * @var string
-     */
-    protected $signature = 'backup:verify
-        {--connection=backup : The database connection used to validate artifacts}
-        {--disk=backups : The filesystem disk where artifacts are stored}';
+    protected $signature = 'backup:verify {--keep-temp : Retain the extracted artifacts for inspection.}';
 
-    /**
-     * @var string
-     */
-    protected $description = 'Verify backup artifacts by restoring them into an ephemeral database connection.';
+    protected $description = 'Verify the newest application backup by restoring it into an ephemeral database and validating artifacts.';
 
     public function handle(): int
     {
-        $diskName = (string) $this->option('disk');
-        $connectionName = (string) $this->option('connection');
-
-        if ($connectionName === Config::get('database.default')) {
-            $this->error('Refusing to verify backups using the default database connection.');
-
-            return self::FAILURE;
-        }
-
-        if (! Config::has('database.connections.'.$connectionName)) {
-            $this->error(sprintf('Database connection [%s] is not configured.', $connectionName));
+        $filesystem = new Filesystem;
+        $storageRoot = $this->stringOrDefault(config('backup.storage_root'), storage_path('app/backups'));
+        if (! $filesystem->exists($storageRoot)) {
+            $this->error(sprintf('Backup root directory [%s] does not exist.', $storageRoot));
 
             return self::FAILURE;
         }
 
-        $disk = Storage::disk($diskName);
+        $directories = collect($filesystem->directories($storageRoot))->sortDesc()->values();
+        if ($directories->isEmpty()) {
+            $this->error('No backups were found to verify.');
+
+            return self::FAILURE;
+        }
+
+        $backupPath = $directories->first();
+        $this->info(sprintf('Verifying backup at [%s].', $backupPath));
+
+        $manifestPath = $backupPath.DIRECTORY_SEPARATOR.'manifest.json';
+        if (! $filesystem->exists($manifestPath)) {
+            $this->error('Backup manifest is missing.');
+
+            return self::FAILURE;
+        }
 
         try {
-            $usersPayload = $this->decodeArtifact($disk, 'artifacts/users.json');
-            $productsPayload = $this->decodeArtifact($disk, 'artifacts/products.json');
-        } catch (Throwable $exception) {
+            $manifest = json_decode($filesystem->get($manifestPath), true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $exception) {
+            $this->error('Failed to read backup manifest: '.$exception->getMessage());
+
+            return self::FAILURE;
+        }
+
+        if (! is_array($manifest)) {
+            $this->error('Backup manifest is malformed.');
+
+            return self::FAILURE;
+        }
+
+        $dumpRelative = Arr::get($manifest, 'database.dump');
+        if (! is_string($dumpRelative) || $dumpRelative === '') {
+            $this->error('Database dump reference is missing from the manifest.');
+
+            return self::FAILURE;
+        }
+
+        $dumpFile = $backupPath.DIRECTORY_SEPARATOR.$dumpRelative;
+        if (! $filesystem->exists($dumpFile)) {
+            $this->error('Database dump file is missing.');
+
+            return self::FAILURE;
+        }
+
+        $expectedDumpHash = Arr::get($manifest, 'database.hash');
+        if (is_string($expectedDumpHash) && $expectedDumpHash !== '' && hash_file('sha256', $dumpFile) !== $expectedDumpHash) {
+            $this->error('Database dump hash does not match the manifest.');
+
+            return self::FAILURE;
+        }
+
+        $mediaArchive = null;
+        $mediaConfig = Arr::get($manifest, 'media');
+        if (is_array($mediaConfig)) {
+            $archiveName = $mediaConfig['archive'] ?? null;
+            if (is_string($archiveName) && $archiveName !== '') {
+                $candidate = $backupPath.DIRECTORY_SEPARATOR.$archiveName;
+                if ($filesystem->exists($candidate)) {
+                    $expectedMediaHash = $mediaConfig['hash'] ?? null;
+                    if (is_string($expectedMediaHash) && $expectedMediaHash !== '' && hash_file('sha256', $candidate) !== $expectedMediaHash) {
+                        $this->error('Media archive hash does not match the manifest.');
+
+                        return self::FAILURE;
+                    }
+
+                    $mediaArchive = $candidate;
+                } else {
+                    $this->warn('Media archive listed in the manifest is missing.');
+                }
+            }
+        }
+
+        $tempRoot = $this->stringOrDefault(config('backup.verify.temp_root'), storage_path('app/backup-verification'));
+        $filesystem->ensureDirectoryExists($tempRoot);
+        $tempPath = $tempRoot.DIRECTORY_SEPARATOR.Str::uuid()->toString();
+        $filesystem->ensureDirectoryExists($tempPath);
+
+        try {
+            if ($mediaArchive !== null) {
+                $this->extractMediaArchive($mediaArchive, $tempPath);
+                $this->info('Media archive extracted successfully.');
+            }
+
+            $databaseConfig = Arr::get($manifest, 'database');
+            if (! is_array($databaseConfig)) {
+                throw new RuntimeException('Database configuration is missing from the manifest.');
+            }
+
+            /** @var array<string, mixed> $databaseConfig */
+            $databaseConfig = $databaseConfig;
+
+            $connection = $this->restoreDatabase($databaseConfig, $dumpFile);
+            $sanityConfig = Arr::get($manifest, 'sanity', []);
+            if (! is_array($sanityConfig)) {
+                $sanityConfig = [];
+            }
+
+            $this->runSanityChecks($connection, $sanityConfig);
+        } catch (RuntimeException|ProcessFailedException $exception) {
             $this->error($exception->getMessage());
 
             return self::FAILURE;
+        } finally {
+            if (! $this->option('keep-temp')) {
+                $filesystem->deleteDirectory($tempPath);
+            }
         }
 
-        $schema = Schema::connection($connectionName);
-        $schema->dropIfExists('users');
-        $schema->dropIfExists('products');
-
-        $schema->create('users', function (Blueprint $table): void {
-            $table->integer('id')->primary();
-            $table->string('name');
-            $table->string('email')->nullable();
-            $table->string('preferred_locale')->nullable();
-            $table->timestamps();
-        });
-
-        $schema->create('products', function (Blueprint $table): void {
-            $table->integer('id')->primary();
-            $table->string('name');
-            $table->string('sku');
-            $table->decimal('price', 12, 2)->nullable();
-            $table->timestamps();
-        });
-
-        $connection = DB::connection($connectionName);
-
-        $this->seedTable($connectionName, 'users', $usersPayload['records']);
-        $this->seedTable($connectionName, 'products', $productsPayload['records']);
-
-        $userCount = $connection->table('users')->count();
-        $productCount = $connection->table('products')->count();
-
-        if ($userCount !== (int) $usersPayload['count']) {
-            $this->error(sprintf('User count mismatch. Expected %d, got %d.', $usersPayload['count'], $userCount));
-
-            return self::FAILURE;
-        }
-
-        if ($productCount !== (int) $productsPayload['count']) {
-            $this->error(sprintf('Product count mismatch. Expected %d, got %d.', $productsPayload['count'], $productCount));
-
-            return self::FAILURE;
-        }
-
-        $this->info('Backup artifacts verified successfully.');
+        $this->info('Backup verification completed successfully.');
 
         return self::SUCCESS;
     }
 
     /**
-     * @return array{count:int, records:array<int, array{id:int, name?:mixed, email?:mixed, preferred_locale?:mixed, sku?:mixed, price?:mixed}>}
+     * @param  array<string, mixed>  $databaseConfig
      */
-    private function decodeArtifact(FilesystemAdapter $disk, string $path): array
+    private function restoreDatabase(array $databaseConfig, string $dumpFile): ConnectionInterface
     {
-        if (! $disk->exists($path)) {
-            throw new InvalidArgumentException(sprintf('Backup artifact [%s] does not exist on the [%s] disk.', $path, $disk->getConfig()['driver'] ?? 'unknown'));
+        $driver = $this->stringOrDefault($databaseConfig['driver'] ?? null, '');
+        if ($driver === '') {
+            throw new RuntimeException('Database driver is missing from the backup manifest.');
         }
 
-        try {
-            $contents = $disk->get($path);
-        } catch (FileNotFoundException $exception) {
-            throw new InvalidArgumentException($exception->getMessage(), (int) $exception->getCode(), $exception);
+        $configuredDefault = $this->stringOrDefault(config('backup.database.connection'), $this->defaultConnectionName());
+        $connectionName = $this->stringOrDefault($databaseConfig['connection'] ?? null, $configuredDefault);
+
+        /** @var array<string, mixed>|null $sourceConfig */
+        $sourceConfig = config("database.connections.{$connectionName}");
+        if (! is_array($sourceConfig)) {
+            throw new RuntimeException(sprintf('Database connection [%s] is not configured.', $connectionName));
         }
 
-        if (! is_string($contents)) {
-            throw new InvalidArgumentException(sprintf('Backup artifact [%s] is not readable.', $path));
-        }
-
-        $payload = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
-
-        if (! is_array($payload) || ! isset($payload['count'], $payload['records']) || ! is_array($payload['records'])) {
-            throw new InvalidArgumentException(sprintf('Backup artifact [%s] is malformed.', $path));
-        }
-
-        if (! is_int($payload['count'])) {
-            throw new InvalidArgumentException(sprintf('Backup artifact [%s] is missing a numeric record count.', $path));
-        }
-
-        $count = $payload['count'];
-
-        $records = [];
-        foreach ($payload['records'] as $record) {
-            if (! is_array($record)) {
-                throw new InvalidArgumentException(sprintf('Backup artifact [%s] contains an invalid record.', $path));
-            }
-
-            if (! array_key_exists('id', $record) || ! is_int($record['id'])) {
-                throw new InvalidArgumentException(sprintf('Backup artifact [%s] contains a record without a numeric identifier.', $path));
-            }
-
-            $records[] = $record;
-        }
-
-        if (count($records) !== $count) {
-            throw new InvalidArgumentException(sprintf(
-                'Backup artifact [%s] record count mismatch. Expected %d entries, found %d.',
-                $path,
-                $count,
-                count($records)
-            ));
-        }
-
-        /** @var array<int, array{id:int, name?:mixed, email?:mixed, preferred_locale?:mixed, sku?:mixed, price?:mixed}> $records */
-        $records = $records;
-
-        return [
-            'count' => $count,
-            'records' => $records,
-        ];
+        return match ($driver) {
+            'mysql' => $this->restoreMysql($connectionName, $sourceConfig, $dumpFile),
+            'pgsql' => $this->restorePgsql($connectionName, $sourceConfig, $dumpFile),
+            'sqlite' => $this->restoreSqlite($databaseConfig, $dumpFile),
+            default => throw new RuntimeException(sprintf('Unsupported database driver [%s] in manifest.', $driver)),
+        };
     }
 
     /**
-     * @param  array<int, array{id:int, name?:mixed, email?:mixed, preferred_locale?:mixed, sku?:mixed, price?:mixed}>  $records
+     * @param  array<string, mixed>  $sourceConfig
      */
-    private function seedTable(string $connectionName, string $table, array $records): void
+    private function restoreMysql(string $connectionName, array $sourceConfig, string $dumpFile): ConnectionInterface
     {
-        if ($records === []) {
-            return;
+        $verifyConnection = $this->stringOrDefault(config('backup.verify.connection'), 'backup-verify');
+        $sourceDatabase = $this->stringOrDefault($sourceConfig['database'] ?? null, 'backup_verification');
+        $baseDatabase = $this->stringOrDefault(config('backup.verify.database'), $sourceDatabase);
+        $temporaryDatabase = sprintf('%s_%s', $baseDatabase, Str::lower(Str::random(6)));
+
+        $host = $this->stringOrDefault($sourceConfig['host'] ?? null, '127.0.0.1');
+        $port = $this->stringOrDefault($sourceConfig['port'] ?? null, '3306');
+        $username = $this->stringOrDefault($sourceConfig['username'] ?? null, 'root');
+        $password = $this->stringOrDefault($sourceConfig['password'] ?? null, '');
+        $charset = $this->stringOrDefault($sourceConfig['charset'] ?? null, 'utf8mb4');
+        $collation = $this->stringOrDefault($sourceConfig['collation'] ?? null, 'utf8mb4_unicode_ci');
+        $restoreBinary = $this->stringOrDefault(config('backup.database.restore_binary'), 'mysql');
+
+        $pdo = DB::connection($connectionName)->getPdo();
+        $pdo->exec(sprintf('DROP DATABASE IF EXISTS `%s`', str_replace('`', '``', $temporaryDatabase)));
+        $pdo->exec(sprintf('CREATE DATABASE `%s` CHARACTER SET %s COLLATE %s', str_replace('`', '``', $temporaryDatabase), $charset, $collation));
+
+        $command = sprintf(
+            '%s --host=%s --port=%s --user=%s %s < %s',
+            escapeshellcmd($restoreBinary),
+            escapeshellarg($host),
+            escapeshellarg($port),
+            escapeshellarg($username),
+            escapeshellarg($temporaryDatabase),
+            escapeshellarg($dumpFile),
+        );
+
+        $process = Process::fromShellCommandline($command, base_path(), $password === '' ? null : ['MYSQL_PWD' => $password]);
+        $process->setTimeout(null);
+
+        try {
+            $process->mustRun();
+        } catch (ProcessFailedException $exception) {
+            $pdo->exec(sprintf('DROP DATABASE IF EXISTS `%s`', str_replace('`', '``', $temporaryDatabase)));
+
+            throw $exception;
         }
 
-        $connection = DB::connection($connectionName);
+        $config = $sourceConfig;
+        $config['database'] = $temporaryDatabase;
+        config(['database.connections.'.$verifyConnection => $config]);
 
-        $normalized = [];
+        register_shutdown_function(static function () use ($verifyConnection, $temporaryDatabase, $connectionName): void {
+            DB::purge($verifyConnection);
+            $pdo = DB::connection($connectionName)->getPdo();
+            $pdo->exec(sprintf('DROP DATABASE IF EXISTS `%s`', str_replace('`', '``', $temporaryDatabase)));
+        });
 
-        foreach ($records as $record) {
-            /** @var array{id:int, name?:mixed, email?:mixed, preferred_locale?:mixed, sku?:mixed, price?:mixed} $record */
-            $id = $record['id'];
+        return DB::connection($verifyConnection);
+    }
 
-            if ($table === 'users') {
-                $nameValue = $record['name'] ?? '';
-                $emailValue = $record['email'] ?? null;
-                $localeValue = $record['preferred_locale'] ?? null;
+    /**
+     * @param  array<string, mixed>  $databaseConfig
+     * @param  array<string, mixed>  $sourceConfig
+     */
+    private function restorePgsql(string $connectionName, array $sourceConfig, string $dumpFile): ConnectionInterface
+    {
+        $verifyConnection = $this->stringOrDefault(config('backup.verify.connection'), 'backup-verify');
+        $sourceDatabase = $this->stringOrDefault($sourceConfig['database'] ?? null, 'backup_verification');
+        $baseDatabase = $this->stringOrDefault(config('backup.verify.database'), $sourceDatabase);
+        $temporaryDatabase = sprintf('%s_%s', $baseDatabase, Str::lower(Str::random(6)));
 
-                $normalized[] = [
-                    'id' => $id,
-                    'name' => is_string($nameValue) ? $nameValue : '',
-                    'email' => is_string($emailValue) ? $emailValue : null,
-                    'preferred_locale' => is_string($localeValue) ? $localeValue : null,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
+        $host = $this->stringOrDefault($sourceConfig['host'] ?? null, '127.0.0.1');
+        $port = $this->stringOrDefault($sourceConfig['port'] ?? null, '5432');
+        $username = $this->stringOrDefault($sourceConfig['username'] ?? null, 'postgres');
+        $password = $this->stringOrDefault($sourceConfig['password'] ?? null, '');
+        $restoreBinary = $this->stringOrDefault(config('backup.database.restore_binary'), 'psql');
 
-                continue;
-            }
+        $pdo = DB::connection($connectionName)->getPdo();
+        $pdo->exec(sprintf('DROP DATABASE IF EXISTS "%s"', str_replace('"', '""', $temporaryDatabase)));
+        $pdo->exec(sprintf('CREATE DATABASE "%s"', str_replace('"', '""', $temporaryDatabase)));
 
-            $nameValue = $record['name'] ?? '';
-            $skuValue = $record['sku'] ?? '';
-            $priceValue = $record['price'] ?? null;
-            $price = null;
+        $command = sprintf(
+            '%s --host=%s --port=%s --username=%s %s < %s',
+            escapeshellcmd($restoreBinary),
+            escapeshellarg($host),
+            escapeshellarg($port),
+            escapeshellarg($username),
+            escapeshellarg($temporaryDatabase),
+            escapeshellarg($dumpFile),
+        );
 
-            if (is_int($priceValue) || is_float($priceValue) || (is_string($priceValue) && is_numeric($priceValue))) {
-                $price = (float) $priceValue;
-            }
+        $process = Process::fromShellCommandline($command, base_path(), $password === '' ? null : ['PGPASSWORD' => $password]);
+        $process->setTimeout(null);
 
-            $normalized[] = [
-                'id' => $id,
-                'name' => is_string($nameValue) ? $nameValue : '',
-                'sku' => is_string($skuValue) ? $skuValue : '',
-                'price' => $price,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
+        try {
+            $process->mustRun();
+        } catch (ProcessFailedException $exception) {
+            $pdo->exec(sprintf('DROP DATABASE IF EXISTS "%s"', str_replace('"', '""', $temporaryDatabase)));
+
+            throw $exception;
         }
 
-        $connection->table($table)->insert($normalized);
+        $config = $sourceConfig;
+        $config['database'] = $temporaryDatabase;
+        config(['database.connections.'.$verifyConnection => $config]);
+
+        register_shutdown_function(static function () use ($verifyConnection, $temporaryDatabase, $connectionName): void {
+            DB::purge($verifyConnection);
+            $pdo = DB::connection($connectionName)->getPdo();
+            $pdo->exec(sprintf('DROP DATABASE IF EXISTS "%s"', str_replace('"', '""', $temporaryDatabase)));
+        });
+
+        return DB::connection($verifyConnection);
+    }
+
+    /**
+     * @param  array<string, mixed>  $databaseConfig
+     */
+    private function restoreSqlite(array $databaseConfig, string $dumpFile): ConnectionInterface
+    {
+        $verifyConnection = $this->stringOrDefault(config('backup.verify.connection'), 'backup-verify');
+        $databaseName = $this->stringOrDefault($databaseConfig['database'] ?? null, 'database.sqlite');
+        $baseName = basename($databaseName, '.sqlite');
+        $tempDatabase = storage_path('framework'.DIRECTORY_SEPARATOR.$baseName.'-backup-verify-'.Str::lower(Str::random(8)).'.sqlite');
+
+        $filesystem = new Filesystem;
+        $filesystem->ensureDirectoryExists(dirname($tempDatabase));
+        $filesystem->copy($dumpFile, $tempDatabase);
+
+        $config = [
+            'driver' => 'sqlite',
+            'database' => $tempDatabase,
+            'prefix' => '',
+            'foreign_key_constraints' => true,
+        ];
+
+        config(['database.connections.'.$verifyConnection => $config]);
+
+        register_shutdown_function(static function () use ($verifyConnection, $tempDatabase): void {
+            DB::purge($verifyConnection);
+            @unlink($tempDatabase);
+        });
+
+        return DB::connection($verifyConnection);
+    }
+
+    private function extractMediaArchive(string $mediaArchive, string $tempPath): void
+    {
+        $extractPath = $tempPath.DIRECTORY_SEPARATOR.'media';
+        $filesystem = new Filesystem;
+        $filesystem->ensureDirectoryExists($extractPath);
+
+        $process = new Process(['tar', '-xzf', $mediaArchive, '-C', $extractPath], base_path());
+        $process->setTimeout(null);
+        $process->run();
+
+        if (! $process->isSuccessful()) {
+            throw new ProcessFailedException($process);
+        }
+    }
+
+    /**
+     * @param  array<string, int|numeric-string>  $expected
+     */
+    private function runSanityChecks(ConnectionInterface $connection, array $expected): void
+    {
+        $userRepository = new UserRepository($connection);
+        $productRepository = new ProductRepository($connection);
+
+        $actualUsers = $userRepository->count();
+        $actualProducts = $productRepository->count();
+
+        $expectedUsers = (int) ($expected['users'] ?? $actualUsers);
+        $expectedProducts = (int) ($expected['products'] ?? $actualProducts);
+
+        if ($actualUsers !== $expectedUsers) {
+            throw new RuntimeException(sprintf('User count mismatch: expected %d, got %d.', $expectedUsers, $actualUsers));
+        }
+
+        if ($actualProducts !== $expectedProducts) {
+            throw new RuntimeException(sprintf('Product count mismatch: expected %d, got %d.', $expectedProducts, $actualProducts));
+        }
+
+        $this->info(sprintf('Sanity checks passed (users: %d, products: %d).', $actualUsers, $actualProducts));
+    }
+
+    private function defaultConnectionName(): string
+    {
+        $default = config('database.default');
+
+        return is_string($default) && $default !== '' ? $default : 'mysql';
+    }
+
+    private function stringOrDefault(mixed $value, string $default): string
+    {
+        return is_string($value) && $value !== '' ? $value : $default;
     }
 }
