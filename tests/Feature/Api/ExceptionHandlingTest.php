@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Api;
 
-use App\Support\ApiErrorResponse;
-use App\Support\ErrorCodes;
+use DomainException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
-use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Route;
-use RuntimeException;
-use Tests\Feature\TestCase;
+use Illuminate\Testing\Fluent\AssertableJson;
+use Illuminate\Testing\TestResponse;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
+use Tests\TestCase;
 
 final class ExceptionHandlingTest extends TestCase
 {
@@ -19,106 +20,111 @@ final class ExceptionHandlingTest extends TestCase
     {
         parent::setUp();
 
-        Route::middleware('api')->group(function (): void {
-            Route::get('/testing/exceptions/server', function (): void {
-                throw new RuntimeException('Unexpected failure');
-            });
-
-            Route::get('/testing/exceptions/not-found', function (): void {
-                abort(404, 'Record not found');
-            });
-
-            Route::get('/testing/exceptions/authentication', function (): void {
-                throw new AuthenticationException('Authentication required.');
-            });
-
-            Route::get('/testing/exceptions/authorization', function (): void {
-                throw new AuthorizationException('Missing [system.autocomplete] ability.');
-            });
-
-            Route::get('/testing/exceptions/rate-limited', function (): void {
-                // Simulate the framework's throttle middleware raising an HTTP 429.
-                abort(429, 'Too many requests, please try again later.');
-            });
-
-            Route::post('/testing/exceptions/validation', function (Request $request) {
-                $request->validate([
-                    'model_class' => ['required', 'string'],
+        Route::middleware('api')->prefix('api/test-exceptions')->group(function (): void {
+            Route::post('/validation', static function (): void {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'email' => ['The email field is required.'],
                 ]);
+            })->name('api.test.validation');
 
-                return response()->json(['ok' => true]);
-            });
+            Route::get('/authentication', static function (): void {
+                throw new AuthenticationException('Unauthenticated.');
+            })->name('api.test.authentication');
+
+            Route::get('/authorization', static function (): void {
+                throw new AuthorizationException('Forbidden action.');
+            })->name('api.test.authorization');
+
+            Route::get('/not-found', static function (): void {
+                $exception = new ModelNotFoundException();
+                $exception->setModel('App\\Models\\User');
+
+                throw $exception;
+            })->name('api.test.not-found');
+
+            Route::get('/rate-limit', static function (): void {
+                throw new TooManyRequestsHttpException(60, 'Too many requests.');
+            })->name('api.test.rate-limit');
+
+            Route::get('/server-error', static function (): void {
+                throw new DomainException('Domain failure.');
+            })->name('api.test.server');
+
+            Route::get('/unexpected', static function (): void {
+                throw new \RuntimeException('Unexpected failure.');
+            })->name('api.test.unexpected');
         });
     }
 
-    public function test_unhandled_exception_returns_problem_details(): void
+    public function test_validation_exceptions_are_rendered_as_problem_json(): void
     {
-        $response = $this->getJson('/testing/exceptions/server');
+        $response = $this->postJson('/api/test-exceptions/validation');
 
-        $response
-            ->assertStatus(500)
-            ->assertJsonPath('type', ApiErrorResponse::typeFor(ErrorCodes::SERVER_ERROR))
-            ->assertJsonPath('title', ErrorCodes::describe(ErrorCodes::SERVER_ERROR))
-            ->assertJsonPath('error.code', ErrorCodes::SERVER_ERROR)
-            ->assertJsonStructure([
-                'correlation' => ['trace_id', 'correlation_id'],
-                'meta'        => ['locale', 'timestamp'],
-            ]);
+        $response->assertStatus(422);
+        $this->assertProblemJson($response, 'validation_error');
+        $response->assertJsonPath('error.details.errors.email.0', 'The email field is required.');
     }
 
-    public function test_validation_exception_returns_structured_violations(): void
+    public function test_authentication_exceptions_are_rendered_as_problem_json(): void
     {
-        $response = $this->postJson('/testing/exceptions/validation', []);
+        $response = $this->getJson('/api/test-exceptions/authentication');
 
-        $response
-            ->assertStatus(422)
-            ->assertJsonPath('type', ApiErrorResponse::typeFor(ErrorCodes::VALIDATION_FAILED))
-            ->assertJsonPath('error.code', ErrorCodes::VALIDATION_FAILED)
-            ->assertJsonPath('error.context.violations.0.field', 'model_class')
-            ->assertJsonPath('error.context.violations.0.reason', 'The model class field is required.');
+        $response->assertStatus(401);
+        $this->assertProblemJson($response, 'unauthenticated');
     }
 
-    public function test_authentication_exception_uses_shared_error_code(): void
+    public function test_authorization_exceptions_are_rendered_as_problem_json(): void
     {
-        $response = $this->getJson('/testing/exceptions/authentication');
+        $response = $this->getJson('/api/test-exceptions/authorization');
 
-        $response
-            ->assertStatus(401)
-            ->assertJsonPath('type', ApiErrorResponse::typeFor(ErrorCodes::UNAUTHORIZED))
-            ->assertJsonPath('error.code', ErrorCodes::UNAUTHORIZED)
-            ->assertJsonPath('detail', 'Authentication required.');
+        $response->assertStatus(403);
+        $this->assertProblemJson($response, 'forbidden');
     }
 
-    public function test_authorization_exception_uses_shared_error_code(): void
+    public function test_not_found_exceptions_are_rendered_as_problem_json(): void
     {
-        $response = $this->getJson('/testing/exceptions/authorization');
+        $response = $this->getJson('/api/test-exceptions/not-found');
 
-        $response
-            ->assertStatus(403)
-            ->assertJsonPath('type', ApiErrorResponse::typeFor(ErrorCodes::FORBIDDEN))
-            ->assertJsonPath('error.code', ErrorCodes::FORBIDDEN)
-            ->assertJsonPath('error.context.reason', 'Missing [system.autocomplete] ability.');
+        $response->assertStatus(404);
+        $this->assertProblemJson($response, 'resource_not_found');
     }
 
-    public function test_http_exception_maps_to_not_found_error_code(): void
+    public function test_rate_limited_exceptions_are_rendered_as_problem_json(): void
     {
-        $response = $this->getJson('/testing/exceptions/not-found');
+        $response = $this->getJson('/api/test-exceptions/rate-limit');
 
-        $response
-            ->assertStatus(404)
-            ->assertJsonPath('type', ApiErrorResponse::typeFor(ErrorCodes::NOT_FOUND))
-            ->assertJsonPath('error.code', ErrorCodes::NOT_FOUND)
-            ->assertJsonPath('detail', 'Record not found');
+        $response->assertStatus(429);
+        $this->assertProblemJson($response, 'rate_limited');
+        $this->assertSame(60, $response->json('error.details.retry_after'));
     }
 
-    public function test_too_many_requests_exception_maps_to_rate_limited_code(): void
+    public function test_domain_exceptions_are_rendered_as_problem_json(): void
     {
-        $response = $this->getJson('/testing/exceptions/rate-limited');
+        $response = $this->getJson('/api/test-exceptions/server-error');
 
-        $response
-            ->assertStatus(429)
-            ->assertJsonPath('type', ApiErrorResponse::typeFor(ErrorCodes::RATE_LIMITED))
-            ->assertJsonPath('error.code', ErrorCodes::RATE_LIMITED)
-            ->assertJsonPath('detail', 'Too many requests, please try again later.');
+        $response->assertStatus(400);
+        $this->assertProblemJson($response, 'domain_error');
+    }
+
+    public function test_unhandled_exceptions_are_rendered_as_problem_json(): void
+    {
+        $response = $this->getJson('/api/test-exceptions/unexpected');
+
+        $response->assertStatus(500);
+        $this->assertProblemJson($response, 'server_error');
+    }
+
+    private function assertProblemJson(TestResponse $response, string $expectedCode): void
+    {
+        $response->assertHeader('Content-Type', 'application/problem+json');
+
+        $response->assertJson(fn (AssertableJson $json) => $json
+            ->has('error', fn (AssertableJson $error) => $error
+                ->where('code', $expectedCode)
+                ->whereType('message', 'string')
+                ->where('details', fn ($value) => is_array($value) || $value === null)
+                ->where('correlation_id', fn ($value) => is_string($value) && preg_match('/^[0-9a-fA-F-]{36}$/', $value) === 1)
+            )
+        );
     }
 }
