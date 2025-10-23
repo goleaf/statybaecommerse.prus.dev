@@ -19,8 +19,7 @@ Laravel 12 provides the HTTP kernel, queue worker, and scheduler. Filament v4 su
 - `app/Http/Controllers/` & `routes/*.php` — REST controllers and route definitions. `routes/admin.php` adds Filament-specific routing while `routes/web.php` handles storefront flows.
 - `app/Services/` — Coarse-grained services (pricing engines, recommendation systems, marketing automation). Many services accept DTOs from `app/Data/` and emit events consumed by listeners in `app/Listeners/`.
 - `app/Actions/` — Reusable command objects invoked by jobs, controllers, or Filament actions. Actions encapsulate multi-step workflows (e.g., syncing external catalogues).
-- `app/Support/` — Helper classes and traits shared across services/resources, including caching helpers, locale utilities, and feature toggles.
-- `app/Support/Authorization/AuthorizationMatrix.php` now inspects the active Filament panel to resolve the correct guard, and safely falls back to configuration defaults whenever the Filament container binding is unavailable (e.g., storefront queues), ensuring admin-only policies keep working even if `filament.auth.guard` is not explicitly configured.
+- `app/Support/` — Helper classes and traits shared across services/resources, including caching helpers, locale utilities, feature toggles, and the Filament navigation facade (`App\\Support\\Nav`) with its optional trait (`App\\Support\\Concerns\\HasNav`).
 - `app/Jobs/` — Queueable jobs for imports, report generation, and notification delivery. Horizon monitors these queues; configuration lives in `config/horizon.php`.
 - `app/Observers/` & `app/Events/` — Domain events driving audit trails via `spatie/laravel-activitylog` and asynchronous side effects.
 
