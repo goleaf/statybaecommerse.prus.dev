@@ -2,7 +2,6 @@ import './bootstrap';
 import './shared/utilities.js';
 import './frontend.js';
 import './modern-interactions.js';
-import './livewire-bridge.js';
 import '@fontsource/inter/latin.css';
 import '@fontsource/space-grotesk/latin.css';
 import '@fontsource/figtree/latin.css';
