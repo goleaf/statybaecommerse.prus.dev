@@ -136,6 +136,26 @@ final class CacheInvalidationService
                 Cache::tags(CacheTagHelper::brands())->forget(CacheKeys::brandTopList($limit));
             }
         }
+
+        foreach ($this->supportedLocales() as $locale) {
+            // Ensure both the legacy navigation cache keys and the new locale-aware
+            // helpers are cleared so header menus immediately reflect brand edits.
+            $navigationKey = CacheKeys::navigationFeaturedBrands($locale);
+            $legacyNavigationKey = 'nav:featured_brands:'.$locale;
+
+            Cache::forget($navigationKey);
+            Cache::forget($legacyNavigationKey);
+
+            if (CacheTagHelper::supportsTags()) {
+                $brandLocaleTags = CacheTagHelper::merge(
+                    CacheTagHelper::brands(),
+                    CacheTagHelper::locale($locale)
+                );
+
+                Cache::tags($brandLocaleTags)->forget($navigationKey);
+                Cache::tags($brandLocaleTags)->forget($legacyNavigationKey);
+            }
+        }
     }
 
     /**
