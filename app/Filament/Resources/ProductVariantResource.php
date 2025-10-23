@@ -10,6 +10,7 @@ use App\Models\AttributeValue;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -532,6 +533,27 @@ final class ProductVariantResource extends Resource
                             default       => $query,
                         };
                     }),
+                Filter::make('sku')
+                    ->label(__('product_variants.fields.sku'))
+                    ->form([
+                        SearchableInput::make('sku')
+                            ->label(__('product_variants.fields.sku'))
+                            ->maxLength(255)
+                            ->searchUsing(fn (string $search): array => self::variantSkuSuggestions($search))
+                            ->options(fn (): array => self::variantSkuSuggestions()),
+                    ])
+                    ->indicateUsing(fn (array $data): array => filled($data['sku'] ?? null)
+                        ? [__('product_variants.fields.sku') . ': ' . $data['sku']]
+                        : [])
+                    ->query(function (Builder $query, array $data): Builder {
+                        $sku = $data['sku'] ?? null;
+
+                        if (! filled($sku)) {
+                            return $query;
+                        }
+
+                        return $query->where('sku', 'like', "%{$sku}%");
+                    }),
                 TernaryFilter::make('is_enabled')
                     ->label(__('product_variants.fields.is_enabled')),
                 TernaryFilter::make('is_default_variant')
@@ -609,29 +631,16 @@ final class ProductVariantResource extends Resource
     /**
      * @return array<int, string>
      */
-    private static function searchProductOptions(string $search): array
+    private static function variantSkuSuggestions(?string $search = null): array
     {
-        $term = trim($search);
-
-        if ($term === '') {
-            return [];
-        }
-
-        return Product::query()
-            ->select(['name', 'sku'])
-            ->where(function (Builder $query) use ($term): void {
-                $query
-                    ->where('name', 'like', "%{$term}%")
-                    ->orWhere('sku', 'like', "%{$term}%");
-            })
-            ->orderBy('name')
-            ->limit(15)
-            ->get()
-            ->map(static function (Product $product): string {
-                $sku = $product->sku;
-
-                return ltrim(($sku ? "[{$sku}] " : '') . $product->name);
-            })
+        return ProductVariant::query()
+            ->select('sku')
+            ->whereNotNull('sku')
+            ->when($search !== null, fn (Builder $query): Builder => $query->where('sku', 'like', "%{$search}%"))
+            ->orderBy('sku')
+            ->limit(25)
+            ->pluck('sku')
+            ->filter()
             ->unique()
             ->values()
             ->all();

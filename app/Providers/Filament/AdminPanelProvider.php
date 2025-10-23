@@ -143,8 +143,8 @@ final class AdminPanelProvider extends PanelProvider
                     ResizedColumnPlugin::make()
                         ->preserveOnDB(),
                 ]))
-            // Remove custom Vite theme to ensure default Filament styles load
-            // ->viteTheme('resources/css/filament-enhancements.css')
+            // Load the enhanced theme so third-party component styles (e.g. searchable inputs) compile correctly.
+            ->viteTheme('resources/css/filament-enhancements.css')
             ->spa();
     }
 

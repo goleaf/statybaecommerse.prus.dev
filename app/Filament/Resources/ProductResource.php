@@ -20,6 +20,7 @@ use App\Services\Export\Exporters\ProductExport;
 use App\Services\Export\ExportService;
 use App\Support\Authorization\AuthorizationMatrix;
 use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -211,9 +212,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                                     ->required()
                                                     ->maxLength(255)
                                                     ->live()
-                                                    ->afterStateUpdated(function (?string $state, callable $set): void {
-                                                        $set('slug', Str::slug((string) $state));
-                                                    }),
+                                                    ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
                                                 TextInput::make('slug')
                                                     ->label(__('products.fields.slug'))
                                                     ->required()
@@ -606,28 +605,73 @@ final class ProductResource extends Resource implements DefinesExportColumns
                     ->label(__('products.fields.track_stock')),
                 TernaryFilter::make('allow_backorder')
                     ->label(__('products.fields.allow_backorder')),
-                ValueRangeFilter::make('price')
-                    ->label(__('products.fields.price'))
-                    ->currency()
-                    ->currencyCode('EUR')
-                    ->locale('lt')
-                    ->currencyInSmallestUnit(false),
-                ValueRangeFilter::make('compare_price')
-                    ->label(__('products.fields.compare_price'))
-                    ->currency()
-                    ->currencyCode('EUR')
-                    ->locale('lt')
-                    ->currencyInSmallestUnit(false),
-                ValueRangeFilter::make('cost_price')
-                    ->label(__('products.fields.cost_price'))
-                    ->currency()
-                    ->currencyCode('EUR')
-                    ->locale('lt')
-                    ->currencyInSmallestUnit(false),
-                ValueRangeFilter::make('stock_quantity')
-                    ->label(__('products.fields.stock')),
-                ValueRangeFilter::make('weight')
-                    ->label(__('products.fields.weight')),
+                Filter::make('sku')
+                    ->label(__('products.fields.sku'))
+                    ->form([
+                        SearchableInput::make('sku')
+                            ->label(__('products.fields.sku'))
+                            ->maxLength(255)
+                            ->searchUsing(fn (string $search): array => self::skuSuggestions($search))
+                            ->options(fn (): array => self::skuSuggestions()),
+                    ])
+                    ->indicateUsing(fn (array $data): array => filled($data['sku'] ?? null)
+                        ? [__('products.fields.sku') . ': ' . $data['sku']]
+                        : [])
+                    ->query(function (Builder $query, array $data): Builder {
+                        $sku = $data['sku'] ?? null;
+
+                        if (! filled($sku)) {
+                            return $query;
+                        }
+
+                        return $query->where('sku', 'like', "%{$sku}%");
+                    }),
+                Filter::make('price_range')
+                    ->label(__('products.filters.price_range'))
+                    ->form([
+                        TextInput::make('price_from')
+                            ->label(__('products.filters.price_from'))
+                            ->numeric()
+                            ->prefix('€'),
+                        TextInput::make('price_to')
+                            ->label(__('products.filters.price_to'))
+                            ->numeric()
+                            ->prefix('€'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['price_from'],
+                                fn (Builder $query, $price): Builder => $query->where('price', '>=', $price),
+                            )
+                            ->when(
+                                $data['price_to'],
+                                fn (Builder $query, $price): Builder => $query->where('price', '<=', $price),
+                            );
+                    }),
+                Filter::make('weight_range')
+                    ->label(__('products.filters.weight_range'))
+                    ->form([
+                        TextInput::make('weight_from')
+                            ->label(__('products.filters.weight_from'))
+                            ->numeric()
+                            ->suffix('kg'),
+                        TextInput::make('weight_to')
+                            ->label(__('products.filters.weight_to'))
+                            ->numeric()
+                            ->suffix('kg'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['weight_from'],
+                                fn (Builder $query, $weight): Builder => $query->where('weight', '>=', $weight),
+                            )
+                            ->when(
+                                $data['weight_to'],
+                                fn (Builder $query, $weight): Builder => $query->where('weight', '<=', $weight),
+                            );
+                    }),
                 Filter::make('low_stock')
                     ->label(__('products.filters.low_stock'))
                     ->query(fn (Builder $query): Builder => $query->whereColumn('stock_quantity', '<=', 'low_stock_threshold')),
@@ -865,16 +909,21 @@ final class ProductResource extends Resource implements DefinesExportColumns
         ];
     }
 
-    private static function authorizeProduct(?Product $product, string $ability): bool
+    /**
+     * @return array<int, string>
+     */
+    private static function skuSuggestions(?string $search = null): array
     {
-        $user = auth()->user();
-
-        if (! $user) {
-            return false;
-        }
-
-        return $product instanceof Product
-            ? $user->can($ability, $product)
-            : $user->can($ability, Product::class);
+        return Product::query()
+            ->select('sku')
+            ->whereNotNull('sku')
+            ->when($search !== null, fn (Builder $query): Builder => $query->where('sku', 'like', "%{$search}%"))
+            ->orderBy('sku')
+            ->limit(25)
+            ->pluck('sku')
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
     }
 }

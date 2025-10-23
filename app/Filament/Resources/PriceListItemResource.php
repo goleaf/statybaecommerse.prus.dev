@@ -9,8 +9,13 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\PriceListItemResource\Pages;
 use App\Models\PriceListItem;
 use App\Models\Product;
-use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -262,35 +267,33 @@ final class PriceListItemResource extends Resource
                 SelectFilter::make('price_list_id')
                     ->relationship('priceList', 'name')
                     ->preload(),
-                Filter::make('product_lookup')
+                SelectFilter::make('product_id')
+                    ->relationship('product', 'name')
+                    ->searchable()
+                    ->preload(),
+                Filter::make('product_search')
                     ->label(__('price_list_items.product'))
                     ->form([
-                        SearchableInput::make('product_name')
+                        SearchableInput::make('product_search')
                             ->label(__('price_list_items.product'))
-                            ->placeholder(__('products.filters.product_placeholder'))
                             ->maxLength(255)
-                            ->searchUsing(fn (string $search): array => self::searchProductOptions($search)),
+                            ->searchUsing(fn (string $search): array => self::productLookupSuggestions($search))
+                            ->options(fn (): array => self::productLookupSuggestions()),
                     ])
-                    ->indicateUsing(function (array $data): array {
-                        $value = trim((string) ($data['product_name'] ?? ''));
-
-                        if ($value === '') {
-                            return [];
-                        }
-
-                        return [__('price_list_items.product') . ': ' . $value];
-                    })
+                    ->indicateUsing(fn (array $data): array => filled($data['product_search'] ?? null)
+                        ? [__('price_list_items.product') . ': ' . $data['product_search']]
+                        : [])
                     ->query(function (Builder $query, array $data): Builder {
-                        $value = trim((string) ($data['product_name'] ?? ''));
+                        $term = $data['product_search'] ?? null;
 
-                        if ($value === '') {
+                        if (! filled($term)) {
                             return $query;
                         }
 
-                        return $query->whereHas('product', function (Builder $relationQuery) use ($value): void {
-                            $relationQuery
-                                ->where('name', 'like', "%{$value}%")
-                                ->orWhere('sku', 'like', "%{$value}%");
+                        return $query->whereHas('product', function (Builder $productQuery) use ($term): void {
+                            $productQuery
+                                ->where('name', 'like', "%{$term}%")
+                                ->orWhere('sku', 'like', "%{$term}%");
                         });
                     }),
                 TernaryFilter::make('is_active')
@@ -439,29 +442,26 @@ final class PriceListItemResource extends Resource
     /**
      * @return array<int, string>
      */
-    private static function searchProductOptions(string $search): array
+    private static function productLookupSuggestions(?string $search = null): array
     {
-        $term = trim($search);
-
-        if ($term === '') {
-            return [];
-        }
-
         return Product::query()
             ->select(['name', 'sku'])
-            ->where(function (Builder $query) use ($term): void {
-                $query
-                    ->where('name', 'like', "%{$term}%")
-                    ->orWhere('sku', 'like', "%{$term}%");
+            ->when($search !== null, function (Builder $query) use ($search): Builder {
+                return $query->where(function (Builder $query) use ($search): void {
+                    $query
+                        ->where('name', 'like', "%{$search}%")
+                        ->orWhere('sku', 'like', "%{$search}%");
+                });
             })
             ->orderBy('name')
-            ->limit(15)
+            ->limit(25)
             ->get()
             ->map(static function (Product $product): string {
-                $sku = $product->sku;
+                $sku = $product->sku ? ' (' . $product->sku . ')' : '';
 
-                return ltrim(($sku ? "[{$sku}] " : '') . $product->name);
+                return $product->name . $sku;
             })
+            ->filter()
             ->unique()
             ->values()
             ->all();
