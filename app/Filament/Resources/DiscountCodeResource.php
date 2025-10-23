@@ -15,6 +15,8 @@ use Filament\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -24,15 +26,12 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 final class DiscountCodeResource extends Resource
 {
@@ -40,9 +39,15 @@ final class DiscountCodeResource extends Resource
 
     protected static ?string $model = DiscountCode::class;
 
-    
+    /**
+     * @var BackedEnum|string|null Icon displayed in the Filament navigation.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
-    
+    public static function getNavigationGroup(): string
+    {
+        return 'Marketing';
+    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -100,6 +105,7 @@ final class DiscountCodeResource extends Resource
                                     'buy_x_get_y'   => __('discount_codes.types.buy_x_get_y'),
                                 ])
                                 ->default('percentage')
+                                ->required()
                                 ->live(),
                             TextInput::make('value')
                                 ->label(__('discount_codes.value'))
@@ -326,7 +332,7 @@ final class DiscountCodeResource extends Resource
                     ->native(false),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 EditAction::make(),
                 Action::make('toggle_active')
                     ->label(fn (DiscountCode $record): string => $record->is_active ? __('discount_codes.deactivate') : __('discount_codes.activate'))

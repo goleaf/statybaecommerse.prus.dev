@@ -7,6 +7,7 @@ namespace App\Filament\Resources\DiscountCodeResource\RelationManagers;
 use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -76,7 +77,7 @@ final class RedemptionsRelationManager extends BaseRelationManager
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
