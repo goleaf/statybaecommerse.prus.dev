@@ -8,7 +8,7 @@ use App\Filament\Components\Combobox;
 use App\Filament\Resources\CollectionResource\Pages;
 use App\Models\Collection;
 use BackedEnum;
-use Filament\Forms\Components\Combobox;
+use Novadaemon\FilamentCombobox\Combobox;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
