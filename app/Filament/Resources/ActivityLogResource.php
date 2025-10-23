@@ -7,7 +7,9 @@ namespace App\Filament\Resources;
 use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\ActivityLogResource\Pages;
 use App\Models\ActivityLog;
-use App\Support\Filament\Components\Flatpickr;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
 use App\Support\Filament\Filters\DateRangeFilter;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -24,7 +26,10 @@ final class ActivityLogResource extends Resource
 {
     protected static ?string $model = ActivityLog::class;
 
-    /** @var string|\BackedEnum|null */
+    /**
+     * @var string|\BackedEnum|null Icon used in the navigation menu to help operators
+     * keep the activity feed grouped with other system tools.
+     */
     protected static $navigationIcon = 'heroicon-o-document-text';
 
     protected static ?int $navigationSort = 9;
@@ -66,6 +71,8 @@ final class ActivityLogResource extends Resource
      */
     public static function form(Form $form): Form
     {
+        // Keep the form hook ready for future enhancements while explicitly
+        // returning the given Form instance, matching Filament v4 expectations.
         return $form->schema([]);
     }
 
@@ -103,20 +110,10 @@ final class ActivityLogResource extends Resource
             ->filters([
                 SelectFilter::make('log_name')
                     ->label(__('Log Name'))
-                    ->options(fn (): array => $modelClass::query()
-                        ->select('log_name')
-                        ->whereNotNull('log_name')
-                        ->distinct()
-                        ->pluck('log_name', 'log_name')
-                        ->toArray()),
+                    ->options(fn (): array => self::getDistinctFilterOptions('log_name')),
                 SelectFilter::make('subject_type')
                     ->label(__('Subject Type'))
-                    ->options(fn (): array => $modelClass::query()
-                        ->select('subject_type')
-                        ->whereNotNull('subject_type')
-                        ->distinct()
-                        ->pluck('subject_type', 'subject_type')
-                        ->toArray()),
+                    ->options(fn (): array => self::getDistinctFilterOptions('subject_type')),
                 Filter::make('created_at')
                     ->form([
                         Flatpickr::makeRange('range')
@@ -176,8 +173,19 @@ final class ActivityLogResource extends Resource
         ];
     }
 
-    public static function getRecordTitleAttribute(): ?string
+    /**
+     * Fetch distinct column values for select filters while keeping the list sorted
+     * alphabetically to provide a predictable operator experience.
+     */
+    private static function getDistinctFilterOptions(string $column): array
     {
-        return self::$recordTitleAttribute;
+        return ActivityLog::query()
+            ->select($column)
+            ->whereNotNull($column)
+            ->where($column, '!=', '')
+            ->distinct()
+            ->orderBy($column)
+            ->pluck($column, $column)
+            ->toArray();
     }
 }
