@@ -2,6 +2,7 @@ name: CI + Auto Merge
 
 on:
   pull_request:
+    # Listen to review-related events so automerge re-evaluates when status changes.
     types:
       - opened
       - synchronize
@@ -20,6 +21,7 @@ jobs:
   automerge:
     name: Auto-merge PR (squash) and delete branch
     runs-on: ubuntu-latest
+    # Require the explicit auto-merge label so only trusted flows are merged automatically.
     if: github.event.pull_request.draft == false && contains(github.event.pull_request.labels.*.name, 'auto-merge')
     steps:
       - name: Automerge

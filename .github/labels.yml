@@ -13,6 +13,7 @@
 - name: "priority:*"
   color: "5319e7"
   description: "Placeholder priority label to be replaced during triage"
+# Labels supporting automated dependency maintenance flows.
 - name: "dependencies"
   color: "0366d6"
   description: "Automated dependency updates"
