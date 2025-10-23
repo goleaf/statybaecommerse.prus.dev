@@ -33,17 +33,15 @@ final class DomainExceptionResponseTest extends TestCase
 
         $response
             ->assertStatus(404)
-            ->assertJsonStructure([
-                'error' => ['code', 'message', 'status'],
-                'meta' => ['correlation_id', 'locale'],
-            ])
+            ->assertJsonStructure(['error' => ['code', 'message'], 'correlation_id'])
             ->assertJson([
                 'error' => [
                     'code' => ErrorCodes::ORDER_NOT_FOUND,
-                    'status' => 404,
-                ],
-                'meta' => [
-                    'locale' => $defaultLocale,
+                    'message' => TranslationService::get(
+                        ErrorCodes::messageKey(ErrorCodes::ORDER_NOT_FOUND),
+                        ['order' => 'ORD-123'],
+                        $defaultLocale,
+                    ),
                 ],
             ]);
 
@@ -68,23 +66,17 @@ final class DomainExceptionResponseTest extends TestCase
 
         $response
             ->assertStatus(409)
-            ->assertJsonStructure([
-                'error' => ['code', 'message', 'status'],
-                'meta' => ['correlation_id', 'locale'],
-            ])
             ->assertJson([
                 'error' => [
                     'code' => ErrorCodes::INVENTORY_INSUFFICIENT,
-                    'status' => 409,
+                    'message' => TranslationService::get(
+                        ErrorCodes::messageKey(ErrorCodes::INVENTORY_INSUFFICIENT),
+                        ['sku' => 'SKU-42'],
+                        $defaultLocale,
+                    ),
                 ],
-            ]);
-
-        $expectedMessage = TranslationService::get(
-            ErrorCodes::translationKey(ErrorCodes::INVENTORY_INSUFFICIENT),
-            ['sku' => 'SKU-42'],
-            $defaultLocale
-        );
-        $this->assertSame($expectedMessage, $response->json('error.message'));
+            ])
+            ->assertJsonStructure(['error' => ['code', 'message'], 'correlation_id']);
     }
 
     public function test_accept_language_header_changes_localized_message(): void
@@ -94,16 +86,11 @@ final class DomainExceptionResponseTest extends TestCase
             ->assertStatus(404)
             ->assertJson([
                 'error' => [
-                    'code' => ErrorCodes::ORDER_NOT_FOUND,
-                    'status' => 404,
                     'message' => TranslationService::get(
-                        ErrorCodes::translationKey(ErrorCodes::ORDER_NOT_FOUND),
+                        ErrorCodes::messageKey(ErrorCodes::ORDER_NOT_FOUND),
                         ['order' => 'ORD-123'],
-                        'en'
+                        'en',
                     ),
-                ],
-                'meta' => [
-                    'locale' => 'en',
                 ],
             ]);
 
@@ -112,16 +99,11 @@ final class DomainExceptionResponseTest extends TestCase
             ->assertStatus(404)
             ->assertJson([
                 'error' => [
-                    'code' => ErrorCodes::ORDER_NOT_FOUND,
-                    'status' => 404,
                     'message' => TranslationService::get(
-                        ErrorCodes::translationKey(ErrorCodes::ORDER_NOT_FOUND),
+                        ErrorCodes::messageKey(ErrorCodes::ORDER_NOT_FOUND),
                         ['order' => 'ORD-123'],
-                        'de'
+                        'de',
                     ),
-                ],
-                'meta' => [
-                    'locale' => 'de',
                 ],
             ]);
     }
@@ -136,16 +118,11 @@ final class DomainExceptionResponseTest extends TestCase
             ->assertStatus(404)
             ->assertJson([
                 'error' => [
-                    'code' => ErrorCodes::ORDER_NOT_FOUND,
-                    'status' => 404,
                     'message' => TranslationService::get(
-                        ErrorCodes::translationKey(ErrorCodes::ORDER_NOT_FOUND),
+                        ErrorCodes::messageKey(ErrorCodes::ORDER_NOT_FOUND),
                         ['order' => 'ORD-123'],
-                        $defaultLocale
+                        $defaultLocale,
                     ),
-                ],
-                'meta' => [
-                    'locale' => $defaultLocale,
                 ],
             ]);
     }

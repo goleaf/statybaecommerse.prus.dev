@@ -2,36 +2,35 @@
 
 declare(strict_types=1);
 
-use App\Support\ErrorCodes;
-
 return [
-    // @translators: Сообщение при отсутствии страницы или записи (HTTP 404).
-    ErrorCodes::normalizedTranslationKey(ErrorCodes::NOT_FOUND) => 'Страница не найдена.',
-
-    // @translators: Сообщение при некорректной или неполной HTTP-запросе (HTTP 400).
-    ErrorCodes::normalizedTranslationKey(ErrorCodes::BAD_REQUEST) => 'Запрос не может быть обработан.',
-
-    // @translators: Сообщение при использовании неподдерживаемого HTTP-метода (HTTP 405).
-    ErrorCodes::normalizedTranslationKey(ErrorCodes::METHOD_NOT_ALLOWED) => 'Метод не поддерживается.',
-
-    // @translators: Показывается при непредвиденной ошибке сервера (HTTP 500).
-    ErrorCodes::normalizedTranslationKey(ErrorCodes::SERVER_ERROR) => 'Произошла непредвиденная ошибка. Попробуйте позже.',
-
-    // @translators: Используется, когда введённые данные не проходят проверку.
-    ErrorCodes::normalizedTranslationKey(ErrorCodes::VALIDATION_FAILED) => 'Проверьте введённые данные.',
-
-    // @translators: Указывает, что пользователь должен войти в систему.
-    ErrorCodes::normalizedTranslationKey(ErrorCodes::UNAUTHORIZED) => 'Войдите в систему, чтобы продолжить.',
-
-    // @translators: Указывает, что у вошедшего пользователя нет прав для действия.
-    ErrorCodes::normalizedTranslationKey(ErrorCodes::FORBIDDEN) => 'У вас нет прав для этого действия.',
-
-    // @translators: Показывается, когда превышен лимит запросов (HTTP 429).
-    ErrorCodes::normalizedTranslationKey(ErrorCodes::TOO_MANY_REQUESTS) => 'Слишком много запросов. Попробуйте позже.',
-
-    // @translators: Ошибка домена, когда заказ не найден.
-    ErrorCodes::normalizedTranslationKey(ErrorCodes::ORDER_NOT_FOUND) => 'Заказ :order не найден.',
-
-    // @translators: Ошибка домена, когда недостаточно товара.
-    ErrorCodes::normalizedTranslationKey(ErrorCodes::INVENTORY_INSUFFICIENT) => 'Недостаточно товара для SKU :sku.',
+    'orders' => [
+        // @translators: Отображается, когда заказ с указанным номером не найден.
+        'not_found' => 'Заказ :order не найден.',
+    ],
+    'inventory' => [
+        // @translators: Отображается, когда для указанного SKU недостаточно запасов.
+        'insufficient' => 'Недостаточно запасов для SKU :sku.',
+    ],
+    'http' => [
+        // @translators: Сообщение по умолчанию для отсутствующих ресурсов (HTTP 404).
+        'not_found' => 'Запрашиваемый ресурс не найден.',
+        // @translators: Отображается, когда пользователь не авторизован (HTTP 401).
+        'unauthorized' => 'Для доступа к ресурсу необходимо выполнить вход.',
+        // @translators: Отображается, когда у пользователя нет прав (HTTP 403).
+        'forbidden' => 'У вас нет прав для выполнения этого действия.',
+        // @translators: Отображается, когда HTTP-метод не разрешен (HTTP 405).
+        'method_not_allowed' => 'Этот HTTP-метод не разрешён.',
+        // @translators: Отображается, когда запрос клиента сформирован неверно (HTTP 400).
+        'bad_request' => 'Не удалось обработать запрос из-за неверного формата.',
+        // @translators: Отображается, когда клиент превышает лимит запросов (HTTP 429).
+        'too_many_requests' => 'Слишком много запросов. Повторите попытку позже.',
+    ],
+    'validation' => [
+        // @translators: Отображается, когда отправленные данные не проходят проверку.
+        'failed' => 'Отправленные данные недействительны.',
+    ],
+    'internal' => [
+        // @translators: Сообщение по умолчанию для внутренних ошибок сервера (HTTP 500).
+        'server_error' => 'Произошла непредвиденная ошибка.',
+    ],
 ];
