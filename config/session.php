@@ -38,17 +38,7 @@ return [
 
     'lifetime' => (int) env('SESSION_LIFETIME', 120),
 
-    'expire_on_close' => value(static function () {
-        $value = env('SESSION_EXPIRE_ON_CLOSE', false);
-
-        if (is_bool($value)) {
-            return $value;
-        }
-
-        $filtered = filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
-
-        return $filtered ?? false;
-    }),
+    'expire_on_close' => filter_var((string) env('SESSION_EXPIRE_ON_CLOSE', 'false'), FILTER_VALIDATE_BOOLEAN),
 
     /*
     |--------------------------------------------------------------------------
@@ -61,17 +51,7 @@ return [
     |
     */
 
-    'encrypt' => value(static function () {
-        $value = env('SESSION_ENCRYPT', false);
-
-        if (is_bool($value)) {
-            return $value;
-        }
-
-        $filtered = filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
-
-        return $filtered ?? false;
-    }),
+    'encrypt' => filter_var((string) env('SESSION_ENCRYPT', 'false'), FILTER_VALIDATE_BOOLEAN),
 
     /*
     |--------------------------------------------------------------------------
@@ -221,19 +201,10 @@ return [
     |
     */
 
-    'secure' => value(static function () {
-        $value = env('SESSION_SECURE_COOKIE');
-
-        if ($value === null || $value === '') {
-            return null;
-        }
-
-        if (is_bool($value)) {
-            return $value;
-        }
-
-        return filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
-    }),
+    'secure' => match ($secure = env('SESSION_SECURE_COOKIE')) {
+        null => null,
+        default => filter_var((string) $secure, FILTER_VALIDATE_BOOLEAN),
+    },
 
     /*
     |--------------------------------------------------------------------------
@@ -246,17 +217,7 @@ return [
     |
     */
 
-    'http_only' => value(static function () {
-        $value = env('SESSION_HTTP_ONLY', true);
-
-        if (is_bool($value)) {
-            return $value;
-        }
-
-        $filtered = filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
-
-        return $filtered ?? true;
-    }),
+    'http_only' => filter_var((string) env('SESSION_HTTP_ONLY', 'true'), FILTER_VALIDATE_BOOLEAN),
 
     /*
     |--------------------------------------------------------------------------
@@ -302,16 +263,6 @@ return [
     |
     */
 
-    'partitioned' => value(static function () {
-        $value = env('SESSION_PARTITIONED_COOKIE', false);
-
-        if (is_bool($value)) {
-            return $value;
-        }
-
-        $filtered = filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
-
-        return $filtered ?? false;
-    }),
+    'partitioned' => filter_var((string) env('SESSION_PARTITIONED_COOKIE', 'false'), FILTER_VALIDATE_BOOLEAN),
 
 ];
