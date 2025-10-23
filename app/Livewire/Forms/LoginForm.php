@@ -66,6 +66,8 @@ final class LoginForm extends Form
 
         $decaySeconds = (int) config('security.rate_limiting.login.decay_seconds', 60);
 
+        $decaySeconds = $this->decaySeconds();
+
         if (! Auth::attempt($this->only(['email', 'password']), $this->remember)) {
             RateLimiter::hit($this->throttleKey(), $decaySeconds);
 
@@ -82,9 +84,7 @@ final class LoginForm extends Form
 
     public function syncCaptchaState(?CaptchaManager $captchaManager = null, bool $forceRefresh = false): void
     {
-        $maxAttempts = (int) config('security.rate_limiting.login.max_attempts', 5);
-
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), $maxAttempts)) {
+        if (! RateLimiter::tooManyAttempts($this->throttleKey(), $this->maxAttempts())) {
             return;
         }
 
@@ -141,21 +141,7 @@ final class LoginForm extends Form
         $ip = request()->ip();
         $ipAddress = is_string($ip) && $ip !== '' ? $ip : 'unknown';
 
-        return Str::transliterate(Str::lower($this->email) . '|' . $ipAddress);
-    }
-
-    private function resetCaptcha(): void
-    {
-        $this->captchaQuestion = null;
-        $this->captchaToken = null;
-        $this->captchaResponse = null;
-    }
-
-    private function ipAddress(): string
-    {
-        $ip = request()->ip();
-
-        return is_string($ip) && $ip !== '' ? $ip : 'unknown';
+        return Str::transliterate(Str::lower($this->email).'|'.$ipAddress);
     }
 
     private function maxAttempts(): int
