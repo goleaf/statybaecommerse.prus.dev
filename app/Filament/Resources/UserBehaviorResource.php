@@ -11,12 +11,13 @@ use App\Models\UserBehavior;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
 use BackedEnum;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
@@ -48,7 +49,10 @@ final class UserBehaviorResource extends Resource
 
     protected static ?string $model = UserBehavior::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
+    /**
+     * Filament navigation icon identifier.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
@@ -182,9 +186,9 @@ final class UserBehaviorResource extends Resource
                     ->label(__('admin.user_behaviors.behavior_type'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'view' => 'info',
-                        'click' => 'success',
-                        'add_to_cart' => 'warning',
+                        'view'             => 'info',
+                        'click'            => 'success',
+                        'add_to_cart'      => 'warning',
                         'remove_from_cart' => 'danger',
                         'purchase'         => 'primary',
                         'search'           => 'secondary',
@@ -264,25 +268,24 @@ final class UserBehaviorResource extends Resource
                     ->preload(),
                 TernaryFilter::make('has_product')
                     ->label(__('admin.user_behaviors.has_product'))
-                    ->queries(
-                        true: fn (Builder $query) => $query->whereNotNull('product_id'),
-                        false: fn (Builder $query) => $query->whereNull('product_id'),
-                        blank: fn (Builder $query) => $query,
-                    ),
+                    ->queries([
+                        true  => fn (Builder $query): Builder => $query->whereNotNull('product_id'),
+                        false => fn (Builder $query): Builder => $query->whereNull('product_id'),
+                        null  => fn (Builder $query): Builder => $query,
+                    ]),
                 TernaryFilter::make('has_category')
                     ->label(__('admin.user_behaviors.has_category'))
-                    ->queries(
-                        true: fn (Builder $query) => $query->whereNotNull('category_id'),
-                        false: fn (Builder $query) => $query->whereNull('category_id'),
-                        blank: fn (Builder $query) => $query,
-                    ),
+                    ->queries([
+                        true  => fn (Builder $query): Builder => $query->whereNotNull('category_id'),
+                        false => fn (Builder $query): Builder => $query->whereNull('category_id'),
+                        null  => fn (Builder $query): Builder => $query,
+                    ]),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::makeRange('range')
-                            ->label(__('admin.user_behaviors.created_at'))
-
-                            ->format('Y-m-d')
-                            ->displayFormat('Y-m-d'),
+                        DatePicker::make('created_from')
+                            ->label(__('admin.user_behaviors.created_from')),
+                        DatePicker::make('created_until')
+                            ->label(__('admin.user_behaviors.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
