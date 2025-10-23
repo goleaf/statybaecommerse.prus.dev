@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Services\Cart\CartLifecycleService;
+use App\Services\Pricing\PriceCalculator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -81,25 +82,39 @@ final class CheckoutController extends Controller
             'notes' => ['nullable', 'string'],
         ]);
 
-        try {
-            $order = DB::transaction(function () use ($items, $request, $validated) {
-                $subtotal = (float) $items->sum(fn (CartItem $item): float => $item->calculateSubtotal());
+        $order = DB::transaction(function () use ($items, $request, $validated) {
+            $subtotal = (float) $items->sum(fn (CartItem $item) => $item->calculateSubtotal());
+            $breakdown = app(PriceCalculator::class)->breakdown($subtotal);
 
-                $order = Order::query()->create([
-                    'number' => Str::upper(Str::random(10)),
-                    'user_id' => $request->user()?->id,
-                    'status' => 'processing',
-                    'subtotal' => $subtotal,
-                    'tax_amount' => 0,
-                    'shipping_amount' => 0,
-                    'discount_amount' => 0,
-                    'total' => $subtotal,
-                    'currency' => current_currency(),
-                    'billing_address' => [],
-                    'shipping_address' => [],
-                    'payment_status' => 'paid',
-                    'payment_method' => $validated['payment_method'],
-                    'payment_reference' => (string) Str::uuid(),
+            $order = Order::query()->create([
+                'number' => Str::upper(Str::random(10)),
+                'user_id' => $request->user()?->id,
+                'status' => 'processing',
+                'subtotal' => $breakdown->subtotal,
+                'tax_amount' => $breakdown->tax,
+                'shipping_amount' => $breakdown->shipping,
+                'discount_amount' => $breakdown->discount,
+                'total' => $breakdown->total,
+                'currency' => $breakdown->currency,
+                'billing_address' => [],
+                'shipping_address' => [],
+                'payment_status' => 'paid',
+                'payment_method' => $validated['payment_method'],
+                'payment_reference' => (string) Str::uuid(),
+            ]);
+
+            foreach ($items as $item) {
+                OrderItem::query()->create([
+                    'order_id' => $order->getKey(),
+                    'product_id' => $item->product_id,
+                    'product_variant_id' => $item->product_variant_id,
+                    'name' => $item->product_snapshot['name'] ?? $item->product?->name,
+                    'sku' => $item->product_snapshot['sku'] ?? $item->product?->sku,
+                    'quantity' => $item->quantity,
+                    'unit_price' => (float) $item->price,
+                    'price' => (float) $item->price,
+                    'total' => $item->calculateSubtotal(),
+                    'notes' => $item->notes,
                 ]);
             }
 
@@ -205,15 +220,10 @@ final class CheckoutController extends Controller
      */
     private function summarize(Collection $items): array
     {
-        $subtotal = (float) $items->sum(fn (CartItem $item): float => $item->calculateSubtotal());
-        /** @var int|float|string $quantitySum */
-        $quantitySum = $items->sum('quantity');
+        $subtotal = (float) $items->sum(fn (CartItem $item) => $item->calculateSubtotal());
+        $breakdown = app(PriceCalculator::class)->breakdown($subtotal);
 
-        return [
-            'item_count' => (int) $quantitySum,
-            'subtotal' => $subtotal,
-            'formatted_subtotal' => app_money_format($subtotal),
-        ];
+        return ['item_count' => (int) $items->sum('quantity')] + $breakdown->toSummary();
     }
 
     private function respondError(Request $request, string $message, int $status, ?string $redirectRoute = null): RedirectResponse|JsonResponse

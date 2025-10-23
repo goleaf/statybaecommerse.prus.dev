@@ -207,25 +207,17 @@ final class ShoppingCartWidget extends Component
     protected function calculateCartSummary(): void
     {
         $cartItems = $this->getCartItems();
-        $calculator = $this->priceCalculator();
+        $subtotal = (float) $cartItems->sum(fn ($item) => $item->price * $item->quantity);
+        $discountAmount = 0.0;
 
-        $subtotal = $cartItems->sum(fn (CartItem $item) => $item->price * $item->quantity);
-        $discountAmount = $this->appliedDiscount ? $this->calculateDiscountAmount($subtotal) : 0.0;
+        if ($this->appliedDiscount) {
+            $discountAmount = $this->calculateDiscountAmount($subtotal);
+        }
 
-        $breakdown = $calculator->calculate(
-            $cartItems->map(fn (CartItem $item) => ['price' => (float) $item->price, 'quantity' => (int) $item->quantity]),
-            $discountAmount
-        );
+        $breakdown = app(PriceCalculator::class)->breakdown($subtotal, $discountAmount);
+        $summary = $breakdown->toSummary();
 
-        $this->cartSummary = [
-            'items_count' => $cartItems->sum('quantity'),
-            'subtotal' => $breakdown->subtotal,
-            'discount_amount' => $breakdown->discount,
-            'tax_amount' => $breakdown->tax,
-            'shipping_amount' => $breakdown->shipping,
-            'total' => $breakdown->total,
-            'formatted_totals' => $breakdown->formatted(),
-        ];
+        $this->cartSummary = ['items_count' => (int) $cartItems->sum('quantity')] + $summary;
     }
 
     /**
