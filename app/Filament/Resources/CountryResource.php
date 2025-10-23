@@ -15,6 +15,7 @@ use App\Filament\Resources\CountryResource\RelationManagers\UsersRelationManager
 use App\Models\Country;
 use App\Models\Scopes\ActiveScope;
 use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Components\Grid as SchemaGrid; // Alias the schema grid to avoid referencing an undefined class name.
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction as TableBulkAction;
