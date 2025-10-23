@@ -17,7 +17,8 @@ The global city database expansion and Filament v4 compatibility projects have b
 
 ### **🔧 Filament v4 Compatibility:**
 - **100+ files fixed** for Filament v4.0.12 compatibility
-- **All form signatures** updated to use `Schema`
+- **Form signatures** realigned with the current `Form $form` API (Activity Log resource patched)
+- **Filter data hygiene** improved via reusable option builders for Activity Log selectors
 - **Import statements** corrected throughout
 - **Variable usage** fixed in all resources
 - **System optimization** completed
