@@ -46,9 +46,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'permissions' => Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'localize' => App\Http\Middleware\SetLocale::class,
-            'partner.api' => App\Http\Middleware\PartnerApiAuthenticate::class,
-            'partner.api.scope' => App\Http\Middleware\EnsurePartnerApiScope::class,
-            'partner.api.rate_limit' => App\Http\Middleware\PartnerApiRateLimit::class,
+            'abilities' => Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
+            'ability' => Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -67,5 +66,6 @@ return Application::configure(basePath: dirname(__DIR__))
         App\Providers\LocaleServiceProvider::class,
         App\Providers\SecurityServiceProvider::class,
         App\Providers\Filament\AdminPanelProvider::class,
+        Laravel\Sanctum\SanctumServiceProvider::class,
     ])
     ->create();
