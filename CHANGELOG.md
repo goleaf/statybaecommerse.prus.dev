@@ -15,6 +15,9 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Delivered the Campaign Product Target management resource with localized strings, reinforced widget navigation metadata, and hardened media path migrations for safer marketing workflows.
 * Restored the Husky hook bootstrap shim so local Git hooks continue to run despite upstream v10 deprecation banner changes, keeping contributor tooling reliable.
 
+### Bug Fixes
+* Corrected shipping option delivery window formatting so zero-day estimates and partially filled ranges no longer collapse to a placeholder dash in admin tables.
+
 ## [0.1.0] - 2025-10-20
 
 ### Features & Enhancements

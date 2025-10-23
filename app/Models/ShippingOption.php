@@ -67,7 +67,6 @@ final class ShippingOption extends Model
             'sort_order'         => 'integer',
             'metadata'           => 'array',
             'shipping_matrix'    => 'array',
-            'zone_id'            => 'integer',
         ];
     }
 
@@ -204,12 +203,16 @@ final class ShippingOption extends Model
      */
     public function getEstimatedDeliveryTextAttribute(): string
     {
-        if ($this->estimated_days_min && $this->estimated_days_max) {
-            if ($this->estimated_days_min === $this->estimated_days_max) {
-                return $this->estimated_days_min . ' ' . __('days');
+        // Mirror the admin listing logic by treating nulls as missing while preserving zero-day scenarios.
+        $minimum = is_numeric($this->estimated_days_min) ? (int) $this->estimated_days_min : null;
+        $maximum = is_numeric($this->estimated_days_max) ? (int) $this->estimated_days_max : null;
+
+        if ($minimum !== null && $maximum !== null) {
+            if ($minimum === $maximum) {
+                return $minimum . ' ' . __('days');
             }
 
-            return $this->estimated_days_min . '-' . $this->estimated_days_max . ' ' . __('days');
+            return $minimum . '-' . $maximum . ' ' . __('days');
         }
 
         return __('Standard delivery');
