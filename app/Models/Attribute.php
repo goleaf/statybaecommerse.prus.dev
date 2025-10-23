@@ -8,7 +8,7 @@ use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\VisibleScope;
 use App\Traits\HasTranslations;
-use DB;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute as EloquentAttribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -21,23 +21,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use JsonException;
+use Stringable;
 
 /**
- * Attribute
- *
- * Eloquent model representing the Attribute entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
- *
- * @property mixed  $table
- * @property mixed  $fillable
- * @property mixed  $appends
- * @property string $translationModel
- * @property mixed  $translatable
- *
- * @method static \Illuminate\Database\Eloquent\Builder|Attribute newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Attribute newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Attribute query()
- *
- * @mixin \Eloquent
+ * Attribute domain model responsible for product metadata.
  */
 #[ScopedBy([ActiveScope::class, EnabledScope::class, VisibleScope::class])]
 final class Attribute extends Model
@@ -68,7 +55,7 @@ final class Attribute extends Model
     protected $translatable = ['name'];
 
     /**
-     * Preserve validation rule strings while still decoding JSON arrays for callers that expect them.
+     * Provide a typed accessor/mutator so plain strings survive hydration while arrays remain JSON encoded in storage.
      */
     protected function validationRules(): EloquentAttribute
     {
@@ -86,49 +73,46 @@ final class Attribute extends Model
                     return $value;
                 }
 
-                $decoded = json_decode($value, true);
-
-                if (json_last_error() === JSON_ERROR_NONE) {
-                    return $decoded;
+                try {
+                    $decoded = json_decode($value, true, 512, JSON_THROW_ON_ERROR);
+                } catch (JsonException) {
+                    return $value;
                 }
 
-                return $value;
+                return is_array($decoded) ? $decoded : $value;
             },
             set: static function ($value): mixed {
                 if ($value === null) {
                     return null;
                 }
 
+                if ($value instanceof Arrayable) {
+                    $value = $value->toArray();
+                }
+
                 if (is_array($value)) {
-                    return self::encodeValidationRules($value);
+                    return self::encodeValidationRuleArray($value);
                 }
 
-                if (is_string($value)) {
-                    $decoded = json_decode($value, true);
-
-                    if (json_last_error() === JSON_ERROR_NONE) {
-                        return $value;
-                    }
-
-                    return self::encodeValidationRules($value);
+                if ($value instanceof Stringable) {
+                    return (string) $value;
                 }
 
-                return self::encodeValidationRules((string) $value);
+                return $value;
             }
         );
     }
 
     /**
-     * Encode validation rule payloads to JSON while tolerating scalar inputs.
+     * JSON encode rule arrays with error tolerance so invalid payloads never bubble up as fatal exceptions.
      */
-    private static function encodeValidationRules(mixed $value): string
+    private static function encodeValidationRuleArray(array $value): string
     {
         try {
             return json_encode($value, JSON_THROW_ON_ERROR);
         } catch (JsonException) {
-            // Fall back to a simple string representation so the JSON column still
-            // stores a valid payload even when custom objects are supplied.
-            return json_encode((string) $value, JSON_THROW_ON_ERROR);
+            // Developers occasionally persist rule objects; casting to strings maintains compatibility.
+            return json_encode(array_map(static fn ($rule): string => (string) $rule, $value), JSON_THROW_ON_ERROR);
         }
     }
 
@@ -326,16 +310,16 @@ final class Attribute extends Model
     public function getFormattedTypeAttribute(): string
     {
         return match ($this->type) {
-            'text'        => 'Text',
-            'number'      => 'Number',
             'boolean'     => 'Boolean',
-            'select'      => 'Select',
-            'multiselect' => 'Multi Select',
             'color'       => 'Color',
             'date'        => 'Date',
-            'textarea'    => 'Textarea',
             'file'        => 'File',
             'image'       => 'Image',
+            'multiselect' => 'Multi Select',
+            'number'      => 'Number',
+            'select'      => 'Select',
+            'text'        => 'Text',
+            'textarea'    => 'Textarea',
             default       => ucfirst($this->type),
         };
     }
@@ -447,14 +431,17 @@ final class Attribute extends Model
     public function getDefaultValueForType(): mixed
     {
         return match ($this->type) {
-            'text', 'textarea' => '',
-            'number'  => 0,
             'boolean' => false,
-            'select', 'multiselect' => null,
-            'color' => '#000000',
-            'date'  => null,
-            'file', 'image' => null,
-            default => null,
+            'color'   => '#000000',
+            'date'    => null,
+            'file',
+            'image'       => null,
+            'multiselect' => [],
+            'number'      => 0,
+            'select'      => null,
+            'text',
+            'textarea' => '',
+            default    => null,
         };
     }
 
@@ -506,16 +493,16 @@ final class Attribute extends Model
     public function getTypeIconAttribute(): string
     {
         return match ($this->type) {
-            'text'        => 'heroicon-o-document-text',
-            'number'      => 'heroicon-o-calculator',
             'boolean'     => 'heroicon-o-check-circle',
-            'select'      => 'heroicon-o-list-bullet',
-            'multiselect' => 'heroicon-o-squares-2x2',
             'color'       => 'heroicon-o-swatch',
             'date'        => 'heroicon-o-calendar',
-            'textarea'    => 'heroicon-o-document',
             'file'        => 'heroicon-o-paper-clip',
             'image'       => 'heroicon-o-photo',
+            'multiselect' => 'heroicon-o-squares-2x2',
+            'number'      => 'heroicon-o-calculator',
+            'select'      => 'heroicon-o-list-bullet',
+            'text'        => 'heroicon-o-document-text',
+            'textarea'    => 'heroicon-o-document',
             default       => 'heroicon-o-adjustments-horizontal',
         };
     }
@@ -710,15 +697,22 @@ final class Attribute extends Model
         // Update product_attributes records to use this attribute instead
         // We need to update both attribute_id and attribute_value_id
         $otherAttribute->products()->get()->each(function ($product) use ($otherAttribute): void {
-            // Get the attribute values for this product from the other attribute
-            $attributeValues = $otherAttribute->values()->whereHas('variants', function ($query) use ($product): void {
-                $query->whereHas('product', function ($q) use ($product): void {
-                    $q->where('id', $product->id);
-                });
-            })->get();
-            // Update the product_attributes records
+            // Resolve the attribute values associated with the product and rewrite the pivot rows to the surviving attribute.
+            $attributeValues = $otherAttribute
+                ->values()
+                ->whereHas('variants', function ($query) use ($product): void {
+                    $query->whereHas('product', static function ($q) use ($product): void {
+                        $q->where('id', $product->id);
+                    });
+                })
+                ->get();
+
             foreach ($attributeValues as $value) {
-                DB::table('product_attributes')->where('product_id', $product->id)->where('attribute_id', $otherAttribute->id)->where('attribute_value_id', $value->id)->update(['attribute_id' => $this->id]);
+                DB::table('product_attributes')
+                    ->where('product_id', $product->id)
+                    ->where('attribute_id', $otherAttribute->id)
+                    ->where('attribute_value_id', $value->id)
+                    ->update(['attribute_id' => $this->id]);
             }
         });
         // Delete the other attribute
@@ -750,7 +744,7 @@ final class Attribute extends Model
     {
         $locale ??= app()->getLocale();
 
-        return $query->with(['translations' => function ($q) use ($locale): void {
+        return $query->with(['translations' => static function ($q) use ($locale): void {
             $q->where('locale', $locale);
         }]);
     }

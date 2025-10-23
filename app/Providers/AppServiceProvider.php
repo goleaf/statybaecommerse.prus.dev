@@ -19,7 +19,7 @@ use App\Models\SystemSetting;
 use App\Observers\UserAttributionObserver;
 use App\Services\CacheInvalidationService;
 use App\Services\DocumentService;
-use App\Support\Filament\SearchableInputState;
+use App\Support\Filament\SearchableComponentHelper;
 use App\Support\Health\HealthReporter;
 use App\Support\Html\HtmlSanitizer;
 use App\Support\Security\CspNonce;
@@ -33,13 +33,12 @@ use App\View\Creators\LocalizationCreator;
 use App\View\Creators\NavigationCreator;
 use App\View\Creators\SeoDataCreator;
 use App\View\Creators\UserDataCreator;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use DateInterval;
 use DateTimeInterface;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
@@ -681,37 +680,6 @@ class AppServiceProvider extends ServiceProvider
             return;
         }
 
-        if (! SearchableInput::hasMacro('payload')) {
-            SearchableInput::macro('payload', function (array|Arrayable|null $payload): SearchableInput {
-                /** @var SearchableInput $this */
-                $normalised = $payload instanceof Arrayable
-                    ? $payload->toArray()
-                    : (is_array($payload) ? $payload : (array) ($payload ?? []));
-
-                SearchableInputState::setPayload($this, $normalised);
-
-                return $this;
-            });
-        }
-
-        if (! SearchableInput::hasMacro('fallbackPayload')) {
-            SearchableInput::macro('fallbackPayload', function (array|Arrayable|null $payload = null): SearchableInput {
-                /** @var SearchableInput $this */
-                $normalised = $payload instanceof Arrayable
-                    ? $payload->toArray()
-                    : (is_array($payload) ? $payload : (array) ($payload ?? []));
-
-                SearchableInputState::setFallback($this, $normalised);
-
-                return $this;
-            });
-        }
-
-        if (! SearchableInput::hasMacro('getPayload')) {
-            SearchableInput::macro('getPayload', function (): array {
-                /** @var SearchableInput $this */
-                return SearchableInputState::getPayload($this);
-            });
-        }
+        SearchableComponentHelper::registerPayloadMacros();
     }
 }
