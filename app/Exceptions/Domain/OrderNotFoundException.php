@@ -12,6 +12,7 @@ final class OrderNotFoundException extends DomainException
     {
         parent::__construct(
             errorCode: ErrorCodes::ORDER_NOT_FOUND,
+            translationKey: 'exceptions.orders.not_found',
             context: ['order' => $orderNumber],
             status: 404,
         );

@@ -12,6 +12,7 @@ final class InventoryUnavailableException extends DomainException
     {
         parent::__construct(
             errorCode: ErrorCodes::INVENTORY_INSUFFICIENT,
+            translationKey: 'exceptions.inventory.insufficient',
             context: ['sku' => $sku],
             status: 409,
         );
