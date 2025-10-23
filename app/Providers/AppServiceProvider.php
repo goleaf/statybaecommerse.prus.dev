@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Console\Commands\ProfiledSeedCommand;
-use App\Contracts\DocumentServiceContract;
-use App\Contracts\HealthReporter as HealthReporterContract;
-use App\Domain\Product\Repositories\ProductRepositoryInterface;
 use App\Filament\Components\LiveNotificationFeed;
 use App\Models\DiscountCode;
 use App\Models\DiscountRedemption;
@@ -88,11 +85,8 @@ class AppServiceProvider extends ServiceProvider
                 ProfiledSeedCommand::class,
             ]);
 
-            $this->app->extend('command.db.seed', function ($command, $app) {
-                /** @var Dispatcher|null $dispatcher */
-                $dispatcher = $app->bound('events') ? $app->make('events') : null;
-
-                return new ProfiledSeedCommand($app->make('db'), $dispatcher, $app->make('config'));
+            $this->app->extend('command.seed', static function ($command, $app) {
+                return \tap(new ProfiledSeedCommand($app['db']), static fn ($seedCommand) => $seedCommand->setLaravel($app));
             });
         }
 
