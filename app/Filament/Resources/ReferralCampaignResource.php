@@ -29,12 +29,12 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use UnitEnum;
 
 final class ReferralCampaignResource extends Resource
 {
-    use HasNav;
+    use Translatable;
 
     protected static ?string $model = ReferralCampaign::class;
 

@@ -8,18 +8,18 @@ use App\Filament\Resources\ReferralCampaignResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\ViewRecord\Concerns\Translatable as SpatieTranslatableViewRecord;
+use LaraZeus\SpatieTranslatable\Resources\Pages\ViewRecord\Concerns\Translatable;
 
 final class ViewReferralCampaign extends ViewRecord
 {
-    use SpatieTranslatableViewRecord; // Keep the detail view synchronized with the active locale.
+    use Translatable;
 
     protected static string $resource = ReferralCampaignResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            LocaleSwitcher::make(), // Allow locale switching while reviewing record details.
+            LocaleSwitcher::make(),
             Actions\EditAction::make(),
         ];
     }

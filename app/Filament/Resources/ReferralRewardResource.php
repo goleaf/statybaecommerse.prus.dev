@@ -33,12 +33,13 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use UnitEnum;
 
 final class ReferralRewardResource extends Resource
 {
-    use HasNav;
+    use Translatable;
 
     protected static ?string $model = ReferralReward::class;
 
@@ -338,7 +339,7 @@ final class ReferralRewardResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $modelClass = static::getModel();
+        $modelClass = self::getModel();
         $count = (int) $modelClass::count();
 
         return $count > 0 ? (string) $count : null;
@@ -353,8 +354,8 @@ final class ReferralRewardResource extends Resource
             ->withoutGlobalScopes()
             ->with([
                 'referral' => static fn (Relation $relation) => $relation->withoutGlobalScopes(),
-                'user' => static fn (Relation $relation) => $relation->withoutGlobalScopes(),
-                'order' => static fn (Relation $relation) => $relation->withoutGlobalScopes(),
+                'user'     => static fn (Relation $relation) => $relation->withoutGlobalScopes(),
+                'order'    => static fn (Relation $relation) => $relation->withoutGlobalScopes(),
             ]);
     }
 }

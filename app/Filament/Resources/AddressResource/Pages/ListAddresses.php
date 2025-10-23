@@ -5,27 +5,27 @@ declare(strict_types=1);
 namespace App\Filament\Resources\AddressResource\Pages;
 
 use App\Enums\AddressType;
-use App\Filament\Concerns\HasResizableColumns;
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\AddressResource;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
-use App\Filament\Pages\Support\BaseListRecords;
 use Illuminate\Database\Eloquent\Builder;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable as SpatieTranslatableListRecords;
+use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable;
 
 final class ListAddresses extends BaseListRecords
 {
     use HasResizableColumns;
     use HasWidgetTabs;
+    use Translatable;
 
     protected static string $resource = AddressResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            LocaleSwitcher::make(), // Provide a quick language toggle for the grid view.
+            LocaleSwitcher::make(),
             Actions\CreateAction::make(),
         ];
     }

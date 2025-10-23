@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\UserResource\Pages;
 
-use App\Filament\Concerns\HasResizableColumns;
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\UserResource;
 use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions\CreateAction;
-use App\Filament\Pages\Support\BaseListRecords;
+use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
+use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable;
 
 class ListUsers extends BaseListRecords
 {
-    use HasResizableColumns;
+    use Translatable;
 
     protected static string $resource = UserResource::class;
 
@@ -23,6 +24,7 @@ class ListUsers extends BaseListRecords
         }
 
         return [
+            LocaleSwitcher::make(),
             CreateAction::make()
                 ->visible(fn () => AuthorizationMatrix::check('users', 'create')),
         ];

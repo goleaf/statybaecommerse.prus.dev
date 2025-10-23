@@ -6,12 +6,22 @@ namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
 use Filament\Resources\Pages\CreateRecord;
+use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
+use LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatable;
 
 class CreateUser extends CreateRecord
 {
-    use SpatieTranslatableCreateRecord; // Keep track of locale-specific form payloads during creation.
+    use Translatable;
 
     protected static string $resource = UserResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            LocaleSwitcher::make(),
+            ...parent::getHeaderActions(),
+        ];
+    }
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {

@@ -40,7 +40,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use UnitEnum;
 
 /**
@@ -50,7 +50,7 @@ use UnitEnum;
  */
 final class PriceListItemResource extends Resource
 {
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-currency-euro';
+    use Translatable;
 
     protected static ?string $model = PriceListItem::class;
 

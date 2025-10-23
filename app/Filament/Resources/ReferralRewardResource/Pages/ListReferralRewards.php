@@ -4,21 +4,22 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ReferralRewardResource\Pages;
 
-use App\Filament\Concerns\HasResizableColumns;
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\ReferralRewardResource;
 use Filament\Actions;
-use App\Filament\Pages\Support\BaseListRecords;
+use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
+use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable;
 
 final class ListReferralRewards extends BaseListRecords
 {
-    use HasResizableColumns;
+    use Translatable;
 
     protected static string $resource = ReferralRewardResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            LocaleSwitcher::make(), // Provide a quick language toggle for the grid view.
+            LocaleSwitcher::make(),
             Actions\CreateAction::make(),
         ];
     }

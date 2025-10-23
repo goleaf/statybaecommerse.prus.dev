@@ -6,8 +6,6 @@ namespace App\Providers\Filament;
 
 use Asmit\ResizedColumn\ResizedColumnPlugin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
-use Hydrat\TableLayoutToggle\Persisters\LocalStoragePersister;
-use Hydrat\TableLayoutToggle\TableLayoutTogglePlugin;
 use Filament\Enums\UserMenuPosition;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -19,10 +17,8 @@ use Filament\PanelProvider;
 use Filament\SpatieLaravelMediaLibraryPlugin\FilamentSpatieLaravelMediaLibraryPlugin;
 use Filament\Support\Colors\Color;
 use Filament\Widgets\AccountWidget;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\Translation\Translator;
+use Hydrat\TableLayoutToggle\Persisters\LocalStoragePersister;
+use Hydrat\TableLayoutToggle\TableLayoutTogglePlugin;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -30,7 +26,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Collection;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Throwable;
+use LaraZeus\SpatieTranslatable\SpatieTranslatablePlugin;
 
 final class AdminPanelProvider extends PanelProvider
 {
@@ -58,9 +54,28 @@ final class AdminPanelProvider extends PanelProvider
 
     public function panel(Panel $panel): Panel
     {
-        $resourceClasses = $this->stringClassList('filament.navigation.resources');
-        $pageClasses = $this->stringClassList('filament.navigation.pages');
-        $isTesting = $this->isTestingEnvironment();
+        $resourceClasses = array_values(array_filter(
+            (array) config('filament.navigation.resources', []),
+            static fn (mixed $resource): bool => is_string($resource),
+        ));
+
+        /** @var array<class-string> $resourceClasses */
+        $pageClasses = array_values(array_filter(
+            (array) config('filament.navigation.pages', []),
+            static fn (mixed $page): bool => is_string($page),
+        ));
+
+        /** @var array<class-string> $pageClasses */
+        $configuredLocales = config('app.supported_locales', ['lt', 'en']);
+        $defaultLocales = collect(is_array($configuredLocales) ? $configuredLocales : explode(',', (string) $configuredLocales))
+            ->map(static fn (mixed $locale): string => trim((string) $locale))
+            ->filter()
+            ->values()
+            ->all();
+
+        if ($defaultLocales === []) {
+            $defaultLocales = ['en'];
+        }
 
         return $panel
             ->default()
@@ -136,26 +151,30 @@ final class AdminPanelProvider extends PanelProvider
                     ]))
                     ->icon('heroicon-o-language'),
             ])
+            ->plugin(
+                SpatieTranslatablePlugin::make()
+                    ->defaultLocales($defaultLocales)
+                    ->persist()
+            )
             ->when(app()->environment('testing'),
-                fn (Panel $p) => $p->plugins([
-                    ResizedColumnPlugin::make()->preserveOnDB(),
-                ]),
-                fn (Panel $p) => $p->plugins([
-                    FilamentShieldPlugin::make(),
-                    TableLayoutTogglePlugin::make()
-                        ->setDefaultLayout('grid')
-                        ->persistLayoutUsing(
-                            persister: LocalStoragePersister::class,
-                            cacheStore: 'redis',
-                            cacheTtl: 60 * 24,
-                        )
-                        ->shareLayoutBetweenPages(false)
-                        ->displayToggleAction()
-                        ->toggleActionHook('tables::toolbar.search.after')
-                        ->listLayoutButtonIcon('heroicon-o-list-bullet')
-                        ->gridLayoutButtonIcon('heroicon-o-squares-2x2'),
-                    ResizedColumnPlugin::make()->preserveOnDB(),
-                ]))
+                static fn (Panel $p) => $p,
+                static fn (Panel $p) => $p
+                    ->plugin(FilamentShieldPlugin::make())
+                    ->plugin(
+                        TableLayoutTogglePlugin::make()
+                            ->setDefaultLayout('grid')
+                            ->persistLayoutUsing(
+                                persister: LocalStoragePersister::class,
+                                cacheStore: 'redis',
+                                cacheTtl: 60 * 24,
+                            )
+                            ->shareLayoutBetweenPages(false)
+                            ->displayToggleAction()
+                            ->toggleActionHook('tables::toolbar.search.after')
+                            ->listLayoutButtonIcon('heroicon-o-list-bullet')
+                            ->gridLayoutButtonIcon('heroicon-o-squares-2x2')
+                    )
+            )
             // Enable the custom Filament theme so third-party plugin views (like the searchable input)
             // are compiled with Tailwind during the build step.
             ->viteTheme('resources/css/filament/admin/theme.css')
