@@ -34,6 +34,9 @@ final class KibanaContextProcessor
             'environment' => $environment,
         ];
 
+        // Capture the current process identifier so Kibana can group log events when multiple workers are active.
+        $pid = getmypid();
+
         if ($pid !== false) {
             $extra['process'] = [
                 'pid' => $pid,

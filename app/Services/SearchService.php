@@ -38,7 +38,15 @@ final class SearchService
             ? $query
             : $this->legacyQueryData((string) $query, $limit);
         $originalQuery = $queryData->query();
+        // Flag SQL injection markers early so we can short-circuit strict API callers while still serving legacy lookups.
+        $isSuspicious = $this->isSuspiciousQuery($originalQuery);
         $normalizedQuery = $this->sanitizeQueryString($originalQuery);
+
+        if ($isSuspicious && ($queryData->context()['strict_sanitization'] ?? false)) {
+            return $isAggregated
+                ? $this->emptyAggregatedPayload($queryData, $originalQuery)
+                : [];
+        }
 
         if ($normalizedQuery === '') {
             return $isAggregated
@@ -322,8 +330,32 @@ final class SearchService
         $cleaned = preg_replace('/(--|\\/\\*|\\*\\/)/', ' ', $query);
         $cleaned = preg_replace('/[\'";=#]/', ' ', $cleaned ?? '');
         $cleaned = preg_replace('/[^\\p{L}\\p{N}\\s]/u', ' ', $cleaned ?? '');
+        // Drop common boolean injection suffixes (e.g. " OR 1=1") so legitimate search terms survive legacy requests.
+        $cleaned = preg_replace('/\b(?:or|and)\b\s+\d+(?:\s*=\s*\d+|\s+\d+)?/iu', ' ', $cleaned ?? '');
         $cleaned = preg_replace('/\\s+/u', ' ', $cleaned ?? '');
 
         return trim($cleaned ?? '');
+    }
+
+    private function isSuspiciousQuery(string $query): bool
+    {
+        // Normalise the payload once so pattern checks remain deterministic across locales.
+        $normalized = mb_strtolower($query);
+
+        $patterns = [
+            '/\b(?:or|and)\b\s+\d+\s*=\s*\d+/u',
+            '/\bunion\b\s+\bselect\b/u',
+            '/;\s*drop\s+table/u',
+            '/--/',
+            '/\/\*/',
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $normalized) === 1) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

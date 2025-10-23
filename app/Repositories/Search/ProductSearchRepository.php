@@ -127,7 +127,8 @@ SQL;
                 ? $fullDescription
                 : (is_string($translatedDescription) && $translatedDescription !== '' ? $translatedDescription : null));
 
-        $title = isset($attributes['name']) && is_string($attributes['name']) ? $attributes['name'] : '';
+        // Names are stored as translatable JSON in production, so we normalise them back to a readable string for the API.
+        $title = $this->normaliseTranslatableString($attributes['name'] ?? '');
         $slug = isset($attributes['slug']) && is_string($attributes['slug']) ? $attributes['slug'] : '';
         $salesCount = $attributes['sales_count'] ?? 0;
         $reviewsCount = $attributes['reviews_count'] ?? 0;
@@ -194,6 +195,30 @@ SQL;
         }
 
         return $score;
+    }
+
+    private function normaliseTranslatableString(mixed $value): string
+    {
+        // Accept already-decoded arrays so the repository works regardless of connection JSON modes.
+        if (is_array($value)) {
+            $first = collect($value)
+                ->filter(static fn ($item): bool => is_string($item) && $item !== '')
+                ->first();
+
+            return is_string($first) ? $first : '';
+        }
+
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                return $this->normaliseTranslatableString($decoded);
+            }
+
+            return trim($value, " \"'");
+        }
+
+        return '';
     }
 
     private function metricProjection(): string
