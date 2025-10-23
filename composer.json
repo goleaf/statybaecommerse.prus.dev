@@ -29,7 +29,7 @@
         "lara-zeus/inline-chart": "^2.0",
         "lara-zeus/list-group": "^2.0",
         "lara-zeus/matrix-choice": "*",
-        "lara-zeus/spatie-translatable": "^1.0",
+        "lara-zeus/spatie-translatable": "*",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.1",
         "laravel/horizon": "^5.33",
@@ -83,8 +83,7 @@
             "Database\\Seeders\\Cities\\": "database/seeders/cities/"
         },
         "files": [
-            "app/helpers.php",
-            "bootstrap/filament_compat.php"
+            "app/helpers.php"
         ]
     },
     "autoload-dev": {

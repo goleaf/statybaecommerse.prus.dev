@@ -7,19 +7,20 @@ namespace App\Filament\Resources\PriceListItemResource\Pages;
 use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\PriceListItemResource;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable as SpatieTranslatableListRecords;
 
 final class ListPriceListItems extends BaseListRecords
 {
-    use Translatable;
+    use SpatieTranslatableListRecords; // Track the active locale for listing translated records.
 
     protected static string $resource = PriceListItemResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            LocaleSwitcher::make(),
+            LocaleSwitcher::make(), // Provide a quick language toggle for the grid view.
             Actions\CreateAction::make(),
         ];
     }

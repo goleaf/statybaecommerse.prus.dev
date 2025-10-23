@@ -8,12 +8,13 @@ use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\UserResource;
 use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions\CreateAction;
+use App\Filament\Pages\Support\BaseListRecords;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable as SpatieTranslatableListRecords;
 
 class ListUsers extends BaseListRecords
 {
-    use Translatable;
+    use SpatieTranslatableListRecords; // Track the active locale for listing translated records.
 
     protected static string $resource = UserResource::class;
 
@@ -24,7 +25,7 @@ class ListUsers extends BaseListRecords
         }
 
         return [
-            LocaleSwitcher::make(),
+            LocaleSwitcher::make(), // Provide a quick language toggle for the grid view.
             CreateAction::make()
                 ->visible(fn () => AuthorizationMatrix::check('users', 'create')),
         ];

@@ -243,6 +243,19 @@ final class AdminPanelProvider extends PanelProvider
             $plugins[] = FilamentNordThemePlugin::make();
         }
 
+        if (class_exists(SpatieTranslatablePlugin::class)) {
+            $supportedLocales = array_values(array_filter(
+                (array) config('shared.localization.supported_locales', []),
+                static fn (mixed $locale): bool => is_string($locale) && $locale !== '',
+            ));
+
+            // Persist the admin locale switcher so users return to their last
+            // editing language across Filament sessions.
+            $plugins[] = SpatieTranslatablePlugin::make()
+                ->defaultLocales($supportedLocales !== [] ? $supportedLocales : null)
+                ->persist();
+        }
+
         if (class_exists(ResizedColumnPlugin::class)) {
             $plugins[] = ResizedColumnPlugin::make()->preserveOnDB();
         }
