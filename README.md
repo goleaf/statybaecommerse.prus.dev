@@ -17,7 +17,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 -### Latest updates
-- User preference scores now return rounded floats via a dedicated accessor that enforces six-decimal precision, stabilizing cast-sensitive tests and the model factory output.
+- User behavior analytics now bypass storefront visibility scopes when resolving related products or categories, and the category factory appends unique slug suffixes so SQLite tests no longer hit null relations or duplicate slug errors.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
 - Region-aware address tables and the dedicated `customers` dataset are back online for the SQLite harness, letting factories and
