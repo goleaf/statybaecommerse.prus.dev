@@ -7,19 +7,25 @@ namespace App\Http\Controllers\Frontend;
 use App\Enums\AddressType;
 use App\Http\Controllers\Controller;
 use App\Models\Address;
+use App\Models\City;
 use App\Models\Customer;
 use App\Models\Country;
 use App\Models\User;
+use App\Support\Database\TableAvailability;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Exists;
 
 final class ProfileController extends Controller
 {
+    public function __construct(
+        private readonly TableAvailability $tableAvailability,
+    ) {
+    }
+
     public function index(Request $request): View
     {
         /** @var User $user */
@@ -215,7 +221,7 @@ final class ProfileController extends Controller
 
     private function resolveCustomerForUser(User $user): ?Customer
     {
-        if (! Schema::hasTable('customers')) {
+        if (! $this->customersTableExists()) {
             return null;
         }
 
@@ -226,7 +232,7 @@ final class ProfileController extends Controller
 
     private function updateCustomerRecord(User $user, array $validated, string $originalEmail): void
     {
-        if (! Schema::hasTable('customers')) {
+        if (! $this->customersTableExists()) {
             return;
         }
 
@@ -260,7 +266,7 @@ final class ProfileController extends Controller
     {
         $rules = ['nullable', 'integer'];
 
-        if (Schema::hasTable('countries')) {
+        if ($this->countriesTableExists()) {
             $rules[] = Rule::exists('countries', 'id');
         }
 
@@ -274,7 +280,7 @@ final class ProfileController extends Controller
     {
         $rules = ['nullable', 'integer'];
 
-        if (Schema::hasTable('cities')) {
+        if ($this->citiesTableExists()) {
             $rules[] = Rule::exists('cities', 'id');
         }
 
@@ -283,10 +289,31 @@ final class ProfileController extends Controller
 
     private function resolveCountries(): Collection
     {
-        if (! Schema::hasTable('countries')) {
+        if (! $this->countriesTableExists()) {
             return collect();
         }
 
         return Country::query()->orderBy('name')->get(['id', 'name', 'cca2']);
+    }
+
+    private function countriesTableExists(): bool
+    {
+        $model = new Country();
+
+        return $this->tableAvailability->has('countries', $model->getConnectionName());
+    }
+
+    private function citiesTableExists(): bool
+    {
+        $model = new City();
+
+        return $this->tableAvailability->has('cities', $model->getConnectionName());
+    }
+
+    private function customersTableExists(): bool
+    {
+        $model = new Customer();
+
+        return $this->tableAvailability->has('customers', $model->getConnectionName());
     }
 }
