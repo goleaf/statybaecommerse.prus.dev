@@ -16,18 +16,17 @@ use BackedEnum;
 use Filament\Actions\Action as TableAction;
 use Filament\Actions\BulkAction as TableBulkAction;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Schemas\Components\Grid;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -46,21 +45,21 @@ final class DiscountRedemptionResource extends Resource
 {
     protected static ?string $model = DiscountRedemption::class;
 
+    /**
+     * Explicitly declare the marketing navigation group for this resource.
+     */
+    protected static string|UnitEnum|null $navigationGroup = 'Marketing';
+
+    // Retain the ticket icon so administrators can spot the redemption resource quickly.
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-ticket';
+
+    // Position the resource prominently within the marketing navigation cluster.
     protected static ?int $navigationSort = 2;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationBadgeColor(): string
     {
-        return 'heroicon-o-receipt-percent';
-    }
-
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Discounts';
-    }
-
-    public static function getNavigationIcon(): BackedEnum|\UnitEnum|string|null
-    {
-        return 'heroicon-o-ticket';
+        // Highlight the badge with a warning tone to draw attention to pending discount redemptions.
+        return 'warning';
     }
 
     public static function getPluralModelLabel(): string
@@ -185,15 +184,24 @@ final class DiscountRedemptionResource extends Resource
                     ->formatStateUsing(fn (DiscountRedemption $record): string => number_format((float) $record->amount_saved, 2).' '.($record->currency_code ?? 'EUR'))
                     ->sortable(),
                 TextColumn::make('status')
-                    ->label(__('admin.discount_redemptions.table.status'))
+                    ->label(__('discount_redemptions.fields.status'))
+                    // Use the badge helper to stay compatible with Filament v4 while keeping the visual treatment.
                     ->badge()
-                    ->colors([
-                        'success' => static fn (string $state): bool => $state === 'redeemed',
-                        'warning' => static fn (string $state): bool => $state === 'pending',
-                        'gray' => static fn (string $state): bool => $state === 'expired',
-                        'danger' => static fn (string $state): bool => $state === 'cancelled',
-                        'info' => static fn (string $state): bool => $state === 'refunded',
-                    ]),
+                    ->color(fn (?string $state): string => match ($state) {
+                        'redeemed'  => 'success',
+                        'pending'   => 'warning',
+                        'expired'   => 'danger',
+                        'cancelled' => 'gray',
+                        default     => 'primary',
+                    })
+                    ->icon(fn (?string $state): ?string => match ($state) {
+                        'redeemed'  => 'heroicon-m-check-circle',
+                        'pending'   => 'heroicon-m-clock',
+                        'cancelled' => 'heroicon-m-x-mark',
+                        'expired'   => 'heroicon-m-exclamation-triangle',
+                        default     => null,
+                    })
+                    ->sortable(),
                 TextColumn::make('redeemed_at')
                     ->label(__('admin.discount_redemptions.table.redeemed_at'))
                     ->dateTime()
