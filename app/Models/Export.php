@@ -4,131 +4,81 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Services\Export\ExportFormat;
-use App\Services\Export\ExportStatus;
-use Illuminate\Database\Eloquent\Concerns\HasUlids;
+use App\Enums\ExportStatus;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 /**
- * @property string $id
- * @property string $name
- * @property string $resource
- * @property string $model
- * @property ExportFormat $format
  * @property array<int, string> $columns
- * @property array<int, string>|null $selection
- * @property array<string, mixed>|null $filters
+ * @property array<string, mixed>|null $exportable_options
  * @property ExportStatus $status
- * @property User|null $user
- * @property string|null $path
- * @property int|null $total_rows
- * @property int $processed_rows
- * @property int $chunk_size
- * @property Carbon|null $available_until
  */
 final class Export extends Model
 {
-    /** @use HasFactory<\Database\Factories\ExportFactory> */
     use HasFactory;
 
-    use HasUlids;
-
     protected $fillable = [
+        'uuid',
         'name',
-        'resource',
-        'model',
         'format',
-        'columns',
-        'selection',
-        'filters',
         'status',
-        'path',
+        'exportable_type',
+        'columns',
+        'exportable_options',
         'total_rows',
         'processed_rows',
-        'chunk_size',
-        'available_until',
+        'artifact_disk',
+        'artifact_path',
+        'artifact_filename',
+        'requested_at',
+        'completed_at',
+        'failed_at',
+        'failure_reason',
+        'requested_by',
     ];
 
-    protected function casts(): array
+    protected $casts = [
+        'columns' => 'array',
+        'exportable_options' => 'array',
+        'requested_at' => 'datetime',
+        'completed_at' => 'datetime',
+        'failed_at' => 'datetime',
+        'status' => ExportStatus::class,
+    ];
+
+    protected static function booted(): void
     {
-        return [
-            'columns' => 'array',
-            'selection' => 'array',
-            'filters' => 'array',
-            'format' => ExportFormat::class,
-            'status' => ExportStatus::class,
-            'available_until' => 'datetime',
-        ];
+        static::creating(function (self $export): void {
+            if (! $export->getAttribute('uuid')) {
+                $export->setAttribute('uuid', (string) Str::uuid());
+            }
+
+            if (! $export->getAttribute('requested_at')) {
+                $export->setAttribute('requested_at', now());
+            }
+        });
     }
 
-    /**
-     * @return BelongsTo<User, Export>
-     */
-    public function user(): BelongsTo
+    public function requestedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'requested_by');
     }
 
-    public function markProcessing(int $totalRows): void
+    public function getRouteKeyName(): string
     {
-        $this->forceFill([
-            'status' => ExportStatus::Processing,
-            'total_rows' => $totalRows,
-            'processed_rows' => 0,
-        ])->save();
-
-        $this->status = ExportStatus::Processing;
-        $this->total_rows = $totalRows;
-        $this->processed_rows = 0;
+        return 'uuid';
     }
 
-    public function incrementProcessedRows(int $amount): void
+    public function scopeQueued($query)
     {
-        $this->forceFill([
-            'processed_rows' => $this->processed_rows + $amount,
-        ])->save();
-
-        $this->processed_rows += $amount;
+        return $query->where('status', ExportStatus::Queued);
     }
 
-    public function markCompleted(string $path): void
+    protected function fileExtension(): Attribute
     {
-        $retentionConfig = config('export.retention_hours');
-        $hours = 48;
-        if (is_int($retentionConfig)) {
-            $hours = $retentionConfig;
-        } elseif (is_string($retentionConfig) && is_numeric($retentionConfig)) {
-            $hours = (int) $retentionConfig;
-        }
-
-        $availableUntil = now()->addHours($hours);
-
-        $this->forceFill([
-            'status' => ExportStatus::Completed,
-            'path' => $path,
-            'available_until' => $availableUntil,
-        ])->save();
-
-        $this->status = ExportStatus::Completed;
-        $this->path = $path;
-        $this->available_until = $availableUntil;
-    }
-
-    public function markFailed(): void
-    {
-        $this->forceFill([
-            'status' => ExportStatus::Failed,
-        ])->save();
-
-        $this->status = ExportStatus::Failed;
-    }
-
-    public function isDownloadable(): bool
-    {
-        return $this->status === ExportStatus::Completed
-            && (! $this->available_until || now()->lessThanOrEqualTo($this->available_until));
+        return Attribute::make(get: fn (): string => $this->format);
     }
 }

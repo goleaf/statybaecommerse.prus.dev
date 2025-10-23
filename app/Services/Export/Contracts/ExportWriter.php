@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace App\Services\Export\Contracts;
 
-use App\Models\Export;
-
 interface ExportWriter
 {
-    public function open(Export $export, array $columns, string $path): void;
+    /**
+     * @param  array<int, string>  $headers
+     */
+    public function open(string $disk, string $path, array $headers): void;
 
     /**
-     * @param iterable<int, array<string, mixed>> $rows
+     * @param  array<int, string>  $row
      */
-    public function append(iterable $rows): void;
+    public function append(array $row): void;
 
+    /**
+     * Finalize the export and persist buffered data to storage.
+     */
     public function close(): void;
-
-    public function extension(): string;
-
-    public function mimeType(): string;
 }

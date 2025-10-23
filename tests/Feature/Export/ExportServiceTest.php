@@ -8,18 +8,18 @@ use App\Jobs\ProcessExportJob;
 use App\Models\Order;
 use App\Models\User;
 use App\Notifications\ExportReadyNotification;
-use App\Services\Export\Exporters\OrderExport;
 use App\Services\Export\ExportService;
-use App\Support\Exports\ExportUrlGenerator;
-use App\Support\Storage\SecureStorage;
+use App\Services\Export\Exporters\OrderExport;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
+use Tests\TestCase;
+
+uses(TestCase::class);
 
 test('it queues and processes exports', function (): void {
-    $disk = SecureStorage::disk();
-    config()->set('filesystems.default', $disk);
-    Storage::fake($disk);
+    config()->set('filesystems.default', 'public');
+    Storage::fake('public');
     Notification::fake();
     Bus::fake();
 
@@ -46,7 +46,7 @@ test('it queues and processes exports', function (): void {
 
     expect($export->status)->toBe(ExportStatus::Completed)
         ->and($export->total_rows)->toBe(3)
-        ->and(Storage::disk($disk)->exists($export->artifact_path))->toBeTrue();
+        ->and(Storage::disk('public')->exists($export->artifact_path))->toBeTrue();
 
     Notification::assertSentTo($user, ExportReadyNotification::class, function (ExportReadyNotification $notification) use ($export): bool {
         $data = $notification->toArray($user);
@@ -56,9 +56,8 @@ test('it queues and processes exports', function (): void {
 });
 
 test('it returns signed download responses', function (): void {
-    $disk = SecureStorage::disk();
-    config()->set('filesystems.default', $disk);
-    Storage::fake($disk);
+    config()->set('filesystems.default', 'public');
+    Storage::fake('public');
     Notification::fake();
 
     $user = User::factory()->create();
@@ -78,7 +77,7 @@ test('it returns signed download responses', function (): void {
     (new ProcessExportJob($export->getKey()))->handle($service);
     $export->refresh();
 
-    $url = ExportUrlGenerator::temporarySignedDownloadUrl($export, 5);
+    $url = $service->downloadUrl($export, 5);
 
     $response = $this->get($url);
 

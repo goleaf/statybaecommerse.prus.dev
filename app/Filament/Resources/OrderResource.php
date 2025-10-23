@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\ExportType;
-use App\Filament\Actions\RequestExportBulkAction;
+use App\Data\ExportRequestData;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Address;
 use App\Models\Channel;
 use App\Models\Order;
-use App\Services\Export\Contracts\DefinesExportColumns;
 use App\Services\Export\ExportColumn;
-use App\Services\Export\ExportFormat;
 use App\Services\Export\ExportService;
+use App\Services\Export\Exporters\OrderExport;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -791,15 +789,50 @@ final class OrderResource extends Resource implements DefinesExportColumns
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    ExportBulkAction::make('export_selected')
+                    BulkAction::make('export_selected')
                         ->label(__('Export selected'))
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('success')
-                        ->exports(self::getExportPresets())
-                        ->deselectRecordsAfterCompletion()
-                        ->visible(fn () => AuthorizationMatrix::check('orders', 'viewAny')),
-                    DeleteBulkAction::make()
-                        ->visible(fn () => AuthorizationMatrix::check('orders', 'delete')),
+                        ->form([
+                            Select::make('format')
+                                ->label(__('Format'))
+                                ->options([
+                                    'csv' => 'CSV',
+                                    'xlsx' => 'XLSX',
+                                    'pdf' => 'PDF',
+                                ])
+                                ->default('csv')
+                                ->required(),
+                            CheckboxList::make('columns')
+                                ->label(__('Columns'))
+                                ->options(fn () => collect(app(OrderExport::class)->columns())->mapWithKeys(fn (ExportColumn $column) => [$column->key => $column->label])->all())
+                                ->default(fn () => app(OrderExport::class)->defaultColumns())
+                                ->columns(2)
+                                ->required(),
+                        ])
+                        ->action(function (Collection $records, array $data): void {
+                            /** @var ExportService $service */
+                            $service = app(ExportService::class);
+                            $columns = $data['columns'] ?? app(OrderExport::class)->defaultColumns();
+                            $request = new ExportRequestData(
+                                name: __('Orders Export'),
+                                exportable: OrderExport::class,
+                                format: $data['format'],
+                                columns: $columns,
+                                recordIds: $records->pluck('id')->all(),
+                                userId: auth()->id(),
+                            );
+
+                            $service->queue($request);
+
+                            Notification::make()
+                                ->title(__('Export queued'))
+                                ->body(__('You will receive a notification once the export has finished.'))
+                                ->success()
+                                ->send();
+                        })
+                        ->deselectRecordsAfterCompletion(),
+                    DeleteBulkAction::make(),
                     BulkAction::make('mark_processing')
                         ->label(__('orders.bulk_mark_processing'))
                         ->icon('heroicon-o-cog')

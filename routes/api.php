@@ -1,7 +1,8 @@
 <?php
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\AuthenticatedUserController;
+use App\Http\Controllers\Api\AutocompleteSearchController;
+use App\Http\Controllers\Api\SignedExportDownloadController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('api/v1')
@@ -19,6 +20,6 @@ Route::prefix('api/v1')
         require __DIR__.'/api/notifications.php';
     });
 
-Route::get('api/v1/exports/{export}/download', \App\Http\Controllers\Api\ExportDownloadController::class)
-    ->middleware('signed')
-    ->name('api.exports.download');
+Route::get('exports/download/{export:uuid}', SignedExportDownloadController::class)
+    ->middleware(['signed'])
+    ->name('exports.signed-download');

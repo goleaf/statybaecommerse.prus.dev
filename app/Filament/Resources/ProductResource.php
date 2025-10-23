@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\ExportType;
-use App\Filament\Actions\RequestExportBulkAction;
+use App\Data\ExportRequestData;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers\AttributesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\CategoriesRelationManager;
@@ -16,10 +15,9 @@ use App\Filament\Resources\ProductResource\RelationManagers\ReviewsRelationManag
 use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
 use App\Filament\Widgets\InlineCharts\ProductSalesSparkline;
 use App\Models\Product;
-use App\Services\Export\Contracts\DefinesExportColumns;
 use App\Services\Export\ExportColumn;
-use App\Services\Export\ExportFormat;
 use App\Services\Export\ExportService;
+use App\Services\Export\Exporters\ProductExport;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\ActionGroup;
@@ -582,12 +580,49 @@ final class ProductResource extends Resource implements DefinesExportColumns
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    ExportBulkAction::make()
+                    BulkAction::make('export_selected')
                         ->label(__('Export selected'))
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('success')
-                        ->exports(self::getExportPresets())
-                        ->visible(fn () => AuthorizationMatrix::check('products', 'viewAny')),
+                        ->form([
+                            Select::make('format')
+                                ->label(__('Format'))
+                                ->options([
+                                    'csv' => 'CSV',
+                                    'xlsx' => 'XLSX',
+                                    'pdf' => 'PDF',
+                                ])
+                                ->default('csv')
+                                ->required(),
+                            CheckboxList::make('columns')
+                                ->label(__('Columns'))
+                                ->options(fn () => collect(app(ProductExport::class)->columns())->mapWithKeys(fn (ExportColumn $column) => [$column->key => $column->label])->all())
+                                ->default(fn () => app(ProductExport::class)->defaultColumns())
+                                ->columns(2)
+                                ->required(),
+                        ])
+                        ->action(function (Collection $records, array $data): void {
+                            /** @var ExportService $service */
+                            $service = app(ExportService::class);
+                            $columns = $data['columns'] ?? app(ProductExport::class)->defaultColumns();
+                            $request = new ExportRequestData(
+                                name: __('Products Export'),
+                                exportable: ProductExport::class,
+                                format: $data['format'],
+                                columns: $columns,
+                                recordIds: $records->pluck('id')->all(),
+                                userId: auth()->id(),
+                            );
+
+                            $service->queue($request);
+
+                            Notification::make()
+                                ->title(__('Export queued'))
+                                ->body(__('You will receive a notification once the export has finished.'))
+                                ->success()
+                                ->send();
+                        })
+                        ->deselectRecordsAfterCompletion(),
                     BulkAction::make('publish')
                         ->label(__('products.actions.publish'))
                         ->icon('heroicon-o-eye')

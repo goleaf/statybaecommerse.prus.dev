@@ -13,7 +13,9 @@ final class ExportFailedNotification extends Notification
 {
     use Queueable;
 
-    public function __construct(private readonly Export $export) {}
+    public function __construct(private readonly Export $export)
+    {
+    }
 
     public function via(object $notifiable): array
     {

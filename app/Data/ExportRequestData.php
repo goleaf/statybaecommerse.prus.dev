@@ -4,47 +4,62 @@ declare(strict_types=1);
 
 namespace App\Data;
 
-use App\Enums\ExportFormat;
-use App\Enums\ExportType;
-use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
-use Spatie\LaravelData\Attributes\Validation\EnumType;
+use Spatie\LaravelData\Attributes\Validation\In;
+use Spatie\LaravelData\Attributes\Validation\MaxItems;
+use Spatie\LaravelData\Attributes\Validation\MinItems;
 use Spatie\LaravelData\Attributes\Validation\Nullable;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Data;
 
+/**
+ * @property array<int, string> $columns
+ */
 final class ExportRequestData extends Data
 {
+    /**
+     * @param  array<int, string>  $columns
+     * @param  array<string, mixed>  $filters
+     * @param  array<int, int|string>  $recordIds
+     * @param  array<string, mixed>  $meta
+     */
     public function __construct(
-        #[Required, EnumType(ExportType::class)]
-        #[MapInputName('entity')]
-        public ExportType $entity,
-        #[Nullable, ArrayType]
-        public ?array $filters,
-        #[Nullable, ArrayType]
-        public ?array $columns,
-        #[Required, EnumType(ExportFormat::class)]
-        public ExportFormat $format,
-        #[Nullable, StringType]
-        public ?string $locale,
-        #[Nullable, StringType]
-        public ?string $timezone,
-        #[Nullable, ArrayType]
-        #[MapInputName('ids')]
-        public ?array $ids = null,
+        #[Required, StringType]
+        public string $name,
+        #[Required, StringType]
+        public string $exportable,
+        #[Required, StringType, In(['csv', 'xlsx', 'pdf'])]
+        public string $format,
+        #[Required, ArrayType, MinItems(1)]
+        public array $columns,
+        #[ArrayType]
+        public array $filters = [],
+        #[ArrayType]
+        public array $recordIds = [],
+        #[Nullable]
+        public ?int $userId = null,
+        #[ArrayType, MaxItems(50)]
+        public array $meta = [],
     ) {
-        $this->filters ??= [];
-        $this->columns ??= [];
     }
 
-    public function normalizedLocale(): string
+    /**
+     * Prepare sanitized payload for persistence.
+     *
+     * @return array<string, mixed>
+     */
+    public function toPayload(): array
     {
-        return $this->locale ?: app()->getLocale();
-    }
-
-    public function normalizedTimezone(): string
-    {
-        return $this->timezone ?: config('app.timezone');
+        return [
+            'name' => $this->name,
+            'exportable' => $this->exportable,
+            'format' => strtolower($this->format),
+            'columns' => array_values(array_unique($this->columns)),
+            'filters' => $this->filters,
+            'record_ids' => array_values($this->recordIds),
+            'user_id' => $this->userId,
+            'meta' => $this->meta,
+        ];
     }
 }
