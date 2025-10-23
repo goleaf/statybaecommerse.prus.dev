@@ -97,6 +97,8 @@ class NewsResource extends Resource
                         ->disabled(),
                     Forms\Components\Toggle::make('is_featured')
                         ->label(__('news.fields.is_featured')),
+                    Forms\Components\Toggle::make('is_breaking')
+                        ->label(__('news.fields.is_breaking')),
                     Forms\Components\Placeholder::make('moderation_state')
                         ->label(__('news.fields.moderation_state'))
                         ->content(fn (?News $record): string => $record?->moderation_state?->label() ?? ModerationState::Draft->label()),
