@@ -8,7 +8,6 @@ use App\Enums\NavigationGroup;
 use App\Filament\Resources\ActivityLogResource\Pages;
 use App\Models\ActivityLog;
 use BackedEnum;
-use Filament\Actions\Action;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
@@ -16,15 +15,16 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use UnitEnum;
+use Illuminate\Database\Eloquent\Model;
 
 final class ActivityLogResource extends Resource
 {
     protected static ?string $model = ActivityLog::class;
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
-
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
+    /**
+     * Icon used in the navigation menu. Type: string|BackedEnum|null.
+     */
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
     protected static ?int $navigationSort = 9;
 
@@ -37,6 +37,11 @@ final class ActivityLogResource extends Resource
     protected static ?string $pluralModelLabel = null;
 
     protected static ?string $recordTitleAttribute = 'description';
+
+    public static function getNavigationGroup(): string
+    {
+        return __('navigation.groups.system');
+    }
 
     public static function getNavigationLabel(): string
     {
@@ -160,7 +165,7 @@ final class ActivityLogResource extends Resource
             $key = $record->getKey();
 
             if ($key !== null) {
-                return __('activity_logs.single').' #'.$key;
+                return __('activity_logs.single') . ' #' . $key;
             }
         }
 
