@@ -34,8 +34,8 @@ Route::prefix('api/v1')
         });
     });
 
-Route::get('exports/{export:uuid}/download', ExportDownloadController::class)
-    ->middleware(['signed'])
+Route::get('exports/download/{export:uuid}', SignedExportDownloadController::class)
+    ->middleware(['signed', 'auth:sanctum', 'abilities:exports.download', 'can:exports.view', 'throttle:api.exports'])
     ->name('exports.signed-download');
 
 Route::prefix('partner')

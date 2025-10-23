@@ -66,6 +66,7 @@ return [
             'default'       => (int) env('API_RATE_LIMIT_DEFAULT', 60),
             'notifications' => (int) env('API_RATE_LIMIT_NOTIFICATIONS', 60),
             'autocomplete'  => (int) env('API_RATE_LIMIT_AUTOCOMPLETE', 30),
+            'exports'       => (int) env('API_RATE_LIMIT_EXPORTS', 30),
         ],
         'auth' => [
             'login' => [

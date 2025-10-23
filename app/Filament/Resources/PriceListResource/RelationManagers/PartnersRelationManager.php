@@ -6,6 +6,7 @@ namespace App\Filament\Resources\PriceListResource\RelationManagers;
 
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\AttachAction;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\DetachAction;
 use Filament\Tables;
 use Filament\Tables\Table;
