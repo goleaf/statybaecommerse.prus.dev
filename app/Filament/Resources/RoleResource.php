@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\RoleResource\MatrixFactory;
 use App\Filament\Resources\RoleResource\Pages;
 use App\Models\Role;
 use App\Support\Authorization\AuthorizationMatrix;
-use App\Support\Forms\MatrixFactory;
 use BackedEnum;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -31,14 +31,8 @@ final class RoleResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-shield-check';
 
-    /**
-     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
-     */
     protected static UnitEnum|string|null $navigationGroup = 'System';
 
     public static function shouldRegisterNavigation(): bool
@@ -116,12 +110,7 @@ final class RoleResource extends Resource
                             ->native(false),
                     ])
                     ->columns(2),
-                MatrixFactory::permissions(
-                    definition: self::matrixDefinition(),
-                    moduleLabelResolver: fn (string $module): string => self::moduleLabel($module),
-                    abilityLabelResolver: fn (string $ability): string => self::abilityLabel($ability),
-                    sectionLabel: __('roles.sections.permissions'),
-                ),
+                MatrixFactory::permissions(),
             ]);
     }
 
