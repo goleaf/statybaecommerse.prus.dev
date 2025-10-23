@@ -6,6 +6,7 @@ namespace App\Filament\Pages;
 
 use App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
 use App\Models\Product;
+use BackedEnum;
 use Filament\Actions\BulkAction;
 use Filament\Forms\Components\Select;
 use Filament\Pages\Page;
@@ -22,10 +23,7 @@ final class InventoryManagement extends Page implements HasTable
     use HasToggleableTable;
     use InteractsWithTable;
 
-    /**
-     * @var string|\BackedEnum|null
-     */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
 
     /**
      * @return string|null
