@@ -126,5 +126,5 @@ return [
         'warning' => 'Предупреждение',
         'danger' => 'Опасность',
     ],
-    'menu_items' => require __DIR__ . '/admin/menu_items.php',
+    'email_campaigns' => require __DIR__.'/admin/email_campaigns.php',
 ];
