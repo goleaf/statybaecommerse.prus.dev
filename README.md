@@ -71,6 +71,10 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
   scopes, ensuring inactive or disabled options stay editable and helper
   actions (activate, duplicate, default toggles) behave consistently during
   regression tests and live admin sessions.
+- Collection management resource navigation and translations were
+  synchronized with the Filament v4 schema, keeping the admin sidebar readable
+  in EN/LT and aligning the comprehensive resource regression suite with the
+  model's fillable contract.
 - Cart lifecycle regression tests now provision a lightweight `cart_items` schema inside the suite, keeping checkout cleanup coverage reliable without invoking the full migration set.
 - Catalog OpenAPI contract now documents the lean product meta payload and nullable image thumbnails, ensuring schema validation mirrors real API responses.
 - Campaign click factories now guard optional relationships and lean on the dedicated SQLite test database configuration, eliminating the missing-table errors that previously interrupted the API listing regression suite.
