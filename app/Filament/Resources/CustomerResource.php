@@ -17,6 +17,8 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Forms;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -24,10 +26,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Utilities\Get as SchemaGet;
-use Filament\Schemas\Components\Utilities\Set as SchemaSet;
+use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
@@ -151,7 +150,7 @@ final class CustomerResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Set|SchemaSet $set): void {
+                                ->afterStateUpdated(function ($state, Forms\Set $set): void {
                                     if ($state) {
                                         $set('city_id', null);
                                     }
@@ -161,10 +160,9 @@ final class CustomerResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->options(function (Forms\Get|SchemaGet $get): array {
-                                    $query = City::query()->orderBy('name');
-
-                                    if ($countryId = $get('country_id')) {
+                                ->modifyOptionsQueryUsing(function (Builder $query, Forms\Get $get): void {
+                                    $countryId = $get('country_id');
+                                    if ($countryId) {
                                         $query->where('country_id', $countryId);
                                     }
 
