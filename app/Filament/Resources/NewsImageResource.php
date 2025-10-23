@@ -9,8 +9,12 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\NewsImageResource\Pages;
 use App\Models\News;
 use App\Models\NewsImage;
-use App\Support\Storage\SecureStorage;
 use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
@@ -23,11 +27,10 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
@@ -40,8 +43,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Storage;
-use Throwable;
 use UnitEnum;
 
 final class NewsImageResource extends Resource
@@ -114,39 +115,19 @@ final class NewsImageResource extends Resource
                                                 '1:1',
                                             ])
                                             ->live()
-                                            ->afterStateUpdated(function ($state, callable $set, callable $get): void {
-                                                if (! $state) {
-                                                    return;
-                                                }
-
-                                                $diskName = SecureStorage::disk();
-                                                $disk = Storage::disk($diskName);
-
-                                                if (! $disk->exists($state)) {
-                                                    return;
-                                                }
-
-                                                $set('file_size', $disk->size($state));
-                                                $set('mime_type', $disk->mimeType($state));
-
-                                                $imageInfo = null;
-                                                $imagePath = null;
-
-                                                try {
-                                                    $imagePath = Storage::disk($diskName)->path($state);
-                                                } catch (Throwable) {
-                                                    $imagePath = null;
-                                                }
-
-                                                if ($imagePath && is_file($imagePath)) {
-                                                    $imageInfo = @getimagesize($imagePath);
-                                                }
-
-                                                if (! $imageInfo && method_exists($disk, 'temporaryUrl')) {
-                                                    try {
-                                                        $temporaryUrl = $disk->temporaryUrl($state, now()->addMinutes(5));
-                                                    } catch (Throwable) {
-                                                        $temporaryUrl = null;
+                                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                                if ($state) {
+                                                    $file = storage_path('app/public/'.$state);
+                                                    if (file_exists($file)) {
+                                                        $set('file_size', filesize($file));
+                                                        $set('mime_type', mime_content_type($file));
+                                                        $imageInfo = getimagesize($file);
+                                                        if ($imageInfo) {
+                                                            $set('dimensions', [
+                                                                'width' => $imageInfo[0],
+                                                                'height' => $imageInfo[1],
+                                                            ]);
+                                                        }
                                                     }
 
                                                     if ($temporaryUrl) {
@@ -190,7 +171,7 @@ final class NewsImageResource extends Resource
                                                     ->label(__('admin.news_images.file_size'))
                                                     ->numeric()
                                                     ->disabled()
-                                                    ->formatStateUsing(fn ($state) => $state ? number_format($state / 1024, 2) . ' KB' : ''),
+                                                    ->formatStateUsing(fn ($state) => $state ? number_format($state / 1024, 2).' KB' : ''),
                                                 TextInput::make('mime_type')
                                                     ->label(__('admin.news_images.mime_type'))
                                                     ->disabled(),
@@ -225,13 +206,13 @@ final class NewsImageResource extends Resource
 
                                                 $info = [];
                                                 if ($fileSize) {
-                                                    $info[] = __('admin.news_images.file_size') . ': ' . number_format($fileSize / 1024, 2) . ' KB';
+                                                    $info[] = __('admin.news_images.file_size').': '.number_format($fileSize / 1024, 2).' KB';
                                                 }
                                                 if ($mimeType) {
-                                                    $info[] = __('admin.news_images.mime_type') . ': ' . $mimeType;
+                                                    $info[] = __('admin.news_images.mime_type').': '.$mimeType;
                                                 }
                                                 if ($dimensions && isset($dimensions['width']) && isset($dimensions['height'])) {
-                                                    $info[] = __('admin.news_images.dimensions') . ': ' . $dimensions['width'] . 'x' . $dimensions['height'];
+                                                    $info[] = __('admin.news_images.dimensions').': '.$dimensions['width'].'x'.$dimensions['height'];
                                                 }
 
                                                 return implode(' | ', $info);
@@ -280,11 +261,7 @@ final class NewsImageResource extends Resource
 
                         return strlen($state) > 40 ? $state : null;
                     })
-                    ->url(
-                        fn (NewsImage $record): ?string => $record->news_id
-                            ? NewsResource::getUrl('edit', ['record' => $record->news])
-                            : null
-                    )
+                    ->url(fn ($record) => route('admin.news.edit', $record->news_id))
                     ->color('primary'),
                 TextColumn::make('alt_text')
                     ->label(__('admin.news_images.alt_text'))
@@ -321,7 +298,7 @@ final class NewsImageResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('file_size')
                     ->label(__('admin.news_images.file_size'))
-                    ->formatStateUsing(fn ($state) => $state ? number_format($state / 1024, 2) . ' KB' : '')
+                    ->formatStateUsing(fn ($state) => $state ? number_format($state / 1024, 2).' KB' : '')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->badge()
@@ -345,7 +322,7 @@ final class NewsImageResource extends Resource
                 TextColumn::make('dimensions')
                     ->label(__('admin.news_images.dimensions'))
                     ->formatStateUsing(fn ($state) => $state && isset($state['width'], $state['height'])
-                        ? $state['width'] . 'x' . $state['height']
+                        ? $state['width'].'x'.$state['height']
                         : '')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->badge()
@@ -391,11 +368,7 @@ final class NewsImageResource extends Resource
                     ->toggle(),
                 Filter::make('no_alt_text')
                     ->label(__('admin.news_images.no_alt_text'))
-                    ->query(fn (Builder $query): Builder => $query->where(
-                        fn (Builder $q): Builder => $q
-                            ->whereNull('alt_text')
-                            ->orWhere('alt_text', '')
-                    ))
+                    ->query(fn (Builder $query): Builder => $query->whereNull('alt_text')->orWhere('alt_text', ''))
                     ->toggle(),
             ])
             ->actions([
@@ -418,11 +391,7 @@ final class NewsImageResource extends Resource
                     Action::make('download')
                         ->label(__('admin.news_images.download'))
                         ->icon('heroicon-o-arrow-down-tray')
-                        ->url(fn (NewsImage $record) => SecureStorage::temporarySignedUrl(
-                            $record->file_path,
-                            now()->addMinutes((int) config('media-security.url_lifetime', 30)),
-                            true
-                        ))
+                        ->url(fn (NewsImage $record) => asset('storage/'.$record->file_path))
                         ->openUrlInNewTab(),
                     DeleteAction::make()
                         ->label(__('admin.common.delete'))

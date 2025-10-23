@@ -127,10 +127,10 @@ final class EnumValueResource extends Resource
                         ->columnSpanFull(),
                     Placeholder::make('usage_count')
                         ->label(__('admin.enum_values.form.fields.usage_count'))
-                        ->content(static fn (?EnumValue $record): int => (int) ($record?->usage_count ?? 0)),
+                        ->content(fn ($record) => $record?->usage_count ?? 0),
                     Placeholder::make('formatted_value')
                         ->label(__('admin.enum_values.form.fields.formatted_value'))
-                        ->content(static fn (?EnumValue $record): string => $record?->formatted_value ?? '-'),
+                        ->content(fn ($record) => $record?->formatted_value ?? '-'),
                 ])
                 ->columns(2)
                 ->collapsible(),
@@ -146,7 +146,7 @@ final class EnumValueResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->badge()
-                    ->color(static fn (string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'navigation_group' => 'primary',
                         'order_status'     => 'success',
                         'payment_status'   => 'warning',

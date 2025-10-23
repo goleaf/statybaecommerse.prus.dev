@@ -261,7 +261,7 @@ final class Category extends Model implements HasMedia
     {
         $name = $this->trans('name', app()->getLocale());
         if ($this->parent) {
-            return $this->parent->getFullNameAttribute() . ' > ' . $name;
+            return $this->parent->getFullNameAttribute().' > '.$name;
         }
 
         return $name;

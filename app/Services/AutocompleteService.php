@@ -111,7 +111,7 @@ final class AutocompleteService
      */
     public function searchProducts(string $query, int $limit = self::DEFAULT_LIMIT): array
     {
-        $normalizedQuery = trim($query);
+        $cacheKey = "autocomplete_products_{$query}_{$limit}_".app()->getLocale();
 
         if ($normalizedQuery === '') {
             return [];
@@ -135,11 +135,11 @@ final class AutocompleteService
                 });
             })->orderByRaw("\n                    CASE \n                        WHEN name LIKE ? THEN 1\n                        WHEN sku LIKE ? THEN 2\n                        WHEN description LIKE ? THEN 3\n                        ELSE 4\n                    END\n                ", [$searchTerm, $searchTerm, $searchTerm])->limit($limit)->cursor()->takeUntilTimeout(now()->addSeconds(5))->collect();
 
-                return Arr::from($products->skipWhile(function (Product $product) {
-                    // Skip products that are not properly configured or have missing essential data
-                    return empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug);
-            })->map(function (Product $product) use ($normalizedQuery, $locale) {
-                return ['id' => $product->id, 'type' => 'product', 'title' => $product->getTranslatedName($locale), 'subtitle' => $product->brand?->name, 'description' => Str::limit($product->getTranslatedDescription($locale), 100), 'url' => route('localized.products.show', ['locale' => $locale, 'product' => $product->slug]), 'image' => $product->getFirstMediaUrl('images', 'thumb'), 'price' => $product->getPrice(), 'formatted_price' => $product->getFormattedPrice(), 'sku' => $product->sku, 'in_stock' => $product->isInStock(), 'relevance_score' => $this->calculateRelevanceScore($product->getTranslatedName($locale), $normalizedQuery)];
+            return Arr::from($products->skipWhile(function (Product $product) {
+                // Skip products that are not properly configured or have missing essential data
+                return empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug);
+            })->map(function (Product $product) use ($query, $locale) {
+                return ['id' => $product->id, 'type' => 'product', 'title' => $product->getTranslatedName($locale), 'subtitle' => $product->brand?->name, 'description' => Str::limit($product->getTranslatedDescription($locale), 100), 'url' => route('localized.products.show', ['locale' => $locale, 'product' => $product->slug]), 'image' => $product->getFirstMediaUrl('images', 'thumb'), 'price' => $product->getPrice(), 'formatted_price' => $product->getFormattedPrice(), 'sku' => $product->sku, 'in_stock' => $product->isInStock(), 'relevance_score' => $this->calculateRelevanceScore($product->getTranslatedName($locale), $query)];
             }));
         });
     }
@@ -149,7 +149,7 @@ final class AutocompleteService
      */
     public function searchCategories(string $query, int $limit = self::DEFAULT_LIMIT): array
     {
-        $normalizedQuery = trim($query);
+        $cacheKey = "autocomplete_categories_{$query}_{$limit}_".app()->getLocale();
 
         if ($normalizedQuery === '') {
             return [];
@@ -190,7 +190,7 @@ final class AutocompleteService
             return Arr::from($categories->skipWhile(function (Category $category) {
                 // Skip categories that are not properly configured or have missing essential data
                 return empty($category->name) || ! $category->is_visible || empty($category->slug);
-            })->map(function (Category $category) use ($normalizedQuery, $locale) {
+            })->map(function (Category $category) use ($query, $locale) {
                 $title = method_exists($category, 'getTranslatedName') ? $category->getTranslatedName($locale) : ($category->name ?? '');
                 $subtitle = $category->parent ? (method_exists($category->parent, 'getTranslatedName') ? $category->parent->getTranslatedName($locale) : ($category->parent->name ?? null)) : null;
                 $description = method_exists($category, 'getTranslatedDescription') ? $category->getTranslatedDescription($locale) : ($category->description ?? '');
@@ -217,7 +217,7 @@ final class AutocompleteService
      */
     public function searchBrands(string $query, int $limit = self::DEFAULT_LIMIT): array
     {
-        $normalizedQuery = trim($query);
+        $cacheKey = "autocomplete_brands_{$query}_{$limit}_".app()->getLocale();
 
         if ($normalizedQuery === '') {
             return [];
@@ -258,7 +258,7 @@ final class AutocompleteService
             return Arr::from($brands->skipWhile(function (Brand $brand) {
                 // Skip brands that are not properly configured or have missing essential data
                 return empty($brand->name) || ! $brand->is_visible || empty($brand->slug);
-            })->map(function (Brand $brand) use ($normalizedQuery, $locale) {
+            })->map(function (Brand $brand) use ($query, $locale) {
                 $title = method_exists($brand, 'getTranslatedName') ? $brand->getTranslatedName($locale) : ($brand->name ?? '');
                 $description = method_exists($brand, 'getTranslatedDescription') ? $brand->getTranslatedDescription($locale) : ($brand->description ?? '');
                 $url = Route::has('localized.brand.show') ? route('localized.brand.show', ['locale' => $locale, 'brand' => $brand->slug]) : url('/brand/'.$brand->slug);
@@ -283,7 +283,7 @@ final class AutocompleteService
      */
     public function searchCollections(string $query, int $limit = self::DEFAULT_LIMIT): array
     {
-        $normalizedQuery = trim($query);
+        $cacheKey = "autocomplete_collections_{$query}_{$limit}_".app()->getLocale();
 
         if ($normalizedQuery === '') {
             return [];
@@ -324,18 +324,8 @@ final class AutocompleteService
             return Arr::from($collections->skipWhile(function (Collection $collection) {
                 // Skip collections that are not properly configured or have missing essential data
                 return empty($collection->name) || ! $collection->is_visible || empty($collection->slug);
-            })->map(function (Collection $collection) use ($normalizedQuery, $locale) {
-                return [
-                    'id' => $collection->id,
-                    'type' => 'collection',
-                    'title' => $collection->getTranslatedName($locale),
-                    'subtitle' => $collection->is_automatic ? __('frontend.collection.automatic') : __('frontend.collection.manual'),
-                    'description' => Str::limit($collection->getTranslatedDescription($locale), 100),
-                    'url' => route('localized.collection.show', ['locale' => $locale, 'collection' => $collection->slug]),
-                    'image' => $collection->getFirstMediaUrl('images', 'thumb'),
-                    'products_count' => (int) ($collection->products_count ?? 0),
-                    'relevance_score' => $this->calculateRelevanceScore($collection->getTranslatedName($locale), $normalizedQuery),
-                ];
+            })->map(function (Collection $collection) use ($query, $locale) {
+                return ['id' => $collection->id, 'type' => 'collection', 'title' => $collection->getTranslatedName($locale), 'subtitle' => $collection->is_automatic ? __('frontend.collection.automatic') : __('frontend.collection.manual'), 'description' => Str::limit($collection->getTranslatedDescription($locale), 100), 'url' => route('localized.collection.show', ['locale' => $locale, 'collection' => $collection->slug]), 'image' => $collection->getFirstMediaUrl('images', 'thumb'), 'products_count' => $collection->products()->count(), 'relevance_score' => $this->calculateRelevanceScore($collection->getTranslatedName($locale), $query)];
             }));
         });
     }
@@ -345,7 +335,7 @@ final class AutocompleteService
      */
     public function searchAttributes(string $query, int $limit = self::DEFAULT_LIMIT): array
     {
-        $normalizedQuery = trim($query);
+        $cacheKey = "autocomplete_attributes_{$query}_{$limit}_".app()->getLocale();
 
         if ($normalizedQuery === '') {
             return [];
@@ -473,7 +463,7 @@ final class AutocompleteService
         }
         $recentSearches = session('recent_searches', []);
         // Remove if already exists
-        $recentSearches = array_filter($recentSearches, fn ($term) => $term !== $normalizedQuery);
+        $recentSearches = array_filter($recentSearches, fn ($term) => $term !== $query);
         // Add to beginning
         array_unshift($recentSearches, $normalizedQuery);
         // Keep only last 10 searches

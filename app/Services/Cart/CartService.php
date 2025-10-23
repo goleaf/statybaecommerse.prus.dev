@@ -15,9 +15,9 @@ use Throwable;
 
 final class CartService
 {
-    public function clear(?int $userId, string $sessionId, ?string $fallbackSessionId = null): void
-    {
-        $sessionIds = $this->normalizeSessionIds($sessionId, $fallbackSessionId);
+    private const SESSION_KEY = 'cart';
+
+    public function __construct(private readonly Session $session) {}
 
         $this->clearCartSession($sessionId);
         $this->clearCartStorage($userId, $sessionIds);

@@ -7,8 +7,6 @@ namespace App\Filament\Resources;
 use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\UserProductInteractionResource\Pages;
-use App\Models\Product;
-use App\Models\User;
 use App\Models\UserProductInteraction;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\Action as TableAction;

@@ -12,6 +12,9 @@ use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -98,8 +101,54 @@ final class PriceListResource extends Resource
             Section::make(__('price_lists.availability'))
                 ->columns(2)
                 ->schema([
-                    Toggle::make('is_enabled')
-                        ->label(__('price_lists.is_enabled'))
+                    Repeater::make('tiers')
+                        ->label(__('price_lists.tiers'))
+                        ->schema([
+                            TextInput::make('min_quantity')
+                                ->label(__('price_lists.min_quantity'))
+                                ->numeric()
+                                ->required(),
+                            TextInput::make('max_quantity')
+                                ->label(__('price_lists.max_quantity'))
+                                ->numeric(),
+                            TextInput::make('price')
+                                ->label(__('price_lists.price'))
+                                ->numeric()
+                                ->required()
+                                ->prefix('€'),
+                        ])
+                        ->defaultItems(1)
+                        ->addActionLabel(__('price_lists.add_tier'))
+                        ->visible(fn (Forms\Get $get): bool => $get('pricing_type') === 'tiered'),
+                ])
+                ->visible(fn (Forms\Get $get): bool => $get('pricing_type') === 'tiered'),
+            Section::make(__('price_lists.volume_pricing'))
+                ->schema([
+                    Repeater::make('volume_tiers')
+                        ->label(__('price_lists.volume_tiers'))
+                        ->schema([
+                            TextInput::make('min_quantity')
+                                ->label(__('price_lists.min_quantity'))
+                                ->numeric()
+                                ->required(),
+                            TextInput::make('max_quantity')
+                                ->label(__('price_lists.max_quantity'))
+                                ->numeric(),
+                            TextInput::make('price')
+                                ->label(__('price_lists.price'))
+                                ->numeric()
+                                ->required()
+                                ->prefix('€'),
+                        ])
+                        ->defaultItems(1)
+                        ->addActionLabel(__('price_lists.add_tier'))
+                        ->visible(fn (Forms\Get $get): bool => $get('pricing_type') === 'volume'),
+                ])
+                ->visible(fn (Forms\Get $get): bool => $get('pricing_type') === 'volume'),
+            Section::make(__('price_lists.settings'))
+                ->schema([
+                    Toggle::make('is_active')
+                        ->label(__('price_lists.is_active'))
                         ->default(true),
                     Toggle::make('is_default')
                         ->label(__('price_lists.is_default')),
@@ -130,13 +179,26 @@ final class PriceListResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->copyable(),
-                TextColumn::make('code')
-                    ->label(__('price_lists.code'))
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('currency.code')
-                    ->label(__('price_lists.currency'))
-                    ->sortable()
+                TextColumn::make('pricing_type')
+                    ->label(__('price_lists.pricing_type'))
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'fixed' => 'success',
+                        'tiered' => 'info',
+                        'volume' => 'warning',
+                        default => 'gray',
+                    }),
+                TextColumn::make('description')
+                    ->label(__('price_lists.description'))
+                    ->limit(50)
+                    ->tooltip(function (TextColumn $column): ?string {
+                        $state = $column->getState();
+                        if (strlen($state) <= 50) {
+                            return null;
+                        }
+
+                        return $state;
+                    })
                     ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('is_enabled')
                     ->label(__('price_lists.is_enabled'))
@@ -225,31 +287,12 @@ final class PriceListResource extends Resource
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
                             ->when(
-                                $data['starts_from'] ?? null,
-                                fn (Builder $query, $date): Builder => $query->whereDate('starts_at', '>=', $date),
+                                $data['valid_from_from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('valid_from', '>=', $date),
                             )
                             ->when(
-                                $data['starts_until'] ?? null,
-                                fn (Builder $query, $date): Builder => $query->whereDate('starts_at', '<=', $date),
-                            );
-                    }),
-                Filter::make('ends_at')
-                    ->label(__('price_lists.ends_at'))
-                    ->form([
-                        Flatpickr::makeDateTime('ends_from')
-                            ->label(__('price_lists.ends_at_from')),
-                        Flatpickr::makeDateTime('ends_until')
-                            ->label(__('price_lists.ends_at_until')),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['ends_from'] ?? null,
-                                fn (Builder $query, $date): Builder => $query->whereDate('ends_at', '>=', $date),
-                            )
-                            ->when(
-                                $data['ends_until'] ?? null,
-                                fn (Builder $query, $date): Builder => $query->whereDate('ends_at', '<=', $date),
+                                $data['valid_from_until'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('valid_from', '<=', $date),
                             );
                     }),
             ])

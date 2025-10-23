@@ -32,14 +32,10 @@ class UserFactory extends Factory
         $baseEmail = fake()->safeEmail();
         $email = $baseEmail;
         $counter = 1;
-        // Avoid querying a table that may not exist yet (e.g. before migrations run in memory) by
-        // ensuring the users table is present before attempting to enforce cross-test uniqueness.
-        if (Schema::hasTable('users')) {
-            while (\App\Models\User::where('email', $email)->exists()) {
-                $emailParts = explode('@', $baseEmail);
-                $email = $emailParts[0].$counter.'@'.$emailParts[1];
-                $counter++;
-            }
+        while (\App\Models\User::where('email', $email)->exists()) {
+            $emailParts = explode('@', $baseEmail);
+            $email = $emailParts[0].$counter.'@'.$emailParts[1];
+            $counter++;
         }
 
         return [

@@ -199,18 +199,7 @@ final class StockResource extends Resource
                     ->native(false),
                 Filter::make('low_stock')
                     ->label(__('inventory.low_stock'))
-                    ->form([
-                        Toggle::make('is_low_stock')
-                            ->label(__('inventory.low_stock_only')),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        if (! ($data['is_low_stock'] ?? false)) {
-                            return $query;
-                        }
-
-                        return $query->whereColumn('quantity', '<=', 'threshold');
-                    })
-                    ->indicateUsing(fn (array $data): ?string => ($data['is_low_stock'] ?? false) ? __('inventory.low_stock_only') : null),
+                    ->query(fn (Builder $query): Builder => $query->whereRaw('quantity <= threshold')),
             ])
             ->actions([
                 ViewAction::make(),

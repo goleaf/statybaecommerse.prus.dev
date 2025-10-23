@@ -7,8 +7,6 @@ namespace App\Livewire\Pages;
 use App\Livewire\Concerns\WithCart;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Support\Cache\CacheKeys;
-use App\Support\Cache\CacheTags;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Facades\Cache;

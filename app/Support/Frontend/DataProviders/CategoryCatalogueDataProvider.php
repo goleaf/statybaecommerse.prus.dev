@@ -11,9 +11,9 @@ use Illuminate\Support\Collection;
 
 final class CategoryCatalogueDataProvider
 {
-    public function __construct(private readonly ProductCatalogueDataProvider $products)
-    {
-    }
+    use BuildsProductCatalogueQuery;
+
+    public function __construct(private readonly ProductCatalogueDataProvider $products) {}
 
     public function show(Category $category, array $filters = []): array
     {

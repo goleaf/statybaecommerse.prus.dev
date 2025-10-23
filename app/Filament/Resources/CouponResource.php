@@ -32,12 +32,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
-use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
-use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
-use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
-use pxlrbt\FilamentExcel\Columns\Column;
-use pxlrbt\FilamentExcel\Exports\ExcelExport;
-use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 
 final class CouponResource extends Resource
 {

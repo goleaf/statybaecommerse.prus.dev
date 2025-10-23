@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\OrderItem;
 use App\Support\Filament\ProductVariantFieldHelper;
 use App\Support\Filament\SearchableInputHelper;
@@ -20,8 +19,6 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;

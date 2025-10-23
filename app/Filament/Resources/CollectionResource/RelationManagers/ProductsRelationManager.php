@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CollectionResource\RelationManagers;
 
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\Product;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 

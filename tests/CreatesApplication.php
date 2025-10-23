@@ -12,7 +12,7 @@ trait CreatesApplication
 {
     public function createApplication(): Application
     {
-        $envPath = __DIR__ . '/../.env';
+        $envPath = __DIR__.'/../.env';
 
         if (! file_exists($envPath)) {
             file_put_contents($envPath, '');
@@ -24,19 +24,7 @@ trait CreatesApplication
             });
         }
 
-        // Prime environment variables before Laravel boots so the framework resolves
-        // the correct SQLite connection on its initial pass through configuration.
-        $databasePath = TestingDatabase::path();
-        TestingDatabase::ensureExists();
-
-        putenv('DB_CONNECTION=sqlite');
-        putenv('DB_DATABASE='.$databasePath);
-        $_ENV['DB_CONNECTION'] = 'sqlite';
-        $_ENV['DB_DATABASE'] = $databasePath;
-        $_SERVER['DB_CONNECTION'] = 'sqlite';
-        $_SERVER['DB_DATABASE'] = $databasePath;
-
-        $app = require __DIR__ . '/../bootstrap/app.php';
+        $app = require __DIR__.'/../bootstrap/app.php';
 
         $app->make(Kernel::class)->bootstrap();
 
