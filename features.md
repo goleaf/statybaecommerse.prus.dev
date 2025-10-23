@@ -46,6 +46,7 @@
   campaign, customer group, and activity filters so admins can intentionally
   include inactive rows in reviews without disabling visibility controls for
   every query.
+- Document Template resource now aligns with Filament v4 schema components, strips editor wrappers before persisting content, and seeds enum-backed factories so CRUD forms, filters, and document relationships behave consistently in tests and production.
 - System setting translation management once again supports soft deletes, restores, and safe duplication because the locale index has been relaxed and the fillable contract mirrors the documented API fields.
 - Campaign conversion analytics drop the inherited ActiveScope so the model's
   own status-aware scopes (campaign, type, device, etc.) surface completed
