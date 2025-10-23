@@ -46,7 +46,7 @@ final class AutocompleteSelect extends Select
     /**
      * @var array<string, array<int, array{value: string, label: string, data: array<string, mixed>}>>
      */
-    protected array $searchCache = [];
+    protected array $searchResultCache = [];
 
     protected ?string $activeModelForCache = null;
 
@@ -55,6 +55,7 @@ final class AutocompleteSelect extends Select
         $component = parent::make($name);
 
         $component->searchable(true);
+        $component->searchResults = $component->emptyResults();
 
         return $component;
     }
@@ -114,13 +115,13 @@ final class AutocompleteSelect extends Select
         }
 
         if ($modelClass !== $this->modelClass) {
-            // Changing the model invalidates cached results and view payloads.
+            $this->modelClass = $modelClass;
             $this->resetSearchState();
+
+            return $this;
         }
 
         $this->modelClass = $modelClass;
-
-        $this->flushSearchCache();
 
         return $this;
     }
@@ -170,8 +171,6 @@ final class AutocompleteSelect extends Select
      */
     public function getSearchResults(string $search): array
     {
-        $normalized = $this->normalizeSearchQuery($search);
-
         return ($this->searchResults ?? collect())
             ->mapWithKeys(
                 /**
@@ -210,7 +209,7 @@ final class AutocompleteSelect extends Select
 
     public function setSearchQuery(?string $query): static
     {
-        $normalized = $this->normalizeSearchQuery($query);
+        $normalizedQuery = $this->normalizeSearchQuery($query);
 
         $this->searchQuery = $normalizedQuery;
 
@@ -368,14 +367,17 @@ final class AutocompleteSelect extends Select
         $this->activeModelForCache = null;
     }
 
+    protected function flushSearchCache(): void
+    {
+        $this->searchResultCache = [];
+        $this->searchResults = $this->emptyResults();
+    }
+
     /**
      * @return Collection<int, array{value: string, label: string, data: array<string, mixed>}>
      */
     protected function emptyResults(): Collection
     {
-        /** @var Collection<int, array{value: string, label: string, data: array<string, mixed>}> $collection */
-        $collection = new Collection;
-
-        return $collection;
+        return collect();
     }
 }

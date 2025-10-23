@@ -186,12 +186,32 @@ enum NavigationGroup: string
 
     public static function options(): array
     {
-        return collect(self::cases())->sortBy('priority')->mapWithKeys(fn ($case) => [$case->value => $case->label()])->toArray();
+        return collect(self::cases())
+            ->sortBy(fn (self $case) => $case->priority())
+            ->mapWithKeys(fn (self $case): array => [$case->value => $case->label()])
+            ->toArray();
     }
 
     public static function optionsWithDescriptions(): array
     {
-        return collect(self::cases())->sortBy('priority')->mapWithKeys(fn ($case) => [$case->value => ['label' => $case->label(), 'description' => $case->description(), 'icon' => $case->icon(), 'color' => $case->color(), 'is_core' => $case->isCore(), 'is_admin_only' => $case->isAdminOnly(), 'is_public' => $case->isPublic(), 'requires_permission' => $case->requiresPermission(), 'permission' => $case->getPermission()]])->toArray();
+        return collect(self::cases())
+            ->sortBy(fn (self $case) => $case->priority())
+            ->mapWithKeys(function (self $case): array {
+                return [
+                    $case->value => [
+                        'label'               => $case->label(),
+                        'description'         => $case->description(),
+                        'icon'                => $case->icon(),
+                        'color'               => $case->color(),
+                        'is_core'             => $case->isCore(),
+                        'is_admin_only'       => $case->isAdminOnly(),
+                        'is_public'           => $case->isPublic(),
+                        'requires_permission' => $case->requiresPermission(),
+                        'permission'          => $case->getPermission(),
+                    ],
+                ];
+            })
+            ->toArray();
     }
 
     public static function core(): Collection
@@ -229,7 +249,10 @@ enum NavigationGroup: string
 
     public static function values(): array
     {
-        return array_column(self::cases(), 'value');
+        return array_map(
+            static fn (self $case): string => $case->value,
+            self::cases(),
+        );
     }
 
     public static function labels(): array

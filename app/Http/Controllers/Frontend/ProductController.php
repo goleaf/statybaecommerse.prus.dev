@@ -14,8 +14,6 @@ use App\Support\Frontend\DataProviders\ProductCatalogueDataProvider;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use Illuminate\View\View;
 
 final class ProductController extends Controller
 {

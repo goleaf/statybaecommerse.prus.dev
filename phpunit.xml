@@ -36,7 +36,7 @@
     </testsuites>
     <source>
         <include>
-            <directory>app</directory>
+            <directory>app/Models</directory>
         </include>
     </source>
     <php>

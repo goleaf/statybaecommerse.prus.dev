@@ -11,6 +11,15 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('system_setting_dependencies')) {
+            return;
+        }
+
+        if (Schema::hasColumn('system_setting_dependencies', 'condition_value')) {
+            // The schema has already been migrated by an earlier patch.
+            return;
+        }
+
         Schema::table('system_setting_dependencies', function (Blueprint $table): void {
             // Store the parsed operator and value separately for improved querying.
             $table->string('condition_operator', 100)->nullable()->after('condition');
@@ -73,6 +82,15 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (! Schema::hasTable('system_setting_dependencies')) {
+            return;
+        }
+
+        if (! Schema::hasColumn('system_setting_dependencies', 'condition_value')) {
+            // Nothing to roll back if the augmentation never ran.
+            return;
+        }
+
         Schema::table('system_setting_dependencies', function (Blueprint $table): void {
             $table->json('condition_json')->nullable()->after('depends_on_setting_id');
         });

@@ -10,7 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('can create analytics event', function () {
+it('creates analytics event record', function () {
     $user = User::factory()->create();
 
     $event = AnalyticsEvent::create([
@@ -31,7 +31,7 @@ it('can create analytics event', function () {
     expect($event->user_id)->toBe($user->id);
 });
 
-it('can track analytics event using static method', function () {
+it('tracks analytics event via static method', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
