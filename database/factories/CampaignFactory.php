@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use App\Models\Campaign;
+use App\Models\CampaignCustomerSegment;
+use App\Models\CampaignProductTarget;
+use App\Models\CampaignSchedule;
+use App\Models\CustomerGroup;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Campaign>
@@ -25,7 +28,7 @@ final class CampaignFactory extends Factory
         $slug = $baseSlug;
         $counter = 1;
         while (\App\Models\Campaign::where('slug', $slug)->exists()) {
-            $slug = $baseSlug.'-'.$counter;
+            $slug = $baseSlug . '-' . $counter;
             $counter++;
         }
 
@@ -65,50 +68,27 @@ final class CampaignFactory extends Factory
     public function configure(): static
     {
         return $this->afterCreating(function (Campaign $campaign): void {
-            // Create related records only when the necessary tables exist in the temporary test database.
-            if ($this->tableExists('campaign_product_targets')) {
-                CampaignProductTarget::factory()
-                    ->category()
-                    ->for($campaign)
-                    ->state($this->ensureActiveState('campaign_product_targets'))
-                    ->create();
-            }
+            CampaignProductTarget::factory()
+                ->category()
+                ->for($campaign)
+                ->state($this->ensureActiveState('campaign_product_targets'))
+                ->create();
 
-            if ($this->tableExists('campaign_customer_segments')) {
-                CampaignCustomerSegment::factory()
-                    ->demographic()
-                    ->for($campaign)
-                    ->state(array_merge(
-                        ['customer_group_id' => CustomerGroup::factory()],
-                        $this->ensureActiveState('campaign_customer_segments'),
-                    ))
-                    ->create();
-            }
+            CampaignCustomerSegment::factory()
+                ->demographic()
+                ->for($campaign)
+                ->state(array_merge(
+                    ['customer_group_id' => CustomerGroup::factory()],
+                    $this->ensureActiveState('campaign_customer_segments'),
+                ))
+                ->create();
 
-            if ($this->tableExists('campaign_schedules')) {
-                CampaignSchedule::factory()
-                    ->daily()
-                    ->for($campaign)
-                    ->state($this->ensureActiveState('campaign_schedules'))
-                    ->create();
-            }
+            CampaignSchedule::factory()
+                ->daily()
+                ->for($campaign)
+                ->state($this->ensureActiveState('campaign_schedules'))
+                ->create();
         });
-    }
-
-    /**
-     * Generate a unique slug by consulting the campaigns table when it is available.
-     */
-    private function generateUniqueSlug(string $baseSlug): string
-    {
-        $slug = $baseSlug;
-        $counter = 1;
-
-        while (Campaign::where('slug', $slug)->exists()) {
-            $slug = $baseSlug.'-'.$counter;
-            $counter++;
-        }
-
-        return $slug;
     }
 
     /**
@@ -125,18 +105,10 @@ final class CampaignFactory extends Factory
         return ['is_active' => true];
     }
 
-    /**
-     * Determine if a table is available for seeding related models.
-     */
-    private function tableExists(string $table): bool
-    {
-        return Schema::hasTable($table);
-    }
-
     public function active(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'active',
+            'status'    => 'active',
             'starts_at' => $this->faker->dateTimeBetween('-1 week', 'now'),
             'ends_at'   => $this->faker->dateTimeBetween('now', '+2 months'),
         ]);
@@ -145,7 +117,7 @@ final class CampaignFactory extends Factory
     public function scheduled(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'scheduled',
+            'status'    => 'scheduled',
             'starts_at' => $this->faker->dateTimeBetween('now', '+1 month'),
             'ends_at'   => $this->faker->dateTimeBetween('+1 month', '+3 months'),
         ]);
@@ -154,7 +126,7 @@ final class CampaignFactory extends Factory
     public function expired(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'active',
+            'status'    => 'active',
             'starts_at' => $this->faker->dateTimeBetween('-3 months', '-1 month'),
             'ends_at'   => $this->faker->dateTimeBetween('-1 month', '-1 week'),
         ]);
@@ -163,7 +135,7 @@ final class CampaignFactory extends Factory
     public function draft(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'draft',
+            'status'    => 'draft',
             'starts_at' => null,
             'ends_at'   => null,
         ]);
