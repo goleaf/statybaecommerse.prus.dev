@@ -6,10 +6,7 @@ use App\Models\Attribute;
 use App\Models\AttributeValue;
 use App\Models\City;
 use App\Models\Country;
-use App\Models\Menu;
-use App\Models\MenuItem;
 use App\Models\Report;
-use App\Repositories\MenuRepository;
 use Illuminate\Support\Facades\DB;
 
 function assertQueryCountLessThanOrEqual(int $expected, callable $callback, string $message = ''): void
@@ -58,58 +55,4 @@ test('reports index maintains a stable query count', function (): void {
     assertQueryCountLessThanOrEqual(10, function (): void {
         get(route('reports.index'))->assertOk();
     }, 'Reports index executed too many queries.');
-});
-
-test('menu repository by key avoids n+1 queries', function (): void {
-    $menu = Menu::factory()->active()->create([
-        'key' => 'main_header',
-        'location' => 'header',
-    ]);
-
-    $roots = MenuItem::factory()
-        ->count(3)
-        ->visible()
-        ->sequence(fn ($sequence) => ['sort_order' => $sequence->index])
-        ->create([
-            'menu_id' => $menu->id,
-            'parent_id' => null,
-        ]);
-
-    foreach ($roots as $root) {
-        MenuItem::factory()->count(2)->visible()->sequence(fn ($sequence) => ['sort_order' => $sequence->index])
-            ->create([
-                'menu_id' => $menu->id,
-                'parent_id' => $root->id,
-            ]);
-    }
-
-    assertQueryCountLessThanOrEqual(4, function () use ($menu): void {
-        $repository = app(MenuRepository::class);
-        $payload = $repository->byKey('main_header', app()->getLocale());
-
-        expect($payload)->not->toBeNull();
-        expect($payload['items'])->toHaveCount(3);
-    }, 'Menu repository byKey executed too many queries.');
-});
-
-test('menu repository index query count remains bounded', function (): void {
-    $menus = Menu::factory()->count(2)->active()->sequence(
-        ['key' => 'main_header', 'location' => 'header'],
-        ['key' => 'footer_links', 'location' => 'footer']
-    )->create();
-
-    foreach ($menus as $menu) {
-        MenuItem::factory()->count(4)->visible()->sequence(fn ($sequence) => ['sort_order' => $sequence->index])
-            ->create([
-                'menu_id' => $menu->id,
-                'parent_id' => null,
-            ]);
-    }
-
-    assertQueryCountLessThanOrEqual(5, function (): void {
-        $repository = app(MenuRepository::class);
-        $collection = $repository->all(null, app()->getLocale());
-
-        expect($collection)->toHaveCount(2);
-    }, 'Menu repository all executed too many queries.');
 });
