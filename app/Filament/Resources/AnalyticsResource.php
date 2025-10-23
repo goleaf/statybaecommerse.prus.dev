@@ -11,6 +11,8 @@ use App\Filament\Resources\AnalyticsResource\Pages;
 use App\Models\Order;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
+use BackedEnum;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\Summarizers\Average;
@@ -31,12 +33,15 @@ final class AnalyticsResource extends Resource
 {
     use TranslatableResource;
 
-    protected static ?string $model = Order::class;
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
+    /**
+     * Mirror the Filament base class union so icon definitions support both enum-backed and string identifiers.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Analytics;
+    /**
+     * Preserve the typed navigation group union to keep enum-backed grouping working across PHP upgrades.
+     */
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Analytics;
 
     public static function getNavigationLabel(): string
     {

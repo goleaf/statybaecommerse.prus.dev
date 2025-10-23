@@ -24,15 +24,24 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use UnitEnum;
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
+
+final class SliderTranslationResource extends Resource
+{
+    protected static ?string $model = \App\Models\SliderTranslation::class;
+
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?int $navigationSort = 3;
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = 'Content Management';
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
+    protected static UnitEnum|string|null $navigationGroup = 'Content Management';
 
     public static function getNavigationLabel(): string
     {

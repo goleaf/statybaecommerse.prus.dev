@@ -48,8 +48,10 @@ use Filament\Schemas\Schema;
 use BackedEnum;
 final class CartItemResource extends Resource
 {
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-shopping-cart';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static ?string $model = CartItem::class;
 

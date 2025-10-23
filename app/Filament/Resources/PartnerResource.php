@@ -27,12 +27,15 @@ final class PartnerResource extends Resource
 {
     use HasNav;
 
-    protected static ?string $model = Partner::class;
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-user-group';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user-group';
 
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = 'Marketing';
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
+    protected static UnitEnum|string|null $navigationGroup = 'Marketing';
 
     protected static ?int $navigationSort = 1;
 

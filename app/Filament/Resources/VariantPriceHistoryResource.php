@@ -20,8 +20,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Schemas\Schema;
-use BackedEnum;
 use UnitEnum;
 
 use Filament\Schemas\Schema;
@@ -31,12 +29,13 @@ final class VariantPriceHistoryResource extends Resource
 {
     use HasNav;
 
-    protected static ?string $model = VariantPriceHistory::class;
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-currency-euro';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-currency-euro';
 
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::System;
+    /** @var string|BackedEnum|null Navigation grouping centralized via enum. */
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 20;
 

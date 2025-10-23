@@ -60,8 +60,10 @@ final class UserResource extends Resource implements DefinesExportColumns
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = 'Users';
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
+    protected static UnitEnum|string|null $navigationGroup = 'Users';
 
     public static function shouldRegisterNavigation(): bool
     {

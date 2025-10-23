@@ -25,9 +25,10 @@ final class RecommendationAnalyticsResource extends Resource
 {
     use HasNav;
 
-    protected static ?string $model = RecommendationAnalytics::class;
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-chart-bar';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?int $navigationSort = 8;
 

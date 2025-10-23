@@ -47,8 +47,10 @@ final class UserProductInteractionResource extends Resource
 {
     protected static ?string $model = UserProductInteraction::class;
 
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = 'Users';
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
+    protected static UnitEnum|string|null $navigationGroup = 'Users';
 
     public static function getNavigationLabel(): string
     {

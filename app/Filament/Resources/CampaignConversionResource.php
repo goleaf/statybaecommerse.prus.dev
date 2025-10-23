@@ -31,11 +31,20 @@ use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Number;
 use UnitEnum;
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-rocket-launch';
 
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Campaigns;
+final class CampaignConversionResource extends Resource
+{
+    protected static ?string $model = \App\Models\CampaignConversion::class;
+
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rocket-launch';
+
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Campaigns;
 
     public static function getNavigationLabel(): string
     {

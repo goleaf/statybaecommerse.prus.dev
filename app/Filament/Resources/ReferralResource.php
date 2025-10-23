@@ -37,11 +37,16 @@ final class ReferralResource extends Resource
     use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
 
     protected static ?string $model = Referral::class;
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-share';
 
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = 'Marketing';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-share';
+
+    /**
+     * Navigation group for organizing the resource in the admin panel.
+     */
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Marketing; // Keep referrals with other marketing touchpoints.
 
     protected static ?int $navigationSort = 17;
 

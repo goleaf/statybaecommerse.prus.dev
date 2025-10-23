@@ -35,18 +35,19 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
-use Filament\Schemas\Schema;
 use UnitEnum;
 
 use Filament\Schemas\Schema;
 use UnitEnum;
 final class CategoryResource extends Resource
 {
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-tag';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
+    /** @var string|BackedEnum|null Align the resource under the Products navigation section. */
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 3;
 

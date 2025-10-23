@@ -43,8 +43,10 @@ final class UserWishlistResource extends Resource
         return 'heroicon-o-heart';
     }
 
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = 'Users';
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
+    protected static UnitEnum|string|null $navigationGroup = 'Users';
 
     protected static ?int $navigationSort = 8;
 

@@ -11,8 +11,10 @@ use BackedEnum;
 use BackedEnum;
 final class AdvancedReports extends Page
 {
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar-square';
 

@@ -26,9 +26,10 @@ final class NewsCategoryResource extends Resource
 {
     use HasNav;
 
-    protected static ?string $model = NewsCategory::class;
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     /**
      * @var string|BackedEnum|null Keep the resource grouped with other news modules.

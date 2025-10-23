@@ -47,8 +47,10 @@ final class StockResource extends Resource
 
     protected static ?string $model = Inventory::class;
 
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = 'Inventory';
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
+    protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 7;
 

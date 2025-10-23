@@ -11,8 +11,10 @@ use UnitEnum;
 
 final class SearchExplorer extends Page
 {
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-magnifying-glass-circle';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-magnifying-glass-circle';
 
     public static function getNavigationGroup(): BackedEnum|string|null
     {

@@ -44,10 +44,15 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-cog-6-tooth';
+
+final class SystemResource extends Resource
+{
+    protected static ?string $model = SystemSetting::class;
+
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     protected static ?string $navigationLabel = null;
 

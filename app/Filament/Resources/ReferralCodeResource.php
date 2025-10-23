@@ -41,8 +41,10 @@ final class ReferralCodeResource extends Resource
 
     protected static ?string $model = ReferralCode::class;
 
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = 'Referral';
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
+    protected static UnitEnum|string|null $navigationGroup = 'Referral';
 
     public static function form(Schema $schema): Schema   
     {

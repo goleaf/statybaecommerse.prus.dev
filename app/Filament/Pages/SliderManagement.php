@@ -42,8 +42,11 @@ use BackedEnum;
 class SliderManagement extends Page implements HasActions, HasForms
 {
     use InteractsWithActions, InteractsWithForms;
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationLabel = 'Slider Management';
 

@@ -38,8 +38,15 @@ use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-photo';
+
+final class VariantImageResource extends Resource
+{
+    protected static ?string $model = \App\Models\VariantImage::class;
+
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-photo';
 
     public static function getNavigationGroup(): ?string
     {

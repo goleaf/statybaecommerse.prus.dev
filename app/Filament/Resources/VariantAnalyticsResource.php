@@ -24,11 +24,21 @@ use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
+use UnitEnum;
 
-    /** @var UnitEnum|string|null Anchor inventory analytics beneath the shared navigation enum. */
-    protected static $navigationGroup = NavigationGroup::Inventory;
+final class VariantAnalyticsResource extends Resource
+{
+    protected static ?string $model = VariantAnalytics::class;
+
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
+
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Inventory;
 
     public static function getNavigationGroup(): ?string
     {

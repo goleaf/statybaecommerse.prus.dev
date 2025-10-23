@@ -49,8 +49,11 @@ use Filament\Schemas\Schema;
 final class InventoryResource extends Resource
 {
     protected static ?string $model = Inventory::class;
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-cube';
+
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-cube';
 
     protected static ?int $navigationSort = 2;
 
