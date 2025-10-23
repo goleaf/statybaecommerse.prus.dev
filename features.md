@@ -101,7 +101,7 @@
 - User Product Interaction analytics pages restore Filament v4-friendly spacing for interaction filters and rating badges, silencing the concatenation notices flagged while QAing PR #1097.
 
 ## Storefront experience
-
+- Password reset Livewire page now reuses shared button components and maintains the CAPTCHA token via a hidden field so rate-limited recovery flows load without missing component errors.
 - The localized search page now opens with a guided hero, live result metrics, and improved empty states so shoppers can refine Makita-grade queries without leaving the results screen.
 
 ## Caching & performance

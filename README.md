@@ -39,8 +39,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 -### Latest updates
-- Variant attribute value admin table filters now ignore storefront global scopes, keeping inactive fixtures visible when QA filters by attribute or variant.
-- Filament attribute value panels now render reliably in tests thanks to registered widget tab components, unscoped variant and attribute selectors, and conditional Vite fallbacks that bypass missing manifest errors.
+- Forgot password Livewire flow now reuses shared button components and keeps the CAPTCHA token synced via a hidden field, ensuring rate-limited password reset requests render cleanly for shoppers and automated tests alike.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
 - Attribute group selectors now reuse a shared translation helper so historical slugs render as human-readable labels across Filament forms, filters, and tables instead of exposing raw keys.

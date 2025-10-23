@@ -7,8 +7,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Bug Fixes
-* Kept the Variant Attribute Value resource table filters in sync with the relaxed form selectors by dropping attribute and variant global scopes so admin filtering continues to surface inactive fixtures during tests.
-* Restored Filament attribute value tooling by registering the widget tab Blade components under the v4 namespace, relaxing global scopes on variant selectors, and short-circuiting Vite lookups during tests so the admin resources render without missing component or manifest errors.
+* Realigned the forgot-password Livewire page with the shared button components and hidden CAPTCHA token wiring so password reset throttling renders without missing component errors during automated tests.
 * Re-enabled flexible system setting translations by replacing the locale uniqueness constraint with an index, restoring soft delete support, and trimming the fillable contract so replication and counting scenarios match the documented API.
 * Preserved Attribute validation rule strings while still decoding JSON arrays, refreshed the Filament form so arrays render as comma-separated chips, and added regression coverage for both storage paths.
 * Reintroduced the `regions` schema with defensive guards and rebuilt the `customers`/`orders` relationship so SQLite-backed factories and analytics widgets can create location-aware records without missing column errors during tests.
