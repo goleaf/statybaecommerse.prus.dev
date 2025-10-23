@@ -1,7 +1,7 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-set -e
+set -eu
 
-echo "Running Composer CI suite before push..."
+printf '\n▶ Running Composer CI suite before push...\n'
 composer ci
