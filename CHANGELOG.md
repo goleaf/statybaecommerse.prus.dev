@@ -7,7 +7,9 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Bug Fixes
-* Realigned the Coupon Usage Filament resource with its Livewire test harness by renaming the used-at filter, tolerating direct date strings, and surfacing the single-record delete action so CRUD flows match the documented scenarios.
+* Restored the Country admin resource by bridging Filament v4 component aliases, reviving the widget tab Blade helpers, seeding
+  default address and city metadata for tests, and removing the global active scope from table queries so activation workflows and
+  regression suites operate on inactive records again.
 * Re-enabled flexible system setting translations by replacing the locale uniqueness constraint with an index, restoring soft delete support, and trimming the fillable contract so replication and counting scenarios match the documented API.
 * Preserved Attribute validation rule strings while still decoding JSON arrays, refreshed the Filament form so arrays render as comma-separated chips, and added regression coverage for both storage paths.
 * Reintroduced the `regions` schema with defensive guards and rebuilt the `customers`/`orders` relationship so SQLite-backed factories and analytics widgets can create location-aware records without missing column errors during tests.

@@ -52,6 +52,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
@@ -149,6 +150,15 @@ class AppServiceProvider extends ServiceProvider
             });
         }
 
+        if (! Testable::hasMacro('assertCanSeeText')) {
+            // Maintain backwards-compatible Livewire assertions used across legacy Filament tests.
+            Testable::macro('assertCanSeeText', function (string $text): Testable {
+                $this->assertSee($text, escape: false);
+
+                return $this;
+            });
+        }
+
         if (! class_exists(\Filament\Forms\Form::class) && class_exists(\Filament\Schemas\Schema::class)) {
             class_alias(\Filament\Schemas\Schema::class, \Filament\Forms\Form::class);
         }
@@ -169,25 +179,17 @@ class AppServiceProvider extends ServiceProvider
             class_alias(\Filament\Schemas\Components\Utilities\Set::class, \Filament\Forms\Set::class);
         }
 
-        if (class_exists(SearchableInput::class)) {
-            if (! SearchableInput::hasMacro('payload')) {
-                SearchableInput::macro('payload', function (array $payload): SearchableInput {
-                    /** @var SearchableInput $this */
-                    $this->meta('searchable_input_payload', $payload);
-
-                    return $this;
-                });
-            }
-
-            if (! SearchableInput::hasMacro('getPayload')) {
-                SearchableInput::macro('getPayload', function (): array {
-                    /** @var SearchableInput $this */
-                    $payload = $this->getMeta('searchable_input_payload');
-
-                    return is_array($payload) ? $payload : [];
-                });
-            }
+        if (! class_exists(\Filament\Infolists\Components\Section::class) && class_exists(\Filament\Schemas\Components\Section::class)) {
+            class_alias(\Filament\Schemas\Components\Section::class, \Filament\Infolists\Components\Section::class);
         }
+
+        if (! class_exists(\Filament\Infolists\Components\Grid::class) && class_exists(\Filament\Schemas\Components\Grid::class)) {
+            class_alias(\Filament\Schemas\Components\Grid::class, \Filament\Infolists\Components\Grid::class);
+        }
+
+        // Expose the custom widget tab templates as Blade components for compatibility with Filament 4.
+        Blade::component('filament.components.widget-tabs.index', 'filament.components.widget-tabs.index');
+        Blade::component('filament.components.widget-tabs.item', 'filament.components.widget-tabs.item');
 
         if (class_exists(\Filament\Forms\Components\FileUpload::class)) {
             \Filament\Forms\Components\FileUpload::configureUsing(
