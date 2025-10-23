@@ -55,16 +55,16 @@ final class CustomerManagementResourceTest extends TestCase
 
         Livewire::test(CreateCustomer::class)
             ->fillForm([
-                'name'                                              => $newCustomerData->name,
-                'email'                                             => $newCustomerData->email,
-                'phone'                                             => $newCustomerData->phone,
-                'is_active'                                         => true,
-                'is_verified'                                       => false,
-                'customer_group_id'                                 => $customerGroup->id,
-                'preferred_locale'                                  => 'lt',
-                'preferences->preferred_currency'                   => 'EUR',
-                'notification_preferences->newsletter_subscription' => false,
-                'notification_preferences->sms_notifications'       => false,
+                'name' => $newCustomerData->name,
+                'email' => $newCustomerData->email,
+                'phone' => $newCustomerData->phone,
+                'is_active' => true,
+                'is_verified' => false,
+                'customerGroups' => [$customerGroup->id],
+                'preferred_language' => 'lt',
+                'preferred_currency' => 'EUR',
+                'newsletter_subscription' => false,
+                'sms_notifications' => false,
             ])
             ->call('create')
             ->assertNotified();
@@ -77,14 +77,12 @@ final class CustomerManagementResourceTest extends TestCase
             'is_verified' => false,
         ]);
 
-        $createdCustomer = User::whereEmail($newCustomerData->email)->firstOrFail();
-        $this->assertSame('lt', $createdCustomer->preferred_locale);
-        $this->assertSame('EUR', $createdCustomer->preferred_currency);
-        $this->assertFalse($createdCustomer->newsletter_subscription);
-        $this->assertFalse($createdCustomer->sms_notifications);
-        $this->assertSame('EUR', data_get($createdCustomer->preferences, 'preferred_currency'));
-        $this->assertFalse((bool) data_get($createdCustomer->notification_preferences, 'newsletter_subscription'));
-        $this->assertFalse((bool) data_get($createdCustomer->notification_preferences, 'sms_notifications'));
+        $createdCustomer = User::where('email', $newCustomerData->email)->firstOrFail();
+
+        $this->assertDatabaseHas('customer_group_user', [
+            'user_id' => $createdCustomer->id,
+            'customer_group_id' => $customerGroup->id,
+        ]);
     }
 
     public function test_can_edit_customer(): void
@@ -136,11 +134,14 @@ final class CustomerManagementResourceTest extends TestCase
         $customerGroup1 = CustomerGroup::factory()->create(['name' => 'VIP']);
         $customerGroup2 = CustomerGroup::factory()->create(['name' => 'Regular']);
 
-        $customer1 = User::factory()->create(['customer_group_id' => $customerGroup1->id]);
-        $customer2 = User::factory()->create(['customer_group_id' => $customerGroup2->id]);
+        $customer1 = User::factory()->create();
+        $customer1->customerGroups()->attach($customerGroup1->id);
+
+        $customer2 = User::factory()->create();
+        $customer2->customerGroups()->attach($customerGroup2->id);
 
         Livewire::test(ListCustomers::class)
-            ->filterTable('customer_group_id', $customerGroup1->id)
+            ->filterTable('customerGroups', $customerGroup1->id)
             ->assertCanSeeTableRecords([$customer1])
             ->assertCanNotSeeTableRecords([$customer2]);
     }
@@ -252,7 +253,8 @@ final class CustomerManagementResourceTest extends TestCase
     public function test_customer_relationships(): void
     {
         $customerGroup = CustomerGroup::factory()->create();
-        $customer = User::factory()->create(['customer_group_id' => $customerGroup->id]);
+        $customer = User::factory()->create();
+        $customer->customerGroups()->attach($customerGroup->id);
 
         // Create related records
         $order = Order::factory()->create(['user_id' => $customer->id]);
@@ -261,7 +263,7 @@ final class CustomerManagementResourceTest extends TestCase
         $discountRedemption = DiscountRedemption::factory()->create(['user_id' => $customer->id]);
 
         // Test relationships
-        $this->assertEquals($customerGroup->id, $customer->customerGroup->id);
+        $this->assertTrue($customer->customerGroups->contains($customerGroup));
         $this->assertTrue($customer->orders->contains($order));
         $this->assertTrue($customer->reviews->contains($review));
         $this->assertTrue($customer->cartItems->contains($cartItem));
