@@ -102,23 +102,15 @@ final class SystemSettingCategoryResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->live()
-                                    ->afterStateUpdated(fn (?string $state, Set $set) => $set('slug', Str::slug($state ?? '')))
+                                    ->afterStateUpdated(fn (?string $state, Set $set) => $set('slug', Str::slug((string) $state)))
                                     ->helperText(__('system_setting_categories.name_help')),
                                 TextInput::make('slug')
                                     ->label(__('system_setting_categories.slug'))
-                                    ->required(fn (Get $get): bool => blank($get('name')))
+                                    ->rules(fn (Get $get) => [blank($get('name')) ? 'required' : 'nullable'])
                                     ->unique(SystemSettingCategory::class, 'slug', ignoreRecord: true)
                                     // Allow empty slug; it will be generated from name on submit
                                     ->maxLength(255)
-                                    ->dehydrateStateUsing(function (?string $state, Get $get): ?string {
-                                        if (filled($state)) {
-                                            return $state;
-                                        }
-
-                                        $name = $get('name');
-
-                                        return is_string($name) ? Str::slug($name) : null;
-                                    })
+                                    ->dehydrateStateUsing(fn (?string $state, Get $get) => $state ?: Str::slug((string) $get('name')))
                                     ->helperText(__('system_setting_categories.slug_help')),
                             ]),
                         Textarea::make('description')
