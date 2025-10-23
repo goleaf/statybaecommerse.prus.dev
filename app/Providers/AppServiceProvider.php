@@ -9,7 +9,12 @@ use App\Contracts\DocumentServiceContract;
 use App\Contracts\HealthReporter as HealthReporterContract;
 use App\Domain\Product\Repositories\ProductRepositoryInterface;
 use App\Filament\Components\LiveNotificationFeed;
-use App\Models\ApiKey;
+use App\Models\DiscountCode;
+use App\Models\DiscountRedemption;
+use App\Models\Document;
+use App\Models\EmailCampaign;
+use App\Models\SystemSetting;
+use App\Observers\UserAttributionObserver;
 use App\Services\DocumentService;
 use App\Support\Filament\SearchableComponentHelper;
 use App\Support\Health\HealthReporter;
@@ -98,12 +103,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->registerModelObservers();
-
-        $this->registerCollectionTimeoutMacros();
-
-        $this->registerQueueTracing();
-
-        $this->registerSearchableInputMacros();
 
         // Register Livewire components
         Livewire::component('live-notification-feed', LiveNotificationFeed::class);
@@ -352,114 +351,6 @@ class AppServiceProvider extends ServiceProvider
         }
     }
 
-    private function registerQueueTracing(): void
-    {
-        Queue::createPayloadUsing(function ($connection, $queue, array $payload): array {
-            $context = Trace::current();
-
-            return [
-                'trace' => [
-                    'trace_id'       => $context->traceId(),
-                    'parent_span_id' => $context->spanId(),
-                    'correlation_id' => $context->correlationId(),
-                    'trace_flags'    => $context->traceFlags(),
-                ],
-            ];
-        });
-
-        Queue::before(function (JobProcessing $event): void {
-            $payload = $event->job->payload();
-            $trace = $payload['trace'] ?? null;
-
-            if (is_array($trace)) {
-                Trace::store(TraceContext::generate(
-                    traceId: (string) ($trace['trace_id'] ?? ''),
-                    parentSpanId: (string) ($trace['parent_span_id'] ?? ''),
-                    correlationId: (string) ($trace['correlation_id'] ?? ''),
-                    traceFlags: (string) ($trace['trace_flags'] ?? TraceContext::DEFAULT_TRACE_FLAGS),
-                ));
-            } else {
-                Trace::store(TraceContext::generate());
-            }
-        });
-
-        $cleanup = static function (): void {
-            Trace::forget();
-        };
-
-        Queue::after(function (JobProcessed $event) use ($cleanup): void {
-            $cleanup();
-        });
-
-        Queue::exceptionOccurred(function (JobExceptionOccurred $event) use ($cleanup): void {
-            $cleanup();
-        });
-
-        Queue::failing(function (JobFailed $event) use ($cleanup): void {
-            $cleanup();
-        });
-    }
-
-    /**
-     * Register collection macros that honour execution timeouts across eager and lazy enumerables.
-     */
-    private function registerCollectionTimeoutMacros(): void
-    {
-        $resolveDeadline = static function (mixed $timeout): Carbon {
-            if ($timeout instanceof Carbon) {
-                // Clone Carbon instances so downstream consumers cannot mutate the original reference.
-                return $timeout->copy();
-            }
-
-            if ($timeout instanceof DateTimeInterface) {
-                return Carbon::instance($timeout);
-            }
-
-            if ($timeout instanceof DateInterval) {
-                return Carbon::now()->add($timeout);
-            }
-
-            if (is_numeric($timeout)) {
-                return Carbon::now()->addSeconds((int) $timeout);
-            }
-
-            throw new InvalidArgumentException('Unsupported timeout value supplied to takeUntilTimeout.');
-        };
-
-        if (! LazyCollection::hasMacro('takeUntilTimeout')) {
-            LazyCollection::macro('takeUntilTimeout', function (mixed $timeout) use ($resolveDeadline) {
-                /** @var LazyCollection $this */
-                $deadline = $resolveDeadline($timeout);
-
-                // Use takeWhile to stop yielding values as soon as the deadline is exceeded.
-                return $this->takeWhile(static function () use ($deadline) {
-                    return Carbon::now()->lte($deadline);
-                });
-            });
-        }
-
-        if (! Collection::hasMacro('takeUntilTimeout')) {
-            Collection::macro('takeUntilTimeout', function (mixed $timeout) use ($resolveDeadline) {
-                /** @var Collection $this */
-                $collection = $this;
-
-                $lazySource = LazyCollection::make(function () use ($collection, $timeout, $resolveDeadline) {
-                    $deadline = $resolveDeadline($timeout);
-
-                    foreach ($collection as $key => $value) {
-                        if (Carbon::now()->gt($deadline)) {
-                            break;
-                        }
-
-                        yield $key => $value;
-                    }
-                });
-
-                return $lazySource;
-            });
-        }
-    }
-
     private function registerModelObservers(): void
     {
         $observer = UserAttributionObserver::class;
@@ -468,7 +359,6 @@ class AppServiceProvider extends ServiceProvider
         DiscountRedemption::observe($observer);
         Document::observe($observer);
         EmailCampaign::observe($observer);
-        FeatureFlag::observe($observer);
         SystemSetting::observe($observer);
     }
 
