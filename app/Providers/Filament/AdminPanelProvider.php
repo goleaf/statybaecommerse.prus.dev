@@ -26,7 +26,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Collection;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use LaraZeus\SpatieTranslatable\SpatieTranslatablePlugin;
+use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
 
 final class AdminPanelProvider extends PanelProvider
 {
@@ -157,24 +157,28 @@ final class AdminPanelProvider extends PanelProvider
                     ->persist()
             )
             ->when(app()->environment('testing'),
-                static fn (Panel $p) => $p,
-                static fn (Panel $p) => $p
-                    ->plugin(FilamentShieldPlugin::make())
-                    ->plugin(
-                        TableLayoutTogglePlugin::make()
-                            ->setDefaultLayout('grid')
-                            ->persistLayoutUsing(
-                                persister: LocalStoragePersister::class,
-                                cacheStore: 'redis',
-                                cacheTtl: 60 * 24,
-                            )
-                            ->shareLayoutBetweenPages(false)
-                            ->displayToggleAction()
-                            ->toggleActionHook('tables::toolbar.search.after')
-                            ->listLayoutButtonIcon('heroicon-o-list-bullet')
-                            ->gridLayoutButtonIcon('heroicon-o-squares-2x2')
-                    )
-            )
+                fn (Panel $p) => $p->plugins([]),
+                fn (Panel $p) => $p->plugins([
+                    FilamentShieldPlugin::make(),
+                    FilamentFullCalendarPlugin::make()
+                        ->selectable(true)
+                        ->editable(true)
+                        ->timezone('Europe/Vilnius')
+                        ->locale('lt'),
+                    TableLayoutTogglePlugin::make()
+                        ->setDefaultLayout('grid')
+                        ->persistLayoutUsing(
+                            persister: LocalStoragePersister::class,
+                            cacheStore: 'redis',
+                            cacheTtl: 60 * 24,
+                        )
+                        ->shareLayoutBetweenPages(false)
+                        ->displayToggleAction()
+                        ->toggleActionHook('tables::toolbar.search.after')
+                        ->listLayoutButtonIcon('heroicon-o-list-bullet')
+                        ->gridLayoutButtonIcon('heroicon-o-squares-2x2'),
+                    FilamentNordThemePlugin::make(),
+                ]))
             // Enable the custom Filament theme so third-party plugin views (like the searchable input)
             // are compiled with Tailwind during the build step.
             ->viteTheme('resources/css/filament/admin/theme.scss')
