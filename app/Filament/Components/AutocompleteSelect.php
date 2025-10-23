@@ -59,7 +59,9 @@ final class AutocompleteSelect extends Select
     {
         parent::searchable($condition);
 
-        $this->searchable = (bool) $this->evaluate($condition);
+        $evaluated = $this->evaluate($condition);
+
+        $this->searchable = is_array($evaluated) ? true : (bool) $evaluated;
 
         return $this;
     }
@@ -114,8 +116,8 @@ final class AutocompleteSelect extends Select
 
         $modelClass = match (true) {
             $evaluatedModel instanceof Model => $evaluatedModel::class,
-            is_string($evaluatedModel) => $evaluatedModel,
-            default => null,
+            is_string($evaluatedModel)       => $evaluatedModel,
+            default                          => null,
         };
 
         if ($modelClass !== null) {
@@ -270,46 +272,18 @@ final class AutocompleteSelect extends Select
         $valueField = $this->getValueField();
         $labelField = $this->getLabelField();
 
-        $resultsArray = $model
-            ->newQuery()
-            ->where($searchField, 'like', '%' . $normalizedSearch . '%')
-            ->limit($this->maxSearchResults)
-            ->get()
-            ->flatMap(function (Model $item) use ($valueField, $labelField): array {
-                $rawValue = $item->getAttribute($valueField);
+        $query = $model
+            ->query()
+            ->where($searchField, 'like', '%' . $this->searchQuery . '%')
+            ->limit($this->maxSearchResults);
 
-                if ($rawValue === null) {
-                    return [];
-                }
-
-                if (! is_scalar($rawValue)) {
-                    return [];
-                }
-
-                $value = (string) $rawValue;
-
-                $rawLabel = $item->getAttribute($labelField);
-                $label = is_string($rawLabel) ? $rawLabel : $value;
-
-                /** @var array<string, mixed> $data */
-                $data = $item->toArray();
-
-                return [[
-                    'value' => $value,
-                    'label' => $label,
-                    'data'  => $data,
-                ]];
-            })
-            ->values()
-            ->all();
-
-        /** @var array<int, array{value: string, label: string, data: array<string, mixed>}> $resultsArray */
-        $this->searchResultCache[$cacheKey] = $resultsArray;
-
-        /** @var Collection<int, array{value: string, label: string, data: array<string, mixed>}> $results */
-        $results = new Collection($resultsArray);
-
-        return $results;
+        $this->searchResults = $query->get()->map(function (Model $item) use ($valueField, $labelField) {
+            return [
+                'value' => $item->{$valueField},
+                'label' => $item->{$labelField},
+                'data'  => $item->toArray(),
+            ];
+        });
     }
 
     public function getViewData(): array
@@ -323,7 +297,7 @@ final class AutocompleteSelect extends Select
             'valueField'       => $this->getValueField(),
             'labelField'       => $this->getLabelField(),
             'modelClass'       => $this->getModelClass(),
-            'searchResults'    => $this->searchResults ?? $this->emptyResults(),
+            'searchResults'    => $this->searchResults ?? collect(),
             'searchQuery'      => $this->getSearchQuery(),
         ];
     }
