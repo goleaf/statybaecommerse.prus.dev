@@ -11,12 +11,8 @@ use App\Filament\Resources\MenuResource\RelationManagers\MenuItemsRelationManage
 use App\Models\Menu;
 use App\Models\Scopes\ActiveScope;
 use BackedEnum;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -46,9 +42,9 @@ final class MenuResource extends Resource
 
     protected static ?string $model = Menu::class;
 
-    
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    
+    protected static UnitEnum|string|null $navigationGroup = 'Content';
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -196,6 +192,29 @@ final class MenuResource extends Resource
                         ? __('menus.activated_successfully')
                         : __('menus.deactivated_successfully')
                     ),
+                Action::make('duplicate')
+                    ->label(__('menus.duplicate'))
+                    ->icon('heroicon-o-document-duplicate')
+                    ->color('secondary')
+                    ->requiresConfirmation()
+                    ->action(function (Menu $record): void {
+                        $timestamp = now()->timestamp;
+
+                        $duplicate = $record->replicate([
+                            'created_at',
+                            'updated_at',
+                        ]);
+
+                        $duplicate->name = sprintf('%s (Copy)', $record->name);
+                        $duplicate->key = sprintf('%s_copy_%s', $record->key, $timestamp);
+
+                        $duplicate->save();
+
+                        Notification::make()
+                            ->title(__('menus.duplicated_successfully'))
+                            ->success()
+                            ->send();
+                    }),
                 Action::make('duplicate')
                     ->label(__('menus.duplicate'))
                     ->icon('heroicon-o-document-duplicate')
