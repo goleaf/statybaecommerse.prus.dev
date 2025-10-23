@@ -143,7 +143,7 @@ class SimplifiedStatsWidget extends BaseWidget
             $endDate->toDateString()
         );
 
-        $chartData = $this->rememberDashboard($cacheKey, CacheKeys::TTL_MINUTE, function () use ($startDate, $endDate, $now) {
+        $chartData = $this->rememberDashboard($cacheKey, 60, function () use ($startDate, $endDate, $now) {
             $dateKeys = [];
             for ($i = 6; $i >= 0; $i--) {
                 $dateKeys[] = $now->copy()->subDays($i)->toDateString();
@@ -303,28 +303,14 @@ class SimplifiedStatsWidget extends BaseWidget
     }
 
     /**
-     * Remember dashboard fragments while gracefully falling back when tags are unsupported.
-     *
-     * @template TValue
-     *
-     * @param  array<int, string> $tags
-     * @param  callable(): TValue $callback
-     * @return TValue
+     * Store dashboard aggregates under a shared cache tag when supported.
      */
-    private function rememberDashboardCache(array $tags, string $key, DateTimeInterface|int $ttl, callable $callback): mixed
+    private function rememberDashboard(string $key, int $ttl, callable $callback): array
     {
-        // Bail out quickly when the cache store cannot work with tags (array, file, etc.).
-        if ($tags !== [] && CacheTagHelper::supportsTags()) {
-            /** @var TaggableStore $store */
-            $store = Cache::getStore();
-
-            // Double-check the store implements the contract before tagging.
-            if ($store instanceof TaggableStore) {
-                return Cache::tags(CacheTagHelper::merge($tags, CacheTagHelper::dashboards()))->remember($key, $ttl, $callback);
-            }
+        if (Cache::supportsTags()) {
+            return Cache::tags(CacheTagHelper::dashboards())->remember($key, $ttl, $callback);
         }
 
-        // Fallback path keeps tests and array stores functional without tag support.
         return Cache::remember($key, $ttl, $callback);
     }
 }

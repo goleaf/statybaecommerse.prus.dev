@@ -7,7 +7,9 @@ namespace App\View\Creators;
 use App\Models\Brand;
 use App\Repositories\CategoryRepository;
 use App\Repositories\MenuRepository;
+use App\Support\Cache\CacheTagHelper;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * NavigationCreator
@@ -36,12 +38,12 @@ final class NavigationCreator
             $menus = $this->menuRepository->all(locale: app()->getLocale());
 
             $view->with([
-                'topCategories' => $topCategories,
+                'topCategories'  => $topCategories,
                 'featuredBrands' => $featuredBrands,
                 'navigationMenu' => [
                     'categories' => $topCategories,
-                    'brands' => $featuredBrands,
-                    'menus' => $menus,
+                    'brands'     => $featuredBrands,
+                    'menus'      => $menus,
                 ],
             ]);
         }
@@ -82,23 +84,25 @@ final class NavigationCreator
      */
     private function getFeaturedBrands()
     {
-        return cache()->remember(
-            'navigation.featured_brands.'.app()->getLocale(),
-            now()->addMinutes(30),
-            fn () => Brand::query()
-                ->with(['translations' => function ($q) {
-                    $q->where('locale', app()->getLocale());
-                }])
-                ->where('is_enabled', true)
-                ->where('is_featured', true)
-                ->orderBy('sort_order')
-                ->limit(6)
-                ->cursor()
-                ->takeUntilTimeout(now()->addSeconds(5))
-                ->collect(),
-            null,
-            CacheTagHelper::brands()
-        );
+        $cacheKey = 'navigation.featured_brands.' . app()->getLocale();
+        $ttl = now()->addMinutes(30);
+        $callback = fn () => Brand::query()
+            ->with(['translations' => function ($q) {
+                $q->where('locale', app()->getLocale());
+            }])
+            ->where('is_enabled', true)
+            ->where('is_featured', true)
+            ->orderBy('sort_order')
+            ->limit(6)
+            ->cursor()
+            ->takeUntilTimeout(now()->addSeconds(5))
+            ->collect();
+
+        if (Cache::supportsTags()) {
+            return Cache::tags(CacheTagHelper::brands())->remember($cacheKey, $ttl, $callback);
+        }
+
+        return Cache::remember($cacheKey, $ttl, $callback);
     }
 
     /**

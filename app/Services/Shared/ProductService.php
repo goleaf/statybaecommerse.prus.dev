@@ -26,6 +26,8 @@ final class ProductService
 
     /**
      * Handle getFeaturedProducts functionality with proper error handling.
+     *
+     * @return Collection<int, Product>
      */
     /**
      * @return Collection<int, Product>
@@ -42,6 +44,8 @@ final class ProductService
 
     /**
      * Handle getNewArrivals functionality with proper error handling.
+     *
+     * @return Collection<int, Product>
      */
     /**
      * @return Collection<int, Product>
@@ -58,6 +62,9 @@ final class ProductService
 
     /**
      * Handle searchProducts functionality with proper error handling.
+     *
+     * @param  array<string, mixed>               $filters
+     * @return LengthAwarePaginator<int, Product>
      */
     /**
      * @param  array<string, mixed>               $filters
@@ -74,6 +81,9 @@ final class ProductService
 
     /**
      * Handle getProductsByCategory functionality with proper error handling.
+     *
+     * @param  array<string, mixed>               $filters
+     * @return LengthAwarePaginator<int, Product>
      */
     /**
      * @param  array<string, mixed>               $filters
@@ -92,6 +102,9 @@ final class ProductService
 
     /**
      * Handle getProductsByBrand functionality with proper error handling.
+     *
+     * @param  array<string, mixed>               $filters
+     * @return LengthAwarePaginator<int, Product>
      */
     /**
      * @param  array<string, mixed>               $filters
@@ -108,6 +121,9 @@ final class ProductService
 
     /**
      * Handle getProductsByCollection functionality with proper error handling.
+     *
+     * @param  array<string, mixed>               $filters
+     * @return LengthAwarePaginator<int, Product>
      */
     /**
      * @param  array<string, mixed>               $filters
@@ -126,6 +142,8 @@ final class ProductService
 
     /**
      * Handle getRelatedProducts functionality with proper error handling.
+     *
+     * @return Collection<int, Product>
      */
     /**
      * @return Collection<int, Product>
@@ -147,6 +165,8 @@ final class ProductService
 
     /**
      * Handle getProductRelations functionality with proper error handling.
+     *
+     * @return array<int, mixed>
      */
     /**
      * @return array<int, mixed>
@@ -169,6 +189,10 @@ final class ProductService
 
     /**
      * Handle applyFilters functionality with proper error handling.
+     *
+     * @param  Builder<Product>     $query
+     * @param  array<string, mixed> $filters
+     * @return Builder<Product>
      */
     /**
      * @param  Builder<Product>     $query
@@ -178,7 +202,7 @@ final class ProductService
     private function applyFilters(Builder $query, array $filters): Builder
     {
         if (! empty($filters['search'])) {
-            $query->where(function ($q) use ($filters): void {
+            $query->where(function ($q) use ($filters) {
                 $q->where('name', 'like', '%' . $filters['search'] . '%')->orWhere('summary', 'like', '%' . $filters['search'] . '%')->orWhere('description', 'like', '%' . $filters['search'] . '%');
             });
         }
@@ -214,6 +238,9 @@ final class ProductService
 
     /**
      * Handle applySorting functionality with proper error handling.
+     *
+     * @param  Builder<Product> $query
+     * @return Builder<Product>
      */
     /**
      * @param  Builder<Product> $query

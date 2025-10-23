@@ -5,83 +5,99 @@ declare(strict_types=1);
 namespace App\Support\Cache;
 
 /**
- * Helper providing cache tag constants and utility methods.
+ * Helper utility that centralizes cache tag groups for catalog features.
  */
 final class CacheTagHelper
 {
-    public const PRODUCTS = 'products';
-
-    public const CATEGORIES = 'categories';
-
-    public const BRANDS = 'brands';
-
-    public const COLLECTIONS = 'collections';
-
-    public const DASHBOARDS = 'dashboards';
-
     /**
-     * Tags used for product related caches.
+     * Tags used for product centric caches (lists, shelves, aggregates).
      *
      * @return array<int, string>
      */
     public static function products(): array
     {
-        return [self::PRODUCTS];
+        return self::unique([
+            'products',
+            CacheKeys::productAggregateTag(),
+            CacheKeys::homeTag(),
+            CacheKeys::dashboardTag(),
+            CacheKeys::navigationTag(),
+        ]);
     }
 
     /**
-     * Tags used for category related caches.
+     * Tags used for category centric caches (navigation, filters, counts).
      *
      * @return array<int, string>
      */
     public static function categories(): array
     {
-        return [self::CATEGORIES];
+        return self::unique([
+            'categories',
+            CacheKeys::navigationTag(),
+            CacheKeys::homeTag(),
+        ]);
     }
 
     /**
-     * Tags used for brand related caches.
+     * Tags used for brand centric caches.
      *
      * @return array<int, string>
      */
     public static function brands(): array
     {
-        return [self::BRANDS];
+        return self::unique([
+            'brands',
+            CacheKeys::navigationTag(),
+            CacheKeys::homeTag(),
+        ]);
     }
 
     /**
-     * Tags used for collection related caches.
+     * Tags used for collection centric caches.
      *
      * @return array<int, string>
      */
     public static function collections(): array
     {
-        return [self::COLLECTIONS];
+        return self::unique([
+            'collections',
+            CacheKeys::homeTag(),
+        ]);
     }
 
     /**
-     * Tags used for dashboard/statistics caches.
+     * Tags used for dashboard/statistical caches.
      *
      * @return array<int, string>
      */
     public static function dashboards(): array
     {
-        return [self::DASHBOARDS];
+        return self::unique([
+            'dashboards',
+            CacheKeys::dashboardTag(),
+        ]);
     }
 
     /**
-     * Merge multiple tag groups, removing duplicates.
+     * Merge multiple tag groups while preventing duplicates or empty values.
      *
      * @param  array<int, string> ...$groups
      * @return array<int, string>
      */
     public static function merge(array ...$groups): array
     {
-        if ($groups === []) {
-            // Provide a graceful fallback when no tag groups are supplied.
-            return [];
-        }
+        return self::unique(array_merge(...$groups));
+    }
 
-        return array_values(array_unique(array_merge(...$groups)));
+    /**
+     * Normalize a set of tags by filtering empties and removing duplicates.
+     *
+     * @param  array<int, string> $tags
+     * @return array<int, string>
+     */
+    private static function unique(array $tags): array
+    {
+        return array_values(array_unique(array_filter($tags, static fn ($tag) => filled($tag))));
     }
 }

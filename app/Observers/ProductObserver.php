@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Observers;
 
 use App\Models\Product;
+use App\Services\CacheInvalidationService;
 use App\Services\Images\GradientImageService;
 use App\Support\Cache\CacheInvalidator;
 use Illuminate\Support\Facades\Log;
@@ -69,9 +70,12 @@ final class ProductObserver
         $this->flushProductCaches($product);
     }
 
+    /**
+     * Flush cache tags tied to the provided product model.
+     */
     private function flushProductCaches(Product $product): void
     {
-        // Delegate to the cache invalidation use case so storefront shelves refresh consistently.
-        ($this->invalidateProductCache)($product);
+        app(CacheInvalidationService::class)->flushForModel($product);
+        ($this->invalidateProductCache)();
     }
 }

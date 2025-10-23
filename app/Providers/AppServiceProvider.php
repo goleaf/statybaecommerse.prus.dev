@@ -18,6 +18,7 @@ use App\Models\EmailCampaign;
 use App\Models\FeatureFlag;
 use App\Models\SystemSetting;
 use App\Observers\UserAttributionObserver;
+use App\Services\CacheInvalidationService;
 use App\Services\DocumentService;
 use App\Support\Health\HealthReporter;
 use App\Support\Storage\SecureStorage;
@@ -31,7 +32,6 @@ use App\View\Creators\NavigationCreator;
 use App\View\Creators\SeoDataCreator;
 use App\View\Creators\UserDataCreator;
 use Artisan;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Console\Scheduling\Schedule;
@@ -53,6 +53,7 @@ use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
 
 use function in_array;
+use function is_array;
 
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
