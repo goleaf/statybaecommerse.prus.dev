@@ -23,6 +23,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
   sync so ROI/ROAS dashboards and unit tests stop dropping recent conversions.
 * Normalized API validation problem responses to always include a fallback English reason alongside the localized message list so integrators receive consistent messaging even when the initial validation ran before locale negotiation completed.
 * Ensured forbidden problem responses raised through `AccessDeniedHttpException` retain the explicit denial reason in the error context, mirroring the structure used for authorization exceptions and keeping client-side handlers uniform.
+* Enabled admin user email verification actions to update timestamps via fillable attributes, unlock bulk selected-record handling, and freeze Pest clocks for deterministic assertions across the Filament resource tests.
 
 ### Enhancements
 * Refreshed the public brands directory with a brighter layout, shared card components, and localized copy so the partner catalogue feels lighter and consistent across languages.
