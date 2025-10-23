@@ -10,8 +10,7 @@ use Filament\Actions;
 use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
-use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Support\Recommendations\RecommendationBlockOptions;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListRecommendationBlocks extends BaseListRecords
@@ -30,36 +29,15 @@ final class ListRecommendationBlocks extends BaseListRecords
 
     public function getWidgetTabs(): array
     {
-        return [
+        $baseQuery = $this->getResource()::getEloquentQuery();
+
+        $tabs = [
             'all' => WidgetTab::make(__('recommendation_blocks.tabs.all'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
+                // Cloning avoids leaking the additional constraints onto subsequent tabs.
+                ->value(fn () => (clone $baseQuery)->count()),
             'active' => WidgetTab::make(__('recommendation_blocks.tabs.active'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_active', true))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_active', true)->count()),
-
-            'featured' => WidgetTab::make(__('recommendation_blocks.tabs.featured'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('is_featured', true))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_featured', true)->count()),
-
-            'product' => WidgetTab::make(__('recommendation_blocks.tabs.product'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'product'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'product')->count()),
-
-            'category' => WidgetTab::make(__('recommendation_blocks.tabs.category'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'category'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'category')->count()),
-
-            'cross_sell' => WidgetTab::make(__('recommendation_blocks.tabs.cross_sell'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'cross_sell'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'cross_sell')->count()),
-
-            'upsell' => WidgetTab::make(__('recommendation_blocks.tabs.upsell'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'upsell'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'upsell')->count()),
-
-            'trending' => WidgetTab::make(__('recommendation_blocks.tabs.trending'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'trending'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'trending')->count()),
+                ->value(fn () => (clone $baseQuery)->where('is_active', true)->count()),
         ];
 
         foreach (RecommendationBlockOptions::tabLabels() as $type => $label) {

@@ -7,10 +7,19 @@ return [
     'single' => 'Recommendation Block',
     'plural' => 'Recommendation Blocks',
 
-    'sections' => [
-        'basic_information' => 'Basic Information',
-        'products' => 'Products',
-        'settings' => 'Display Settings',
+    'basic_information' => 'Basic Information',
+    'name' => 'Name',
+    'block_title' => 'Title',
+    'description' => 'Description',
+    'type' => 'Type',
+    'position' => 'Position',
+
+    'types' => [
+        'featured' => 'Featured',
+        'related' => 'Related',
+        'similar' => 'Similar',
+        'trending' => 'Trending',
+        'recent' => 'Recent',
     ],
 
     'fields' => [
@@ -65,6 +74,16 @@ return [
     'actions' => [
         'toggle_active' => 'Toggle Active',
         'set_default' => 'Set as Default',
+    ],
+
+    'tabs' => [
+        'all' => 'All Blocks',
+        'active' => 'Active Blocks',
+        'featured' => 'Featured',
+        'related' => 'Related',
+        'similar' => 'Similar',
+        'trending' => 'Trending',
+        'recent' => 'Recent',
     ],
 
     'tabs' => [
