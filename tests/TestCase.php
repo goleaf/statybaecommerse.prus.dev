@@ -46,7 +46,6 @@ abstract class TestCase extends BaseTestCase
         Config::set('telescope.enabled', false);
         Config::set('telescope.storage.database.connection', 'sqlite');
         $this->refreshTranslationLoader();
-        app()->instance('request', Request::create('/'));
         $this->withoutMiddleware([
             \App\Http\Middleware\ZoneDetector::class,
             \App\Http\Middleware\SetLocale::class,
@@ -106,10 +105,7 @@ abstract class TestCase extends BaseTestCase
             $loader = $translator->getLoader();
 
             if ($loader instanceof TranslationLoader && method_exists($loader, 'addJsonPath')) {
-                // Ensure base lang/ JSON files remain available when tests rebuild translators.
                 $loader->addJsonPath(lang_path());
-                // Also expose resources/lang JSON directories so admin commerce labels resolve.
-                $loader->addJsonPath(resource_path('lang'));
             }
         }
 
