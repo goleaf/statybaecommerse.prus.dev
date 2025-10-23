@@ -48,6 +48,7 @@ return [
         'enhanced_settings' => 'Расширенные настройки',
         'system_settings' => 'Системные настройки',
     ],
+    'menu_items' => require __DIR__.'/admin/menu_items.php',
     // Table
     'table' => [
         'name' => 'Имя',
