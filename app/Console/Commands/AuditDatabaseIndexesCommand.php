@@ -83,19 +83,22 @@ final class AuditDatabaseIndexesCommand extends Command
         /** @var Connection $connection */
         $connection = DB::connection($connectionName);
 
-        // Gather normalized index metadata so both duplicate detection and suggestions operate on a single source of truth.
-        /** @var list<array{table:string, name:string, columns:list<string>, unique:bool}> $indexes */
-        $indexes = $this->listIndexes($connection);
-        $duplicates = $this->findDuplicateIndexes($indexes);
-        $suggestions = $this->suggestCompositeIndexes($indexes);
+        $snapshot = $this->gatherIndexSnapshot($connection);
+        $duplicates = $this->findDuplicateIndexes($snapshot);
+        $suggestions = $this->recommendCompositeIndexes($connection, $snapshot);
 
         if ($this->option('json')) {
-            $this->outputJson($duplicates, $suggestions);
+            $this->outputJson([
+                'duplicates'  => $duplicates,
+                'suggestions' => $suggestions,
+            ]);
 
             return $duplicates === [] && $suggestions === [] ? self::SUCCESS : self::FAILURE;
         }
 
-        if ($duplicates !== []) {
+        if ($duplicates === []) {
+            $this->components->info('No duplicate indexes found.');
+        } else {
             $this->components->error('Duplicate indexes detected:');
 
             foreach ($duplicates as $duplicate) {
@@ -105,289 +108,38 @@ final class AuditDatabaseIndexesCommand extends Command
             }
         }
 
-        if ($suggestions !== []) {
-            $this->components->warn('Suggested composite indexes for commerce hotspots:');
-
-            foreach ($suggestions as $suggestion) {
-                $columns = implode(', ', $suggestion['columns']);
-                $this->line(sprintf('- %s: add [%s] (recommended name: %s) → %s', $suggestion['table'], $columns, $suggestion['name'], $suggestion['reason']));
-            }
+        if ($suggestions === []) {
+            $this->components->info('No additional composite indexes recommended for commerce tables.');
+        } else {
+            $this->outputSuggestions($suggestions);
         }
 
-        if ($duplicates === [] && $suggestions === []) {
-            $this->components->info('No duplicate indexes found and all recommended composites are present.');
-
-            return self::SUCCESS;
-        }
-
-        return self::FAILURE;
+        return $duplicates === [] ? self::SUCCESS : self::FAILURE;
     }
 
     /**
-     * @return list<array{table:string, name:string, columns:list<string>, unique:bool}>
-     */
-    private function listIndexes(Connection $connection): array
-    {
-        return match ($connection->getDriverName()) {
-            'sqlite' => $this->listSqliteIndexes($connection),
-            'mysql', 'mariadb' => $this->listMysqlIndexes($connection),
-            default => $this->listDoctrineIndexes($connection),
-        };
-    }
-
-    /**
-     * @param  list<array{table:string, name:string, columns:list<string>, unique:bool}>          $indexes
+     * @param  array<string, array<string, array{columns:list<string>, unique:bool}>>             $snapshot
      * @return list<array{table:string, columns:list<string>, unique:bool, indexes:list<string>}>
      */
-    private function findDuplicateIndexes(array $indexes): array
+    private function findDuplicateIndexes(array $snapshot): array
     {
-        $grouped = [];
-
-        foreach ($indexes as $index) {
-            // Build a signature so we can group indexes with identical coverage and uniqueness.
-            $signature = $index['table'] . '|' . implode('|', $index['columns']) . '|unique:' . ($index['unique'] ? '1' : '0');
-
-            if (! isset($grouped[$signature])) {
-                $grouped[$signature] = [
-                    'table'   => $index['table'],
-                    'columns' => $index['columns'],
-                    'unique'  => $index['unique'],
-                    'indexes' => [$index['name']],
-                ];
-            } else {
-                $grouped[$signature]['indexes'][] = $index['name'];
-            }
-        }
-
         $duplicates = [];
 
-        foreach ($grouped as $payload) {
-            if (count($payload['indexes']) > 1) {
-                $duplicates[] = $payload;
-            }
-        }
+        foreach ($snapshot as $table => $indexes) {
+            $signatures = [];
 
-        return $duplicates;
-    }
+            foreach ($indexes as $name => $definition) {
+                $signature = $this->signature($definition['columns'], $definition['unique']);
 
-    /**
-     * @return list<array{table:string, name:string, columns:list<string>, unique:bool}>
-     */
-    private function listSqliteIndexes(Connection $connection): array
-    {
-        $indexes = [];
-        $tableResults = $connection->select("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'");
-
-        foreach ($tableResults as $tableResult) {
-            if (! $tableResult instanceof stdClass) {
-                continue;
-            }
-
-            $table = (string) $tableResult->name;
-
-            if ($table === '') {
-                continue;
-            }
-
-            $indexResults = $connection->select("PRAGMA index_list('{$table}')");
-
-            foreach ($indexResults as $indexResult) {
-                if (! $indexResult instanceof stdClass) {
-                    continue;
-                }
-
-                $row = (array) $indexResult;
-                $indexName = isset($row['name']) ? (string) $row['name'] : '';
-                $origin = isset($row['origin']) ? (string) $row['origin'] : '';
-
-                if ($indexName === '' || $origin === 'pk') {
-                    continue;
-                }
-
-                $columnResults = $connection->select("PRAGMA index_info('{$indexName}')");
-                $columns = [];
-
-                foreach ($columnResults as $columnResult) {
-                    if (! $columnResult instanceof stdClass) {
-                        continue;
-                    }
-
-                    $column = (array) $columnResult;
-                    $columnName = isset($column['name']) ? (string) $column['name'] : '';
-                    $sequenceRaw = $column['seqno'] ?? null;
-                    $sequence = is_numeric($sequenceRaw) ? (int) $sequenceRaw : 0;
-
-                    if ($columnName === '') {
-                        continue;
-                    }
-
-                    $columns[$sequence] = $columnName;
-                }
-
-                if ($columns === []) {
-                    continue;
-                }
-
-                ksort($columns);
-
-                /** @var list<string> $orderedColumns */
-                $orderedColumns = array_values($columns);
-
-                $isUnique = isset($row['unique']) ? (bool) $row['unique'] : false;
-
-                $indexes[] = [
-                    'table'   => $table,
-                    'name'    => $indexName,
-                    'columns' => $orderedColumns,
-                    'unique'  => $isUnique,
-                ];
-            }
-        }
-
-        return $indexes;
-    }
-
-    /**
-     * @return list<array{table:string, name:string, columns:list<string>, unique:bool}>
-     */
-    private function listMysqlIndexes(Connection $connection): array
-    {
-        $database = (string) $connection->getDatabaseName();
-
-        if ($database === '') {
-            return [];
-        }
-
-        $rawRows = $connection->select(
-            'SELECT TABLE_NAME, INDEX_NAME, COLUMN_NAME, SEQ_IN_INDEX, NON_UNIQUE '
-            . 'FROM information_schema.STATISTICS '
-            . 'WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME, INDEX_NAME, SEQ_IN_INDEX',
-            [$database]
-        );
-
-        /** @var array<string, array<string, list<array{column:string, seq:int, non_unique:int}>>> $grouped */
-        $grouped = [];
-
-        foreach ($rawRows as $rawRow) {
-            if (! $rawRow instanceof stdClass) {
-                continue;
-            }
-
-            $row = (array) $rawRow;
-            $table = isset($row['TABLE_NAME']) ? (string) $row['TABLE_NAME'] : '';
-            $indexName = isset($row['INDEX_NAME']) ? (string) $row['INDEX_NAME'] : '';
-
-            if ($table === '' || $indexName === '') {
-                continue;
-            }
-
-            $columnName = isset($row['COLUMN_NAME']) ? (string) $row['COLUMN_NAME'] : '';
-            $sequenceRaw = $row['SEQ_IN_INDEX'] ?? null;
-            $sequence = is_numeric($sequenceRaw) ? (int) $sequenceRaw : 0;
-            $nonUniqueRaw = $row['NON_UNIQUE'] ?? null;
-            $nonUnique = is_numeric($nonUniqueRaw) ? (int) $nonUniqueRaw : 1;
-
-            if (! isset($grouped[$table])) {
-                $grouped[$table] = [];
-            }
-
-            if (! isset($grouped[$table][$indexName])) {
-                $grouped[$table][$indexName] = [];
-            }
-
-            $grouped[$table][$indexName][] = [
-                'column'     => $columnName,
-                'seq'        => $sequence,
-                'non_unique' => $nonUnique,
-            ];
-        }
-
-        $indexes = [];
-
-        foreach ($grouped as $table => $tableIndexes) {
-            foreach ($tableIndexes as $indexName => $parts) {
-                $columns = [];
-                $isUnique = true;
-
-                foreach ($parts as $part) {
-                    $columnName = $part['column'];
-
-                    if ($columnName === '') {
-                        continue;
-                    }
-
-                    $columns[$part['seq']] = $columnName;
-                    $isUnique = $isUnique && $part['non_unique'] === 0;
-                }
-
-                if ($columns === []) {
-                    continue;
-                }
-
-                ksort($columns);
-
-                /** @var list<string> $orderedColumns */
-                $orderedColumns = array_values($columns);
-
-                $indexes[] = [
-                    'table'   => $table,
-                    'name'    => $indexName,
-                    'columns' => $orderedColumns,
-                    'unique'  => $isUnique,
-                ];
-            }
-        }
-
-        return $indexes;
-    }
-
-    /**
-     * @return list<array{table:string, name:string, columns:list<string>, unique:bool}>
-     */
-    private function listDoctrineIndexes(Connection $connection): array
-    {
-        if (! method_exists($connection, 'getDoctrineSchemaManager')) {
-            return [];
-        }
-
-        $schemaManager = $connection->getDoctrineSchemaManager();
-
-        if (! is_object($schemaManager)) {
-            return [];
-        }
-
-        if (! method_exists($schemaManager, 'listTableNames') || ! method_exists($schemaManager, 'listTableIndexes')) {
-            return [];
-        }
-
-        $indexes = [];
-
-        $tableNames = $schemaManager->listTableNames();
-
-        if (! is_iterable($tableNames)) {
-            return [];
-        }
-
-        foreach ($tableNames as $table) {
-            if (! is_string($table) || $table === '') {
-                continue;
-            }
-
-            $tableName = $table;
-
-            $tableIndexes = $schemaManager->listTableIndexes($tableName);
-
-            if (! is_iterable($tableIndexes)) {
-                continue;
-            }
-
-            foreach ($tableIndexes as $index) {
-                if (! is_object($index)) {
-                    continue;
-                }
-
-                if (! method_exists($index, 'getColumns') || ! method_exists($index, 'getName') || ! method_exists($index, 'isUnique')) {
-                    continue;
+                if (isset($signatures[$signature])) {
+                    $signatures[$signature]['indexes'][] = $name;
+                } else {
+                    $signatures[$signature] = [
+                        'table'   => $table,
+                        'columns' => $definition['columns'],
+                        'unique'  => $definition['unique'],
+                        'indexes' => [$name],
+                    ];
                 }
 
                 $columns = $index->getColumns();
@@ -435,71 +187,287 @@ final class AuditDatabaseIndexesCommand extends Command
     }
 
     /**
-     * @param list<array{table:string, columns:list<string>, unique:bool, indexes:list<string>}>       $duplicates
-     * @param list<array{table:string, columns:list<string>, unique:bool, name:string, reason:string}> $suggestions
+     * @return array<string, array<string, array{columns:list<string>, unique:bool}>>
      */
-    private function outputJson(array $duplicates, array $suggestions): void
+    private function gatherIndexSnapshot(Connection $connection): array
     {
-        $this->line((string) json_encode([
-            'duplicates'  => $duplicates,
-            'suggestions' => $suggestions,
-        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        return match ($connection->getDriverName()) {
+            'sqlite' => $this->snapshotSqlite($connection),
+            'mysql', 'mariadb' => $this->snapshotMysql($connection),
+            default => $this->snapshotViaDoctrine($connection),
+        };
     }
 
     /**
-     * @param  list<array{table:string, name:string, columns:list<string>, unique:bool}>                $indexes
-     * @return list<array{table:string, columns:list<string>, unique:bool, name:string, reason:string}>
+     * @return array<string, array<string, array{columns:list<string>, unique:bool}>>
      */
-    private function suggestCompositeIndexes(array $indexes): array
+    private function snapshotSqlite(Connection $connection): array
     {
-        $byTable = [];
+        $tableRows = $connection->select("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'");
+        $tables = [];
 
-        foreach ($indexes as $index) {
-            $table = $index['table'];
-
-            if (! isset($byTable[$table])) {
-                $byTable[$table] = [];
+        foreach ($tableRows as $tableRow) {
+            if (! $tableRow instanceof stdClass) {
+                continue;
             }
 
-            $byTable[$table][] = $index;
+            $name = (string) ($tableRow->name ?? '');
+
+            if ($name !== '') {
+                $tables[] = $name;
+            }
         }
 
-        $suggestions = [];
+        $snapshot = [];
 
-        foreach (self::RECOMMENDED_COMPOSITE_INDEXES as $table => $recommendations) {
-            $existing = $byTable[$table] ?? [];
+        foreach ($tables as $table) {
+            $snapshot[$table] ??= [];
 
-            foreach ($recommendations as $recommendation) {
-                if ($existing === []) {
-                    // Without any indexes present we can immediately recommend the composite.
-                    $suggestions[] = [
-                        'table'   => $table,
-                        'columns' => $recommendation['columns'],
-                        'unique'  => $recommendation['unique'],
-                        'name'    => $recommendation['name'],
-                        'reason'  => $recommendation['reason'],
-                    ];
+            $indexRows = $connection->select("PRAGMA index_list('{$table}')");
 
+            foreach ($indexRows as $row) {
+                if (! $row instanceof stdClass) {
                     continue;
                 }
 
+                $data = (array) $row;
+                $indexName = isset($data['name']) ? (string) $data['name'] : '';
+                $origin = isset($data['origin']) ? (string) $data['origin'] : '';
+
+                if ($indexName === '' || $origin === 'pk') {
+                    continue;
+                }
+
+                $columnRows = $connection->select("PRAGMA index_info('{$indexName}')");
+                $columnMap = [];
+
+                foreach ($columnRows as $column) {
+                    if (! $column instanceof stdClass) {
+                        continue;
+                    }
+
+                    $columnData = (array) $column;
+                    $columnName = isset($columnData['name']) ? (string) $columnData['name'] : '';
+                    $sequence = isset($columnData['seqno']) ? (int) $columnData['seqno'] : null;
+
+                    if ($columnName === '' || $sequence === null) {
+                        continue;
+                    }
+
+                    $columnMap[$sequence] = $columnName;
+                }
+
+                if ($columnMap === []) {
+                    continue;
+                }
+
+                ksort($columnMap);
+
+                /** @var list<string> $columns */
+                $columns = array_values($columnMap);
+
+                $snapshot[$table][$indexName] = [
+                    'columns' => $columns,
+                    'unique'  => (bool) ($data['unique'] ?? false),
+                ];
+            }
+        }
+
+        return $snapshot;
+    }
+
+    /**
+     * @return array<string, array<string, array{columns:list<string>, unique:bool}>>
+     */
+    private function snapshotMysql(Connection $connection): array
+    {
+        $database = (string) $connection->getDatabaseName();
+
+        if ($database === '') {
+            return [];
+        }
+
+        $rows = $connection->select(
+            'SELECT TABLE_NAME, INDEX_NAME, COLUMN_NAME, SEQ_IN_INDEX, NON_UNIQUE '
+            . 'FROM information_schema.STATISTICS '
+            . 'WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME, INDEX_NAME, SEQ_IN_INDEX',
+            [$database]
+        );
+
+        $grouped = [];
+
+        foreach ($rows as $row) {
+            if (! $row instanceof stdClass) {
+                continue;
+            }
+
+            $data = (array) $row;
+            $table = isset($data['TABLE_NAME']) ? (string) $data['TABLE_NAME'] : '';
+            $indexName = isset($data['INDEX_NAME']) ? (string) $data['INDEX_NAME'] : '';
+
+            if ($table === '' || $indexName === '') {
+                continue;
+            }
+
+            $grouped[$table][$indexName][] = $data;
+        }
+
+        $snapshot = [];
+
+        foreach ($grouped as $table => $indexes) {
+            foreach ($indexes as $indexName => $rowsForIndex) {
+                usort($rowsForIndex, static function (array $a, array $b): int {
+                    return ((int) ($a['SEQ_IN_INDEX'] ?? 0)) <=> ((int) ($b['SEQ_IN_INDEX'] ?? 0));
+                });
+
+                $columns = [];
+
+                foreach ($rowsForIndex as $rowData) {
+                    $columnValue = $rowData['COLUMN_NAME'] ?? null;
+
+                    if (! is_string($columnValue) || $columnValue === '') {
+                        continue;
+                    }
+
+                    $columns[] = $columnValue;
+                }
+
+                if ($columns === []) {
+                    continue;
+                }
+
+                $firstRow = $rowsForIndex[0];
+                $nonUnique = 1;
+
+                if (array_key_exists('NON_UNIQUE', $firstRow) && is_numeric($firstRow['NON_UNIQUE'])) {
+                    $nonUnique = (int) $firstRow['NON_UNIQUE'];
+                }
+
+                $snapshot[$table][$indexName] = [
+                    'columns' => $columns,
+                    'unique'  => $nonUnique === 0,
+                ];
+            }
+        }
+
+        return $snapshot;
+    }
+
+    /**
+     * @return array<string, array<string, array{columns:list<string>, unique:bool}>>
+     */
+    private function snapshotViaDoctrine(Connection $connection): array
+    {
+        if (! method_exists($connection, 'getDoctrineSchemaManager')) {
+            return [];
+        }
+
+        $schemaManager = $connection->getDoctrineSchemaManager();
+
+        if (! is_object($schemaManager) || ! method_exists($schemaManager, 'listTableNames')) {
+            return [];
+        }
+
+        $snapshot = [];
+        $tableNames = $schemaManager->listTableNames();
+
+        if (! is_array($tableNames)) {
+            return [];
+        }
+
+        foreach ($tableNames as $table) {
+            if (! is_string($table) || $table === '') {
+                continue;
+            }
+
+            $snapshot[$table] ??= [];
+
+            if (! method_exists($schemaManager, 'listTableIndexes')) {
+                continue;
+            }
+
+            $indexes = $schemaManager->listTableIndexes($table);
+
+            if (! is_array($indexes)) {
+                continue;
+            }
+
+            foreach ($indexes as $index) {
+                if (! is_object($index)
+                    || ! method_exists($index, 'getColumns')
+                    || ! method_exists($index, 'getName')
+                    || ! method_exists($index, 'isUnique')) {
+                    continue;
+                }
+
+                $columns = $index->getColumns();
+
+                if (! is_array($columns) || $columns === []) {
+                    continue;
+                }
+
+                $columnList = [];
+
+                foreach ($columns as $column) {
+                    if (! is_string($column) || $column === '') {
+                        continue;
+                    }
+
+                    $columnList[] = $column;
+                }
+
+                if ($columnList === []) {
+                    continue;
+                }
+
+                $indexName = $index->getName();
+
+                if (! is_string($indexName) || $indexName === '') {
+                    continue;
+                }
+
+                $snapshot[$table][$indexName] = [
+                    'columns' => $columnList,
+                    'unique'  => (bool) $index->isUnique(),
+                ];
+            }
+        }
+
+        return $snapshot;
+    }
+
+    /**
+     * @param  array<string, array<string, array{columns:list<string>, unique:bool}>> $snapshot
+     * @return list<array{table:string, columns:list<string>, description:string}>
+     */
+    private function recommendCompositeIndexes(Connection $connection, array $snapshot): array
+    {
+        $suggestions = [];
+
+        foreach ($this->commerceIndexRecommendations() as $table => $recommendations) {
+            if (! isset($snapshot[$table]) && ! $this->tableExists($connection, $table)) {
+                continue;
+            }
+
+            /** @var array<string, array{columns:list<string>, unique:bool}> $existing */
+            $existing = $snapshot[$table] ?? [];
+
+            foreach ($recommendations as $recommendation) {
+                $columns = $recommendation['columns'];
+
                 $alreadyCovered = false;
 
-                foreach ($existing as $existingIndex) {
-                    /** @var list<string> $expected */
-                    $expected = array_map(
-                        static fn (string $column): string => Str::lower($column),
-                        $recommendation['columns']
-                    );
-                    /** @var list<string> $actual */
-                    $actual = array_map(
-                        static fn (string $column): string => Str::lower($column),
-                        $existingIndex['columns']
-                    );
+                foreach ($existing as $definition) {
+                    $existingColumns = $definition['columns'];
 
-                    if ($expected === $actual && $existingIndex['unique'] === $recommendation['unique']) {
+                    if ($existingColumns === $columns) {
                         $alreadyCovered = true;
+                        break;
+                    }
 
+                    if (count($existingColumns) >= count($columns)
+                        && array_slice($existingColumns, 0, count($columns)) === $columns) {
+                        $alreadyCovered = true;
                         break;
                     }
                 }
@@ -509,15 +477,80 @@ final class AuditDatabaseIndexesCommand extends Command
                 }
 
                 $suggestions[] = [
-                    'table'   => $table,
-                    'columns' => $recommendation['columns'],
-                    'unique'  => $recommendation['unique'],
-                    'name'    => $recommendation['name'],
-                    'reason'  => $recommendation['reason'],
+                    'table'       => $table,
+                    'columns'     => $columns,
+                    'description' => $recommendation['description'],
                 ];
             }
         }
 
         return $suggestions;
+    }
+
+    /**
+     * @param list<array{table:string, columns:list<string>, description:string}> $suggestions
+     */
+    private function outputSuggestions(array $suggestions): void
+    {
+        $this->components->warn('Suggested composite indexes for commerce tables:');
+
+        foreach ($suggestions as $suggestion) {
+            $this->line(sprintf('- %s on [%s]: %s', $suggestion['table'], implode(', ', $suggestion['columns']), $suggestion['description']));
+        }
+    }
+
+    /**
+     * Determine if the given table exists on the connection.
+     */
+    private function tableExists(Connection $connection, string $table): bool
+    {
+        return $connection->getSchemaBuilder()->hasTable($table);
+    }
+
+    /**
+     * @return array<string, list<array{columns:list<string>, description:string}>>
+     */
+    private function commerceIndexRecommendations(): array
+    {
+        return [
+            'orders' => [
+                [
+                    'columns'     => ['customer_id', 'status'],
+                    'description' => "Speed up account timelines that filter a customer's orders by status.",
+                ],
+                [
+                    'columns'     => ['status', 'created_at'],
+                    'description' => 'Support admin dashboards that slice order throughput by status and date.',
+                ],
+            ],
+            'order_items' => [
+                [
+                    'columns'     => ['order_id', 'product_id'],
+                    'description' => 'Accelerate fulfillment jobs that join order items with product catalogs.',
+                ],
+            ],
+            'cart_items' => [
+                [
+                    'columns'     => ['cart_id', 'product_id'],
+                    'description' => 'Prevent duplicate cart rows and speed up cart hydration queries.',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @param list<string> $columns
+     */
+    private function signature(array $columns, bool $isUnique): string
+    {
+        return implode('|', $columns) . '|unique:' . ($isUnique ? '1' : '0');
+    }
+
+    /**
+     * @param array{duplicates:list<array{table:string, columns:list<string>, unique:bool, indexes:list<string>}>, suggestions:list<array{table:string, columns:list<string>, description:string}>} $payload
+     */
+    private function outputJson(array $payload): void
+    {
+        $this->line((string) json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
     }
 }
