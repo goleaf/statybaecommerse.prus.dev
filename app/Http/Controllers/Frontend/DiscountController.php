@@ -5,71 +5,66 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Models\Discount;
-use App\Models\DiscountCode;
-use Illuminate\Contracts\View\View;
-use Illuminate\Http\RedirectResponse;
+use App\Http\Requests\ApplyCouponRequest;
+use App\Services\Discounts\CouponApplicationService;
+use App\Services\Discounts\DiscountContextBuilder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
+use Illuminate\View\View;
 
 final class DiscountController extends Controller
 {
-    public function index(): View
-    {
-        $discounts = Discount::query()
-            ->withoutGlobalScopes()
-            ->active()
-            ->orderByDesc('priority')
-            ->get(['id', 'name', 'description', 'type', 'value', 'starts_at', 'ends_at']);
+    public function __construct(
+        private readonly CouponApplicationService $couponService,
+        private readonly DiscountContextBuilder $contextBuilder,
+    ) {}
 
-        return view('frontend.discounts.index', [
-            'discounts' => $discounts,
+    public function index(Request $request): JsonResponse
+    {
+        $context = $this->contextBuilder->fromRequest($request);
+
+        return response()->json([
+            'coupons' => $this->couponService->getAvailableCoupons($context),
         ]);
     }
 
-    public function coupons(): View
+    public function coupons(Request $request): View|JsonResponse
     {
-        $coupons = DiscountCode::query()
-            ->withoutGlobalScopes()
-            ->where('is_active', true)
-            ->orderByDesc('created_at')
-            ->limit(50)
-            ->get(['id', 'code', 'name', 'description', 'type', 'value', 'expires_at']);
+        $context = $this->contextBuilder->fromRequest($request);
+        $coupons = $this->couponService->getAvailableCoupons($context);
+
+        if ($request->wantsJson()) {
+            return response()->json(['coupons' => $coupons]);
+        }
 
         return view('frontend.discounts.coupons', [
             'coupons' => $coupons,
+            'hasAppliedCoupon' => $request->session()->has('checkout.coupon.code'),
         ]);
     }
 
-    public function applyCoupon(Request $request): RedirectResponse
+    public function applyCoupon(ApplyCouponRequest $request): JsonResponse
     {
-        $data = $request->validate([
-            'code' => ['required', 'string', 'max:255'],
-        ]);
+        $context = $this->contextBuilder->fromRequest($request, $request->validated('code'));
+        $result = $this->couponService->apply($request->validated('code'), $context);
 
-        $coupon = DiscountCode::query()
-            ->withoutGlobalScopes()
-            ->whereRaw('LOWER(code) = ?', [strtolower($data['code'])])
-            ->where('is_active', true)
-            ->first();
-
-        if (! $coupon) {
-            return redirect()->route('frontend.discounts.coupons')->withErrors([
-                'code' => __('The provided coupon is not valid.'),
-            ]);
-        }
-
-        Session::put('applied_coupon', $coupon->code);
-        Session::put('cart_discount', (float) $coupon->value);
-
-        return redirect()->route('frontend.cart.index')->with('status', __('Coupon applied successfully.'));
+        return response()->json($result, $result['success'] ? 200 : 422);
     }
 
-    public function removeCoupon(): RedirectResponse
+    public function removeCoupon(Request $request): JsonResponse
     {
-        Session::forget('applied_coupon');
-        Session::forget('cart_discount');
+        $context = $this->contextBuilder->fromRequest($request);
 
-        return redirect()->route('frontend.cart.index')->with('status', __('Coupon removed.'));
+        return response()->json($this->couponService->remove($context));
+    }
+
+    public function show(string $id): JsonResponse
+    {
+        return response()->json(['message' => 'Discount details not implemented yet', 'id' => $id]);
+    }
+
+    public function validate(Request $request): JsonResponse
+    {
+        return response()->json(['message' => 'Discount validation not implemented yet']);
     }
 }
