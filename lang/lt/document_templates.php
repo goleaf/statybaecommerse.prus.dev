@@ -11,16 +11,15 @@ return [
     'content'           => 'Turinys',
     'settings'          => 'Nustatymai',
 
-    'name'            => 'Pavadinimas',
-    'slug'            => 'URL adresas',
-    'description'     => 'Aprašymas',
-    'content'         => 'Turinys',
-    'type'            => 'Tipas',
-    'category'        => 'Kategorija',
-    'is_active'       => 'Aktyvus',
-    'documents_count' => 'Dokumentų skaičius',
-    'created_at'      => 'Sukurta',
-    'updated_at'      => 'Atnaujinta',
+    'name'        => 'Pavadinimas',
+    'slug'        => 'URL adresas',
+    'description' => 'Aprašymas',
+    'content'     => 'Turinys',
+    'type'        => 'Tipas',
+    'category'    => 'Kategorija',
+    'is_active'   => 'Aktyvus',
+    'created_at'  => 'Sukurta',
+    'updated_at'  => 'Atnaujinta',
 
     'types' => [
         'invoice'  => 'Sąskaita faktūra',
@@ -37,20 +36,10 @@ return [
         'operational' => 'Operacinis',
     ],
 
-    'actions' => [
-        'preview'    => 'Peržiūrėti',
-        'duplicate'  => 'Dubliuoti',
-        'activate'   => 'Aktyvuoti',
-        'deactivate' => 'Deaktyvuoti',
-        'export'     => 'Eksportuoti',
-    ],
-
     'notifications' => [
-        'previewed'   => 'Peržiūra sėkmingai atidaryta.',
-        'duplicated'  => 'Šablonas sėkmingai dubliuotas.',
-        'activated'   => 'Pasirinkti šablonai aktyvuoti sėkmingai.',
-        'deactivated' => 'Pasirinkti šablonai deaktyvuoti sėkmingai.',
+        'delete_has_documents' => [
+            'title' => 'Šablono ištrinti negalima',
+            'body'  => 'Šis šablonas naudojamas esamuose dokumentuose. Pirmiausia pašalinkite dokumentus.',
+        ],
     ],
-
-    'copy_suffix' => '(Kopija)',
 ];

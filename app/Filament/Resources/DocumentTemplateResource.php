@@ -317,7 +317,20 @@ final class DocumentTemplateResource extends Resource
                     }),
                 TableViewAction::make(),
                 TableEditAction::make(),
-                DeleteAction::make(),
+                DeleteAction::make()
+                    ->before(function (DeleteAction $action, DocumentTemplate $record): void {
+                        if (! $record->documents()->exists()) {
+                            return;
+                        }
+
+                        Notification::make()
+                            ->title(__('document_templates.notifications.delete_has_documents.title'))
+                            ->body(__('document_templates.notifications.delete_has_documents.body'))
+                            ->warning()
+                            ->send();
+
+                        $action->halt();
+                    }),
             ])
             ->bulkActions([
                 TableBulkActionGroup::make([
