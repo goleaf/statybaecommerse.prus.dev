@@ -7,7 +7,8 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Bug Fixes
-* Ensured discount code admin actions bypass storefront scopes so edits, toggles, duplication, and bulk activation flows persist inactive records correctly, and adjusted tests to assert duplicates via scope-free queries.
+* Stabilized backup lifecycle commands in tests by routing filesystem calls through a new graceful shim that auto-runs `backup:prepare`/`backup:verify` when directories are missing, preventing race conditions in backup metadata assertions.
+* Tightened the Filament top navigation widget to honour admin roles, permission-gated sections, and deterministic ordering so regression coverage sees every navigation group the widget is expected to expose.
 * Re-enabled flexible system setting translations by replacing the locale uniqueness constraint with an index, restoring soft delete support, and trimming the fillable contract so replication and counting scenarios match the documented API.
 * Preserved Attribute validation rule strings while still decoding JSON arrays, refreshed the Filament form so arrays render as comma-separated chips, and added regression coverage for both storage paths.
 * Reintroduced the `regions` schema with defensive guards and rebuilt the `customers`/`orders` relationship so SQLite-backed factories and analytics widgets can create location-aware records without missing column errors during tests.
@@ -40,36 +41,36 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 - Realigned the Discount Redemption Filament resource navigation metadata and status badge styling with the v4 table schema so admin pages and supporting tests use the modern badge helpers without compatibility gaps.
 
 ### Maintenance
-
-- Registered SearchableInput payload macros lazily with safe defaults and provisioned per-worker SQLite database files during the test bootstrap, eliminating parallel lock contention while keeping hydrate/clear helpers available even when the service provider has not pre-booted macros.
-- Extended the demo store seeder to call the collection seeders, ensuring curated collections ship with featured products for storefront demos and automated tests.
-- Provisioned a reusable SQLite testing harness that seeds the Spatie permission tables, attribute pivots, and variant matrix schema once per process, registered Filament SearchableInput payload macros for v4 containers, and wrapped the ProductVariant attribute matrix suite in transactions so PHPUnit reuses a shared schema without losing isolation.
-- Fixed the custom Filament edit profile page to import the correct Schema class, eliminating fatal compatibility errors during automated tests.
-- Normalized Filament navigation icons and groups across pages, resources, relation managers, and widgets to use the BackedEnum-/UnitEnum-aware union types required by Filament v4 so composer installs no longer crash on PHP 8.3.
-- Captured the Oct 21–22, 2025 pull request triage results in `docs/analysis/CURRENT_SYSTEM_STATUS.md`, outlining merge-ready Husky and feature flag fixes, superseded Filament cleanups to close, and outstanding follow-up work so maintainers can act without revisiting GitHub filters.
-- Updated the test harness configuration to respect the configured database connection so PHPUnit now boots against the shared `database/database.sqlite` datastore by default while remaining overridable for contributors who prefer in-memory runs.
-- Captured a repository-wide analysis summary that enumerates the 24 open pull requests, clustering the Filament Schema migrations, Husky shim fixes, and layered rate-limiting work so reviewers can triage without scraping the GitHub UI.
-- Documented the open security hardening proposal from PR #289 covering layered API rate limits, per-identity throttling buckets, and correlation-aware logging so stakeholders can track the pending review scope from within the repository knowledge base.
-- Migrated Filament resources, relation managers, custom pages, and widgets to the v4 Schema API while normalizing navigation icon docblocks so BackedEnum-powered metadata stays compatible with upstream traits (#1070).
-- Refactored the product API flow to run through dedicated application use cases, a presenter, and an Eloquent-backed repository so contract responses stay stable while filtering non-displayable catalogue entries.
-- Centralized Filament navigation metadata by adopting the `HasNav` trait on notifications, hardening the Nav helper against recursion, and documenting the `Schema::components([...])` pipeline for the Address resource.
-- Normalized the Menu Item Filament resource icon annotation to the shared docblock convention and documented the delegated schema/table builders for reviewers.
-- Clarified the Wishlist Item Filament resource navigation metadata by switching to the documented static icon property and explaining the sidebar sort order for reviewers.
-- Replaced the artisan diagnostics commands with PHPUnit coverage suites, added Paratest support, and wired a minimum coverage extension that fails the build when thresholds are not met.
-- Added granular rate limiting configuration scopes and partner-friendly throttling helpers while wiring CSP nonces into helper utilities and admin providers.
-- Normalized HTTP 429 API responses to the new shared `error.rate_limited` problem code and refreshed the contract docs so client throttling logic stays consistent.
-- Resolved the cache tagging conflicts from PR #120 by wiring `CacheInvalidationService` into model events, aligning navigation/menu repositories with locale-aware tags, and extending regression tests that exercise storefront widgets and dashboard stats.
-- Introduced a cache invalidation service with tag-aware fallbacks and updated storefront widgets to honour locale-aware cache tags while adding regression coverage for cart and dashboard flows.
-- Hardened the Filament schema upgrade script so navigation icon docblocks are normalized automatically and every resource/page/widget reflects the v4 schema signature changes.
-- Updated the Discount Redemption resource unit test harness to supply a lightweight `HasTable` stub, keeping the Filament v4 table factory invocations compatible with Pest assertions.
-- Aligned Filament variant pricing and analytics resources with stricter action namespaces, clarified currency formatting, and refreshed navigation icon annotations to streamline BackedEnum usage across admin pages.
-- Synced Collection Rule resource signatures, modal reorder UX, and cache maintenance tooling with Filament v4 to retire legacy array fallbacks.
-- Delivered the Campaign Product Target management resource with localized strings, reinforced widget navigation metadata, and hardened media path migrations for safer marketing workflows.
-- Restored the Husky bootstrap shim and its executable permissions so Git hooks keep executing with the repository's local toolchain while still surfacing the upstream v10 deprecation guidance.
-- Ensured the User Product Interaction Filament resource now returns concrete `Form`/`Table` instances so Filament v4 boots without schema contract errors during analytics validation.
-- Normalized Filament navigation icon overrides to rely on docblocks, consolidated variant stock danger badges, and refreshed the `data:import` command metadata to resolve regressions from PR #1098.
-- Smoothed out User Product Interaction rating badges and filter option spacing so Filament v4 renders the analytics table without concatenation warnings spotted while reviewing PR #1097.
-- Introduced a reusable HTML sanitization pipeline with a maintenance command, model hooks, and storefront renderer updates to harden product and legal content.
+* Isolated the database index audit console test on a dedicated SQLite database file, ensuring duplicate-index detection can stage schemas without colliding with the primary test connection while still verifying cleanup flows.
+* Registered SearchableInput payload macros lazily with safe defaults and provisioned per-worker SQLite database files during the test bootstrap, eliminating parallel lock contention while keeping hydrate/clear helpers available even when the service provider has not pre-booted macros.
+* Extended the demo store seeder to call the collection seeders, ensuring curated collections ship with featured products for storefront demos and automated tests.
+* Provisioned a reusable SQLite testing harness that seeds the Spatie permission tables, attribute pivots, and variant matrix schema once per process, registered Filament SearchableInput payload macros for v4 containers, and wrapped the ProductVariant attribute matrix suite in transactions so PHPUnit reuses a shared schema without losing isolation.
+* Fixed the custom Filament edit profile page to import the correct Schema class, eliminating fatal compatibility errors during automated tests.
+* Normalized Filament navigation icons and groups across pages, resources, relation managers, and widgets to use the BackedEnum-/UnitEnum-aware union types required by Filament v4 so composer installs no longer crash on PHP 8.3.
+* Captured the Oct 21–22, 2025 pull request triage results in `docs/analysis/CURRENT_SYSTEM_STATUS.md`, outlining merge-ready Husky and feature flag fixes, superseded Filament cleanups to close, and outstanding follow-up work so maintainers can act without revisiting GitHub filters.
+* Updated the test harness configuration to respect the configured database connection so PHPUnit now boots against the shared `database/database.sqlite` datastore by default while remaining overridable for contributors who prefer in-memory runs.
+* Captured a repository-wide analysis summary that enumerates the 24 open pull requests, clustering the Filament Schema migrations, Husky shim fixes, and layered rate-limiting work so reviewers can triage without scraping the GitHub UI.
+* Documented the open security hardening proposal from PR #289 covering layered API rate limits, per-identity throttling buckets, and correlation-aware logging so stakeholders can track the pending review scope from within the repository knowledge base.
+* Migrated Filament resources, relation managers, custom pages, and widgets to the v4 Schema API while normalizing navigation icon docblocks so BackedEnum-powered metadata stays compatible with upstream traits (#1070).
+* Refactored the product API flow to run through dedicated application use cases, a presenter, and an Eloquent-backed repository so contract responses stay stable while filtering non-displayable catalogue entries.
+* Centralized Filament navigation metadata by adopting the `HasNav` trait on notifications, hardening the Nav helper against recursion, and documenting the `Schema::components([...])` pipeline for the Address resource.
+* Normalized the Menu Item Filament resource icon annotation to the shared docblock convention and documented the delegated schema/table builders for reviewers.
+* Clarified the Wishlist Item Filament resource navigation metadata by switching to the documented static icon property and explaining the sidebar sort order for reviewers.
+* Replaced the artisan diagnostics commands with PHPUnit coverage suites, added Paratest support, and wired a minimum coverage extension that fails the build when thresholds are not met.
+* Added granular rate limiting configuration scopes and partner-friendly throttling helpers while wiring CSP nonces into helper utilities and admin providers.
+* Normalized HTTP 429 API responses to the new shared `error.rate_limited` problem code and refreshed the contract docs so client throttling logic stays consistent.
+* Resolved the cache tagging conflicts from PR #120 by wiring `CacheInvalidationService` into model events, aligning navigation/menu repositories with locale-aware tags, and extending regression tests that exercise storefront widgets and dashboard stats.
+* Introduced a cache invalidation service with tag-aware fallbacks and updated storefront widgets to honour locale-aware cache tags while adding regression coverage for cart and dashboard flows.
+* Hardened the Filament schema upgrade script so navigation icon docblocks are normalized automatically and every resource/page/widget reflects the v4 schema signature changes.
+* Updated the Discount Redemption resource unit test harness to supply a lightweight `HasTable` stub, keeping the Filament v4 table factory invocations compatible with Pest assertions.
+* Aligned Filament variant pricing and analytics resources with stricter action namespaces, clarified currency formatting, and refreshed navigation icon annotations to streamline BackedEnum usage across admin pages.
+* Synced Collection Rule resource signatures, modal reorder UX, and cache maintenance tooling with Filament v4 to retire legacy array fallbacks.
+* Delivered the Campaign Product Target management resource with localized strings, reinforced widget navigation metadata, and hardened media path migrations for safer marketing workflows.
+* Restored the Husky bootstrap shim and its executable permissions so Git hooks keep executing with the repository's local toolchain while still surfacing the upstream v10 deprecation guidance.
+* Ensured the User Product Interaction Filament resource now returns concrete `Form`/`Table` instances so Filament v4 boots without schema contract errors during analytics validation.
+* Normalized Filament navigation icon overrides to rely on docblocks, consolidated variant stock danger badges, and refreshed the `data:import` command metadata to resolve regressions from PR #1098.
+* Smoothed out User Product Interaction rating badges and filter option spacing so Filament v4 renders the analytics table without concatenation warnings spotted while reviewing PR #1097.
+* Introduced a reusable HTML sanitization pipeline with a maintenance command, model hooks, and storefront renderer updates to harden product and legal content.
 
 ### Bug Fixes
 

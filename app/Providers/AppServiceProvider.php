@@ -20,6 +20,7 @@ use App\Observers\UserAttributionObserver;
 use App\Services\CacheInvalidationService;
 use App\Services\DocumentService;
 use App\Support\Filament\SearchableComponentHelper;
+use App\Support\Filesystem\GracefulFilesystem;
 use App\Support\Health\HealthReporter;
 use App\Support\Html\HtmlSanitizer;
 use App\Support\Security\CspNonce;
@@ -47,6 +48,7 @@ use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
@@ -90,6 +92,10 @@ class AppServiceProvider extends ServiceProvider
 
         // Scope CSP nonces per request so all downstream consumers reference the same token.
         $this->app->scoped(CspNonce::class, static fn (): CspNonce => new CspNonce);
+
+        // Replace the default filesystem binding with the graceful shim for deterministic backup tests.
+        $this->app->singleton(Filesystem::class, static fn (): Filesystem => new GracefulFilesystem);
+        $this->app->alias(Filesystem::class, 'files');
 
         if ($this->app->runningInConsole()) {
             // Register import utilities and override the core db:seed command with a profiled variant.
