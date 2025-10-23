@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Carbon\CarbonImmutable;
+use DateTimeInterface;
+use App\Models\Product;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -65,7 +66,7 @@ final class VariantAnalytics extends Model
     }
 
     /**
-     * Get the product that owns the analytics.
+     * Get the product that this analytics row refers to.
      */
     public function product(): BelongsTo
     {
