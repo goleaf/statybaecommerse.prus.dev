@@ -127,7 +127,10 @@ SQL;
                 ? $fullDescription
                 : (is_string($translatedDescription) && $translatedDescription !== '' ? $translatedDescription : null));
 
-        $title = isset($attributes['name']) && is_string($attributes['name']) ? $attributes['name'] : '';
+        // Product names are stored as translated JSON payloads in the catalogue,
+        // so we normalise the raw database projection to a human readable
+        // string before exposing it through the API response.
+        $title = $this->extractTranslatableString($attributes['name'] ?? null);
         $slug = isset($attributes['slug']) && is_string($attributes['slug']) ? $attributes['slug'] : '';
         $salesCount = $attributes['sales_count'] ?? 0;
         $reviewsCount = $attributes['reviews_count'] ?? 0;
@@ -194,6 +197,42 @@ SQL;
         }
 
         return $score;
+    }
+
+    private function extractTranslatableString(mixed $value): string
+    {
+        // The product table persists translated attributes as JSON, which means
+        // raw SQL projections can surface the encoded payload. We attempt to
+        // decode the value and fall back to the first non-empty string we find.
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+
+            if (json_last_error() === JSON_ERROR_NONE) {
+                if (is_string($decoded) && $decoded !== '') {
+                    return trim($decoded);
+                }
+
+                if (is_array($decoded)) {
+                    foreach ($decoded as $candidate) {
+                        if (is_string($candidate) && trim($candidate) !== '') {
+                            return trim($candidate);
+                        }
+                    }
+                }
+            }
+
+            return trim($value, " \t\n\r\0\x0B\"'");
+        }
+
+        if (is_array($value)) {
+            foreach ($value as $candidate) {
+                if (is_string($candidate) && trim($candidate) !== '') {
+                    return trim($candidate);
+                }
+            }
+        }
+
+        return '';
     }
 
     private function metricProjection(): string

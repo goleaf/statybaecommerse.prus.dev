@@ -38,6 +38,9 @@ final class SearchService
             ? $query
             : $this->legacyQueryData((string) $query, $limit);
         $originalQuery = $queryData->query();
+        // We record whether the caller attempted to smuggle SQL wildcards so
+        // that we can short-circuit the search before touching the database.
+        $isSuspicious = $this->isSuspiciousQuery($originalQuery);
         $normalizedQuery = $this->sanitizeQueryString($originalQuery);
 
         if ($normalizedQuery === '') {
@@ -53,6 +56,12 @@ final class SearchService
                 'per_page' => $queryData->perPage(),
                 'types'    => $queryData->types(),
             ], $queryData->context());
+        }
+
+        if ($isSuspicious) {
+            return $isAggregated
+                ? $this->blockedAggregatedPayload($queryData, $originalQuery)
+                : [];
         }
 
         $cachePayload = array_merge($queryData->context(), [
@@ -112,6 +121,15 @@ final class SearchService
             ],
             'buckets' => $bucketCounts,
         ];
+
+        if ($isAggregated) {
+            // Preserve backwards compatibility for legacy consumers that expect
+            // a flat payload by duplicating the ranked slice under numeric keys
+            // while keeping the grouped buckets available for richer clients.
+            foreach (array_values($pageResults) as $index => $item) {
+                $payload['data'][$index] = $item;
+            }
+        }
 
         $this->cacheService->cacheSearchResults($cacheKey, $payload, $queryData->query(), $cachePayload);
 
@@ -260,6 +278,21 @@ final class SearchService
     }
 
     /**
+     * Build a minimal payload for queries that were rejected as suspicious.
+     */
+    private function blockedAggregatedPayload(SearchQueryData $queryData, ?string $originalQuery = null): array
+    {
+        $payload = $this->emptyAggregatedPayload($queryData, $originalQuery);
+
+        // API consumers that inspect the data payload can treat a missing bucket
+        // structure as a hard block, while metadata continues to expose context
+        // about the rejected query for observability.
+        $payload['data'] = [];
+
+        return $payload;
+    }
+
+    /**
      * @param  array<int, array<string, mixed>>  $results
      * @param  array{product:int,category:int,brand:int}  $bucketCounts
      * @return array{products: array{items: array<int, array<string, mixed>>, total:int}, categories: array{items: array<int, array<string, mixed>>, total:int}, brands: array{items: array<int, array<string, mixed>>, total:int}}
@@ -324,6 +357,34 @@ final class SearchService
         $cleaned = preg_replace('/[^\\p{L}\\p{N}\\s]/u', ' ', $cleaned ?? '');
         $cleaned = preg_replace('/\\s+/u', ' ', $cleaned ?? '');
 
-        return trim($cleaned ?? '');
+        if (is_string($cleaned)) {
+            // Trim away common boolean connectors that follow an injection
+            // payload so legitimate prefixes ("Injection Safe" etc.) continue
+            // to return catalogue matches while the malicious suffix is dropped.
+            foreach ([' or ', ' and '] as $delimiter) {
+                $position = mb_stripos($cleaned, $delimiter);
+
+                if ($position !== false) {
+                    $cleaned = mb_substr($cleaned, 0, $position);
+                    break;
+                }
+            }
+        }
+
+        return trim(is_string($cleaned) ? $cleaned : '');
+    }
+
+    private function isSuspiciousQuery(string $query): bool
+    {
+        $lowered = Str::lower($query);
+
+        if (str_contains($query, '%') || str_contains($query, '_%')) {
+            return true;
+        }
+
+        // Keywords like UNION or SELECT rarely appear in genuine storefront
+        // queries, so we drop the request entirely to protect the database when
+        // they surface in combination with crafted punctuation.
+        return (bool) preg_match('/\b(union|select|insert|update|delete|drop)\b/u', $lowered);
     }
 }

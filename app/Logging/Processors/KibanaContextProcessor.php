@@ -7,6 +7,7 @@ namespace App\Logging\Processors;
 use DateTimeInterface;
 use DateTimeZone;
 use Monolog\LogRecord;
+use function getmypid;
 
 final class KibanaContextProcessor
 {
@@ -33,6 +34,12 @@ final class KibanaContextProcessor
             'name' => $serviceName,
             'environment' => $environment,
         ];
+
+        // We fetch the current process identifier so Kibana dashboards can
+        // correlate log lines with the PHP worker that emitted them. The
+        // native getmypid() helper returns false on unsupported platforms,
+        // so we guard the enrichment to avoid emitting undefined values.
+        $pid = getmypid();
 
         if ($pid !== false) {
             $extra['process'] = [
