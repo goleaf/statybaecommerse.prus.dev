@@ -7,15 +7,13 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Bug Fixes
-
-- Stabilised the Filament address admin regression suite by registering the Spatie translatable plugin during tests, skipping Vite assets in the harness, updating widget tab markup, and migrating table actions to Filament v4 APIs so bulk operations and soft deletes behave deterministically.
-- Replaced the unavailable `heroicon-o-bullseye-arrow` campaign navigation icon with a supported chart glyph so the admin sidebar renders without aborting when heroicons assets are cached offline.
-- Preserved Attribute validation rule strings while still decoding JSON arrays, refreshed the Filament form so arrays render as comma-separated chips, and added regression coverage for both storage paths.
-- Reintroduced the `regions` schema with defensive guards and rebuilt the `customers`/`orders` relationship so SQLite-backed factories and analytics widgets can create location-aware records without missing column errors during tests.
-- Resolved localized product and category routing by honouring translated slugs during route model binding and updating storefront links so product detail pages load reliably from the home feed and other localized listings.
-- Restored the dashboard permission guard to default to open access when no abilities are configured and aligned inline sparkline widgets with Filament's nullable model contract, clearing the latest unit test regressions around navigation metadata and dataset checksums.
-- Replaced the CampaignCustomerSegment global ActiveScope with targeted query helpers so unit tests can fetch inactive records while dashboards retain expressive filters for campaign, type, and group segmentation.
-- Removed the generic ActiveScope from campaign conversion analytics so status-
+* Stabilized admin guard redirects by hardening the exception handler, skipping Vite asset loading when the manifest is missing during tests, and seeding Filament roles so the dashboard URL and login path assertions run without 500s in the regression suite.
+* Preserved Attribute validation rule strings while still decoding JSON arrays, refreshed the Filament form so arrays render as comma-separated chips, and added regression coverage for both storage paths.
+* Reintroduced the `regions` schema with defensive guards and rebuilt the `customers`/`orders` relationship so SQLite-backed factories and analytics widgets can create location-aware records without missing column errors during tests.
+* Resolved localized product and category routing by honouring translated slugs during route model binding and updating storefront links so product detail pages load reliably from the home feed and other localized listings.
+* Restored the dashboard permission guard to default to open access when no abilities are configured and aligned inline sparkline widgets with Filament's nullable model contract, clearing the latest unit test regressions around navigation metadata and dataset checksums.
+* Replaced the CampaignCustomerSegment global ActiveScope with targeted query helpers so unit tests can fetch inactive records while dashboards retain expressive filters for campaign, type, and group segmentation.
+* Removed the generic ActiveScope from campaign conversion analytics so status-
   filtered scopes (campaign, type, device, medium, etc.) once again return
   completed records in unit tests and dashboards instead of being filtered out
   by a non-existent `is_active` flag.

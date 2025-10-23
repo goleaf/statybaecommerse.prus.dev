@@ -39,8 +39,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 -### Latest updates
-
-- Filament address management tests now boot the admin panel with the translation plugin, offline-safe assets, and updated widget tab markup, letting PHPUnit exercise table and bulk actions without missing plugins, Vite manifests, or confirmation blockers.
+- Admin panel regression suite now seeds the Filament authorization matrix, hardens exception redirects, and skips Vite asset loading when the manifest is missing so `/admin` checks run without 500s during tests.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
 - Attribute group selectors now reuse a shared translation helper so historical slugs render as human-readable labels across Filament forms, filters, and tables instead of exposing raw keys.
