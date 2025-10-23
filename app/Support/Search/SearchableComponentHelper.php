@@ -4,46 +4,96 @@ declare(strict_types=1);
 
 namespace App\Support\Search;
 
-use DefStudio\SearchableInput\DTO\SearchResult;
+use Closure;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Filament\Forms\Set;
 
+/**
+ * Centralises behaviour for hydrating and synchronising Filament SearchableInput components.
+ */
 final class SearchableComponentHelper
 {
-    private const META_KEY = 'searchable_input.selected';
-
-    public static function remember(SearchableInput $component, SearchResult $result): void
+    /**
+     * Hydrate a SearchableInput component from a stored identifier.
+     *
+     * @param  Closure(int|string): (\DefStudio\SearchableInput\DTO\SearchResult|array{id?: string, label?: string, payload?: array<string, mixed>})|null  $resolver
+     */
+    public static function hydrate(SearchableInput $component, int|string|null $state, Closure $resolver): void
     {
-        $component->meta(self::META_KEY, $result->toArray());
-    }
+        if ($state === null || $state === '') {
+            self::clear($component);
 
-    public static function forget(SearchableInput $component): void
-    {
-        $component->meta(self::META_KEY, null);
-    }
-
-    public static function recall(SearchableInput $component): ?SearchResult
-    {
-        $stored = $component->getMeta(self::META_KEY);
-
-        if (! is_array($stored) || ! isset($stored['value'])) {
-            return null;
+            return;
         }
 
-        return SearchResult::fromArray([
-            'value' => is_string($stored['value']) ? $stored['value'] : (string) $stored['value'],
-            'label' => is_string($stored['label'] ?? null) ? $stored['label'] : (string) ($stored['value'] ?? ''),
-            'data'  => is_array($stored['data'] ?? null) ? $stored['data'] : [],
-        ]);
+        $result = $resolver($state);
+
+        if ($result === null) {
+            self::clear($component);
+
+            return;
+        }
+
+        $normalised = SearchResultPayload::hydrate($result);
+
+        // Persist the selection so the UI displays the correct label after hydration.
+        $component
+            ->state((string) $normalised['id'])
+            ->options([
+                (string) $normalised['id'] => $normalised['label'],
+            ]);
     }
 
-    public static function apply(SearchableInput $component, SearchResult $result): void
+    /**
+     * Update a related attribute when a SearchableInput state changes.
+     *
+     * @param  Closure(string): (\DefStudio\SearchableInput\DTO\SearchResult|array{id?: string, label?: string, payload?: array<string, mixed>})|null  $resolver
+     */
+    public static function syncSelectedRecord(
+        SearchableInput $component,
+        ?string $state,
+        Set $set,
+        string $attribute,
+        Closure $resolver,
+    ): void {
+        if ($state === null || $state === '') {
+            // Clearing the selection must remove both the stored identifier and any UI remnants.
+            $set($attribute, null);
+            self::clear($component);
+
+            return;
+        }
+
+        $result = $resolver($state);
+
+        if ($result === null) {
+            $set($attribute, null);
+            self::clear($component);
+
+            return;
+        }
+
+        $normalised = SearchResultPayload::hydrate($result);
+        $identifier = $normalised['id'];
+
+        // Persist the related key using an integer when appropriate.
+        $set($attribute, is_numeric($identifier) ? (int) $identifier : $identifier);
+
+        // Refresh the UI with the normalised label to avoid stale selections.
+        $component
+            ->state((string) $identifier)
+            ->options([
+                (string) $identifier => $normalised['label'],
+            ]);
+    }
+
+    /**
+     * Reset the component state to avoid leaking stale payloads in Livewire form data.
+     */
+    public static function clear(SearchableInput $component): void
     {
         $component
-            ->state($result->value())
-            ->options([
-                $result->value() => $result->label(),
-            ]);
-
-        self::remember($component, $result);
+            ->state(null)
+            ->options([]);
     }
 }
