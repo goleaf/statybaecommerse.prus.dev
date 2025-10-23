@@ -20,6 +20,11 @@ namespace {
     if (! class_exists(Set::class) && class_exists(\Filament\Schemas\Components\Utilities\Set::class)) {
         class_alias(\Filament\Schemas\Components\Utilities\Set::class, Set::class);
     }
+
+    if (! class_exists(\Filament\Forms\Components\Flatpickr::class) && class_exists(\Coolsam\Flatpickr\Forms\Components\Flatpickr::class)) {
+        // Preserve the legacy component namespace so third-party discovery hooks can resolve Flatpickr during upgrades.
+        class_alias(\Coolsam\Flatpickr\Forms\Components\Flatpickr::class, \Filament\Forms\Components\Flatpickr::class);
+    }
 }
 
 namespace Filament\Forms\Components {
