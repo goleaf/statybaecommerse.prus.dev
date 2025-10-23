@@ -11,8 +11,8 @@ use App\Models\News;
 use App\Models\Translations\NewsTranslation;
 use BackedEnum;
 use Filament\Forms;
-use Filament\Forms\Get;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Infolists;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use RuntimeException;
 
 class NewsResource extends Resource
@@ -32,7 +33,8 @@ class NewsResource extends Resource
 
     protected static ?string $model = News::class;
 
-    
+    /** @phpstan-var string|BackedEnum|null */
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-newspaper';
 
     protected static ?int $navigationSort = 1;
 
