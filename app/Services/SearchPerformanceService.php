@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Support\Telemetry\TelemetryManager;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use OpenTelemetry\API\Trace\SpanInterface;
+use OpenTelemetry\API\Trace\StatusCode;
 
 /**
  * SearchPerformanceService
@@ -19,29 +22,49 @@ final class SearchPerformanceService
     private const CACHE_TTL = 3600;
 
     // 1 hour
+    public function __construct(private readonly TelemetryManager $telemetry)
+    {
+    }
+
     /**
      * Handle trackSearchPerformance functionality with proper error handling.
      */
     public function trackSearchPerformance(string $query, float $executionTime, int $resultCount, string $searchType = 'general'): void
     {
-        try {
-            $metrics = ['query' => $query, 'execution_time' => $executionTime, 'result_count' => $resultCount, 'search_type' => $searchType, 'timestamp' => now(), 'memory_usage' => memory_get_usage(true), 'peak_memory' => memory_get_peak_usage(true)];
-            // Store in cache for real-time monitoring
-            $cacheKey = self::CACHE_PREFIX.'recent_'.now()->format('Y-m-d-H');
-            $recentSearches = Cache::get($cacheKey, []);
-            $recentSearches[] = $metrics;
-            // Keep only last 100 searches per hour
-            $recentSearches = array_slice($recentSearches, -100);
-            Cache::put($cacheKey, $recentSearches, self::CACHE_TTL);
-            // Log slow searches
-            if ($executionTime > 1.0) {
-                Log::warning('Slow search detected', $metrics);
+        $this->telemetry->inSpan('search.performance.track', function (?SpanInterface $span) use ($query, $executionTime, $resultCount, $searchType): void {
+            try {
+                $metrics = ['query' => $query, 'execution_time' => $executionTime, 'result_count' => $resultCount, 'search_type' => $searchType, 'timestamp' => now(), 'memory_usage' => memory_get_usage(true), 'peak_memory' => memory_get_peak_usage(true)];
+                if ($span !== null) {
+                    $span->setAttribute('search.query', $query);
+                    $span->setAttribute('search.result_count', $resultCount);
+                    $span->setAttribute('search.type', $searchType);
+                    $span->setAttribute('search.execution_time', $executionTime);
+                }
+                // Store in cache for real-time monitoring
+                $cacheKey = self::CACHE_PREFIX.'recent_'.now()->format('Y-m-d-H');
+                $recentSearches = Cache::get($cacheKey, []);
+                $recentSearches[] = $metrics;
+                // Keep only last 100 searches per hour
+                $recentSearches = array_slice($recentSearches, -100);
+                Cache::put($cacheKey, $recentSearches, self::CACHE_TTL);
+                // Log slow searches
+                if ($executionTime > 1.0) {
+                    Log::warning('Slow search detected', $metrics);
+                    $span?->setStatus(StatusCode::STATUS_ERROR, 'Slow search threshold exceeded');
+                }
+                // Update performance statistics
+                $this->updatePerformanceStats($metrics);
+            } catch (\Exception $e) {
+                if ($span !== null) {
+                    $span->recordException($e);
+                    $span->setStatus(StatusCode::STATUS_ERROR, $e->getMessage());
+                }
+                Log::error('Failed to track search performance', ['error' => $e->getMessage(), 'query' => $query]);
             }
-            // Update performance statistics
-            $this->updatePerformanceStats($metrics);
-        } catch (\Exception $e) {
-            Log::error('Failed to track search performance', ['error' => $e->getMessage(), 'query' => $query]);
-        }
+        }, [
+            'search.query_length' => strlen($query),
+            'search.type' => $searchType,
+        ]);
     }
 
     /**
@@ -51,11 +74,15 @@ final class SearchPerformanceService
     {
         $cacheKey = self::CACHE_PREFIX.'stats_'.$days;
 
-        return Cache::remember($cacheKey, 1800, function () use ($days) {
-            $since = now()->subDays($days);
+        return $this->telemetry->inSpan('search.performance.summary', function (?SpanInterface $span) use ($cacheKey, $days): array {
+            $span?->setAttribute('search.days', $days);
 
-            return ['average_execution_time' => $this->getAverageExecutionTime($since), 'slow_searches_count' => $this->getSlowSearchesCount($since), 'total_searches' => $this->getTotalSearches($since), 'memory_usage_stats' => $this->getMemoryUsageStats($since), 'search_type_performance' => $this->getSearchTypePerformance($since), 'hourly_performance' => $this->getHourlyPerformance($since)];
-        });
+            return Cache::remember($cacheKey, 1800, function () use ($days) {
+                $since = now()->subDays($days);
+
+                return ['average_execution_time' => $this->getAverageExecutionTime($since), 'slow_searches_count' => $this->getSlowSearchesCount($since), 'total_searches' => $this->getTotalSearches($since), 'memory_usage_stats' => $this->getMemoryUsageStats($since), 'search_type_performance' => $this->getSearchTypePerformance($since), 'hourly_performance' => $this->getHourlyPerformance($since)];
+            });
+        }, ['search.days' => $days]);
     }
 
     /**
@@ -77,24 +104,30 @@ final class SearchPerformanceService
      */
     public function optimizeSearchPerformance(): array
     {
-        $optimizations = [];
-        $stats = $this->getPerformanceStats(30);
-        // Check for slow searches
-        if ($stats['average_execution_time'] > 0.5) {
-            $optimizations[] = ['type' => 'slow_searches', 'message' => 'Average search time is high. Consider adding more database indexes.', 'priority' => 'high', 'suggestions' => ['Add indexes on frequently searched columns', 'Implement query result caching', 'Consider using Elasticsearch for complex searches']];
-        }
-        // Check cache hit rates
-        $cacheRates = $this->getCacheHitRates();
-        if ($cacheRates['total_cache_hit_rate'] < 70) {
-            $optimizations[] = ['type' => 'low_cache_hit_rate', 'message' => 'Cache hit rate is low. Consider increasing cache TTL.', 'priority' => 'medium', 'suggestions' => ['Increase cache TTL for search results', 'Implement more aggressive caching strategies', 'Review cache invalidation patterns']];
-        }
-        // Check memory usage
-        if ($stats['memory_usage_stats']['average_memory'] > 50 * 1024 * 1024) {
-            // 50MB
-            $optimizations[] = ['type' => 'high_memory_usage', 'message' => 'High memory usage detected. Consider optimizing queries.', 'priority' => 'medium', 'suggestions' => ['Use LazyCollection for large result sets', 'Implement pagination for search results', 'Optimize database queries with proper indexing']];
-        }
+        return $this->telemetry->inSpan('search.performance.optimize', function (?SpanInterface $span): array {
+            $optimizations = [];
+            $stats = $this->getPerformanceStats(30);
+            $cacheRates = $this->getCacheHitRates();
 
-        return $optimizations;
+            $span?->setAttribute('search.average_execution_time', $stats['average_execution_time'] ?? 0.0);
+            $span?->setAttribute('search.total_cache_hit_rate', $cacheRates['total_cache_hit_rate'] ?? 0.0);
+
+            if ($stats['average_execution_time'] > 0.5) {
+                $optimizations[] = ['type' => 'slow_searches', 'message' => 'Average search time is high. Consider adding more database indexes.', 'priority' => 'high', 'suggestions' => ['Add indexes on frequently searched columns', 'Implement query result caching', 'Consider using Elasticsearch for complex searches']];
+            }
+
+            if ($cacheRates['total_cache_hit_rate'] < 70) {
+                $optimizations[] = ['type' => 'low_cache_hit_rate', 'message' => 'Cache hit rate is low. Consider increasing cache TTL.', 'priority' => 'medium', 'suggestions' => ['Increase cache TTL for search results', 'Implement more aggressive caching strategies', 'Review cache invalidation patterns']];
+            }
+
+            if (($stats['memory_usage_stats']['average_memory'] ?? 0) > 50 * 1024 * 1024) {
+                $optimizations[] = ['type' => 'high_memory_usage', 'message' => 'High memory usage detected. Consider optimizing queries.', 'priority' => 'medium', 'suggestions' => ['Use LazyCollection for large result sets', 'Implement pagination for search results', 'Optimize database queries with proper indexing']];
+            }
+
+            $span?->setAttribute('search.optimization_count', count($optimizations));
+
+            return $optimizations;
+        });
     }
 
     /**

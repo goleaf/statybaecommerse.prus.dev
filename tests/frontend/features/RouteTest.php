@@ -540,10 +540,10 @@ class RouteTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Security Audit');
 
-        // Test system monitoring
-        $response = $this->get('/admin/system-monitoring');
+        // Test observability dashboard
+        $response = $this->get('/admin/observability');
         $response->assertStatus(200);
-        $response->assertSee('System Monitoring');
+        $response->assertSee('Observability');
     }
 
     /**

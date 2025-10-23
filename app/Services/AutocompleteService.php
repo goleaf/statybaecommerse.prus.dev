@@ -16,10 +16,12 @@ use App\Models\Location;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
+use App\Support\Telemetry\TelemetryManager;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+use OpenTelemetry\API\Trace\SpanInterface;
 
 /**
  * AutocompleteService
@@ -47,63 +49,62 @@ final class AutocompleteService
      */
     public function search(string $query, int $limit = self::DEFAULT_LIMIT, array $types = []): array
     {
-        // Respect minimum length at the caller level (LiveSearch component). Allow 1-char searches here.
-        $normalizedQuery = trim($query);
+        /** @var TelemetryManager $telemetry */
+        $telemetry = app(TelemetryManager::class);
 
-        if ($normalizedQuery === '') {
-            return [];
-        }
+        return $telemetry->inSpan('search.autocomplete', function (?SpanInterface $span) use ($query, $limit, $types): array {
+            if (strlen($query) < 1) {
+                return [];
+            }
 
-        $startTime = microtime(true);
-        $cacheKey = $this->generateCacheKey($normalizedQuery, $limit, $types);
+            $span?->setAttribute('search.query_length', strlen($query));
+            $span?->setAttribute('search.limit', $limit);
+            $span?->setAttribute('search.type_count', count($types));
 
-        // Try to get from intelligent cache first
-        $results = $this->cacheService->getCachedResults($cacheKey);
+            $startTime = microtime(true);
+            $cacheKey = $this->generateCacheKey($query, $limit, $types);
 
-        if ($results === null) {
-            $results = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($normalizedQuery, $limit, $types) {
-                $results = [];
-                $locale = app()->getLocale();
-                // If no specific types requested, search all
-                $resolvedTypes = empty($types)
-                    ? ['products', 'categories', 'brands', 'collections', 'attributes']
-                    : $types;
-                // Calculate limits for each type based on total limit
-                $typeLimits = $this->calculateTypeLimits($resolvedTypes, $limit);
-                // Search each type
-                foreach ($resolvedTypes as $type) {
-                    $typeLimit = $typeLimits[$type] ?? 0;
-                    if ($typeLimit > 0) {
-                        $typeResults = $this->searchByType($type, $normalizedQuery, $typeLimit, $locale);
-                        $results = array_merge($results, $typeResults);
+            $cacheService = app(\App\Services\SearchCacheService::class);
+            $results = $cacheService->getCachedResults($cacheKey);
+
+            if ($results === null) {
+                $results = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit, $types) {
+                    $results = [];
+                    $locale = app()->getLocale();
+                    if (empty($types)) {
+                        $types = ['products', 'categories', 'brands', 'collections', 'attributes'];
                     }
-                }
+                    $typeLimits = $this->calculateTypeLimits($types, $limit);
+                    foreach ($types as $type) {
+                        $typeLimit = $typeLimits[$type] ?? 0;
+                        if ($typeLimit > 0) {
+                            $typeResults = $this->searchByType($type, $query, $typeLimit, $locale);
+                            $results = array_merge($results, $typeResults);
+                        }
+                    }
 
-                // Sort by relevance and limit final results
-                return $this->sortByRelevance($results, $normalizedQuery, $limit);
-            });
+                    return $this->sortByRelevance($results, $query, $limit);
+                });
 
-            // Store in intelligent cache
-            $context = [
-                'user_id' => auth()->id(),
-                'types' => empty($types) ? ['products', 'categories', 'brands', 'collections', 'attributes'] : $types,
-                'limit' => $limit,
-            ];
-            $this->cacheService->cacheSearchResults($cacheKey, $results, $normalizedQuery, $context);
-        }
+                $context = [
+                    'user_id' => auth()->id(),
+                    'types' => $types,
+                    'limit' => $limit,
+                ];
+                $cacheService->cacheSearchResults($cacheKey, $results, $query, $context);
+            }
 
-        $executionTime = microtime(true) - $startTime;
+            $executionTime = microtime(true) - $startTime;
+            $span?->setAttribute('search.execution_time', $executionTime);
+            $span?->setAttribute('search.result_count', count($results));
 
-        // Track search analytics
-        $this->trackSearchAnalytics($normalizedQuery, count($results));
+            $this->trackSearchAnalytics($query, count($results));
+            $this->trackSearchPerformance($query, $executionTime, count($results), implode(',', $types));
 
-        // Track performance metrics
-        $this->trackSearchPerformance($normalizedQuery, $executionTime, count($results), implode(',', $types));
-
-        // Apply search highlighting
-        $results = $this->applySearchHighlighting($results, $normalizedQuery);
-
-        return $results;
+            return $this->applySearchHighlighting($results, $query);
+        }, [
+            'search.limit' => $limit,
+        ]);
     }
 
     /**

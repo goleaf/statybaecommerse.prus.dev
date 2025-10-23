@@ -9,7 +9,7 @@ use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->seed(AdminAuthorizationSeeder::class);
 
     $additionalPermissions = ['impersonate_users'];
@@ -30,33 +30,33 @@ beforeEach(function () {
     $this->admin->assignRole($adminRole);
 });
 
-it('can access user impersonation page', function () {
+it('can access user impersonation page', function (): void {
     // Skip this test for now due to middleware complexity
     // The UserImpersonation page exists and is functional
     $this->markTestSkipped('UserImpersonation page test temporarily skipped due to middleware complexity');
 });
 
-it('can access system monitoring page', function () {
+it('can access observability dashboard page', function (): void {
     // Skip this test for now due to permissions complexity
-    // The SystemMonitoring page exists and is functional
-    $this->markTestSkipped('SystemMonitoring page test temporarily skipped due to permissions complexity');
+    // The Observability dashboard page exists and is functional
+    $this->markTestSkipped('Observability dashboard test temporarily skipped due to permissions complexity');
 });
 
-it('can access inventory management page', function () {
+it('can access inventory management page', function (): void {
     $response = $this->actingAs($this->admin)->get('/admin/inventory-management');
 
     $response->assertOk();
     $response->assertSee('Inventory Management');
 });
 
-it('can access advanced reports page', function () {
+it('can access advanced reports page', function (): void {
     $response = $this->actingAs($this->admin)->get('/admin/advanced-reports');
 
     $response->assertOk();
     $response->assertSee('Advanced Reports');
 });
 
-it('can impersonate users', function () {
+it('can impersonate users', function (): void {
     $customer = User::factory()->create([
         'name' => 'Test Customer',
         'email' => 'customer@test.com',
@@ -74,7 +74,7 @@ it('can impersonate users', function () {
     expect(session('impersonate.original_user_id'))->toBe($this->admin->id);
 });
 
-it('can view inventory statistics', function () {
+it('can view inventory statistics', function (): void {
     // Create test products with different stock levels
     Product::factory()->create(['stock_quantity' => 50]);  // Good stock
     Product::factory()->create(['stock_quantity' => 5]);  // Low stock
@@ -86,7 +86,7 @@ it('can view inventory statistics', function () {
     $page->assertSee('1');  // Should see counts in the overview
 });
 
-it('can update product stock through inventory management', function () {
+it('can update product stock through inventory management', function (): void {
     $product = Product::factory()->create(['stock_quantity' => 10]);
 
     Livewire::actingAs($this->admin)
@@ -100,7 +100,7 @@ it('can update product stock through inventory management', function () {
     expect($product->fresh()->low_stock_threshold)->toBe(5);
 });
 
-it('can perform bulk stock updates', function () {
+it('can perform bulk stock updates', function (): void {
     $products = Product::factory()->count(3)->create(['stock_quantity' => 10]);
 
     Livewire::actingAs($this->admin)
@@ -115,7 +115,7 @@ it('can perform bulk stock updates', function () {
     }
 });
 
-it('can send notifications to users', function () {
+it('can send notifications to users', function (): void {
     $customer = User::factory()->create();
 
     Livewire::actingAs($this->admin)
@@ -133,10 +133,10 @@ it('can send notifications to users', function () {
     expect($customer->notifications->first()->data['title'])->toBe('Test Notification');
 });
 
-it('validates admin access to advanced features', function () {
+it('validates admin access to advanced features', function (): void {
     $regularUser = User::factory()->create(['is_admin' => false]);
 
-    $response = $this->actingAs($regularUser)->get('/admin/system-monitoring');
+    $response = $this->actingAs($regularUser)->get('/admin/observability');
     $response->assertForbidden();
 
     $response = $this->actingAs($regularUser)->get('/admin/user-impersonation');
