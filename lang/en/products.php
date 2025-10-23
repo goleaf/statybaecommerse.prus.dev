@@ -92,18 +92,8 @@ return [
     'helpers' => [
         'price_increase' => 'Enter percentage to increase prices (e.g., 10 for 10% increase)',
     ],
-    'matrix' => [
-        'helper_text' => 'Select which SKU groups support each attribute.',
-        'rows' => [
-            'size' => 'Size',
-            'color' => 'Color',
-            'material' => 'Material',
-        ],
-        'columns' => [
-            'primary' => 'Primary SKU',
-            'bundle' => 'Bundle SKU',
-            'limited' => 'Limited edition SKU',
-        ],
+    'sparkline' => [
+        'revenue_label' => 'Revenue over the last :days days',
     ],
     'widgets' => [
         'total_products' => 'Total Products',

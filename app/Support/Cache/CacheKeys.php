@@ -52,6 +52,14 @@ final class CacheKeys
         return 'user:aggregate';
     }
 
+    /**
+     * Build the cache key for customer order activity sparklines.
+     */
+    public static function customerOrdersSeries(int $customerId, int $days): string
+    {
+        return sprintf('customer:series:orders:%d:%d', $customerId, $days);
+    }
+
     public static function orderAggregateTag(): string
     {
         return 'order:aggregate';
@@ -116,6 +124,14 @@ final class CacheKeys
     public static function productLatestList(int $limit): string
     {
         return sprintf('product:latest:list:%d', $limit);
+    }
+
+    /**
+     * Build the cache key for sparkline-ready product sales series.
+     */
+    public static function productSalesSeries(int $productId, int $days): string
+    {
+        return sprintf('product:series:sales:%d:%d', $productId, $days);
     }
 
     public static function categoryPopularList(int $limit): string

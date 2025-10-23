@@ -15,9 +15,9 @@ use App\Filament\Resources\ProductResource\RelationManagers\ReviewsRelationManag
 use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
 use App\Filament\Widgets\InlineCharts\ProductSales30DaysChart;
 use App\Models\Product;
-use App\Support\Seo\LocaleUrlGenerator;
+use App\Filament\Widgets\InlineCharts\ProductSalesSparkline;
 use App\Support\Authorization\AuthorizationMatrix;
-use App\Support\Forms\MatrixFactory;
+use App\Support\Seo\LocaleUrlGenerator;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\ActionGroup;
@@ -69,7 +69,7 @@ use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
+use LaraZeus\InlineChart\Tables\Columns\InlineChart;
 
 /**
  * ProductResource
@@ -523,13 +523,13 @@ final class ProductResource extends Resource implements DefinesExportColumns
                     ->label(__('products.fields.price'))
                     ->money('EUR')
                     ->sortable(),
-                InlineChartColumn::make('sales_30d')
-                    ->label(__('Sales (30d)'))
-                    ->chart(ProductSales30DaysChart::class)
-                    ->maxWidth(300)
-                    ->maxHeight(60)
-                    ->description(__('Last 30 days of sold units'))
-                    ->toggleable(),
+                // Inline revenue sparkline powered by the cached product series helper.
+                InlineChart::make('sales_sparkline')
+                    ->label(__('products.fields.sales_trend'))
+                    ->chart(ProductSalesSparkline::class)
+                    ->maxWidth(160)
+                    ->maxHeight(48)
+                    ->icon('heroicon-o-chart-bar'),
                 TextColumn::make('stock_quantity')
                     ->label(__('products.fields.stock'))
                     ->sortable()

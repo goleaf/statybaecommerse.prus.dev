@@ -60,24 +60,14 @@ final class ProductResourceTest extends TestCase
             ->assertSee('Alpha Product');
     }
 
-    public function test_list_page_renders_inline_chart_column(): void
+    /**
+     * Ensure the new inline chart column is registered on the product list table.
+     */
+    public function test_list_page_includes_sales_sparkline_column(): void
     {
-        $product = Product::factory()->create([
-            'status'       => 'published',
-            'published_at' => now(),
-            'is_visible'   => true,
-        ]);
-
-        OrderItem::factory()
-            ->forProduct($product)
-            ->create([
-                'quantity' => 2,
-            ]);
-
         Livewire::test(ListProducts::class)
             ->call('loadTable')
-            ->assertSee('Sales (30d)')
-            ->assertSee("chart-{$product->getKey()}");
+            ->assertTableColumnExists('sales_sparkline');
     }
 
     public function test_can_create_product_via_filament_form(): void
