@@ -6,72 +6,76 @@ namespace App\Http\Middleware;
 
 use App\Models\ApiKey;
 use Closure;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 final class EnsurePartnerApiKey
 {
-    private const API_KEY_HEADER = 'X-Api-Key';
-
-    /**
-     * Handle an incoming partner API request.
-     */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, string ...$requiredScopes): Response
     {
-        $this->registerRequestMacros();
+        $providedKey = $this->resolveProvidedKey($request);
 
-        $keyValue = trim((string) $request->header(self::API_KEY_HEADER, ''));
-
-        if ($keyValue === '') {
-            return response()->json([
-                'message' => 'Missing partner API key.',
-            ], 401);
+        if ($providedKey === null) {
+            $this->reject('Missing partner API key.', Response::HTTP_UNAUTHORIZED);
         }
 
-        $apiKey = ApiKey::query()
-            ->active()
-            ->where('key', $keyValue)
-            ->first();
+        $apiKey = $this->findActiveKey($providedKey);
 
-        if (! $apiKey || $apiKey->isExpired()) {
-            return response()->json([
-                'message' => 'The provided API key is invalid or inactive.',
-            ], 403);
+        if ($apiKey === null) {
+            $this->reject('Invalid or inactive partner API key.', Response::HTTP_FORBIDDEN);
         }
 
-        $apiKey->markAsUsed();
+        if ($requiredScopes !== [] && ! $apiKey->hasAnyScope($requiredScopes)) {
+            $this->reject('Insufficient partner API permissions.', Response::HTTP_FORBIDDEN);
+        }
 
-        $abilities = $apiKey->resolvedAbilities();
+        $apiKey->forceFill(['last_used_at' => now()])->saveQuietly();
 
-        $request->attributes->set('partner.api_key', $apiKey);
-        $request->attributes->set('partner.api_abilities', $abilities);
+        $abilities = $apiKey->resolvedScopes();
+
+        $request->attributes->set('partner_api_key', $apiKey);
+        $request->attributes->set('partner_api_abilities', $abilities);
+
+        if ($requiredScopes !== []) {
+            $request->attributes->set('partner_api_required_scopes', array_values($requiredScopes));
+        }
 
         return $next($request);
     }
 
-    private function registerRequestMacros(): void
+    private function resolveProvidedKey(Request $request): ?string
     {
-        if (! Request::hasMacro('partnerApiKey')) {
-            Request::macro('partnerApiKey', static function (): ?ApiKey {
-                /** @var Request $this */
-                return $this->attributes->get('partner.api_key');
-            });
+        $header = $request->headers->get('X-Api-Key');
+
+        if (! is_string($header)) {
+            return null;
         }
 
-        if (! Request::hasMacro('partnerApiAbilities')) {
-            Request::macro('partnerApiAbilities', static function (): array {
-                /** @var Request $this */
-                return $this->attributes->get('partner.api_abilities', []);
-            });
-        }
+        $trimmed = trim($header);
 
-        if (! Request::hasMacro('partnerCan')) {
-            Request::macro('partnerCan', static function (string $ability): bool {
-                /** @var Request $this */
-                $abilities = $this->partnerApiAbilities();
+        return $trimmed !== '' ? $trimmed : null;
+    }
 
-                return \in_array('*', $abilities, true) || \in_array($ability, $abilities, true);
-            });
-        }
+    private function findActiveKey(string $plainText): ?ApiKey
+    {
+        $hashed = ApiKey::hashKey($plainText);
+
+        /** @var ApiKey|null $apiKey */
+        $apiKey = ApiKey::query()
+            ->where('key', $hashed)
+            ->where('active', true)
+            ->first();
+
+        return $apiKey;
+    }
+
+    private function reject(string $message, int $status): never
+    {
+        throw new HttpResponseException(
+            response()->json([
+                'message' => $message,
+            ], $status)
+        );
     }
 }

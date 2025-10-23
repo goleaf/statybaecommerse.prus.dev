@@ -121,9 +121,9 @@ final class ApiKey extends Model
     /**
      * Determine if the API key has the given scope.
      */
-    protected $appends = [
-        'rate_limit',
-    ];
+    public function hasScope(string $scope): bool
+    {
+        $scopes = $this->resolvedScopes();
 
     /**
      * @var list<string>
@@ -187,7 +187,7 @@ final class ApiKey extends Model
             return Str::mask($key, '*', 0);
         }
 
-        $assignedScopes = $this->scopes ?? [];
+        $assignedScopes = $this->resolvedScopes();
 
         if (in_array('*', $assignedScopes, true)) {
             return true;
@@ -197,7 +197,21 @@ final class ApiKey extends Model
     }
 
     /**
-     * @return array{key: string, secret: string}
+     * Retrieve the sanitised scopes assigned to the API key.
+     *
+     * @return array<int, string>
+     */
+    public function resolvedScopes(): array
+    {
+        return Collection::make(Arr::wrap($this->scopes))
+            ->filter(static fn ($scope): bool => is_string($scope) && $scope !== '')
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Determine if the API key meets its configured rate limit for the given request count.
      */
     public function regenerateCredentials(): array
     {
