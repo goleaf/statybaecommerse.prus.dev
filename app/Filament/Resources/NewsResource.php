@@ -11,6 +11,7 @@ use App\Models\News;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Forms;
+use Filament\Forms\Get;
 use Filament\Forms\Form;
 use Filament\Infolists;
 use Filament\Notifications\Notification;
@@ -22,6 +23,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Filament\Notifications\Notification;
 
 class NewsResource extends Resource
@@ -42,29 +44,46 @@ class NewsResource extends Resource
     {
         return $form->components([
             Forms\Components\Section::make('Article Information')
-                ->components([
-                    LanguageTabs::make([
-                        Forms\Components\TextInput::make('title')
-                            ->label(__('news.fields.title'))
-                            ->required()
-                            ->maxLength(255)
-                            ->live()
-                            ->afterStateUpdated(function (?string $state, callable $set): void {
-                                $set('slug', \Illuminate\Support\Str::slug((string) $state));
-                            }),
-                        Forms\Components\TextInput::make('slug')
-                            ->label(__('news.fields.slug'))
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\Textarea::make('summary')
-                            ->label(__('news.fields.excerpt'))
-                            ->maxLength(500)
-                            ->rows(3),
-                        Forms\Components\RichEditor::make('content')
-                            ->label(__('news.fields.content'))
-                            ->required()
-                            ->columnSpanFull(),
-                    ])->columnSpanFull(),
+                ->schema([
+                    Forms\Components\TextInput::make('title')
+                        ->label(__('news.fields.title'))
+                        ->required()
+                        ->maxLength(255)
+                        ->live()
+                        ->afterStateUpdated(fn ($state, callable $set) => $set('slug', \Illuminate\Support\Str::slug($state))),
+                    Forms\Components\Hidden::make('current_locale')
+                        ->default(fn (): string => app()->getLocale())
+                        ->dehydrated(false),
+                    Forms\Components\TextInput::make('slug')
+                        ->label(__('news.fields.slug'))
+                        ->required()
+                        ->maxLength(255)
+                        ->rules(function (Get $get, ?News $record): array {
+                            $locale = $get('current_locale') ?? app()->getLocale();
+
+                            $rule = Rule::unique('news_translations', 'slug')
+                                ->where(fn ($query) => $query->where('locale', $locale));
+
+                            if ($record) {
+                                $translationId = $record->translations()
+                                    ->where('locale', $locale)
+                                    ->value('id');
+
+                                if ($translationId) {
+                                    $rule->ignore($translationId);
+                                }
+                            }
+
+                            return [$rule];
+                        }),
+                    Forms\Components\Textarea::make('excerpt')
+                        ->label(__('news.fields.excerpt'))
+                        ->maxLength(500)
+                        ->rows(3),
+                    Forms\Components\RichEditor::make('content')
+                        ->label(__('news.fields.content'))
+                        ->required()
+                        ->columnSpanFull(),
                 ])
                 ->columns(1),
             Forms\Components\Section::make('Publishing')
