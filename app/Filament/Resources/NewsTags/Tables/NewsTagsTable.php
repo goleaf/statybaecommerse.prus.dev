@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsTags\Tables;
 
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
+use App\Models\NewsTag;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
@@ -56,7 +57,7 @@ class NewsTagsTable
                         'primary' => fn ($state): bool => $state === '#3B82F6',
                         'success' => fn ($state): bool => $state === '#10B981',
                         'warning' => fn ($state): bool => $state === '#F59E0B',
-                        'danger'  => fn ($state): bool => $state === '#EF4444',
+                        'danger' => fn ($state): bool => $state === '#EF4444',
                     ])
                     ->formatStateUsing(fn ($state): string => $state ?? '#3B82F6')
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -146,8 +147,8 @@ class NewsTagsTable
                     ->color('info')
                     ->action(function (NewsTag $record): void {
                         $newTag = $record->replicate();
-                        $newTag->name = $record->name . ' (Copy)';
-                        $newTag->slug = $record->slug . '-copy';
+                        $newTag->name = $record->name.' (Copy)';
+                        $newTag->slug = $record->slug.'-copy';
                         $newTag->save();
 
                         Notification::make()
@@ -194,8 +195,8 @@ class NewsTagsTable
                         ->action(function (Collection $records): void {
                             $records->each(function (NewsTag $record): void {
                                 $newTag = $record->replicate();
-                                $newTag->name = $record->name . ' (Copy)';
-                                $newTag->slug = $record->slug . '-copy';
+                                $newTag->name = $record->name.' (Copy)';
+                                $newTag->slug = $record->slug.'-copy';
                                 $newTag->save();
                             });
 
