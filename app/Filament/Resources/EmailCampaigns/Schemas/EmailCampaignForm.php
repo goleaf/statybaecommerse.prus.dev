@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\EmailCampaigns\Schemas;
 
-use App\Support\Filament\Components\Flatpickr;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
@@ -68,12 +68,12 @@ class EmailCampaignForm
                             ]),
                         Grid::make(2)
                             ->schema([
-                                Flatpickr::makeDateTime('scheduled_at')
+                                DateTimePicker::make('scheduled_at')
                                     ->label('Scheduled at'),
-                                Flatpickr::makeDateTime('sent_at')
+                                DateTimePicker::make('sent_at')
                                     ->label('Sent at'),
                             ]),
-                        Flatpickr::makeDateTime('completed_at')
+                        DateTimePicker::make('completed_at')
                             ->label('Completed at'),
                         Textarea::make('target_audience')
                             ->label('Target audience')

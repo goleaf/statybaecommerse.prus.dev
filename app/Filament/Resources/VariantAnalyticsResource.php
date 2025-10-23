@@ -100,9 +100,13 @@ final class VariantAnalyticsResource extends Resource
                                                     ->searchable()
                                                     ->preload()
                                                     ->live()
-                                                    ->afterStateUpdated(static function (int|string|null $state, callable $set): void {
-                                                        if ($state === null || $state === '') {
-                                                            return;
+                                                    ->afterStateUpdated(function ($state, callable $set): void {
+                                                        if ($state) {
+                                                            $variant = \App\Models\ProductVariant::find($state);
+                                                            if ($variant) {
+                                                                $set('variant_name', $variant->name);
+                                                                $set('product_name', $variant->product->name ?? '');
+                                                            }
                                                         }
 
                                                         $variant = \App\Models\ProductVariant::find($state);

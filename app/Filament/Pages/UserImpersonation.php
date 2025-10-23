@@ -7,7 +7,6 @@ namespace App\Filament\Pages;
 use App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
 use App\Models\User;
 use BackedEnum;
-use UnitEnum;
 use Filament\Pages\Page;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
