@@ -8,7 +8,7 @@ use App\Filament\Resources\AdminUserResource\Pages;
 use App\Models\AdminUser;
 use App\Support\Concerns\HasNav;
 use App\Support\Filament\Components\Flatpickr;
-use BackedEnum;
+use DateTimeInterface;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -29,10 +29,8 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 final class AdminUserResource extends Resource
 {
@@ -42,12 +40,10 @@ final class AdminUserResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): string
     {
         return 'heroicon-o-document-text';
     }
-
-    
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -69,7 +65,7 @@ final class AdminUserResource extends Resource
      * Configure the Filament form schema using the v4 Schema contract so the
      * resource signature remains compatible with the upstream Resource base class.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             SchemaSection::make(__('admin.admin_users.form.sections.basic_information'))
@@ -96,8 +92,8 @@ final class AdminUserResource extends Resource
                                 ->password()
                                 ->required(fn (string $context): bool => $context === 'create')
                                 ->minLength(8)
-                                ->dehydrated(fn ($state) => filled($state))
-                                ->dehydrateStateUsing(fn ($state) => filled($state) ? bcrypt($state) : null)
+                                ->dehydrated(fn (?string $state): bool => filled($state))
+                                ->dehydrateStateUsing(fn (?string $state): ?string => filled($state) ? bcrypt($state) : null)
                                 ->columnSpan(1),
                             TextInput::make('password_confirmation')
                                 ->label(__('admin.admin_users.form.fields.password_confirmation'))
@@ -112,13 +108,43 @@ final class AdminUserResource extends Resource
                 ->schema([
                     Placeholder::make('email_verified_at')
                         ->label(__('admin.admin_users.form.fields.email_verified_at'))
-                        ->content(fn ($record) => $record?->email_verified_at?->format('Y-m-d H:i:s') ?? '-'),
+                        ->content(function (?AdminUser $record): string {
+                            // Provide a predictable placeholder when the record is still being created.
+                            /** @var DateTimeInterface|null $timestamp */
+                            $timestamp = $record?->email_verified_at;
+
+                            if (! $timestamp instanceof DateTimeInterface) {
+                                return '-';
+                            }
+
+                            return $timestamp->format('Y-m-d H:i:s');
+                        }),
                     Placeholder::make('created_at')
                         ->label(__('admin.admin_users.form.fields.created_at'))
-                        ->content(fn ($record) => $record?->created_at?->format('Y-m-d H:i:s') ?? '-'),
+                        ->content(function (?AdminUser $record): string {
+                            // Avoid dereferencing null timestamps before the model is persisted to the database.
+                            /** @var DateTimeInterface|null $timestamp */
+                            $timestamp = $record?->created_at;
+
+                            if (! $timestamp instanceof DateTimeInterface) {
+                                return '-';
+                            }
+
+                            return $timestamp->format('Y-m-d H:i:s');
+                        }),
                     Placeholder::make('updated_at')
                         ->label(__('admin.admin_users.form.fields.updated_at'))
-                        ->content(fn ($record) => $record?->updated_at?->format('Y-m-d H:i:s') ?? '-'),
+                        ->content(function (?AdminUser $record): string {
+                            // Keep the audit detail consistent by collapsing null values into a dash indicator.
+                            /** @var DateTimeInterface|null $timestamp */
+                            $timestamp = $record?->updated_at;
+
+                            if (! $timestamp instanceof DateTimeInterface) {
+                                return '-';
+                            }
+
+                            return $timestamp->format('Y-m-d H:i:s');
+                        }),
                 ])
                 ->columns(2),
             SchemaSection::make(__('admin.admin_users.form.sections.roles_permissions'))
@@ -144,7 +170,7 @@ final class AdminUserResource extends Resource
      * Configure the Filament table while returning the Table instance to satisfy
      * Filament v4's stricter resource method typing.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -181,7 +207,12 @@ final class AdminUserResource extends Resource
                     ->query(function (Builder $query, array $data): Builder {
                         return $query->when(
                             $data['value'] ?? null,
-                            function (Builder $query, $value): Builder {
+                            function (Builder $query, mixed $value): Builder {
+                                // Guard against unexpected types so the filter gracefully becomes a no-op.
+                                if (! is_string($value)) {
+                                    return $query;
+                                }
+
                                 return match ($value) {
                                     'verified'   => $query->whereNotNull('email_verified_at'),
                                     'unverified' => $query->whereNull('email_verified_at'),
@@ -202,11 +233,25 @@ final class AdminUserResource extends Resource
                         return $query
                             ->when(
                                 $data['from'] ?? null,
-                                fn (Builder $q, $date): Builder => $q->whereDate('created_at', '>=', $date)
+                                function (Builder $q, mixed $date): Builder {
+                                    // Bail out if the picker returns an unexpected payload.
+                                    if (! is_string($date)) {
+                                        return $q;
+                                    }
+
+                                    return $q->whereDate('created_at', '>=', $date);
+                                }
                             )
                             ->when(
                                 $data['until'] ?? null,
-                                fn (Builder $q, $date): Builder => $q->whereDate('created_at', '<=', $date)
+                                function (Builder $q, mixed $date): Builder {
+                                    // Apply the upper bound only when the filter contains a valid date string.
+                                    if (! is_string($date)) {
+                                        return $q;
+                                    }
+
+                                    return $q->whereDate('created_at', '<=', $date);
+                                }
                             );
                     }),
                 Filter::make('recent')
@@ -221,8 +266,14 @@ final class AdminUserResource extends Resource
                     ->label(__('admin.admin_users.actions.verify_email'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
+                    ->visible(function (AdminUser $record): bool {
+                        // Hide the manual override once the admin already confirmed their email.
+                        return blank($record->email_verified_at);
+                    })
                     ->action(function (AdminUser $record): void {
-                        $record->update(['email_verified_at' => now()]);
+                        // Delegate to the model helper so both single and bulk flows share the same logic.
+                        $record->markEmailAsVerified();
+
                         FilamentNotification::make()
                             ->title(__('admin.admin_users.notifications.email_verified_successfully'))
                             ->success()
@@ -232,8 +283,12 @@ final class AdminUserResource extends Resource
                     ->label(__('admin.admin_users.actions.send_verification'))
                     ->icon('heroicon-o-envelope')
                     ->color('info')
+                    ->visible(function (AdminUser $record): bool {
+                        // Only allow resending the verification email while the account is still pending.
+                        return blank($record->email_verified_at);
+                    })
                     ->action(function (AdminUser $record): void {
-                        // Send verification email logic here
+                        // Placeholder for the outbound email workflow to keep operators informed in the UI.
                         FilamentNotification::make()
                             ->title(__('admin.admin_users.notifications.verification_sent_successfully'))
                             ->success()
@@ -250,9 +305,16 @@ final class AdminUserResource extends Resource
                         // Enable access to the selected records collection within the handler.
                         ->accessSelectedRecords()
                         ->action(function (Collection $records): void {
-                            $records->each(function (AdminUser $record): void {
-                                $record->update(['email_verified_at' => now()]);
+                            /** @var Collection<int, AdminUser> $records */
+                            $records->each(function (AdminUser $record, int|string $key): void {
+                                // Skip records that already hold a verification timestamp to keep auditing clean.
+                                if ($record->hasVerifiedEmail()) {
+                                    return;
+                                }
+
+                                $record->markEmailAsVerified();
                             });
+
                             FilamentNotification::make()
                                 ->title(__('admin.admin_users.notifications.emails_verified_successfully'))
                                 ->success()
@@ -265,7 +327,16 @@ final class AdminUserResource extends Resource
                         // Allow the callback to iterate through the selected records.
                         ->accessSelectedRecords()
                         ->action(function (Collection $records): void {
-                            // Send verification emails logic here
+                            // Only target the addresses that still need a reminder to prevent duplicates.
+                            /** @var Collection<int, AdminUser> $records */
+                            $records->each(function (AdminUser $record, int|string $key): void {
+                                if ($record->hasVerifiedEmail()) {
+                                    return;
+                                }
+
+                                // Send verification emails logic here
+                            });
+
                             FilamentNotification::make()
                                 ->title(__('admin.admin_users.notifications.verifications_sent_successfully'))
                                 ->success()
