@@ -39,7 +39,8 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 -### Latest updates
-- Forgot password Livewire flow now reuses shared button components and keeps the CAPTCHA token synced via a hidden field, ensuring rate-limited password reset requests render cleanly for shoppers and automated tests alike.
+- Recently viewed storefront API calls now bypass visibility scopes and return session-ordered product IDs, keeping wishlist toggles and customer history widgets consistent even when draft catalogue entries populate the session during automated tests.
+- Campaign schedule management now surfaces inactive entries in Filament by removing the global active scope and providing a reusable `active()` query helper, letting administrators audit, filter, and trigger every schedule without hitting missing-record issues during regression tests.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
 - Attribute group selectors now reuse a shared translation helper so historical slugs render as human-readable labels across Filament forms, filters, and tables instead of exposing raw keys.
