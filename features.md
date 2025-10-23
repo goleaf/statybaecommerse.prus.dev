@@ -28,7 +28,7 @@
 - The custom Edit Profile page now imports `Filament\\Schemas\\Schema`, keeping the authentication profile form aligned with v4 expectations and preventing namespace-related fatal errors during automated test cycles.
 - Discount Redemption navigation now lives under the Marketing group with a warning badge and Filament v4 badge styling, and the Pest harness includes a HasTable-aware stub so table schemas are exercised reliably in unit tests.
 - Pest test bootstrap helpers now guard the `login()`, `get()`, and `post()` helpers with function-existence checks so repeated includes during `php artisan test` runs no longer trigger fatal redeclaration errors.
-- PHPUnit and Pest now share a persistent `database/testing.sqlite` connection with forced refreshes at setup, eliminating missing-table factory errors during feature API tests.
+- Address autocomplete builders now emit top-level metadata and skip user-owned scopes, keeping admin search suggestions accurate for support agents who are not impersonating a specific shopper.
 - Added a foundational `customer_groups` migration so later schema updates (extra permissions, soft deletes, translations) apply cleanly during `php artisan migrate:fresh --seed` runs.
 - Filament resources, relation managers, and admin-only pages now target the v4 Schema API with normalized navigation icon docblocks, preserving enum-aware metadata resolution across the upgraded form, table, and infolist builders.
 - Analytics event dashboards and rate limiting diagnostics now skip restrictive scopes in console contexts, fall back to raw configuration when container bindings are missing, and unhide disabled brands, keeping Pest unit suites and Filament tooling reliable during maintenance.
