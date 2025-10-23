@@ -18,7 +18,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
+use Filament\Schemas\Components\Grid as FormGrid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -62,14 +62,9 @@ final class SystemSettingTranslationResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static $navigationIcon = 'heroicon-o-document-text';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Settings';
+    protected static string|\UnitEnum|null $navigationGroup = 'Settings';
 
     public static function getNavigationLabel(): string
     {
@@ -86,10 +81,9 @@ final class SystemSettingTranslationResource extends Resource
         return __('admin.system_setting_translations.model_label');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form
+        return $schema
             ->schema([
                 Tabs::make('Translation Details')
                     ->tabs([

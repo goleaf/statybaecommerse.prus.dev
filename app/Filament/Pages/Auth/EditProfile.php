@@ -7,8 +7,8 @@ namespace App\Filament\Pages\Auth;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -19,9 +19,8 @@ use Filament\Schemas\Schema;
 
 class EditProfile extends BaseEditProfile
 {
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-        // Configure the Filament resource form schema using the v4 Schema API.
         return $schema
             ->components([
                 Section::make(__('admin.profile.personal_information'))

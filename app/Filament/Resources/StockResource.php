@@ -46,7 +46,7 @@ final class StockResource extends Resource
 
     protected static ?string $model = Inventory::class;
 
-    protected static string|UnitEnum|null $navigationGroup = 'Inventory';
+    protected static string|\UnitEnum|null $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 7;
 
@@ -67,10 +67,9 @@ final class StockResource extends Resource
         return __('inventory.single');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('inventory.product_information'))
                 ->schema([
                     Grid::make(2)

@@ -26,9 +26,9 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid as FormGrid;
+use Filament\Schemas\Components\Grid as FormGrid;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section as FormSection;
+use Filament\Schemas\Components\Section as FormSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -110,10 +110,9 @@ final class WishlistItemResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form
+        return $schema
             ->schema([
                 FormSection::make(__('admin.wishlist_items.sections.basic_info'))
                     ->description(__('admin.wishlist_items.sections.basic_info_description'))

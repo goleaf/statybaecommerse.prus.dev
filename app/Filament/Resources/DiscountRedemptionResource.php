@@ -73,10 +73,9 @@ final class DiscountRedemptionResource extends Resource
         return __('admin.discount_redemptions.single');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('discount_redemptions.sections.associations'))
                 ->schema([
                     Grid::make(2)

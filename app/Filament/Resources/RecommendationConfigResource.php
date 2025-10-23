@@ -34,7 +34,7 @@ final class RecommendationConfigResource extends Resource
 
     protected static ?string $model = RecommendationConfig::class;
 
-    protected static string|UnitEnum|null $navigationGroup = 'Analytics';
+    protected static string|\UnitEnum|null $navigationGroup = 'Analytics';
 
     protected static ?int $navigationSort = 11;
 
@@ -55,10 +55,9 @@ final class RecommendationConfigResource extends Resource
         return __('recommendation_configs.single');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('recommendation_config.sections.basic_info'))
                 ->schema([
                     Grid::make(2)

@@ -34,10 +34,9 @@ final class ProductsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Products';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-        // Bridge the relation manager form to the Schema-based builder expected by Filament v4.
-        return $form->schema([
+        return $schema->schema([
             TextInput::make('name')
                 ->label(__('products.name'))
                 ->required()

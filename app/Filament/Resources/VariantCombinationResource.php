@@ -49,14 +49,9 @@ final class VariantCombinationResource extends Resource
 
     protected static ?string $model = VariantCombination::class;
 
-    /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-squares-2x2';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Inventory';
+    protected static string|\UnitEnum|null $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 19;
 
@@ -75,10 +70,9 @@ final class VariantCombinationResource extends Resource
         return __('admin.variant_combinations.model_label');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form
+        return $schema
             ->components([
                 Section::make(__('admin.variant_combinations.basic_information'))
                     ->description(__('admin.variant_combinations.basic_information_description'))

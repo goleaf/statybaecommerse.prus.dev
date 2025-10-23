@@ -35,7 +35,7 @@ class NewsResource extends Resource
     protected static ?string $model = News::class;
 
     /** @phpstan-var string|BackedEnum|null */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-newspaper';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-newspaper';
 
     protected static ?int $navigationSort = 1;
 
@@ -43,10 +43,9 @@ class NewsResource extends Resource
 
     protected static ?string $pluralModelLabel = 'News Articles';
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form->components([
+        return $schema->components([
             Forms\Components\Section::make('Article Information')
                 ->components([
                     LanguageTabs::make([

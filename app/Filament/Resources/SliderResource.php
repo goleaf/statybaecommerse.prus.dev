@@ -50,14 +50,9 @@ final class SliderResource extends Resource
 
     protected static ?string $model = Slider::class;
 
-    /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Content';
+    protected static string|\UnitEnum|null $navigationGroup = 'Content';
 
     protected static ?int $navigationSort = 4;
 
@@ -87,10 +82,9 @@ final class SliderResource extends Resource
         return __('sliders.single');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('sliders.basic_information'))
                 ->schema([
                     Grid::make(2)

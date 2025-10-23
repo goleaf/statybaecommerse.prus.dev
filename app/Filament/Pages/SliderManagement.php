@@ -17,11 +17,11 @@ use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
@@ -45,7 +45,9 @@ class SliderManagement extends Page implements HasActions, HasForms
     /**
      * @var string|BackedEnum|null Navigation icon override documented to support enums without extra imports.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    /** @var string|\BackedEnum|null */
+
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationLabel = 'Slider Management';
 

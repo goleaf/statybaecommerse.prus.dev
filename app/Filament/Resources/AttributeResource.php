@@ -35,12 +35,7 @@ final class AttributeResource extends Resource
 
     protected static ?string $model = Attribute::class;
 
-    /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static $navigationIcon = 'heroicon-o-tag';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-tag';
 
     public static function getNavigationGroup(): string|UnitEnum|null
     {
@@ -66,10 +61,9 @@ final class AttributeResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('attributes.basic_information'))
                 ->schema([
                     Grid::make(2)

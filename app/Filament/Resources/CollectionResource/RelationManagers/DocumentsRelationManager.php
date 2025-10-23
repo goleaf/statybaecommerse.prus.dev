@@ -22,10 +22,9 @@ final class DocumentsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Collection Documents';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-        // Bridge the relation manager form to the Schema-based builder expected by Filament v4.
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Select::make('document_template_id')
                     ->label(__('admin.documents.fields.template'))

@@ -16,11 +16,13 @@ use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\AddressSearch;
 use App\Support\Search\CustomerSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
-use Filament\Forms\Components\Grid;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Schema;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -105,10 +107,8 @@ final class AddressResource extends Resource
      * Keeping the Form wrapper avoids mismatches with auto-discovery checks that expect Filament
      * resource signatures to follow the documented `Form $form` pattern during application boot.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Return the schema instance so that the resource complies with the
-        // Filament v4 expectations introduced by the Schema-based APIs.
         return $schema->schema([
             Section::make(__('translations.address_information'))
                 ->components([

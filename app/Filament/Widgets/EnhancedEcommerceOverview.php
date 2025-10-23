@@ -19,10 +19,10 @@ final class EnhancedEcommerceOverview extends StatsOverviewWidget
     /**
      * @var string|\BackedEnum|null Navigation icon override so marketing teams recognise the widget quickly.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-presentation-chart-line';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-presentation-chart-line';
 
     /** @var string|UnitEnum|null Ensure the widget stays surfaced within the dashboard group. */
-    protected static UnitEnum|string|null $navigationGroup = 'Dashboard';
+    protected static string|\UnitEnum|null $navigationGroup = 'Dashboard';
 
     /**
      * Localize the navigation label to align with analytics translations.

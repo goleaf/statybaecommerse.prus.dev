@@ -25,10 +25,9 @@ final class VariantsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Product Variants';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-        // Bridge the relation manager form to the Schema-based builder expected by Filament v4.
-        return $form
+        return $schema
             ->components([
                 Forms\Components\TextInput::make('name')
                     ->label(__('admin.products.fields.variant_name'))

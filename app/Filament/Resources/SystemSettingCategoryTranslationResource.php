@@ -48,10 +48,9 @@ final class SystemSettingCategoryTranslationResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    /** @var string|BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-language';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-language';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Settings';
+    protected static string|\UnitEnum|null $navigationGroup = 'Settings';
 
     protected static bool $shouldRegisterNavigation = false;
 
@@ -70,10 +69,9 @@ final class SystemSettingCategoryTranslationResource extends Resource
         return __('admin.system_setting_category_translations.model_label');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('admin.system_setting_category_translations.basic_information'))
                 ->schema([
                     Grid::make(2)

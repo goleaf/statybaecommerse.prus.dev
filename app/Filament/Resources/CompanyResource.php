@@ -53,10 +53,9 @@ final class CompanyResource extends Resource
     /**
      * Build the form schema for creating and editing companies.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form->schema([
+        return $schema->schema([
             Forms\Components\Section::make(__('companies.basic_information'))
                 ->schema([
                     Forms\Components\Grid::make(2)

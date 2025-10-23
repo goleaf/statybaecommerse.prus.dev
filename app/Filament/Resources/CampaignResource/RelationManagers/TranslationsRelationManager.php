@@ -27,10 +27,9 @@ final class TranslationsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Translations';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-        // Bridge the relation manager form to the Schema-based builder expected by Filament v4.
-        return $form->schema([
+        return $schema->schema([
             // Select helper keeps locale choices consistent across the admin panel.
             Select::make('locale')
                 ->label($this->label('Locale'))

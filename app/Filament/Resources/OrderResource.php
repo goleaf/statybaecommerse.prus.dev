@@ -200,10 +200,9 @@ final class OrderResource extends Resource implements DefinesExportColumns
     /**
      * Configure the comprehensive form schema with advanced features.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('orders.sections.order_details'))
                 ->description(__('orders.sections.customer_information'))
                 ->icon('heroicon-o-information-circle')

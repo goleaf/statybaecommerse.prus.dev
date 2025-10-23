@@ -21,10 +21,9 @@ final class CommentsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Comments';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-        // Bridge the relation manager form to the Schema-based builder expected by Filament v4.
-        return $form
+        return $schema
             ->components([
                 Forms\Components\TextInput::make('author_name')
                     ->label(__('news.fields.author_name'))

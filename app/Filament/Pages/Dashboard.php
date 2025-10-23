@@ -16,7 +16,7 @@ class Dashboard extends BaseDashboard
      *
      * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static $navigationIcon = 'heroicon-o-home';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-home';
 
     protected static ?string $title = 'Dashboard';
 

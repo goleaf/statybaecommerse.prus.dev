@@ -43,7 +43,7 @@ final class ReferralCodeStatisticsResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'date';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Analytics';
+    protected static string|\UnitEnum|null $navigationGroup = 'Analytics';
 
     public static function getNavigationLabel(): string
     {
@@ -60,10 +60,9 @@ final class ReferralCodeStatisticsResource extends Resource
         return __('admin.referral_code_statistics.model_label');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.referral_code_statistics.basic_information'))
                     ->schema([

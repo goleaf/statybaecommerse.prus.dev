@@ -54,10 +54,9 @@ class StockMovementsRelationManager extends BaseRelationManager
         return __('inventory.stock_movements');
     }
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-        // Bridge the relation manager form to the Schema-based builder expected by Filament v4.
-        return $form
+        return $schema
             ->components([
                 Quantity::make('quantity')
                     ->label(__('inventory.quantity'))

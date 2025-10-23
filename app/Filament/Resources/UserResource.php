@@ -57,7 +57,7 @@ final class UserResource extends Resource implements DefinesExportColumns
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Users';
+    protected static string|\UnitEnum|null $navigationGroup = 'Users';
 
     public static function shouldRegisterNavigation(): bool
     {
@@ -128,10 +128,9 @@ final class UserResource extends Resource implements DefinesExportColumns
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('users.sections.basic_info'))
                     ->schema([

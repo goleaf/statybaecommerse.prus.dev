@@ -47,10 +47,10 @@ final class EnumValueResource extends Resource
     protected static ?string $model = EnumValue::class;
 
     /** @var string|\BackedEnum|null Provide a consistent icon for value maintenance. */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-squares-2x2';
 
     /** @var string|\BackedEnum|null Keep enum value tools inside the System cluster. */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
+    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::System;
 
     public static function getNavigationGroup(): ?string
     {
@@ -77,10 +77,9 @@ final class EnumValueResource extends Resource
         return __('admin.enum_values.navigation_label');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('admin.enum_values.form.sections.basic_information'))
                 ->schema([
                     Select::make('type')

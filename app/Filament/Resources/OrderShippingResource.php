@@ -72,10 +72,9 @@ final class OrderShippingResource extends Resource
         return __('admin.order_shippings.model_label');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('admin.order_shippings.basic_information'))
                 ->description(__('admin.order_shippings.basic_information_description'))
                 ->schema([

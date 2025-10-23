@@ -70,10 +70,9 @@ final class ShippingOptionResource extends Resource
         return __('admin.shipping_options.model_label');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.shipping_options.basic_information'))
                     ->schema([

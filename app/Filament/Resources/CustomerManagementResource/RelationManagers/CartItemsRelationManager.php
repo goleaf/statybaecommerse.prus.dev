@@ -26,10 +26,9 @@ class CartItemsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'cartItems';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-        // Bridge the relation manager form to the Schema-based builder expected by Filament v4.
-        return $form
+        return $schema
             ->schema([
                 // Keep the identifier locked because the relationship is read-only in this manager.
                 TextInput::make('id')
@@ -40,7 +39,7 @@ class CartItemsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function infolist(Schema $infolist): Schema
+    public function infolist(Schema $schema): Schema
     {
         // Configure the Filament infolist schema using the v4 Schema API.
         return $infolist

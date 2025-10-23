@@ -8,9 +8,9 @@ use App\Services\ImportExport\ProviderRegistry;
 use App\Support\Storage\SecureStorage;
 use Filament\Actions\Action;
 use Filament\Forms;
-use Filament\Forms\Components\Fieldset;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
@@ -26,7 +26,7 @@ final class DataImportExport extends Page
      *
      * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static $navigationIcon = 'heroicon-o-arrow-down-tray';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-arrow-down-tray';
 
     public ?string $provider = 'xml';
 
@@ -38,9 +38,8 @@ final class DataImportExport extends Page
 
     public array|string|null $file = null;
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-        // Configure the Filament resource form schema using the v4 Schema API.
         return $schema
             ->schema([
                 Section::make(__('translations.data_import_export'))

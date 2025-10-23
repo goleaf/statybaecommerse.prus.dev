@@ -56,10 +56,9 @@ final class NewsCategoryResource extends Resource
 
     protected static ?string $pluralModelLabel = 'News Categories';
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('news_categories.sections.category_information'))
                 ->schema([
                     TextInput::make('name')

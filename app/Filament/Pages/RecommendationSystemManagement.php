@@ -40,7 +40,7 @@ final class RecommendationSystemManagement extends Page
      *
      * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static $navigationIcon = 'heroicon-o-sparkles';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-sparkles';
 
     protected string $view = 'filament.pages.recommendation-system-management';
 

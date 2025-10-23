@@ -21,10 +21,9 @@ final class AttributesRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Product Attributes';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-        // Bridge the relation manager form to the Schema-based builder expected by Filament v4.
-        return $form
+        return $schema
             ->components([
                 Forms\Components\Select::make('attribute_id')
                     ->label(__('products.attributes.attribute'))

@@ -31,7 +31,7 @@ final class NormalSettingResource extends Resource
 
     protected static ?string $model = NormalSetting::class;
 
-    protected static string|UnitEnum|null $navigationGroup = 'System';
+    protected static string|\UnitEnum|null $navigationGroup = 'System';
 
     protected static ?int $navigationSort = 8;
 
@@ -52,10 +52,9 @@ final class NormalSettingResource extends Resource
         return __('admin.normal_settings.navigation');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form->schema([
+        return $schema->schema([
             Tabs::make(__('normal_settings.tabs.label'))
                 ->tabs([
                     Tab::make(__('admin.normal_settings.basic_information'))

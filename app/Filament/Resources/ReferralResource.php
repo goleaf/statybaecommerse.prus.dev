@@ -38,23 +38,22 @@ final class ReferralResource extends Resource
      *
      * @var string|BackedEnum|null
      */
-    protected static $navigationIcon = 'heroicon-o-share';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-share';
 
     /**
      * Navigation group for organizing the resource in the admin panel.
      *
      * @var UnitEnum|string|null
      */
-    protected static string|UnitEnum|null $navigationGroup = 'Marketing';
+    protected static string|\UnitEnum|null $navigationGroup = 'Marketing';
 
     protected static ?int $navigationSort = 17;
 
     protected static ?string $recordTitleAttribute = 'referral_code';
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form
+        return $schema
             ->components([
                 Section::make('Referral Details')
                     ->columns(2)

@@ -44,14 +44,9 @@ final class UserPreferenceResource extends Resource
 
     protected static ?string $model = UserPreference::class;
 
-    /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static $navigationIcon = 'heroicon-o-document-text';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Users';
+    protected static string|\UnitEnum|null $navigationGroup = 'Users';
 
     protected static ?int $navigationSort = 6;
 
@@ -70,10 +65,9 @@ final class UserPreferenceResource extends Resource
         return __('admin/user_preferences.model_label');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form
+        return $schema
             ->schema([
                 Select::make('user_id')
                     ->label(__('admin/user_preferences.user'))

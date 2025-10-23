@@ -39,10 +39,10 @@ use UnitEnum;
 final class CategoryResource extends Resource
 {
     /** @var string|BackedEnum|null Keep compatibility with Filament v4 navigation icon expectations. */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-tag';
 
-    /** @var string|BackedEnum|null Align the resource under the Products navigation section. */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
+    /** @var string|\UnitEnum|null Align the resource under the Products navigation section. */
+    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 3;
 
@@ -100,10 +100,9 @@ final class CategoryResource extends Resource
         return __('categories.single');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('categories.basic_information'))
                 ->schema([
                     Grid::make(2)

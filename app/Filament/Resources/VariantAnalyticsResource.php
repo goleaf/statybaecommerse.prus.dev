@@ -37,10 +37,10 @@ final class VariantAnalyticsResource extends Resource
     /**
      * @var string|BackedEnum|null Flag the analytics icon while staying compatible with Filament v4 conventions.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
     /** @var string|\BackedEnum|null Anchor inventory analytics beneath the shared navigation enum. */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Inventory;
+    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::Inventory;
 
     public static function getNavigationGroup(): ?string
     {
@@ -72,10 +72,9 @@ final class VariantAnalyticsResource extends Resource
         return __('admin.variant_analytics.model_label');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Tabs::make(__('admin.variant_analytics.tabs'))
                     ->tabs([

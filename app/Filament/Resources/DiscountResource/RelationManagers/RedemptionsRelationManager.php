@@ -33,10 +33,9 @@ final class RedemptionsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Redemptions';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-        // Bridge the relation manager form to the Schema-based builder expected by Filament v4.
-        return $form->schema([
+        return $schema->schema([
             Section::make('Redemption Details')
                 ->schema([
                     Select::make('code_id')

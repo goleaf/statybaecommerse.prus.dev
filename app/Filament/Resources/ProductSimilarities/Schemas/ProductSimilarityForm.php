@@ -12,7 +12,7 @@ use Filament\Schemas\Schema;
 
 class ProductSimilarityForm
 {
-    public static function configure(Form $form): Form
+    public static function configure(Schema $schema): Schema
     {
         return $schema
             ->schema([

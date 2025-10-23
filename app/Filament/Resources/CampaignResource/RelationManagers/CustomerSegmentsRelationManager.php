@@ -24,10 +24,9 @@ final class CustomerSegmentsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Customer Segments';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-        // Bridge the relation manager form to the Schema-based builder expected by Filament v4.
-        return $form->schema([
+        return $schema->schema([
             Select::make('customer_group_id')
                 ->label('Customer Group')
                 ->relationship('customerGroup', 'name')

@@ -16,7 +16,7 @@ final class SearchExplorer extends Page
      *
      * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static $navigationIcon = 'heroicon-o-magnifying-glass-circle';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-magnifying-glass-circle';
 
     public static function getNavigationGroup(): BackedEnum|string|null
     {

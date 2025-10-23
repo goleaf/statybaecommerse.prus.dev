@@ -7,7 +7,7 @@ namespace App\Filament\Pages;
 use App\Services\Shared\ComponentPerformanceService;
 use Filament\Actions\Action;
 use Filament\Forms;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
@@ -25,7 +25,7 @@ final class CacheMaintenance extends Page
      *
      * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static $navigationIcon = 'heroicon-o-server-stack';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-server-stack';
 
     public static function getNavigationGroup(): BackedEnum|string|null
     {
@@ -84,7 +84,7 @@ final class CacheMaintenance extends Page
         return (bool) ($user->is_admin ?? false);
     }
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         // Embrace the Filament v4 return contract so downstream tooling can rely on a `Form` instance.

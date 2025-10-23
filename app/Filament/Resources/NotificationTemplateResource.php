@@ -46,12 +46,7 @@ final class NotificationTemplateResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    /**
-     * Navigation group for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static $navigationGroup = NavigationGroup::Content;
+    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::Content;
 
     public static function getNavigationLabel(): string
     {
@@ -68,10 +63,9 @@ final class NotificationTemplateResource extends Resource
         return __('admin.notification_templates.model_label');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.notification_templates.basic_information'))
                     ->columns(2)

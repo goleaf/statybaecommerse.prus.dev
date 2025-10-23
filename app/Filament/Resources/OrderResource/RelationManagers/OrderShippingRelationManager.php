@@ -55,10 +55,9 @@ final class OrderShippingRelationManager extends BaseRelationManager
     /**
      * Configure the form schema for order shipping.
      */
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-        // Bridge the relation manager form to the Schema-based builder expected by Filament v4.
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('orders.shipping_information'))
                     ->description(__('orders.shipping_information_description'))

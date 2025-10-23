@@ -67,10 +67,9 @@ final class RecommendationAnalyticsResource extends Resource
         return __('admin.recommendation_analytics.model_label');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form
+        return $schema
             ->schema([
                 SchemaSection::make(__('admin.recommendation_analytics.basic_information'))
                     ->schema([

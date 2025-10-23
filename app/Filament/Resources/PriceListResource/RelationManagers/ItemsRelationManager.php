@@ -28,10 +28,9 @@ final class ItemsRelationManager extends BaseRelationManager
         return __('price_lists.relation_managers.items.title');
     }
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-        // Bridge the relation manager form to the Schema-based builder expected by Filament v4.
-        return $form
+        return $schema
             ->components([
                 Forms\Components\Select::make('product_id')
                     ->label(__('price_list_items.product'))

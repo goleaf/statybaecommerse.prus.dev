@@ -59,10 +59,9 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
     /**
      * Configure the form schema for order documents.
      */
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-        // Bridge the relation manager form to the Schema-based builder expected by Filament v4.
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('orders.document_information'))
                     ->description(__('orders.document_information_description'))

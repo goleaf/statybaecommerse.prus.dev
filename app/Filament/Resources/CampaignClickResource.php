@@ -76,10 +76,9 @@ final class CampaignClickResource extends Resource
      * @param  Forms\Form $schema
      * @return Forms\Form
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('campaign_clicks.basic_information'))
                 ->schema([
                     Grid::make(2)

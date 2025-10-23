@@ -52,7 +52,7 @@ final class SeoDataResource extends Resource
 
     protected static ?string $model = SeoData::class;
 
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Content;
+    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::Content;
 
     public static function getNavigationLabel(): string
     {

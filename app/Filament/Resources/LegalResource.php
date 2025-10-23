@@ -65,10 +65,9 @@ final class LegalResource extends Resource
         return __('legal.single');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Section::make(__('legal.basic_information'))
                     ->schema([
