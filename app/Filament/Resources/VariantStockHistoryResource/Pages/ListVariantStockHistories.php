@@ -7,6 +7,7 @@ namespace App\Filament\Resources\VariantStockHistoryResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\VariantStockHistoryResource;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListVariantStockHistories extends BaseListRecords
 {

@@ -7,6 +7,7 @@ namespace App\Filament\Resources\ProductHistoryResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\ProductHistoryResource;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListProductHistories extends BaseListRecords
 {

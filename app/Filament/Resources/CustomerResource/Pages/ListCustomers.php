@@ -9,6 +9,7 @@ use App\Filament\Resources\CustomerResource;
 use App\Filament\Resources\CustomerResource\Widgets\CustomerGrowthChart;
 use App\Filament\Resources\CustomerResource\Widgets\CustomerResourceStats;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListCustomers extends BaseListRecords
 {

@@ -7,6 +7,7 @@ namespace App\Filament\Resources\ProductResource\RelationManagers;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\AttachAction;
 use Filament\Actions\DetachAction;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;

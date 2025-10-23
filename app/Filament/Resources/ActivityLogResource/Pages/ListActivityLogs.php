@@ -6,6 +6,7 @@ namespace App\Filament\Resources\ActivityLogResource\Pages;
 
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\ActivityLogResource;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListActivityLogs extends BaseListRecords
 {

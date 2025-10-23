@@ -20,6 +20,7 @@
         "encoredigitalgroup/filament-helpers": "^4.0@rc",
         "filament/filament": "^4.1",
         "filament/spatie-laravel-media-library-plugin": "^4.0",
+        "hydrat/filament-table-layout-toggle": "^3.0",
         "kenepa/resource-lock": "^4.0",
         "lara-zeus/bolt": "^4.0.5",
         "lara-zeus/quantity": "^2.0",

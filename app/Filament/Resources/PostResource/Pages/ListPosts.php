@@ -7,6 +7,7 @@ namespace App\Filament\Resources\PostResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\PostResource;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListPosts extends BaseListRecords
 {

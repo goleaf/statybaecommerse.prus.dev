@@ -7,6 +7,7 @@ namespace App\Filament\Resources\CampaignScheduleResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\CampaignScheduleResource;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 class ListCampaignSchedules extends BaseListRecords
 {

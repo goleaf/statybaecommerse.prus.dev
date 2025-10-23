@@ -10,6 +10,7 @@ use App\Filament\Resources\DiscountResource\Widgets\DiscountChartWidget;
 use App\Filament\Resources\DiscountResource\Widgets\DiscountStatsWidget;
 use App\Filament\Resources\DiscountResource\Widgets\RecentRedemptionsWidget;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListDiscounts extends BaseListRecords
 {

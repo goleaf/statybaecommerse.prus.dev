@@ -14,7 +14,6 @@ use App\Filament\Widgets\VariantPriceWidget;
 use App\Filament\Widgets\VariantStockWidget;
 use App\Models\ProductVariant;
 use Filament\Actions;
-use Filament\Resources\Pages\ManageRecords;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ManageProductVariants extends BaseManageRecords

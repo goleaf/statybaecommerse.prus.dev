@@ -7,6 +7,7 @@ namespace App\Filament\Resources\MenuResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\MenuResource;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListMenus extends BaseListRecords
 {

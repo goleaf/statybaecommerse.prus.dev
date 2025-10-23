@@ -7,6 +7,7 @@ namespace App\Filament\Resources\EmailCampaigns\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\EmailCampaigns\EmailCampaignResource;
 use Filament\Actions\CreateAction;
+use App\Filament\Pages\Support\BaseListRecords;
 
 class ListEmailCampaigns extends BaseListRecords
 {

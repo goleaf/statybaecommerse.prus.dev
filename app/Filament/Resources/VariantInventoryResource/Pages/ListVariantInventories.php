@@ -7,6 +7,7 @@ namespace App\Filament\Resources\VariantInventoryResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\VariantInventoryResource;
 use Filament\Actions\CreateAction;
+use App\Filament\Pages\Support\BaseListRecords;
 
 class ListVariantInventories extends BaseListRecords
 {

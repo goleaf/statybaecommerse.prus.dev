@@ -7,6 +7,7 @@ namespace App\Filament\Resources\NewsCategoryResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\NewsCategoryResource;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 class ListNewsCategories extends BaseListRecords
 {

@@ -7,6 +7,7 @@ namespace App\Filament\Resources\UserBehaviorResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\UserBehaviorResource;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListUserBehaviors extends BaseListRecords
 {

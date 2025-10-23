@@ -8,6 +8,7 @@ use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\BrandResource;
 use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListBrands extends BaseListRecords
 {

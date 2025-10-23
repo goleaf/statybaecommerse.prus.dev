@@ -10,8 +10,7 @@ use App\Filament\Resources\OrderResource\Widgets\OrderResourceStats;
 use App\Filament\Resources\OrderResource\Widgets\OrderRevenueTrend;
 use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions;
-use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable as SpatieTranslatableListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListOrders extends BaseListRecords
 {

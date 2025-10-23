@@ -7,6 +7,7 @@ namespace App\Filament\Resources\RecommendationCacheResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\RecommendationCacheResource;
 use Filament\Actions\CreateAction;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListRecommendationCaches extends BaseListRecords
 {

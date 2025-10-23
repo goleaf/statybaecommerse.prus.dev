@@ -7,6 +7,7 @@ namespace App\Filament\Resources\SystemResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\SystemResource;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 class ListSystems extends BaseListRecords
 {

@@ -10,8 +10,7 @@ use App\Filament\Resources\ReferralCodeResource\Widgets\ReferralCodeStatsWidget;
 use App\Filament\Resources\ReferralCodeResource\Widgets\ReferralCodeUsageChartWidget;
 use App\Filament\Resources\ReferralCodeResource\Widgets\TopReferralCodesWidget;
 use Filament\Actions;
-use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable as SpatieTranslatableListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListReferralCodes extends BaseListRecords
 {

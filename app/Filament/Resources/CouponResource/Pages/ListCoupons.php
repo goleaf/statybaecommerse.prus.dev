@@ -7,6 +7,7 @@ namespace App\Filament\Resources\CouponResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\CouponResource;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListCoupons extends BaseListRecords
 {

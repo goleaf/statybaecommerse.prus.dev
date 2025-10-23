@@ -7,6 +7,7 @@ namespace App\Filament\Resources\RecommendationConfigResourceSimple\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\RecommendationConfigResourceSimple;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListRecommendationConfigsSimple extends BaseListRecords
 {

@@ -7,6 +7,7 @@ namespace App\Filament\Resources\SubscriberResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\SubscriberResource;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 class ListSubscribers extends BaseListRecords
 {

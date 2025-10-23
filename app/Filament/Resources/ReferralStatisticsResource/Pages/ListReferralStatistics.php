@@ -7,6 +7,7 @@ namespace App\Filament\Resources\ReferralStatisticsResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\ReferralStatisticsResource;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListReferralStatistics extends BaseListRecords
 {

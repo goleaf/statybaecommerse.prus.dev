@@ -8,8 +8,7 @@ use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\UserResource;
 use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions\CreateAction;
-use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable as SpatieTranslatableListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
 class ListUsers extends BaseListRecords
 {

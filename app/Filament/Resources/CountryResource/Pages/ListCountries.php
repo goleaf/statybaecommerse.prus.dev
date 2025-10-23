@@ -15,7 +15,8 @@ use App\Filament\Resources\CountryResource\Widgets\EuMembersWidget;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use App\Filament\WidgetTabs\Enums\WidgetTabTheme;
-use Filament\Resources\Pages\ListRecords;
+use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListCountries extends BaseListRecords

@@ -7,6 +7,7 @@ namespace App\Filament\Resources\Countries\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\Countries\CountryResource;
 use Filament\Actions\CreateAction;
+use App\Filament\Pages\Support\BaseListRecords;
 
 class ListCountries extends BaseListRecords
 {

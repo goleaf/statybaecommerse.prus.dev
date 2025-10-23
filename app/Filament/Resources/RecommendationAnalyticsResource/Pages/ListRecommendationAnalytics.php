@@ -7,6 +7,7 @@ namespace App\Filament\Resources\RecommendationAnalyticsResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\RecommendationAnalyticsResource;
 use Filament\Actions\CreateAction;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListRecommendationAnalytics extends BaseListRecords
 {

@@ -6,6 +6,7 @@ namespace App\Filament\Resources\UserProductInteractionResource\Pages;
 
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\UserProductInteractionResource;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListUserProductInteractions extends BaseListRecords
 {
