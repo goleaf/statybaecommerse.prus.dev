@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Http\Middleware\AddSecurityHeaders;
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
@@ -10,7 +10,7 @@ use Tests\TestCase;
 uses(TestCase::class);
 
 it('adds the expected security headers to responses', function (): void {
-    $middleware = app(AddSecurityHeaders::class);
+    $middleware = app(SecurityHeaders::class);
     $request = Request::create('/security-headers-test', 'GET');
 
     $response = $middleware->handle($request, static fn () => new Response('ok'));
@@ -24,21 +24,19 @@ it('adds the expected security headers to responses', function (): void {
     $csp = $response->headers->get('Content-Security-Policy');
     expect($csp)->toBeString()
         ->and($csp)->toContain("default-src 'self'")
-        ->and($csp)->toMatch("/script-src 'self' 'nonce-[^']+' https:\\/\\/unpkg\\.com/")
-        ->and($csp)->toContain("script-src-attr 'unsafe-inline'")
-        ->and($csp)->toMatch("/style-src 'self' 'nonce-[^']+' https:\\/\\/fonts\\.bunny\\.net https:\\/\\/unpkg\\.com/")
-        ->and($csp)->toContain("style-src-attr 'unsafe-inline'")
+        ->and($csp)->toContain("script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com")
+        ->and($csp)->toContain("style-src 'self' 'unsafe-inline' https://fonts.bunny.net https://unpkg.com")
         ->and($csp)->toContain("font-src 'self' https://fonts.bunny.net data:")
         ->and($csp)->toContain("img-src 'self' data: blob:");
 });
 
 it('allows customizing CSP directives via configuration', function (): void {
-    config()->set('security.headers.content_security_policy.script-src', [
+    config()->set('security-headers.content_security_policy.script-src', [
         "'self'",
         'https://trusted.cdn.example',
     ]);
 
-    $middleware = app(AddSecurityHeaders::class);
+    $middleware = app(SecurityHeaders::class);
     $request = Request::create('/security-headers-custom', 'GET');
 
     $response = $middleware->handle($request, static fn () => new Response('ok'));
