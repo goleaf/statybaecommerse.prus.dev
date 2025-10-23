@@ -39,6 +39,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Expanded the currencies schema and demo country seeder translation handling to match model expectations, allowing `php artisan migrate:fresh --seed` to succeed across SQLite/MySQL environments with full multilingual fixtures.
 * Added the foundational `customer_groups` table migration so subsequent enhancement scripts (including soft deletes) succeed during fresh installs and automated refreshes.
 * Staged the stock reservation foreign keys until the products and variant inventory tables exist so `php artisan migrate:fresh --seed` succeeds on clean installs without sacrificing cascading deletes.
+* Rebuilt the discount schema migration workflow to toggle MySQL foreign key checks only during data copy, preventing the `discount_codes_created_by_foreign` system-table error encountered when rerunning `php artisan migrate:fresh --seed`.
 * Corrected shipping option delivery window formatting so zero-day estimates and partially filled ranges no longer collapse to a placeholder dash in admin tables.
 * Ensured the test bootstrap reloads JSON translation directories so Filament commerce navigation labels resolve to localized values instead of falling back to raw keys during regression runs.
 * Ensured the Feature Flag resource surfaces inactive and disabled toggles so administrators can audit rollout states without adjusting global scopes.
