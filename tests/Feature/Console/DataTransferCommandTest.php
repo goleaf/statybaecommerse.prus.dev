@@ -10,6 +10,7 @@ use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 final class DataTransferCommandTest extends TestCase
@@ -31,9 +32,7 @@ final class DataTransferCommandTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider entityFormatProvider
-     */
+    #[DataProvider('entityFormatProvider')] // Attribute form prevents deprecated docblock metadata notices in PHPUnit 11.
     public function test_data_round_trip(string $entity, string $format): void
     {
         $this->seedEntity($entity);

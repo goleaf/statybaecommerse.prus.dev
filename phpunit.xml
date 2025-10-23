@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd"
          bootstrap="tests/bootstrap.php"
+         cacheDirectory="storage/app/coverage/cache"
          colors="true"
          cacheResult="true"
          executionOrder="defects"
          beStrictAboutTestsThatDoNotTestAnything="false"
-         beStrictAboutOutputDuringTests="false"
->
+         beStrictAboutOutputDuringTests="false">
     <extensions>
-        <extension class="Tests\Diagnostics\Coverage\MinimumCoverageExtension">
+        <!-- PHPUnit 11 expects extension hooks to be declared as bootstrap entries rather than legacy <extension> nodes. -->
+        <bootstrap class="Tests\Diagnostics\Coverage\MinimumCoverageExtension">
             <parameter name="threshold" value="65"/>
-        </extension>
-        <extension class="Tests\Support\Coverage\CoverageThresholdExtension">
+        </bootstrap>
+        <bootstrap class="Tests\Support\Coverage\CoverageThresholdExtension">
             <parameter name="minCoverage" value="70"/>
-        </extension>
+        </bootstrap>
     </extensions>
     <coverage>
-        <cacheDirectory>storage/app/coverage/cache</cacheDirectory>
         <report>
             <clover outputFile="storage/app/coverage/clover.xml"/>
         </report>
