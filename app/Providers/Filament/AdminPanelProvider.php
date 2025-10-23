@@ -52,6 +52,17 @@ final class AdminPanelProvider extends PanelProvider
 
     public function panel(Panel $panel): Panel
     {
+        $configuredResources = array_values(array_filter(
+            (array) config('filament.navigation.resources', []),
+            static fn (mixed $resource): bool => is_string($resource),
+        ));
+
+        $resourceClasses = array_values(array_unique(
+            [...Nav::orderedResources(), ...$configuredResources],
+            SORT_STRING,
+        ));
+
+        /** @var array<class-string> $resourceClasses */
         $pageClasses = array_values(array_filter(
             (array) config('filament.navigation.pages', []),
             static fn (mixed $page): bool => is_string($page),
@@ -125,9 +136,7 @@ final class AdminPanelProvider extends PanelProvider
                 'danger'  => Color::Red,
                 'info'    => Color::Sky,
             ])
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
-            // Register ordered resources to guarantee deterministic navigation rendering.
-            ->resources(Nav::orderedResources())
+            ->resources($resourceClasses)
             ->pages($pageClasses)
             ->widgets([
                 AccountWidget::class,
@@ -248,28 +257,70 @@ final class AdminPanelProvider extends PanelProvider
     }
 
     /**
-     * Build Filament navigation groups from configuration.
+     * Build Filament navigation groups by combining the central Nav registry with optional configuration overrides.
      *
      * @return array<int, NavigationGroup>
      */
     private function configuredNavigationGroups(): array
     {
-        return collect(Nav::navigationGroups())
-            ->map(static function (array $group): NavigationGroup {
-                $navigationGroup = NavigationGroup::make()
-                    ->label($group['label']);
+        $configuredGroups = array_values(array_filter(
+            (array) config('filament.navigation.groups', []),
+            static fn (mixed $group): bool => is_array($group),
+        ));
 
-                if (! empty($group['icon'])) {
-                    $navigationGroup->icon($group['icon']);
-                }
+        /** @var array<string, array{label?: string, icon?: string|null, collapsed?: bool|null}> $overrides */
+        $overrides = [];
+        $extras = [];
 
-                if ($group['collapsed']) {
-                    $navigationGroup->collapsed();
-                }
+        foreach ($configuredGroups as $group) {
+            $key = $group['key'] ?? $group['label'] ?? null;
 
-                return $navigationGroup;
-            })
-            ->all();
+            if ($key !== null) {
+                $overrides[$key] = $group;
+            } else {
+                $extras[] = $group;
+            }
+        }
+
+        $navigationGroups = [];
+
+        foreach (Nav::navigationGroups() as $group) {
+            $override = $overrides[$group['key']] ?? null;
+            $label = $override['label'] ?? $group['label'];
+            $icon = $override['icon'] ?? $group['icon'];
+            $collapsed = $override['collapsed'] ?? false;
+
+            $navigationGroup = NavigationGroup::make()->label(__($label));
+
+            if (! empty($icon)) {
+                $navigationGroup->icon($icon);
+            }
+
+            if ($collapsed === true) {
+                $navigationGroup->collapsed();
+            }
+
+            $navigationGroups[] = $navigationGroup;
+
+            unset($overrides[$group['key']]);
+        }
+
+        foreach (array_merge(array_values($overrides), $extras) as $group) {
+            $navigationGroup = NavigationGroup::make()
+                ->label(__($group['label'] ?? ''));
+
+            if (! empty($group['icon'])) {
+                $navigationGroup->icon($group['icon']);
+            }
+
+            if (($group['collapsed'] ?? false) === true) {
+                $navigationGroup->collapsed();
+            }
+
+            $navigationGroups[] = $navigationGroup;
+        }
+
+        return $navigationGroups;
     }
 
     private function makeFullCalendarPlugin(): ?\Filament\Contracts\Plugin
