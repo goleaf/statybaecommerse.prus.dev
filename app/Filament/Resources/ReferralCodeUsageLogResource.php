@@ -7,11 +7,20 @@ namespace App\Filament\Resources;
 use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\ReferralCodeUsageLogResource\Pages;
-use App\Filament\Resources\ReferralCodeUsageLogs\Schemas\ReferralCodeUsageLogForm as ReferralCodeUsageLogFormSchema;
-use App\Filament\Resources\ReferralCodeUsageLogs\Tables\ReferralCodeUsageLogsTable as ReferralCodeUsageLogsTableSchema;
 use App\Models\ReferralCodeUsageLog;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
 
@@ -52,12 +61,121 @@ final class ReferralCodeUsageLogResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return ReferralCodeUsageLogFormSchema::configure($form);
+        return $form
+            ->schema([
+                Section::make(__('admin.referral_code_usage_logs.basic_information'))
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                Select::make('referral_code_id')
+                                    ->label(__('admin.referral_code_usage_logs.referral_code'))
+                                    ->relationship('referralCode', 'code')
+                                    ->required()
+                                    ->searchable()
+                                    ->preload(),
+                                Select::make('user_id')
+                                    ->label(__('admin.referral_code_usage_logs.user'))
+                                    ->relationship('user', 'name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->nullable(),
+                                TextInput::make('ip_address')
+                                    ->label(__('admin.referral_code_usage_logs.ip_address'))
+                                    ->ip()
+                                    ->required()
+                                    ->maxLength(45),
+                                TextInput::make('referrer')
+                                    ->label(__('admin.referral_code_usage_logs.referrer'))
+                                    ->url()
+                                    ->maxLength(255),
+                                TextInput::make('user_agent')
+                                    ->label(__('admin.referral_code_usage_logs.user_agent'))
+                                    ->maxLength(500),
+                            ]),
+                        KeyValue::make('metadata')
+                            ->label(__('admin.referral_code_usage_logs.metadata'))
+                            ->keyLabel(__('referral.form.metadata_key'))
+                            ->valueLabel(__('referral.form.metadata_value'))
+                            ->helperText(__('admin.referral_code_usage_logs.metadata_help'))
+                            ->nullable()
+                            ->columnSpanFull(),
+                    ]),
+            ]);
     }
 
     public static function table(Table $table): Table
     {
-        return ReferralCodeUsageLogsTableSchema::configure($table);
+        return $table
+            ->query(
+                ReferralCodeUsageLog::query()->with([
+                    'referralCode:id,code',
+                    'user:id,name',
+                ]),
+            )
+            ->columns([
+                TextColumn::make('referralCode.code')
+                    ->label(__('admin.referral_code_usage_logs.referral_code'))
+                    ->searchable()
+                    ->sortable()
+                    ->copyable(),
+                TextColumn::make('user.name')
+                    ->label(__('admin.referral_code_usage_logs.user'))
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('ip_address')
+                    ->label(__('admin.referral_code_usage_logs.ip_address'))
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('referrer')
+                    ->label(__('admin.referral_code_usage_logs.referrer'))
+                    ->limit(30)
+                    ->tooltip(function (TextColumn $column): ?string {
+                        $state = $column->getState();
+
+                        if (! is_string($state) || $state === '') {
+                            return null;
+                        }
+
+                        return strlen((string) $state) > 30 ? $state : null;
+                    }),
+                TextColumn::make('user_agent')
+                    ->label(__('admin.referral_code_usage_logs.user_agent'))
+                    ->limit(50)
+                    ->tooltip(function (TextColumn $column): ?string {
+                        $state = $column->getState();
+
+                        if (! is_string($state) || $state === '') {
+                            return null;
+                        }
+
+                        return strlen((string) $state) > 50 ? $state : null;
+                    }),
+                TextColumn::make('created_at')
+                    ->label(__('admin.common.created_at'))
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                SelectFilter::make('referral_code_id')
+                    ->label(__('admin.referral_code_usage_logs.referral_code'))
+                    ->relationship('referralCode', 'code')
+                    ->searchable(),
+                SelectFilter::make('user_id')
+                    ->label(__('admin.referral_code_usage_logs.user'))
+                    ->relationship('user', 'name')
+                    ->searchable(),
+            ])
+            ->actions([
+                ViewAction::make(),
+                EditAction::make(),
+            ])
+            ->bulkActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
+            ])
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getRelations(): array
