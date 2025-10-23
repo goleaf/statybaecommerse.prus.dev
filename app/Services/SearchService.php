@@ -8,111 +8,146 @@ use App\Data\SearchQueryData;
 use App\Repositories\Search\BrandSearchRepository;
 use App\Repositories\Search\CategorySearchRepository;
 use App\Repositories\Search\ProductSearchRepository;
-use Illuminate\Contracts\Cache\Repository as CacheRepository;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 
 final class SearchService
 {
-    private CacheRepository $cache;
+    private const PRODUCT_RATIO = 0.6;
+
+    private const CATEGORY_RATIO = 0.25;
+
+    private const BRAND_RATIO = 0.15;
 
     public function __construct(
         private readonly ProductSearchRepository $productRepository,
         private readonly CategorySearchRepository $categoryRepository,
         private readonly BrandSearchRepository $brandRepository,
-        ?CacheRepository $cache = null,
+        private readonly SearchRankingService $rankingService,
+        private readonly SearchCacheService $cacheService
     ) {
-        $this->cache = $cache ?? Cache::store();
     }
 
-    public function aggregate(SearchQueryData $query, array $limits = []): array
+    /**
+     * Handle search functionality with proper error handling.
+     */
+    public function search(string|SearchQueryData $query, ?int $limit = null): array
     {
-        $limits = $this->normalizeLimits($query, $limits);
-        $cacheKey = $this->cacheKey($query, $limits);
+        $isAggregated = $query instanceof SearchQueryData;
+        $queryData = $isAggregated
+            ? $query
+            : $this->legacyQueryData((string) $query, $limit);
 
-        return $this->cache->remember($cacheKey, now()->addSeconds(120), function () use ($query, $limits) {
-            $products = $this->productRepository->search($query, $limits['products']);
-            $categories = $this->categoryRepository->search($query, $limits['categories']);
-            $brands = $this->brandRepository->search($query, $limits['brands']);
+        $cachePayload = array_merge($queryData->context(), [
+            'page' => $queryData->page(),
+            'per_page' => $queryData->perPage(),
+            'types' => $queryData->types(),
+            'locale' => app()->getLocale(),
+        ]);
+        $cacheKey = $this->cacheService->generateCacheKey($queryData->query(), $cachePayload);
 
-            return [
-                'products' => $products,
-                'categories' => $categories,
-                'brands' => $brands,
-                'meta' => [
-                    'query' => $query->q,
-                    'sort' => $query->sort(),
-                    'page' => $query->page(),
-                    'per_page' => $query->perPage(),
-                    'filters' => [
-                        'brand' => $query->brandIds(),
-                        'category' => $query->categoryIds(),
-                        'price_min' => $query->price_min,
-                        'price_max' => $query->price_max,
-                    ],
-                ],
-            ];
-        });
-    }
+        if ($cached = $this->cacheService->getCachedResults($cacheKey)) {
+            if (isset($cached['meta'])) {
+                $cached['meta']['cached'] = true;
+            }
 
-    public function search(string $term, int $limit = 10): array
-    {
-        $limit = (int) min(max($limit, 1), SearchQueryData::MAX_PER_PAGE);
-        $query = new SearchQueryData(q: $term, per_page: $limit);
-        $limits = [
-            'products' => min((int) ceil($limit * 0.6), SearchQueryData::MAX_PER_PAGE),
-            'categories' => min((int) ceil($limit * 0.2), SearchQueryData::MAX_PER_PAGE),
-            'brands' => min((int) ceil($limit * 0.2), SearchQueryData::MAX_PER_PAGE),
+            return $isAggregated ? $cached : ($cached['data'] ?? []);
+        }
+
+        $started = microtime(true);
+        $buckets = $this->collectBuckets($queryData);
+        $merged = [];
+
+        foreach ($buckets as $results) {
+            $merged = array_merge($merged, $results);
+        }
+        $ranked = $this->rankingService->rankResults($merged, $queryData->query(), $queryData->context());
+        $total = count($ranked);
+        $offset = $queryData->offset();
+        $pageResults = array_slice($ranked, $offset, $queryData->perPage());
+
+        $bucketCounts = [
+            'product' => count($buckets['product'] ?? []),
+            'category' => count($buckets['category'] ?? []),
+            'brand' => count($buckets['brand'] ?? []),
         ];
 
-        $results = $this->aggregate($query, $limits);
+        $payload = [
+            'data' => $pageResults,
+            'meta' => [
+                'query' => $queryData->query(),
+                'page' => $queryData->page(),
+                'per_page' => $queryData->perPage(),
+                'max_per_page' => SearchQueryData::MAX_PER_PAGE,
+                'total_results' => $total,
+                'returned' => count($pageResults),
+                'has_more' => ($offset + count($pageResults)) < $total,
+                'took_ms' => (int) round((microtime(true) - $started) * 1000),
+                'types' => $queryData->types(),
+                'cached' => false,
+            ],
+            'buckets' => $bucketCounts,
+        ];
 
-        return collect([$results['products']['items'], $results['categories']['items'], $results['brands']['items']])
-            ->collapse()
-            ->sortByDesc('score')
-            ->take($limit)
-            ->values()
-            ->map(function (array $item) {
-                $item['relevance_score'] = $item['score'];
-                unset($item['score']);
+        $this->cacheService->cacheSearchResults($cacheKey, $payload, $queryData->query(), $cachePayload);
 
-                return $item;
-            })
-            ->all();
+        return $isAggregated ? $payload : $payload['data'];
     }
 
+    /**
+     * Handle clearCache functionality with proper error handling.
+     */
     public function clearCache(): void
     {
         $this->cache->flush();
     }
 
-    public function clearSearchCache(string $query): void
+    /**
+     * @return array<string, array<int, array<string, mixed>>>
+     */
+    private function collectBuckets(SearchQueryData $queryData): array
     {
-        $this->cache->flush();
-    }
-
-    private function cacheKey(SearchQueryData $query, array $limits): string
-    {
-        return $this->cacheNamespace().'|'.app()->getLocale().'|'.$query->normalizedCacheKey().'|'.md5(json_encode($limits, JSON_THROW_ON_ERROR));
-    }
-
-    private function cacheNamespace(): string
-    {
-        return 'search:aggregate';
-    }
-
-    private function normalizeLimits(SearchQueryData $query, array $limits): array
-    {
-        $defaults = [
-            'products' => $query->perPage(),
-            'categories' => min(5, $query->perPage()),
-            'brands' => min(5, $query->perPage()),
+        $perPage = $queryData->perPage();
+        $limits = [
+            'product' => max(1, (int) ceil($perPage * self::PRODUCT_RATIO * 2)),
+            'category' => max(1, (int) ceil($perPage * self::CATEGORY_RATIO * 2)),
+            'brand' => max(1, (int) ceil($perPage * self::BRAND_RATIO * 2)),
         ];
 
-        $merged = array_merge($defaults, Arr::only($limits, ['products', 'categories', 'brands']));
+        $limits['product'] = max($limits['product'], $perPage);
+        $limits['category'] = max($limits['category'], (int) ceil($perPage / 2));
+        $limits['brand'] = max($limits['brand'], (int) ceil($perPage / 2));
 
-        return collect($merged)
-            ->map(fn ($value) => (int) min(max((int) $value, 1), SearchQueryData::MAX_PER_PAGE))
-            ->all();
+        $buckets = [];
+
+        foreach ($queryData->types() as $type) {
+            if ($type === 'product') {
+                $buckets['product'] = $this->productRepository->search($queryData, $limits['product']);
+            }
+
+            if ($type === 'category') {
+                $buckets['category'] = $this->categoryRepository->search($queryData, $limits['category']);
+            }
+
+            if ($type === 'brand') {
+                $buckets['brand'] = $this->brandRepository->search($queryData, $limits['brand']);
+            }
+        }
+
+        return $buckets;
+    }
+
+    private function legacyQueryData(string $query, ?int $limit): SearchQueryData
+    {
+        $perPage = $limit ?? SearchQueryData::DEFAULT_PER_PAGE;
+
+        return SearchQueryData::fromArray([
+            'query' => $query,
+            'page' => 1,
+            'per_page' => $perPage,
+            'types' => ['product', 'category', 'brand'],
+        ], [
+            'source' => 'legacy-search',
+            'locale' => app()->getLocale(),
+        ]);
     }
 }
