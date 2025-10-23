@@ -6,6 +6,7 @@ namespace App\Repositories;
 
 use App\Models\Product;
 use App\Support\Cache\CacheKeys;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
 final class ProductRepository
@@ -35,5 +36,86 @@ final class ProductRepository
                 now()->addSeconds(CacheKeys::TTL_MINUTE),
                 static fn (): int => Product::query()->count(),
             );
+    }
+
+    public function visibleCount(): int
+    {
+        return $this->rememberWithTags(
+            CacheKeys::productVisibleCount(),
+            CacheKeys::TTL_MINUTE,
+            static fn (): int => Product::query()
+                ->withoutGlobalScopes()
+                ->where('is_visible', true)
+                ->whereNotNull('published_at')
+                ->where('published_at', '<=', now())
+                ->count(),
+            [CacheKeys::productAggregateTag(), CacheKeys::homeTag()],
+        );
+    }
+
+    public function featured(int $limit = 8): Collection
+    {
+        return $this->rememberWithTags(
+            CacheKeys::productFeaturedList($limit),
+            CacheKeys::TTL_MINUTE,
+            static fn (): Collection => Product::query()
+                ->withoutGlobalScopes()
+                ->where('is_visible', true)
+                ->where('is_featured', true)
+                ->whereNotNull('published_at')
+                ->where('published_at', '<=', now())
+                ->latest('published_at')
+                ->limit($limit)
+                ->get(),
+            [CacheKeys::productAggregateTag(), CacheKeys::homeTag(), CacheKeys::navigationTag()],
+        );
+    }
+
+    public function latest(int $limit = 8): Collection
+    {
+        return $this->rememberWithTags(
+            CacheKeys::productLatestList($limit),
+            CacheKeys::TTL_MINUTE,
+            static fn (): Collection => Product::query()
+                ->withoutGlobalScopes()
+                ->where('is_visible', true)
+                ->whereNotNull('published_at')
+                ->where('published_at', '<=', now())
+                ->latest('created_at')
+                ->limit($limit)
+                ->get(),
+            [CacheKeys::productAggregateTag(), CacheKeys::homeTag()],
+        );
+    }
+
+    public function findPublishedById(int $productId): ?Product
+    {
+        $cacheKey = CacheKeys::productTag($productId);
+
+        return $this->rememberWithTags(
+            $cacheKey,
+            CacheKeys::TTL_MINUTE,
+            static fn () => Product::query()
+                ->withoutGlobalScopes()
+                ->whereKey($productId)
+                ->where('is_visible', true)
+                ->whereNotNull('published_at')
+                ->where('published_at', '<=', now())
+                ->first(),
+            [CacheKeys::productAggregateTag()],
+        );
+    }
+
+    private function rememberWithTags(string $key, int $ttlSeconds, callable $callback, array $tags = []): mixed
+    {
+        $expiresAt = now()->addSeconds($ttlSeconds);
+
+        if (Cache::supportsTags()) {
+            $normalizedTags = array_values(array_unique($tags));
+
+            return Cache::tags($normalizedTags)->remember($key, $expiresAt, $callback);
+        }
+
+        return Cache::remember($key, $expiresAt, $callback);
     }
 }

@@ -5,69 +5,123 @@ declare(strict_types=1);
 namespace App\Repositories;
 
 use App\Models\Menu;
-use App\UseCases\Menu\InvalidateMenuCache;
-use Illuminate\Contracts\Cache\Repository as CacheRepository;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Str;
+use App\Models\MenuItem;
+use App\Support\Cache\CacheKeys;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 final class MenuRepository
 {
-    private const CACHE_TTL_MINUTES = 15;
-
-    public function __construct(private readonly CacheRepository $cache)
+    public function all(?string $location = null, ?string $locale = null): Collection
     {
+        $resolvedLocale = $locale ?? app()->getLocale();
+        $cacheKey = CacheKeys::menuCollectionKey($location, $resolvedLocale);
+
+        return $this->remember(
+            $cacheKey,
+            CacheKeys::TTL_FIVE_MINUTES,
+            fn (): Collection => $this->loadMenus($location)->map(fn (Menu $menu): array => $this->buildMenuPayload($menu)),
+        );
     }
 
-    public function getActiveMenus(?string $location = null): Collection
+    public function byKey(string $key, ?string $locale = null): ?array
     {
-        $version = $this->cacheVersion(InvalidateMenuCache::MENU_VERSION_KEY);
-        $cacheKey = sprintf('menus:list:%s:%s', $version, $location ?? 'all');
+        $resolvedLocale = $locale ?? app()->getLocale();
+        $cacheKey = CacheKeys::menuByKey($key, $resolvedLocale);
 
-        return $this->cache->remember($cacheKey, now()->addMinutes(self::CACHE_TTL_MINUTES), static function () use ($location) {
-            return Menu::query()
-                ->when($location, static function ($query) use ($location): void {
-                    $query->where('location', $location);
-                })
-                ->with(['allItems' => static function ($query): void {
-                    $query->orderBy('sort_order');
-                }])
-                ->orderBy('name')
-                ->get();
-        });
+        return $this->remember(
+            $cacheKey,
+            CacheKeys::TTL_FIVE_MINUTES,
+            function () use ($key): ?array {
+                $menu = Menu::query()
+                    ->active()
+                    ->forKey($key)
+                    ->withVisibleItems()
+                    ->first();
+
+                return $menu ? $this->buildMenuPayload($menu) : null;
+            },
+        );
     }
 
-    public function findActiveMenuByKey(string $key): ?Menu
+    public function byLocation(string $location, ?string $locale = null): ?array
     {
-        $version = $this->cacheVersion(InvalidateMenuCache::MENU_VERSION_KEY);
-        $cacheKey = sprintf('menus:single:%s:key:%s', $version, $key);
+        $resolvedLocale = $locale ?? app()->getLocale();
+        $cacheKey = CacheKeys::menuByLocation($location, $resolvedLocale);
 
-        return $this->cache->remember($cacheKey, now()->addMinutes(self::CACHE_TTL_MINUTES), static function () use ($key) {
-            return Menu::query()
-                ->where('key', $key)
-                ->with(['allItems' => static function ($query): void {
-                    $query->orderBy('sort_order');
-                }])
-                ->first();
-        });
+        return $this->remember(
+            $cacheKey,
+            CacheKeys::TTL_FIVE_MINUTES,
+            function () use ($location): ?array {
+                $menu = Menu::query()
+                    ->active()
+                    ->forLocation($location)
+                    ->withVisibleItems()
+                    ->first();
+
+                return $menu ? $this->buildMenuPayload($menu) : null;
+            },
+        );
     }
 
-    public function findActiveMenuByLocation(string $location): ?Menu
+    private function loadMenus(?string $location): Collection
     {
-        $version = $this->cacheVersion(InvalidateMenuCache::MENU_VERSION_KEY);
-        $cacheKey = sprintf('menus:single:%s:location:%s', $version, $location);
-
-        return $this->cache->remember($cacheKey, now()->addMinutes(self::CACHE_TTL_MINUTES), static function () use ($location) {
-            return Menu::query()
-                ->where('location', $location)
-                ->with(['allItems' => static function ($query): void {
-                    $query->orderBy('sort_order');
-                }])
-                ->first();
-        });
+        return Menu::query()
+            ->active()
+            ->when($location, static fn ($query) => $query->forLocation($location))
+            ->withVisibleItems()
+            ->orderBy('id')
+            ->get();
     }
 
-    private function cacheVersion(string $key): string
+    private function buildMenuPayload(Menu $menu): array
     {
-        return $this->cache->rememberForever($key, static fn (): string => Str::uuid()->toString());
+        return [
+            'id' => $menu->id,
+            'key' => $menu->key,
+            'name' => $menu->name,
+            'location' => $menu->location,
+            'items' => $this->buildTree($menu->allItems),
+        ];
+    }
+
+    /**
+     * @param  Collection<int, MenuItem>  $items
+     */
+    private function buildTree(Collection $items): array
+    {
+        $grouped = $items->groupBy('parent_id');
+
+        return $this->mapChildren($grouped, null);
+    }
+
+    /**
+     * @param  Collection<int, Collection<int, MenuItem>>  $grouped
+     */
+    private function mapChildren(Collection $grouped, ?int $parentId): array
+    {
+        return $grouped->get($parentId, collect())->map(function (MenuItem $item) use ($grouped): array {
+            return [
+                'id' => $item->id,
+                'label' => $item->label,
+                'url' => $item->url,
+                'route_name' => $item->route_name,
+                'route_params' => $item->route_params,
+                'icon' => $item->icon,
+                'sort_order' => $item->sort_order,
+                'children' => $this->mapChildren($grouped, $item->id),
+            ];
+        })->all();
+    }
+
+    private function remember(string $key, int $ttlSeconds, callable $callback): mixed
+    {
+        $expiresAt = now()->addSeconds($ttlSeconds);
+
+        if (Cache::supportsTags()) {
+            return Cache::tags([CacheKeys::navigationTag()])->remember($key, $expiresAt, $callback);
+        }
+
+        return Cache::remember($key, $expiresAt, $callback);
     }
 }

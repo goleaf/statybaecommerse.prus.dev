@@ -8,8 +8,8 @@ use App\Livewire\Concerns\WithCart;
 use App\Livewire\Concerns\WithNotifications;
 use App\Models\Brand;
 use App\Models\Category;
-use App\Models\Product;
 use App\Models\Review;
+use App\Repositories\ProductRepository;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTags;
 use Illuminate\Contracts\View\View;
@@ -37,20 +37,15 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return Cache::tags([
-            CacheTags::home(),
-            CacheTags::locale($locale),
-            CacheTags::products(),
-            CacheTags::categories(),
-            CacheTags::brands(),
-            CacheTags::reviews(),
-        ])->remember(CacheKeys::homeStats($locale), now()->addSeconds(60), function (): array {
+        return Cache::remember(CacheKeys::homeStats($locale), CacheKeys::TTL_MINUTE, function (): array {
+            $productRepository = app(ProductRepository::class);
+
             return [
-                'products_count' => Product::query()->where('is_visible', true)->count(),
-                'categories_count' => Category::query()->where('is_visible', true)->count(),
-                'brands_count' => Brand::query()->where('is_enabled', true)->count(),
-                'reviews_count' => Review::query()->where('is_approved', true)->count(),
-                'avg_rating' => (float) (Review::query()->where('is_approved', true)->avg('rating') ?? 0),
+                'products_count' => $productRepository->visibleCount(),
+                'categories_count' => Category::where('is_visible', true)->count(),
+                'brands_count' => Brand::where('is_enabled', true)->count(),
+                'reviews_count' => Review::where('is_approved', true)->count(),
+                'avg_rating' => (float) (Review::where('is_approved', true)->avg('rating') ?? 0),
             ];
         });
     }
@@ -63,21 +58,7 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return Cache::tags([
-            CacheTags::home(),
-            CacheTags::locale($locale),
-            CacheTags::products(),
-            CacheTags::brands(),
-            CacheTags::categories(),
-        ])->remember(CacheKeys::homeFeaturedProducts($locale), now()->addSeconds(60), static function (): Collection {
-            return Product::query()
-                ->withoutGlobalScopes()
-                ->where('is_visible', true)
-                ->where('is_featured', true)
-                ->latest('published_at')
-                ->limit(8)
-                ->get();
-        });
+        return app(ProductRepository::class)->featured();
     }
 
     /**
@@ -88,20 +69,7 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return Cache::tags([
-            CacheTags::home(),
-            CacheTags::locale($locale),
-            CacheTags::products(),
-            CacheTags::brands(),
-            CacheTags::categories(),
-        ])->remember(CacheKeys::homeLatestProducts($locale), now()->addSeconds(60), static function (): Collection {
-            return Product::query()
-                ->withoutGlobalScopes()
-                ->where('is_visible', true)
-                ->latest('published_at')
-                ->limit(8)
-                ->get();
-        });
+        return app(ProductRepository::class)->latest();
     }
 
     /**

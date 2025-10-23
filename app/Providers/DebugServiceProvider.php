@@ -37,11 +37,20 @@ class DebugServiceProvider extends ServiceProvider
                 return $detector;
             });
         }
+
+        if ($this->app->environment('local')) {
+            $this->app->singleton(NPlusOneDetector::class, static function (): NPlusOneDetector {
+                $detector = new NPlusOneDetector();
+                $detector->register();
+
+                return $detector;
+            });
+        }
     }
 
     public function boot(): void
     {
-        if ($this->app->environment('local', 'staging')) {
+        if ($this->app->environment('local')) {
             $this->app->make(NPlusOneDetector::class);
         }
     }
