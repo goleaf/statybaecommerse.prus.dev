@@ -10,6 +10,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Introduced operator-aware system setting dependencies with explicit condition values, refreshed Filament forms, and resilient evaluation helpers for richer admin automation.
 
 ### Maintenance
+* Migrated Filament resources, relation managers, custom pages, and widgets to the v4 Schema API while normalizing navigation icon docblocks so BackedEnum-powered metadata stays compatible with upstream traits (#1070).
 * Refactored the product API flow to run through dedicated application use cases, a presenter, and an Eloquent-backed repository so contract responses stay stable while filtering non-displayable catalogue entries.
 * Centralized Filament navigation metadata by adopting the `HasNav` trait on notifications, hardening the Nav helper against recursion, and documenting the `Schema::components([...])` pipeline for the Address resource.
 * Normalized the Menu Item Filament resource icon annotation to the shared docblock convention and documented the delegated schema/table builders for reviewers.
