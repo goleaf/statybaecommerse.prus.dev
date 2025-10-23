@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\SystemSettingCategoryResource\Pages;
 use App\Filament\Resources\SystemSettingCategoryResource\RelationManagers;
 use App\Models\Scopes\ActiveScope;
@@ -36,8 +35,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
-use UnitEnum;
-use Filament\Schemas\Schema;
 
 /**
  * SystemSettingCategoryResource
@@ -50,9 +47,12 @@ final class SystemSettingCategoryResource extends Resource
 
     protected static ?string $model = SystemSettingCategory::class;
 
-    public static function getNavigationGroup(): string
+    /**
+     * Surface the translated navigation group label without relying on duplicate UnitEnum imports.
+     */
+    public static function getNavigationGroup(): ?string
     {
-        return 'System';
+        return NavigationGroup::System->label();
     }
 
     protected static ?int $navigationSort = 2;
