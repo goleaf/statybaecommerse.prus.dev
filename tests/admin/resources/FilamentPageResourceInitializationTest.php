@@ -6,7 +6,7 @@ use Filament\Resources\Pages\Page;
 use Illuminate\Filesystem\Filesystem;
 
 it('ensures Filament resource pages can resolve their resource classes', function () {
-    $filesystem = new Filesystem;
+    $filesystem = new Filesystem();
     $resourcesPath = app_path('Filament/Resources');
 
     if (! $filesystem->isDirectory($resourcesPath)) {
@@ -40,12 +40,10 @@ it('ensures Filament resource pages can resolve their resource classes', functio
             $property = new \ReflectionProperty($class, 'resource');
             if ($property->isStatic() && ! $property->isInitialized()) {
                 $issues[] = $class.' has an uninitialised static $resource property ('.$file->getPathname().').';
-
                 continue;
             }
         } catch (\ReflectionException $exception) {
             $issues[] = $class.' is missing the static $resource property: '.$exception->getMessage();
-
             continue;
         }
 
