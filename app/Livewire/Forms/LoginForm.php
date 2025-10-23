@@ -64,12 +64,17 @@ final class LoginForm extends Form
 
         $decaySeconds = $this->decaySeconds();
 
-        $decaySeconds = (int) config('security.rate_limiting.login.decay_seconds', 60);
-
-        $decaySeconds = $this->decaySeconds();
-
         if (! Auth::attempt($this->only(['email', 'password']), $this->remember)) {
             RateLimiter::hit($this->throttleKey(), $decaySeconds);
+
+            $captchaManager->markRequired($this->throttleKey(), 'auth.login');
+            $monitor->record($this->ipAddress(), 'auth-login', [
+                'email'        => $this->email,
+                'attempts'     => RateLimiter::attempts($this->throttleKey()),
+                'max_attempts' => $this->maxAttempts(),
+            ]);
+
+            $this->syncCaptchaState($captchaManager, true);
 
             throw ValidationException::withMessages([
                 'loginForm.email' => trans('auth.failed'),
@@ -84,7 +89,11 @@ final class LoginForm extends Form
 
     public function syncCaptchaState(?CaptchaManager $captchaManager = null, bool $forceRefresh = false): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), $this->maxAttempts())) {
+        $captchaManager ??= app(CaptchaManager::class);
+
+        if (! $captchaManager->shouldChallenge($this->throttleKey(), 'auth.login')) {
+            $this->resetCaptcha();
+
             return;
         }
 
@@ -141,7 +150,21 @@ final class LoginForm extends Form
         $ip = request()->ip();
         $ipAddress = is_string($ip) && $ip !== '' ? $ip : 'unknown';
 
-        return Str::transliterate(Str::lower($this->email).'|'.$ipAddress);
+        return Str::transliterate(Str::lower($this->email) . '|' . $ipAddress);
+    }
+
+    private function resetCaptcha(): void
+    {
+        $this->captchaQuestion = null;
+        $this->captchaToken = null;
+        $this->captchaResponse = null;
+    }
+
+    private function ipAddress(): string
+    {
+        $ip = request()->ip();
+
+        return is_string($ip) && $ip !== '' ? $ip : 'unknown';
     }
 
     private function maxAttempts(): int

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Logging\CustomizeFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
@@ -76,15 +78,15 @@ return [
     'channels' => [
 
         'stack' => [
-            'driver' => 'stack',
-            'channels' => $stackChannels,
+            'driver'            => 'stack',
+            'channels'          => $stackChannels,
             'ignore_exceptions' => false,
             'tap' => [App\Logging\ConfigureContextProcessors::class],
         ],
 
         'production' => [
-            'driver' => 'stack',
-            'channels' => $productionStackChannels,
+            'driver'            => 'stack',
+            'channels'          => $productionStackChannels,
             'ignore_exceptions' => false,
         ],
 
@@ -107,21 +109,18 @@ return [
             'level'                => env('LOG_LEVEL', 'debug'),
             'days'                 => env('LOG_DAILY_DAYS', 14),
             'replace_placeholders' => true,
-            'formatter' => JsonFormatter::class,
-            'formatter_with' => [
-                'batch_mode' => JsonFormatter::BATCH_MODE_JSON,
-                'append_newline' => true,
+            'tap'                  => [
+                CustomizeFormatter::class,
             ],
-            'tap' => [App\Logging\ConfigureContextProcessors::class],
         ],
 
-        'daily_json' => [
-            'driver' => 'daily',
-            'path' => storage_path('logs/laravel.log'),
-            'level' => env('LOG_LEVEL', 'debug'),
-            'days' => $logRetentionDays > 0 ? $logRetentionDays : 14,
+        'security' => [
+            'driver'               => 'daily',
+            'path'                 => storage_path('logs/security.log'),
+            'level'                => env('LOG_SECURITY_LEVEL', 'notice'),
+            'days'                 => env('LOG_SECURITY_DAYS', 30),
             'replace_placeholders' => true,
-            'tap' => [
+            'tap'                  => [
                 CustomizeFormatter::class,
             ],
         ],
@@ -155,11 +154,7 @@ return [
             'handler_with' => [
                 'stream' => 'php://stderr',
             ],
-            'formatter' => JsonFormatter::class,
-            'formatter_with' => [
-                'batch_mode' => JsonFormatter::BATCH_MODE_JSON,
-                'append_newline' => true,
-            ],
+            'formatter'  => env('LOG_STDERR_FORMATTER'),
             'processors' => [PsrLogMessageProcessor::class],
             'tap' => [App\Logging\ConfigureContextProcessors::class],
         ],
@@ -176,7 +171,7 @@ return [
 
         'sentry' => [
             'driver' => 'sentry',
-            'level' => env('SENTRY_LOG_LEVEL', env('LOG_LEVEL', 'error')),
+            'level'  => env('SENTRY_LOG_LEVEL', env('LOG_LEVEL', 'error')),
         ],
 
         'syslog' => [
