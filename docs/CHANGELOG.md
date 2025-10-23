@@ -19,4 +19,4 @@
 - Restored typed navigation icons for the Menu, Enum Management, and Variant Analytics resources while cleaning up redundant `UnitEnum` imports in favor of fully qualified annotations.
 - Routed the Menu activation toggle through Filament's success notification system to standardize feedback messaging.
 - Added localized LaraZeus list group quick links to the product, order, customer, and post view record pages so relationship collections surface with consistent icons, tooltips, and storefront URLs.
-- Clarified Company size selection and filtering to support nullable records with explicit placeholders inside the Filament resource.
+- Normalized Filament relation manager repeater actions to use static closures and clarified their inline-editing intent to satisfy automation tooling expectations.

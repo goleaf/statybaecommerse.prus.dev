@@ -71,8 +71,17 @@ final class OrderItemsRelationManager extends BaseRelationManager
                                     ->placeholder(__('orders.placeholders.product_variant'))
                                     ->searchUsing(fn (string $term): array => ProductVariantSearch::results($term))
                                     ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?OrderItem $record): void {
-                                        if ($state === null || ! $record?->productVariant) {
+                                    ->afterStateHydrated(static function (SearchableInput $component, ?int $state): void {
+                                        if ($state === null) {
+                                            return;
+                                        }
+
+                                        $variant = ProductVariant::query()
+                                            ->select(['id', 'product_id', 'sku', 'name', 'price'])
+                                            ->with(['product:id,sku,name'])
+                                            ->find($state);
+
+                                        if (! $variant instanceof ProductVariant) {
                                             return;
                                         }
 
@@ -82,7 +91,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
                                                 (string) $record->product_variant_id => ProductVariantSearch::label($record->productVariant),
                                             ]);
                                     })
-                                    ->afterStateUpdated(function (?string $state, callable $set, callable $get): void {
+                                    ->afterStateUpdated(static function (?string $state, Set $set, Get $get): void {
                                         if ($state === null || $state === '') {
                                             return;
                                         }
@@ -110,14 +119,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
                                     ->numeric()
                                     ->required()
                                     ->reactive()
-                                    ->prefixIcon('heroicon-o-cube'),
-                                Quantity::make('quantity')
-                                    ->label(__('orders.quantity'))
-                                    ->minValue(1)
-                                    ->steps(1)
-                                    ->default(1)
-                                    ->live()
-                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                    ->afterStateUpdated(static function ($state, callable $set, callable $get): void {
                                         $unitPrice = $get('unit_price') ?? 0;
                                         $set('total', $unitPrice * $state);
                                     }),
@@ -131,7 +133,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
                                     ->prefix('€')
                                     ->step(0.01)
                                     ->reactive()
-                                    ->afterStateUpdated(function ($state, callable $set, callable $get): void {
+                                    ->afterStateUpdated(static function ($state, callable $set, callable $get): void {
                                         $quantity = $get('quantity') ?? 1;
                                         $set('total', $state * $quantity);
                                     })
@@ -143,7 +145,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
                                     ->prefix('€')
                                     ->step(0.01)
                                     ->reactive()
-                                    ->afterStateUpdated(function ($state, callable $set, callable $get): void {
+                                    ->afterStateUpdated(static function ($state, callable $set, callable $get): void {
                                         $unitPrice = $get('unit_price') ?? 0;
                                         $quantity = $get('quantity') ?? 1;
                                         $discount = $state ?? 0;
@@ -151,8 +153,8 @@ final class OrderItemsRelationManager extends BaseRelationManager
                                     })
                                     ->prefixIcon('heroicon-o-tag'),
                                 Placeholder::make('total')
-                                    ->label(__('orders.fields.total'))
-                                    ->content(function (Get $get): string {
+                                    ->label(__('orders.total'))
+                                    ->content(static function ($get): string {
                                         $unitPrice = (float) $get('unit_price') ?? 0;
                                         $quantity = (int) $get('quantity') ?? 1;
                                         $discount = (float) $get('discount_amount') ?? 0;
@@ -169,7 +171,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
                         Hidden::make('sku')
                             ->required(),
                         Hidden::make('total')
-                            ->default(function (Get $get): float {
+                            ->default(static function ($get): float {
                                 $unitPrice = (float) $get('unit_price') ?? 0;
                                 $quantity = (int) $get('quantity') ?? 1;
                                 $discount = (float) $get('discount_amount') ?? 0;
@@ -204,7 +206,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
                     ->searchable()
                     ->sortable()
                     ->limit(30)
-                    ->tooltip(function (TextColumn $column): ?string {
+                    ->tooltip(static function (TextColumn $column): ?string {
                         $state = $column->getState();
 
                         return strlen($state) > 30 ? $state : null;
@@ -268,7 +270,8 @@ final class OrderItemsRelationManager extends BaseRelationManager
                     ->icon('heroicon-m-pencil-square')
                     ->modalHeading('Edit order items')
                     ->modalWidth('5xl')
-                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                    // Support rapid order item adjustments while keeping financial fields visible.
+                    ->configureRepeater(static function (Repeater $repeater): Repeater {
                         return $repeater
                             ->collapsible()
                             ->defaultItems(0)
@@ -318,7 +321,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
                     ->label(__('orders.duplicate_item'))
                     ->icon('heroicon-o-document-duplicate')
                     ->color('gray')
-                    ->action(function (OrderItem $record): void {
+                    ->action(static function (OrderItem $record): void {
                         $newItem = $record->replicate();
                         $newItem->save();
 
@@ -335,7 +338,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
                         ->label(__('orders.bulk_mark_completed'))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->action(function (Collection $records): void {
+                        ->action(static function (Collection $records): void {
                             $records->each->update(['status' => 'completed']);
 
                             Notification::make()
@@ -344,19 +347,19 @@ final class OrderItemsRelationManager extends BaseRelationManager
                                 ->send();
                         })
                         ->requiresConfirmation(),
-                        BulkAction::make('apply_discount')
-                            ->label(__('orders.bulk_apply_discount'))
-                            ->icon('heroicon-o-tag')
-                            ->color('info')
-                            ->form([
-                                TextInput::make('discount_amount')
-                                ->label(__('orders.fields.discount_amount'))
-                                    ->numeric()
-                                    ->required()
-                                    ->prefix('€')
-                                    ->step(0.01),
-                            ])
-                        ->action(function (Collection $records, array $data): void {
+                    BulkAction::make('apply_discount')
+                        ->label(__('orders.bulk_apply_discount'))
+                        ->icon('heroicon-o-tag')
+                        ->color('info')
+                        ->form([
+                            TextInput::make('discount_amount')
+                                ->label(__('orders.discount_amount'))
+                                ->numeric()
+                                ->required()
+                                ->prefix('€')
+                                ->step(0.01),
+                        ])
+                        ->action(static function (Collection $records, array $data): void {
                             $records->each->update(['discount_amount' => $data['discount_amount']]);
 
                             Notification::make()
