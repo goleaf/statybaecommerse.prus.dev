@@ -4,17 +4,37 @@ declare(strict_types=1);
 
 namespace App\Support;
 
+/**
+ * Application-wide error code definitions for consistent API and UI messaging.
+ */
 final class ErrorCodes
 {
-    public const UNKNOWN_ERROR = 'unknown_error';
-    public const VALIDATION_FAILED = 'validation_failed';
-    public const AUTHENTICATION_FAILED = 'authentication_failed';
-    public const AUTHORIZATION_FAILED = 'authorization_failed';
-    public const ROUTE_NOT_FOUND = 'route_not_found';
-    public const METHOD_NOT_ALLOWED = 'method_not_allowed';
-    public const MODEL_NOT_FOUND = 'model_not_found';
-    public const TOO_MANY_REQUESTS = 'too_many_requests';
-    public const SERVICE_UNAVAILABLE = 'service_unavailable';
-    public const RUNTIME_ERROR = 'runtime_error';
-    public const CODE_STYLE_VIOLATION = 'code_style_violation';
+    /**
+     * Code for resources that cannot be found (HTTP 404).
+     */
+    public const NOT_FOUND = 'error.not_found';
+
+    /**
+     * Code for unexpected server failures (HTTP 500).
+     */
+    public const SERVER_ERROR = 'error.server';
+
+    /**
+     * Code for validation failures when provided data is invalid.
+     */
+    public const VALIDATION_FAILED = 'error.validation';
+
+    /**
+     * Code for requests made without proper authentication.
+     */
+    public const UNAUTHORIZED = 'error.unauthorized';
+
+    /**
+     * Code for requests that are authenticated but lack permission.
+     */
+    public const FORBIDDEN = 'error.forbidden';
+
+    private function __construct()
+    {
+    }
 }
