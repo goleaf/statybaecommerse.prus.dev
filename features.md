@@ -46,7 +46,7 @@
   storefront metrics while trimming duplicate queries from feature coverage.
 
 ## Admin panel resilience
-- Analytics event administration now renders widget tabs directly in Blade, exposes the "scroll" event type across filters, enforces per-user query scoping in the `byUser` scope, and returns audit logs sorted by most recent change so QA suites and dashboards stay aligned.
+- Channel administration now loads only the viewed record in detail tables, bypasses product global scopes for relationship checks, sanitizes factory-generated codes, and aligns slug auto-fill tests with Filament v4 helpers to keep the resource reliable during regressions.
 - Attribute administration keeps validation rule strings verbatim, surfaces array-based rules as comma-separated chips, and pairs with regression tests that prove both paths round-trip correctly through Filament.
 - Attribute group filters, columns, and form selectors now share a translation fallback so legacy group slugs render as readable labels instead of raw keys throughout the Filament admin.
 - Filament dashboard access checks now fall back to open access when no

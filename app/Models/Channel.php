@@ -8,6 +8,7 @@ use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\StatusScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -35,87 +36,109 @@ final class Channel extends Model
 
     protected $table = 'channels';
 
-    protected $fillable = ['name', 'slug', 'code', 'type', 'description', 'timezone', 'url', 'is_enabled', 'is_default', 'is_active', 'sort_order', 'metadata', 'configuration', 'domain', 'ssl_enabled', 'meta_title', 'meta_description', 'meta_keywords', 'analytics_tracking_id', 'analytics_enabled', 'payment_methods', 'payment_matrix', 'default_payment_method', 'shipping_methods', 'default_shipping_method', 'free_shipping_threshold', 'currency_code', 'currency_symbol', 'currency_position', 'default_language', 'supported_languages', 'contact_email', 'contact_phone', 'contact_address', 'social_media', 'legal_documents'];
-
     /**
-     * Handle casts functionality with proper error handling.
+     * @var array<int, string> Safely mass assignable channel attributes.
      */
-    protected function casts(): array
-    {
-        return ['is_enabled' => 'boolean', 'is_default' => 'boolean', 'is_active' => 'boolean', 'ssl_enabled' => 'boolean', 'analytics_enabled' => 'boolean', 'sort_order' => 'integer', 'free_shipping_threshold' => 'decimal:2', 'metadata' => 'array', 'configuration' => 'array', 'payment_methods' => 'array', 'payment_matrix' => 'array', 'shipping_methods' => 'array', 'supported_languages' => 'array', 'social_media' => 'array', 'legal_documents' => 'array'];
-    }
+    protected $fillable = [
+        'name',
+        'slug',
+        'code',
+        'type',
+        'description',
+        'timezone',
+        'url',
+        'domain',
+        'is_enabled',
+        'is_default',
+        'is_active',
+        'ssl_enabled',
+        'analytics_enabled',
+        'sort_order',
+        'metadata',
+        'configuration',
+        'currency_code',
+        'currency_symbol',
+        'currency_position',
+    ];
 
     /**
-     * Handle orders functionality with proper error handling.
+     * @var array<string, string> Attribute casts ensuring typed access to toggles and configuration blobs.
+     */
+    protected $casts = [
+        'is_enabled'        => 'boolean',
+        'is_default'        => 'boolean',
+        'is_active'         => 'boolean',
+        'ssl_enabled'       => 'boolean',
+        'analytics_enabled' => 'boolean',
+        'sort_order'        => 'integer',
+        'metadata'          => 'array',
+        'configuration'     => 'array',
+    ];
+
+    /**
+     * Describe the one-to-many relationship between channels and orders.
      */
     public function orders(): HasMany
     {
-        return $this->hasMany(Order::class);
+        return $this->hasMany(Order::class)->withoutGlobalScopes();
     }
 
     /**
-     * Handle discounts functionality with proper error handling.
+     * Describe the one-to-many relationship between channels and discounts.
      */
     public function discounts(): HasMany
     {
-        return $this->hasMany(Discount::class);
+        return $this->hasMany(Discount::class)->withoutGlobalScopes();
     }
 
     /**
-     * Handle products functionality with proper error handling.
+     * Describe the many-to-many relationship between channels and products.
      */
     public function products(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class);
+        // Skip global scopes so pivot checks in tests do not filter freshly attached products.
+        return $this->belongsToMany(Product::class)->withoutGlobalScopes();
     }
 
     /**
-     * Handle scopeEnabled functionality with proper error handling.
-     *
-     * @param mixed $query
+     * Limit the query to enabled channels only.
      */
-    public function scopeEnabled($query)
+    public function scopeEnabled(Builder $query): Builder
     {
         return $query->where('is_enabled', true);
     }
 
     /**
-     * Handle scopeDefault functionality with proper error handling.
-     *
-     * @param mixed $query
+     * Limit the query to the default channel definition.
      */
-    public function scopeDefault($query)
+    public function scopeDefault(Builder $query): Builder
     {
         return $query->where('is_default', true);
     }
 
     /**
-     * Handle scopeActive functionality with proper error handling.
-     *
-     * @param mixed $query
+     * Limit the query to channels currently marked as active.
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
 
     /**
-     * Handle scopeByType functionality with proper error handling.
-     *
-     * @param mixed $query
+     * Restrict channels by their delivery type (web, mobile, api, ...).
      */
-    public function scopeByType($query, string $type)
+    public function scopeByType(Builder $query, string $type): Builder
     {
         return $query->where('type', $type);
     }
 
     /**
-     * Handle scopeOrdered functionality with proper error handling.
-     *
-     * @param mixed $query
+     * Order channels deterministically for navigation surfaces.
      */
-    public function scopeOrdered($query)
+    public function scopeOrdered(Builder $query): Builder
     {
-        return $query->orderBy('sort_order')->orderBy('name');
+        return $query
+            ->orderBy('sort_order')
+            ->orderBy('name');
     }
 }

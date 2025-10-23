@@ -201,17 +201,7 @@ class AppServiceProvider extends ServiceProvider
             class_alias(\Filament\Schemas\Components\Utilities\Set::class, \Filament\Forms\Set::class);
         }
 
-        if (! class_exists(\Filament\Infolists\Components\Section::class) && class_exists(\Filament\Schemas\Components\Section::class)) {
-            class_alias(\Filament\Schemas\Components\Section::class, \Filament\Infolists\Components\Section::class);
-        }
-
-        if (! class_exists(\Filament\Infolists\Components\Grid::class) && class_exists(\Filament\Schemas\Components\Grid::class)) {
-            class_alias(\Filament\Schemas\Components\Grid::class, \Filament\Infolists\Components\Grid::class);
-        }
-
-        // Expose the custom widget tab templates as Blade components for compatibility with Filament 4.
-        Blade::component('filament.components.widget-tabs.index', 'filament.components.widget-tabs.index');
-        Blade::component('filament.components.widget-tabs.item', 'filament.components.widget-tabs.item');
+        $this->registerChannelResourceAliases();
 
         if (class_exists(\Filament\Forms\Components\FileUpload::class)) {
             \Filament\Forms\Components\FileUpload::configureUsing(
@@ -705,5 +695,24 @@ class AppServiceProvider extends ServiceProvider
         }
 
         SearchableComponentHelper::registerPayloadMacros();
+    }
+
+    /**
+     * Provide backwards compatible aliases for the legacy Channels namespace used in fixtures.
+     */
+    private function registerChannelResourceAliases(): void
+    {
+        $aliases = [
+            \App\Filament\Resources\ChannelResource\Pages\ListChannels::class  => \App\Filament\Resources\Channels\ChannelResource\Pages\ListChannels::class,
+            \App\Filament\Resources\ChannelResource\Pages\CreateChannel::class => \App\Filament\Resources\Channels\ChannelResource\Pages\CreateChannel::class,
+            \App\Filament\Resources\ChannelResource\Pages\EditChannel::class   => \App\Filament\Resources\Channels\ChannelResource\Pages\EditChannel::class,
+            \App\Filament\Resources\ChannelResource\Pages\ViewChannel::class   => \App\Filament\Resources\Channels\ChannelResource\Pages\ViewChannel::class,
+        ];
+
+        foreach ($aliases as $original => $alias) {
+            if (! class_exists($alias)) {
+                class_alias($original, $alias);
+            }
+        }
     }
 }
