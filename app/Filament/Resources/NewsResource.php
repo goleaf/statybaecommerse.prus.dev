@@ -12,7 +12,6 @@ use App\Models\News;
 use App\Models\Translations\NewsTranslation;
 use BackedEnum;
 use Filament\Forms;
-use Filament\Forms\Components\Combobox;
 use Filament\Forms\Form;
 use Filament\Infolists;
 use Filament\Notifications\Notification;
@@ -26,6 +25,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
+use Novadaemon\FilamentCombobox\Combobox;
 use RuntimeException;
 
 class NewsResource extends Resource
@@ -141,8 +141,6 @@ class NewsResource extends Resource
                     Combobox::make('categories')
                         ->label(__('news.fields.categories'))
                         ->relationship('categories', 'name')
-                        ->multiple()
-                        ->preload()
                         ->boxSearchs()
                         ->height('320px')
                         ->optionsLabel(__('news.combobox.categories.available'))
@@ -150,8 +148,6 @@ class NewsResource extends Resource
                     Combobox::make('tags')
                         ->label(__('news.fields.tags'))
                         ->relationship('tags', 'name')
-                        ->multiple()
-                        ->preload()
                         ->boxSearchs()
                         ->height('320px')
                         ->optionsLabel(__('news.combobox.tags.available'))
