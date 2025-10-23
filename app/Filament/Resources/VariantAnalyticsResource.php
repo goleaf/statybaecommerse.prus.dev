@@ -37,7 +37,7 @@ final class VariantAnalyticsResource extends Resource
      */
     protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    /** @var string|BackedEnum|null Ensure inventory analytics stay grouped centrally. */
+    /** @var string|\BackedEnum|UnitEnum|null Ensure inventory analytics stay grouped centrally. */
     protected static $navigationGroup = NavigationGroup::Inventory;
 
     /**
