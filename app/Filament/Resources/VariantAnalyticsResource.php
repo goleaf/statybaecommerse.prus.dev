@@ -59,7 +59,10 @@ final class VariantAnalyticsResource extends Resource
      */
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    protected static ?string $navigationGroup = NavigationGroup::Inventory->value;
+    /**
+     * @var string|null
+     */
+    protected static ?string $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 2;
 
