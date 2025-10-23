@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Api;
 
+use App\Models\Campaign;
 use App\Models\CampaignClick;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -12,43 +14,83 @@ final class CampaignClickListingTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_per_page_is_capped(): void
+    public function test_index_returns_paginated_results_with_default_sort(): void
     {
-        CampaignClick::factory()->count(120)->create();
+        CampaignClick::factory()->count(3)->sequence(fn (int $index) => [
+            'clicked_at' => now()->subMinutes($index * 5),
+        ])->create();
 
-        $response = $this->getJson('/campaign-clicks?per_page=500');
+        $response = $this->getJson('/campaign-clicks?per_page=2');
 
-        $response->assertOk()
-            ->assertJsonPath('meta.per_page', 100)
-            ->assertJsonCount(100, 'data');
+        $response->assertOk();
+        $response->assertJsonStructure([
+            'success',
+            'data',
+            'meta' => ['pagination' => ['total', 'per_page', 'current_page', 'last_page', 'count', 'from', 'to'], 'sort' => ['by', 'direction'], 'filters'],
+            'links' => ['first', 'last', 'prev', 'next'],
+        ]);
+
+        $payload = $response->json();
+
+        $this->assertSame(2, count($payload['data']));
+        $this->assertSame('clicked_at', $payload['meta']['sort']['by']);
+        $this->assertSame('desc', $payload['meta']['sort']['direction']);
+        $this->assertSame(2, $payload['meta']['pagination']['per_page']);
+        $this->assertSame(3, $payload['meta']['pagination']['total']);
     }
 
-    public function test_invalid_sort_returns_validation_error(): void
+    public function test_index_applies_filters_and_exposes_meta_filters(): void
     {
-        $response = $this->getJson('/campaign-clicks?sort=invalid:asc');
+        $campaign = Campaign::factory()->create();
+        $converted = CampaignClick::factory()->converted()->create([
+            'clicked_at' => now()->subDay(),
+            'campaign_id' => $campaign->id,
+            'device_type' => 'mobile',
+        ]);
 
-        $response->assertStatus(422);
+        CampaignClick::factory()->create([
+            'clicked_at' => now()->subDays(5),
+            'campaign_id' => Campaign::factory(),
+            'device_type' => 'desktop',
+            'is_converted' => false,
+        ]);
+
+        $dateFrom = now()->subDays(2)->toDateString();
+        $response = $this->getJson('/campaign-clicks?is_converted=1&campaign_id='.$campaign->id.'&date_from='.$dateFrom);
+
+        $response->assertOk();
+        $payload = $response->json();
+
+        $this->assertCount(1, $payload['data']);
+        $this->assertSame($converted->id, $payload['data'][0]['id']);
+        $this->assertTrue($payload['meta']['filters']['is_converted']);
+        $this->assertSame($campaign->id, $payload['meta']['filters']['campaign_id']);
+        $this->assertSame($dateFrom, $payload['meta']['filters']['date_from']);
     }
 
-    public function test_empty_result_returns_empty_payload(): void
+    public function test_index_rejects_invalid_sort_parameter(): void
     {
-        $response = $this->getJson('/campaign-clicks?filter[campaign_id]=999999');
+        $response = $this->getJson('/campaign-clicks?sort_by=invalid-column');
 
-        $response->assertOk()
-            ->assertJsonPath('data', [])
-            ->assertJsonPath('meta.total', 0);
+        $response->assertUnprocessable();
+        $response->assertJsonValidationErrors(['sort_by']);
     }
 
-    public function test_last_page_indicators_are_correct(): void
+    public function test_index_limits_results_to_authenticated_customer(): void
     {
-        CampaignClick::factory()->count(3)->create();
+        $user = User::factory()->create();
+        $ownClick = CampaignClick::factory()->withCustomer()->create([
+            'customer_id' => $user->id,
+        ]);
 
-        $response = $this->getJson('/campaign-clicks?per_page=2&page=2&sort=clicked_at:desc');
+        CampaignClick::factory()->count(2)->create();
 
-        $response->assertOk()
-            ->assertJsonPath('meta.page', 2)
-            ->assertJsonPath('meta.total_pages', 2)
-            ->assertJsonPath('links.next', null)
-            ->assertJsonPath('links.prev', fn ($value) => is_string($value));
+        $response = $this->actingAs($user)->getJson('/campaign-clicks');
+
+        $response->assertOk();
+        $payload = $response->json();
+
+        $this->assertCount(1, $payload['data']);
+        $this->assertSame($ownClick->id, $payload['data'][0]['id']);
     }
 }

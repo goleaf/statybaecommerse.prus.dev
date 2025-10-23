@@ -4,33 +4,49 @@ declare(strict_types=1);
 
 namespace App\Support\ListQuery;
 
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 final class ListResponse
 {
     /**
-     * @template T
-     * @param callable(T):mixed|null $transformer
+     * @template TValue
+     *
+     * @param callable(TValue): array|null $transform
+     * @return array{data: array<int, mixed>, meta: array<string, mixed>, links: array<string, string|null>}
      */
-    public static function fromPaginator(LengthAwarePaginator $paginator, ?callable $transformer = null): array
+    public static function fromPaginator(LengthAwarePaginator $paginator, ListQuery $query, ?callable $transform = null): array
     {
-        $items = $paginator->items();
+        $collection = $paginator->getCollection();
 
-        if ($transformer !== null) {
-            $items = array_map($transformer, $items);
+        if ($transform !== null) {
+            $collection = $collection->map(static fn ($item) => $transform($item));
         }
 
+        $data = $collection->values()->all();
+
         return [
-            'data' => $items,
+            'data' => $data,
             'meta' => [
-                'page' => $paginator->currentPage(),
-                'per_page' => $paginator->perPage(),
-                'total' => $paginator->total(),
-                'total_pages' => $paginator->lastPage(),
+                'pagination' => [
+                    'total' => $paginator->total(),
+                    'count' => $paginator->count(),
+                    'per_page' => $paginator->perPage(),
+                    'current_page' => $paginator->currentPage(),
+                    'last_page' => $paginator->lastPage(),
+                    'from' => $paginator->firstItem(),
+                    'to' => $paginator->lastItem(),
+                ],
+                'sort' => [
+                    'by' => $query->sortBy(),
+                    'direction' => $query->sortDirection(),
+                ],
+                'filters' => $query->activeFilters(),
             ],
             'links' => [
-                'next' => $paginator->nextPageUrl(),
+                'first' => $paginator->url(1),
+                'last' => $paginator->url($paginator->lastPage()),
                 'prev' => $paginator->previousPageUrl(),
+                'next' => $paginator->nextPageUrl(),
             ],
         ];
     }

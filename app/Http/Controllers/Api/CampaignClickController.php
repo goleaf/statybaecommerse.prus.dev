@@ -69,76 +69,29 @@ final class CampaignClickController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $definition = ListQueryDefinition::make(
-            allowedSorts: [
-                'clicked_at' => 'clicked_at',
-                'created_at' => 'created_at',
-                'conversion_value' => 'conversion_value',
-            ],
-            defaultSort: 'clicked_at',
-            defaultDirection: 'desc',
-            defaultPerPage: 15,
-            maxPerPage: 100,
-        );
-
+        $definition = $this->campaignClickListDefinition();
         $listQuery = ListQueryValidator::fromRequest($request, $definition);
 
-        $query = CampaignClick::with(['campaign', 'customer']);
+        $query = CampaignClick::query()->with(['campaign', 'customer']);
 
-        // Route bound campaign (campaign/{campaign}/clicks) should be respected
-        if ($request->route('campaign')) {
-            $query->where('campaign_id', (int) $request->route('campaign'));
-        }
-
-        $filters = $listQuery->filters;
-
-        if (array_key_exists('campaign_id', $filters)) {
-            $query->where('campaign_id', $filters['campaign_id']);
-        }
-
-        if (array_key_exists('click_type', $filters)) {
-            $query->where('click_type', $filters['click_type']);
-        }
-
-        if (array_key_exists('device_type', $filters)) {
-            $query->where('device_type', $filters['device_type']);
-        }
-
-        if (array_key_exists('is_converted', $filters)) {
-            $query->where('is_converted', filter_var($filters['is_converted'], FILTER_VALIDATE_BOOLEAN));
-        }
-
-        if (array_key_exists('country', $filters)) {
-            $query->where('country', $filters['country']);
-        }
-
-        if (array_key_exists('utm_source', $filters)) {
-            $query->where('utm_source', $filters['utm_source']);
-        }
-
-        if (array_key_exists('date_from', $filters)) {
-            $query->where('clicked_at', '>=', $filters['date_from']);
-        }
-
-        if (array_key_exists('date_to', $filters)) {
-            $query->where('clicked_at', '<=', $filters['date_to']);
-        }
-
-        // For authenticated users, show only their clicks
         if (Auth::check()) {
             $query->where('customer_id', Auth::id());
         }
 
-        $query = $listQuery->apply($query, $definition);
-
-        $paginator = $query->paginate($listQuery->perPage, ['*'], 'page', $listQuery->page)
-            ->appends($request->query());
+        $paginator = $listQuery->apply($query, $definition);
 
         $response = ListResponse::fromPaginator(
-            $paginator->through(fn (CampaignClick $click) => (new CampaignClickResource($click))->resolve()),
+            $paginator,
+            $listQuery,
+            static fn (CampaignClick $click) => (new CampaignClickResource($click))->toArray($request),
         );
 
-        return response()->json($response);
+        return response()->json([
+            'success' => true,
+            'data' => $response['data'],
+            'meta' => $response['meta'],
+            'links' => $response['links'],
+        ]);
     }
 
     #[OA\Post(
@@ -457,5 +410,28 @@ final class CampaignClickController extends Controller
             });
             fclose($handle);
         }, 200, $headers);
+}
+
+    private function campaignClickListDefinition(): ListQueryDefinition
+    {
+        return ListQueryDefinition::make()
+            ->defaultPerPage(15)
+            ->maxPerPage(100)
+            ->defaultSort('clicked_at', 'desc')
+            ->allowedSorts([
+                'clicked_at' => ['column' => 'clicked_at'],
+                'created_at' => ['column' => 'created_at'],
+                'conversion_value' => ['column' => 'conversion_value'],
+            ])
+            ->filters([
+                'campaign_id' => ['type' => 'int', 'column' => 'campaign_id'],
+                'click_type' => ['type' => 'string', 'column' => 'click_type'],
+                'device_type' => ['type' => 'string', 'column' => 'device_type'],
+                'is_converted' => ['type' => 'bool', 'column' => 'is_converted'],
+                'country' => ['type' => 'string', 'column' => 'country'],
+                'utm_source' => ['type' => 'string', 'column' => 'utm_source'],
+                'date_from' => ['type' => 'date', 'column' => 'clicked_at', 'operator' => '>='],
+                'date_to' => ['type' => 'date', 'column' => 'clicked_at', 'operator' => '<='],
+            ]);
     }
 }
