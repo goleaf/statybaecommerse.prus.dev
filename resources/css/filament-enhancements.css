@@ -1,6 +1,19 @@
-@import './filament/widget-tabs.css';
+@import '../../vendor/filament/support/dist/index.css';
 
-/* Filament Enhancements CSS */
-/* This file provides additional styling for Filament admin panel */
+@source '../../vendor/filament/**/*.blade.php';
+@source '../../vendor/defstudio/filament-searchable-input/resources/**/*.blade.php';
 
-/* Custom enhancements can be added here */
+/*
+ |--------------------------------------------------------------------------
+ | Filament Enhancements
+ |--------------------------------------------------------------------------
+ |
+ | Use this file to extend the default Filament admin appearance. The
+ | imports above ensure the base Filament styles continue to load while also
+ | exposing the searchable input plugin views to Tailwind's JIT compiler so
+ | their utility classes are preserved in production builds.
+ */
+
+:root {
+    /* Reserved for future design tokens specific to the admin panel. */
+}

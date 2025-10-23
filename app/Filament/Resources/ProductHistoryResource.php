@@ -12,6 +12,7 @@ use App\Filament\Resources\ProductHistoryResource\Widgets\ProductHistoryStatsWid
 use App\Filament\Resources\ProductHistoryResource\Widgets\RecentProductChangesWidget;
 use App\Models\ProductHistory;
 use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
@@ -33,10 +34,7 @@ final class ProductHistoryResource extends Resource
 
     protected static ?string $model = ProductHistory::class;
 
-    /**
-     * Icon used in the navigation menu. Type: string|BackedEnum|null.
-     */
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clock';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-clock';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
@@ -77,9 +75,11 @@ final class ProductHistoryResource extends Resource
                     SelectInput::make('action', __('product_history.action'))
                         ->required()
                         ->options(self::actionOptions()),
-                    TextInputInput::make('field_name', __('product_history.field_name'))
-                        ->columnSpan(1)
-                        ->maxLength(255),
+                    SearchableInput::make('field_name')
+                        ->label(__('product_history.field_name'))
+                        ->maxLength(255)
+                        ->searchUsing(fn (string $search): array => self::fieldNameSuggestions($search))
+                        ->options(fn (): array => self::fieldNameSuggestions()),
                 ]),
             Section::make(__('product_history.details'))
                 ->columns(2)
@@ -151,6 +151,24 @@ final class ProductHistoryResource extends Resource
                     ->label(__('product_history.user'))
                     ->relationship('user', 'name')
                     ->preload(),
+                Filter::make('field_name')
+                    ->label(__('product_history.field_name'))
+                    ->form([
+                        SearchableInput::make('field_name')
+                            ->label(__('product_history.field_name'))
+                            ->maxLength(255)
+                            ->searchUsing(fn (string $search): array => self::fieldNameSuggestions($search))
+                            ->options(fn (): array => self::fieldNameSuggestions()),
+                    ])
+                    ->indicateUsing(fn (array $data): array => filled($data['field_name'] ?? null)
+                        ? [__('product_history.field_name') . ': ' . $data['field_name']]
+                        : [])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query->when(
+                            filled($data['field_name'] ?? null),
+                            fn (Builder $query, string $fieldName): Builder => $query->where('field_name', $fieldName),
+                        );
+                    }),
                 Filter::make('date')
                     ->label(__('product_history.date'))
                     ->form([
@@ -241,6 +259,22 @@ final class ProductHistoryResource extends Resource
             'status_changed' => 'purple',
             default          => 'secondary',
         };
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function fieldNameSuggestions(?string $search = null): array
+    {
+        return ProductHistory::query()
+            ->select('field_name')
+            ->whereNotNull('field_name')
+            ->when($search !== null, fn (Builder $query): Builder => $query->where('field_name', 'like', "%{$search}%"))
+            ->distinct()
+            ->orderBy('field_name')
+            ->limit(20)
+            ->pluck('field_name')
+            ->all();
     }
 
     private static function encodeJsonForTextarea(mixed $value): ?string
