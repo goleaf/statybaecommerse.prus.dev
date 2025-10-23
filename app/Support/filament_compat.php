@@ -54,6 +54,70 @@ namespace Asmit\ResizedColumn {
     }
 }
 
+namespace Hydrat\TableLayoutToggle\Concerns {
+    if (! trait_exists(HasToggleableTable::class)) {
+        trait HasToggleableTable
+        {
+            public ?string $layoutView = null;
+
+            public function initializeHasToggleableTable(): void
+            {
+                // No-op fallback.
+            }
+
+            public function updatedLayoutView(mixed $value): void
+            {
+                // No-op fallback.
+            }
+
+            public function bootHasToggleableTable(): void
+            {
+                $this->layoutView ??= $this->getDefaultLayoutView();
+            }
+
+            public function configurePersister(): void
+            {
+                // No-op fallback.
+            }
+
+            public function bootedHasToggleableTable(): void
+            {
+                // No-op fallback.
+            }
+
+            public function getDefaultLayoutView(): string
+            {
+                return 'list';
+            }
+
+            public function isGridLayout(): bool
+            {
+                return $this->getLayoutView() === 'grid';
+            }
+
+            public function isListLayout(): bool
+            {
+                return $this->getLayoutView() === 'list';
+            }
+
+            public function getLayoutView(): string
+            {
+                return $this->layoutView ?? $this->getDefaultLayoutView();
+            }
+
+            protected function registerLayoutViewToogleActionHook(string $filamentHook): void
+            {
+                // No-op fallback.
+            }
+
+            public function changeLayoutView(): void
+            {
+                $this->layoutView = $this->isListLayout() ? 'grid' : 'list';
+            }
+        }
+    }
+}
+
 namespace {
     if (! class_exists(\Filament\Infolists\Infolist::class) && class_exists(\Filament\Schemas\Schema::class)) {
         class_alias(\Filament\Schemas\Schema::class, \Filament\Infolists\Infolist::class);

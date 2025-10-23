@@ -10,6 +10,7 @@ use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 
 use function class_exists;
 
+use Filament\Contracts\Plugin as FilamentPlugin;
 use Filament\Enums\UserMenuPosition;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -208,24 +209,45 @@ final class AdminPanelProvider extends PanelProvider
      */
     private function configuredPlugins(): array
     {
-        return array_values(array_filter([
-            FilamentShieldPlugin::make(),
-            $this->makeFullCalendarPlugin(),
-            TableLayoutTogglePlugin::make()
+        $plugins = [];
+
+        if (class_exists(FilamentShieldPlugin::class)) {
+            $plugins[] = FilamentShieldPlugin::make();
+        }
+
+        if ($fullCalendar = $this->makeFullCalendarPlugin()) {
+            $plugins[] = $fullCalendar;
+        }
+
+        if (class_exists(TableLayoutTogglePlugin::class)) {
+            $tableLayoutPlugin = TableLayoutTogglePlugin::make()
                 ->setDefaultLayout('grid')
-                ->persistLayoutUsing(
-                    persister: LocalStoragePersister::class,
-                    cacheStore: 'redis',
-                    cacheTtl: 60 * 24,
-                )
                 ->shareLayoutBetweenPages(false)
                 ->displayToggleAction()
                 ->toggleActionHook('tables::toolbar.search.after')
                 ->listLayoutButtonIcon('heroicon-o-list-bullet')
-                ->gridLayoutButtonIcon('heroicon-o-squares-2x2'),
-            FilamentNordThemePlugin::make(),
-            ResizedColumnPlugin::make()->preserveOnDB(),
-        ], static fn (?FilamentPlugin $plugin): bool => $plugin instanceof FilamentPlugin));
+                ->gridLayoutButtonIcon('heroicon-o-squares-2x2');
+
+            if (class_exists(LocalStoragePersister::class)) {
+                $tableLayoutPlugin->persistLayoutUsing(
+                    persister: LocalStoragePersister::class,
+                    cacheStore: 'redis',
+                    cacheTtl: 60 * 24,
+                );
+            }
+
+            $plugins[] = $tableLayoutPlugin;
+        }
+
+        if (class_exists(FilamentNordThemePlugin::class)) {
+            $plugins[] = FilamentNordThemePlugin::make();
+        }
+
+        if (class_exists(ResizedColumnPlugin::class)) {
+            $plugins[] = ResizedColumnPlugin::make()->preserveOnDB();
+        }
+
+        return array_values($plugins);
     }
 
     /**
@@ -258,58 +280,6 @@ final class AdminPanelProvider extends PanelProvider
                 return $navigationGroup;
             })
             ->all();
-    }
-
-    private function makeFilamentShieldPlugin(): ?\Filament\Contracts\Plugin
-    {
-        if (! class_exists(FilamentShieldPlugin::class)) {
-            return null;
-        }
-
-        return FilamentShieldPlugin::make();
-    }
-
-    private function makeFilamentNordThemePlugin(): ?\Filament\Contracts\Plugin
-    {
-        if (! class_exists(FilamentNordThemePlugin::class)) {
-            return null;
-        }
-
-        return FilamentNordThemePlugin::make();
-    }
-
-    private function makeResizedColumnPlugin(): ?\Filament\Contracts\Plugin
-    {
-        if (! class_exists(ResizedColumnPlugin::class)) {
-            return null;
-        }
-
-        return ResizedColumnPlugin::make()->preserveOnDB();
-    }
-
-    private function makeTableLayoutTogglePlugin(): ?\Filament\Contracts\Plugin
-    {
-        if (! class_exists(TableLayoutTogglePlugin::class)) {
-            return null;
-        }
-
-        $plugin = TableLayoutTogglePlugin::make()
-            ->setDefaultLayout('grid')
-            ->shareLayoutBetweenPages(false)
-            ->displayToggleAction()
-            ->toggleActionHook('tables::toolbar.search.after')
-            ->listLayoutButtonIcon('heroicon-o-list-bullet')
-            ->gridLayoutButtonIcon('heroicon-o-squares-2x2');
-
-        if (class_exists(LocalStoragePersister::class)) {
-            $plugin->persistLayoutUsing(
-                persister: LocalStoragePersister::class,
-                cacheStore: 'redis',
-                cacheTtl: 60 * 24,
-            );
-        }
-
-        return $plugin;
     }
 
     private function makeFullCalendarPlugin(): ?\Filament\Contracts\Plugin
