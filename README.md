@@ -17,6 +17,8 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 ### Latest updates
+- Hardened the `2025_02_15_120000_add_created_at_indexes` migration with case-insensitive index detection and information schema fallbacks, eliminating duplicate key errors during repeated deploys or fresh seeds.
+- Expanded the currency schema and demo country seeder so multilingual fields, activation flags, and translation records stay in sync, keeping `php artisan migrate:fresh --seed` reliable on both SQLite and MySQL setups.
 - Added an initial `customer_groups` table migration so downstream enhancements (missing fields, soft deletes, translations) run without errors during `php artisan migrate:fresh --seed` on clean environments.
 - Stock reservation migrations now stage foreign keys after their parent tables exist, preventing `php artisan migrate:fresh --seed` from failing on pristine databases while keeping cascade rules in place for live systems.
 - Filament admin navigation now standardises every icon and group declaration on the BackedEnum/UnitEnum union types mandated by v4, eliminating the PHP 8.3 fatals that previously surfaced during `composer install`.
