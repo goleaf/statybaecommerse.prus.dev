@@ -15,20 +15,13 @@ use Illuminate\Support\Carbon;
 final class EnhancedEcommerceOverview extends StatsOverviewWidget
 {
     /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     * Navigation icon override (Filament expects a string identifier).
      */
-    protected static $navigationIcon = 'heroicon-o-presentation-chart-line';
+    protected static ?string $navigationIcon = 'heroicon-o-presentation-chart-line';
 
     protected static $navigationLabel = 'Enh. E-commerce Overview';
 
-    /**
-     * Navigation group for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static $navigationGroup = 'Dashboard';
+    protected static ?string $navigationGroup = 'Dashboard';
 
     protected string $maxHeight = '32rem';
 
