@@ -44,8 +44,6 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use BackedEnum;
-use UnitEnum;
 
 final class EnumManagementResource extends Resource
 {
@@ -58,12 +56,7 @@ final class EnumManagementResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-squares-2x2';
-    }
-
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): string|\UnitEnum|null
     {
         return trans('admin.enums.navigation_groups.system');
     }

@@ -34,7 +34,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 final class MenuResource extends Resource
 {
@@ -44,7 +43,7 @@ final class MenuResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Content';
+    protected static \UnitEnum|string|null $navigationGroup = 'Content';
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -188,37 +187,10 @@ final class MenuResource extends Resource
                         // Flip the active flag before Filament resolves the success notification payload.
                         $record->update(['is_active' => ! $record->is_active]);
                     })
-                    ->successNotificationTitle(static fn (Menu $record): string => $record->is_active
+                    ->successNotificationTitle(fn (Menu $record): string => $record->is_active
                         ? __('menus.activated_successfully')
                         : __('menus.deactivated_successfully')
                     ),
-                Action::make('duplicate')
-                    ->label(__('menus.duplicate'))
-                    ->icon('heroicon-o-document-duplicate')
-                    ->color('secondary')
-                    ->requiresConfirmation()
-                    ->action(function (Menu $record): void {
-                        $timestamp = now()->timestamp;
-
-                        $duplicate = $record->replicate([
-                            'created_at',
-                            'updated_at',
-                        ]);
-
-                        $duplicate->name = sprintf('%s (Copy)', $record->name);
-                        $duplicate->key = sprintf('%s_copy_%s', $record->key, $timestamp);
-
-                        $duplicate->save();
-
-                        $title = $record->is_active
-                            ? __('menus.activated_successfully')
-                            : __('menus.deactivated_successfully');
-
-                        Notification::make()
-                            ->title($title)
-                            ->success()
-                            ->send();
-                    }),
                 Action::make('duplicate')
                     ->label(__('menus.duplicate'))
                     ->icon('heroicon-o-document-duplicate')

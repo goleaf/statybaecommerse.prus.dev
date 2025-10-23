@@ -24,7 +24,7 @@ final class InventoryManagement extends Page implements HasTable
 
     protected static ?string $navigationIcon = 'heroicon-o-archive-box';
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): string|\UnitEnum|null
     {
         return 'Products';
     }
