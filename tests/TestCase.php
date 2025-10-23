@@ -11,6 +11,7 @@ use Illuminate\Contracts\Translation\Loader as TranslationLoader;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
@@ -21,16 +22,27 @@ abstract class TestCase extends BaseTestCase
 
     private bool $createdEnvFile = false;
 
-    private string $sqliteDatabasePath;
+    private ?string $sqliteDatabasePath = null;
 
     private ?Panel $resolvedAdminPanel = null;
 
     protected function setUp(): void
     {
-        // Resolve the shared SQLite database location before the application boots so the
-        // parent setup sequence works with the same persistent datastore prepared by
-        // Tests\Support\TestingDatabase.
-        $this->sqliteDatabasePath = TestingDatabase::path();
+        // Calculate and prepare the SQLite database path before booting the application so the
+        // framework picks up the correct connection details during the refresh cycle.
+        $this->sqliteDatabasePath = dirname(__DIR__).'/database/testing.sqlite';
+        if (! file_exists($this->sqliteDatabasePath)) {
+            touch($this->sqliteDatabasePath);
+        }
+
+        // Update environment variables prior to the parent setup call because Laravel resolves
+        // database configuration while bootstrapping the application instance.
+        putenv('DB_CONNECTION=sqlite');
+        putenv('DB_DATABASE='.$this->sqliteDatabasePath);
+        $_ENV['DB_CONNECTION'] = 'sqlite';
+        $_ENV['DB_DATABASE'] = $this->sqliteDatabasePath;
+        $_SERVER['DB_CONNECTION'] = 'sqlite';
+        $_SERVER['DB_DATABASE'] = $this->sqliteDatabasePath;
 
         parent::setUp();
 
@@ -42,8 +54,11 @@ abstract class TestCase extends BaseTestCase
         }
 
         Config::set('database.default', 'sqlite');
-        Config::set('database.connections.sqlite.database', ':memory:');
-        Config::set('app.key', 'base64:' . base64_encode(random_bytes(32)));
+        Config::set('database.connections.sqlite.database', $this->sqliteDatabasePath);
+        // Explicitly refresh the schema after adjusting the database configuration to guarantee
+        // migrations run against the on-disk SQLite database used for tests.
+        Artisan::call('migrate:fresh', ['--force' => true]);
+        Config::set('app.key', 'base64:'.base64_encode(random_bytes(32)));
         // Ensure Telescope doesn't use MySQL during tests and avoid watchers overhead
         Config::set('telescope.enabled', false);
         Config::set('telescope.storage.database.connection', 'sqlite');
@@ -82,6 +97,12 @@ abstract class TestCase extends BaseTestCase
 
         parent::tearDown();
 
+        // Clean up the temporary SQLite database file after each test run to prevent stale
+        // state from impacting subsequent tests or developers running the suite locally.
+        if ($this->sqliteDatabasePath !== null && file_exists($this->sqliteDatabasePath)) {
+            unlink($this->sqliteDatabasePath);
+            $this->sqliteDatabasePath = null;
+        }
     }
 
     protected function resolveAdminPanel(): Panel
