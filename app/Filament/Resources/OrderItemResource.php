@@ -12,6 +12,7 @@ use App\Support\Filament\ProductVariantFieldHelper;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Filament\Filters\DateRangeFilter;
 use App\Support\Filament\ProductVariantFieldHelper;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;
 use App\Support\Search\ProductVariantSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
