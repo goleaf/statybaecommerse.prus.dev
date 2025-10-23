@@ -24,7 +24,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -59,7 +59,7 @@ final class CategoryResource extends Resource
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
     /** Align the resource under the Products navigation section. */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
+    protected static \Filament\Navigation\NavigationGroup|array|string|null $navigationGroup = NavigationGroup::Products->value;
 
     protected static ?int $navigationSort = 3;
 
@@ -117,9 +117,9 @@ final class CategoryResource extends Resource
         return __('categories.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('categories.basic_information'))
                 ->components([
                     LanguageTabs::make([

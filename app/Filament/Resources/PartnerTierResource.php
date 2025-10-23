@@ -26,11 +26,11 @@ final class PartnerTierResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static \UnitEnum|string|null $navigationGroup = 'Marketing';
+    protected static \Filament\Navigation\NavigationGroup|array|string|null $navigationGroup = 'Marketing';
 
     protected static ?string $model = PartnerTier::class;
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
     {
         return 'Marketing';
     }

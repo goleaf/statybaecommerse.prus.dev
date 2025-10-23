@@ -43,7 +43,7 @@ final class SystemSettingCategoryTranslationResource extends Resource
     /**
      * @var string|\UnitEnum|null Navigation group assignment stored without a typed property to avoid enum collisions.
      */
-    protected static \UnitEnum|string|null $navigationGroup = 'Settings';
+    protected static \Filament\Navigation\NavigationGroup|array|string|null $navigationGroup = 'Settings';
 
     protected static bool $shouldRegisterNavigation = false;
 

@@ -47,7 +47,7 @@ final class VariantImageResource extends Resource
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-photo';
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
     {
         return 'Inventory';
     }

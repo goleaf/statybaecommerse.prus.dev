@@ -55,7 +55,7 @@ final class CampaignProductTargetResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'target_type';
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
     {
         return 'Marketing';
     }

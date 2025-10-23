@@ -57,9 +57,9 @@ final class SystemSettingCategoryResource extends Resource
     /**
      * @var string|BackedEnum|null Keep navigation grouping aligned with the shared enum helper.
      */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::System;
+    protected static \Filament\Navigation\NavigationGroup|array|string|null $navigationGroup = NavigationGroup::System->value;
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
     {
         // Harmonize enum and string groups to avoid leaking raw enum values in the UI.
         $group = self::$navigationGroup;

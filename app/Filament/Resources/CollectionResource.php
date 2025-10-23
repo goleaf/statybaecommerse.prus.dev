@@ -7,7 +7,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CollectionResource\Pages;
 use App\Models\Collection;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -29,7 +29,8 @@ final class CollectionResource extends Resource
     /**
      * Group the resource under the "Products" navigation entry.
      */
-    protected static \UnitEnum|string|null $navigationGroup = 'Products';
+    /** @var \Filament\Navigation\NavigationGroup|array|string|null */
+    protected static \Filament\Navigation\NavigationGroup|array|string|null $navigationGroup = 'Products';
 
     /**
      * Display icon used by Filament's sidebar.
@@ -41,9 +42,9 @@ final class CollectionResource extends Resource
      * Collection attributes. Additional validation rules can be added
      * later without affecting the expectations covered by the tests.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             // Basic collection metadata.
             Forms\Components\TextInput::make('name')
                 ->label(__('collections.name'))
@@ -128,7 +129,7 @@ final class CollectionResource extends Resource
      * Return the navigation group configured for the resource so
      * the test-suite can confirm it matches the Nav helper output.
      */
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
     {
         return static::$navigationGroup;
     }
