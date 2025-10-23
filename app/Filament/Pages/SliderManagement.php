@@ -8,7 +8,9 @@ use App\Forms\Components\Flatpickr;
 use App\Models\Slider;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Search\ContentLinkSearch;
+use App\Support\Search\SearchableComponentHelper;
 use BackedEnum;
+use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
@@ -42,9 +44,6 @@ class SliderManagement extends Page implements HasActions, HasForms
 {
     use InteractsWithActions, InteractsWithForms;
 
-    /**
-     * Navigation icon override (string|\BackedEnum|null).
-     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationLabel = 'Slider Management';
@@ -124,10 +123,21 @@ class SliderManagement extends Page implements HasActions, HasForms
                                 ->maxLength(255),
                             SearchableInput::make('button_url')
                                 ->label(__('translations.button_url'))
-                                ->placeholder(__('translations.button_url_placeholder'))
-                                ->helperText(__('translations.button_url_helper'))
-                                ->searchUsing(fn (string $term): array => ContentLinkSearch::suggest($term))
-                                ->maxLength(255),
+                                ->placeholder(__('translations.slider_link_placeholder'))
+                                ->maxLength(255)
+                                ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
+                                ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
+                                ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
+                                    ContentLinkSearch::hydrateComponent($component, $state);
+                                })
+                                ->onItemSelected(function (SearchResult $item, SearchableInput $component): void {
+                                    SearchableComponentHelper::apply($component, $item);
+                                })
+                                ->afterStateUpdated(function (?string $state, SearchableInput $component): void {
+                                    if ($state === null || $state === '') {
+                                        SearchableComponentHelper::forget($component);
+                                    }
+                                }),
                         ]),
                         TextInput::make('button_url')
                             ->label(__('translations.button_url'))
@@ -294,10 +304,20 @@ class SliderManagement extends Page implements HasActions, HasForms
                                     ->directory('sliders/slides'),
                                 SearchableInput::make('link')
                                     ->label(__('translations.slide_link'))
-                                    ->placeholder(__('translations.button_url_placeholder'))
-                                    ->helperText(__('translations.button_url_helper'))
-                                    ->searchUsing(fn (string $term): array => ContentLinkSearch::suggest($term))
-                                    ->maxLength(255),
+                                    ->placeholder(__('translations.slider_link_placeholder'))
+                                    ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
+                                    ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
+                                    ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
+                                        ContentLinkSearch::hydrateComponent($component, $state);
+                                    })
+                                    ->onItemSelected(function (SearchResult $item, SearchableInput $component): void {
+                                        SearchableComponentHelper::apply($component, $item);
+                                    })
+                                    ->afterStateUpdated(function (?string $state, SearchableInput $component): void {
+                                        if ($state === null || $state === '') {
+                                            SearchableComponentHelper::forget($component);
+                                        }
+                                    }),
                             ])
                             ->collapsible()
                             ->itemLabel(fn (array $state): ?string => $state['title'] ?? null),

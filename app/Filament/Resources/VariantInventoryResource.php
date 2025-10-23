@@ -6,14 +6,14 @@ namespace App\Filament\Resources;
 
 use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\VariantInventoryResource\Pages;
-use App\Models\Location;
-use App\Models\ProductVariant;
 use App\Models\VariantInventory;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Search\LocationSearch;
 use App\Support\Search\PartnerSearch;
 use App\Support\Search\ProductVariantSearch;
+use App\Support\Search\SearchableComponentHelper;
 use BackedEnum;
+use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -96,41 +96,45 @@ final class VariantInventoryResource extends Resource
                                     ->placeholder(__('admin.variant_inventory.placeholders.variant'))
                                     ->searchUsing(fn (string $term): array => ProductVariantSearch::results($term))
                                     ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?VariantInventory $record): void {
-                                        if ($state === null || ! $record?->variant) {
+                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                        ProductVariantSearch::hydrateComponent($component, $state);
+                                    })
+                                    ->onItemSelected(function (SearchResult $item, SearchableInput $component, Set $set): void {
+                                        SearchableComponentHelper::apply($component, $item);
+                                        $set('variant_id', (int) $item->value());
+                                    })
+                                    ->afterStateUpdated(function (?string $state, Set $set, SearchableInput $component): void {
+                                        if ($state === null || $state === '') {
+                                            SearchableComponentHelper::forget($component);
+                                            $set('variant_id', null);
+
                                             return;
                                         }
 
-                                        $component
-                                            ->state((string) $state)
-                                            ->options([
-                                                (string) $record->variant_id => ProductVariantSearch::label($record->variant),
-                                            ]);
-                                    })
-                                    ->afterStateUpdated(function (?string $state, callable $set): void {
-                                        $set('variant_id', $state !== null && $state !== '' ? (int) $state : null);
-                                    })
-                                    ->required(),
+                                        $set('variant_id', (int) $state);
+                                    }),
                                 SearchableInput::make('location_id')
                                     ->label(__('admin.variant_inventory.location'))
                                     ->placeholder(__('admin.variant_inventory.placeholders.location'))
                                     ->searchUsing(fn (string $term): array => LocationSearch::results($term))
                                     ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?VariantInventory $record): void {
-                                        if ($state === null || ! $record?->location) {
+                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                        LocationSearch::hydrateComponent($component, $state);
+                                    })
+                                    ->onItemSelected(function (SearchResult $item, SearchableInput $component, Set $set): void {
+                                        SearchableComponentHelper::apply($component, $item);
+                                        $set('location_id', (int) $item->value());
+                                    })
+                                    ->afterStateUpdated(function (?string $state, Set $set, SearchableInput $component): void {
+                                        if ($state === null || $state === '') {
+                                            SearchableComponentHelper::forget($component);
+                                            $set('location_id', null);
+
                                             return;
                                         }
 
-                                        $component
-                                            ->state((string) $state)
-                                            ->options([
-                                                (string) $record->location_id => LocationSearch::label($record->location),
-                                            ]);
-                                    })
-                                    ->afterStateUpdated(function (?string $state, callable $set): void {
-                                        $set('location_id', $state !== null && $state !== '' ? (int) $state : null);
-                                    })
-                                    ->required(),
+                                        $set('location_id', (int) $state);
+                                    }),
                             ]),
                         Grid::make(2)
                             ->schema([
