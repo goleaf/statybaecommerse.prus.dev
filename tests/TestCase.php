@@ -10,12 +10,11 @@ use Filament\Panel;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Illuminate\Contracts\Translation\Loader as TranslationLoader;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
-use Illuminate\Foundation\Testing\RefreshDatabaseState;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
 
 abstract class TestCase extends BaseTestCase
@@ -53,14 +52,31 @@ abstract class TestCase extends BaseTestCase
         }
 
         Config::set('database.default', 'sqlite');
-        Config::set('database.connections.sqlite.database', ':memory:');
+        Config::set('database.connections.sqlite.database', database_path('database.sqlite'));
         Config::set('app.key', 'base64:' . base64_encode(random_bytes(32)));
         // Ensure Telescope doesn't use MySQL during tests and avoid watchers overhead
         Config::set('telescope.enabled', false);
         Config::set('telescope.storage.database.connection', 'sqlite');
-        Config::set('activitylog.database_connection', 'sqlite');
-        Config::set('app.key', 'base64:'.base64_encode(random_bytes(32)));
-
+        // Provision the companies table on demand when migrations are unavailable in isolated unit tests.
+        if (! Schema::hasTable('companies')) {
+            Schema::create('companies', function (Blueprint $table): void {
+                $table->id();
+                $table->string('name');
+                $table->string('email')->nullable();
+                $table->string('phone')->nullable();
+                $table->text('address')->nullable();
+                $table->string('website')->nullable();
+                $table->string('industry')->nullable();
+                $table->enum('size', ['small', 'medium', 'large'])->nullable();
+                $table->text('description')->nullable();
+                $table->boolean('is_active')->default(true);
+                $table->json('metadata')->nullable();
+                $table->timestamps();
+                $table->index('is_active');
+                $table->index('industry');
+                $table->index('size');
+            });
+        }
         $this->refreshTranslationLoader();
         app()->instance('request', Request::create('/'));
         $this->withoutMiddleware([
@@ -127,6 +143,17 @@ abstract class TestCase extends BaseTestCase
         $this->resolvedAdminPanel = $panel;
 
         return $panel;
+    }
+
+    /**
+     * Ensure the in-memory SQLite database is active before migrations execute.
+     *
+     * @return void
+     */
+    protected function beforeRefreshingDatabase()
+    {
+        Config::set('database.default', 'sqlite');
+        Config::set('database.connections.sqlite.database', database_path('database.sqlite'));
     }
 
     /**

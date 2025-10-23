@@ -26,7 +26,7 @@
 ## Admin panel resilience
 - The base test harness now resets Laravel's refresh state before each boot cycle so in-memory SQLite migrations execute for every PHPUnit suite, eliminating the missing table errors that previously surfaced in feature tests.
 - The custom Edit Profile page now imports `Filament\\Schemas\\Schema`, keeping the authentication profile form aligned with v4 expectations and preventing namespace-related fatal errors during automated test cycles.
-- Discount Redemption navigation now lives under the Marketing group with a warning badge and Filament v4 badge styling, and the Pest harness includes a HasTable-aware stub so table schemas are exercised reliably in unit tests.
+- Company model unit tests now provision the `companies` schema during setup and relax the global active scope until migrations run, so SQLite suites no longer fail with missing-table errors.
 - Pest test bootstrap helpers now guard the `login()`, `get()`, and `post()` helpers with function-existence checks so repeated includes during `php artisan test` runs no longer trigger fatal redeclaration errors.
 - Address autocomplete builders now emit top-level metadata and skip user-owned scopes, keeping admin search suggestions accurate for support agents who are not impersonating a specific shopper.
 - Added a foundational `customer_groups` migration so later schema updates (extra permissions, soft deletes, translations) apply cleanly during `php artisan migrate:fresh --seed` runs.

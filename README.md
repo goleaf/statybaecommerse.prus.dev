@@ -20,7 +20,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - Feature tests now reset Laravel's refresh flag before booting, ensuring in-memory SQLite migrations run for every suite and avoiding the missing table exceptions previously raised by the API endpoints.
 - Recently viewed storefront responses now fall back to bare identifiers for draft products while still returning the full media payload for published catalogue entries, keeping session-driven history widgets predictable.
 - Search endpoints now respect mixed-case `types[]` filters by normalizing them server-side, preventing fallback to all buckets when storefront clients request specific result categories.
-- Data import regression coverage now uses reflection to exercise the protected truncation helper on the final Artisan command, keeping foreign key enforcement tests intact without weakening the command's contract.
+- Company model unit tests now bootstrap the SQLite `companies` table and defer the active scope until migrations complete, eliminating missing-table crashes during `php artisan test` runs.
 - Storefront autocomplete now trims and caches queries, reuses injected services for faster bucket lookups, and delivers safe highlight markup so Live Search suggestions no longer show raw `<mark>` tags.
 - Analytics event tracking now skips restrictive user scopes during console execution, tolerates missing request data, and reports float-safe revenue totals so dashboards and regression suites stay in sync.
 - API rate limiting and authorization helpers now fall back to raw configuration files when container bindings are unavailable, allowing console diagnostics and unit tests to execute without fatal bindings.
