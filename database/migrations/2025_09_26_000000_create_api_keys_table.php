@@ -10,7 +10,9 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::dropIfExists('api_keys');
+        if (Schema::hasTable('api_keys')) {
+            return;
+        }
 
         Schema::create('api_keys', function (Blueprint $table): void {
             $table->id();

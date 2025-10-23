@@ -2,9 +2,14 @@
 
 declare(strict_types=1);
 
-use App\Filament\AdminPanelProvider;
+use App\Providers\Filament\AdminPanelProvider;
 use Filament\Enums\UserMenuPosition;
 use Filament\Panel;
+use Illuminate\Foundation\Testing\RefreshDatabaseState;
+
+beforeEach(function (): void {
+    RefreshDatabaseState::$migrated = true;
+});
 
 it('disables the topbar and moves the user menu to the sidebar', function (): void {
     $provider = new AdminPanelProvider;

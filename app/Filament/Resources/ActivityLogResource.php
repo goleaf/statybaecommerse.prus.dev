@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\ActivityLogResource\Pages;
 use App\Models\ActivityLog;
 use BackedEnum;
@@ -17,13 +16,15 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Database\Eloquent\Model;
 use UnitEnum;
 
 final class ActivityLogResource extends Resource
 {
     protected static ?string $model = ActivityLog::class;
+
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
+
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
 
     protected static ?int $navigationSort = 9;
 
@@ -36,16 +37,6 @@ final class ActivityLogResource extends Resource
     protected static ?string $pluralModelLabel = null;
 
     protected static ?string $recordTitleAttribute = 'description';
-
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return __('navigation.groups.system');
-    }
-
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-document-text';
-    }
 
     public static function getNavigationLabel(): string
     {
@@ -82,6 +73,8 @@ final class ActivityLogResource extends Resource
      */
     public static function table(Table $table): Table
     {
+        $modelClass = self::getModel();
+
         return $table
             ->columns([
                 TextColumn::make('id')
@@ -113,7 +106,7 @@ final class ActivityLogResource extends Resource
             ->filters([
                 SelectFilter::make('log_name')
                     ->label(__('Log Name'))
-                    ->options(fn(): array => ActivityLog::query()
+                    ->options(fn (): array => $modelClass::query()
                         ->select('log_name')
                         ->whereNotNull('log_name')
                         ->distinct()
@@ -121,7 +114,7 @@ final class ActivityLogResource extends Resource
                         ->toArray()),
                 SelectFilter::make('subject_type')
                     ->label(__('Subject Type'))
-                    ->options(fn(): array => ActivityLog::query()
+                    ->options(fn (): array => $modelClass::query()
                         ->select('subject_type')
                         ->whereNotNull('subject_type')
                         ->distinct()
