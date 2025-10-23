@@ -1,6 +1,7 @@
 # Platform Features
 
 ## Fulfilment & Logistics
+
 - Orders and zones now rely on first-class shipping option relationships, so factories and regression tests can link carriers
   without hand-setting foreign keys.
 - Stock reservation migrations now create their tables before wiring foreign keys, so full database refreshes finish cleanly while live environments keep cascading deletes for products and variant inventories.
@@ -11,7 +12,7 @@
 - Filament currency administration now accepts extended ISO identifiers, surfaces inactive entries for auditing, and respects per-currency separators when rendering formatted amounts.
 
 ## Data integrity & seeding
-- Products now persist the expanded status enum by migrating the column to a string-based implementation, allowing values like `active` to survive fresh installs and SQLite-powered test suites without CHECK constraint failures.
+
 - Demo store seeder now calls the collection and collection-product seeders, ensuring curated collections always feature representative products during fresh installs and automated demos.
 - PHPUnit harness now provisions a shared `database/testing.sqlite` file, runs a focused SQLite migration that seeds Spatie permission tables and variant attribute pivots, and registers Filament SearchableInput payload macros so suites share deterministic schema state without losing compatibility.
 - Region hierarchies and the `customers` table now provision automatically during SQLite migrations, ensuring factories, analytics widgets, and Filament resources can persist customer journeys without manual schema patches.
@@ -33,24 +34,24 @@
 - Filament autocomplete select components now discard model global scopes during lookups so catalog managers immediately see freshly created records in suggestion lists while still benefiting from cached, trimmed queries.
 
 ## Discounts & promotions
-- Coupon Usage administration now exposes the standard delete action and an exact-date filter that also accepts Livewire's `filterTable()` strings, keeping the Filament UI and regression coverage perfectly aligned.
+
 - Coupon migrations now provision maximum discount caps, per-user usage limits, and product/category scoping columns so factories, admin forms, and API tests share the same schema snapshot during refreshes.
 - Coupon application responses now round computed totals instead of calling `Number::parseFloat` on floats, keeping the discount API stable across PHP 8.3 test runs.
 
 ## Storefront discovery
-- Cache invalidation service now flushes featured collections, navigation menus, and live dashboard stats across tagged cache stores and Livewire components whenever catalogue data changes, keeping showcases accurate during edits.
+
 - Brands directory was redesigned with a light-themed layout, shared card components, and refreshed translations for English and Lithuanian so partner browsing feels polished across locales.
 - Search endpoint hardening now rejects suspicious SQL fragments and adds an explicit exact-match boost so precise catalogue queries surface first and malicious payloads return empty buckets.
 - Search type filters now normalise mixed-case identifiers from clients, ensuring storefront queries stay restricted to the requested product, category, or brand buckets instead of ballooning to every result group.
 - Catalogue search now rebuilds product metrics from related tables, honours the `product_categories` pivot, and tolerates Redis being unavailable so the API behaves consistently across MySQL and SQLite deployments.
 
 ## API contracts
+
 - OpenAPI documentation now mirrors the lean product meta payload and nullable media thumbnails emitted by the presenter, keeping schema validators and client SDKs in sync with production responses.
 
 ## Admin panel resilience
-- Customer group management now honours Filament v4 action namespaces, bridges the legacy `create` helper to mounted actions, sets sensible defaults for discount fields, and normalises single-locale translations back to plain strings so regression tests and admin workflows stay aligned without sacrificing multilingual support.
-- Customer group activation toggles now mirror `is_active` and `is_enabled` updates, coercing boolean-like values from forms,
-  factories, and seed data so scopes, dashboards, and legacy queries all read the same state.
+
+- Filament address workflows now register the Spatie translatable plugin during tests, bypass Vite assets in testing, and inline their widget tab markup, keeping Livewire feature tests and real admin sessions aligned without plugin or manifest errors.
 - Attribute administration keeps validation rule strings verbatim, surfaces array-based rules as comma-separated chips, and pairs with regression tests that prove both paths round-trip correctly through Filament.
 - Attribute group filters, columns, and form selectors now share a translation fallback so legacy group slugs render as readable labels instead of raw keys throughout the Filament admin.
 - Filament dashboard access checks now fall back to open access when no
@@ -98,41 +99,49 @@
 - User Product Interaction analytics pages restore Filament v4-friendly spacing for interaction filters and rating badges, silencing the concatenation notices flagged while QAing PR #1097.
 
 ## Storefront experience
+
 - The localized search page now opens with a guided hero, live result metrics, and improved empty states so shoppers can refine Makita-grade queries without leaving the results screen.
 
 ## Caching & performance
+
 - Cache invalidation conflicts from PR #120 are closed: navigation/menu caches now rely on the shared tag helper, model events invoke the invalidation service automatically, and new storefront/dashboard regression tests confirm cached payloads refresh right after catalogue updates.
 - Storefront autocomplete reuses injected cache and highlighting services, trims whitespace-only queries, and sanitizes highlight payloads so results load faster without leaking `<mark>` tags into the suggestion UI.
 
 ## Content safety and compliance
+
 - Established an allow-listed HTML sanitizer that runs on product descriptions, translations, and legal documents to prevent script injection.
 - The sanitizer now removes entire `<script>`, `<style>`, and `<template>` elements instead of leaving their inline payloads behind, keeping sanitized storefront and admin content free from executable remnants.
 - Added a storefront `<x-sanitized-html>` component so any rendered rich text automatically passes through the sanitizer.
 - Shipped the `php artisan maintenance:sanitize-html` command to reprocess legacy content in bulk.
 
 ## Security hardening
+
 - Documented the open proposal in PR #289 to layer per-user and per-IP throttling buckets across read, write, notification, and autocomplete APIs with correlation-aware logging so security reviewers can coordinate the upcoming rollout.
 - Request-scoped CSP nonces now propagate through middleware, helpers, Livewire, and Vite so every inline Blade script/style satisfies the stricter nonce-based CSP and updated HSTS/permissions policy headers.
 
 ## Tooling polish
+
 - `scripts/upgrade_filament_schema.php` now updates navigation icon docblocks automatically while refactoring `form`, `infolist`, and `table` signatures, making repeated schema migrations safe for the entire Filament tree.
 - The `data:import` Artisan command now documents its signature and description directly on the command class, improving discoverability via `php artisan list`.
 - Legacy diagnostics artisan commands were retired in favour of PHPUnit suites guarded by a configurable coverage extension and Paratest-aware composer scripts, making quality checks part of every test run.
 
 ## API experience
-- Contract validation endpoints now mirror the published schemas thanks to the persistent SQLite test bootstrap and trimmed response envelopes, ensuring the API suite passes on fresh installs.
+
 - Product search, catalogue, and detail endpoints resolve via dedicated application use cases, an Eloquent-backed repository, and a presenter that preserves the public contract while filtering hidden or malformed catalogue entries.
 - Problem+JSON responses now include the shared `error.rate_limited` code for HTTP 429 throttling scenarios, helping integrators react uniformly when the throttle middleware triggers.
 - Validation problem responses now deliver localized violation arrays plus a fallback English reason so clients can show consistent messaging while still exposing locale-specific details.
 - Access denied HTTP exceptions now keep their explicit denial reason inside `error.context.reason`, aligning Symfony-generated responses with Laravel's authorization handler contract.
 
 ## Documentation consolidation
+
 - Documentation now lives in dedicated `docs/analysis/`, `docs/runbooks/`, and `docs/contracts/` directories, with a new [style guide](docs/STYLE_GUIDE.md) and CI guard ensuring Markdown stays reviewable.
 
 ## Project governance
+
 - Maintainer playbooks now capture the Oct 21–22, 2025 PR triage in `docs/analysis/CURRENT_SYSTEM_STATUS.md`, calling out immediate merges, superseded branches, and fix-required submissions so review queues stay actionable without reprocessing GitHub filters.
 
 ## Reference
+
 - Review `app/Filament/Resources/ShippingOptionResource.php` for the table presentation logic and `app/Models/ShippingOption.php` for the accessor reused across storefront components.
 - Developer tooling now documents the restored Husky bootstrap shim, keeping cross-platform Git hooks consistent for contributors.
 - Filament analytics utilities reference the updated User Product Interaction resource so schema contract mismatches no longer block admin boot sequences.
