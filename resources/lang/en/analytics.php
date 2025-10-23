@@ -16,6 +16,7 @@ return [
     'status' => 'Status',
     'pending' => 'Pending',
     'processing' => 'Processing',
+    'completed' => 'Completed',
     'shipped' => 'Shipped',
     'delivered' => 'Delivered',
     'cancelled' => 'Cancelled',
@@ -69,7 +70,32 @@ return [
     'export_report' => 'Export Report',
     'refresh_data' => 'Refresh Data',
     'view' => 'View',
-    'view_order' => 'View Order',
+    'actions' => [
+        'view_order' => 'View order',
+    ],
+    'columns' => [
+        'order_date' => 'Order date',
+        'order_number' => 'Order number',
+        'customer_name' => 'Customer',
+        'customer_email' => 'Customer email',
+        'items_count' => 'Items',
+        'order_total' => 'Order total',
+        'status' => 'Status',
+        'sales_channel' => 'Sales channel',
+        'placed_at' => 'Placed at',
+        'updated_at' => 'Updated at',
+    ],
+    'filters' => [
+        'status' => 'Order status',
+        'status_placeholder' => 'Select status',
+        'date_range' => 'Order date range',
+        'high_value' => 'High value orders',
+        'this_month' => 'Orders this month',
+    ],
+    'groups' => [
+        'status' => 'Group by status',
+        'placed_at' => 'Group by month',
+    ],
     // Chart Types
     'line_chart' => 'Line Chart',
     'bar_chart' => 'Bar Chart',
@@ -87,6 +113,11 @@ return [
     'featured' => 'featured',
     'report_exported_successfully' => 'Report exported successfully',
     'data_refreshed_successfully' => 'Data refreshed successfully',
+    'summary' => [
+        'orders_count' => 'Orders',
+        'total_revenue' => 'Total revenue',
+        'average_order_value' => 'Average order value',
+    ],
     'enhanced_overview' => [
         'title' => 'Enhanced E-commerce Overview',
         'navigation_label' => 'Enhanced E-commerce Overview',

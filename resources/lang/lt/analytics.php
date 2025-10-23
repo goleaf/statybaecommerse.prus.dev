@@ -16,6 +16,7 @@ return [
     'status' => 'Būsena',
     'pending' => 'Laukiantis',
     'processing' => 'Apdorojamas',
+    'completed' => 'Užbaigtas',
     'shipped' => 'Išsiųstas',
     'delivered' => 'Pristatytas',
     'cancelled' => 'Atšauktas',
@@ -69,7 +70,32 @@ return [
     'export_report' => 'Eksportuoti ataskaitą',
     'refresh_data' => 'Atnaujinti duomenis',
     'view' => 'Peržiūrėti',
-    'view_order' => 'Peržiūrėti užsakymą',
+    'actions' => [
+        'view_order' => 'Peržiūrėti užsakymą',
+    ],
+    'columns' => [
+        'order_date' => 'Užsakymo data',
+        'order_number' => 'Užsakymo numeris',
+        'customer_name' => 'Klientas',
+        'customer_email' => 'Kliento el. paštas',
+        'items_count' => 'Prekių kiekis',
+        'order_total' => 'Užsakymo suma',
+        'status' => 'Būsena',
+        'sales_channel' => 'Pardavimo kanalas',
+        'placed_at' => 'Sukurta',
+        'updated_at' => 'Atnaujinta',
+    ],
+    'filters' => [
+        'status' => 'Užsakymų būsena',
+        'status_placeholder' => 'Pasirinkite būseną',
+        'date_range' => 'Užsakymų data',
+        'high_value' => 'Aukštos vertės užsakymai',
+        'this_month' => 'Šio mėnesio užsakymai',
+    ],
+    'groups' => [
+        'status' => 'Grupuoti pagal būseną',
+        'placed_at' => 'Grupuoti pagal mėnesį',
+    ],
     // Chart Types
     'line_chart' => 'Linijų Diagrama',
     'bar_chart' => 'Stulpelių Diagrama',
@@ -87,6 +113,11 @@ return [
     'featured' => 'rekomenduojami',
     'report_exported_successfully' => 'Ataskaita sėkmingai eksportuota',
     'data_refreshed_successfully' => 'Duomenys sėkmingai atnaujinti',
+    'summary' => [
+        'orders_count' => 'Užsakymai',
+        'total_revenue' => 'Bendros pajamos',
+        'average_order_value' => 'Vidutinė užsakymo vertė',
+    ],
     'enhanced_overview' => [
         'title' => 'Išplėstinė el. prekybos apžvalga',
         'navigation_label' => 'Išplėstinė el. prekybos apžvalga',
