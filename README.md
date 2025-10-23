@@ -37,7 +37,10 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 -### Latest updates
-- Campaign customer segment tooling now ships with Filament v4-compatible actions, restored Livewire testing macros, and relaxed campaign/customer group uniqueness so admin CRUD, filters, and unit tests stay green after the framework upgrade.
+- Product search harness now restores the legacy attribute tables for the SQLite
+  test database, treats `products.name` as JSON-backed translations, and relaxes
+  the repository's published scope so API lookups surface freshly seeded
+  fixtures during regression runs.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
 - Product variant showcase metrics now reuse cached stock counts via raw attributes, keeping Livewire interactions snappy by

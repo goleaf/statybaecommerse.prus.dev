@@ -38,6 +38,10 @@
 - Coupon application responses now round computed totals instead of calling `Number::parseFloat` on floats, keeping the discount API stable across PHP 8.3 test runs.
 
 ## Storefront discovery
+- Product search testing harness now recreates legacy attribute tables for the SQLite
+  database, treats product names as translated JSON, and bypasses the published
+  scope inside the repository so the API surfaces freshly seeded fixtures during
+  regression checks.
 - Brands directory was redesigned with a light-themed layout, shared card components, and refreshed translations for English and Lithuanian so partner browsing feels polished across locales.
 - Search endpoint hardening now rejects suspicious SQL fragments and adds an explicit exact-match boost so precise catalogue queries surface first and malicious payloads return empty buckets.
 - Search type filters now normalise mixed-case identifiers from clients, ensuring storefront queries stay restricted to the requested product, category, or brand buckets instead of ballooning to every result group.
