@@ -37,7 +37,7 @@ class WidgetTab extends Component
     public static function make(string|Closure|null $label = null): static
     {
         $static = app(static::class, ['label' => $label]);
-        // Trigger the base component bootstrapping to stay compatible with Filament v4.
+        // Leverage the inherited Configurable trait to allow downstream modifiers to hook into setup.
         $static->configure();
 
         return $static;

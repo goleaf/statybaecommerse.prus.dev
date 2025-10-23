@@ -201,7 +201,19 @@ class AppServiceProvider extends ServiceProvider
             class_alias(\Filament\Schemas\Components\Utilities\Set::class, \Filament\Forms\Set::class);
         }
 
-        $this->registerChannelResourceAliases();
+        // Bridge Filament v3 infolist classes to the schema equivalents so Filament v4 resources
+        // can continue to resolve the expected symbols when the newer package is not present.
+        if (! class_exists(\Filament\Infolists\Infolist::class) && class_exists(\Filament\Schemas\Schema::class)) {
+            class_alias(\Filament\Schemas\Schema::class, \Filament\Infolists\Infolist::class);
+        }
+
+        if (! class_exists(\Filament\Infolists\Components\Section::class) && class_exists(\Filament\Schemas\Components\Section::class)) {
+            class_alias(\Filament\Schemas\Components\Section::class, \Filament\Infolists\Components\Section::class);
+        }
+
+        if (! class_exists(\Filament\Infolists\Components\Grid::class) && class_exists(\Filament\Schemas\Components\Grid::class)) {
+            class_alias(\Filament\Schemas\Components\Grid::class, \Filament\Infolists\Components\Grid::class);
+        }
 
         if (class_exists(\Filament\Forms\Components\FileUpload::class)) {
             \Filament\Forms\Components\FileUpload::configureUsing(
