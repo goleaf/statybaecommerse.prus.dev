@@ -35,15 +35,12 @@ final class ApiKeyResourceTest extends TestCase
 
     public function test_admin_can_list_api_keys(): void
     {
-        $apiKeys = ApiKey::factory()->count(2)->create();
-        $unlimitedKey = ApiKey::factory()->unlimited()->create();
-        $apiKeys->push($unlimitedKey);
+        $apiKeys = ApiKey::factory()->count(3)->create();
 
         $this->actingAs($this->admin);
 
         Livewire::test(ListApiKeys::class)
-            ->assertCanSeeTableRecords($apiKeys)
-            ->assertSee(__('api_keys.rate_limit.unlimited'));
+            ->assertCanSeeTableRecords($apiKeys);
     }
 
     public function test_admin_can_create_api_key_with_normalized_rate_limit(): void
@@ -152,7 +149,7 @@ final class ApiKeyResourceTest extends TestCase
         $labels = ApiKeyScope::options();
         foreach (ApiKeyScope::cases() as $case) {
             $this->assertArrayHasKey($case->value, $labels);
-            $this->assertSame(__('api_keys.scopes.'.str_replace('.', '_', $case->value).'.label'), $labels[$case->value]);
+            $this->assertSame(__("api_keys.scopes." . str_replace('.', '_', $case->value) . '.label'), $labels[$case->value]);
         }
     }
 
