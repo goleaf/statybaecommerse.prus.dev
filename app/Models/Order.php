@@ -28,6 +28,9 @@ use Spatie\Translatable\HasTranslations;
  * Eloquent model representing the Order entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
  * @property array $translatable
+ * @property array|null $transactions
+ * @property array|null $billing_address
+ * @property array|null $shipping_address
  * @property mixed $fillable
  * @property mixed $appends
  *
@@ -49,14 +52,25 @@ final class Order extends Model
 
     public array $translatable = ['notes', 'billing_address', 'shipping_address'];
 
-    protected $fillable = ['number', 'user_id', 'status', 'subtotal', 'tax_amount', 'shipping_amount', 'discount_amount', 'total', 'currency', 'billing_address', 'shipping_address', 'notes', 'shipped_at', 'delivered_at', 'channel_id', 'shipping_option_id', 'partner_id', 'payment_status', 'payment_method', 'payment_reference'];
+    protected $fillable = ['number', 'user_id', 'status', 'subtotal', 'tax_amount', 'shipping_amount', 'discount_amount', 'total', 'currency', 'billing_address', 'shipping_address', 'notes', 'shipped_at', 'delivered_at', 'channel_id', 'shipping_option_id', 'partner_id', 'payment_status', 'payment_method', 'payment_reference', 'transactions'];
 
     /**
      * Handle casts functionality with proper error handling.
      */
     protected function casts(): array
     {
-        return ['subtotal' => 'decimal:2', 'tax_amount' => 'decimal:2', 'shipping_amount' => 'decimal:2', 'discount_amount' => 'decimal:2', 'total' => 'decimal:2', 'billing_address' => 'json', 'shipping_address' => 'json', 'shipped_at' => 'datetime', 'delivered_at' => 'datetime'];
+        return [
+            'subtotal' => 'decimal:2',
+            'tax_amount' => 'decimal:2',
+            'shipping_amount' => 'decimal:2',
+            'discount_amount' => 'decimal:2',
+            'total' => 'decimal:2',
+            'billing_address' => 'array',
+            'shipping_address' => 'array',
+            'transactions' => 'array',
+            'shipped_at' => 'datetime',
+            'delivered_at' => 'datetime',
+        ];
     }
 
     /**
