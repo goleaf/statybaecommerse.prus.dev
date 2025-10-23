@@ -10,10 +10,9 @@ use App\Services\TranslationService;
 use App\Support\ApiErrorResponse;
 use App\Support\ErrorCodes;
 use App\Support\RequestContext;
-use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
-use Illuminate\Database\Connectors\ConnectionFactory;
-use Illuminate\Database\DatabaseManager;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -23,7 +22,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
-require_once __DIR__.'/../app/Support/filament_compat.php';
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 // Load the Filament compatibility shims before the application boots so the
 // legacy class aliases are always available during early package discovery.
@@ -187,12 +186,70 @@ $app = Application::configure(basePath: dirname(__DIR__))
                 'errors' => $exception->errors(),
             ]);
 
+            $fallbackMessages = [];
+            $fallbackLocale = TranslationService::getFallbackLocale();
+
+            $validator = $exception->validator;
+
+            if ($validator instanceof ValidatorContract) {
+                $originalLocale = app()->getLocale();
+
+                try {
+                    // Re-run the validator with the fallback locale so we can surface
+                    // a predictable English summary alongside the localized messages.
+                    app()->setLocale($fallbackLocale);
+
+                    $fallbackValidator = app('validator')->make(
+                        $validator->getData(),
+                        $validator->getRules(),
+                        []
+                    );
+
+                    if (property_exists($validator, 'customMessages')) {
+                        $fallbackValidator->setCustomMessages($validator->customMessages);
+                    }
+
+                    if (property_exists($validator, 'fallbackMessages')) {
+                        $fallbackValidator->setFallbackMessages($validator->fallbackMessages);
+                    }
+
+                    if (property_exists($validator, 'customAttributes')) {
+                        $fallbackValidator->setAttributeNames($validator->customAttributes);
+                    }
+
+                    if (property_exists($validator, 'customValues')) {
+                        $fallbackValidator->setValueNames($validator->customValues);
+                    }
+
+                    if (method_exists($validator, 'getPresenceVerifier') && method_exists($fallbackValidator, 'setPresenceVerifier')) {
+                        $presenceVerifier = $validator->getPresenceVerifier();
+
+                        if ($presenceVerifier !== null) {
+                            $fallbackValidator->setPresenceVerifier($presenceVerifier);
+                        }
+                    }
+
+                    $fallbackValidator->fails();
+
+                    $fallbackMessages = $fallbackValidator->errors()->toArray();
+                } finally {
+                    // Always restore the previous locale so downstream formatters keep the
+                    // request-scoped language selected by RequestContext.
+                    app()->setLocale($originalLocale);
+                }
+            }
+
             $violations = collect($exception->errors())
-                ->map(static fn (array $messages, string $field): array => [
-                    'field'    => $field,
-                    'messages' => array_values($messages),
-                    'reason'   => $messages[0] ?? 'Invalid value.',
-                ])
+                ->map(static function (array $messages, string $field) use ($fallbackMessages): array {
+                    $localizedMessages = array_values($messages);
+                    $fallbackReason = $fallbackMessages[$field][0] ?? ($localizedMessages[0] ?? 'Invalid value.');
+
+                    return [
+                        'field'    => $field,
+                        'messages' => $localizedMessages,
+                        'reason'   => $fallbackReason,
+                    ];
+                })
                 ->values()
                 ->all();
 
@@ -416,13 +473,24 @@ $app = Application::configure(basePath: dirname(__DIR__))
                         : (ErrorCodes::message($code, $locale)
                             ?? (SymfonyResponse::$statusTexts[$status] ?? 'HTTP Error'));
 
+                    $context = $throwable->getHeaders() !== []
+                        ? ['headers' => $throwable->getHeaders()]
+                        : [];
+
+                    if ($throwable instanceof AccessDeniedHttpException && $throwable->getMessage() !== '') {
+                        // Mirror the explicit reason we provide for AuthorizationException so
+                        // downstream clients can keep a consistent schema even when Symfony
+                        // wraps the exception in an access denied HTTP variant.
+                        $context['reason'] = $throwable->getMessage();
+                    }
+
                     $response = ApiErrorResponse::problem(
                         request: $request,
                         errorCode: $code,
                         detail: $detail,
                         status: $status,
                         title: ApiErrorResponse::titleFor($code, $locale),
-                        context: $throwable->getHeaders() !== [] ? ['headers' => $throwable->getHeaders()] : [],
+                        context: $context,
                         locale: $locale,
                     );
 
