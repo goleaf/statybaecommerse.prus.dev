@@ -7,6 +7,7 @@ namespace Tests;
 use App\Support\Cache\TagAwareCache;
 use Filament\Facades\Filament;
 use Filament\Panel;
+use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Illuminate\Contracts\Translation\Loader as TranslationLoader;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
@@ -28,8 +29,7 @@ abstract class TestCase extends BaseTestCase
 
     protected function setUp(): void
     {
-        // Reset the RefreshDatabase state so each test run rebuilds the SQLite schema.
-        \Illuminate\Foundation\Testing\RefreshDatabaseState::$migrated = false;
+        RefreshDatabaseState::$migrated = false;
 
         parent::setUp();
 
@@ -51,7 +51,7 @@ abstract class TestCase extends BaseTestCase
         }
 
         Config::set('database.default', 'sqlite');
-        Config::set('database.connections.sqlite.database', $testingDatabasePath);
+        Config::set('database.connections.sqlite.database', database_path('testing.sqlite'));
         Config::set('app.key', 'base64:'.base64_encode(random_bytes(32)));
         // Ensure Telescope doesn't use MySQL during tests and avoid watchers overhead
         Config::set('telescope.enabled', false);
@@ -69,7 +69,13 @@ abstract class TestCase extends BaseTestCase
             \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
 
-        $this->resolveAdminPanel();
+        if (! Schema::connection('sqlite')->hasTable('api_keys')) {
+            // Guarantee the API key schema exists for partner API tests when RefreshDatabase skips migrations.
+            Artisan::call('migrate', [
+                '--database' => 'sqlite',
+                '--force' => true,
+            ]);
+        }
     }
 
     protected function tearDown(): void
@@ -158,6 +164,14 @@ abstract class TestCase extends BaseTestCase
                 $translator->load('*', 'json', $locale);
             }
         }
+    }
+
+    /**
+     * Always run destructive migration commands with the force flag enabled during tests.
+     */
+    protected function migrateFreshUsing()
+    {
+        return array_merge(parent::migrateFreshUsing(), ['--force' => true]);
     }
 
     /**

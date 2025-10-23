@@ -6,7 +6,7 @@ namespace App\Http\Middleware;
 
 use App\Models\ApiKey;
 use Closure;
-use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,7 +33,7 @@ final class EnsurePartnerApiRateLimit
         if (RateLimiter::tooManyAttempts($rateLimiterKey, $limit)) {
             $retryAfter = RateLimiter::availableIn($rateLimiterKey);
 
-            $this->reject($retryAfter, $limit);
+            return $this->reject($retryAfter, $limit);
         }
 
         RateLimiter::hit($rateLimiterKey, $decaySeconds);
@@ -48,7 +48,10 @@ final class EnsurePartnerApiRateLimit
         return $response;
     }
 
-    private function reject(int $retryAfter, int $limit): never
+    /**
+     * Emit a throttling response with explicit retry metadata.
+     */
+    private function reject(int $retryAfter, int $limit): JsonResponse
     {
         $response = response()->json([
             'message' => 'Partner API rate limit exceeded.',
@@ -58,6 +61,6 @@ final class EnsurePartnerApiRateLimit
         $response->headers->set('X-RateLimit-Limit', (string) $limit);
         $response->headers->set('X-RateLimit-Remaining', '0');
 
-        throw new HttpResponseException($response);
+        return $response;
     }
 }

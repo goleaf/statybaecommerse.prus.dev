@@ -14,7 +14,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Realigned the Discount Redemption Filament resource navigation metadata and status badge styling with the v4 table schema so admin pages and supporting tests use the modern badge helpers without compatibility gaps.
 
 ### Maintenance
-* Streamlined the PHPUnit bootstrap to provision a dedicated SQLite testing database and route Telescope/Activity Log storage through that connection so catalog integrity checks no longer fail on missing tables.
+* Hardened partner API test bootstrapping by forcing SQLite migrations, resetting refresh state per case, and refactoring middleware to return JSON responses so 401/403/429 failures no longer surface as 500-level exceptions.
 * Fixed the custom Filament edit profile page to import the correct Schema class, eliminating fatal compatibility errors during automated tests.
 * Normalized Filament navigation icons and groups across pages, resources, relation managers, and widgets to use the BackedEnum-/UnitEnum-aware union types required by Filament v4 so composer installs no longer crash on PHP 8.3.
 * Registered fallback payload macros for Filament searchable inputs and introduced a fake Livewire HasSchemas fixture so unit tests hydrate v4 components without container errors.
