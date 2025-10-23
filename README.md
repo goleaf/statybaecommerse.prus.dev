@@ -31,13 +31,11 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Feature flag governance** with Filament listings that expose inactive and disabled toggles for quick rollout audits and remediation.
 - **Multilingual experience** across storefront and admin via `spatie/laravel-translatable`, Volt-powered Livewire pages, and localized seed data.
 
--### Latest updates
-- Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
-  those values without forcing JSON, and new regression coverage keeps both storage paths stable.
-- Region-aware address tables and the dedicated `customers` dataset are back online for the SQLite harness, letting factories and
-  analytics widgets build customer journeys without missing foreign keys during PHPUnit runs.
-- SearchableInput payload macros are registered lazily with safer fallbacks, and the SQLite testing harness now spins up one
-  database per parallel worker so hydrate/clear flows avoid TypeErrors and filesystem locks during `php artisan test --parallel`.
+### Latest updates
+- Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates those values without forcing JSON, and new regression coverage keeps both storage paths stable.
+- Region-aware address tables and the dedicated `customers` dataset are back online for the SQLite harness, letting factories and analytics widgets build customer journeys without missing foreign keys during PHPUnit runs.
+- SearchableInput payload macros are registered lazily with safer fallbacks, and the SQLite testing harness now spins up one database per parallel worker so hydrate/clear flows avoid TypeErrors and filesystem locks during `php artisan test --parallel`.
+- Filament dashboard smoke tests now boot a lightweight widget stack with a temporary Vite manifest and heroicon fallback while still discovering every resource/page during tests, and user profile contract exports emit deterministic UTC timestamps to keep the import/export suites green.
 - System setting translation records can once again be soft deleted, restored, and replicated thanks to the relaxed locale index and leaner fillable list that align with the documented API expectations.
 - Campaign conversion analytics now keep their translation model, timestamps, and
   scope filters aligned so ROI/ROAS dashboards and PHPUnit coverage see the same
