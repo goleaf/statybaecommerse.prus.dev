@@ -59,29 +59,10 @@ class AdminPanelProvider extends PanelProvider
                 ->colors([
                     'primary' => Color::Blue,
                 ])
-                ->plugins([
-                    $translatablePlugin,
-                ])
-                ->resources([
-                    \App\Filament\Resources\ApiKeyResource::class,
-                    \App\Filament\Resources\OrderShippingResource::class,
-                    \App\Filament\Resources\PartnerResource::class,
-                    \App\Filament\Resources\PartnerTierResource::class,
-                    \App\Filament\Resources\PriceListItemResource::class,
-                    \App\Filament\Resources\ProductResource::class,
-                    \App\Filament\Resources\ProductVariantResource::class,
-                    \App\Filament\Resources\PostResource::class,
-                    \App\Filament\Resources\RecommendationAnalyticsResource::class,
-                    \App\Filament\Resources\RecommendationConfigResource::class,
-                    \App\Filament\Resources\NotificationResource::class,
-                    \App\Filament\Resources\UserBehaviorResource::class,
-                ])
+                // Keep the testing panel lean so sqlite memory databases never load heavy resources that expect extra tables.
+                ->resources([])
                 ->pages([])
-                ->widgets([
-                    GeneralStatsOverview::class,
-                    SalesByMonthChart::class,
-                    StatsOverviewWidget::class,
-                ])
+                ->widgets([])
                 ->middleware([
                     \Illuminate\Session\Middleware\StartSession::class,
                     \Illuminate\View\Middleware\ShareErrorsFromSession::class,
