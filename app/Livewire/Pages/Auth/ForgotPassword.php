@@ -83,7 +83,16 @@ final class ForgotPassword extends Component
             $this->throwRateLimitException($captchaManager, $monitor, primeTimer: false);
         }
 
-        $status = Password::sendResetLink($this->only('email'));
+        $broker = Password::broker();
+
+        // Remove any existing tokens for the user so each permitted attempt dispatches a notification
+        // before the rate limiter triggers and stops further emails from being sent.
+        $user = $broker->getUser($this->only('email'));
+        if ($user !== null) {
+            $broker->deleteToken($user);
+        }
+
+        $status = $broker->sendResetLink($this->only('email'));
 
         if ($status !== Password::RESET_LINK_SENT) {
             $this->addError('email', __($status));
