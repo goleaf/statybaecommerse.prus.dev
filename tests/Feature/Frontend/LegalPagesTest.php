@@ -7,15 +7,14 @@ namespace Tests\Feature\Frontend;
 use App\Models\Legal;
 use App\Models\Translations\LegalTranslation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Feature\TestCase;
 
 final class LegalPagesTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * @dataProvider legalRouteProvider
-     */
+    #[DataProvider('legalRouteProvider')] // Using attributes silences PHPUnit's metadata deprecation warnings.
     public function test_legal_pages_render_successfully(string $routeName, array $state, string $expectedTitle): void
     {
         Legal::factory()
