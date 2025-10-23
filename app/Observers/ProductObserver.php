@@ -6,7 +6,7 @@ namespace App\Observers;
 
 use App\Models\Product;
 use App\Services\Images\GradientImageService;
-use App\UseCases\Cache\InvalidateProductCache;
+use App\Support\Cache\CacheInvalidator;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -16,16 +16,12 @@ use Illuminate\Support\Facades\Log;
  */
 final class ProductObserver
 {
-    public function __construct(
-        private readonly InvalidateProductCache $invalidateProductCache,
-    ) {}
-
     /**
      * Handle created functionality with proper error handling.
      */
     public function created(Product $product): void
     {
-        $this->flushProductCaches();
+        $this->flushProductCaches($product);
 
         // Skip placeholder image generation during tests to prevent memory issues
         if (app()->environment('testing')) {
@@ -84,26 +80,26 @@ final class ProductObserver
 
     public function updated(Product $product): void
     {
-        $this->flushProductCaches();
+        $this->flushProductCaches($product);
     }
 
     public function deleted(Product $product): void
     {
-        $this->flushProductCaches();
+        $this->flushProductCaches($product);
     }
 
     public function restored(Product $product): void
     {
-        $this->flushProductCaches();
+        $this->flushProductCaches($product);
     }
 
     public function forceDeleted(Product $product): void
     {
-        $this->flushProductCaches();
+        $this->flushProductCaches($product);
     }
 
-    private function flushProductCaches(): void
+    private function flushProductCaches(Product $product): void
     {
-        ($this->invalidateProductCache)();
+        app(CacheInvalidator::class)->productChanged($product);
     }
 }

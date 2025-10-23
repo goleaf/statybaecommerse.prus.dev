@@ -8,7 +8,7 @@ parameters:
     - config
   scanFiles:
     - stubs/phpstan/livewire-components.php
-    - stubs/phpstan/cart.php
+    - stubs/phpstan/tag-aware-cache.stub.php
   checkExplicitMixed: true
   checkImplicitMixed: true
   checkMissingTypehints: true

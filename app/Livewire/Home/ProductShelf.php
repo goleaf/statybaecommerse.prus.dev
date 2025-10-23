@@ -7,8 +7,8 @@ namespace App\Livewire\Home;
 use App\Livewire\Concerns\WithCart;
 use App\Livewire\Concerns\WithNotifications;
 use App\Models\Product;
-use App\Services\Shared\CacheService as SharedCacheService;
-use App\Support\Cache\CacheTagHelper;
+use App\Support\Cache\CacheKeys;
+use App\Support\Cache\TagAwareCache;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
@@ -56,49 +56,54 @@ final class ProductShelf extends Component implements HasSchemas
         return app(SharedCacheService::class)->rememberShort($cacheKey, function (): EloquentCollection {
             $locale = app()->getLocale();
 
-        return Cache::remember(CacheKeys::homeShelf($this->preset, $this->limit, $locale), CacheKeys::TTL_MINUTE, function () use ($locale): EloquentCollection {
-            $query = Product::query()
-                ->with(['brand', 'media', 'categories'])
-                ->with(['translations' => function ($q) use ($locale) {
-                    $q->where('locale', $locale);
-                }, 'categories.translations' => function ($q) use ($locale) {
-                    $q->where('locale', $locale);
-                }])
-                ->withAvg(['reviews as average_rating' => fn ($q) => $q->where('is_approved', true)], 'rating')
-                ->withCount(['reviews' => fn ($q) => $q->where('is_approved', true)])
-                ->where('is_visible', true)
-                ->whereNotNull('published_at')
-                ->where('published_at', '<=', now())
-                ->whereNull('deleted_at');
+        return TagAwareCache::remember(
+            CacheKeys::homeShelf($this->preset, $this->limit, $locale),
+            CacheKeys::TTL_MINUTE,
+            function () use ($locale): EloquentCollection {
+                $query = Product::query()
+                    ->with(['brand', 'media', 'categories'])
+                    ->with(['translations' => function ($q) use ($locale) {
+                        $q->where('locale', $locale);
+                    }, 'categories.translations' => function ($q) use ($locale) {
+                        $q->where('locale', $locale);
+                    }])
+                    ->withAvg(['reviews as average_rating' => fn ($q) => $q->where('is_approved', true)], 'rating')
+                    ->withCount(['reviews' => fn ($q) => $q->where('is_approved', true)])
+                    ->where('is_visible', true)
+                    ->whereNotNull('published_at')
+                    ->where('published_at', '<=', now())
+                    ->whereNull('deleted_at');
 
-            $query = match ($this->preset) {
-                'latest' => $query->orderByDesc('published_at'),
-                'sale' => $query
-                    ->where(function ($saleQuery): void {
-                        $saleQuery
-                            ->whereNotNull('sale_price')
-                            ->whereColumn('sale_price', '<', 'price')
-                            ->orWhere(function ($compareQuery): void {
-                                $compareQuery
-                                    ->whereNotNull('compare_price')
-                                    ->whereColumn('compare_price', '>', 'price');
-                            });
-                    })
-                    ->orderByDesc('updated_at')
-                    ->orderByDesc('published_at'),
-                'trending' => $query
-                    ->withSum('orderItems as orders_quantity', 'quantity')
-                    ->orderByDesc('orders_quantity')
-                    ->orderByDesc('reviews_count')
-                    ->orderByDesc('published_at'),
-                default => $query
-                    ->where('is_featured', true)
-                    ->orderBy('sort_order')
-                    ->orderByDesc('published_at'),
-            };
+                $query = match ($this->preset) {
+                    'latest' => $query->orderByDesc('published_at'),
+                    'sale' => $query
+                        ->where(function ($saleQuery): void {
+                            $saleQuery
+                                ->whereNotNull('sale_price')
+                                ->whereColumn('sale_price', '<', 'price')
+                                ->orWhere(function ($compareQuery): void {
+                                    $compareQuery
+                                        ->whereNotNull('compare_price')
+                                        ->whereColumn('compare_price', '>', 'price');
+                                });
+                        })
+                        ->orderByDesc('updated_at')
+                        ->orderByDesc('published_at'),
+                    'trending' => $query
+                        ->withSum('orderItems as orders_quantity', 'quantity')
+                        ->orderByDesc('orders_quantity')
+                        ->orderByDesc('reviews_count')
+                        ->orderByDesc('published_at'),
+                    default => $query
+                        ->where('is_featured', true)
+                        ->orderBy('sort_order')
+                        ->orderByDesc('published_at'),
+                };
 
-            return $query->limit($this->limit)->get();
-        }, 60, CacheTagHelper::products());
+                return $query->limit($this->limit)->get();
+            },
+            [CacheKeys::homeTag()]
+        );
     }
 
     public function productShelf(Schema $schema): Schema

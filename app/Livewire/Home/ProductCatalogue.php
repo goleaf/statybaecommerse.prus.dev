@@ -8,8 +8,8 @@ use App\Livewire\Concerns\WithCart;
 use App\Livewire\Concerns\WithNotifications;
 use App\Models\Category;
 use App\Models\Product;
-use App\Services\Shared\CacheService as SharedCacheService;
-use App\Support\Cache\CacheTagHelper;
+use App\Support\Cache\CacheKeys;
+use App\Support\Cache\TagAwareCache;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
@@ -62,13 +62,18 @@ final class ProductCatalogue extends Component implements HasSchemas
     {
         $locale = app()->getLocale();
 
-        return app(SharedCacheService::class)->rememberLong("home:catalogue:categories:{$locale}", function (): array {
-            return Category::query()
-                ->where('is_visible', true)
-                ->orderBy('name')
-                ->pluck('name', 'id')
-                ->toArray();
-        }, 300, CacheTagHelper::categories());
+        return TagAwareCache::remember(
+            CacheKeys::homeCatalogueCategories($locale),
+            CacheKeys::TTL_FIVE_MINUTES,
+            function (): array {
+                return Category::query()
+                    ->where('is_visible', true)
+                    ->orderBy('name')
+                    ->pluck('name', 'id')
+                    ->toArray();
+            },
+            [CacheKeys::homeTag()]
+        );
     }
 
     #[Computed]

@@ -11,10 +11,8 @@ use App\Models\Category;
 use App\Models\Review;
 use App\Repositories\ProductRepository;
 use App\Support\Cache\CacheKeys;
-use App\Support\Cache\CacheTags;
-use Illuminate\Contracts\View\View;
+use App\Support\Cache\TagAwareCache;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -37,9 +35,7 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return Cache::remember(CacheKeys::homeStats($locale), CacheKeys::TTL_MINUTE, function (): array {
-            $productRepository = app(ProductRepository::class);
-
+        return TagAwareCache::remember(CacheKeys::homeStats($locale), CacheKeys::TTL_MINUTE, function (): array {
             return [
                 'products_count' => $productRepository->visibleCount(),
                 'categories_count' => Category::where('is_visible', true)->count(),
@@ -47,7 +43,7 @@ final class Home extends Component
                 'reviews_count' => Review::where('is_approved', true)->count(),
                 'avg_rating' => (float) (Review::where('is_approved', true)->avg('rating') ?? 0),
             ];
-        });
+        }, [CacheKeys::homeTag(), CacheKeys::productAggregateTag()]);
     }
 
     /**
@@ -58,7 +54,17 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return app(ProductRepository::class)->featured();
+        return TagAwareCache::remember(CacheKeys::homeFeaturedProducts($locale), CacheKeys::TTL_MINUTE, static function (): Collection {
+            return Product::query()
+                ->withoutGlobalScopes()
+                ->where('is_visible', true)
+                ->where('is_featured', true)
+                ->whereNotNull('published_at')
+                ->where('published_at', '<=', now())
+                ->latest('published_at')
+                ->limit(8)
+                ->get();
+        }, [CacheKeys::homeTag()]);
     }
 
     /**
@@ -69,7 +75,16 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return app(ProductRepository::class)->latest();
+        return TagAwareCache::remember(CacheKeys::homeLatestProducts($locale), CacheKeys::TTL_MINUTE, static function (): Collection {
+            return Product::query()
+                ->withoutGlobalScopes()
+                ->where('is_visible', true)
+                ->whereNotNull('published_at')
+                ->where('published_at', '<=', now())
+                ->latest('created_at')
+                ->limit(8)
+                ->get();
+        }, [CacheKeys::homeTag()]);
     }
 
     /**
@@ -80,19 +95,14 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return Cache::tags([
-            CacheTags::home(),
-            CacheTags::locale($locale),
-            CacheTags::reviews(),
-            CacheTags::products(),
-        ])->remember(CacheKeys::homeLatestReviews($locale), now()->addSeconds(60), static function (): Collection {
+        return TagAwareCache::remember(CacheKeys::homeLatestReviews($locale), CacheKeys::TTL_MINUTE, static function (): Collection {
             return Review::query()
                 ->where('is_approved', true)
                 ->with(['product' => static fn ($query) => $query->select('id', 'name', 'slug')])
                 ->latest('created_at')
                 ->limit(6)
                 ->get();
-        });
+        }, [CacheKeys::homeTag()]);
     }
 
     private function rememberWithTagsFallback(array $tags, string $key, \DateTimeInterface|\DateInterval|int $ttl, callable $callback): mixed
