@@ -4,27 +4,23 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use App\Support\Concerns\HasNav;
-use Filament\Schemas\Schema;
 use App\Filament\Resources\CampaignViewResource\Pages;
 use App\Models\CampaignView;
+use App\Support\Concerns\HasNav;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Tabs as SchemaTabs;
 use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use UnitEnum;
 
 final class CampaignViewResource extends Resource
 {
     use HasNav;
-
-    
 
     protected static ?string $model = CampaignView::class;
 
@@ -47,7 +43,7 @@ final class CampaignViewResource extends Resource
         return __('campaign_views.navigation');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -92,7 +88,7 @@ final class CampaignViewResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -115,6 +111,12 @@ final class CampaignViewResource extends Resource
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
+                        if (! is_string($state)) {
+                            // Non-string values should not trigger a tooltip.
+                            return null;
+                        }
+
                         if (strlen($state) <= 50) {
                             return null;
                         }
@@ -127,6 +129,12 @@ final class CampaignViewResource extends Resource
                     ->limit(30)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
+                        if (! is_string($state)) {
+                            // Non-string values should not trigger a tooltip.
+                            return null;
+                        }
+
                         if (strlen($state) <= 30) {
                             return null;
                         }
@@ -152,11 +160,13 @@ final class CampaignViewResource extends Resource
                     ->preload(),
                 SelectFilter::make('ip_address')
                     ->label(__('campaign_views.ip_address'))
-                    ->options(function () {
-                        return CampaignView::distinct('ip_address')
+                    // Provide a deduplicated list of IP addresses so operators can filter without typing free-form values.
+                    ->options(
+                        fn (): array => CampaignView::query()
+                            ->distinct('ip_address')
                             ->pluck('ip_address', 'ip_address')
-                            ->toArray();
-                    })
+                            ->toArray()
+                    )
                     ->searchable(),
             ])
             ->actions([
