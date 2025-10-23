@@ -6,7 +6,6 @@ namespace Database\Factories;
 
 use App\Models\Channel;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 /**
@@ -16,27 +15,15 @@ class ChannelFactory extends Factory
 {
     protected $model = Channel::class;
 
-    /**
-     * @var array<string, true>
-     */
-    private static array $generatedCodes = [];
-
     public function definition(): array
     {
+        static $sequence = 0;
+
         $name = $this->faker->unique()->company() . ' Channel';
-        $baseCode = Str::of($name)
-            ->snake()
-            ->replaceMatches('/[^a-z0-9_]/', '')
-            ->replaceMatches('/_{2,}/', '_')
-            ->trim('_')
-            ->upper()
-            ->limit(12, '')
-            ->value();
 
-        // Guarantee the code respects the alpha_dash rule even when company names contain punctuation.
-        $baseCode = $baseCode !== '' ? $baseCode : Str::upper(Str::random(8));
-
-        $code = $this->generateUniqueCode($baseCode);
+        // Generate a ULID-backed identifier to guarantee uniqueness even when
+        // diagnostics seeders run concurrently across multiple processes.
+        $code = sprintf('chn-%s-%d', Str::lower((string) Str::ulid()), $sequence++);
 
         return [
             // Identity and descriptive metadata.
@@ -79,53 +66,5 @@ class ChannelFactory extends Factory
             'is_default'  => true,
             'is_enabled'  => true,
         ]);
-    }
-
-    /**
-     * Generate a unique channel code while avoiding collisions within the current factory run
-     * and the persisted database records when the table exists.
-     */
-    private function generateUniqueCode(string $baseCode): string
-    {
-        $table = (new Channel())->getTable();
-        $tableExists = Schema::hasTable($table);
-
-        // Ensure we always have a valid uppercase base to work with.
-        $normalisedBase = trim($baseCode, '_');
-        $normalisedBase = $normalisedBase !== '' ? $normalisedBase : Str::upper(Str::random(8));
-
-        $attempts = 0;
-
-        while ($attempts < 100) {
-            $attempts++;
-
-            $candidate = Str::limit(
-                $normalisedBase . '_' . Str::upper(Str::random(6)),
-                20,
-                ''
-            );
-
-            if ($candidate === '') {
-                continue;
-            }
-
-            if (isset(self::$generatedCodes[$candidate])) {
-                continue;
-            }
-
-            if ($tableExists && Channel::where('code', $candidate)->exists()) {
-                continue;
-            }
-
-            self::$generatedCodes[$candidate] = true;
-
-            return $candidate;
-        }
-
-        // Fallback to a full random code if we exhausted attempts (extremely unlikely).
-        $fallback = Str::upper(Str::random(20));
-        self::$generatedCodes[$fallback] = true;
-
-        return $fallback;
     }
 }

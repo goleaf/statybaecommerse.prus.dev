@@ -59,13 +59,26 @@
 
     <!-- Scripts -->
     @php
-        $shouldLoadViteAssets = \App\Support\ViteManifest::isPopulated();
+        // Load Vite assets only when the build manifest exists and contains a
+        // valid JSON structure; this keeps Blade safe during tests where the
+        // build step is intentionally skipped.
+        $manifestPath = public_path('build/manifest.json');
+        $hasManifest = false;
+
+        if (is_file($manifestPath) && is_readable($manifestPath)) {
+            $manifestContents = file_get_contents($manifestPath);
+
+            if ($manifestContents !== false) {
+                $manifestData = json_decode($manifestContents, true);
+                $hasManifest = is_array($manifestData) && $manifestData !== [];
+            }
+        }
     @endphp
 
-    @if ($shouldLoadViteAssets)
+    @if ($hasManifest)
         @vite(['resources/css/app.scss', 'resources/js/app.js'])
     @else
-        {{-- Skip Vite during isolated feature tests when the manifest is absent to keep Blade rendering resilient. --}}
+        {{-- Fall back to the precompiled asset pipeline when Vite has not built a manifest yet. --}}
         <link rel="stylesheet" href="{{ asset('css/app.css') }}">
         <script src="{{ asset('js/app.js') }}" defer></script>
     @endif
