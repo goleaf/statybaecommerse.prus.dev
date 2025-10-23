@@ -19,9 +19,9 @@ final class MatrixFactory
     /**
      * Build a section containing module permission toggles.
      *
-     * @param  array<string, array<string, string>>  $definition
-     * @param  callable(string): string  $moduleLabelResolver
-     * @param  callable(string): string  $abilityLabelResolver
+     * @param array<string, array<string, string>> $definition
+     * @param callable(string): string             $moduleLabelResolver
+     * @param callable(string): string             $abilityLabelResolver
      */
     public static function permissions(
         array $definition,
@@ -91,7 +91,7 @@ final class MatrixFactory
      * - options: array of column key => label pairs
      * - hint (optional): helper text for the row
      *
-     * @param  callable(Get $get): (array<int, array<string, mixed>>|Collection<int, array<string, mixed>>)  $rowsResolver
+     * @param callable(Get $get): (array<int, array<string, mixed>>|Collection<int, array<string, mixed>>) $rowsResolver
      */
     public static function radioGrid(string $statePath, callable $rowsResolver): Component
     {
@@ -114,8 +114,8 @@ final class MatrixFactory
     /**
      * Build a checkbox-based grid for mapping rows to multiple selectable columns.
      *
-     * @param  array<string, string>  $rows
-     * @param  array<string, string>  $columns
+     * @param array<string, string> $rows
+     * @param array<string, string> $columns
      */
     public static function checkboxGrid(string $name, array $rows, array $columns): Matrix
     {
@@ -123,12 +123,15 @@ final class MatrixFactory
             ->rowData($rows)
             ->columnData($columns)
             ->asCheckbox()
+            // Allow the matrix to be submitted without selecting every row so default
+            // channel creation flows (and automated tests) are not blocked by validation.
+            ->rowSelectRequired(false)
             ->default(static fn (): array => []);
     }
 
     /**
-     * @param  callable(string, array<string, mixed>): Component  $fieldFactory
-     * @param  callable(Get $get): (array<int, array<string, mixed>>|Collection<int, array<string, mixed>>)  $rowsResolver
+     * @param callable(string, array<string, mixed>): Component                                            $fieldFactory
+     * @param callable(Get $get): (array<int, array<string, mixed>>|Collection<int, array<string, mixed>>) $rowsResolver
      */
     private static function buildDynamicGrid(string $statePath, callable $rowsResolver, callable $fieldFactory): Component
     {
@@ -140,7 +143,7 @@ final class MatrixFactory
 
                 if ($rows->isEmpty()) {
                     return [
-                        Placeholder::make($statePath.'_empty')
+                        Placeholder::make($statePath . '_empty')
                             ->label(__('No attributes available'))
                             ->content(__('Assign attributes to the product to configure the matrix.')),
                     ];
@@ -161,4 +164,3 @@ final class MatrixFactory
             });
     }
 }
-
