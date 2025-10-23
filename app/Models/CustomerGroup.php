@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\EnabledScope;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Spatie\Translatable\HasTranslations;
 
 /**
@@ -60,12 +62,53 @@ final class CustomerGroup extends Model
         'can_use_coupons',
         'is_active',
         'is_enabled',
+        'is_active',
         'is_default',
-        'sort_order',
-        'type',
         'metadata',
         'conditions',
     ];
+
+    /**
+     * Bootstrap the model and ensure the slug column is automatically maintained.
+     */
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        self::creating(static function (CustomerGroup $customerGroup): void {
+            // Derive the slug from the code or name so the database constraint is always satisfied.
+            $slug = $customerGroup->getAttribute('slug');
+            $customerGroup->setAttribute('slug', $slug ?? self::generateSlug($customerGroup));
+        });
+
+        self::updating(static function (CustomerGroup $customerGroup): void {
+            // Refresh the slug when relevant attributes change while respecting manually provided values.
+            $slug = $customerGroup->getAttribute('slug');
+
+            if ($customerGroup->isDirty(['name', 'code']) && empty($slug)) {
+                $customerGroup->setAttribute('slug', self::generateSlug($customerGroup));
+            }
+        });
+    }
+
+    /**
+     * Generate a consistent slug value based on the group code or translated name.
+     */
+    private static function generateSlug(CustomerGroup $customerGroup): string
+    {
+        // Prefer the code for deterministic slugs, otherwise fall back to the default locale name.
+        $code = $customerGroup->getAttribute('code');
+        $translation = $customerGroup->getTranslation('name', app()->getLocale(), false);
+        $fallbackName = is_string($translation) ? $translation : '';
+
+        $source = is_string($code) && $code !== ''
+            ? $code
+            : $fallbackName;
+
+        $resolvedSource = $source !== '' ? $source : Str::random(8);
+
+        return Str::slug($resolvedSource);
+    }
 
     /**
      * Handle casts functionality with proper error handling.
@@ -74,22 +117,21 @@ final class CustomerGroup extends Model
     {
         return [
             'discount_percentage' => 'decimal:2',
-            'discount_fixed' => 'decimal:2',
-            'has_special_pricing' => 'boolean',
-            'has_volume_discounts' => 'boolean',
-            'can_view_prices' => 'boolean',
-            'can_place_orders' => 'boolean',
-            'can_view_catalog' => 'boolean',
-            'can_use_coupons' => 'boolean',
-            'is_active' => 'boolean',
-            'is_enabled' => 'boolean',
-            'is_default' => 'boolean',
-            'sort_order' => 'integer',
-            'type' => 'string',
-            'metadata' => 'array',
-            'conditions' => 'array',
-            'deleted_at' => 'datetime',
+            'is_enabled'          => 'boolean',
+            'metadata'            => 'array',
+            'conditions'          => 'array',
+            'deleted_at'          => 'datetime',
         ];
+    }
+
+    /**
+     * Present the discount percentage as a floating point value for consistency in tests and UI renders.
+     */
+    protected function discountPercentage(): Attribute
+    {
+        return Attribute::make(
+            get: static fn ($value): ?float => $value === null ? null : (float) $value,
+        );
     }
 
     /**
@@ -131,7 +173,9 @@ final class CustomerGroup extends Model
     }
 
     /**
-     * Scope a query to only include enabled groups.
+     * Handle scopeEnabled functionality with proper error handling.
+     *
+     * @param mixed $query
      */
     public function scopeEnabled(Builder $query): Builder
     {
@@ -139,7 +183,9 @@ final class CustomerGroup extends Model
     }
 
     /**
-     * Scope a query to only include groups with a positive discount rate.
+     * Handle scopeWithDiscount functionality with proper error handling.
+     *
+     * @param mixed $query
      */
     public function scopeWithDiscount(Builder $query): Builder
     {
