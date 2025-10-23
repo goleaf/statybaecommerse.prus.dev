@@ -11,13 +11,7 @@ use Illuminate\Database\Eloquent\Scope;
 /**
  * ActiveScope
  *
- * Eloquent model representing the ActiveScope entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
- *
- * @method static \Illuminate\Database\Eloquent\Builder|ActiveScope newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|ActiveScope newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|ActiveScope query()
- *
- * @mixin \Eloquent
+ * Global scope that keeps model queries limited to active or visible records when supported by the table schema.
  */
 final class ActiveScope implements Scope
 {
@@ -26,21 +20,45 @@ final class ActiveScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
-        // Prefer stricter check when both flags exist
         $schema = $model->getConnection()->getSchemaBuilder();
         $table = $model->getTable();
+
+        // Guard against running scope logic before migrations have created the table.
+        if (! $schema->hasTable($table)) {
+            return;
+        }
+
+        // Prefer stricter check when both flags exist to keep behaviour predictable.
         $hasIsActive = $schema->hasColumn($table, 'is_active');
         $hasIsVisible = $schema->hasColumn($table, 'is_visible');
+        $hasIsEnabled = $schema->hasColumn($table, 'is_enabled');
+        $hasStatus = $schema->hasColumn($table, 'status');
 
         if ($hasIsActive && $hasIsVisible) {
             $builder->where('is_active', true)->where('is_visible', true);
-        } elseif ($hasIsActive) {
+
+            return;
+        }
+
+        if ($hasIsActive) {
             $builder->where('is_active', true);
-        } elseif ($model->getConnection()->getSchemaBuilder()->hasColumn($model->getTable(), 'is_enabled')) {
+
+            return;
+        }
+
+        if ($hasIsEnabled) {
             $builder->where('is_enabled', true);
-        } elseif ($hasIsVisible) {
+
+            return;
+        }
+
+        if ($hasIsVisible) {
             $builder->where('is_visible', true);
-        } elseif ($model->getConnection()->getSchemaBuilder()->hasColumn($model->getTable(), 'status')) {
+
+            return;
+        }
+
+        if ($hasStatus) {
             $builder->where('status', 'active');
         }
     }
