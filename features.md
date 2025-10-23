@@ -39,6 +39,7 @@
 - Activity Log monitoring now declares its navigation icon with the BackedEnum-friendly union type mandated by Filament v4, keeping the admin panel boot sequence stable.
 - Feature Flag listings now bypass the active and enabled scopes so administrators can review inactive toggles alongside live ones without temporary scope adjustments.
 - Test bootstrapping now adds both JSON translation directories so Filament's commerce navigation label renders localized copy during PHPUnit runs.
+- The PHPUnit harness now seeds a dedicated SQLite testing database and directs Telescope/Activity Log to that connection before migrations execute, so catalog integrity and other schema-heavy suites run without missing table errors.
 - Filament navigation icons once again use docblock overrides so enum-aware navigation metadata loads without typed property collisions introduced in PR #1098.
 - Analytics dashboards now declare navigation metadata via the shared docblock convention and keep the resource form signature aligned with Filament v4 expectations, preventing BackedEnum type collisions during admin boot.
 - Variant stock history tables consolidate destructive change reasons under the `danger` badge, keeping badge colors predictable for both `damage` and `theft` events.
