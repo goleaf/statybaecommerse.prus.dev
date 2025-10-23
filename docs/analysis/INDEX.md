@@ -1,7 +1,6 @@
 # Analysis & Summary Index
 
-A curated directory for audits, retrospectives, and programme-wide reports. Documents in this folder capture the reasoning behind
-architecture choices, rollout plans, and the evidence gathered while validating each release.
+A curated directory for audits, retrospectives, and programme-wide reports. Documents in this folder capture the reasoning behind architecture choices, rollout plans, and the evidence gathered while validating each release.
 
 ## Admin & Interface
 - [ADMIN_PLUGINS](ADMIN_PLUGINS.md) – catalogue of Filament and Livewire plugins wired into the control panel.
@@ -74,4 +73,3 @@ architecture choices, rollout plans, and the evidence gathered while validating 
 - [FINAL_IMPLEMENTATION_SUMMARY](FINAL_IMPLEMENTATION_SUMMARY.md) – consolidated scorecard of all programme objectives.
 - [FINAL_SYSTEM_SETTINGS_GLOBAL_SCOPES_IMPLEMENTATION_SUMMARY](FINAL_SYSTEM_SETTINGS_GLOBAL_SCOPES_IMPLEMENTATION_SUMMARY.md)
 - [TEST_ORGANIZATION_SUMMARY](TEST_ORGANIZATION_SUMMARY.md) – structure and conventions for automated test suites.
-
