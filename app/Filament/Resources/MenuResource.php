@@ -27,8 +27,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
-use Filament\Schemas\Schema;
 
 final class MenuResource extends Resource
 {
@@ -37,13 +35,10 @@ final class MenuResource extends Resource
     protected static ?string $model = Menu::class;
 
     /**
-     * Navigation icon override (string|\BackedEnum|null).
+     * Navigation icon override (string|\BackedEnum|null) kept typed for Filament discovery.
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    /**
-     * @var string|\UnitEnum|null
-     */
     protected static \UnitEnum|string|null $navigationGroup = 'Content';
 
     /**
@@ -187,16 +182,11 @@ final class MenuResource extends Resource
                     ->action(function (Menu $record): void {
                         // Flip the active flag before Filament resolves the success notification payload.
                         $record->update(['is_active' => ! $record->is_active]);
-
-                        $message = $record->is_active
-                            ? __('menus.activated_successfully')
-                            : __('menus.deactivated_successfully');
-
-                        Notification::make()
-                            ->success()
-                            ->title((string) $message)
-                            ->send();
-                    }),
+                    })
+                    ->successNotificationTitle(static fn (Menu $record): string => $record->is_active
+                        ? __('menus.activated_successfully')
+                        : __('menus.deactivated_successfully')
+                    ),
                 Action::make('duplicate')
                     ->label(__('menus.duplicate'))
                     ->icon('heroicon-o-document-duplicate')

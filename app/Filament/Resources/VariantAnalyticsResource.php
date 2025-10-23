@@ -39,8 +39,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
-use Filament\Schemas\Schema;
 
 /**
  * VariantAnalyticsResource
@@ -51,9 +49,12 @@ final class VariantAnalyticsResource extends Resource
 {
     protected static ?string $model = VariantAnalytics::class;
 
+    /**
+     * Typed navigation icon ensures the analytics section resolves enum-backed overrides cleanly.
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    protected static string|UnitEnum|null $navigationGroup = null;
+    protected static string|\UnitEnum|null $navigationGroup = null;
 
     public static function getNavigationGroup(): string|UnitEnum|null
     {
