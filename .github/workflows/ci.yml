@@ -81,8 +81,12 @@ jobs:
           name: coverage-php-${{ matrix.php-version }}
           path: build/coverage-${{ matrix.php-version }}.xml
 
-      - name: Install dependencies
-        run: composer install --no-interaction --prefer-dist
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
 
       - name: Install Node dependencies
         run: npm ci
