@@ -128,7 +128,7 @@ class ChannelResourceTest extends TestCase
         Channel::factory()->create(['name' => 'Web Channel']);
         Channel::factory()->create(['name' => 'Mobile Channel']);
 
-        Livewire::test(\App\Filament\Resources\Channels\ChannelResource\Pages\ListChannels::class)
+        Livewire::test(\App\Filament\Resources\ChannelResource\Pages\ListChannels::class)
             ->searchTable('Web')
             ->assertCanSeeTableRecords(Channel::where('name', 'like', '%Web%')->get())
             ->assertCanNotSeeTableRecords(Channel::where('name', 'like', '%Mobile%')->get());
@@ -165,7 +165,7 @@ class ChannelResourceTest extends TestCase
     {
         Channel::factory()->create(['slug' => 'existing-slug', 'code' => 'EXISTING']);
 
-        Livewire::test(\App\Filament\Resources\Channels\ChannelResource\Pages\CreateChannel::class)
+        Livewire::test(\App\Filament\Resources\ChannelResource\Pages\CreateChannel::class)
             ->fillForm([
                 'name' => 'Test Channel',
                 'slug' => 'existing-slug',

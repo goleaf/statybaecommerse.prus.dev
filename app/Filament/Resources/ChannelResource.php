@@ -78,7 +78,11 @@ final class ChannelResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->live(onBlur: true)
-                                    ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', Str::slug($state)) : null),
+                                    ->afterStateUpdated(function ($state, Forms\Set $set, ?string $operation): void {
+                                        if ($operation === 'create' && filled($state)) {
+                                            $set('slug', Str::slug((string) $state));
+                                        }
+                                    }),
                                 TextInput::make('slug')
                                     ->label(__('admin.channels.slug'))
                                     ->required()
@@ -194,6 +198,10 @@ final class ChannelResource extends Resource
                     ->limit(30)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
+                        if (! is_string($state)) {
+                            return null;
+                        }
 
                         return strlen($state) > 30 ? $state : null;
                     }),
