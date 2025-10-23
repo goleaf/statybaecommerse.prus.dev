@@ -7,6 +7,7 @@ return [
         'label' => 'Campaign Targets',
     ],
     'plural' => 'Campaign Product Targets',
+    'single' => 'Campaign Target', // Provide an explicit singular label for Filament resource metadata.
     'tab_label' => 'Tabs',
     'tabs' => [
         'all' => 'All Targets',

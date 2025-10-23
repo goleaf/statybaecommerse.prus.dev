@@ -7,6 +7,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CampaignProductTargetResource\Pages;
 use App\Models\CampaignProductTarget;
 use App\Models\Scopes\ActiveScope;
+use App\Support\Filament\Traits\SafeNavigation;
 use BackedEnum;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -42,6 +43,8 @@ use Illuminate\Support\Facades\Lang;
 
 final class CampaignProductTargetResource extends Resource
 {
+    use SafeNavigation; // Share the Filament navigation guard and translation helpers.
+
     protected static ?string $model = CampaignProductTarget::class;
 
     /**
@@ -61,30 +64,22 @@ final class CampaignProductTargetResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        // Resolve the label from the nested translation key first so newer
-        // language files can supply an explicit navigation label while still
-        // honouring the legacy flat key when upgrading older installations.
-        $label = __('campaign_product_targets.navigation.label');
+        // Prefer the nested navigation label while gracefully falling back to legacy keys.
+        $legacyFallback = static::translateString('campaign_product_targets.navigation', 'Campaign Targets');
 
-        if (is_array($label) || ! is_string($label) || $label === '') {
-            // Fallback to the legacy translation entry that returned a plain
-            // string before the nested structure existed.
-            $label = __('campaign_product_targets.navigation');
-        }
-
-        // Provide a hard-coded default as a final guard so Filament can still
-        // render the navigation item without breaking localisation loaders.
-        return is_string($label) && $label !== '' ? $label : 'Campaign Targets';
+        return static::translateString('campaign_product_targets.navigation.label', $legacyFallback);
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('campaign_product_targets.plural');
+        // Ensure the plural label resolves reliably during multilingual tests.
+        return static::translateString('campaign_product_targets.plural', 'Campaign Product Targets');
     }
 
     public static function getModelLabel(): string
     {
-        return __('campaign_product_targets.single');
+        // Provide a deterministic singular label for legacy translation files.
+        return static::translateString('campaign_product_targets.single', 'Campaign Target');
     }
 
     /**

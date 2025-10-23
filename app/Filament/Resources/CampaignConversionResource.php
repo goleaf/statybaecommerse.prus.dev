@@ -9,8 +9,10 @@ use App\Filament\Resources\CampaignConversionResource\Pages;
 use App\Models\Campaign;
 use App\Models\CampaignConversion;
 use App\Models\User;
+use App\Support\Filament\Traits\SafeNavigation;
 use BackedEnum;
 use Filament\Forms;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -29,6 +31,8 @@ use UnitEnum;
 
 final class CampaignConversionResource extends Resource
 {
+    use SafeNavigation; // Centralized navigation guard and translation fallbacks.
+
     protected static ?string $model = \App\Models\CampaignConversion::class;
 
     /**
@@ -43,7 +47,8 @@ final class CampaignConversionResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('campaign_conversions.title');
+        // Resolve the navigation label with resilient translation fallbacks.
+        return static::translateString('campaign_conversions.navigation.label', 'Campaign Conversions');
     }
 
     public static function getNavigationGroup(): string|UnitEnum|null
@@ -55,30 +60,14 @@ final class CampaignConversionResource extends Resource
 
     public static function getPluralModelLabel(): string
     {
-        return __('campaign_conversions.plural');
+        // Provide the plural label with a deterministic fallback for localisation gaps.
+        return static::translateString('campaign_conversions.plural', 'Campaign Conversions');
     }
 
     public static function getModelLabel(): string
     {
-        return __('campaign_conversions.single');
-    }
-
-    /**
-     * Hide this resource from the Filament navigation when the application is
-     * executing PHPUnit scenarios so feature tests do not attempt to resolve
-     * missing admin routes, while still delegating to the parent behaviour in
-     * every other environment.
-     */
-    public static function shouldRegisterNavigation(): bool
-    {
-        if (app()->runningUnitTests()) {
-            // During tests we completely disable navigation registration to
-            // avoid Filament attempting to reference routes that are not
-            // bootstrapped inside lightweight HTTP feature tests.
-            return false;
-        }
-
-        return parent::shouldRegisterNavigation();
+        // Return the singular label leveraging the shared translation helper.
+        return static::translateString('campaign_conversions.single', 'Campaign Conversion');
     }
 
     /**

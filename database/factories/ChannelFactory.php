@@ -21,14 +21,39 @@ class ChannelFactory extends Factory
 
         $name = $this->faker->unique()->company() . ' Channel';
 
-        // Generate a ULID-backed identifier to guarantee uniqueness even when
-        // diagnostics seeders run concurrently across multiple processes.
-        $code = sprintf('chn-%s-%d', Str::lower((string) Str::ulid()), $sequence++);
+        // Build a deterministic slug that appends a compact counter and random suffix to avoid collisions.
+        $slug = Str::of($name)
+            ->slug('-')
+            ->append('-' . $sequence)
+            ->append('-' . Str::lower(Str::random(4)))
+            ->value();
+
+        // Generate a short, uppercase base for the channel code before appending a randomised suffix.
+        $base = Str::of($name)
+            ->snake()
+            ->upper()
+            ->replaceMatches('/[^A-Z0-9_]/', '')
+            ->substr(0, 8)
+            ->trim('_');
+
+        if ($base->isEmpty()) {
+            // Guarantee a sensible default base when the generated company name is too short.
+            $base = Str::of('CHANNEL');
+        }
+
+        $code = $base
+            ->append('_')
+            ->append(Str::upper(Str::random(4)))
+            ->append('_' . $sequence++)
+            ->replaceMatches('/_{2,}/', '_')
+            ->trim('_')
+            ->substr(0, 16)
+            ->value();
 
         return [
             // Identity and descriptive metadata.
             'name'        => $name,
-            'slug'        => Str::slug($name),
+            'slug'        => $slug,
             'code'        => $code,
             'type'        => $this->faker->randomElement(['web', 'mobile', 'api', 'pos']),
             'description' => $this->faker->boolean(50) ? $this->faker->sentence(10) : null,

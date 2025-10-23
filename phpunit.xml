@@ -45,6 +45,7 @@
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_STORE" value="array"/>
+        <env name="CACHE_DRIVER" value="array"/>
         <env name="DB_CONNECTION" value="sqlite"/>
         <!-- Use in-memory SQLite for stable, fast tests -->
         <env name="DB_DATABASE" value=":memory:"/>
@@ -60,5 +61,14 @@
         <env name="NIGHTWATCH_ENABLED" value="false"/>
         <!-- Avoid SQLite write-contention across processes -->
         <env name="PARATEST_PROCESSES" value="1"/>
+
+        <!-- Expose critical testing configuration as server variables for CI runners that bypass env files. -->
+        <server name="APP_ENV" value="testing"/>
+        <server name="APP_DEBUG" value="true"/>
+        <server name="CACHE_DRIVER" value="array"/>
+        <server name="SESSION_DRIVER" value="array"/>
+        <server name="QUEUE_CONNECTION" value="sync"/>
+        <server name="DB_CONNECTION" value="sqlite"/>
+        <server name="DB_DATABASE" value=":memory:"/>
     </php>
 </phpunit>

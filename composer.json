@@ -118,11 +118,13 @@
             "@analyze",
             "@test:ci"
         ],
+        "lint": "@php vendor/bin/pint",
+        "analyse": "@php vendor/bin/phpstan analyse --memory-limit=1G",
+        "test": "@php vendor/bin/phpunit -c phpunit.xml --colors=always",
         "app:install": [
             "@php artisan migrate --force",
             "@php artisan storage:link"
         ],
-        "analyse": "@analyze",
         "seed:fresh": "@php artisan migrate:fresh --seed --ansi",
         "build": [
             "@php artisan optimize --ansi",
