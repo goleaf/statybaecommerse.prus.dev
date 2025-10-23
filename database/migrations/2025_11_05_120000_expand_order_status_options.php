@@ -18,11 +18,6 @@ return new class extends Migration
             return;
         }
 
-        // SQLite used in tests does not support MODIFY COLUMN / ENUM. Skip safely.
-        if (DB::connection()->getDriverName() === 'sqlite') {
-            return;
-        }
-
         DB::statement(<<<'SQL'
             ALTER TABLE `orders`
             MODIFY COLUMN `status` ENUM(
@@ -46,10 +41,6 @@ return new class extends Migration
     {
         if (! Schema::hasTable('orders')) {
             // Consistent with the up() guard, skip when the orders table is missing.
-            return;
-        }
-
-        if (DB::connection()->getDriverName() === 'sqlite') {
             return;
         }
 
