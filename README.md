@@ -16,8 +16,9 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Multilingual experience** across storefront and admin via `spatie/laravel-translatable`, Volt-powered Livewire pages, and localized seed data.
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
-### Latest updates
-- Country admin tooling now loads Filament v4-compatible widget tabs, activation actions, and address/city defaults while exposing inactive records in listings, keeping the country regression suite and admin toggles functional on PHP 8.3.
+-### Latest updates
+- Reports generation now respects the dedicated `reports` queue when triggered via Artisan, keeping retry backoff aligned with the queued job configuration.
+- The HTML sanitization maintenance command now prints styled summary lines and the product status schema accepts modern enum values like `active`, preventing fresh test runs from failing on CHECK constraints.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
 - Customer group creation now auto-generates slugs from the supplied code or localized name so SQLite-powered tests and admin

@@ -42,6 +42,7 @@ final class SanitizeHtmlContentCommand extends Command
         Product::withoutGlobalScopes()
             ->select(['id', 'description', 'short_description'])
             ->chunkById($chunkSize, function (Collection $products) use (&$counters, $sanitizer, $dryRun): void {
+                /** @var Product $product */
                 foreach ($products as $product) {
                     $updates = [];
 
@@ -72,11 +73,12 @@ final class SanitizeHtmlContentCommand extends Command
         ProductTranslation::query()
             ->select(['id', 'description', 'short_description', 'summary'])
             ->chunkById($chunkSize, function (Collection $translations) use (&$counters, $sanitizer, $dryRun): void {
+                /** @var ProductTranslation $translation */
                 foreach ($translations as $translation) {
                     $updates = [];
 
                     foreach (['description', 'short_description', 'summary'] as $field) {
-                        $current = $translation->{$field};
+                        $current = $translation->getAttribute($field);
                         if (! is_string($current) || trim($current) === '') {
                             continue;
                         }
@@ -102,8 +104,9 @@ final class SanitizeHtmlContentCommand extends Command
         LegalTranslation::query()
             ->select(['id', 'content'])
             ->chunkById($chunkSize, function (Collection $translations) use (&$counters, $sanitizer, $dryRun): void {
+                /** @var LegalTranslation $translation */
                 foreach ($translations as $translation) {
-                    $current = $translation->content;
+                    $current = $translation->getAttribute('content');
                     if (! is_string($current) || trim($current) === '') {
                         continue;
                     }
@@ -124,7 +127,8 @@ final class SanitizeHtmlContentCommand extends Command
         $this->components->info('HTML sanitization run finished.');
 
         foreach ($counters as $label => $count) {
-            $this->components->line(Str::headline($label) . ": {$count} updated");
+            // Provide the style argument explicitly now that the component API expects it in Laravel 12.
+            $this->components->line('info', Str::headline($label) . ": {$count} updated");
         }
 
         if ($dryRun) {

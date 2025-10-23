@@ -7,16 +7,15 @@ namespace App\Console\Commands;
 use App\Jobs\GenerateReportsJob;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Queue;
 
 final class GenerateReportsCommand extends Command
 {
     protected $signature = 'reports:generate'
-        .' {--type=all : Report type (all, sales, products, users, system)}'
-        .' {--output=storage/reports : Output directory}'
-        .' {--format=json : Output format (json, csv)}'
-        .' {--date-from= : Start date (Y-m-d)}'
-        .' {--date-to= : End date (Y-m-d)}';
+        . ' {--type=all : Report type (all, sales, products, users, system)}'
+        . ' {--output=storage/reports : Output directory}'
+        . ' {--format=json : Output format (json, csv)}'
+        . ' {--date-from= : Start date (Y-m-d)}'
+        . ' {--date-to= : End date (Y-m-d)}';
 
     protected $description = 'Queue report generation so the CLI command stays responsive.';
 
@@ -25,9 +24,10 @@ final class GenerateReportsCommand extends Command
         $type = (string) $this->option('type');
         $outputDir = (string) $this->option('output');
         $format = (string) $this->option('format');
+        /** @var array<string, mixed> $filters */
         $filters = Arr::whereNotNull([
             'date_from' => $this->option('date-from') ?: null,
-            'date_to' => $this->option('date-to') ?: null,
+            'date_to'   => $this->option('date-to') ?: null,
         ]);
 
         if (! in_array($type, ['all', 'sales', 'products', 'users', 'system'], true)) {
@@ -44,7 +44,8 @@ final class GenerateReportsCommand extends Command
             return self::FAILURE;
         }
 
-        Queue::push(new GenerateReportsJob($type, $outputDir, $format, $filters));
+        // Dispatch the job through the dispatcher so the job's preferred queue is honoured.
+        GenerateReportsJob::dispatch($type, $outputDir, $format, $filters);
 
         $this->info('✅ Report generation has been queued.');
         $this->info('📬 Monitor queue workers to track progress.');
