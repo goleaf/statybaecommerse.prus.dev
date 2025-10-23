@@ -33,16 +33,20 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use UnitEnum;
 
+/**
+ * SliderResource
+ *
+ * Filament v4 resource for Slider management in the admin panel with comprehensive CRUD operations, filters, and actions.
+ */
 final class SliderResource extends Resource
 {
     use HasNav;
 
     protected static ?string $model = Slider::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    /** @var UnitEnum|string|null */
-    protected static UnitEnum|string|null $navigationGroup = 'Content';
+    protected static UnitEnum|string|null $navigationGroup = 'Content Management';
 
     protected static ?int $navigationSort = 4;
 

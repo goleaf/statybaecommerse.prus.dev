@@ -40,16 +40,18 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
+/**
+ * VariantImageResource
+ *
+ * Filament v4 resource for VariantImage management in the admin panel with comprehensive CRUD operations, filters, and actions.
+ */
 final class VariantImageResource extends Resource
 {
     use HasNav;
 
     protected static ?string $model = VariantImage::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-photo';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-photo';
 
     
 
@@ -249,7 +251,7 @@ final class VariantImageResource extends Resource
                     ->label(__('admin.variant_images.file_size'))
                     ->formatStateUsing(function ($state) {
                         if ($state) {
-                            return number_format($state / 1024, 2) . ' KB';
+                            return number_format($state / 1024, 2).' KB';
                         }
 
                         return '-';

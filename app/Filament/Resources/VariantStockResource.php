@@ -9,9 +9,6 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\VariantStockResource\Pages;
 use App\Models\Location;
 use App\Models\VariantInventory;
-use App\Support\Filament\Components\Flatpickr;
-use BackedEnum;
-use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -41,10 +38,7 @@ final class VariantStockResource extends Resource
 
     protected static ?string $model = VariantInventory::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-archive-box';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.

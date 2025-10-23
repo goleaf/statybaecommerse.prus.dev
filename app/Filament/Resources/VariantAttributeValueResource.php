@@ -24,7 +24,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
-use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\FontWeight;
@@ -40,16 +39,18 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 use UnitEnum;
 
+/**
+ * VariantAttributeValueResource
+ *
+ * Filament v4 resource for VariantAttributeValue management in the admin panel with comprehensive CRUD operations, filters, and actions.
+ */
 final class VariantAttributeValueResource extends Resource
 {
     use HasNav;
 
     protected static ?string $model = VariantAttributeValue::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-tag';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.

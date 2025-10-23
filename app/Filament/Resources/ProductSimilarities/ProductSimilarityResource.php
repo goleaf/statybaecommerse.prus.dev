@@ -11,7 +11,6 @@ use App\Filament\Resources\ProductSimilarities\Pages\ListProductSimilarities;
 use App\Filament\Resources\ProductSimilarities\Schemas\ProductSimilarityForm;
 use App\Filament\Resources\ProductSimilarities\Tables\ProductSimilaritiesTable;
 use App\Models\ProductSimilarity;
-use BackedEnum;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
@@ -23,10 +22,7 @@ class ProductSimilarityResource extends Resource
 
     protected static ?string $model = ProductSimilarity::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Form $form): Form
     {

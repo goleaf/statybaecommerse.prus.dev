@@ -242,7 +242,7 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "platform": {
-            "php": "8.3.0"
+            "php": "8.2.14"
         },
         "allow-plugins": {
             "pestphp/pest-plugin": true,

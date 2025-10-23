@@ -19,10 +19,7 @@ final class EnhancedEcommerceOverview extends StatsOverviewWidget
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-presentation-chart-line';
-
-    /** @var string|UnitEnum|null Ensure the widget stays surfaced within the dashboard group. */
-    protected static UnitEnum|string|null $navigationGroup = 'Dashboard';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-presentation-chart-line';
 
     /**
      * Localize the navigation label to align with analytics translations.

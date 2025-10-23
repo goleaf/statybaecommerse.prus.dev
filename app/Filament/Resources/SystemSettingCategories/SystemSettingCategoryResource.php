@@ -11,7 +11,6 @@ use App\Filament\Resources\SystemSettingCategories\Pages\ListSystemSettingCatego
 use App\Filament\Resources\SystemSettingCategories\Schemas\SystemSettingCategoryForm;
 use App\Filament\Resources\SystemSettingCategories\Tables\SystemSettingCategoriesTable;
 use App\Models\SystemSettingCategory;
-use BackedEnum;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
@@ -25,10 +24,7 @@ class SystemSettingCategoryResource extends Resource
 
     protected static ?string $model = SystemSettingCategory::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Form $form): Form
     {

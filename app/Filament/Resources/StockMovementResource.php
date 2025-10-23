@@ -23,21 +23,19 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
 
+/**
+ * StockMovementResource
+ *
+ * Filament v4 resource for StockMovement management in the admin panel with comprehensive CRUD operations, filters, and actions.
+ */
 final class StockMovementResource extends Resource
 {
-    use HasNav;
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-archive-box';
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-archive-box';
-
-    /**
-     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
-     */
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 3;
@@ -146,8 +144,8 @@ final class StockMovementResource extends Resource
                     ->label(__('stock_movement.fields.type'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'in'         => 'success',
-                        'out'        => 'danger',
+                        'in' => 'success',
+                        'out' => 'danger',
                         'adjustment' => 'warning',
                         'transfer'   => 'info',
                         default      => 'gray',

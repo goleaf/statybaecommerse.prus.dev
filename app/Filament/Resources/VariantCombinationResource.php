@@ -7,7 +7,6 @@ namespace App\Filament\Resources;
 use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\VariantCombinationResource\Pages;
-use App\Models\Product;
 use App\Models\VariantCombination;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -37,16 +36,18 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
+/**
+ * VariantCombinationResource
+ *
+ * Filament v4 resource for VariantCombination management in the admin panel with comprehensive CRUD operations, filters, and actions.
+ */
 final class VariantCombinationResource extends Resource
 {
     use HasNav;
 
     protected static ?string $model = VariantCombination::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-squares-2x2';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
@@ -156,7 +157,7 @@ final class VariantCombinationResource extends Resource
                     ->formatStateUsing(function ($state) {
                         if (is_array($state)) {
                             return collect($state)->map(function ($value, $key) {
-                                return $key . ': ' . $value;
+                                return $key.': '.$value;
                             })->join(', ');
                         }
 
@@ -179,7 +180,7 @@ final class VariantCombinationResource extends Resource
                     ->formatStateUsing(fn ($state) => $state ? __('admin.variant_combinations.available') : __('admin.variant_combinations.unavailable'))
                     ->colors([
                         'success' => fn ($state) => $state,
-                        'danger'  => fn ($state) => ! $state,
+                        'danger' => fn ($state) => ! $state,
                     ])
                     ->sortable(),
                 TextColumn::make('combination_hash')
@@ -224,8 +225,8 @@ final class VariantCombinationResource extends Resource
                     ->falseLabel(__('admin.variant_combinations.unavailable_only')),
                 Filter::make('valid_combinations')
                     ->label(__('admin.variant_combinations.valid_combinations_only'))
-                    ->query(fn (Builder $query): Builder => $query->whereHas('product', function (Builder $query): Builder {
-                        return $query->whereHas('attributes');
+                    ->query(fn (Builder $query): Builder => $query->whereHas('product', function (Builder $query) {
+                        $query->whereHas('attributes');
                     }))
                     ->toggle(),
                 Filter::make('recent_combinations')

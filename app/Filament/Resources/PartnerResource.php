@@ -10,7 +10,6 @@ use App\Filament\Resources\PartnerResource\Pages;
 use App\Models\Partner;
 use BackedEnum;
 use Filament\Forms;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -27,10 +26,7 @@ final class PartnerResource extends Resource
 
     protected static ?string $model = Partner::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user-group';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-user-group';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.

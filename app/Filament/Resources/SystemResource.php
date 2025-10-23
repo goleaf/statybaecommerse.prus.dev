@@ -45,16 +45,34 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * System Resource - Comprehensive System Management
+ *
+ * Features:
+ * - System settings management with categories
+ * - Real-time system monitoring
+ * - Cache management
+ * - Database optimization
+ * - System health checks
+ * - Backup management
+ * - Performance monitoring
+ * - Multi-language support
+ * - Advanced filtering and search
+ * - Bulk operations
+ * - Export capabilities
+ * - Audit trail
+ */
 final class SystemResource extends Resource
 {
     use HasNav;
 
     protected static ?string $model = SystemSetting::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-cog-6-tooth';
+    protected static UnitEnum|string|null $navigationGroup = 'System';
+
+    protected static ?int $navigationSort = 1;
+
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     protected static ?string $navigationLabel = 'system.title';
 

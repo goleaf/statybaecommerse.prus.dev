@@ -8,7 +8,6 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\SystemSettingResource\Pages;
 use App\Models\SystemSetting;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -33,16 +32,22 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
+/**
+ * SystemSettingResource
+ *
+ * Filament v4 resource for SystemSetting management in the admin panel with comprehensive CRUD operations, filters, and actions.
+ */
 final class SystemSettingResource extends Resource
 {
     use HasNav;
 
     protected static ?string $model = SystemSetting::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-cog-6-tooth';
+    protected static ?int $navigationSort = 18;
+
+    protected static ?string $recordTitleAttribute = 'key';
+
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.

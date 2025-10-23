@@ -7,9 +7,6 @@ namespace App\Filament\Resources;
 use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\VariantInventoryResource\Pages;
-use App\Models\Location;
-use App\Models\Product;
-use App\Models\ProductVariant;
 use App\Models\VariantInventory;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\SearchableInputHelper;
@@ -31,7 +28,6 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
-use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Resources\Resource;
@@ -47,16 +43,22 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
+/**
+ * VariantInventoryResource
+ *
+ * Filament v4 resource for VariantInventory management in the admin panel with comprehensive CRUD operations, filters, and actions.
+ */
 final class VariantInventoryResource extends Resource
 {
     use HasNav;
 
     protected static ?string $model = VariantInventory::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
+    protected static ?int $navigationSort = 2;
+
+    protected static ?string $recordTitleAttribute = 'variant_id';
+
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-archive-box';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.

@@ -12,47 +12,19 @@ use App\Filament\Resources\RecommendationCaches\Pages\ViewRecommendationCache;
 use App\Filament\Resources\RecommendationCaches\Schemas\RecommendationCacheForm;
 use App\Filament\Resources\RecommendationCaches\Tables\RecommendationCachesTable;
 use App\Models\RecommendationCache;
-use BackedEnum;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use UnitEnum;
 
-final class RecommendationCacheResource extends Resource
+class RecommendationCacheResource extends Resource
 {
     use HasNav;
 
     protected static ?string $model = RecommendationCache::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
-    protected static ?int $navigationSort = 20;
-
-    protected static ?string $recordTitleAttribute = 'cache_key';
-
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Analytics';
-    }
-
-    public static function getNavigationLabel(): string
-    {
-        return __('admin.recommendation_caches.navigation_label');
-    }
-
-    public static function getPluralModelLabel(): string
-    {
-        return __('admin.recommendation_caches.plural_model_label');
-    }
-
-    public static function getModelLabel(): string
-    {
-        return __('admin.recommendation_caches.model_label');
-    }
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Form $form): Form
     {

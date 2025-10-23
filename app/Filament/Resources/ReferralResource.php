@@ -33,10 +33,7 @@ final class ReferralResource extends Resource
 
     protected static ?string $model = Referral::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-share';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-share';
 
     /**
      * Navigation group for organizing the resource in the admin panel.
