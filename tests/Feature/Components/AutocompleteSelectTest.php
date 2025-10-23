@@ -14,13 +14,13 @@ beforeEach(function (): void {
     $this->user = User::factory()->create();
 });
 
-it('renders autocomplete select component', function (): void {
+it('feature: renders autocomplete select component', function (): void {
     $component = AutocompleteSelect::make('test_field');
 
     expect($component)->toBeInstanceOf(AutocompleteSelect::class);
 });
 
-it('has correct default configuration', function (): void {
+it('feature: has correct default configuration', function (): void {
     $component = AutocompleteSelect::make('test_field');
 
     expect($component->getSearchable())->toBeTrue();
@@ -31,7 +31,7 @@ it('has correct default configuration', function (): void {
     expect($component->getLabelField())->toBe('name');
 });
 
-it('can configure searchable property', function (): void {
+it('feature: can configure searchable property', function (): void {
     $component = AutocompleteSelect::make('test_field')
         ->searchable(false);
 
@@ -41,7 +41,7 @@ it('can configure searchable property', function (): void {
     expect($component->getSearchable())->toBeTrue();
 });
 
-it('can configure multiple selection', function (): void {
+it('feature: can configure multiple selection', function (): void {
     $component = AutocompleteSelect::make('test_field')
         ->multiple(true);
 
@@ -51,7 +51,7 @@ it('can configure multiple selection', function (): void {
     expect($component->getMultiple())->toBeFalse();
 });
 
-it('can configure search parameters', function (): void {
+it('feature: can configure search parameters', function (): void {
     $component = AutocompleteSelect::make('test_field')
         ->minSearchLength(3)
         ->maxSearchResults(20);
@@ -60,7 +60,7 @@ it('can configure search parameters', function (): void {
     expect($component->getMaxSearchResults())->toBe(20);
 });
 
-it('can configure field mappings', function (): void {
+it('feature: can configure field mappings', function (): void {
     $component = AutocompleteSelect::make('test_field')
         ->searchField('title')
         ->valueField('uuid')
@@ -71,14 +71,14 @@ it('can configure field mappings', function (): void {
     expect($component->getLabelField())->toBe('display_name');
 });
 
-it('can set model class', function (): void {
+it('feature: can set model class', function (): void {
     $component = AutocompleteSelect::make('test_field')
         ->model(Product::class);
 
     expect($component->getModelClass())->toBe(Product::class);
 });
 
-it('can set search query', function (): void {
+it('feature: can set search query', function (): void {
     $component = AutocompleteSelect::make('test_field')
         ->model(Product::class)
         ->setSearchQuery('test');
@@ -86,7 +86,7 @@ it('can set search query', function (): void {
     expect($component->getSearchQuery())->toBe('test');
 });
 
-it('performs search when query is set', function (): void {
+it('feature: performs search when query is set', function (): void {
     $firstProduct = Product::factory()->create(['name' => 'Test Product 1']);
     $secondProduct = Product::factory()->create(['name' => 'Test Product 2']);
     Product::factory()->create(['name' => 'Another Item']);
@@ -101,7 +101,7 @@ it('performs search when query is set', function (): void {
     expect(array_values($searchResults))->toContain('Test Product 2');
 });
 
-it('respects minimum search length', function (): void {
+it('feature: respects minimum search length', function (): void {
     Product::factory()->create([
         'name' => 'Test Product',
         'is_visible' => true,
@@ -118,7 +118,7 @@ it('respects minimum search length', function (): void {
     expect($searchResults)->toBeEmpty();
 });
 
-it('limits search results', function (): void {
+it('feature: limits search results', function (): void {
     Product::factory()->count(15)->create([
         'name' => 'Test Product',
         'is_visible' => true,
@@ -135,7 +135,7 @@ it('limits search results', function (): void {
     expect($searchResults)->toHaveCount(5);
 });
 
-it('uses custom search field', function (): void {
+it('feature: uses custom search field', function (): void {
     Product::factory()->create([
         'description' => 'Test Description',
         'is_visible' => true,
@@ -152,7 +152,7 @@ it('uses custom search field', function (): void {
     expect($searchResults)->toHaveCount(1);
 });
 
-it('returns empty results for invalid model class', function (): void {
+it('feature: returns empty results for invalid model class', function (): void {
     $component = AutocompleteSelect::make('test_field');
 
     $searchResults = $component->getSearchResults('test');
@@ -160,7 +160,7 @@ it('returns empty results for invalid model class', function (): void {
     expect($searchResults)->toBeEmpty();
 });
 
-it('returns empty results for empty search query', function (): void {
+it('feature: returns empty results for empty search query', function (): void {
     Product::factory()->create([
         'name' => 'Test Product',
         'is_visible' => true,
@@ -176,7 +176,7 @@ it('returns empty results for empty search query', function (): void {
     expect($searchResults)->toBeEmpty();
 });
 
-it('trims search queries before execution', function (): void {
+it('feature: trims search queries before execution', function (): void {
     Product::factory()->create(['name' => 'Trimmed Test Product']);
 
     $component = AutocompleteSelect::make('test_field')
@@ -190,7 +190,7 @@ it('trims search queries before execution', function (): void {
     expect($searchResults)->toHaveCount(1);
 });
 
-it('caches search results for identical queries', function (): void {
+it('feature: caches search results for identical queries', function (): void {
     Product::factory()->count(2)->create(['name' => 'Cache Product']);
 
     $component = AutocompleteSelect::make('test_field')
@@ -209,7 +209,7 @@ it('caches search results for identical queries', function (): void {
     DB::flushQueryLog();
 });
 
-it('provides correct view data', function (): void {
+it('feature: provides correct view data', function (): void {
     $component = AutocompleteSelect::make('test_field')
         ->model(Product::class)
         ->searchable(true)
@@ -247,7 +247,7 @@ it('provides correct view data', function (): void {
     expect($viewData['searchQuery'])->toBe('test');
 });
 
-it('handles search with no results', function (): void {
+it('feature: handles search with no results', function (): void {
     Product::factory()->create([
         'name' => 'Different Product',
         'is_visible' => true,
@@ -264,7 +264,7 @@ it('handles search with no results', function (): void {
     expect($searchResults)->toBeEmpty();
 });
 
-it('caches results for identical search queries', function (): void {
+it('feature: caches results for identical search queries', function (): void {
     $initialProduct = Product::factory()->create(['name' => 'Cached Result Product']);
 
     $component = AutocompleteSelect::make('test_field')
@@ -283,7 +283,7 @@ it('caches results for identical search queries', function (): void {
     expect($secondResults)->not->toHaveKey($newProduct->id);
 });
 
-it('refreshes results after clearing the search cache', function (): void {
+it('feature: refreshes results after clearing the search cache', function (): void {
     Product::factory()->create(['name' => 'Initial Search Product']);
 
     $component = AutocompleteSelect::make('test_field')
@@ -301,7 +301,7 @@ it('refreshes results after clearing the search cache', function (): void {
     expect($refreshedResults)->toHaveCount(2);
 });
 
-it('supports multi term searches', function (): void {
+it('feature: supports multi term searches', function (): void {
     Product::factory()->create(['name' => 'Incredible Test Product']);
     Product::factory()->create(['name' => 'Test Gadget']);
     Product::factory()->create(['name' => 'Product Sample']);
@@ -315,7 +315,7 @@ it('supports multi term searches', function (): void {
     expect(array_values($results))->toContain('Incredible Test Product');
 });
 
-it('can chain configuration methods', function (): void {
+it('feature: can chain configuration methods', function (): void {
     $component = AutocompleteSelect::make('test_field')
         ->searchable(true)
         ->multiple(false)
@@ -336,7 +336,7 @@ it('can chain configuration methods', function (): void {
     expect($component->getModelClass())->toBe(Product::class);
 });
 
-it('trims search queries before executing search', function (): void {
+it('feature: trims search queries before executing search', function (): void {
     Product::factory()->create(['name' => 'Trimmed Result']);
 
     $component = AutocompleteSelect::make('test_field')
@@ -349,7 +349,7 @@ it('trims search queries before executing search', function (): void {
     expect($component->getSearchQuery())->toBe('Trimmed');
 });
 
-it('caches identical search results to avoid duplicate queries', function (): void {
+it('feature: caches identical search results to avoid duplicate queries', function (): void {
     Product::factory()->count(3)->create(['name' => 'Cached Product']);
 
     $component = AutocompleteSelect::make('test_field')
@@ -373,7 +373,7 @@ it('caches identical search results to avoid duplicate queries', function (): vo
     expect($secondQueryCount)->toBe(0);
 });
 
-it('reuses cached results for trimmed search queries', function (): void {
+it('feature: reuses cached results for trimmed search queries', function (): void {
     Product::factory()->create(['name' => 'Trim Cache Product']);
 
     $component = AutocompleteSelect::make('test_field')

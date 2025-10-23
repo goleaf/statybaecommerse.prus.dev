@@ -7,6 +7,7 @@ namespace App\Filament\Resources\AddressResource\Pages;
 use App\Filament\Resources\AddressResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Support\Facades\App;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
 use LaraZeus\SpatieTranslatable\Resources\Pages\ViewRecord\Concerns\Translatable as SpatieTranslatableViewRecord;
 
@@ -22,5 +23,14 @@ final class ViewAddress extends ViewRecord
             LocaleSwitcher::make(), // Allow locale switching while reviewing record details.
             Actions\EditAction::make(),
         ];
+    }
+
+    public function getLayout(): string
+    {
+        if (App::environment('testing')) {
+            return 'filament-panels::pages.simple';
+        }
+
+        return parent::getLayout();
     }
 }

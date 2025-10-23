@@ -9,13 +9,79 @@ use App\Models\Order;
 use App\Support\Cache\CacheKeys;
 use App\Support\Stats\Series\CustomerSeries;
 use Carbon\CarbonImmutable;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 final class CustomerSeriesTest extends TestCase
 {
-    use RefreshDatabase;
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Schema::dropIfExists('order_items');
+        Schema::dropIfExists('orders');
+        Schema::dropIfExists('customers');
+        Schema::create('customers', static function (Blueprint $table): void {
+            $table->id();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->string('phone')->nullable();
+            $table->string('address')->nullable();
+            $table->string('postal_code')->nullable();
+            $table->unsignedBigInteger('country_id')->nullable();
+            $table->unsignedBigInteger('city_id')->nullable();
+            $table->unsignedBigInteger('company_id')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->json('metadata')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('orders', static function (Blueprint $table): void {
+            $table->id();
+            $table->string('number')->unique();
+            $table->unsignedBigInteger('customer_id')->nullable();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('channel_id')->nullable();
+            $table->unsignedBigInteger('zone_id')->nullable();
+            $table->unsignedBigInteger('partner_id')->nullable();
+            $table->string('status')->default('completed');
+            $table->string('payment_status')->nullable();
+            $table->string('payment_method')->nullable();
+            $table->string('payment_reference')->nullable();
+            $table->decimal('subtotal', 12, 2)->default(0);
+            $table->decimal('tax_amount', 12, 2)->default(0);
+            $table->decimal('shipping_amount', 12, 2)->default(0);
+            $table->decimal('discount_amount', 12, 2)->default(0);
+            $table->decimal('total', 12, 2)->default(0);
+            $table->string('currency', 3)->default('EUR');
+            $table->json('billing_address')->nullable();
+            $table->json('shipping_address')->nullable();
+            $table->text('notes')->nullable();
+            $table->timestamp('shipped_at')->nullable();
+            $table->timestamp('delivered_at')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+            // Ensure the same index name used in production exists for SQLite's INDEXED BY hint
+            $table->index('created_at', 'orders_created_at_index');
+        });
+
+        Schema::create('order_items', static function (Blueprint $table): void {
+            $table->id();
+            $table->unsignedBigInteger('order_id');
+            $table->unsignedBigInteger('product_id')->nullable();
+            $table->unsignedBigInteger('product_variant_id')->nullable();
+            $table->string('name')->nullable();
+            $table->string('sku')->nullable();
+            $table->integer('quantity')->default(1);
+            $table->decimal('unit_price', 12, 2)->default(0);
+            $table->decimal('price', 12, 2)->default(0);
+            $table->decimal('total', 12, 2)->default(0);
+            $table->text('notes')->nullable();
+            $table->timestamps();
+        });
+    }
 
     /**
      * Ensure the customer order helper returns the expected totals and caches the payload.

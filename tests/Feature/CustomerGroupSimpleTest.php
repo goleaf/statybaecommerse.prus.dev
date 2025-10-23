@@ -6,42 +6,42 @@ use App\Filament\Resources\CustomerGroupResource;
 use App\Models\CustomerGroup;
 use App\Support\Nav;
 
-it('can load CustomerGroupResource class', function () {
+it('feature: can load CustomerGroupResource class', function () {
     expect(class_exists(CustomerGroupResource::class))->toBeTrue();
 });
 
-it('can load CustomerGroup model class', function () {
+it('feature: can load CustomerGroup model class', function () {
     expect(class_exists(CustomerGroup::class))->toBeTrue();
 });
 
-it('can instantiate CustomerGroupResource', function () {
+it('feature: can instantiate CustomerGroupResource', function () {
     $resource = new CustomerGroupResource;
     expect($resource)->toBeInstanceOf(CustomerGroupResource::class);
 });
 
-it('can get CustomerGroupResource model', function () {
+it('feature: can get CustomerGroupResource model', function () {
     expect(CustomerGroupResource::getModel())->toBe(CustomerGroup::class);
 });
 
-it('can get CustomerGroupResource navigation group', function () {
+it('feature: can get CustomerGroupResource navigation group', function () {
     expect(CustomerGroupResource::getNavigationGroup())->toBe(
         Nav::groupForResource(CustomerGroupResource::class)
     );
 });
 
-it('can get CustomerGroupResource navigation label', function () {
+it('feature: can get CustomerGroupResource navigation label', function () {
     expect(CustomerGroupResource::getNavigationLabel())->toBeString();
 });
 
-it('can get CustomerGroupResource plural model label', function () {
+it('feature: can get CustomerGroupResource plural model label', function () {
     expect(CustomerGroupResource::getPluralModelLabel())->toBeString();
 });
 
-it('can get CustomerGroupResource model label', function () {
+it('feature: can get CustomerGroupResource model label', function () {
     expect(CustomerGroupResource::getModelLabel())->toBeString();
 });
 
-it('can get CustomerGroupResource pages', function () {
+it('feature: can get CustomerGroupResource pages', function () {
     $pages = CustomerGroupResource::getPages();
     expect($pages)->toBeArray();
     expect($pages)->toHaveKey('index');
@@ -50,7 +50,7 @@ it('can get CustomerGroupResource pages', function () {
     expect($pages)->toHaveKey('edit');
 });
 
-it('can get CustomerGroupResource relations', function () {
+it('feature: can get CustomerGroupResource relations', function () {
     $relations = CustomerGroupResource::getRelations();
     expect($relations)->toBeArray();
 });

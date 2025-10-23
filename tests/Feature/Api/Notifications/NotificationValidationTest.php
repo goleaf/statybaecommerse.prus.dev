@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Models\User;
 
-it('rejects invalid pagination values', function (): void {
+it('feature: rejects invalid pagination values', function (): void {
     $user = User::factory()->create();
 
     $response = $this->actingAs($user, 'sanctum')->getJson('/api/notifications?per_page=foo');
@@ -16,7 +16,7 @@ it('rejects invalid pagination values', function (): void {
         ]);
 });
 
-it('requires a search query parameter', function (): void {
+it('feature: requires a search query parameter', function (): void {
     $user = User::factory()->create();
 
     $response = $this->actingAs($user, 'sanctum')->getJson('/api/notifications/search');

@@ -22,7 +22,8 @@ final class CategorySearchRepository extends AbstractSearchRepository
         $productFilters = $this->productPublicationFilter();
 
         // Category/product relationships live in the `product_categories` pivot, so we
-        // join through that table to keep MySQL and SQLite test schemas aligned.
+        // join through that table (and the product table itself) to keep MySQL and
+        // SQLite test schemas aligned while still allowing product-level filters.
         return <<<SQL
 SELECT
     c.id,
@@ -34,6 +35,7 @@ SELECT
     COALESCE(ct.description, '') AS translated_description
 FROM categories AS c
 JOIN product_categories AS pc ON pc.category_id = c.id
+JOIN products AS p ON p.id = pc.product_id
 LEFT JOIN category_translations AS ct ON ct.category_id = c.id AND ct.locale = ?
 WHERE 1 = 1{$categoryFilters}{$productFilters}
   AND c.slug IS NOT NULL

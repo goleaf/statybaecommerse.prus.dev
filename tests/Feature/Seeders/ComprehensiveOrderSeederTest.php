@@ -15,7 +15,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('creates orders using factory relationships', function () {
+it('feature: creates orders using factory relationships', function () {
     // Create prerequisite data
     User::factory(10)->create();
     Product::factory(5)->create();
@@ -37,7 +37,7 @@ it('creates orders using factory relationships', function () {
     expect($order->total)->toBeGreaterThan(0);
 });
 
-it('creates order items using factory relationships', function () {
+it('feature: creates order items using factory relationships', function () {
     User::factory(5)->create();
     Product::factory(3)->create();
     Zone::factory()->create(['is_default' => true]);
@@ -56,7 +56,7 @@ it('creates order items using factory relationships', function () {
     expect($orderItem->price)->toBeGreaterThan(0);
 });
 
-it('creates order shipping using factory relationships', function () {
+it('feature: creates order shipping using factory relationships', function () {
     User::factory(5)->create();
     Product::factory(3)->create();
     Zone::factory()->create(['is_default' => true]);
@@ -74,7 +74,7 @@ it('creates order shipping using factory relationships', function () {
     expect($shipping->service)->toBeIn(['Standard', 'Express', 'Next Day', 'Economy', 'Premium']);
 });
 
-it('creates documents using factory relationships when templates exist', function () {
+it('feature: creates documents using factory relationships when templates exist', function () {
     User::factory(5)->create();
     Product::factory(3)->create();
     Zone::factory()->create(['is_default' => true]);
@@ -99,7 +99,7 @@ it('creates documents using factory relationships when templates exist', functio
     }
 });
 
-it('ensures required data is created when missing', function () {
+it('feature: ensures required data is created when missing', function () {
     // Start with empty database
     $seeder = new ComprehensiveOrderSeeder;
     $seeder->run();
@@ -110,7 +110,7 @@ it('ensures required data is created when missing', function () {
     expect(Zone::count())->toBeGreaterThan(0);
 });
 
-it('creates orders for specified time periods', function () {
+it('feature: creates orders for specified time periods', function () {
     User::factory(10)->create();
     Product::factory(5)->create();
     Zone::factory()->create(['is_default' => true]);
@@ -136,7 +136,7 @@ it('creates orders for specified time periods', function () {
     expect($lastMonthOrders)->toBeGreaterThan(0);
 });
 
-it('maintains proper order status and payment status relationships', function () {
+it('feature: maintains proper order status and payment status relationships', function () {
     User::factory(10)->create();
     Product::factory(5)->create();
     Zone::factory()->create(['is_default' => true]);
@@ -158,7 +158,7 @@ it('maintains proper order status and payment status relationships', function ()
     }
 });
 
-it('creates proper order item relationships without duplicates', function () {
+it('feature: creates proper order item relationships without duplicates', function () {
     User::factory(5)->create();
     Product::factory(3)->create();
     Zone::factory()->create(['is_default' => true]);

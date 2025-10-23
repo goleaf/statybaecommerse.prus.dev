@@ -38,7 +38,7 @@ beforeEach(function (): void {
     });
 });
 
-it('exposes product search results through the form component', function (string $resourceClass): void {
+it('feature: exposes product search results through the form component', function (string $resourceClass): void {
     Product::unguarded(fn () => Product::create([
         'sku'          => 'FORM-001',
         'name'         => ['en' => 'Form Drill', 'lt' => 'Forma Gręžtuvas'],
@@ -84,7 +84,7 @@ it('exposes product search results through the form component', function (string
     WishlistItemResource::class,
 ]);
 
-it('exposes payload macros for standalone searchable inputs', function (): void {
+it('feature: exposes payload macros for standalone searchable inputs', function (): void {
     $component = SearchableInput::make('standalone')
         ->fallbackPayload(['id' => null, 'label' => ''])
         ->payload(['id' => '42', 'label' => 'Standalone']);

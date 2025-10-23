@@ -129,6 +129,36 @@ final class ActivityLogResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
+    /**
+     * Resolve distinct column values so select filters populate with real activity log data.
+     *
+     * @return array<string, string>
+     */
+    protected static function getDistinctFilterOptions(string $column): array
+    {
+        $values = ActivityLog::query()
+            ->select($column)
+            ->distinct()
+            ->whereNotNull($column)
+            ->orderBy($column)
+            ->pluck($column)
+            ->filter(static fn ($value) => $value !== '');
+
+        if ($column === 'subject_type') {
+            return $values
+                ->mapWithKeys(static fn ($value): array => [
+                    (string) $value => class_basename((string) $value),
+                ])
+                ->all();
+        }
+
+        return $values
+            ->mapWithKeys(static fn ($value): array => [
+                (string) $value => (string) $value,
+            ])
+            ->all();
+    }
+
     public static function getRecordTitle(?Model $record): string
     {
         if ($record instanceof ActivityLog) {

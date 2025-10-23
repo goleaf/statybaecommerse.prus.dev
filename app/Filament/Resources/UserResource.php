@@ -16,9 +16,9 @@ use App\Services\Export\ExportService;
 use App\Support\Authorization\AuthorizationMatrix;
 use App\Support\Forms\MatrixFactory;
 use Filament\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\FileUpload;
@@ -133,6 +133,38 @@ final class UserResource extends Resource implements DefinesExportColumns
      */
     public static function form(Schema $schema): Schema   
     {
+        $permissionModuleLabels = [
+            'products'   => __('users.permissions.rows.products'),
+            'categories' => __('users.permissions.rows.categories'),
+            'brands'     => __('users.permissions.rows.brands'),
+            'orders'     => __('users.permissions.rows.orders'),
+            'users'      => __('users.permissions.rows.users'),
+        ];
+
+        $permissionAbilityLabels = [
+            'viewAny' => __('users.permissions.columns.view_any'),
+            'view'    => __('users.permissions.columns.view'),
+            'create'  => __('users.permissions.columns.create'),
+            'update'  => __('users.permissions.columns.update'),
+            'delete'  => __('users.permissions.columns.delete'),
+        ];
+
+        $permissionMatrixDefinition = [];
+
+        foreach ($permissionModuleLabels as $moduleKey => $_) {
+            $permissionMatrixDefinition[$moduleKey] = array_fill_keys(array_keys($permissionAbilityLabels), true);
+        }
+
+        $permissionsMatrix = MatrixFactory::permissions(
+            $permissionMatrixDefinition,
+            static fn (string $module): string => $permissionModuleLabels[$module] ?? ucwords(str_replace('_', ' ', $module)),
+            static fn (string $ability): string => $permissionAbilityLabels[$ability] ?? ucwords(str_replace('_', ' ', $ability)),
+            __('users.sections.permissions'),
+            'permissions_matrix'
+        )
+            ->columnSpanFull()
+            ->live();
+
         return $schema
             ->schema([
                 SchemaSection::make(__('users.sections.basic_info'))
@@ -174,30 +206,7 @@ final class UserResource extends Resource implements DefinesExportColumns
                             ->default(true),
                     ])
                     ->columns(1),
-                SchemaSection::make(__('users.sections.permissions'))
-                    ->schema([
-                        MatrixFactory::permissions(
-                            [
-                                'products'   => __('users.permissions.rows.products'),
-                                'categories' => __('users.permissions.rows.categories'),
-                                'brands'     => __('users.permissions.rows.brands'),
-                                'orders'     => __('users.permissions.rows.orders'),
-                                'users'      => __('users.permissions.rows.users'),
-                            ],
-                            [
-                                'viewAny' => __('users.permissions.columns.view_any'),
-                                'view'    => __('users.permissions.columns.view'),
-                                'create'  => __('users.permissions.columns.create'),
-                                'update'  => __('users.permissions.columns.update'),
-                                'delete'  => __('users.permissions.columns.delete'),
-                            ],
-                        )
-                            ->label(__('users.fields.permissions_matrix'))
-                            ->helperText(__('users.permissions.helper_text'))
-                            ->columnSpanFull()
-                            ->live(),
-                    ])
-                    ->columns(1),
+                $permissionsMatrix,
                 SchemaSection::make(__('users.sections.profile'))
                     ->schema([
                         FileUpload::make('avatar_url')

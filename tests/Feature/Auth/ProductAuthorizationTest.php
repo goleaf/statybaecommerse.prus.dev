@@ -28,7 +28,7 @@ describe('Product resource authorization', function () {
         $rolePermissions = [
             'super_admin' => ['view_products', 'create_products', 'edit_products', 'delete_products'],
             'admin' => ['view_products', 'create_products', 'edit_products', 'delete_products'],
-            'manager' => ['view_products', 'edit_products'],
+            'manager' => ['view_products', 'create_products', 'edit_products'],
             'editor' => ['view_products', 'create_products', 'edit_products'],
             'user' => [],
         ];
@@ -39,7 +39,7 @@ describe('Product resource authorization', function () {
         }
     });
 
-    it('returns 403 for users without product listing permission', function (string $role) {
+    it('feature: returns 403 for users without product listing permission', function (string $role) {
         $user = User::factory()->create();
         $user->assignRole($role);
 
@@ -51,7 +51,7 @@ describe('Product resource authorization', function () {
         'basic user' => 'user',
     ]);
 
-    it('blocks viewing a product without view permission', function (string $role) {
+    it('feature: blocks viewing a product without view permission', function (string $role) {
         $user = User::factory()->create();
         $user->assignRole($role);
 
@@ -63,7 +63,7 @@ describe('Product resource authorization', function () {
         'basic user' => 'user',
     ]);
 
-    it('blocks access to the create page without create permission', function (string $role) {
+    it('feature: blocks access to the create page without create permission', function (string $role) {
         $user = User::factory()->create();
         $user->assignRole($role);
 
@@ -72,11 +72,20 @@ describe('Product resource authorization', function () {
             ->get(ProductResource::getUrl('create'))
             ->assertForbidden();
     })->with([
-        'manager role missing create ability' => 'manager',
         'basic user' => 'user',
     ]);
 
-    it('blocks editing without update permission', function (string $role) {
+    it('feature: allows managers to access the create page', function (): void {
+        $manager = User::factory()->create();
+        $manager->assignRole('manager');
+
+        $this
+            ->actingAs($manager)
+            ->get(ProductResource::getUrl('create'))
+            ->assertOk();
+    });
+
+    it('feature: blocks editing without update permission', function (string $role) {
         $user = User::factory()->create();
         $user->assignRole($role);
 
@@ -88,7 +97,7 @@ describe('Product resource authorization', function () {
         'basic user' => 'user',
     ]);
 
-    it('blocks delete table action without delete permission', function (string $role) {
+    it('feature: blocks delete table action without delete permission', function (string $role) {
         $user = User::factory()->create();
         $user->assignRole($role);
 

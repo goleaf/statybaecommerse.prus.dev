@@ -68,17 +68,16 @@ final class ApiRateLimit429Test extends RateLimitTestCase
 
         Storage::disk('secure-media')->put($export->artifact_path, 'id,name');
 
-        $user = $this->makeSanctumUser(303);
-        Sanctum::actingAs($user, ['exports.download'], 'sanctum');
-
-        $key = 'user:'.$user->getAuthIdentifier().'|exports';
-        RateLimiter::clear($key);
+        $ipKey = 'ip:127.0.0.1|exports';
+        RateLimiter::clear($ipKey);
 
         $this->get($this->signedDownloadUrl($export))->assertOk();
 
         $response = $this->get($this->signedDownloadUrl($export));
 
         $response->assertStatus(429);
+
+        RateLimiter::clear($ipKey);
     }
 
     private function createCompletedExport(): Export
@@ -101,6 +100,6 @@ final class ApiRateLimit429Test extends RateLimitTestCase
 
     private function signedDownloadUrl(Export $export): string
     {
-        return URL::signedRoute('exports.signed-download', ['export' => $export]);
+        return URL::signedRoute('api.exports.download', ['export' => $export]);
     }
 }

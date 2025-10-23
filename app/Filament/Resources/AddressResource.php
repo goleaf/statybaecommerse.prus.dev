@@ -4,27 +4,23 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-use BackedEnum;
 use App\Enums\AddressType;
 use App\Filament\Resources\AddressResource\Pages;
 use App\Models\Address;
 use App\Models\City;
 use App\Models\Country;
 use App\Models\User;
+use App\Support\Concerns\HasNav;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\AddressSearch;
 use App\Support\Search\CustomerSearch;
+use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -32,8 +28,13 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables\Columns\IconColumn;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\QueryBuilder;
 use Filament\Tables\Filters\QueryBuilder\Constraints\DateConstraint;
@@ -42,7 +43,6 @@ use Filament\Tables\Filters\QueryBuilder\Constraints\TextConstraint;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
@@ -100,7 +100,7 @@ final class AddressResource extends Resource
 
     /**
      * Configure the Filament form schema using the v4 `Schema` contract so downstream
-     * consumers resolve the same container pipeline that powers `Schema::components([...])`
+     * consumers resolve the same container pipeline that powers `Schema::schema([...])`
      * definitions. Returning the schema keeps the resource compatible with Filament's
      * stricter signature expectations while documenting the component wiring strategy.
      */
@@ -108,8 +108,8 @@ final class AddressResource extends Resource
     {
         return $schema->schema([
             SchemaSection::make(__('translations.address_information'))
-                ->components([
-                    SchemaGrid::make(2)->components([
+                ->schema([
+                    SchemaGrid::make(2)->schema([
                         SearchableInput::make('user_id')
                             ->label(__('translations.user'))
                             ->placeholder('Name, email or phone')
@@ -159,7 +159,7 @@ final class AddressResource extends Resource
                             ->required()
                             ->default(AddressType::SHIPPING->value),
                     ]),
-                    SchemaGrid::make(2)->components([
+                    SchemaGrid::make(2)->schema([
                         TextInput::make('first_name')
                             ->label(__('translations.first_name'))
                             ->maxLength(255),
@@ -167,7 +167,7 @@ final class AddressResource extends Resource
                             ->label(__('translations.last_name'))
                             ->maxLength(255),
                     ]),
-                    SchemaGrid::make(2)->components([
+                    SchemaGrid::make(2)->schema([
                         TextInput::make('company_name')
                             ->label(__('translations.company'))
                             ->maxLength(255),
@@ -177,7 +177,7 @@ final class AddressResource extends Resource
                     ]),
                 ]),
             SchemaSection::make(__('translations.address_details'))
-                ->components([
+                ->schema([
                     SearchableInput::make('address_line_1')
                         ->label(__('translations.address_line_1'))
                         ->placeholder(__('translations.address_line_1'))
@@ -187,7 +187,7 @@ final class AddressResource extends Resource
                     TextInput::make('address_line_2')
                         ->label(__('translations.address_line_2'))
                         ->maxLength(255),
-                    SchemaGrid::make(3)->components([
+                    SchemaGrid::make(3)->schema([
                         TextInput::make('apartment')
                             ->label(__('translations.apartment'))
                             ->maxLength(100),
@@ -198,7 +198,7 @@ final class AddressResource extends Resource
                             ->label(__('translations.building'))
                             ->maxLength(100),
                     ]),
-                    SchemaGrid::make(3)->components([
+                    SchemaGrid::make(3)->schema([
                         SearchableInput::make('city')
                             ->label(__('translations.city'))
                             ->placeholder(__('translations.city'))
@@ -213,7 +213,7 @@ final class AddressResource extends Resource
                             ->required()
                             ->maxLength(20),
                     ]),
-                    SchemaGrid::make(2)->components([
+                    SchemaGrid::make(2)->schema([
                         Select::make('country_code')
                             ->label(__('translations.country'))
                             ->options(fn (): array => Country::query()->orderBy('name')->pluck('name', 'cca2')->all())
@@ -280,8 +280,8 @@ final class AddressResource extends Resource
                     ]),
                 ]),
             SchemaSection::make(__('translations.contact_information'))
-                ->components([
-                    SchemaGrid::make(2)->components([
+                ->schema([
+                    SchemaGrid::make(2)->schema([
                         TextInput::make('phone')
                             ->label(__('translations.phone'))
                             ->tel()
@@ -296,7 +296,7 @@ final class AddressResource extends Resource
                         ->maxLength(255),
                 ]),
             SchemaSection::make(__('translations.additional_information'))
-                ->components([
+                ->schema([
                     Textarea::make('notes')
                         ->label(__('translations.notes'))
                         ->maxLength(1000)
@@ -309,8 +309,8 @@ final class AddressResource extends Resource
                         ->columnSpanFull(),
                 ]),
             SchemaSection::make(__('translations.settings'))
-                ->components([
-                    SchemaGrid::make(2)->components([
+                ->schema([
+                    SchemaGrid::make(2)->schema([
                         Toggle::make('is_default')
                             ->label(__('translations.is_default'))
                             ->helperText(__('translations.is_default_help')),
@@ -319,7 +319,7 @@ final class AddressResource extends Resource
                             ->default(true)
                             ->helperText(__('translations.is_active_help')),
                     ]),
-                    SchemaGrid::make(2)->components([
+                    SchemaGrid::make(2)->schema([
                         Toggle::make('is_billing')
                             ->label(__('translations.is_billing'))
                             ->helperText(__('translations.is_billing_help')),

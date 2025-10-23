@@ -10,7 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('creates analytics event record', function () {
+it('feature: creates analytics event record', function () {
     $user = User::factory()->create();
 
     $event = AnalyticsEvent::create([
@@ -31,7 +31,7 @@ it('creates analytics event record', function () {
     expect($event->user_id)->toBe($user->id);
 });
 
-it('tracks analytics event via static method', function () {
+it('feature: tracks analytics event via static method', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
@@ -47,24 +47,24 @@ it('tracks analytics event via static method', function () {
     expect($event->properties['page'])->toBe('/test-page');
 });
 
-it('can get analytics event resource model', function () {
+it('feature: can get analytics event resource model', function () {
     expect(AnalyticsEventResource::getModel())->toBe(AnalyticsEvent::class);
 });
 
-it('can get analytics event resource navigation group', function () {
+it('feature: can get analytics event resource navigation group', function () {
     expect(AnalyticsEventResource::getNavigationGroup())->toBe(
         Nav::groupForResource(AnalyticsEventResource::class)
     );
 });
 
-it('can get analytics event resource navigation label', function () {
+it('feature: can get analytics event resource navigation label', function () {
     expect(AnalyticsEventResource::getNavigationLabel())->toBeString();
 });
 
-it('can get analytics event resource plural model label', function () {
+it('feature: can get analytics event resource plural model label', function () {
     expect(AnalyticsEventResource::getPluralModelLabel())->toBeString();
 });
 
-it('can get analytics event resource model label', function () {
+it('feature: can get analytics event resource model label', function () {
     expect(AnalyticsEventResource::getModelLabel())->toBeString();
 });

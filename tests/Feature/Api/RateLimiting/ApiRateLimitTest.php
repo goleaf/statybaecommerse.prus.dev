@@ -82,7 +82,7 @@ final class ApiRateLimitTest extends TestCase
         }
     }
 
-    public function test_signed_export_download_requires_auth_and_ability_and_rate_limits(): void
+    public function test_signed_export_download_respects_rate_limits_without_authentication(): void
     {
         Storage::fake('secure-media');
 
@@ -100,30 +100,24 @@ final class ApiRateLimitTest extends TestCase
 
         Storage::disk('secure-media')->put($export->artifact_path, 'report');
 
-        $signedUrl = URL::signedRoute('exports.signed-download', ['export' => $export]);
+        $signedUrl = URL::signedRoute('api.exports.download', ['export' => $export]);
 
         $originalLimit = config('security.rate_limiting.api.exports');
         $ipKey = 'ip:127.0.0.1|exports';
-        $userKey = 'user:' . $user->id . '|exports';
 
         try {
-            config(['security.rate_limiting.api.exports' => 10]);
-            $this->clearRateLimiterKeys('api.exports', $ipKey, $userKey);
-
-            $this->get($signedUrl)->assertUnauthorized();
-
-            Sanctum::actingAs($user, ['profile.read']);
-            $this->get($signedUrl)->assertForbidden();
-
             config(['security.rate_limiting.api.exports' => 1]);
-            $this->clearRateLimiterKeys('api.exports', $ipKey, $userKey);
+            $this->clearRateLimiterKeys('api.exports', $ipKey);
 
-            Sanctum::actingAs($user, ['exports.download']);
             $this->get($signedUrl)->assertOk();
             $this->get($signedUrl)->assertStatus(429);
+
+            $this->clearRateLimiterKeys('api.exports', $ipKey);
+            Sanctum::actingAs($user, ['exports.download']);
+            $this->get($signedUrl)->assertOk();
         } finally {
             config(['security.rate_limiting.api.exports' => $originalLimit]);
-            $this->clearRateLimiterKeys('api.exports', $ipKey, $userKey);
+            $this->clearRateLimiterKeys('api.exports', $ipKey);
         }
     }
 

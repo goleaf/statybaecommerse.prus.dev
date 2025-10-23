@@ -6,7 +6,6 @@ namespace Database\Factories;
 
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -23,11 +22,16 @@ final class SystemSettingFactory extends Factory
      */
     public function definition(): array
     {
-        $types = ['string', 'integer', 'boolean', 'json', 'array', 'file', 'color', 'date', 'datetime', 'email', 'url', 'password'];
+        $types = ['string', 'integer', 'boolean', 'json', 'array', 'file', 'color', 'date', 'datetime', 'email', 'url', 'password', 'float'];
         $type = $this->faker->randomElement($types);
 
         return [
-            'category_id' => SystemSettingCategory::factory(),
+            'category_id' => static function (): int {
+                return SystemSettingCategory::factory()
+                    ->state(['is_active' => true])
+                    ->createQuietly()
+                    ->id;
+            },
             'key' => $this->faker->unique()->slug(2),
             'name' => $this->faker->sentence(3),
             'description' => $this->faker->paragraph(),
@@ -36,7 +40,7 @@ final class SystemSettingFactory extends Factory
             'value' => $this->getValueForType($type),
             'group' => $this->faker->randomElement(['general', 'security', 'performance', 'ui_ux', 'api']),
             'sort_order' => $this->faker->numberBetween(0, 100),
-            'is_active' => $this->faker->boolean(80),
+            'is_active' => true,
             'is_public' => $this->faker->boolean(20),
             'is_required' => $this->faker->boolean(10),
             'is_readonly' => $this->faker->boolean(5),
@@ -52,7 +56,7 @@ final class SystemSettingFactory extends Factory
             'environment' => $this->faker->randomElement(['local', 'staging', 'production']),
             'cache_key' => $this->faker->slug(),
             'cache_ttl' => $this->faker->randomElement([0, 60, 300, 900, 3600, 86400]),
-            'updated_by' => User::factory(),
+            'updated_by' => null,
         ];
     }
 
@@ -65,9 +69,13 @@ final class SystemSettingFactory extends Factory
             'string', 'text' => $this->faker->sentence(),
             'integer' => $this->faker->numberBetween(1, 1000),
             'boolean' => $this->faker->boolean(),
-            'json' => json_encode(['key' => $this->faker->word(), 'value' => $this->faker->sentence()]),
-            'array' => json_encode($this->faker->words(3)),
+            'json' => [
+                'key' => $this->faker->word(),
+                'value' => $this->faker->sentence(),
+            ],
+            'array' => $this->faker->words(3),
             'file' => $this->faker->filePath(),
+            'image' => $this->faker->imageUrl(),
             'color' => $this->faker->hexColor(),
             'date' => $this->faker->date(),
             'datetime' => $this->faker->dateTime()->format('Y-m-d H:i:s'),
@@ -180,6 +188,36 @@ final class SystemSettingFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'is_encrypted' => true,
         ]);
+    }
+
+    public function string(): static
+    {
+        return $this->ofType('string');
+    }
+
+    public function boolean(): static
+    {
+        return $this->ofType('boolean');
+    }
+
+    public function integer(): static
+    {
+        return $this->ofType('integer');
+    }
+
+    public function float(): static
+    {
+        return $this->ofType('float');
+    }
+
+    public function json(): static
+    {
+        return $this->ofType('json');
+    }
+
+    public function arrayValue(): static
+    {
+        return $this->ofType('array');
     }
 
     /**

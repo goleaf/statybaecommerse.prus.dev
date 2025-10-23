@@ -21,7 +21,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
-use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Actions\BulkActionGroup;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;

@@ -7,15 +7,14 @@ namespace Tests;
 use App\Support\Cache\TagAwareCache;
 use Filament\Facades\Filament;
 use Filament\Panel;
-use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Illuminate\Contracts\Translation\Loader as TranslationLoader;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Artisan;
 use Throwable;
 use Tests\Support\TestingDatabase;
 
@@ -33,6 +32,10 @@ abstract class TestCase extends BaseTestCase
 
     protected function setUp(): void
     {
+        if (! class_exists(TestingDatabase::class) && file_exists(__DIR__ . '/Support/TestingDatabase.php')) {
+            require_once __DIR__ . '/Support/TestingDatabase.php';
+        }
+
         // Resolve the shared SQLite database location before the application boots so the
         // parent setup sequence works with the same persistent datastore prepared by
         // Tests\Support\TestingDatabase.
@@ -58,14 +61,17 @@ abstract class TestCase extends BaseTestCase
         Config::set('database.connections.sqlite.database', $this->sqliteDatabasePath);
         Config::set('database.connections.sqlite.foreign_key_constraints', true);
         Config::set('database.connections.sqlite.journal_mode', null);
+        Config::set('database.connections.sqlite.busy_timeout', 5000);
         Config::set('cache.default', 'array');
         Config::set('app.key', 'base64:' . base64_encode(random_bytes(32)));
+        Config::set('app.debug', false);
         // Ensure Telescope doesn't use MySQL during tests and avoid watchers overhead.
         Config::set('telescope.enabled', false);
         Config::set('telescope.storage.database.connection', 'sqlite');
         $this->ensureViteManifest();
         $this->refreshTranslationLoader();
         app()->instance('request', Request::create('/'));
+        Auth::forgetGuards();
         $this->withoutMiddleware([
             \App\Http\Middleware\ZoneDetector::class,
             \App\Http\Middleware\SetLocale::class,
@@ -74,17 +80,10 @@ abstract class TestCase extends BaseTestCase
             \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
 
-        if (! Schema::connection('sqlite')->hasTable('api_keys')) {
-            // Guarantee the API key schema exists for partner API tests when RefreshDatabase skips migrations.
-            try {
-                Artisan::call('migrate', [
-                    '--database' => 'sqlite',
-                    '--force' => true,
-                ]);
-            } catch (Throwable) {
-                // Lightweight unit tests do not require a database; skip when migrations fail.
-            }
+        if (function_exists('activity')) {
+            activity()->disableLogging();
         }
+
     }
 
     protected function tearDown(): void
@@ -113,8 +112,28 @@ abstract class TestCase extends BaseTestCase
             }
         }
 
+        Auth::forgetGuards();
+
         parent::tearDown();
 
+    }
+
+    /**
+     * Override the default database refresh cycle to lean on the shared
+     * TestingDatabase helper. Laravel's RefreshDatabase trait will
+     * call this method for every test that uses the trait, so we
+     * ensure migrations only execute once per process and
+     * then wrap each test in a fresh transaction.
+     */
+    protected function refreshDatabase()
+    {
+        $this->beforeRefreshingDatabase();
+
+        TestingDatabase::migrate();
+
+        $this->beginDatabaseTransaction();
+
+        $this->afterRefreshingDatabase();
     }
 
     protected function resolveAdminPanel(): Panel
@@ -153,6 +172,7 @@ abstract class TestCase extends BaseTestCase
         Config::set('database.connections.sqlite.database', $databasePath);
         Config::set('database.connections.sqlite.foreign_key_constraints', true);
         Config::set('database.connections.sqlite.journal_mode', null);
+        Config::set('database.connections.sqlite.busy_timeout', 5000);
     }
 
     /**
@@ -249,10 +269,10 @@ abstract class TestCase extends BaseTestCase
                 'isEntry' => true,
                 'src'     => 'resources/js/app.js',
             ],
-            'resources/css/filament/admin/theme.css' => [
+            'resources/css/filament/admin/theme.scss' => [
                 'file'    => 'assets/filament-admin-theme.css',
                 'isEntry' => false,
-                'src'     => 'resources/css/filament/admin/theme.css',
+                'src'     => 'resources/css/filament/admin/theme.scss',
             ],
         ];
 

@@ -20,7 +20,7 @@ final class ApiServiceProvider extends ServiceProvider
     {
         RateLimiter::for('api.default', function (Request $request): array {
             // Preserve the historical alias while delegating to the layered read throttle.
-            return $this->layeredLimits($request, 'api.read', $this->readRateLimitConfig());
+            return $this->layeredLimits($request, 'api.read', $this->defaultRateLimitConfig());
         });
 
         RateLimiter::for('api.read', function (Request $request): array {
@@ -40,11 +40,15 @@ final class ApiServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('api.autocomplete', function (Request $request): array {
-            return $this->layeredLimits($request, 'api.autocomplete', $this->autocompleteRateLimitConfig());
+            return $this->layeredLimits($request, 'api.autocomplete', $this->autocompleteRateLimitConfig(), 'autocomplete');
         });
 
         RateLimiter::for('api.profile', function (Request $request): array {
             return $this->layeredLimits($request, 'api.profile', $this->profileRateLimitConfig());
+        });
+
+        RateLimiter::for('api.exports', function (Request $request): array {
+            return $this->layeredLimits($request, 'api.exports', $this->exportRateLimitConfig(), 'exports');
         });
 
         RateLimiter::for('frontend.checkout', function (Request $request): array {
@@ -79,12 +83,14 @@ final class ApiServiceProvider extends ServiceProvider
      * @param  array{per_user:int|null,per_ip:int|null} $config
      * @return array<int, Limit>
      */
-    private function layeredLimits(Request $request, string $bucket, array $config): array
+    private function layeredLimits(Request $request, string $bucket, array $config, ?string $keySuffix = null): array
     {
+        $suffix = $keySuffix ?? $bucket;
+
         // Compose per-user and per-IP throttles so we can block abusive actors individually.
         $limits = [
-            $this->perUserLimit($request, $bucket, $config['per_user']),
-            $this->perIpLimit($request, $bucket, $config['per_ip']),
+            $this->perUserLimit($request, $bucket, $config['per_user'], $suffix),
+            $this->perIpLimit($request, $bucket, $config['per_ip'], $suffix),
         ];
 
         $filtered = array_values(array_filter($limits, static fn (?Limit $limit): bool => $limit !== null));
@@ -96,8 +102,8 @@ final class ApiServiceProvider extends ServiceProvider
         $fallback = $this->defaultRateLimitConfig();
 
         return array_values(array_filter([
-            $this->perUserLimit($request, $bucket, $fallback['per_user']),
-            $this->perIpLimit($request, $bucket, $fallback['per_ip']),
+            $this->perUserLimit($request, $bucket, $fallback['per_user'], $suffix),
+            $this->perIpLimit($request, $bucket, $fallback['per_ip'], $suffix),
         ], static fn (?Limit $limit): bool => $limit !== null));
     }
 
@@ -106,7 +112,7 @@ final class ApiServiceProvider extends ServiceProvider
      */
     private function readRateLimitConfig(): array
     {
-        $config = (array) config('security.rate_limiting.api.read', []);
+        $config = config('security.rate_limiting.api.read');
 
         return $this->normalizeRateLimitConfig($config, $this->defaultRateLimitConfig());
     }
@@ -116,7 +122,7 @@ final class ApiServiceProvider extends ServiceProvider
      */
     private function writeRateLimitConfig(): array
     {
-        $config = (array) config('security.rate_limiting.api.write', []);
+        $config = config('security.rate_limiting.api.write');
 
         return $this->normalizeRateLimitConfig($config, $this->defaultRateLimitConfig());
     }
@@ -231,7 +237,7 @@ final class ApiServiceProvider extends ServiceProvider
      */
     private function notificationRateLimitConfig(string $type): array
     {
-        $config = (array) data_get(config('security.rate_limiting.api.notifications', []), $type, []);
+        $config = data_get(config('security.rate_limiting.api.notifications'), $type);
 
         return $this->normalizeRateLimitConfig($config, $this->defaultRateLimitConfig());
     }
@@ -241,7 +247,7 @@ final class ApiServiceProvider extends ServiceProvider
      */
     private function autocompleteRateLimitConfig(): array
     {
-        $config = (array) config('security.rate_limiting.api.autocomplete', []);
+        $config = config('security.rate_limiting.api.autocomplete');
 
         return $this->normalizeRateLimitConfig($config, [
             'per_user' => 30,
@@ -254,7 +260,7 @@ final class ApiServiceProvider extends ServiceProvider
      */
     private function profileRateLimitConfig(): array
     {
-        $config = (array) config('security.rate_limiting.api.profile', []);
+        $config = config('security.rate_limiting.api.profile');
 
         return $this->normalizeRateLimitConfig($config, $this->readRateLimitConfig());
     }
@@ -262,9 +268,19 @@ final class ApiServiceProvider extends ServiceProvider
     /**
      * @return array{per_user:int|null,per_ip:int|null}
      */
+    private function exportRateLimitConfig(): array
+    {
+        $config = config('security.rate_limiting.api.exports');
+
+        return $this->normalizeRateLimitConfig($config, $this->defaultRateLimitConfig());
+    }
+
+    /**
+     * @return array{per_user:int|null,per_ip:int|null}
+     */
     private function checkoutRateLimitConfig(): array
     {
-        $config = (array) config('security.rate_limiting.frontend.checkout', []);
+        $config = config('security.rate_limiting.frontend.checkout');
 
         return $this->normalizeRateLimitConfig($config, [
             'per_user' => 10,
@@ -300,8 +316,19 @@ final class ApiServiceProvider extends ServiceProvider
      * @param  array{per_user:int|null,per_ip:int|null} $fallback
      * @return array{per_user:int|null,per_ip:int|null}
      */
-    private function normalizeRateLimitConfig(array $config, array $fallback): array
+    private function normalizeRateLimitConfig(mixed $config, array $fallback): array
     {
+        if ($config === null) {
+            return $fallback;
+        }
+
+        if (! is_array($config)) {
+            return [
+                'per_user' => $this->normalizeLimitValue($config, $fallback['per_user']),
+                'per_ip'   => $this->normalizeLimitValue($config, $fallback['per_ip']),
+            ];
+        }
+
         return [
             'per_user' => array_key_exists('per_user', $config)
                 ? $this->normalizeLimitValue($config['per_user'], $fallback['per_user'])
@@ -331,7 +358,7 @@ final class ApiServiceProvider extends ServiceProvider
         return $normalized;
     }
 
-    private function perUserLimit(Request $request, string $bucket, ?int $maxAttempts): ?Limit
+    private function perUserLimit(Request $request, string $bucket, ?int $maxAttempts, ?string $keySuffix = null): ?Limit
     {
         if ($maxAttempts === null || $maxAttempts <= 0) {
             return null;
@@ -343,12 +370,12 @@ final class ApiServiceProvider extends ServiceProvider
             return null;
         }
 
-        $key = $this->formatKey('user', (string) $userId, $bucket);
+        $key = $this->formatKey('user', (string) $userId, $keySuffix ?? $bucket);
 
         return $this->buildLimit($bucket . '.user', $key, $maxAttempts);
     }
 
-    private function perIpLimit(Request $request, string $bucket, ?int $maxAttempts): ?Limit
+    private function perIpLimit(Request $request, string $bucket, ?int $maxAttempts, ?string $keySuffix = null): ?Limit
     {
         if ($maxAttempts === null || $maxAttempts <= 0) {
             return null;
@@ -356,7 +383,7 @@ final class ApiServiceProvider extends ServiceProvider
 
         $ip = (string) $request->ip();
         $identifier = $ip !== '' ? $ip : 'unknown';
-        $key = $this->formatKey('ip', $identifier, $bucket);
+        $key = $this->formatKey('ip', $identifier, $keySuffix ?? $bucket);
 
         return $this->buildLimit($bucket . '.ip', $key, $maxAttempts);
     }
@@ -407,11 +434,16 @@ final class ApiServiceProvider extends ServiceProvider
             $resolved = app()->make('request_correlation_id');
 
             if (is_string($resolved) && $resolved !== '') {
+                $request->attributes->set('correlation_id', $resolved);
+
                 return $resolved;
             }
         }
 
-        return Str::uuid()->toString();
+        $generated = Str::uuid()->toString();
+        $request->attributes->set('correlation_id', $generated);
+
+        return $generated;
     }
 
     /**

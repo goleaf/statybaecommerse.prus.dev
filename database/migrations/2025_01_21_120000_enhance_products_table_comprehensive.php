@@ -154,8 +154,21 @@ return new class extends Migration
 
     private function indexExists(string $table, string $indexName): bool
     {
-        $indexes = Schema::getConnection()->getDoctrineSchemaManager()->listTableIndexes($table);
+        $connection = Schema::getConnection();
 
-        return array_key_exists($indexName, $indexes);
+        // Avoid hard dependency on doctrine/dbal in environments where it's not installed.
+        if (! method_exists($connection, 'getDoctrineSchemaManager')) {
+            return false;
+        }
+
+        try {
+            $indexes = $connection->getDoctrineSchemaManager()->listTableIndexes($table);
+
+            return array_key_exists($indexName, $indexes);
+        } catch (\Throwable) {
+            // If the doctrine layer is unavailable or errors, assume the index does not exist
+            // and let the schema builder attempt to create it.
+            return false;
+        }
     }
 };

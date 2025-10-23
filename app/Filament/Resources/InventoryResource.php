@@ -9,6 +9,7 @@ use Filament\Schemas\Schema;
 use App\Filament\Resources\InventoryResource\Pages;
 use App\Models\Inventory;
 use App\Models\Product;
+use App\Filament\Forms\Components\Quantity;
 use App\Support\Filament\SearchableComponentHelper;
 use App\Support\Search\ProductSearch;
 use App\Support\Search\SearchResultPayload;

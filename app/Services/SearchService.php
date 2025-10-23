@@ -37,14 +37,22 @@ final class SearchService
         $queryData = $isAggregated
             ? $query
             : $this->legacyQueryData((string) $query, $limit);
+        $originalQuery = $queryData->query();
+        $normalizedQuery = $this->sanitizeQueryString($originalQuery);
 
-        // Immediately short-circuit any suspicious looking queries so we do not even
-        // attempt to send them towards the database layer (defence in depth against
-        // SQL injection style payloads that might bypass upstream validation).
-        if ($this->isSuspiciousQuery($queryData->query())) {
+        if ($normalizedQuery === '') {
             return $isAggregated
-                ? $this->emptyAggregatedPayload($queryData)
+                ? $this->emptyAggregatedPayload($queryData, $originalQuery)
                 : [];
+        }
+
+        if ($normalizedQuery !== $originalQuery) {
+            $queryData = SearchQueryData::fromArray([
+                'query'    => $normalizedQuery,
+                'page'     => $queryData->page(),
+                'per_page' => $queryData->perPage(),
+                'types'    => $queryData->types(),
+            ], $queryData->context());
         }
 
         $cachePayload = array_merge($queryData->context(), [
@@ -83,15 +91,20 @@ final class SearchService
             'brand' => count($buckets['brand'] ?? []),
         ];
 
+        $groupedResults = $this->groupResultsByType($pageResults, $bucketCounts);
+        $returnedCount = $isAggregated
+            ? array_sum(array_map(static fn (array $bucket): int => count($bucket['items']), $groupedResults))
+            : count($pageResults);
+
         $payload = [
-            'data' => $pageResults,
+            'data' => $isAggregated ? $groupedResults : $pageResults,
             'meta' => [
-                'query' => $queryData->query(),
+                'query' => $originalQuery,
                 'page' => $queryData->page(),
                 'per_page' => $queryData->perPage(),
                 'max_per_page' => SearchQueryData::MAX_PER_PAGE,
                 'total_results' => $total,
-                'returned' => count($pageResults),
+                'returned' => $returnedCount,
                 'has_more' => ($offset + count($pageResults)) < $total,
                 'took_ms' => (int) round((microtime(true) - $started) * 1000),
                 'types' => $queryData->types(),
@@ -216,45 +229,22 @@ final class SearchService
     }
 
     /**
-     * Determine if the incoming query looks like an SQL injection attempt.
-     */
-    private function isSuspiciousQuery(string $query): bool
-    {
-        $normalized = Str::lower($query);
-
-        // Simple heuristics that catch the most common payload styles without
-        // being overly aggressive for legitimate catalogue searches.
-        $dangerousFragments = [
-            "' or ",
-            '" or ',
-            '--',
-            ';',
-            '/*',
-            '*/',
-            ' union ',
-            ' select ',
-        ];
-
-        foreach ($dangerousFragments as $fragment) {
-            if (str_contains($normalized, $fragment)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Build the standard aggregated payload for the suspicious query branch.
      */
-    private function emptyAggregatedPayload(SearchQueryData $queryData): array
+    private function emptyAggregatedPayload(SearchQueryData $queryData, ?string $originalQuery = null): array
     {
+        $bucketCounts = [
+            'product' => 0,
+            'category' => 0,
+            'brand' => 0,
+        ];
+
         // We keep the meta structure identical to successful searches so the
         // API contract remains predictable for callers.
         return [
-            'data' => [],
+            'data' => $this->groupResultsByType([], $bucketCounts),
             'meta' => [
-                'query' => $queryData->query(),
+                'query' => $originalQuery ?? $queryData->query(),
                 'page' => $queryData->page(),
                 'per_page' => $queryData->perPage(),
                 'max_per_page' => SearchQueryData::MAX_PER_PAGE,
@@ -265,11 +255,75 @@ final class SearchService
                 'types' => $queryData->types(),
                 'cached' => false,
             ],
-            'buckets' => [
-                'product' => 0,
-                'category' => 0,
-                'brand' => 0,
+            'buckets' => $bucketCounts,
+        ];
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $results
+     * @param  array{product:int,category:int,brand:int}  $bucketCounts
+     * @return array{products: array{items: array<int, array<string, mixed>>, total:int}, categories: array{items: array<int, array<string, mixed>>, total:int}, brands: array{items: array<int, array<string, mixed>>, total:int}}
+     */
+    private function groupResultsByType(array $results, array $bucketCounts): array
+    {
+        $buckets = $this->bucketSkeleton($bucketCounts);
+
+        foreach ($results as $result) {
+            if (! is_array($result)) {
+                continue;
+            }
+
+            $key = match ($result['type'] ?? null) {
+                'product' => 'products',
+                'category' => 'categories',
+                'brand' => 'brands',
+                default => null,
+            };
+
+            if ($key === null) {
+                continue;
+            }
+
+            $buckets[$key]['items'][] = $result;
+        }
+
+        foreach ($buckets as &$bucket) {
+            $bucket['items'] = array_values($bucket['items']);
+        }
+        unset($bucket);
+
+        return $buckets;
+    }
+
+    /**
+     * @param  array{product:int,category:int,brand:int}  $bucketCounts
+     * @return array{products: array{items: array<int, array<string, mixed>>, total:int}, categories: array{items: array<int, array<string, mixed>>, total:int}, brands: array{items: array<int, array<string, mixed>>, total:int}}
+     */
+    private function bucketSkeleton(array $bucketCounts): array
+    {
+        return [
+            'products' => [
+                'items' => [],
+                'total' => $bucketCounts['product'] ?? 0,
+            ],
+            'categories' => [
+                'items' => [],
+                'total' => $bucketCounts['category'] ?? 0,
+            ],
+            'brands' => [
+                'items' => [],
+                'total' => $bucketCounts['brand'] ?? 0,
             ],
         ];
+    }
+
+    private function sanitizeQueryString(string $query): string
+    {
+        $cleaned = preg_replace('/(--|\\/\\*|\\*\\/)/', ' ', $query);
+        $cleaned = preg_replace('/[\'";=#]/', ' ', $cleaned ?? '');
+        $cleaned = preg_replace('/[^\\p{L}\\p{N}\\s]/u', ' ', $cleaned ?? '');
+        $cleaned = preg_replace('/\\s+/u', ' ', $cleaned ?? '');
+
+        return trim($cleaned ?? '');
     }
 }

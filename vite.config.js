@@ -14,9 +14,9 @@ export default defineConfig({
     laravel({
       input: [
         'resources/css/app.scss',
-        'resources/css/filament-enhancements.css',
+        'resources/css/filament-enhancements.scss',
         // Compile the Filament admin theme so vendor combobox assets remain in sync with CSS imports.
-        'resources/css/filament/admin/theme.css',
+        'resources/css/filament/admin/theme.scss',
         'resources/js/app.js',
         'resources/js/live-notifications.js',
         // Bundle the Filament admin JavaScript entry to expose combobox behaviour during builds.

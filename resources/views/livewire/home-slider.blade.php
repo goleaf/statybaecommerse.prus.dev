@@ -37,9 +37,10 @@
                      data-color="{{ $slider->background_color }}">
 
                     <!-- Background Image -->
-                    @if ($slider->image)
+                    @php($bgUrl = $slider->getImageUrl('slider_large') ?? $slider->getImageUrl('slider'))
+                    @if ($bgUrl)
                         <div class="absolute inset-0 bg-cover bg-center bg-no-repeat bg-img-var"
-                             data-bg-img="{{ asset('storage/' . $slider->image) }}" aria-hidden="true"></div>
+                             data-bg-img="{{ $bgUrl }}" aria-hidden="true"></div>
                     @endif
 
                     <!-- Overlay -->

@@ -14,7 +14,9 @@ uses()->group('searchable-input');
 beforeEach(function (): void {
     RefreshDatabaseState::$migrated = true;
 
-    Schema::dropIfExists('products');
+    Schema::withoutForeignKeyConstraints(static function (): void {
+        Schema::dropIfExists('products');
+    });
 
     Schema::create('products', function (Blueprint $table): void {
         $table->id();
@@ -30,7 +32,7 @@ beforeEach(function (): void {
     });
 });
 
-it('returns formatted product labels for free text search', function (): void {
+it('unit: returns formatted product labels for free text search', function (): void {
     $product = Product::unguarded(fn () => Product::create([
         'sku'          => 'TEST-SKU',
         'name'         => ['en' => 'Makita Hammer', 'lt' => 'Makita Plaktukas'],
@@ -49,7 +51,7 @@ it('returns formatted product labels for free text search', function (): void {
         ->toContain('TEST-SKU');
 });
 
-it('returns search result metadata for product lookups', function (): void {
+it('unit: returns search result metadata for product lookups', function (): void {
     $product = Product::unguarded(fn () => Product::create([
         'sku'          => 'META-001',
         'price'        => 19.99,

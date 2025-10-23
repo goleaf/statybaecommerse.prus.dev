@@ -16,7 +16,7 @@ beforeEach(function (): void {
     ]);
 });
 
-it('can render top navigation widget', function (): void {
+it('feature: can render top navigation widget', function (): void {
     $this->actingAs($this->user);
 
     $component = Livewire::test(TopNavigation::class);
@@ -24,7 +24,7 @@ it('can render top navigation widget', function (): void {
     $component->assertSuccessful();
 });
 
-it('provides navigation groups data', function (): void {
+it('feature: provides navigation groups data', function (): void {
     $this->actingAs($this->user);
 
     $component = Livewire::test(TopNavigation::class);
@@ -37,7 +37,7 @@ it('provides navigation groups data', function (): void {
     expect($viewData['isAdmin'])->toBeTrue();
 });
 
-it('filters navigation groups based on user permissions', function (): void {
+it('feature: filters navigation groups based on user permissions', function (): void {
     $adminUser = User::factory()->create(['is_admin' => true]);
     $regularUser = User::factory()->create(['is_admin' => false]);
 
@@ -58,7 +58,7 @@ it('filters navigation groups based on user permissions', function (): void {
     expect($regularGroups)->toHaveCountLessThan(count(NavigationGroup::cases()));
 });
 
-it('excludes admin-only groups for non-admin users', function (): void {
+it('feature: excludes admin-only groups for non-admin users', function (): void {
     $regularUser = User::factory()->create(['is_admin' => false]);
 
     $this->actingAs($regularUser);
@@ -72,7 +72,7 @@ it('excludes admin-only groups for non-admin users', function (): void {
     expect($adminOnlyGroups)->toHaveCount(0);
 });
 
-it('includes admin-only groups for admin users', function (): void {
+it('feature: includes admin-only groups for admin users', function (): void {
     $adminUser = User::factory()->create(['is_admin' => true]);
 
     $this->actingAs($adminUser);
@@ -86,7 +86,7 @@ it('includes admin-only groups for admin users', function (): void {
     expect($adminOnlyGroups)->toHaveCount(0);
 });
 
-it('respects user permissions for permission-required groups', function (): void {
+it('feature: respects user permissions for permission-required groups', function (): void {
     $userWithoutPermission = User::factory()->create(['is_admin' => false]);
 
     $this->actingAs($userWithoutPermission);
@@ -100,7 +100,7 @@ it('respects user permissions for permission-required groups', function (): void
     expect($analyticsGroup)->toBeNull();
 });
 
-it('returns empty navigation groups for unauthenticated user', function (): void {
+it('feature: returns empty navigation groups for unauthenticated user', function (): void {
     $component = Livewire::test(TopNavigation::class);
     $viewData = $component->instance()->getViewData();
 
@@ -110,7 +110,7 @@ it('returns empty navigation groups for unauthenticated user', function (): void
     expect($viewData['isAdmin'])->toBeFalse();
 });
 
-it('has correct widget configuration', function (): void {
+it('feature: has correct widget configuration', function (): void {
     $reflection = new ReflectionClass(TopNavigation::class);
 
     $viewProperty = $reflection->getProperty('view');
@@ -126,7 +126,7 @@ it('has correct widget configuration', function (): void {
     expect($sortProperty->getValue(new TopNavigation))->toBe(-100);
 });
 
-it('can access navigation group data correctly', function (): void {
+it('feature: can access navigation group data correctly', function (): void {
     $this->actingAs($this->user);
 
     $component = Livewire::test(TopNavigation::class);
@@ -151,7 +151,7 @@ it('can access navigation group data correctly', function (): void {
     ]);
 });
 
-it('sorts navigation groups by priority', function (): void {
+it('feature: sorts navigation groups by priority', function (): void {
     $this->actingAs($this->user);
 
     $component = Livewire::test(TopNavigation::class);

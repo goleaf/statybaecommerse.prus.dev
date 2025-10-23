@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
+use Throwable;
 
 final class ModelScopeServiceProvider extends ServiceProvider
 {
@@ -14,16 +15,33 @@ final class ModelScopeServiceProvider extends ServiceProvider
         $scopesByModel = $this->buildModelScopeMap();
 
         foreach ($scopesByModel as $modelClass => $scopeClasses) {
-            if (! class_exists($modelClass) || ! is_subclass_of($modelClass, Model::class)) {
+            try {
+                $isModel = class_exists($modelClass) && is_subclass_of($modelClass, Model::class);
+            } catch (Throwable) {
+                // Skip models that cannot be autoloaded cleanly (e.g. due to parse errors in vendor stubs).
+                continue;
+            }
+
+            if (! $isModel) {
                 continue;
             }
 
             foreach (array_unique($scopeClasses) as $scopeClass) {
-                if (! class_exists($scopeClass)) {
+                try {
+                    if (! class_exists($scopeClass)) {
+                        continue;
+                    }
+                } catch (Throwable) {
+                    // Skip problematic scope classes without stopping the application bootstrap.
                     continue;
                 }
 
-                $modelClass::addGlobalScope(new $scopeClass());
+                try {
+                    $modelClass::addGlobalScope(new $scopeClass());
+                } catch (Throwable) {
+                    // Avoid bubbling issues from unexpected constructor signatures or other runtime failures.
+                    continue;
+                }
             }
         }
     }

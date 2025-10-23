@@ -26,34 +26,34 @@ function makeTestTable(): Table
     return Table::make($component);
 }
 
-it('can create form', function (): void {
+it('unit: can create form', function (): void {
     $form = DiscountRedemptionResource::form(Schema::make());
     expect($form)->toBeInstanceOf(Schema::class);
 });
 
-it('can create table', function (): void {
+it('unit: can create table', function (): void {
     $table = DiscountRedemptionResource::table(makeTestTable());
     expect($table)->toBeInstanceOf(Table::class);
 });
 
-it('has correct model', function (): void {
+it('unit: has correct model', function (): void {
     expect(DiscountRedemptionResource::getModel())->toBe(\App\Models\DiscountRedemption::class);
 });
 
-it('has correct navigation group', function (): void {
+it('unit: has correct navigation group', function (): void {
     // The resource now lives under the Discounts cluster to mirror Filament navigation.
     expect(DiscountRedemptionResource::getNavigationGroup())->toBe('Discounts');
 });
 
-it('has correct navigation icon', function (): void {
+it('unit: has correct navigation icon', function (): void {
     expect(DiscountRedemptionResource::getNavigationIcon())->toBe('heroicon-o-receipt-percent');
 });
 
-it('has correct navigation sort', function (): void {
+it('unit: has correct navigation sort', function (): void {
     expect(DiscountRedemptionResource::getNavigationSort())->toBeNull();
 });
 
-it('has correct pages', function (): void {
+it('unit: has correct pages', function (): void {
     $pages = DiscountRedemptionResource::getPages();
     expect($pages)->toHaveKey('index');
     expect($pages)->toHaveKey('create');
@@ -61,15 +61,15 @@ it('has correct pages', function (): void {
     expect($pages)->toHaveKey('edit');
 });
 
-it('has correct relations', function (): void {
+it('unit: has correct relations', function (): void {
     $relations = DiscountRedemptionResource::getRelations();
     expect($relations)->toBeArray();
 });
 
-it('has navigation badge', function (): void {
+it('unit: has navigation badge', function (): void {
     expect(DiscountRedemptionResource::getNavigationBadge())->toBeNull();
 });
 
-it('has navigation badge color', function (): void {
+it('unit: has navigation badge color', function (): void {
     expect(DiscountRedemptionResource::getNavigationBadgeColor())->toBeNull();
 });

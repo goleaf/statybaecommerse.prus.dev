@@ -6,13 +6,11 @@ namespace Tests\Feature\Api;
 
 use App\Enums\ExportStatus;
 use App\Models\Export;
-use App\Models\User;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
-use Laravel\Sanctum\Sanctum;
 use Tests\Concerns\PreparesRateLimitTestDatabase;
 use Tests\TestCase;
 
@@ -51,7 +49,7 @@ final class ExportDownloadRateLimitTest extends TestCase
         });
     }
 
-    public function test_signed_export_download_requires_authentication(): void
+    public function test_signed_export_download_allows_guest_access(): void
     {
         Storage::fake('public');
 
@@ -64,36 +62,31 @@ final class ExportDownloadRateLimitTest extends TestCase
 
         Storage::disk('public')->put('exports/report.csv', 'csv-content');
 
-        $url = URL::temporarySignedRoute('exports.signed-download', now()->addMinutes(5), [
+        $url = URL::temporarySignedRoute('api.exports.download', now()->addMinutes(5), [
             'export' => $export,
         ]);
 
-        $this->get($url, ['Accept' => 'application/json'])->assertUnauthorized();
+        $this->get($url, ['Accept' => 'application/json'])->assertOk();
     }
 
     public function test_signed_export_download_is_rate_limited(): void
     {
         Storage::fake('public');
 
-        $user = User::factory()->create();
-
         $export = Export::factory()->create([
             'status' => ExportStatus::Completed,
             'artifact_disk' => 'public',
             'artifact_path' => 'exports/report.csv',
             'artifact_filename' => 'report.csv',
-            'requested_by' => $user->getKey(),
         ]);
 
         Storage::disk('public')->put('exports/report.csv', 'csv-content');
 
-        $originalLimit = config('api.rate_limits.exports');
-        config(['api.rate_limits.exports' => 1]);
-        RateLimiter::clear('user:'.$user->getKey().'|exports');
+        $originalLimit = config('security.rate_limiting.api.exports');
+        config(['security.rate_limiting.api.exports' => 1]);
+        RateLimiter::clear('ip:127.0.0.1|exports');
 
-        Sanctum::actingAs($user);
-
-        $url = URL::temporarySignedRoute('exports.signed-download', now()->addMinutes(5), [
+        $url = URL::temporarySignedRoute('api.exports.download', now()->addMinutes(5), [
             'export' => $export,
         ]);
 
@@ -101,8 +94,8 @@ final class ExportDownloadRateLimitTest extends TestCase
             $this->get($url, ['Accept' => 'application/json'])->assertOk();
             $this->get($url, ['Accept' => 'application/json'])->assertStatus(429);
         } finally {
-            config(['api.rate_limits.exports' => $originalLimit]);
-            RateLimiter::clear('user:'.$user->getKey().'|exports');
+            config(['security.rate_limiting.api.exports' => $originalLimit]);
+            RateLimiter::clear('ip:127.0.0.1|exports');
         }
     }
 }

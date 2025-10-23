@@ -8,7 +8,7 @@ use App\Models\ProductVariant;
 use Livewire\Livewire;
 
 describe('ProductVariantSelector', function (): void {
-    it('selects the requested variant and resets dependent state when the variantSelected event is received', function (): void {
+    it('feature: selects the requested variant and resets dependent state when the variantSelected event is received', function (): void {
         $product = Product::factory()->create([
             'status' => 'published',
             'is_visible' => true,

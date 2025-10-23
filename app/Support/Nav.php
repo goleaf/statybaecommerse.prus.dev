@@ -366,7 +366,7 @@ final class Nav
     /**
      * Build the navigation group definitions consumed by Filament.
      *
-     * @return array<int, array{key: string, label: string, icon: string|null, sort: int|null}>
+     * @return array<int, array{key: string, label: string, label_key: string|null, icon: string|null, sort: int|null}>
      */
     public static function navigationGroups(): array
     {
@@ -375,7 +375,51 @@ final class Nav
             self::resourceMeta($resource);
         }
 
-        $groups = array_values(self::$groupMetaCache);
+        /** @var array<int, array{key?: string, label?: string, icon?: string|null}> $configured */
+        $configured = (array) config('filament.navigation.groups', []);
+
+        $groups = [];
+
+        // Seed groups from configuration so tests can assert deterministic ordering and translation keys.
+        $order = 0;
+        foreach ($configured as $group) {
+            if (! is_array($group)) {
+                continue;
+            }
+
+            $key = (string) ($group['key'] ?? $group['label'] ?? '');
+            if ($key === '') {
+                continue;
+            }
+
+            $labelKey = (string) ($group['label'] ?? $key);
+
+            $groups[$key] = [
+                'key'       => $key,
+                'label'     => trans($labelKey, locale: 'en'),
+                'label_key' => $labelKey,
+                'icon'      => $group['icon'] ?? null,
+                'sort'      => $order++,
+            ];
+        }
+
+        // Bring in any additional groups discovered from resources that were not configured explicitly.
+        foreach (self::$groupMetaCache as $key => $meta) {
+            $groupKey = $meta['key'] ?? null;
+            if (! is_string($groupKey) || $groupKey === '' || isset($groups[$groupKey])) {
+                continue;
+            }
+
+            $groups[$groupKey] = [
+                'key'       => $groupKey,
+                'label'     => (string) ($meta['label'] ?? $groupKey),
+                'label_key' => $groupKey,
+                'icon'      => $meta['icon'] ?? null,
+                'sort'      => $meta['sort'] ?? null,
+            ];
+        }
+
+        $groups = array_values($groups);
 
         usort(
             $groups,

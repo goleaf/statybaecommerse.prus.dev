@@ -46,9 +46,13 @@ final class SearchRankingService
     {
         $score = 0.0;
 
+        $normalizedQuery = $this->normalizeForComparison($query);
+
         // Always give an outsized boost to exact matches so customer intent is
-        // respected even when popularity data would otherwise dominate.
-        if (isset($result['title']) && strtolower((string) $result['title']) === strtolower($query)) {
+        // respected even when popularity data would otherwise dominate. We trim any
+        // surrounding punctuation first because catalog imports often wrap product
+        // titles in quotes while customers omit them when searching.
+        if (isset($result['title']) && $this->normalizeForComparison((string) $result['title']) === $normalizedQuery) {
             $score += 100.0;
         }
 
@@ -80,19 +84,19 @@ final class SearchRankingService
 
         // Title matching (highest weight)
         if (isset($result['title'])) {
-            $titleLower = strtolower($result['title']);
+            $titleLower = strtolower($this->stripWrappingPunctuation((string) $result['title']));
             $score += $this->calculateWordMatchingScore($titleLower, $queryWords) * 0.5;
         }
 
         // Subtitle matching
         if (isset($result['subtitle'])) {
-            $subtitleLower = strtolower($result['subtitle']);
+            $subtitleLower = strtolower($this->stripWrappingPunctuation((string) $result['subtitle']));
             $score += $this->calculateWordMatchingScore($subtitleLower, $queryWords) * 0.3;
         }
 
         // Description matching
         if (isset($result['description'])) {
-            $descriptionLower = strtolower($result['description']);
+            $descriptionLower = strtolower($this->stripWrappingPunctuation((string) $result['description']));
             $score += $this->calculateWordMatchingScore($descriptionLower, $queryWords) * 0.2;
         }
 
@@ -120,6 +124,18 @@ final class SearchRankingService
         }
 
         return $score;
+    }
+
+    private function normalizeForComparison(string $value): string
+    {
+        $stripped = $this->stripWrappingPunctuation($value);
+
+        return strtolower(trim($stripped));
+    }
+
+    private function stripWrappingPunctuation(string $value): string
+    {
+        return trim($value, " \t\n\r\0\x0B\"'`´“”‘’«»");
     }
 
     /**

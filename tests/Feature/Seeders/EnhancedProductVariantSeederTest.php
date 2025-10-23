@@ -18,7 +18,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('creates enhanced attributes with proper structure', function () {
+it('feature: creates enhanced attributes with proper structure', function () {
     $seeder = new EnhancedProductVariantSeeder;
     $seeder->run();
 
@@ -41,7 +41,7 @@ it('creates enhanced attributes with proper structure', function () {
     expect(AttributeValue::where('attribute_id', $colorAttribute->id)->count())->toBeGreaterThan(5);
 });
 
-it('creates products with variants using factories', function () {
+it('feature: creates products with variants using factories', function () {
     $seeder = new EnhancedProductVariantSeeder;
     $seeder->run();
 
@@ -62,7 +62,7 @@ it('creates products with variants using factories', function () {
     expect($variant->price)->toBeGreaterThan(0);
 });
 
-it('creates variant inventories using factory relationships', function () {
+it('feature: creates variant inventories using factory relationships', function () {
     $seeder = new EnhancedProductVariantSeeder;
     $seeder->run();
 
@@ -77,7 +77,7 @@ it('creates variant inventories using factory relationships', function () {
     expect($inventory->stock)->toBeGreaterThanOrEqual(0);
 });
 
-it('creates variant attribute values with proper relationships', function () {
+it('feature: creates variant attribute values with proper relationships', function () {
     $seeder = new EnhancedProductVariantSeeder;
     $seeder->run();
 
@@ -91,7 +91,7 @@ it('creates variant attribute values with proper relationships', function () {
     expect($variantAttributeValue->attribute_value)->not->toBeNull();
 });
 
-it('creates pricing rules for products', function () {
+it('feature: creates pricing rules for products', function () {
     $seeder = new EnhancedProductVariantSeeder;
     $seeder->run();
 
@@ -106,7 +106,7 @@ it('creates pricing rules for products', function () {
     expect($pricingRule->is_active)->toBeTrue();
 });
 
-it('creates price history using factories', function () {
+it('feature: creates price history using factories', function () {
     $seeder = new EnhancedProductVariantSeeder;
     $seeder->run();
 
@@ -121,7 +121,7 @@ it('creates price history using factories', function () {
     expect($priceHistory->price_type)->not->toBeNull();
 });
 
-it('creates stock history using factories', function () {
+it('feature: creates stock history using factories', function () {
     $seeder = new EnhancedProductVariantSeeder;
     $seeder->run();
 
@@ -136,7 +136,7 @@ it('creates stock history using factories', function () {
     expect($stockHistory->quantity_change)->not->toBeNull();
 });
 
-it('creates analytics using factories', function () {
+it('feature: creates analytics using factories', function () {
     $seeder = new EnhancedProductVariantSeeder;
     $seeder->run();
 
@@ -151,7 +151,7 @@ it('creates analytics using factories', function () {
     expect($analytics->clicks)->toBeGreaterThanOrEqual(0);
 });
 
-it('creates locations when needed for inventory', function () {
+it('feature: creates locations when needed for inventory', function () {
     // Ensure no locations exist initially
     Location::query()->delete();
 
@@ -167,7 +167,7 @@ it('creates locations when needed for inventory', function () {
     expect($mainLocation->name)->toBe('Main Warehouse');
 });
 
-it('maintains data integrity across all relationships', function () {
+it('feature: maintains data integrity across all relationships', function () {
     $seeder = new EnhancedProductVariantSeeder;
     $seeder->run();
 

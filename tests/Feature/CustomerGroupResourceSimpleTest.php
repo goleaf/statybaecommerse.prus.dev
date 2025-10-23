@@ -14,7 +14,7 @@ beforeEach(function () {
     $this->adminUser = User::factory()->create(['is_admin' => true]);
 });
 
-it('can list customer groups in admin panel', function () {
+it('feature: can list customer groups in admin panel', function () {
     $customerGroup = CustomerGroup::factory()->create();
 
     Livewire::actingAs($this->adminUser)
@@ -22,7 +22,7 @@ it('can list customer groups in admin panel', function () {
         ->assertCanSeeTableRecords([$customerGroup]);
 });
 
-it('can create a new customer group with basic fields', function () {
+it('feature: can create a new customer group with basic fields', function () {
     $customerGroupData = [
         'name' => 'VIP Customers',
         'code' => 'VIP',

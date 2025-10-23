@@ -109,7 +109,7 @@ afterEach(function (): void {
     }
 });
 
-it('returns dataset data for the product inline chart widget', function (): void {
+it('unit: returns dataset data for the product inline chart widget', function (): void {
     $product = Product::withoutEvents(function () {
         return Product::unguarded(fn () => Product::create([
             'name'       => 'Widget Product',
@@ -146,7 +146,7 @@ it('returns dataset data for the product inline chart widget', function (): void
         ->and($data['labels'])->toHaveCount(30);
 });
 
-it('returns dataset data for the customer inline chart widget', function (): void {
+it('unit: returns dataset data for the customer inline chart widget', function (): void {
     $customer = Customer::unguarded(fn () => Customer::create([
         'name'      => 'Inline Customer',
         'email'     => 'inline@example.com',

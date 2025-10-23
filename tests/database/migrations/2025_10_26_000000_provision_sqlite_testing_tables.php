@@ -17,6 +17,7 @@ return new class extends Migration
         $this->ensurePermissionTables($schema);
         $this->ensureAttributesTables($schema, $connection);
         $this->ensureVariantPivotTable($schema);
+        $this->ensureUsersTable($schema);
     }
 
     public function down(): void
@@ -32,6 +33,7 @@ return new class extends Migration
         $schema->dropIfExists($tables['roles'] ?? 'roles');
 
         $schema->dropIfExists('product_variant_attributes');
+        $schema->dropIfExists('users');
         $schema->dropIfExists('attribute_values');
         $schema->dropIfExists('attributes');
     }
@@ -224,6 +226,30 @@ return new class extends Migration
             $table->unsignedBigInteger('attribute_value_id');
             $table->timestamps();
             $table->unique(['variant_id', 'attribute_id', 'attribute_value_id'], 'variant_attribute_unique');
+        });
+    }
+
+    /**
+     * Ensure a minimal users table exists for factories that rely on admin accounts in tests.
+     */
+    private function ensureUsersTable(Builder $schema): void
+    {
+        if ($schema->hasTable('users')) {
+            return;
+        }
+
+        $schema->create('users', function (Blueprint $table): void {
+            $table->id();
+            $table->string('name')->nullable();
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->string('preferred_locale', 5)->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->boolean('is_admin')->default(false);
+            $table->rememberToken();
+            $table->softDeletes();
+            $table->timestamps();
         });
     }
 

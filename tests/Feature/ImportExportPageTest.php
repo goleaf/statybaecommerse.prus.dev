@@ -10,14 +10,14 @@ use Livewire\Livewire;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-it('renders the data import export page', function (): void {
+it('feature: renders the data import export page', function (): void {
     $user = AdminUser::factory()->create();
     $this->actingAs($user);
     $this->get(DataImportExport::getUrl())
         ->assertOk();
 });
 
-it('imports via xml provider from uploaded file', function (): void {
+it('feature: imports via xml provider from uploaded file', function (): void {
     Storage::fake('public');
     $user = AdminUser::factory()->create();
     $this->actingAs($user);

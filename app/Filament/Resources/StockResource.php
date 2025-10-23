@@ -10,6 +10,7 @@ use Filament\Schemas\Schema;
 use App\Filament\Resources\StockResource\Pages;
 use App\Models\Inventory;
 use App\Models\Product;
+use App\Filament\Forms\Components\Quantity;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;

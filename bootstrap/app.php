@@ -17,6 +17,7 @@ use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
@@ -66,6 +67,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         // Handle user impersonation for admin support
         $middleware->append(App\Http\Middleware\HandleImpersonation::class);
         $middleware->append(AddSecurityHeaders::class);
+        $middleware->throttleApi('api.default');
         // Register Spatie permission middlewares (Laravel 11+/12 style)
         $middleware->alias([
             'role'                   => Spatie\Permission\Middleware\RoleMiddleware::class,
@@ -434,6 +436,10 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ];
 
             Log::withContext($context);
+
+            if ($throwable instanceof HttpResponseException) {
+                return $throwable->getResponse();
+            }
 
             if (RequestContext::isApiRequest($request)) {
                 if ($throwable instanceof HttpExceptionInterface) {

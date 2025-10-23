@@ -8,7 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('creates UI translations using database models instead of filesystem', function () {
+it('feature: creates UI translations using database models instead of filesystem', function () {
     $seeder = new NewsTranslationSeeder;
     $seeder->run();
 
@@ -24,7 +24,7 @@ it('creates UI translations using database models instead of filesystem', functi
     expect($ltTranslations)->toBe($enTranslations);  // Should have same number of keys
 });
 
-it('creates translations with proper group assignment', function () {
+it('feature: creates translations with proper group assignment', function () {
     $seeder = new NewsTranslationSeeder;
     $seeder->run();
 
@@ -35,7 +35,7 @@ it('creates translations with proper group assignment', function () {
     expect($newsTranslations)->toBe($totalTranslations);
 });
 
-it('creates translations with proper key structure', function () {
+it('feature: creates translations with proper key structure', function () {
     $seeder = new NewsTranslationSeeder;
     $seeder->run();
 
@@ -52,7 +52,7 @@ it('creates translations with proper key structure', function () {
     expect(UiTranslation::where('key', 'news.filters.published_from')->exists())->toBeTrue();
 });
 
-it('creates translations with proper metadata', function () {
+it('feature: creates translations with proper metadata', function () {
     $seeder = new NewsTranslationSeeder;
     $seeder->run();
 
@@ -64,7 +64,7 @@ it('creates translations with proper metadata', function () {
     expect($translation->metadata['context'])->toBe('news_admin_interface');
 });
 
-it('creates Lithuanian translations with proper values', function () {
+it('feature: creates Lithuanian translations with proper values', function () {
     $seeder = new NewsTranslationSeeder;
     $seeder->run();
 
@@ -84,7 +84,7 @@ it('creates Lithuanian translations with proper values', function () {
     expect($contentLt->value)->toBe('Turinys');
 });
 
-it('creates English translations with proper values', function () {
+it('feature: creates English translations with proper values', function () {
     $seeder = new NewsTranslationSeeder;
     $seeder->run();
 
@@ -104,7 +104,7 @@ it('creates English translations with proper values', function () {
     expect($contentEn->value)->toBe('Content');
 });
 
-it('ensures unique key-locale combinations', function () {
+it('feature: ensures unique key-locale combinations', function () {
     $seeder = new NewsTranslationSeeder;
     $seeder->run();
 
@@ -117,7 +117,7 @@ it('ensures unique key-locale combinations', function () {
     expect($duplicates)->toBe(0);
 });
 
-it('can retrieve translations using model methods', function () {
+it('feature: can retrieve translations using model methods', function () {
     $seeder = new NewsTranslationSeeder;
     $seeder->run();
 
@@ -133,7 +133,7 @@ it('can retrieve translations using model methods', function () {
     expect($nonExistent)->toBeNull();
 });
 
-it('can retrieve group translations', function () {
+it('feature: can retrieve group translations', function () {
     $seeder = new NewsTranslationSeeder;
     $seeder->run();
 
@@ -152,7 +152,7 @@ it('can retrieve group translations', function () {
     expect($newsTranslationsEn['news.fields.title'])->toBe('Title');
 });
 
-it('handles running seeder multiple times without duplicates', function () {
+it('feature: handles running seeder multiple times without duplicates', function () {
     $seeder = new NewsTranslationSeeder;
 
     // Run seeder first time

@@ -14,7 +14,7 @@ final class AuthorizationMatrixTest extends TestCase
     {
         $adminPermissions = AuthorizationMatrix::permissionsForRole(AuthorizationRole::ADMIN);
 
-        $this->assertContains('products.create', $adminPermissions);
+        $this->assertContains('create_products', $adminPermissions);
         $this->assertContains('orders.update', $adminPermissions);
     }
 
@@ -22,7 +22,7 @@ final class AuthorizationMatrixTest extends TestCase
     {
         $supportPermissions = AuthorizationMatrix::permissionsForRole(AuthorizationRole::SUPPORT);
 
-        $this->assertNotContains('products.create', $supportPermissions);
+        $this->assertNotContains('create_products', $supportPermissions);
         $this->assertContains('orders.update', $supportPermissions);
     }
 

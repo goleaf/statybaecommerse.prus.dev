@@ -101,7 +101,24 @@ final class AttributeValueFactory extends Factory
 
     private function createTranslations(AttributeValue $attributeValue): void
     {
-        if (! method_exists($attributeValue, 'translations') || $attributeValue->translations()->exists()) {
+        if (! method_exists($attributeValue, 'translations')) {
+            return;
+        }
+
+        $relation = $attributeValue->translations();
+        $connection = $relation->getQuery()->getConnection();
+        $schema = $connection->getSchemaBuilder();
+        $translationsTable = $relation->getRelated()->getTable();
+
+        if (! $schema->hasTable($translationsTable) || $relation->exists()) {
+            return;
+        }
+
+        if (! $schema->hasColumn($translationsTable, 'value')) {
+            return;
+        }
+
+        if (! $schema->hasColumn($translationsTable, 'description')) {
             return;
         }
 

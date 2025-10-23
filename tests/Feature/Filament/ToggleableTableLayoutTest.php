@@ -115,7 +115,7 @@ beforeEach(function (): void {
 });
 
 describe('toggleable table layout integration', function (): void {
-    it('boots a list page with the toggleable layout trait applied', function (): void {
+    it('feature: boots a list page with the toggleable layout trait applied', function (): void {
         /** @var Panel $panel */
         $panel = Filament::getPanel('admin');
 

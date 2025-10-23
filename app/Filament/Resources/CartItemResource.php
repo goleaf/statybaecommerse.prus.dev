@@ -10,6 +10,7 @@ use App\Filament\Resources\CartItemResource\Pages;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Filament\Forms\Components\Quantity;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;

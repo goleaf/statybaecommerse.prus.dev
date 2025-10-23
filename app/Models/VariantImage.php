@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Scopes\ActiveScope;
-use App\Models\Scopes\EnabledScope;
 use App\Support\Storage\SecureStorage;
-use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -25,7 +22,6 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * accompanying unit tests as well as the Filament resources that manage product
  * variant images throughout the administration panel.
  */
-#[ScopedBy([ActiveScope::class, EnabledScope::class])]
 final class VariantImage extends Model implements HasMedia
 {
     use HasFactory;

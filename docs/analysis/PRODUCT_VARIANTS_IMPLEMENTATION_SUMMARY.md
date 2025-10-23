@@ -202,7 +202,7 @@ lang/
 ### **Core Tables**
 - `product_variants` - Main variant data
 - `variant_attribute_values` - Attribute relationships
-- `variant_price_history` - Price change tracking
+- `variant_price_histories` - Price change tracking
 - `variant_stock_history` - Stock movement tracking
 - `variant_analytics` - Performance metrics
 

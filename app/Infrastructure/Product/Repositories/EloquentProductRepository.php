@@ -36,14 +36,15 @@ final class EloquentProductRepository implements ProductRepositoryInterface
                     ->orWhere('description', 'like', "%{$term}%")
                     ->orWhere('sku', 'like', "%{$term}%");
             })
-            ->with(['brand', 'categories', 'variants']);
+            ->with(['brand', 'categories', 'variants', 'media']);
 
         $timeout = now()->addSeconds($criteria->getTimeoutSeconds());
 
-        $products = $query->cursor()
+        $products = $query->limit($criteria->getLimit())
+            ->get()
             ->takeUntilTimeout($timeout)
-            ->take($criteria->getLimit())
             ->map(fn (Product $product) => $this->mapToDomainProduct($product))
+            ->collect()
             ->values()
             ->all();
 
@@ -54,7 +55,7 @@ final class EloquentProductRepository implements ProductRepositoryInterface
     {
         $builder = Product::query()
             ->where('is_visible', true)
-            ->with(['brand', 'categories', 'variants']);
+            ->with(['brand', 'categories', 'variants', 'media']);
 
         if ($query->getCategorySlug()) {
             $builder->whereHas('categories', static function ($relation) use ($query): void {
@@ -87,7 +88,7 @@ final class EloquentProductRepository implements ProductRepositoryInterface
     {
         $product = Product::query()
             ->where('slug', $slug->getValue())
-            ->with(['brand', 'categories', 'variants'])
+            ->with(['brand', 'categories', 'variants', 'media'])
             ->first();
 
         return $product ? $this->mapToDomainProduct($product) : null;
@@ -95,8 +96,6 @@ final class EloquentProductRepository implements ProductRepositoryInterface
 
     private function mapToDomainProduct(Product $product): DomainProduct
     {
-        $product->loadMissing('media');
-
         $images = new ProductImageCollection(
             $product->getMedia('images')
                 ->map(static fn ($media) => new ProductImage(

@@ -313,15 +313,21 @@ if (! function_exists('debug_order')) {
 if (! function_exists('safe_asset')) {
     function safe_asset(string $path): string
     {
-        if (! app()->bound('request') || ! app('request') instanceof \Illuminate\Http\Request) {
-            return '/' . ltrim($path, '/');
-        }
-
-        if (! method_exists($app, 'bound') || ! $app->bound('url') || ! $app->bound('request')) {
-            return $relativePath;
-        }
+        $relativePath = '/' . ltrim($path, '/');
 
         try {
+            $app = app();
+
+            if (! method_exists($app, 'bound') || ! $app->bound('url') || ! $app->bound('request')) {
+                return $relativePath;
+            }
+
+            $request = $app->make('request');
+
+            if (! $request instanceof \Illuminate\Http\Request) {
+                return $relativePath;
+            }
+
             return asset($path);
         } catch (\Throwable $exception) {
             return $relativePath;

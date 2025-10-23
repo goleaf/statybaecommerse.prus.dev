@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Command\Command;
 
-it('creates and verifies a sqlite backup snapshot with metadata counts', function (): void {
+it('feature: creates and verifies a sqlite backup snapshot with metadata counts', function (): void {
     $uuid = Str::uuid()->toString();
     $backupRoot = storage_path('framework/testing/backups/' . $uuid);
     $snapshotDatabasePath = storage_path('framework/testing/databases/' . $uuid . '/snapshot.sqlite');

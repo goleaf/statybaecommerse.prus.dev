@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Lang;
 
-it('falls back to the configured locale when translation is missing', function (): void {
+it('feature: falls back to the configured locale when translation is missing', function (): void {
     $translator = Lang::getFacadeRoot();
     $originalLocale = $translator->getLocale();
     $fallbackLocale = config('app.fallback_locale');

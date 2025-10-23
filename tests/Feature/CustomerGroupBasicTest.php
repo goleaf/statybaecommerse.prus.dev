@@ -8,7 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('can create a customer group with basic fields', function () {
+it('feature: can create a customer group with basic fields', function () {
     $user = User::factory()->create(['is_admin' => true]);
 
     $customerGroup = CustomerGroup::create([
@@ -29,7 +29,7 @@ it('can create a customer group with basic fields', function () {
     expect($customerGroup->is_default)->toBeFalse();
 });
 
-it('can update customer group fields', function () {
+it('feature: can update customer group fields', function () {
     $customerGroup = CustomerGroup::create([
         'name' => 'Regular Customers',
         'code' => 'REG',

@@ -46,7 +46,7 @@ afterEach(function (): void {
     Carbon::setTestNow();
 });
 
-it('builds a 30 day quantity series for a product', function (): void {
+it('unit: builds a 30 day quantity series for a product', function (): void {
     $productId = 42;
 
     OrderItem::withoutEvents(function () use ($productId): void {

@@ -15,6 +15,15 @@ final class ActivityLogResourceTest extends TestCase
 {
     use RefreshDatabase;
 
+    public static function setUpBeforeClass(): void
+    {
+        putenv('TEST_FORCE_MINIMAL_SQLITE=1');
+        $_ENV['TEST_FORCE_MINIMAL_SQLITE'] = '1';
+        $_SERVER['TEST_FORCE_MINIMAL_SQLITE'] = '1';
+
+        parent::setUpBeforeClass();
+    }
+
     protected function setUp(): void
     {
         parent::setUp();

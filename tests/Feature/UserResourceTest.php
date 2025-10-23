@@ -21,14 +21,14 @@ use function Pest\Laravel\assertDatabaseMissing;
 
 uses(RefreshDatabase::class);
 
-it('can list users', function () {
+it('feature: can list users', function () {
     $users = User::factory()->count(5)->create();
 
     Livewire::test(ListUsers::class)
         ->assertCanSeeTableRecords($users);
 });
 
-it('can create a user', function () {
+it('feature: can create a user', function () {
     $newUserData = User::factory()->make();
 
     Livewire::test(CreateUser::class)
@@ -50,14 +50,14 @@ it('can create a user', function () {
     ]);
 });
 
-it('can view a user', function () {
+it('feature: can view a user', function () {
     $user = User::factory()->create();
 
     Livewire::test(ViewUser::class, ['record' => $user->id])
         ->assertOk();
 });
 
-it('can edit a user', function () {
+it('feature: can edit a user', function () {
     $user = User::factory()->create();
     $newUserData = User::factory()->make();
 
@@ -78,7 +78,7 @@ it('can edit a user', function () {
     ]);
 });
 
-it('can delete a user', function () {
+it('feature: can delete a user', function () {
     $user = User::factory()->create();
 
     Livewire::test(EditUser::class, ['record' => $user->id])
@@ -90,7 +90,7 @@ it('can delete a user', function () {
     ]);
 });
 
-it('can activate users in bulk', function () {
+it('feature: can activate users in bulk', function () {
     $users = User::factory()->count(3)->create(['is_active' => false]);
 
     Livewire::test(ListUsers::class)
@@ -105,7 +105,7 @@ it('can activate users in bulk', function () {
     }
 });
 
-it('can deactivate users in bulk', function () {
+it('feature: can deactivate users in bulk', function () {
     $users = User::factory()->count(3)->create(['is_active' => true]);
 
     Livewire::test(ListUsers::class)
@@ -120,7 +120,7 @@ it('can deactivate users in bulk', function () {
     }
 });
 
-it('can load addresses relation manager', function () {
+it('feature: can load addresses relation manager', function () {
     $user = User::factory()->create();
 
     Livewire::test(AddressesRelationManager::class, [
@@ -130,7 +130,7 @@ it('can load addresses relation manager', function () {
         ->assertOk();
 });
 
-it('can load orders relation manager', function () {
+it('feature: can load orders relation manager', function () {
     $user = User::factory()->create();
 
     Livewire::test(OrdersRelationManager::class, [
@@ -140,7 +140,7 @@ it('can load orders relation manager', function () {
         ->assertOk();
 });
 
-it('can load reviews relation manager', function () {
+it('feature: can load reviews relation manager', function () {
     $user = User::factory()->create();
 
     Livewire::test(ReviewsRelationManager::class, [
@@ -150,7 +150,7 @@ it('can load reviews relation manager', function () {
         ->assertOk();
 });
 
-it('can load wishlist relation manager', function () {
+it('feature: can load wishlist relation manager', function () {
     $user = User::factory()->create();
 
     Livewire::test(WishlistRelationManager::class, [

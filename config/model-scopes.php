@@ -46,7 +46,6 @@ return [
         App\Models\CollectionRule::class,
         App\Models\AdminUser::class,
         App\Models\CampaignClick::class,
-        App\Models\CampaignCustomerSegment::class,
         App\Models\CampaignProductTarget::class,
         App\Models\CampaignSchedule::class,
         App\Models\CampaignView::class,

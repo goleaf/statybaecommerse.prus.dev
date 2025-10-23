@@ -6,6 +6,7 @@ namespace App\Filament\Resources\StockResource\RelationManagers;
 
 
 use App\Filament\RelationManagers\Support\BaseRelationManager;
+use App\Filament\Forms\Components\Quantity;
 use Filament\Schemas\Schema;
 use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Models\Product;
 
-it('returns displayable products from the search use case', function (): void {
+it('feature: returns displayable products from the search use case', function (): void {
     $matching = Product::factory()->create([
         'name' => 'Profesionalus plaktukas',
         'slug' => 'profesionalus-plaktukas',

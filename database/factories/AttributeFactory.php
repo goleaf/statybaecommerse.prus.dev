@@ -5,13 +5,18 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class AttributeFactory extends Factory
 {
     protected $model = \App\Models\Attribute::class;
+    private static bool $schemaEnsured = false;
 
     public function definition(): array
     {
+        self::ensureSchema();
+
         $label = $this->faker->randomElement(['Color', 'Size', 'Material', 'Fit', 'Length', 'Style']).' '.$this->faker->unique()->numerify('###');
         $types = ['text', 'number', 'boolean', 'select', 'multiselect', 'color', 'date', 'textarea', 'file', 'image'];
         $groupNames = ['basic_info', 'technical_specs', 'appearance', 'dimensions', 'materials', 'features', 'compatibility', 'warranty', 'shipping', 'seo'];
@@ -58,5 +63,82 @@ class AttributeFactory extends Factory
                 ['format' => 'percentage'],
             ]),
         ];
+    }
+
+    private static function ensureSchema(): void
+    {
+        if (self::$schemaEnsured) {
+            return;
+        }
+
+        $schema = Schema::connection(config('database.default', 'sqlite'));
+
+        if (! $schema->hasTable('attributes')) {
+            $schema->create('attributes', static function (Blueprint $table): void {
+                $table->id();
+                $table->string('name');
+                $table->string('slug')->unique();
+                $table->string('type')->default('text');
+                $table->text('description')->nullable();
+                $table->text('validation_rules')->nullable();
+                $table->text('default_value')->nullable();
+                $table->boolean('is_required')->default(false);
+                $table->boolean('is_filterable')->default(false);
+                $table->boolean('is_searchable')->default(false);
+                $table->boolean('is_visible')->default(true);
+                $table->boolean('is_editable')->default(true);
+                $table->boolean('is_sortable')->default(false);
+                $table->integer('sort_order')->default(0);
+                $table->boolean('is_enabled')->default(true);
+                $table->boolean('is_active')->default(true);
+                $table->unsignedBigInteger('category_id')->nullable();
+                $table->string('group_name')->nullable();
+                $table->string('icon')->nullable();
+                $table->string('color')->nullable();
+                $table->decimal('min_value', 10, 2)->nullable();
+                $table->decimal('max_value', 10, 2)->nullable();
+                $table->decimal('step_value', 10, 2)->nullable();
+                $table->string('placeholder')->nullable();
+                $table->text('help_text')->nullable();
+                $table->json('meta_data')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        if (! $schema->hasTable('attribute_values')) {
+            $schema->create('attribute_values', static function (Blueprint $table): void {
+                $table->id();
+                $table->unsignedBigInteger('attribute_id');
+                $table->string('value');
+                $table->string('slug');
+                $table->string('attribute_value_type')->nullable();
+                $table->string('valueable_type')->nullable();
+                $table->unsignedBigInteger('valueable_id')->nullable();
+                $table->string('color_code')->nullable();
+                $table->integer('sort_order')->default(0);
+                $table->boolean('is_enabled')->default(true);
+                $table->boolean('is_active')->default(true);
+                $table->boolean('is_default')->default(false);
+                $table->boolean('is_searchable')->default(false);
+                $table->string('display_value')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        if (! $schema->hasTable('product_attributes')) {
+            $schema->create('product_attributes', static function (Blueprint $table): void {
+                $table->id();
+                $table->unsignedBigInteger('product_id');
+                $table->unsignedBigInteger('attribute_id');
+                $table->unsignedBigInteger('attribute_value_id');
+                $table->timestamps();
+
+                $table->index('product_id');
+                $table->index('attribute_id');
+                $table->index('attribute_value_id');
+            });
+        }
+
+        self::$schemaEnsured = true;
     }
 }

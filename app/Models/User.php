@@ -494,6 +494,10 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
      */
     public function canAccessPanel(Panel $panel): bool
     {
+        if ((bool) ($this->is_admin ?? false)) {
+            return true;
+        }
+
         $allowedRoles = collect(array_keys(config('permissions.roles', [])))
             ->merge(array_keys(config('permissions.aliases', [])))
             ->unique()

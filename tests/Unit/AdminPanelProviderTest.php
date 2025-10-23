@@ -11,7 +11,7 @@ beforeEach(function (): void {
     RefreshDatabaseState::$migrated = true;
 });
 
-it('disables the topbar and moves the user menu to the sidebar', function (): void {
+it('unit: disables the topbar and moves the user menu to the sidebar', function (): void {
     $provider = new AdminPanelProvider(app());
 
     $panel = $provider->panel(Panel::make());

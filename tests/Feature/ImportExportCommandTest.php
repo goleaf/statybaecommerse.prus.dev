@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-it('runs catalog:xml export and import', function (): void {
+it('feature: runs catalog:xml export and import', function (): void {
     $tmp = base_path('storage/cmd-catalog.xml');
     @unlink($tmp);
     $this->artisan('catalog:xml export '.$tmp.' --only=all')

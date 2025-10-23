@@ -43,40 +43,41 @@ final class ForgotPassword extends Component
 
         $captchaManager = app(CaptchaManager::class);
         $monitor = app(SuspiciousIpMonitor::class);
+        $decaySeconds = $this->decaySeconds();
 
         $this->ensureIsNotRateLimited($captchaManager, $monitor);
 
-        if ($captchaManager->shouldChallenge($this->throttleKey(), 'auth.password_reset')) {
-            $this->syncCaptchaState($captchaManager);
+        try {
+            if ($captchaManager->shouldChallenge($this->throttleKey(), 'auth.password_reset')) {
+                $this->syncCaptchaState($captchaManager);
 
-            $this->validate([
-                'captchaToken'    => ['required', 'string'],
-                'captchaResponse' => ['required', 'string'],
-            ]);
-
-            if (! $captchaManager->verify($this->throttleKey(), 'auth.password_reset', (string) $this->captchaToken, (string) $this->captchaResponse)) {
-                $this->syncCaptchaState($captchaManager, true);
-                $this->captchaResponse = '';
-
-                throw ValidationException::withMessages([
-                    'captchaResponse' => __('The security check response did not match. Please try again.'),
+                $this->validate([
+                    'captchaToken'    => ['required', 'string'],
+                    'captchaResponse' => ['required', 'string'],
                 ]);
+
+                if (! $captchaManager->verify($this->throttleKey(), 'auth.password_reset', (string) $this->captchaToken, (string) $this->captchaResponse)) {
+                    $this->syncCaptchaState($captchaManager, true);
+                    $this->captchaResponse = '';
+
+                    throw ValidationException::withMessages([
+                        'captchaResponse' => __('The security check response did not match. Please try again.'),
+                    ]);
+                }
+            } else {
+                $this->syncCaptchaState($captchaManager);
             }
-        } else {
-            $this->syncCaptchaState($captchaManager);
+        } catch (ValidationException $exception) {
+            $attempts = $this->recordRateLimitAttempt($monitor, $decaySeconds);
+
+            if ($attempts > $this->maxAttempts()) {
+                $this->throwRateLimitException($captchaManager, $monitor, primeTimer: false);
+            }
+
+            throw $exception;
         }
 
-        $decaySeconds = $this->decaySeconds();
-
-        $rateLimiterAttempts = RateLimiter::hit($this->throttleKey(), $decaySeconds);
-        $sessionAttempts = $this->incrementAttemptCounter($this->throttleKey(), $decaySeconds);
-        $attempts = max($rateLimiterAttempts, $sessionAttempts);
-
-        $monitor->record($this->ipAddress(), 'password-reset', [
-            'email'        => $this->email,
-            'attempts'     => $attempts,
-            'max_attempts' => $this->maxAttempts(),
-        ]);
+        $attempts = $this->recordRateLimitAttempt($monitor, $decaySeconds);
 
         if ($attempts > $this->maxAttempts()) {
             $this->throwRateLimitException($captchaManager, $monitor, primeTimer: false);
@@ -155,12 +156,16 @@ final class ForgotPassword extends Component
             $seconds = $this->decaySeconds();
         }
 
-        throw ValidationException::withMessages([
+        $exception = ValidationException::withMessages([
             'email' => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => (int) ceil($seconds / 60),
             ]),
         ]);
+
+        $exception->status = 429;
+
+        throw $exception;
     }
 
     private function syncCaptchaState(CaptchaManager $captchaManager, bool $forceRefresh = false): void
@@ -213,12 +218,24 @@ final class ForgotPassword extends Component
 
     private function maxAttempts(): int
     {
-        return max(1, (int) data_get(config('security.rate_limiting.auth.password_reset'), 'max_attempts', 5));
+        $configured = config('security.rate_limiting.password_reset.max_attempts');
+
+        if ($configured === null) {
+            $configured = data_get(config('security.rate_limiting.auth.password_reset'), 'max_attempts');
+        }
+
+        return max(1, (int) ($configured ?? 5));
     }
 
     private function decaySeconds(): int
     {
-        return max(1, (int) data_get(config('security.rate_limiting.auth.password_reset'), 'decay_seconds', 300));
+        $configured = config('security.rate_limiting.password_reset.decay_seconds');
+
+        if ($configured === null) {
+            $configured = data_get(config('security.rate_limiting.auth.password_reset'), 'decay_seconds');
+        }
+
+        return max(1, (int) ($configured ?? 300));
     }
 
     private function incrementAttemptCounter(string $throttleKey, int $decaySeconds): int
@@ -251,6 +268,12 @@ final class ForgotPassword extends Component
             return 0;
         }
 
+        if (! $this->rateLimiterUsesEphemeralStore() && RateLimiter::attempts($throttleKey) === 0) {
+            $store->forget($this->attemptCacheKey($throttleKey));
+
+            return 0;
+        }
+
         if (($payload['expires_at'] ?? 0) <= now()->getTimestamp()) {
             $store->forget($this->attemptCacheKey($throttleKey));
 
@@ -279,8 +302,36 @@ final class ForgotPassword extends Component
         );
     }
 
+    private function recordRateLimitAttempt(SuspiciousIpMonitor $monitor, int $decaySeconds): int
+    {
+        $rateLimiterAttempts = RateLimiter::hit($this->throttleKey(), $decaySeconds);
+        $sessionAttempts = $this->incrementAttemptCounter($this->throttleKey(), $decaySeconds);
+        $attempts = max($rateLimiterAttempts, $sessionAttempts);
+
+        $monitor->record($this->ipAddress(), 'password-reset', [
+            'email'        => $this->email,
+            'attempts'     => $attempts,
+            'max_attempts' => $this->maxAttempts(),
+        ]);
+
+        return $attempts;
+    }
+
     private function attemptCacheKey(string $throttleKey): string
     {
         return 'auth:password-reset-attempts:' . $throttleKey;
+    }
+
+    private function rateLimiterUsesEphemeralStore(): bool
+    {
+        $defaultStore = config('cache.default');
+
+        if (! is_string($defaultStore) || $defaultStore === '') {
+            return false;
+        }
+
+        $driver = config("cache.stores.{$defaultStore}.driver");
+
+        return in_array($driver, ['array', 'null'], true);
     }
 }

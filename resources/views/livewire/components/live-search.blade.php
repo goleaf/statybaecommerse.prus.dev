@@ -1,3 +1,25 @@
+@php
+    foreach ($results as $index => $resultItem) {
+        if (is_iterable($resultItem)) {
+            foreach ($resultItem as $field => $value) {
+                if ($value instanceof \Closure) {
+                    logger()->error('Live search result contains closure.', ['index' => $index, 'field' => $field]);
+                }
+            }
+        }
+    }
+
+    foreach ($suggestions as $index => $suggestionItem) {
+        if (is_iterable($suggestionItem)) {
+            foreach ($suggestionItem as $field => $value) {
+                if ($value instanceof \Closure) {
+                    logger()->error('Live search suggestion contains closure.', ['index' => $index, 'field' => $field]);
+                }
+            }
+        }
+    }
+@endphp
+
 <div class="relative" x-data="{ 
     showResults: @entangle('showResults'),
     showSuggestions: @entangle('showSuggestions'),
@@ -124,7 +146,9 @@
                             {{-- Result Image --}}
                             <div class="flex-shrink-0">
                                 {{-- Blend modern and legacy image keys for live search suggestions. --}}
-                                @php($image = $result['main_image'] ?? $result['thumbnail'] ?? ($result['image'] ?? null))
+                                @php
+                                    $image = $result['main_image'] ?? $result['thumbnail'] ?? ($result['image'] ?? null);
+                                @endphp
                                 @if($image)
                                     <img
                                         src="{{ $image }}"
@@ -305,7 +329,7 @@
                                     @endif
                                 </div>
                                 
-                                @if($suggestion['subtitle'])
+                                @if(!empty($suggestion['subtitle']))
                                     <p class="text-sm text-gray-500 truncate dark:text-gray-400">
                                         {{ $suggestion['subtitle'] }}
                                     </p>

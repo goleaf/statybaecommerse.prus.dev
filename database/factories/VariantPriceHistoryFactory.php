@@ -20,20 +20,22 @@ final class VariantPriceHistoryFactory extends Factory
     {
         $oldPrice = $this->faker->randomFloat(4, 1, 100);
         $newPrice = $this->faker->randomFloat(4, 1, 100);
+        $reason = $this->faker->randomElement([
+            'manual',
+            'automatic',
+            'promotion',
+            'cost_change',
+            'market_adjustment',
+            'seasonal',
+        ]);
 
         return [
             'variant_id' => ProductVariant::factory(),
             'old_price' => $oldPrice,
             'new_price' => $newPrice,
             'price_type' => $this->faker->randomElement(['regular', 'sale', 'wholesale', 'bulk']),
-            'change_reason' => $this->faker->randomElement([
-                'manual',
-                'automatic',
-                'promotion',
-                'cost_change',
-                'market_adjustment',
-                'seasonal',
-            ]),
+            'reason' => $reason,
+            'change_reason' => $reason,
             'changed_by' => User::factory(),
             'effective_from' => $this->faker->dateTimeBetween('-1 month', 'now'),
             'effective_until' => $this->faker->optional(0.3)->dateTimeBetween('now', '+1 month'),
@@ -97,6 +99,7 @@ final class VariantPriceHistoryFactory extends Factory
     public function manual(): static
     {
         return $this->state(fn (array $attributes) => [
+            'reason' => 'manual',
             'change_reason' => 'manual',
         ]);
     }
@@ -104,6 +107,7 @@ final class VariantPriceHistoryFactory extends Factory
     public function automatic(): static
     {
         return $this->state(fn (array $attributes) => [
+            'reason' => 'automatic',
             'change_reason' => 'automatic',
         ]);
     }
@@ -111,6 +115,7 @@ final class VariantPriceHistoryFactory extends Factory
     public function promotion(): static
     {
         return $this->state(fn (array $attributes) => [
+            'reason' => 'promotion',
             'change_reason' => 'promotion',
         ]);
     }

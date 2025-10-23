@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
+use Illuminate\Cache\TaggableStore;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -46,37 +47,55 @@ final class SystemSetting extends Model implements HasMedia
      */
     protected function value(): Attribute
     {
-        return Attribute::make(get: function ($value) {
-            if ($this->is_encrypted && $value) {
-                try {
-                    $value = decrypt($value);
-                } catch (\Exception $e) {
-                    // If decryption fails, return the original value
+        return Attribute::make(
+            get: function ($value) {
+                if ($this->is_encrypted && $value) {
+                    try {
+                        $value = decrypt($value);
+                    } catch (\Exception $e) {
+                        // If decryption fails, return the original value.
+                    }
                 }
-            }
 
-            return match ($this->type) {
-                'boolean' => (bool) json_decode($value ?? 'false'),
-                'integer' => (int) ($value ?? 0),
-                'float' => (float) ($value ?? 0.0),
-                'array', 'json' => json_decode($value ?? '[]', true) ?? [],
-                'file' => $this->getFirstMediaUrl('files'),
-                'image' => $this->getFirstMediaUrl('images'),
-                default => $value,
-            };
-        }, set: function ($value) {
-            if ($this->is_encrypted && $value) {
-                $value = encrypt($value);
-            }
+                $type = $this->type ?? 'string';
 
-            return match ($this->type) {
-                'boolean' => json_encode((bool) $value),
-                'integer' => (string) (int) $value,
-                'float' => (string) (float) $value,
-                'array', 'json' => json_encode($value),
-                default => (string) $value,
-            };
-        });
+                return match ($type) {
+                    'boolean' => filter_var(
+                        $value,
+                        FILTER_VALIDATE_BOOL,
+                        FILTER_NULL_ON_FAILURE
+                    ) ?? (bool) json_decode($value ?? 'false'),
+                    'integer' => is_null($value) ? null : (int) $value,
+                    'float' => is_null($value) ? null : (float) $value,
+                    'array', 'json' => is_string($value)
+                        ? json_decode($value ?: '[]', true) ?? []
+                        : (array) ($value ?? []),
+                    'file' => $this->getFirstMediaUrl('files'),
+                    'image' => $this->getFirstMediaUrl('images'),
+                    default => $value,
+                };
+            },
+            set: function ($value, array $attributes) {
+                $type = $attributes['type'] ?? $this->type ?? 'string';
+
+                return $this->normalizeValueForStorage($value, $type);
+            }
+        );
+    }
+
+    private function normalizeValueForStorage(mixed $value, string $type): ?string
+    {
+        return match ($type) {
+            'boolean' => json_encode(filter_var(
+                $value,
+                FILTER_VALIDATE_BOOL,
+                FILTER_NULL_ON_FAILURE
+            ) ?? (bool) $value),
+            'integer' => is_null($value) ? null : (string) (int) $value,
+            'float' => is_null($value) ? null : (string) (float) $value,
+            'array', 'json' => json_encode($value ?? []),
+            default => is_null($value) ? null : (string) $value,
+        };
     }
 
     /**
@@ -268,8 +287,21 @@ final class SystemSetting extends Model implements HasMedia
      */
     public static function setValue(string $key, $value, array $options = []): void
     {
-        $defaults = ['type' => 'string', 'group' => 'general', 'is_public' => false, 'is_required' => false, 'is_encrypted' => false, 'is_readonly' => false, 'is_active' => true];
-        $data = array_merge($defaults, $options, ['key' => $key, 'value' => $value, 'updated_by' => auth()->id()]);
+        $defaults = [
+            'type'        => 'string',
+            'group'       => 'general',
+            'is_public'   => false,
+            'is_required' => false,
+            'is_encrypted'=> false,
+            'is_readonly' => false,
+            'is_active'   => true,
+        ];
+        $data = array_merge($defaults, $options, [
+            'key'        => $key,
+            'name'       => $options['name'] ?? $key,
+            'value'      => $value,
+            'updated_by' => auth()->id(),
+        ]);
         self::updateOrCreate(['key' => $key], $data);
     }
 
@@ -568,7 +600,15 @@ final class SystemSetting extends Model implements HasMedia
      */
     public static function clearCache(): void
     {
-        cache()->tags(['system_settings'])->flush();
+        $store = cache()->getStore();
+
+        if ($store instanceof TaggableStore) {
+            cache()->tags(['system_settings'])->flush();
+
+            return;
+        }
+
+        cache()->forget('system_settings');
     }
 
     /**
@@ -576,7 +616,15 @@ final class SystemSetting extends Model implements HasMedia
      */
     public function clearInstanceCache(): void
     {
-        cache()->tags($this->getCacheTags())->forget($this->getCacheKey());
+        $store = cache()->getStore();
+
+        if ($store instanceof TaggableStore) {
+            cache()->tags($this->getCacheTags())->forget($this->getCacheKey());
+
+            return;
+        }
+
+        cache()->forget($this->getCacheKey());
     }
 
     /**
@@ -593,6 +641,16 @@ final class SystemSetting extends Model implements HasMedia
     protected static function boot(): void
     {
         parent::boot();
+        self::saving(function (SystemSetting $setting) {
+            $type = $setting->type ?? 'string';
+            $normalizedValue = $setting->normalizeValueForStorage($setting->value, $type);
+
+            if ($setting->is_encrypted && $normalizedValue !== null && $normalizedValue !== '') {
+                $setting->attributes['value'] = encrypt($normalizedValue);
+            } else {
+                $setting->attributes['value'] = $normalizedValue;
+            }
+        });
         self::updating(function (SystemSetting $setting) {
             $setting->clearCache();
         });
@@ -606,7 +664,7 @@ final class SystemSetting extends Model implements HasMedia
      */
     public function getActiveDependencies()
     {
-        return $this->dependencies()->active()->with('dependsOnSetting')->get();
+        return $this->dependencies()->active()->with('dependsOnSettingRelation')->get();
     }
 
     /**
@@ -688,14 +746,28 @@ final class SystemSetting extends Model implements HasMedia
         }
         $validationRules = $this->getValidationRulesArray();
         foreach ($validationRules as $rule => $value) {
-            if (is_bool($value) && $value) {
-                $rules[] = $rule;
-            } elseif (! is_bool($value)) {
+            if (is_int($rule)) {
+                if (is_string($value) && $value !== '') {
+                    $rules[] = $value;
+                }
+
+                continue;
+            }
+
+            if (is_bool($value)) {
+                if ($value) {
+                    $rules[] = $rule;
+                }
+
+                continue;
+            }
+
+            if ($value !== null && $value !== '') {
                 $rules[] = "{$rule}:{$value}";
             }
         }
 
-        return $rules;
+        return array_values(array_unique($rules));
     }
 
     /**

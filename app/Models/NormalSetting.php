@@ -6,10 +6,12 @@ namespace App\Models;
 
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\DeadlockException;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\QueryException;
 use JsonSerializable;
 
 /**
@@ -220,14 +222,26 @@ final class NormalSetting extends Model
         $locale = $locale ?? app()->getLocale();
         $type = self::inferTypeFromValue($value);
 
-        self::updateOrCreate(
-            ['key' => $key, 'locale' => $locale],
-            [
-                'group' => $group,
-                'type'  => $type,
-                'value' => self::normalizeValueForStorage($value, $type),
-            ],
-        );
+        for ($attempt = 0; $attempt < 5; $attempt++) {
+            try {
+                self::updateOrCreate(
+                    ['key' => $key, 'locale' => $locale],
+                    [
+                        'group' => $group,
+                        'type'  => $type,
+                        'value' => self::normalizeValueForStorage($value, $type),
+                    ],
+                );
+
+                return;
+            } catch (DeadlockException|QueryException $exception) {
+                if (! self::isSqliteLockException($exception) || $attempt === 4) {
+                    throw $exception;
+                }
+
+                usleep(100_000);
+            }
+        }
     }
 
     private static function inferTypeFromValue($value): string
@@ -302,6 +316,19 @@ final class NormalSetting extends Model
         }
 
         return $value;
+    }
+
+    private static function isSqliteLockException(DeadlockException|QueryException $exception): bool
+    {
+        if ($exception instanceof DeadlockException) {
+            return true;
+        }
+
+        $message = strtolower((string) $exception->getMessage());
+
+        return str_contains($message, 'database is locked')
+            || str_contains($message, 'database table is locked')
+            || (string) $exception->getCode() === '5';
     }
 
     /**

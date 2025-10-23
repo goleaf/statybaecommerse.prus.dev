@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\Api\AuditLogController;
 use App\Http\Controllers\Api\AuthenticatedUserController;
 use App\Http\Controllers\Api\AutocompleteSearchController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\ExportDownloadController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\SearchController;
@@ -41,9 +42,30 @@ Route::prefix('v1')
         });
     });
 
+Route::middleware('auth:sanctum')
+    ->prefix('notifications')
+    ->as('api.notifications.')
+    ->withoutMiddleware(['throttle:api.default', 'throttle:api.read'])
+    ->group(function (): void {
+        Route::middleware('throttle:api.notifications.read')->group(function (): void {
+            Route::get('/', [NotificationController::class, 'index'])->name('index');
+            Route::get('/stats', [NotificationController::class, 'stats'])->name('stats');
+            Route::get('/search', [NotificationController::class, 'search'])->name('search');
+            Route::get('/{notification}', [NotificationController::class, 'show'])->name('show');
+        });
+
+        Route::middleware('throttle:api.notifications.write')->group(function (): void {
+            Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('mark-all-read');
+            Route::post('/mark-all-unread', [NotificationController::class, 'markAllAsUnread'])->name('mark-all-unread');
+            Route::post('/{notification}/mark-read', [NotificationController::class, 'markAsRead'])->name('mark-as-read');
+            Route::post('/{notification}/mark-unread', [NotificationController::class, 'markAsUnread'])->name('mark-as-unread');
+            Route::delete('/{notification}', [NotificationController::class, 'destroy'])->name('destroy');
+        });
+    });
+
 Route::get('exports/download/{export:uuid}', ExportDownloadController::class)
-    ->middleware(['signed', 'auth:sanctum', 'abilities:exports.download', 'throttle:api.exports'])
-    ->name('exports.signed-download');
+    ->middleware(['signed', 'throttle:api.exports'])
+    ->name('api.exports.download');
 
 Route::prefix('partner')
     ->middleware(['partner.api.auth', 'partner.api.rate_limit'])

@@ -72,7 +72,7 @@ final class VariantPriceHistoryResource extends Resource
                     ])
                     ->default('regular')
                     ->required(),
-                Forms\Components\Select::make('change_reason')
+                Forms\Components\Select::make('reason')
                     ->options([
                         'manual'            => 'Manual Change',
                         'automatic'         => 'Automatic Update',
@@ -160,7 +160,7 @@ final class VariantPriceHistoryResource extends Resource
                         default     => 'gray',
                     })
                     ->sortable(),
-                Tables\Columns\TextColumn::make('change_reason')
+                Tables\Columns\TextColumn::make('reason')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'manual'            => 'primary',
@@ -198,7 +198,7 @@ final class VariantPriceHistoryResource extends Resource
                         'wholesale' => 'Wholesale Price',
                         'bulk'      => 'Bulk Price',
                     ]),
-                Tables\Filters\SelectFilter::make('change_reason')
+                Tables\Filters\SelectFilter::make('reason')
                     ->options([
                         'manual'            => 'Manual Change',
                         'automatic'         => 'Automatic Update',

@@ -72,7 +72,7 @@ final class ApiRateLimitTest extends RateLimitTestCase
         $this->saturateRateLimit($user, 'exports', 'api.exports');
 
         $signedUrl = URL::temporarySignedRoute(
-            'exports.signed-download',
+            'api.exports.download',
             now()->addMinute(),
             ['export' => $export],
         );

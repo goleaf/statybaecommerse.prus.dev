@@ -7,7 +7,7 @@ use App\Models\DiscountCode;
 use App\Models\DiscountRedemption;
 use Database\Seeders\DiscountRedemptionSeeder;
 
-it('creates redemptions for discount codes via factories', function (): void {
+it('feature: creates redemptions for discount codes via factories', function (): void {
     $discount = Discount::factory()
         ->has(DiscountCode::factory()->count(2))
         ->create();
