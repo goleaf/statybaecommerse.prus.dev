@@ -76,14 +76,25 @@ jobs:
       - name: Run PHPStan analysis
         run: composer analyse
 
-      - name: Prepare build directory
-        run: mkdir -p build
+  phpunit:
+    name: PHPUnit (PHP ${{ matrix.php-version }})
+    runs-on: ubuntu-latest
+    # Run the test suite against the Renovate-supported PHP versions so
+    # dependency bumps get early feedback on cross-version compatibility.
+    strategy:
+      matrix:
+        php-version: ${{ fromJSON(github.event_name == 'pull_request' && startsWith(github.actor, 'renovate') ? '["8.2","8.3"]' : '["8.3"]') }}
+    needs: phpstan
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Run tests with coverage
-        env:
-          XDEBUG_MODE: coverage
-        run: >-
-          composer test -- --coverage-clover build/coverage-${{ matrix.php-version }}.xml
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, intl, pdo_sqlite
+          coverage: none
 
       - name: Get Composer cache directory
         id: composer-cache

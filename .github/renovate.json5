@@ -1,4 +1,5 @@
 {
+  // Enable Renovate with project defaults and dashboard tracking.
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended",
@@ -9,12 +10,14 @@
     "after 02:00 on monday"
   ],
   "prHourlyLimit": 2,
+  "prConcurrentLimit": 10,
   "constraints": {
     "php": ">=8.2 <9.0"
   },
   "composerIgnorePlatformReqs": false,
   "packageRules": [
     {
+      // Group composer updates into a single weekly batch.
       "groupName": "Weekly PHP dependency rollup",
       "groupSlug": "php-weekly",
       "matchManagers": ["composer"],
@@ -23,6 +26,7 @@
       "stabilityDays": 3
     },
     {
+      // Group npm updates into a single weekly batch to reduce CI churn.
       "groupName": "Weekly Node dependency rollup",
       "groupSlug": "node-weekly",
       "matchManagers": ["npm"],
@@ -31,21 +35,21 @@
       "stabilityDays": 3
     },
     {
+      // Keep Laravel framework updates within the current major release.
       "matchManagers": ["composer"],
       "matchPackageNames": [
         "laravel/framework"
       ],
-      "rangeStrategy": "pin",
       "allowedVersions": ">=12.0.0 <13.0.0",
       "ignoreUnstable": true,
       "stabilityDays": 7
     },
     {
+      // Ensure Filament packages remain on the 4.x release line.
       "matchManagers": ["composer"],
       "matchPackagePatterns": [
         "^filament/(filament|forms|tables|infolists|spatie-laravel-media-library-plugin)$"
       ],
-      "rangeStrategy": "pin",
       "allowedVersions": ">=4.1.0 <5.0.0",
       "ignoreUnstable": true,
       "stabilityDays": 7
