@@ -50,9 +50,7 @@ final class ProductFeatureResource extends Resource
                 ->searchable()
                 ->preload(),
             Forms\Components\Select::make('feature_type')
-                ->label('Feature Type')
                 ->options(self::getFeatureTypeOptions())
-                ->required()
                 ->searchable(),
             Forms\Components\TextInput::make('feature_key')
                 ->label('Feature Key')
@@ -126,10 +124,6 @@ final class ProductFeatureResource extends Resource
                     ->options(self::getFeatureTypeOptions()),
                 Tables\Filters\SelectFilter::make('product_id')
                     ->relationship('product', 'name'),
-                Tables\Filters\TernaryFilter::make('is_active')
-                    ->label('Active')
-                    ->trueLabel('Active')
-                    ->falseLabel('Inactive'),
             ])
             ->actions([
                 TablesEditAction::make(),
@@ -170,6 +164,20 @@ final class ProductFeatureResource extends Resource
             'feature'       => 'Feature',
             'technical'     => 'Technical',
             'performance'   => 'Performance',
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function getFeatureTypeOptions(): array
+    {
+        return [
+            'specification' => 'Specification',
+            'benefit' => 'Benefit',
+            'feature' => 'Feature',
+            'technical' => 'Technical',
+            'performance' => 'Performance',
         ];
     }
 }

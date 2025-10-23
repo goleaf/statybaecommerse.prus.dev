@@ -20,12 +20,12 @@ class EditStock extends EditRecord
         ];
     }
 
-    protected function getBreadcrumb(): string
+    public function getBreadcrumb(): string
     {
         return (string) data_get($this->record, 'product_name', '');
     }
 
-    protected function getTitle(): string
+    public function getTitle(): string
     {
         return (string) data_get($this->record, 'product_name', '');
     }

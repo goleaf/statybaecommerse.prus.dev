@@ -6,6 +6,8 @@ namespace App\Filament\Pages;
 
 use App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
 use App\Models\User;
+use BackedEnum;
+use UnitEnum;
 use Filament\Pages\Page;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
@@ -20,12 +22,9 @@ final class UserImpersonation extends Page implements HasTable
     use HasToggleableTable;
     use InteractsWithTable;
 
-    /**
-     * @var string|BackedEnum|null
-     */
-    protected static $navigationIcon = 'heroicon-o-user';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user';
 
-    protected static ?string $navigationGroup = 'System';
+    protected static UnitEnum|string|null $navigationGroup = 'System';
 
     protected static ?string $title = 'User Impersonation';
 

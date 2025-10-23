@@ -22,10 +22,7 @@ class SliderAnalytics extends BaseDashboard
 
     protected static ?string $navigationLabel = 'Slider Analytics';
 
-    /**
-     * @var string|BackedEnum|null
-     */
-    protected static $navigationIcon = 'heroicon-o-chart-bar';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?int $navigationSort = 3;
 
