@@ -48,10 +48,44 @@ final class DemoStoreSeeder extends Seeder
     {
         $attributes = Country::factory()->lithuania()->raw();
 
-        return Country::query()->updateOrCreate(
+        // Normalise translated fields so the base table stores the default locale while the
+        // remaining translations are persisted in the country_translations relation.
+        $translatedFields = ['name', 'name_official', 'description'];
+        $translationsByLocale = [];
+
+        foreach ($translatedFields as $field) {
+            if (! array_key_exists($field, $attributes)) {
+                continue;
+            }
+
+            $value = $attributes[$field];
+
+            if (! is_array($value)) {
+                continue;
+            }
+
+            foreach ($value as $locale => $translatedValue) {
+                $translationsByLocale[$locale][$field] = $translatedValue;
+            }
+
+            $attributes[$field] = $value[self::DEFAULT_LOCALE] ?? reset($value) ?? null;
+        }
+
+        $country = Country::query()->updateOrCreate(
             ['cca2' => $attributes['cca2']],
             $attributes,
         );
+
+        foreach ($translationsByLocale as $locale => $payload) {
+            // Ensure each locale is synchronised without overwriting unrelated translation
+            // fields, keeping the demo content resilient to repeated seed executions.
+            $country->translations()->updateOrCreate(
+                ['locale' => $locale],
+                $payload,
+            );
+        }
+
+        return $country;
     }
 
     private function seedChannel(): Channel

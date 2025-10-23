@@ -83,13 +83,50 @@ return new class extends Migration
         }
 
         if (! method_exists($connection, 'getDoctrineSchemaManager')) {
-            // Without Doctrine we cannot safely introspect other drivers, so default to false.
-            return false;
+            // Doctrine DBAL is optional, therefore we fall back to driver-specific introspection so
+            // that repeated deployments remain idempotent even in minimal installations.
+            return $this->indexExistsViaInformationSchema($connection, $tableName, $indexName);
         }
 
         $schemaManager = $connection->getDoctrineSchemaManager();
         $indexes = $schemaManager->listTableIndexes($table);
 
-        return array_key_exists($indexName, $indexes);
+        foreach ($indexes as $name => $index) {
+            // Doctrine may normalise index names to uppercase on some database drivers, therefore
+            // we compare the names in a case-insensitive manner to avoid false negatives.
+            if (strcasecmp($name, $indexName) === 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Use lightweight INFORMATION_SCHEMA queries when Doctrine DBAL support is unavailable.
+     */
+    private function indexExistsViaInformationSchema($connection, string $tableName, string $indexName): bool
+    {
+        $driver = $connection->getDriverName();
+        $table = $connection->getTablePrefix() . $tableName;
+
+        return match ($driver) {
+            'mysql', 'mariadb' => (bool) $connection->selectOne(
+                // MySQL exposes index metadata via information_schema.statistics.
+                'SELECT 1 FROM information_schema.statistics WHERE table_schema = ? AND table_name = ? AND index_name = ? LIMIT 1',
+                [$connection->getDatabaseName(), $table, $indexName],
+            ),
+            'pgsql' => (bool) $connection->selectOne(
+                // PostgreSQL stores index metadata in pg_indexes; we scope to the current schema.
+                'SELECT 1 FROM pg_indexes WHERE schemaname = current_schema() AND tablename = ? AND indexname = ? LIMIT 1',
+                [$table, $indexName],
+            ),
+            'sqlite' => (bool) collect(
+                // SQLite provides the pragma_index_list command for the same purpose; parameter binding
+                // is not supported, so we safely interpolate the known table identifier.
+                $connection->select(sprintf("PRAGMA index_list('%s')", str_replace("'", "''", $table))),
+            )->firstWhere('name', $indexName),
+            default => false,
+        };
     }
 };

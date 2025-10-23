@@ -35,6 +35,8 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Introduced a reusable HTML sanitization pipeline with a maintenance command, model hooks, and storefront renderer updates to harden product and legal content.
 
 ### Bug Fixes
+* Hardened the created_at indexing migration with case-insensitive Doctrine checks and driver-specific fallbacks so repeated deployments no longer trip duplicate key errors on tables that already expose timestamp indexes.
+* Expanded the currencies schema and demo country seeder translation handling to match model expectations, allowing `php artisan migrate:fresh --seed` to succeed across SQLite/MySQL environments with full multilingual fixtures.
 * Added the foundational `customer_groups` table migration so subsequent enhancement scripts (including soft deletes) succeed during fresh installs and automated refreshes.
 * Staged the stock reservation foreign keys until the products and variant inventory tables exist so `php artisan migrate:fresh --seed` succeeds on clean installs without sacrificing cascading deletes.
 * Corrected shipping option delivery window formatting so zero-day estimates and partially filled ranges no longer collapse to a placeholder dash in admin tables.
