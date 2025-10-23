@@ -14,9 +14,9 @@ use App\Services\NotificationService;
 use App\Support\ListQuery\ListQueryDefinition;
 use App\Support\ListQuery\ListQueryValidator;
 use App\Support\ListQuery\ListResponse;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
 
 final class NotificationController extends Controller
 {
@@ -27,32 +27,16 @@ final class NotificationController extends Controller
      */
     public function index(ListNotificationsRequest $request): JsonResponse
     {
-        $definition = $this->notificationListDefinition();
-        $listQuery = ListQueryValidator::fromRequest($request, $definition);
-
         $user = Auth::user();
-        $notifications = $this->notificationService->getUserNotifications($user, $listQuery, $definition);
-
-        $response = ListResponse::fromPaginator(
-            $notifications,
-            $listQuery,
-            static fn (Notification $notification): array => [
-                'id' => $notification->id,
-                'type' => $notification->type,
-                'data' => $notification->data,
-                'read_at' => $notification->read_at,
-                'created_at' => $notification->created_at,
-                'updated_at' => $notification->updated_at,
-                'is_read' => $notification->is_read,
-                'is_urgent' => $notification->is_urgent,
-            ],
-        );
+        $input = array_merge($request->query(), $request->validated());
+        $listQuery = ListQueryValidator::fromArray($input, $this->notificationListDefinition());
+        $notifications = $this->notificationService->getUserNotifications($user, $listQuery);
 
         return response()->json([
             'success' => true,
-            'data' => $response['data'],
-            'meta' => $response['meta'],
-            'links' => $response['links'],
+            'data' => $notifications->items(),
+            'meta' => ListResponse::meta($listQuery, $notifications),
+            'links' => ListResponse::links($notifications),
         ]);
     }
 
@@ -201,38 +185,59 @@ final class NotificationController extends Controller
     private function authenticatedUser(): User
     {
         $user = Auth::user();
-        $searchQuery = $request->get('q');
+        $input = array_merge($request->query(), $request->validated());
+        $listQuery = ListQueryValidator::fromArray($input, $this->notificationListDefinition(includeSearch: true));
+        $notifications = $this->notificationService->searchNotifications($user, $listQuery);
 
-        return response()->json(['success' => true, 'data' => $notifications->items(), 'pagination' => ['current_page' => $notifications->currentPage(), 'last_page' => $notifications->lastPage(), 'per_page' => $notifications->perPage(), 'total' => $notifications->total(), 'from' => $notifications->firstItem(), 'to' => $notifications->lastItem()]]);
-}
+        return response()->json([
+            'success' => true,
+            'data' => $notifications->items(),
+            'meta' => ListResponse::meta($listQuery, $notifications),
+            'links' => ListResponse::links($notifications),
+        ]);
+    }
 
-    private function notificationListDefinition(): ListQueryDefinition
+    private function notificationListDefinition(bool $includeSearch = false): ListQueryDefinition
     {
-        return ListQueryDefinition::make()
-            ->defaultPerPage(25)
-            ->maxPerPage(100)
-            ->defaultSort('created_at', 'desc')
-            ->allowedSorts([
-                'created_at' => ['column' => 'created_at'],
-                'read_at' => ['column' => 'read_at'],
-                'type' => ['column' => 'type'],
-            ])
-            ->filters([
-                'type' => ['type' => 'string', 'nullable' => true, 'scope' => 'byType'],
-                'read' => [
-                    'type' => 'bool',
-                    'nullable' => true,
-                    'callback' => static function (Builder $query, bool $read): void {
-                        $read ? $query->read() : $query->unread();
-                    },
-                ],
-                'urgent' => [
-                    'type' => 'bool',
-                    'nullable' => true,
-                    'callback' => static function (Builder $query, bool $urgent): void {
-                        $urgent ? $query->urgent() : $query->normal();
-                    },
-                ],
-            ]);
+        $filters = [
+            'type' => [
+                'type' => 'string',
+                'callback' => static function (Builder $builder, string $type): void {
+                    $builder->byType($type);
+                },
+            ],
+            'read' => [
+                'type' => 'bool',
+                'nullable' => true,
+                'callback' => static function (Builder $builder, bool $read): void {
+                    $read ? $builder->read() : $builder->unread();
+                },
+            ],
+        ];
+
+        if ($includeSearch) {
+            $filters['q'] = [
+                'type' => 'string',
+                'callback' => static function (Builder $builder, string $term): void {
+                    $builder->where(function (Builder $query) use ($term): void {
+                        $query->where('data->title', 'like', '%'.$term.'%')
+                            ->orWhere('data->message', 'like', '%'.$term.'%')
+                            ->orWhere('data->type', 'like', '%'.$term.'%');
+                    });
+                },
+            ];
+        }
+
+        return new ListQueryDefinition(
+            filters: $filters,
+            sortable: [
+                'created_at' => ['column' => 'notifications.created_at', 'default_direction' => 'desc'],
+                'type' => ['column' => 'notifications.type'],
+            ],
+            defaultSort: 'created_at',
+            defaultDirection: 'desc',
+            defaultPerPage: 25,
+            maxPerPage: 100,
+        );
     }
 }

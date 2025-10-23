@@ -13,6 +13,7 @@ use App\Application\Product\UseCases\SearchProductsUseCase;
 use App\Domain\Product\Exceptions\ProductNotFoundException;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Support\Contracts\Entities\ProductContract;
 use App\Support\ListQuery\ListQueryDefinition;
 use App\Support\ListQuery\ListQueryValidator;
 use App\Support\ListQuery\ListResponse;
@@ -21,6 +22,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\View\View;
 
 /**
@@ -66,17 +68,62 @@ final class ProductController extends Controller
      */
     public function catalog(Request $request): JsonResponse|View|Response
     {
-        $definition = $this->productCatalogDefinition();
+        $definition = new ListQueryDefinition(
+            filters: [
+                'category' => [
+                    'type' => 'string',
+                    'callback' => static function (Builder $builder, string $slug): void {
+                        $builder->whereHas('category', static function (Builder $query) use ($slug): void {
+                            $query->where('slug', $slug);
+                        });
+                    },
+                ],
+                'brand' => [
+                    'type' => 'string',
+                    'callback' => static function (Builder $builder, string $slug): void {
+                        $builder->whereHas('brand', static function (Builder $query) use ($slug): void {
+                            $query->where('slug', $slug);
+                        });
+                    },
+                ],
+            ],
+            sortable: [
+                'name' => ['column' => 'products.name'],
+                'price' => ['column' => 'products.price'],
+                'created_at' => ['column' => 'products.created_at'],
+            ],
+            defaultSort: 'name',
+            defaultDirection: 'asc',
+            defaultPerPage: 20,
+            maxPerPage: 100,
+        );
+
         $listQuery = ListQueryValidator::fromRequest($request, $definition);
 
-        $query = Product::query()
-            ->where('is_visible', true)
-            ->where('price', '>', 0)
-            ->whereNotNull('slug')
-            ->where('slug', '<>', '')
-            ->whereNotNull('name')
-            ->where('name', '<>', '')
-            ->with(['brand', 'media', 'category']);
+        $query = Product::query()->where('is_visible', true)->with(['brand', 'media', 'category']);
+        $listQuery->applyFilters($query);
+        $listQuery->applySorts($query);
+
+        if (! $listQuery->hasSort('name')) {
+            $query->orderBy('products.name');
+        }
+
+        $products = $query->get()->skipWhile(function (Product $product) {
+            // Skip products that are not properly configured for catalog display
+            return empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug);
+        });
+        // Apply pagination manually after skipWhile filtering
+        $total = $products->count();
+        $currentPage = $listQuery->page();
+        $perPage = $listQuery->perPage();
+        $offset = ($currentPage - 1) * $perPage;
+        $paginatedProducts = $products->slice($offset, $perPage)->values();
+        $paginatedData = new LengthAwarePaginator($paginatedProducts, $total, $perPage, $currentPage, ['path' => $request->url(), 'pageName' => 'page']);
+
+        $payload = ProductContract::forCollection($paginatedData, ListResponse::meta($listQuery, $paginatedData, [
+            'total' => $total,
+            'limit' => $perPage,
+        ]));
 
         $paginator = $listQuery->apply($query, $definition);
 

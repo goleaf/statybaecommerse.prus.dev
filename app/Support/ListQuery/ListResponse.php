@@ -9,45 +9,50 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 final class ListResponse
 {
     /**
-     * @template TValue
-     *
-     * @param callable(TValue): array|null $transform
-     * @return array{data: array<int, mixed>, meta: array<string, mixed>, links: array<string, string|null>}
+     * @param array<string, mixed>|list<mixed> $data
+     * @return array<string, mixed>
      */
-    public static function fromPaginator(LengthAwarePaginator $paginator, ListQuery $query, ?callable $transform = null): array
+    public static function fromPaginator(LengthAwarePaginator $paginator, ListQuery $query, array $data, array $extraMeta = []): array
     {
-        $collection = $paginator->getCollection();
-
-        if ($transform !== null) {
-            $collection = $collection->map(static fn ($item) => $transform($item));
-        }
-
-        $data = $collection->values()->all();
-
         return [
             'data' => $data,
-            'meta' => [
-                'pagination' => [
-                    'total' => $paginator->total(),
-                    'count' => $paginator->count(),
-                    'per_page' => $paginator->perPage(),
-                    'current_page' => $paginator->currentPage(),
-                    'last_page' => $paginator->lastPage(),
-                    'from' => $paginator->firstItem(),
-                    'to' => $paginator->lastItem(),
-                ],
-                'sort' => [
-                    'by' => $query->sortBy(),
-                    'direction' => $query->sortDirection(),
-                ],
-                'filters' => $query->activeFilters(),
+            'meta' => self::meta($query, $paginator, $extraMeta),
+            'links' => self::links($paginator),
+        ];
+    }
+
+    public static function meta(ListQuery $query, ?LengthAwarePaginator $paginator = null, array $extraMeta = []): array
+    {
+        $meta = array_merge([
+            'query' => [
+                'page' => $query->page(),
+                'per_page' => $query->perPage(),
+                'sort' => $query->sorts(),
+                'filters' => $query->filters(),
             ],
-            'links' => [
-                'first' => $paginator->url(1),
-                'last' => $paginator->url($paginator->lastPage()),
-                'prev' => $paginator->previousPageUrl(),
-                'next' => $paginator->nextPageUrl(),
-            ],
+        ], $extraMeta);
+
+        if ($paginator !== null) {
+            $meta['pagination'] = [
+                'current_page' => $paginator->currentPage(),
+                'last_page' => $paginator->lastPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+                'from' => $paginator->firstItem(),
+                'to' => $paginator->lastItem(),
+            ];
+        }
+
+        return $meta;
+    }
+
+    public static function links(LengthAwarePaginator $paginator): array
+    {
+        return [
+            'first' => $paginator->url(1),
+            'last' => $paginator->url($paginator->lastPage()),
+            'prev' => $paginator->previousPageUrl(),
+            'next' => $paginator->nextPageUrl(),
         ];
     }
 }

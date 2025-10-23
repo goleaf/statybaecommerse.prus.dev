@@ -14,7 +14,6 @@ use App\Application\DTOs\Notifications\NotificationStatsData;
 use App\Models\Notification;
 use App\Models\User;
 use App\Support\ListQuery\ListQuery;
-use App\Support\ListQuery\ListQueryDefinition;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -125,11 +124,18 @@ final class NotificationService
     /**
      * Handle getUserNotifications functionality with proper error handling.
      */
-    public function getUserNotifications(User $user, ListQuery $listQuery, ListQueryDefinition $definition): LengthAwarePaginator
+    public function getUserNotifications(User $user, ListQuery $query): LengthAwarePaginator
     {
-        $query = Notification::forUser($user->id);
+        $builder = Notification::forUser($user->id);
 
-        return $listQuery->apply($query, $definition);
+        $query->applyFilters($builder);
+        $query->applySorts($builder);
+
+        if (! $query->hasSort('created_at')) {
+            $builder->latest();
+        }
+
+        return $builder->paginate($query->perPage(), ['*'], 'page', $query->page());
     }
 
     /**
@@ -158,31 +164,9 @@ final class NotificationService
     /**
      * Search notifications for the authenticated user.
      */
-    public function searchNotifications(string $query, User $user, ?string $type = null, ?bool $read = null, int $perPage = 25): LengthAwarePaginator
+    public function searchNotifications(User $user, ListQuery $query): LengthAwarePaginator
     {
-        $builder = $this->applyFilters(Notification::forUser($user->id), $type, $read)
-            ->where(function (Builder $searchQuery) use ($query): void {
-                $searchQuery->where('data->title', 'like', '%'.$query.'%')
-                    ->orWhere('data->message', 'like', '%'.$query.'%')
-                    ->orWhere('data->type', 'like', '%'.$query.'%');
-            });
-
-        return $builder->latest()->paginate($perPage);
-    }
-
-    private function applyFilters(Builder $query, ?string $type, ?bool $read): Builder
-    {
-        if ($type) {
-            $query->byType($type);
-        }
-
-        if ($read !== null) {
-            $query = $read ? $query->read() : $query->unread();
-        }
-
-        return $query
-            ->orderBy($sortColumn, $sortDirection)
-            ->paginate($perPage, ['*'], 'page', $page);
+        return $this->getUserNotifications($user, $query);
     }
 
     private function getOrderMessage(string $action, array $orderData): string

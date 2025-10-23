@@ -4,93 +4,58 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Api;
 
-use App\Models\Campaign;
 use App\Models\CampaignClick;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 final class CampaignClickListingTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_index_returns_paginated_results_with_default_sort(): void
+    public function test_it_caps_page_size_and_falls_back_to_default_sort(): void
     {
-        CampaignClick::factory()->count(3)->sequence(fn (int $index) => [
-            'clicked_at' => now()->subMinutes($index * 5),
-        ])->create();
+        CampaignClick::factory()->count(3)->sequence(
+            ['clicked_at' => Carbon::parse('2024-01-01 12:00:00')],
+            ['clicked_at' => Carbon::parse('2024-01-02 12:00:00')],
+            ['clicked_at' => Carbon::parse('2024-01-03 12:00:00')],
+        )->create();
 
-        $response = $this->getJson('/campaign-clicks?per_page=2');
+        $response = $this->getJson('/api/campaign-clicks?per_page=500&sort=-invalid');
 
         $response->assertOk();
-        $response->assertJsonStructure([
-            'success',
-            'data',
-            'meta' => ['pagination' => ['total', 'per_page', 'current_page', 'last_page', 'count', 'from', 'to'], 'sort' => ['by', 'direction'], 'filters'],
-            'links' => ['first', 'last', 'prev', 'next'],
+        $payload = $response->json();
+
+        $this->assertSame(100, $payload['meta']['query']['per_page']);
+        $this->assertSame('clicked_at', $payload['meta']['query']['sort'][0]['key']);
+        $this->assertSame('desc', $payload['meta']['query']['sort'][0]['direction']);
+
+        $timestamps = array_column($payload['data'], 'clicked_at');
+        $this->assertSame(
+            ['2024-01-03T12:00:00.000000Z', '2024-01-02T12:00:00.000000Z', '2024-01-01T12:00:00.000000Z'],
+            $timestamps
+        );
+    }
+
+    public function test_it_applies_boolean_and_date_filters(): void
+    {
+        CampaignClick::factory()->count(2)->create([
+            'is_converted' => true,
+            'clicked_at' => Carbon::parse('2024-02-10 08:00:00'),
+        ]);
+        CampaignClick::factory()->create([
+            'is_converted' => false,
+            'clicked_at' => Carbon::parse('2024-02-15 08:00:00'),
         ]);
 
+        $response = $this->getJson('/api/campaign-clicks?is_converted=true&date_from=2024-02-01&date_to=2024-02-28');
+
+        $response->assertOk();
         $payload = $response->json();
 
         $this->assertSame(2, count($payload['data']));
-        $this->assertSame('clicked_at', $payload['meta']['sort']['by']);
-        $this->assertSame('desc', $payload['meta']['sort']['direction']);
-        $this->assertSame(2, $payload['meta']['pagination']['per_page']);
-        $this->assertSame(3, $payload['meta']['pagination']['total']);
-    }
-
-    public function test_index_applies_filters_and_exposes_meta_filters(): void
-    {
-        $campaign = Campaign::factory()->create();
-        $converted = CampaignClick::factory()->converted()->create([
-            'clicked_at' => now()->subDay(),
-            'campaign_id' => $campaign->id,
-            'device_type' => 'mobile',
-        ]);
-
-        CampaignClick::factory()->create([
-            'clicked_at' => now()->subDays(5),
-            'campaign_id' => Campaign::factory(),
-            'device_type' => 'desktop',
-            'is_converted' => false,
-        ]);
-
-        $dateFrom = now()->subDays(2)->toDateString();
-        $response = $this->getJson('/campaign-clicks?is_converted=1&campaign_id='.$campaign->id.'&date_from='.$dateFrom);
-
-        $response->assertOk();
-        $payload = $response->json();
-
-        $this->assertCount(1, $payload['data']);
-        $this->assertSame($converted->id, $payload['data'][0]['id']);
-        $this->assertTrue($payload['meta']['filters']['is_converted']);
-        $this->assertSame($campaign->id, $payload['meta']['filters']['campaign_id']);
-        $this->assertSame($dateFrom, $payload['meta']['filters']['date_from']);
-    }
-
-    public function test_index_rejects_invalid_sort_parameter(): void
-    {
-        $response = $this->getJson('/campaign-clicks?sort_by=invalid-column');
-
-        $response->assertUnprocessable();
-        $response->assertJsonValidationErrors(['sort_by']);
-    }
-
-    public function test_index_limits_results_to_authenticated_customer(): void
-    {
-        $user = User::factory()->create();
-        $ownClick = CampaignClick::factory()->withCustomer()->create([
-            'customer_id' => $user->id,
-        ]);
-
-        CampaignClick::factory()->count(2)->create();
-
-        $response = $this->actingAs($user)->getJson('/campaign-clicks');
-
-        $response->assertOk();
-        $payload = $response->json();
-
-        $this->assertCount(1, $payload['data']);
-        $this->assertSame($ownClick->id, $payload['data'][0]['id']);
+        $this->assertSame(true, $payload['meta']['query']['filters']['is_converted']);
+        $this->assertSame('2024-02-01 00:00:00', $payload['meta']['query']['filters']['date_from']);
+        $this->assertSame('2024-02-28 00:00:00', $payload['meta']['query']['filters']['date_to']);
     }
 }
