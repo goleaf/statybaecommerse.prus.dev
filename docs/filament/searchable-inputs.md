@@ -107,6 +107,7 @@ Call `SearchableComponentHelper::clear($component);` whenever you need to wipe a
 
 - Register `afterStateHydrated` closures on your Filament form components to call `SearchableComponentHelper::hydrate()` with a finder closure and normaliser that return the `[value, label, payload]` tuple described above. This keeps edit forms and relation managers aligned when records are re-opened.
 - Pair `afterStateUpdated` hooks with `SearchableComponentHelper::clear()` so clearing the lookup also wipes any dependent state (`Set` helpers for foreign keys, cached payload fields, and related dropdowns).
+- Slider-specific surfaces (the quick actions widget, Slider Management modal, and Slider resource form) follow this pattern so the `button_url` field rehydrates the stored link payload and clears the cached metadata when the lookup is emptied. Use them as templates when wiring additional slider entry points.
 - Prefer returning a payload array that is already shaped for the downstream Livewire data structure you need. The helper simply forwards the normalised payload, making the component the single source of truth for metadata.
 
 ## Related guidelines
