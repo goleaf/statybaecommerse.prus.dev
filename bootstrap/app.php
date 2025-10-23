@@ -334,7 +334,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->header('Content-Language', $locale);
         });
     })
-    ->withProviders((function (): array {
+    ->withProviders((static function (): array {
         $providers = [
             App\Providers\AuthServiceProvider::class,
             App\Providers\ApiServiceProvider::class,
