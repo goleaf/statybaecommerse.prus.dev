@@ -37,7 +37,7 @@
 - OpenAPI documentation now mirrors the lean product meta payload and nullable media thumbnails emitted by the presenter, keeping schema validators and client SDKs in sync with production responses.
 
 ## Admin panel resilience
-- Variant image tooling now ships with active/primary scopes, formatted metadata accessors, and predictable sorting helpers so administrators can audit gallery images without bespoke queries.
+- User preference models now expose a float accessor that rounds to six decimals before persisting, ensuring Filament resources and unit factories agree on score precision without introducing casting regressions.
 - Attribute administration keeps validation rule strings verbatim, surfaces array-based rules as comma-separated chips, and pairs with regression tests that prove both paths round-trip correctly through Filament.
 - Filament dashboard access checks now fall back to open access when no
   permissions are configured and inline sparkline widgets respect the base
