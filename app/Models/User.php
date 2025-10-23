@@ -52,7 +52,8 @@ use Spatie\Translatable\HasTranslations;
 #[ScopedBy([ActiveScope::class])]
 final class User extends Authenticatable implements FilamentUser, HasLocalePreferenceContract
 {
-    use HasApiTokens, HasFactory, HasRoles, HasSafeSerialization, HasTranslations, LogsActivity, Notifiable, SoftDeletes;
+    use HasApiTokens; // Allow issuing API tokens for Sanctum-protected endpoints.
+    use HasFactory, HasRoles, HasSafeSerialization, HasTranslations, LogsActivity, Notifiable, SoftDeletes;
 
     /**
      * Handle booted functionality with proper error handling.
