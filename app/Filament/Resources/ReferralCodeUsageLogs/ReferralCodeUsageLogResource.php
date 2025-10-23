@@ -18,7 +18,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 
-class ReferralCodeUsageLogResource extends Resource
+final class ReferralCodeUsageLogResource extends Resource
 {
     use HasNav;
 
