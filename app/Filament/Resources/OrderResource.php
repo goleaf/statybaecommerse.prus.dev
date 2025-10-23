@@ -228,8 +228,8 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                         labelResolver: fn (User $user): string => trim(sprintf('%s <%s>', (string) ($user->name ?? ''), (string) ($user->email ?? ''))),
                                     );
                                 })
-                                ->afterStateUpdated(function (?string $state, Set $set): void {
-                                    SearchableComponentHelper::assignNullableId($set, 'user_id', $state);
+                                ->afterStateUpdated(function (SearchableInput $component, int|string|null $state, Set $set): void {
+                                    SearchableComponentHelper::syncNullableIntState($state, $set, 'user_id', $component);
                                 }),
                             Select::make('status')
                                 ->label(__('orders.fields.status'))
@@ -488,8 +488,8 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                         labelResolver: fn (Channel $channel): string => ChannelSearch::label($channel),
                                     );
                                 })
-                                ->afterStateUpdated(function (?string $state, Set $set): void {
-                                    SearchableComponentHelper::assignNullableId($set, 'channel_id', $state);
+                                ->afterStateUpdated(function (SearchableInput $component, int|string|null $state, Set $set): void {
+                                    SearchableComponentHelper::syncNullableIntState($state, $set, 'channel_id', $component);
                                 }),
                             SearchableInput::make('partner_id')
                                 ->label(__('orders.fields.partner'))
@@ -507,8 +507,8 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                         labelResolver: fn (Partner $partner): string => PartnerSearch::label($partner),
                                     );
                                 })
-                                ->afterStateUpdated(function (?string $state, Set $set): void {
-                                    SearchableComponentHelper::assignNullableId($set, 'partner_id', $state);
+                                ->afterStateUpdated(function (SearchableInput $component, int|string|null $state, Set $set): void {
+                                    SearchableComponentHelper::syncNullableIntState($state, $set, 'partner_id', $component);
                                 }),
                         ]),
                 ])

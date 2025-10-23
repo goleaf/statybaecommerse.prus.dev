@@ -4,15 +4,38 @@ The `App\\Support\\Filament\\Components\\SearchableComponentHelper` centralizes 
 
 ## Available Utilities
 
-- **`hydrateFromRecord()`** – accepts an already-loaded model and injects the correct option/state pair so Filament renders a selected value during form hydration.
-- **`hydrateUsingResolver()`** – lazily resolves a model by identifier before deferring to `hydrateFromRecord()`. Use this whenever the resource only has an ID column at hydrate time.
-- **`assignNullableId()`** – normalizes component state into nullable integer identifiers, ensuring blank states save as `null` instead of `0` or empty strings.
-- **`syncLookupPayload()`** – keeps lookup components and their structured payloads (e.g., billing/shipping address metadata) in sync. When cleared, it resets both the lookup field and payload array to avoid stale UI state.
+| Scenario | Helper | Notes |
+| --- | --- | --- |
+| Hydrating an edit form with an existing model | `hydrateFromModel()` or `hydrateUsingFinder()` | Restores the component state and option list from a model instance without duplicating query logic. |
+| Persisting nullable foreign keys | `syncNullableIntState()` | Normalises blank values to `null`, clears the component when empty, and persists integer IDs. |
+| Propagating lookup payloads to dependent fields | `syncLookupPayload()` | Keeps downstream payload arrays in sync and clears the lookup component when state is removed. |
 
 ## Usage Notes
 
-1. Always add a short inline comment referencing this page near helper-powered callbacks so future contributors know where to find behavioural details.
-2. When a lookup controls derivative payload (addresses, contact payloads, etc.), wrap your domain-specific fetch logic in the resolver closure and return the normalized array (see `App\\Support\\Search\\AddressSearch::payload`).
-3. Helper methods intentionally avoid emitting events; Filament's `Set` injection keeps dependent totals and key-value components in sync with the fresh payload data.
+1. Normalise raw component values with `normaliseIdentifier()` before casting to integers.
+2. Clear the lookup via `clearComponent()` whenever the helper determines the state is empty.
+3. Pass the optional component instance to `syncNullableIntState()` so clearing logic stays centralised.
+4. Use the optional label resolver in `syncLookupPayload()` when a component needs its option list rebuilt (e.g. editing existing orders).
 
-For metadata structure guidelines, continue to reference [`docs/forms/SEARCHABLE_INPUT_METADATA.md`](./SEARCHABLE_INPUT_METADATA.md).
+> **Tip:** The helper intentionally returns payload arrays untouched, so dependent totals, key-value components, or computed summaries continue to consume the normalised data emitted by search payload builders like `AddressSearch::payload()`.
+
+## Example
+
+```php
+SearchableInput::make('customer_id')
+    ->searchUsing(fn (string $search) => CustomerSearch::byEmailPhoneName($search))
+    ->dehydrateStateUsing(static fn ($state) => SearchableComponentHelper::normaliseIdentifier($state))
+    ->afterStateHydrated(fn (SearchableInput $component, ?int $state) =>
+        SearchableComponentHelper::hydrateUsingFinder($component, $state, $finder, $labelResolver)
+    )
+    ->afterStateUpdated(fn (SearchableInput $component, $state, Set $set) =>
+        SearchableComponentHelper::syncNullableIntState($state, $set, 'customer_id', $component)
+    );
+
+```
+
+## Payload expectations
+
+- `syncLookupPayload()` expects the payload resolver to return associative arrays ready for downstream consumers (e.g. `KeyValue` components or computed totals). The helper writes these arrays verbatim so structure the payload according to the receiving field.
+- Provide an `$emptyPayload` value mirroring the target field's default shape. For example, supply an empty array for key-value components or a zeroed structure for totals so the UI remains consistent when the lookup is cleared.
+- When using the optional label resolver, return the same text you would normally push into `$component->options()` to keep edit forms hydrated correctly.
