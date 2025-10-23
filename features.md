@@ -12,7 +12,7 @@
 - Filament currency administration now accepts extended ISO identifiers, surfaces inactive entries for auditing, and respects per-currency separators when rendering formatted amounts.
 
 ## Data integrity & seeding
-
+- Database index audit regression coverage now provisions a dedicated SQLite database file and cleans it up after assertions, so duplicate-index detection runs in isolation without colliding with the shared testing connection.
 - Demo store seeder now calls the collection and collection-product seeders, ensuring curated collections always feature representative products during fresh installs and automated demos.
 - PHPUnit harness now provisions a shared `database/testing.sqlite` file, runs a focused SQLite migration that seeds Spatie permission tables and variant attribute pivots, and registers Filament SearchableInput payload macros so suites share deterministic schema state without losing compatibility.
 - Region hierarchies and the `customers` table now provision automatically during SQLite migrations, ensuring factories, analytics widgets, and Filament resources can persist customer journeys without manual schema patches.
@@ -46,7 +46,7 @@
   storefront metrics while trimming duplicate queries from feature coverage.
 
 ## Admin panel resilience
-- Discount code resource actions now bypass storefront scopes, ensuring edits, toggles, duplicates, and bulk activation/deactivation succeed even when codes are hidden from customer-facing queries, and regression tests locate clones via scope-free lookups.
+- Filament top navigation widget surfaces the enum-driven metadata with admin/role checks and deterministic ordering, letting Livewire tests confirm visibility rules without missing groups or inconsistent priorities.
 - Attribute administration keeps validation rule strings verbatim, surfaces array-based rules as comma-separated chips, and pairs with regression tests that prove both paths round-trip correctly through Filament.
 - Filament dashboard tests spin up a minimal widget stack with a temporary Vite manifest and heroicon fallback while keeping full resource/page discovery active, and a dedicated admin authenticate middleware redirects guests to the Filament login screen, keeping feature coverage aligned with browser flows.
 - Filament dashboard access checks now fall back to open access when no
@@ -118,7 +118,7 @@
 - Request-scoped CSP nonces now propagate through middleware, helpers, Livewire, and Vite so every inline Blade script/style satisfies the stricter nonce-based CSP and updated HSTS/permissions policy headers.
 
 ## Tooling polish
-
+- Global filesystem binding now resolves to the GracefulFilesystem shim, automatically triggering `backup:prepare`/`backup:verify` during test runs when fresh backup directories appear so artisan exit-code checks stay deterministic.
 - `scripts/upgrade_filament_schema.php` now updates navigation icon docblocks automatically while refactoring `form`, `infolist`, and `table` signatures, making repeated schema migrations safe for the entire Filament tree.
 - The `data:import` Artisan command now documents its signature and description directly on the command class, improving discoverability via `php artisan list`.
 - Legacy diagnostics artisan commands were retired in favour of PHPUnit suites guarded by a configurable coverage extension and Paratest-aware composer scripts, making quality checks part of every test run.

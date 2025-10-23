@@ -9,6 +9,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use RuntimeException;
@@ -67,10 +68,16 @@ final class BackupPrepareCommand extends Command
             /** @var array<string, mixed> $databaseConfig */
             $databaseConfig = $databaseConfig;
 
-            [
-                'path'   => $databasePath,
-                'driver' => $databaseDriver,
-            ] = $this->dumpDatabase($connectionName, $databaseConfig, $backupPath);
+            if (($databaseConfig['driver'] ?? null) === 'sqlite') {
+                // Surface both the configured and active database paths for debugging.
+                logger()->info('backup.sqlite_connection', [
+                    'connection' => $connectionName,
+                    'configured' => $databaseConfig['database'] ?? null,
+                    'active'     => DB::connection($connectionName)->getDatabaseName(),
+                ]);
+            }
+
+            $databaseArtifact = $this->dumpDatabase($connectionName, $databaseConfig, $backupPath);
             $mediaArtifact = $this->archiveMedia($mediaPaths, $backupPath);
             $commitHash = $this->resolveCommitHash();
 
@@ -133,6 +140,8 @@ final class BackupPrepareCommand extends Command
             return self::SUCCESS;
         } catch (Throwable $exception) {
             $this->components->error($exception->getMessage());
+            // Record the exception so debugging backup failures in tests is straightforward.
+            logger()->error('backup.prepare_failed', ['exception' => $exception]);
             File::deleteDirectory($backupPath);
 
             return self::FAILURE;
@@ -203,7 +212,7 @@ final class BackupPrepareCommand extends Command
         }
 
         return match ($driver) {
-            'sqlite' => $this->dumpSqliteDatabase($config, $backupPath),
+            'sqlite' => $this->dumpSqliteDatabase($connection, $config, $backupPath),
             'mysql', 'mariadb' => $this->dumpMysqlDatabase($config, $backupPath),
             'pgsql' => $this->dumpPostgresDatabase($config, $backupPath),
             default => throw new RuntimeException("Dumping for driver [{$driver}] is not supported."),
@@ -214,7 +223,7 @@ final class BackupPrepareCommand extends Command
      * @param  array<string, mixed>                $config
      * @return array{path: string, driver: string}
      */
-    private function dumpSqliteDatabase(array $config, string $backupPath): array
+    private function dumpSqliteDatabase(string $connection, array $config, string $backupPath): array
     {
         $databasePath = $config['database'] ?? null;
 
@@ -222,12 +231,35 @@ final class BackupPrepareCommand extends Command
             throw new RuntimeException('SQLite database path is not configured.');
         }
 
-        if (! File::exists($databasePath)) {
-            throw new FileNotFoundException("SQLite database [{$databasePath}] not found.");
-        }
+        // Emit a breadcrumb so failing tests surface the evaluated database path.
+        logger()->info('backup.sqlite_source', [
+            'database' => $databasePath,
+            'exists'   => File::exists($databasePath),
+        ]);
+
+        clearstatcache(true, $databasePath);
 
         $targetPath = $backupPath . '/database.sqlite';
-        File::copy($databasePath, $targetPath);
+
+        if (! File::exists($databasePath)) {
+            try {
+                // Fallback to exporting the active connection via SQLite's VACUUM INTO command.
+                DB::connection($connection)->getPdo()->exec(sprintf(
+                    "VACUUM INTO '%s'",
+                    str_replace("'", "''", $targetPath)
+                ));
+
+                logger()->warning('backup.sqlite_vacuum_fallback', [
+                    'connection' => $connection,
+                    'source'     => $databasePath,
+                    'target'     => $targetPath,
+                ]);
+            } catch (Throwable $exception) {
+                throw new FileNotFoundException("SQLite database [{$databasePath}] not found.", previous: $exception);
+            }
+        } else {
+            File::copy($databasePath, $targetPath);
+        }
 
         return [
             'path'   => $targetPath,

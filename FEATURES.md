@@ -20,8 +20,9 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
-- Discount redemption management screens now respect their full status lifecycle after widening the shared status scope, ensuring Filament listings, filters, and widgets display pending through cancelled records for administrators.
-- Campaign click tracking screens now provide a configurable click timestamp, zero-default conversion values, and automatic fallbacks so operators can capture marketing signals without manual database edits.
+- Graceful filesystem shim now sits behind the global `files` binding, ensuring automated backup prepare/verify commands run when tests create fresh directories so scheduled backup coverage stops flaking.
+- Database index audit command suite runs against a dedicated SQLite database file, keeping duplicate-index detection isolated while preserving the cleanup assertions that power the console workflow.
+- Filament top navigation widget respects admin roles, permission requirements, and enum-defined ordering, aligning Livewire regression coverage with the expected navigation tree.
 - Brands page now features a light-themed layout, shared card components, and refreshed translations so the partner directory feels consistent across locales.
 - Product API endpoints now honour eager-loaded review aggregates so cached rating/count metrics stay in sync while
   trimming redundant queries from feature and regression suites.
