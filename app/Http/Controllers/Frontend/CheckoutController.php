@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Services\Cart\CartLifecycleService;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Stringable;
@@ -28,7 +30,6 @@ final class CheckoutController extends Controller
 {
     public function index(Request $request): View
     {
-        /** @var Collection<int, CartItem> $items */
         /** @var Collection<int, CartItem> $items */
         $items = $this->getCartItems($request);
 
@@ -41,14 +42,14 @@ final class CheckoutController extends Controller
     public function process(Request $request, CartLifecycleService $cartLifecycleService): RedirectResponse|JsonResponse
     {
         $throttleKey = $this->checkoutThrottleKey($request);
-        $maxAttempts = Config::get('checkout.rate_limit.attempts', 3);
-        if (! is_int($maxAttempts)) {
-            $maxAttempts = is_numeric($maxAttempts) ? (int) $maxAttempts : 3;
+        $maxAttempts = (int) (Config::get('checkout.rate_limit.attempts', 3) ?? 3);
+        if ($maxAttempts <= 0) {
+            $maxAttempts = 3;
         }
 
-        $decaySeconds = Config::get('checkout.rate_limit.decay_seconds', 60);
-        if (! is_int($decaySeconds)) {
-            $decaySeconds = is_numeric($decaySeconds) ? (int) $decaySeconds : 60;
+        $decaySeconds = (int) (Config::get('checkout.rate_limit.decay_seconds', 60) ?? 60);
+        if ($decaySeconds <= 0) {
+            $decaySeconds = 60;
         }
 
         if (RateLimiter::tooManyAttempts($throttleKey, $maxAttempts)) {
@@ -69,7 +70,6 @@ final class CheckoutController extends Controller
         $items = $this->getCartItems($request);
         if ($items->isEmpty()) {
             if ($request->expectsJson()) {
-                // Produce a structured error payload when the cart has no purchasable items.
                 return ApiErrorResponse::problem(
                     request: $request,
                     errorCode: ErrorCodes::CHECKOUT_CART_EMPTY,
@@ -79,91 +79,77 @@ final class CheckoutController extends Controller
                 );
             }
 
-            return redirect()->route('frontend.cart.index')->with('error', __('Your cart is empty.'));
+            return $this->respondError(
+                $request,
+                __('errors.messages.checkout_empty'),
+                422,
+                'frontend.cart.index'
+            );
         }
 
         $validated = $request->validate([
             'payment_method' => ['required', 'string', 'max:255'],
-            'confirm'        => ['accepted'],
+            'confirm'        => ['nullable', 'accepted'],
         ]);
 
-        $order = DB::transaction(function () use ($items, $request, $validated) {
-            $subtotal = (float) $items->sum(fn (CartItem $item) => $item->calculateSubtotal());
-            $breakdown = app(PriceCalculator::class)->breakdown($subtotal);
+        try {
+            $order = DB::transaction(function () use ($items, $request, $validated) {
+                $subtotal = (float) $items->sum(fn (CartItem $item) => $item->calculateSubtotal());
+                $breakdown = app(PriceCalculator::class)->breakdown($subtotal);
 
-            $order = Order::query()->create([
-                'number'            => Str::upper(Str::random(10)),
-                'user_id'           => $request->user()?->id,
-                'status'            => 'processing',
-                'subtotal'          => $breakdown->subtotal,
-                'tax_amount'        => $breakdown->tax,
-                'shipping_amount'   => $breakdown->shipping,
-                'discount_amount'   => $breakdown->discount,
-                'total'             => $breakdown->total,
-                'currency'          => $breakdown->currency,
-                'billing_address'   => [],
-                'shipping_address'  => [],
-                'payment_status'    => 'paid',
-                'payment_method'    => $validated['payment_method'],
-                'payment_reference' => (string) Str::uuid(),
-            ]);
-
-            foreach ($items as $item) {
-                OrderItem::query()->create([
-                    'order_id'           => $order->getKey(),
-                    'product_id'         => $item->product_id,
-                    'product_variant_id' => $item->product_variant_id,
-                    'name'               => $item->product_snapshot['name'] ?? $item->product?->name,
-                    'sku'                => $item->product_snapshot['sku'] ?? $item->product?->sku,
-                    'quantity'           => $item->quantity,
-                    'unit_price'         => (float) $item->price,
-                    'price'              => (float) $item->price,
-                    'total'              => $item->calculateSubtotal(),
-                    'notes'              => $item->notes,
+                /** @var Order $order */
+                $order = Order::query()->create([
+                    'number'            => Str::upper(Str::random(10)),
+                    'user_id'           => $request->user()?->id,
+                    'status'            => 'processing',
+                    'subtotal'          => $breakdown->subtotal,
+                    'tax_amount'        => $breakdown->tax,
+                    'shipping_amount'   => $breakdown->shipping,
+                    'discount_amount'   => $breakdown->discount,
+                    'total'             => $breakdown->total,
+                    'currency'          => $breakdown->currency,
+                    'billing_address'   => [],
+                    'shipping_address'  => [],
+                    'payment_status'    => 'paid',
+                    'payment_method'    => $validated['payment_method'],
+                    'payment_reference' => (string) Str::uuid(),
                 ]);
-            }
+
+                foreach ($items as $item) {
+                    $snapshot = $item->product_snapshot ?? [];
+                    $product = $item->product;
 
                     OrderItem::query()->create([
-                        'order_id' => $order->getKey(),
-                        'product_id' => $item->product_id,
-                        'product_variant_id' => $item->product_variant_id,
-                        'name' => $snapshot['name'] ?? $product?->name,
-                        'sku' => $snapshot['sku'] ?? $product?->sku,
-                        'quantity' => $item->quantity,
-                        'unit_price' => (float) $item->price,
-                        'price' => (float) $item->price,
-                        'total' => $item->calculateSubtotal(),
-                        'notes' => $item->notes,
+                        'order_id'           => $order->getKey(),
+                        'product_id'         => $item->product_id,
+                        'product_variant_id' => $item->product_variant_id ?? $item->variant_id,
+                        'name'               => $snapshot['name'] ?? $product?->name,
+                        'sku'                => $snapshot['sku'] ?? $product?->sku,
+                        'quantity'           => $item->quantity,
+                        'unit_price'         => (float) ($item->price ?? $item->unit_price ?? 0),
+                        'price'              => (float) ($item->price ?? $item->unit_price ?? 0),
+                        'total'              => $item->calculateSubtotal(),
+                        'notes'              => $item->notes,
                     ]);
+                }
+
+                return $order;
+            });
+        } catch (Throwable $exception) {
+            Log::error('Failed to process checkout.', [
+                'user_id'   => $request->user()?->getAuthIdentifier(),
+                'session'   => $request->session()->getId(),
+                'exception' => $exception,
+            ]);
+
+            return $this->respondError($request, __('ecommerce.payment_failed'), 500);
+        }
 
         $cartLifecycleService->clearAfterCheckout(
             $request->user()?->id,
             $request->session()->getId(),
             $order->payment_status ?? null
         );
-
-        $request->session()->put('checkout.last_order_id', $order->getKey());
-
-        if ($request->expectsJson()) {
-            // Return a compact success document for API clients that initiate checkout via AJAX.
-            return response()->json([
-                'success' => true,
-                'message' => __('Order placed successfully.'),
-                'order'   => [
-                    'id'       => $order->getKey(),
-                    'number'   => $order->number,
-                    'status'   => $order->status,
-                    'total'    => (float) $order->total,
-                    'currency' => $order->currency,
-                ],
-            ], 201);
-        }
-
-        return redirect()->route('frontend.checkout.success')->with('status', __('Order placed successfully.'));
-    }
-
-            return $this->respondError($request, __('ecommerce.payment_failed'), 500);
-        }
 
         RateLimiter::clear($throttleKey);
 
@@ -172,20 +158,25 @@ final class CheckoutController extends Controller
         Session::forget('applied_coupon');
         Session::put('checkout_order_id', $order->getKey());
 
+        $request->session()->put('checkout.last_order_id', $order->getKey());
+
         if ($request->wantsJson()) {
             return response()->json([
                 'success' => true,
                 'message' => __('ecommerce.order_placed_successfully'),
                 'order_id' => $order->getKey(),
-            ]);
+            ], 201);
         }
 
         return redirect()->route('frontend.checkout.success')->with('status', __('ecommerce.order_placed_successfully'));
     }
 
-    public function success(): View
+    public function success(Request $request): View
     {
         $orderId = Session::get('checkout_order_id');
+        if ($orderId === null) {
+            abort(404);
+        }
 
         /** @var Order $order */
         $order = Order::withoutGlobalScopes()->with('items')->findOrFail($orderId);

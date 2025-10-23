@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use BackedEnum;
-use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Filament\Resources\CategoryResource\RelationManagers\ChildrenRelationManager;
@@ -17,6 +14,8 @@ use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\VisibleScope;
 use App\Support\Authorization\AuthorizationMatrix;
+use App\Support\Concerns\HasNav;
+use BackedEnum;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Schemas\Components\Grid as SchemaGrid;
@@ -29,6 +28,7 @@ use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -47,10 +47,11 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
-use UnitEnum;
 
 final class CategoryResource extends Resource
 {
+    use HasNav;
+
     /** Aligns the navigation icon with Filament's expectations. */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 

@@ -108,27 +108,17 @@ final class ApiServiceProvider extends ServiceProvider
     {
         $config = (array) config('security.rate_limiting.api.read', []);
 
-        if (is_int($definitions)) {
-            return [Limit::perMinute(max(1, $definitions))->by($key)];
-        }
+        return $this->normalizeRateLimitConfig($config, $this->defaultRateLimitConfig());
+    }
 
-        if (! is_array($definitions) || $definitions === []) {
-            $default = (int) ($fallback ?? config('security.rate_limiting.defaults.minute', 60));
+    /**
+     * @return array{per_user:int|null,per_ip:int|null}
+     */
+    private function writeRateLimitConfig(): array
+    {
+        $config = (array) config('security.rate_limiting.api.write', []);
 
-            // Fall back to the global default minute window when the dedicated configuration is missing.
-            return [Limit::perMinute(max(1, $default))->by($key)];
-        }
-
-        $limits = $this->resolveLimit($definitions, $key);
-
-        if ($limits === []) {
-            $default = (int) ($fallback ?? config('security.rate_limiting.defaults.minute', 60));
-
-            // Reuse the default limit whenever none of the configured scopes produced a valid limiter.
-            return [Limit::perMinute(max(1, $default))->by($key)];
-        }
-
-        return $limits;
+        return $this->normalizeRateLimitConfig($config, $this->defaultRateLimitConfig());
     }
 
     /**
@@ -157,9 +147,83 @@ final class ApiServiceProvider extends ServiceProvider
      */
     private function normalizeLimit(int|string $scope, mixed $value, string $key): ?Limit
     {
-        $config = (array) config('security.rate_limiting.api.write', []);
+        if (is_array($value)) {
+            $maxAttempts = $this->normalizeLimitValue(
+                $value['max_attempts'] ?? $value['limit'] ?? $value['attempts'] ?? null,
+                null,
+            );
 
-        return $this->normalizeRateLimitConfig($config, $this->defaultRateLimitConfig());
+            if ($maxAttempts === null) {
+                return null;
+            }
+
+            $decaySeconds = null;
+
+            foreach (['decay_seconds' => 1, 'decay' => 1] as $field => $multiplier) {
+                if (array_key_exists($field, $value) && is_numeric($value[$field])) {
+                    $seconds = (int) $value[$field] * $multiplier;
+                    if ($seconds > 0) {
+                        $decaySeconds = $seconds;
+                        break;
+                    }
+                }
+            }
+
+            if ($decaySeconds === null && array_key_exists('decay_minutes', $value) && is_numeric($value['decay_minutes'])) {
+                $minutes = (int) $value['decay_minutes'];
+                if ($minutes > 0) {
+                    $decaySeconds = $minutes * 60;
+                }
+            }
+
+            if ($decaySeconds === null && array_key_exists('decay_hours', $value) && is_numeric($value['decay_hours'])) {
+                $hours = (int) $value['decay_hours'];
+                if ($hours > 0) {
+                    $decaySeconds = $hours * 3600;
+                }
+            }
+
+            if ($decaySeconds === null && array_key_exists('decay_days', $value) && is_numeric($value['decay_days'])) {
+                $days = (int) $value['decay_days'];
+                if ($days > 0) {
+                    $decaySeconds = $days * 86400;
+                }
+            }
+
+            if ($decaySeconds !== null) {
+                return Limit::perSecond($maxAttempts, $decaySeconds)->by($key);
+            }
+
+            $value = $maxAttempts;
+        }
+
+        $maxAttempts = $this->normalizeLimitValue($value, null);
+
+        if ($maxAttempts === null) {
+            return null;
+        }
+
+        $scopeName = is_string($scope) ? strtolower(trim($scope)) : 'minute';
+        $window = 1;
+
+        if (str_contains($scopeName, ':')) {
+            [$scopeName, $windowSegment] = explode(':', $scopeName, 2);
+            $windowCandidate = trim($windowSegment);
+
+            if ($windowCandidate !== '' && is_numeric($windowCandidate)) {
+                $window = max(1, (int) $windowCandidate);
+            }
+        }
+
+        return match ($scopeName) {
+            'second', 'seconds', 'per_second', 'per-second' => Limit::perSecond($maxAttempts, $window)->by($key),
+            'minute', 'minutes', 'per_minute', 'per-minute' => Limit::perMinutes($window, $maxAttempts)->by($key),
+            'hour', 'hours', 'per_hour', 'per-hour' => Limit::perHour($maxAttempts, $window)->by($key),
+            'day', 'days', 'per_day', 'per-day' => Limit::perDay($maxAttempts, $window)->by($key),
+            'none', 'unlimited' => Limit::none()->by($key),
+            default => null,
+        };
+
     }
 
     /**

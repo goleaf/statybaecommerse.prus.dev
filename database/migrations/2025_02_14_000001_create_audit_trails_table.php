@@ -10,6 +10,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('audit_trails')) {
+            return;
+        }
+
         Schema::create('audit_trails', function (Blueprint $table): void {
             $table->id();
             $table->morphs('auditable');
@@ -23,13 +27,15 @@ return new class extends Migration
             $table->index('event');
             $table->index('created_at');
             $table->index('request_id');
-            $table->index(['auditable_type', 'auditable_id']);
-            $table->index(['actor_type', 'actor_id']);
         });
     }
 
     public function down(): void
     {
+        if (! Schema::hasTable('audit_trails')) {
+            return;
+        }
+
         Schema::dropIfExists('audit_trails');
     }
 };

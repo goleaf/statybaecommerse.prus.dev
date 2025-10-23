@@ -8,6 +8,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -106,17 +107,22 @@ final class TestingDatabase
         Config::set('database.default', 'sqlite');
         Config::set('database.connections.sqlite.database', $databasePath);
         Config::set('database.connections.sqlite.foreign_key_constraints', true);
+        // Disable custom journal modes so Laravel skips the PRAGMA toggle that can
+        // lock the SQLite database when migrations run in quick succession.
+        Config::set('database.connections.sqlite.journal_mode', null);
         Config::set('database.connections.sqlite.prefix', '');
         Config::set('database.connections.testing', [
             'driver'                  => 'sqlite',
             'database'                => $databasePath,
             'prefix'                  => '',
             'foreign_key_constraints' => true,
+            'journal_mode'            => null,
         ]);
 
         $app['config']->set('database.default', 'sqlite');
         $app['config']->set('database.connections.sqlite.database', $databasePath);
         $app['config']->set('database.connections.sqlite.foreign_key_constraints', true);
+        $app['config']->set('database.connections.sqlite.journal_mode', null);
 
         self::registerTeardownHook();
     }
@@ -130,6 +136,12 @@ final class TestingDatabase
         if (self::$migrationsRan) {
             return;
         }
+
+        $databasePath = self::path();
+        DB::purge('sqlite');
+        DB::disconnect('sqlite');
+        self::deleteSQLiteArtifacts($databasePath);
+        self::ensureExists();
 
         // Force-enable foreign key constraints so pivot relationships behave the
         // same way they do in production databases.
@@ -159,8 +171,8 @@ final class TestingDatabase
      */
     public static function teardown(): void
     {
-        if (self::$databasePath !== null && file_exists(self::$databasePath)) {
-            unlink(self::$databasePath);
+        if (self::$databasePath !== null) {
+            self::deleteSQLiteArtifacts(self::$databasePath);
         }
 
         self::$databasePath = null;
@@ -189,5 +201,23 @@ final class TestingDatabase
         });
 
         self::$teardownRegistered = true;
+    }
+
+    /**
+     * Remove the SQLite database file and any leftover journal artifacts so fresh
+     * test runs start from a consistent state.
+     */
+    private static function deleteSQLiteArtifacts(string $databasePath): void
+    {
+        foreach ([
+            $databasePath,
+            $databasePath . '-journal',
+            $databasePath . '-shm',
+            $databasePath . '-wal',
+        ] as $path) {
+            if ($path !== '' && is_file($path)) {
+                @unlink($path);
+            }
+        }
     }
 }

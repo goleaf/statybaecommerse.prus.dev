@@ -14,7 +14,7 @@ beforeEach(function (): void {
     $this->user = User::factory()->create();
 });
 
-it('can create autocomplete select component', function (): void {
+it('renders autocomplete select component', function (): void {
     $component = AutocompleteSelect::make('test_field');
 
     expect($component)->toBeInstanceOf(AutocompleteSelect::class);

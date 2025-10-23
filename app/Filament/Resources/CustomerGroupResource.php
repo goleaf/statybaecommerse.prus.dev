@@ -4,36 +4,33 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\CustomerGroupResource\Pages;
 use App\Models\CustomerGroup;
-use Filament\Actions\Action as TableAction; // Filament v4 exposes the table view action through the global actions namespace.
-use Filament\Actions\BulkAction as TableBulkAction;
-use Filament\Actions\BulkActionGroup as TableBulkActionGroup;
-use Filament\Actions\DeleteBulkAction as TableDeleteBulkAction;
-use Filament\Actions\EditAction as TableEditAction;
-use Filament\Actions\ViewAction as TableViewAction;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Notifications\Notification;
-use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
+use Illuminate\Validation\Rule;
 
 final class CustomerGroupResource extends Resource
 {
-    use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
-
     protected static ?string $model = CustomerGroup::class;
 
     /**
@@ -43,29 +40,25 @@ final class CustomerGroupResource extends Resource
 
     public static function getNavigationGroup(): \UnitEnum|string|null
     {
-        return self::$navigationGroup ?? __('navigation.groups.customers');
+        return self::$navigationGroup ?? __('customer_groups.navigation_group');
     }
 
-    /**
-     * Handle getPluralModelLabel functionality with proper error handling.
-     */
+    public static function getNavigationLabel(): string
+    {
+        return __('customer_groups.navigation_label');
+    }
+
     public static function getPluralModelLabel(): string
     {
-        return __('customer_groups.plural');
+        return __('customer_groups.navigation_label');
     }
 
-    /**
-     * Handle getModelLabel functionality with proper error handling.
-     */
     public static function getModelLabel(): string
     {
-        return __('customer_groups.single');
+        return __('customer_groups.navigation_label');
     }
 
-    /**
-     * Configure the Filament form schema with fields and validation.
-     */
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             SchemaSection::make(__('customer_groups.basic_information'))
@@ -82,102 +75,10 @@ final class CustomerGroupResource extends Resource
                                 ->unique(ignoreRecord: true)
                                 ->rules(['alpha_dash']),
                         ]),
-                    SchemaGrid::make(2)
-                        ->schema([
-                            ColorPicker::make('color')
-                                ->label(__('customer_groups.color'))
-                                ->nullable(),
-                            TextInput::make('icon')
-                                ->label(__('customer_groups.icon'))
-                                ->maxLength(64)
-                                ->datalist([
-                                    'users',
-                                    'star',
-                                    'crown',
-                                    'sparkles',
-                                    'building-storefront',
-                                ]),
-                        ]),
                     Textarea::make('description')
                         ->label(__('customer_groups.description'))
                         ->rows(3)
-                        ->maxLength(500)
                         ->columnSpanFull(),
-                ]),
-            SchemaSection::make(__('customer_groups.pricing_settings'))
-                ->schema([
-                    SchemaGrid::make(2)
-                        ->schema([
-                            TextInput::make('discount_percentage')
-                                ->label(__('customer_groups.discount_percentage'))
-                                ->numeric()
-                                ->step(0.01)
-                                ->minValue(0)
-                                ->maxValue(100)
-                                ->suffix('%')
-                                ->helperText(__('customer_groups.discount_percentage_help')),
-                            TextInput::make('discount_fixed')
-                                ->label(__('customer_groups.discount_fixed'))
-                                ->numeric()
-                                ->minValue(0)
-                                ->prefix('€')
-                                ->numeric()
-                                ->default(0)
-                                ->helperText(__('customer_groups.discount_fixed_help')),
-                        ]),
-                    SchemaGrid::make(2)
-                        ->schema([
-                            TextInput::make('minimum_order_amount')
-                                ->label(__('customer_groups.minimum_order_amount'))
-                                ->numeric()
-                                ->step(0.01)
-                                ->minValue(0)
-                                ->prefix('€'),
-                            TextInput::make('credit_limit')
-                                ->label(__('customer_groups.credit_limit'))
-                                ->numeric()
-                                ->step(0.01)
-                                ->minValue(0)
-                                ->prefix('€'),
-                        ]),
-                    SchemaGrid::make(2)
-                        ->schema([
-                            Toggle::make('has_special_pricing')
-                                ->label(__('customer_groups.has_special_pricing'))
-                                ->default(false),
-                            Toggle::make('has_volume_discounts')
-                                ->label(__('customer_groups.has_volume_discounts'))
-                                ->default(false),
-                        ]),
-                    Select::make('payment_terms')
-                        ->label(__('customer_groups.payment_terms'))
-                        ->options([
-                            'due_on_receipt' => __('customer_groups.payment_terms_due_on_receipt'),
-                            'net_15'         => __('customer_groups.payment_terms_net_15'),
-                            'net_30'         => __('customer_groups.payment_terms_net_30'),
-                            'net_45'         => __('customer_groups.payment_terms_net_45'),
-                            'net_60'         => __('customer_groups.payment_terms_net_60'),
-                        ])
-                        ->default('net_30')
-                        ->rules([Rule::in(['due_on_receipt', 'net_15', 'net_30', 'net_45', 'net_60'])]),
-                ]),
-            SchemaSection::make(__('customer_groups.permissions'))
-                ->schema([
-                    SchemaGrid::make(2)
-                        ->schema([
-                            Toggle::make('can_view_prices')
-                                ->label(__('customer_groups.can_view_prices'))
-                                ->default(true),
-                            Toggle::make('can_place_orders')
-                                ->label(__('customer_groups.can_place_orders'))
-                                ->default(true),
-                            Toggle::make('can_view_catalog')
-                                ->label(__('customer_groups.can_view_catalog'))
-                                ->default(true),
-                            Toggle::make('can_use_coupons')
-                                ->label(__('customer_groups.can_use_coupons'))
-                                ->default(true),
-                        ]),
                 ]),
             SchemaSection::make(__('customer_groups.settings'))
                 ->schema([
@@ -192,241 +93,103 @@ final class CustomerGroupResource extends Resource
                         ]),
                     SchemaGrid::make(2)
                         ->schema([
-                            TextInput::make('sort_order')
-                                ->label(__('customer_groups.sort_order'))
-                                ->numeric()
-                                ->default(0)
-                                ->minValue(0),
                             Select::make('type')
                                 ->label(__('customer_groups.type'))
                                 ->options([
-                                    'regular'   => __('customer_groups.types.regular'),
-                                    'vip'       => __('customer_groups.types.vip'),
-                                    'wholesale' => __('customer_groups.types.wholesale'),
-                                    'retail'    => __('customer_groups.types.retail'),
-                                    'corporate' => __('customer_groups.types.corporate'),
+                                    'regular'   => 'Regular',
+                                    'vip'       => 'VIP',
+                                    'wholesale' => 'Wholesale',
+                                    'retail'    => 'Retail',
+                                    'corporate' => 'Corporate',
                                 ])
-                                ->default('regular'),
+                                ->nullable()
+                                ->rules([Rule::in(['regular', 'vip', 'wholesale', 'retail', 'corporate'])]),
+                            TextInput::make('sort_order')
+                                ->label(__('customer_groups.sort_order'))
+                                ->numeric()
+                                ->default(0),
                         ]),
                 ]),
         ]);
     }
 
-    /**
-     * Configure the Filament table with columns, filters, and actions.
-     */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
-        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label(__('customer_groups.name'))
+                    ->label(__('customer_groups.table_name'))
                     ->searchable()
-                    ->sortable()
-                    ->weight('bold'),
+                    ->sortable(),
                 TextColumn::make('code')
                     ->label(__('customer_groups.code'))
-                    ->copyable()
-                    ->badge()
-                    ->color('gray'),
-                ColorColumn::make('color')
-                    ->label(__('customer_groups.color'))
-                    ->copyable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('icon')
-                    ->label(__('customer_groups.icon'))
-                    ->badge()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('type')
-                    ->label(__('customer_groups.type'))
-                    ->formatStateUsing(fn (string $state): string => __("customer_groups.types.{$state}"))
-                    ->color(fn (string $state): string => match ($state) {
-                        'regular'   => 'blue',
-                        'vip'       => 'gold',
-                        'wholesale' => 'green',
-                        'retail'    => 'purple',
-                        'corporate' => 'orange',
-                        default     => 'gray',
-                    }),
-                TextColumn::make('discount_percentage')
-                    ->label(__('customer_groups.discount_percentage'))
-                    ->numeric()
-                    ->formatStateUsing(fn ($state): string => $state ? $state . '%' : '-')
-                    ->alignCenter()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('discount_fixed')
-                    ->label(__('customer_groups.discount_fixed'))
-                    ->money('EUR'),
-                TextColumn::make('minimum_order_amount')
-                    ->label(__('customer_groups.minimum_order_amount'))
-                    ->money('EUR')
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('credit_limit')
-                    ->label(__('customer_groups.credit_limit'))
-                    ->money('EUR')
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('payment_terms')
-                    ->label(__('customer_groups.payment_terms'))
-                    ->badge()
-                    ->formatStateUsing(fn (?string $state): string => match ($state) {
-                        'due_on_receipt' => __('customer_groups.payment_terms_due_on_receipt'),
-                        'net_15'         => __('customer_groups.payment_terms_net_15'),
-                        'net_30'         => __('customer_groups.payment_terms_net_30'),
-                        'net_45'         => __('customer_groups.payment_terms_net_45'),
-                        'net_60'         => __('customer_groups.payment_terms_net_60'),
-                        default          => '-'
-                    })
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('customers_count')
-                    ->label(__('customer_groups.customers_count'))
-                    ->counts('customers')
-                    ->alignCenter(),
-                IconColumn::make('has_special_pricing')
-                    ->label(__('customer_groups.has_special_pricing'))
-                    ->boolean(),
-                IconColumn::make('has_volume_discounts')
-                    ->label(__('customer_groups.has_volume_discounts'))
-                    ->boolean(),
-                IconColumn::make('can_view_prices')
-                    ->label(__('customer_groups.can_view_prices'))
-                    ->boolean(),
-                IconColumn::make('can_place_orders')
-                    ->label(__('customer_groups.can_place_orders'))
-                    ->boolean(),
+                    ->sortable(),
                 IconColumn::make('is_active')
                     ->label(__('customer_groups.is_active'))
-                    ->boolean()
-                    ->sortable(),
+                    ->boolean(),
                 IconColumn::make('is_default')
                     ->label(__('customer_groups.is_default'))
                     ->boolean(),
-                TextColumn::make('sort_order')
-                    ->label(__('customer_groups.sort_order'))
-                    ->numeric(),
-                TextColumn::make('created_at')
-                    ->label(__('customer_groups.created_at'))
-                    ->dateTime(),
-                TextColumn::make('updated_at')
-                    ->label(__('customer_groups.updated_at'))
-                    ->dateTime(),
             ])
             ->filters([
-                SelectFilter::make('type')
-                    ->options([
-                        'regular'   => __('customer_groups.types.regular'),
-                        'vip'       => __('customer_groups.types.vip'),
-                        'wholesale' => __('customer_groups.types.wholesale'),
-                        'retail'    => __('customer_groups.types.retail'),
-                        'corporate' => __('customer_groups.types.corporate'),
-                    ]),
                 SelectFilter::make('is_active')
                     ->label(__('customer_groups.is_active'))
                     ->options([
-                        1 => __('customer_groups.active_only'),
-                        0 => __('customer_groups.inactive_only'),
+                        1 => __('customer_groups.enabled_only'),
+                        0 => __('customer_groups.disabled_only'),
                     ])
-                    ->query(function (Builder $query, $value) {
-                        // Normalise truthy values coming from Livewire during table filtering.
-                        return $query->when($value !== null, function (Builder $innerQuery) use ($value) {
-                            $state = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? (bool) $value;
+                    ->query(function (Builder $query, $value): Builder {
+                        return $query->when($value !== null, function (Builder $innerQuery) use ($value): Builder {
+                            $state = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
+                            if ($state === null) {
+                                $state = (bool) $value;
+                            }
 
                             return $innerQuery->where('is_active', $state);
                         });
                     }),
-                SelectFilter::make('is_default')
-                    ->label(__('customer_groups.is_default'))
-                    ->options([
-                        1 => __('customer_groups.default_only'),
-                        0 => __('customer_groups.non_default_only'),
-                    ])
-                    ->query(function (Builder $query, $value) {
-                        return $query->when($value !== null, function (Builder $innerQuery) use ($value) {
-                            $state = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? (bool) $value;
-
-                            return $innerQuery->where('is_default', $state);
-                        });
-                    }),
-                SelectFilter::make('has_special_pricing')
-                    ->label(__('customer_groups.has_special_pricing'))
-                    ->options([
-                        1 => __('customer_groups.special_pricing_only'),
-                        0 => __('customer_groups.no_special_pricing'),
-                    ])
-                    ->query(function (Builder $query, $value) {
-                        return $query->when($value !== null, function (Builder $innerQuery) use ($value) {
-                            $state = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? (bool) $value;
-
-                            return $innerQuery->where('has_special_pricing', $state);
-                        });
-                    }),
-                SelectFilter::make('has_volume_discounts')
-                    ->label(__('customer_groups.has_volume_discounts'))
-                    ->options([
-                        1 => __('customer_groups.volume_discounts_only'),
-                        0 => __('customer_groups.no_volume_discounts'),
-                    ])
-                    ->query(function (Builder $query, $value) {
-                        return $query->when($value !== null, function (Builder $innerQuery) use ($value) {
-                            $state = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? (bool) $value;
-
-                            return $innerQuery->where('has_volume_discounts', $state);
-                        });
-                    }),
             ])
             ->actions([
-                TableViewAction::make(),
-                TableEditAction::make(),
-                TableAction::make('toggle_active')
+                ViewAction::make(),
+                EditAction::make(),
+                Action::make('toggle_active')
                     ->label(fn (CustomerGroup $record): string => $record->is_active ? __('customer_groups.deactivate') : __('customer_groups.activate'))
                     ->icon(fn (CustomerGroup $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                     ->color(fn (CustomerGroup $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (CustomerGroup $record): void {
                         $record->update(['is_active' => ! $record->is_active]);
+
                         Notification::make()
                             ->title($record->is_active ? __('customer_groups.activated_successfully') : __('customer_groups.deactivated_successfully'))
                             ->success()
                             ->send();
                     })
                     ->requiresConfirmation(),
-                TableAction::make('set_default')
-                    ->label(__('customer_groups.set_default'))
-                    ->icon('heroicon-o-star')
-                    ->color('warning')
-                    ->visible(fn (CustomerGroup $record): bool => ! $record->is_default)
-                    ->action(function (CustomerGroup $record): void {
-                        // Remove default from other customer groups
-                        CustomerGroup::where('is_default', true)->update(['is_default' => false]);
-                        // Set this customer group as default
-                        $record->update(['is_default' => true]);
-                        Notification::make()
-                            ->title(__('customer_groups.set_as_default_successfully'))
-                            ->success()
-                            ->send();
-                    })
-                    ->requiresConfirmation(),
             ])
             ->bulkActions([
-                TableBulkActionGroup::make([
-                    TableDeleteBulkAction::make(),
-                    TableBulkAction::make('activate')
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    BulkAction::make('activate')
                         ->label(__('customer_groups.activate_selected'))
                         ->icon('heroicon-o-eye')
                         ->color('success')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => true]);
+
                             Notification::make()
                                 ->title(__('customer_groups.bulk_activated_success'))
                                 ->success()
                                 ->send();
                         })
                         ->requiresConfirmation(),
-                    TableBulkAction::make('deactivate')
+                    BulkAction::make('deactivate')
                         ->label(__('customer_groups.deactivate_selected'))
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
                         ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => false]);
+
                             Notification::make()
                                 ->title(__('customer_groups.bulk_deactivated_success'))
                                 ->success()
@@ -434,23 +197,14 @@ final class CustomerGroupResource extends Resource
                         })
                         ->requiresConfirmation(),
                 ]),
-            ])
-            ->defaultSort('sort_order');
+            ]);
     }
 
-    /**
-     * Get the relations for this resource.
-     */
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
-    /**
-     * Get the pages for this resource.
-     */
     public static function getPages(): array
     {
         return [
