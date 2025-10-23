@@ -153,7 +153,11 @@ final class UserResource extends Resource implements DefinesExportColumns
                             ->required(fn (string $context): bool => $context === 'create')
                             ->minLength(8)
                             ->dehydrated(fn (?string $state): bool => filled($state))
-                            ->dehydrateStateUsing(fn (string $state): string => Hash::make($state)),
+                            ->dehydrateStateUsing(
+                                fn (?string $state): ?string => filled($state)
+                                    ? Hash::make($state)
+                                    : null,
+                            ),
                         Select::make('locale')
                             ->label(__('users.fields.locale'))
                             ->options([
