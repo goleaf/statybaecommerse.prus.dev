@@ -15,6 +15,8 @@ use App\Models\SystemSetting;
 use App\Observers\UserAttributionObserver;
 use App\Services\DocumentService;
 use App\Support\Health\HealthReporter;
+use App\Support\Tracing\Trace;
+use App\Support\Tracing\TraceContext;
 use App\View\Creators\CartDataCreator;
 use App\View\Creators\GlobalDataCreator;
 use App\View\Creators\LocalizationCreator;
@@ -35,12 +37,8 @@ use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\LazyCollection;
@@ -86,6 +84,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->registerModelObservers();
+
+        $this->registerQueueTracing();
 
         // Register Livewire components
         Livewire::component('live-notification-feed', LiveNotificationFeed::class);
@@ -330,6 +330,54 @@ class AppServiceProvider extends ServiceProvider
                 // ignore macro registration failures
             }
         }
+    }
+
+    private function registerQueueTracing(): void
+    {
+        Queue::createPayloadUsing(function ($connection, $queue, array $payload): array {
+            $context = Trace::current();
+
+            return [
+                'trace' => [
+                    'trace_id' => $context->traceId(),
+                    'parent_span_id' => $context->spanId(),
+                    'correlation_id' => $context->correlationId(),
+                    'trace_flags' => $context->traceFlags(),
+                ],
+            ];
+        });
+
+        Queue::before(function (JobProcessing $event): void {
+            $payload = $event->job->payload();
+            $trace = $payload['trace'] ?? null;
+
+            if (\is_array($trace)) {
+                Trace::store(TraceContext::generate(
+                    traceId: (string) ($trace['trace_id'] ?? ''),
+                    parentSpanId: (string) ($trace['parent_span_id'] ?? ''),
+                    correlationId: (string) ($trace['correlation_id'] ?? ''),
+                    traceFlags: (string) ($trace['trace_flags'] ?? TraceContext::DEFAULT_TRACE_FLAGS),
+                ));
+            } else {
+                Trace::store(TraceContext::generate());
+            }
+        });
+
+        $cleanup = static function (): void {
+            Trace::forget();
+        };
+
+        Queue::after(function (JobProcessed $event) use ($cleanup): void {
+            $cleanup();
+        });
+
+        Queue::exceptionOccurred(function (JobExceptionOccurred $event) use ($cleanup): void {
+            $cleanup();
+        });
+
+        Queue::failing(function (JobFailed $event) use ($cleanup): void {
+            $cleanup();
+        });
     }
 
     private function registerModelObservers(): void
