@@ -10,6 +10,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Introduced operator-aware system setting dependencies with explicit condition values, refreshed Filament forms, and resilient evaluation helpers for richer admin automation.
 
 ### Maintenance
+* Fixed the custom Filament edit profile page to import the correct Schema class, eliminating fatal compatibility errors during automated tests.
 * Normalized Filament navigation icons and groups across pages, resources, relation managers, and widgets to use the BackedEnum-/UnitEnum-aware union types required by Filament v4 so composer installs no longer crash on PHP 8.3.
 * Captured the Oct 21–22, 2025 pull request triage results in `docs/analysis/CURRENT_SYSTEM_STATUS.md`, outlining merge-ready Husky and feature flag fixes, superseded Filament cleanups to close, and outstanding follow-up work so maintainers can act without revisiting GitHub filters.
 * Captured a repository-wide analysis summary that enumerates the 24 open pull requests, clustering the Filament Schema migrations, Husky shim fixes, and layered rate-limiting work so reviewers can triage without scraping the GitHub UI.
