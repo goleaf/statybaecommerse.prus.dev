@@ -25,10 +25,10 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
-use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\URL;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use pxlrbt\FilamentExcel\FilamentExport;
-use function class_exists;
+use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
 
 final class AdminPanelProvider extends PanelProvider
 {
@@ -145,9 +145,15 @@ final class AdminPanelProvider extends PanelProvider
             )
             ->when(app()->environment('testing'),
                 fn (Panel $p) => $p->plugins([]),
-                fn (Panel $p) => $p->plugins([
+                fn (Panel $p) => $p->plugins(array_values(array_filter([
                     FilamentShieldPlugin::make(),
-                    $this->makeFullCalendarPlugin(),
+                    class_exists(FilamentFullCalendarPlugin::class)
+                        ? FilamentFullCalendarPlugin::make()
+                            ->selectable(true)
+                            ->editable(true)
+                            ->timezone('Europe/Vilnius')
+                            ->locale('lt')
+                        : null,
                     TableLayoutTogglePlugin::make()
                         ->setDefaultLayout('grid')
                         ->persistLayoutUsing(
@@ -165,7 +171,7 @@ final class AdminPanelProvider extends PanelProvider
                         ->persist(),
                     FilamentNordThemePlugin::make(),
                     ResizedColumnPlugin::make()->preserveOnDB(),
-                ]))
+                ], static fn ($plugin) => $plugin !== null))))
             // Enable the custom Filament theme so third-party plugin views (like the searchable input)
             // are compiled with Tailwind during the build step.
             ->viteTheme('resources/css/filament/admin/theme.scss')
