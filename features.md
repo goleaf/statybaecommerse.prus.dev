@@ -25,6 +25,7 @@
   longer collide with unique keys during regression tests.
 
 ## Discounts & promotions
+- Discount management resource now includes a fully validated Filament schema with slug automation, duplicate helpers, and activation/deactivation bulk actions so admins can curate inactive offers without disabling storefront visibility scopes.
 - Coupon migrations now provision maximum discount caps, per-user usage limits, and product/category scoping columns so factories, admin forms, and API tests share the same schema snapshot during refreshes.
 - Coupon application responses now round computed totals instead of calling `Number::parseFloat` on floats, keeping the discount API stable across PHP 8.3 test runs.
 
