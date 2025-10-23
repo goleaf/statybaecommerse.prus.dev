@@ -42,16 +42,6 @@ final class CartItem extends Model
      */
     protected $appends = ['formatted_total_price', 'formatted_unit_price', 'subtotal', 'product_name', 'product_sku'];
 
-    public function getProductNameAttribute(): ?string
-    {
-        return $this->product?->name;
-    }
-
-    public function getProductSkuAttribute(): ?string
-    {
-        return $this->product?->sku;
-    }
-
     /**
      * Handle user functionality with proper error handling.
      */

@@ -9,6 +9,7 @@ use App\Filament\Resources\CartItemResource\Pages;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Support\Filament\Components\Flatpickr;
 use App\Support\Search\ProductSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
@@ -35,12 +36,15 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
 
 final class CartItemResource extends Resource
 {
-    use HasNav;
+    /**
+     * Define the navigation icon in a docblock to keep compatibility with Filament's autoloading.
+     *
+     * @var string|\BackedEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static ?string $model = CartItem::class;
 
@@ -148,15 +152,18 @@ final class CartItemResource extends Resource
                     // The product name is derived from the related product, therefore we never dehydrate the value.
                     TextInput::make('product_name')
                         ->label(__('cart_items.product_name'))
-                        ->disabled()
-                        ->dehydrated(false),
+                        ->readOnly()
+                        ->dehydrated(false)
+                        ->maxLength(255),
+                    // The product SKU behaves like the name above and remains display-only.
                     TextInput::make('product_sku')
                         ->label(__('cart_items.product_sku'))
-                        ->disabled()
-                        ->dehydrated(false),
+                        ->readOnly()
+                        ->dehydrated(false)
+                        ->maxLength(255),
                     Grid::make(2)
-                        ->components([
-                            Quantity::make('quantity')
+                        ->schema([
+                            TextInput::make('quantity')
                                 ->label(__('cart_items.quantity'))
                                 ->minValue(1)
                                 ->steps(1)
@@ -218,7 +225,7 @@ final class CartItemResource extends Resource
                                 ->label(__('cart_items.total'))
                                 ->prefix('€')
                                 ->disabled()
-                                ->dehydrated(true),
+                                ->dehydrated(),
                         ]),
                 ]),
             Section::make(__('cart_items.additional_info'))
