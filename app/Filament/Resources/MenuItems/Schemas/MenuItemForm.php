@@ -8,27 +8,33 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 
 class MenuItemForm
 {
-    public static function configure(Schema $schema): Schema
+    public static function configure(Form $form): Form
     {
-        return $schema
-            ->components([
+        return $form
+            ->schema([
                 Select::make('menu_id')
                     ->relationship('menu', 'name')
-                    ->required(),
+                    ->required()
+                    ->searchable(),
                 Select::make('parent_id')
-                    ->relationship('parent', 'id'),
+                    ->relationship('parent', 'label')
+                    ->searchable(),
                 TextInput::make('label')
-                    ->required(),
+                    ->required()
+                    ->maxLength(255),
                 TextInput::make('url')
-                    ->url(),
-                TextInput::make('route_name'),
+                    ->url()
+                    ->maxLength(255),
+                TextInput::make('route_name')
+                    ->maxLength(255),
                 Textarea::make('route_params')
                     ->columnSpanFull(),
-                TextInput::make('icon'),
+                TextInput::make('icon')
+                    ->maxLength(100),
                 TextInput::make('sort_order')
                     ->required()
                     ->numeric()

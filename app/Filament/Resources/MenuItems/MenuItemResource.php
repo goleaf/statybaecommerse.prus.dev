@@ -13,7 +13,6 @@ use App\Filament\Resources\MenuItems\Tables\MenuItemsTable;
 use App\Models\MenuItem;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class MenuItemResource extends Resource
@@ -22,7 +21,7 @@ class MenuItemResource extends Resource
 
     protected static ?string $model = MenuItem::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     /**
      * Compose the shared form schema for creating and editing menu items.
