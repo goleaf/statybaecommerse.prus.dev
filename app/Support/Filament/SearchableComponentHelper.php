@@ -20,6 +20,16 @@ use Stringable;
  */
 final class SearchableComponentHelper
 {
+    /**
+     * Meta key used to stash the canonical payload when macros are unavailable upstream.
+     */
+    private const PAYLOAD_META_KEY = 'searchable_component_payload';
+
+    /**
+     * Guard flag so payload macros register only once during the request lifecycle.
+     */
+    private static bool $payloadMacrosRegistered = false;
+
     private function __construct() {}
 
     /**
@@ -35,6 +45,8 @@ final class SearchableComponentHelper
         Closure $resolveRecord,
         Closure $normalizePayload,
     ): void {
+        self::ensurePayloadMacros();
+
         // Early exit when no state is available so the component falls back to an empty input.
         if (self::stateIsEmpty($state)) {
             self::clear($component);
@@ -78,6 +90,8 @@ final class SearchableComponentHelper
         Closure ...$clearRelated,
     ): void {
         $emptyPayload = self::normaliseEmptyPayload($emptyPayload);
+
+        self::ensurePayloadMacros();
 
         $clearSelection = static function () use ($component, $set, $attribute, $payloadField, $emptyPayload, $clearRelated): void {
             // Reset the persisted identifier alongside the lookup metadata to avoid stale state.
@@ -127,6 +141,8 @@ final class SearchableComponentHelper
      */
     public static function clear(SearchableInput $component, Closure ...$clearRelated): void
     {
+        self::ensurePayloadMacros();
+
         // Wipe the component so Filament renders an empty dropdown and no metadata payload.
         $component
             ->state(null)
@@ -266,5 +282,33 @@ final class SearchableComponentHelper
         }
 
         return $payload;
+    }
+
+    /**
+     * Register macros that persist payload data when the upstream package omits them.
+     */
+    private static function ensurePayloadMacros(): void
+    {
+        if (self::$payloadMacrosRegistered) {
+            return;
+        }
+
+        if (! SearchableInput::hasMacro('payload')) {
+            SearchableInput::macro('payload', function (array $payload): SearchableInput {
+                /** @var SearchableInput $this */
+                return $this->meta(SearchableComponentHelper::PAYLOAD_META_KEY, $payload);
+            });
+        }
+
+        if (! SearchableInput::hasMacro('getPayload')) {
+            SearchableInput::macro('getPayload', function (): array {
+                /** @var SearchableInput $this */
+                $payload = $this->getMeta(SearchableComponentHelper::PAYLOAD_META_KEY);
+
+                return is_array($payload) ? $payload : [];
+            });
+        }
+
+        self::$payloadMacrosRegistered = true;
     }
 }
