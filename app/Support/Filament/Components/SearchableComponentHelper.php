@@ -52,7 +52,7 @@ final class SearchableComponentHelper
      *
      * @template TModel of Model
      *
-     * @param TModel|null              $model
+     * @param TModel|null $model
      * @param callable(TModel): string $labelResolver Resolve the label for the hydrated option.
      */
     public static function hydrateFromModel(
@@ -77,8 +77,8 @@ final class SearchableComponentHelper
      *
      * @template TModel of Model
      *
-     * @param callable(int): (TModel|null) $finder        Retrieve the model from a persisted store.
-     * @param callable(TModel): string     $labelResolver Resolve the label for the hydrated option.
+     * @param callable(int): (TModel|null) $finder Retrieve the model from a persisted store.
+     * @param callable(TModel): string $labelResolver Resolve the label for the hydrated option.
      */
     public static function hydrateUsingFinder(
         SearchableInput $component,
@@ -101,30 +101,10 @@ final class SearchableComponentHelper
 
     /**
      * Persist a nullable relation identifier by normalising the raw component state first.
-     *
-     * When the resolved identifier is null, the associated SearchableInput component is
-     * also cleared to keep its options and label in sync with the stored value. Refer to
-     * docs/forms/SEARCHABLE_INPUT_HELPER.md for behavioural notes around this helper.
      */
-    public static function syncNullableIntState(
-        int|string|null $state,
-        Set $set,
-        string $field,
-        ?SearchableInput $component = null
-    ): void {
-        $identifier = self::normaliseIdentifier($state);
-
-        if ($identifier === null) {
-            $set($field, null);
-
-            if ($component !== null) {
-                self::clearComponent($component);
-            }
-
-            return;
-        }
-
-        $set($field, $identifier);
+    public static function syncNullableIntState(int|string|null $state, Set $set, string $field): void
+    {
+        $set($field, self::normaliseIdentifier($state));
     }
 
     /**
@@ -132,11 +112,11 @@ final class SearchableComponentHelper
      *
      * @template TModel of Model
      *
-     * @param int|string|null                        $state           Raw component state that may be null, empty, or a string identifier.
-     * @param callable(int): (TModel|null)           $finder          Resolve the model backing the lookup.
+     * @param int|string|null $state Raw component state that may be null, empty, or a string identifier.
+     * @param callable(int): (TModel|null) $finder Resolve the model backing the lookup.
      * @param callable(TModel): array<string, mixed> $payloadResolver Build the normalized payload for dependent components.
-     * @param callable(TModel): string|null          $labelResolver   Optionally resolve an explicit label for the lookup component.
-     * @param array<string, mixed>                   $emptyPayload    Provide the default payload when no selection exists.
+     * @param callable(TModel): string|null $labelResolver Optionally resolve an explicit label for the lookup component.
+     * @param array<string, mixed> $emptyPayload Provide the default payload when no selection exists.
      */
     public static function syncLookupPayload(
         SearchableInput $component,
