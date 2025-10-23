@@ -208,7 +208,7 @@ final class VariantPricingRuleResource extends Resource
                             return $state.'%';
                         }
 
-                        return '€'.number_format($state, 2);
+                        return Number::currency((float) $state, 'EUR');
                     }),
                 TextColumn::make('min_quantity')
                     ->label(__('variant_pricing_rules.min_quantity'))
