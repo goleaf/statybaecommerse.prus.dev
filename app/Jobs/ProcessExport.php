@@ -18,6 +18,21 @@ final class ProcessExport implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
+    /**
+     * Number of job attempts before failing.
+     */
+    public int $tries = 3;
+
+    /**
+     * Define retry backoff windows (in seconds).
+     *
+     * @return array<int, int>
+     */
+    public function backoff(): array
+    {
+        return [60, 120, 300];
+    }
+
     public function __construct(public readonly int $exportId) {}
 
     public function handle(ExportService $service): void

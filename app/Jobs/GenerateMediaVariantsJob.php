@@ -21,6 +21,21 @@ final class GenerateMediaVariantsJob implements ShouldQueue
     use SerializesModels;
 
     /**
+     * Number of job attempts before failing.
+     */
+    public int $tries = 3;
+
+    /**
+     * Define retry backoff windows (in seconds).
+     *
+     * @return array<int, int>
+     */
+    public function backoff(): array
+    {
+        return [30, 120, 300];
+    }
+
+    /**
      * @param  array<string, array<string, int>>  $variants
      */
     public function __construct(

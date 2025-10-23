@@ -22,6 +22,21 @@ class ImportPricesChunk implements ShouldQueue
 {
     use InteractsWithQueue, Queueable, SerializesModels;
 
+    /**
+     * Number of job attempts before failing.
+     */
+    public int $tries = 5;
+
+    /**
+     * Define retry backoff windows (in seconds).
+     *
+     * @return array<int, int>
+     */
+    public function backoff(): array
+    {
+        return [30, 90, 180, 300, 600];
+    }
+
     /** @var array<int,array<string,mixed>> */
     private array $rows;
 
@@ -41,7 +56,7 @@ class ImportPricesChunk implements ShouldQueue
         // Use LazyCollection with timeout to prevent long-running price import operations
         $timeout = now()->addMinutes(10);
         // 10 minute timeout for price imports
-        LazyCollection::make($this->rows)->takeUntilTimeout($timeout)->each(function ($row) {
+        LazyCollection::make($this->rows)->takeUntilTimeout($timeout)->each(function ($row): void {
             $productSlug = (string) ($row['product_slug'] ?? '');
             $currencyCode = strtoupper((string) ($row['currency_code'] ?? ''));
             $amount = isset($row['amount']) ? (float) $row['amount'] : null;

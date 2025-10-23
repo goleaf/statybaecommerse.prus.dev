@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Contracts\HealthReporter as HealthReporterContract;
+use App\Contracts\SystemNotificationSender;
 use App\Filament\Components\LiveNotificationFeed;
 use App\Mail\Auth\PasswordResetMail;
 use App\Mail\Auth\VerifyEmailMail;
@@ -16,12 +17,9 @@ use App\Models\FeatureFlag;
 use App\Models\SystemSetting;
 use App\Observers\UserAttributionObserver;
 use App\Services\DocumentService;
-use App\Support\Storage\SecureStorage;
-use App\Support\Uploads\SecureUploadHandler;
+use App\Services\LiveNotificationService;
 use App\Support\Health\HealthReporter;
-use App\Support\Security\CspNonce;
-use App\Support\Tracing\Trace;
-use App\Support\Tracing\TraceContext;
+use App\Support\Queue\QueueFailureHandler;
 use App\View\Creators\CartDataCreator;
 use App\View\Creators\GlobalDataCreator;
 use App\View\Creators\LocalizationCreator;
@@ -38,8 +36,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
+use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Vite;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\Number;
@@ -60,7 +60,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(HealthReporterContract::class, HealthReporter::class);
-        $this->app->scoped(CspNonce::class, fn (): CspNonce => new CspNonce());
+        $this->app->singleton(SystemNotificationSender::class, LiveNotificationService::class);
 
         if ($this->app->runningInConsole()) {
             // Register import utilities and override the core db:seed command with a profiled variant.
@@ -93,6 +93,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         $this->registerModelObservers();
+        $this->registerQueueMonitoring();
 
         $this->registerQueueTracing();
 
@@ -317,16 +318,11 @@ class AppServiceProvider extends ServiceProvider
         }
     }
 
-    private function resolveNotifiableLocale(object $notifiable): string
+    private function registerQueueMonitoring(): void
     {
-        if (method_exists($notifiable, 'preferredLocale')) {
-            $preferred = $notifiable->preferredLocale();
-            if (is_string($preferred) && $preferred !== '') {
-                return $preferred;
-            }
-        }
-
-        return app()->getLocale();
+        Queue::failing(function (JobFailed $event): void {
+            app(QueueFailureHandler::class)->handle($event);
+        });
     }
 
     private function registerModelObservers(): void
