@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Enums\ModerationState;
 use App\Filament\Resources\NewsResource\Pages;
 use App\Filament\Resources\NewsResource\RelationManagers;
 use App\Models\News;
@@ -23,9 +22,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Novadaemon\FilamentCombobox\Combobox;
-use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
-use RuntimeException;
+use Filament\Notifications\Notification;
 
 class NewsResource extends Resource
 {
@@ -89,8 +86,6 @@ class NewsResource extends Resource
                         ->disabled(),
                     Forms\Components\Toggle::make('is_featured')
                         ->label(__('news.fields.is_featured')),
-                    Forms\Components\Toggle::make('is_breaking')
-                        ->label(__('news.fields.is_breaking')),
                     Forms\Components\Placeholder::make('moderation_state')
                         ->label(__('news.fields.moderation_state'))
                         ->content(fn (?News $record): string => $record?->moderation_state?->label() ?? ModerationState::Draft->label()),
@@ -182,7 +177,7 @@ class NewsResource extends Resource
                     ->formatStateUsing(fn (?ModerationState $state): ?string => $state?->label())
                     ->colors([
                         'warning' => fn (?ModerationState $state): bool => $state === ModerationState::Draft,
-                        'info'    => fn (?ModerationState $state): bool => $state === ModerationState::Review,
+                        'info' => fn (?ModerationState $state): bool => $state === ModerationState::Review,
                         'success' => fn (?ModerationState $state): bool => $state === ModerationState::Published,
                     ])
                     ->sortable(),
@@ -256,9 +251,9 @@ class NewsResource extends Resource
                     ->visible(fn (News $record): bool => $record->moderation_state === ModerationState::Draft)
                     ->action(function (News $record): void {
                         $record->update([
-                            'moderation_state'        => ModerationState::Review,
+                            'moderation_state' => ModerationState::Review,
                             'submitted_for_review_at' => now(),
-                            'is_visible'              => false,
+                            'is_visible' => false,
                         ]);
 
                         activity()
@@ -289,23 +284,23 @@ class NewsResource extends Resource
                         $userId = Auth::id();
 
                         if (! $userId) {
-                            throw new RuntimeException('Approvals require an authenticated user.');
+                            throw new \RuntimeException('Approvals require an authenticated user.');
                         }
 
                         DB::transaction(function () use ($record, $userId, $data): void {
                             $record->approvals()->create([
-                                'user_id'    => $userId,
-                                'decision'   => 'approved',
-                                'notes'      => $data['notes'] ?? null,
+                                'user_id' => $userId,
+                                'decision' => 'approved',
+                                'notes' => $data['notes'] ?? null,
                                 'decided_at' => now(),
                             ]);
 
                             $record->update([
                                 'moderation_state' => ModerationState::Published,
-                                'approved_at'      => now(),
-                                'approved_by_id'   => $userId,
-                                'is_visible'       => true,
-                                'published_at'     => $record->published_at ?? now(),
+                                'approved_at' => now(),
+                                'approved_by_id' => $userId,
+                                'is_visible' => true,
+                                'published_at' => $record->published_at ?? now(),
                             ]);
                         });
 
@@ -337,23 +332,23 @@ class NewsResource extends Resource
                         $userId = Auth::id();
 
                         if (! $userId) {
-                            throw new RuntimeException('Return to draft requires an authenticated user.');
+                            throw new \RuntimeException('Return to draft requires an authenticated user.');
                         }
 
                         DB::transaction(function () use ($record, $userId, $data): void {
                             $record->approvals()->create([
-                                'user_id'    => $userId,
-                                'decision'   => 'returned',
-                                'notes'      => $data['notes'] ?? null,
+                                'user_id' => $userId,
+                                'decision' => 'returned',
+                                'notes' => $data['notes'] ?? null,
                                 'decided_at' => now(),
                             ]);
 
                             $record->update([
-                                'moderation_state'        => ModerationState::Draft,
+                                'moderation_state' => ModerationState::Draft,
                                 'submitted_for_review_at' => null,
-                                'approved_at'             => null,
-                                'approved_by_id'          => null,
-                                'is_visible'              => false,
+                                'approved_at' => null,
+                                'approved_by_id' => null,
+                                'is_visible' => false,
                             ]);
                         });
 

@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\ModerationState;
+use App\Models\PostApproval;
 use App\Models\Scopes\PublishedScope;
 use App\Services\Security\HtmlContentSanitizer;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;

@@ -4,9 +4,6 @@ return [
     'title' => 'Pranešimai',
     'single' => 'Pranešimas',
     'plural' => 'Pranešimai',
-    'view_author_profile' => 'Peržiūrėti autoriaus profilį',
-    'browse_by_author' => 'Naršyti :author straipsnius',
-    'search_tagged' => 'Ieškoti įrašų su žyme :tag',
     'sections' => [
         'basic_information' => 'Pagrindinė informacija',
         'media' => 'Medija',
