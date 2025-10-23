@@ -53,6 +53,8 @@ final class CreateNews extends CreateRecord
     {
         $this->syncTranslationRecords($this->record, $this->languageTabsPayload);
 
-        parent::afterCreate();
+        if (method_exists(CreateRecord::class, 'afterCreate')) {
+            parent::afterCreate();
+        }
     }
 }
