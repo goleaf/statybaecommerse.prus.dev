@@ -112,6 +112,7 @@ final class UserProductInteractionResource extends Resource
                                 Select::make('interaction_type')
                                     ->label(__('admin.user_product_interactions.interaction_type'))
                                     ->options([
+                                        // Maintain readable alignment so localized labels stay scannable for admins.
                                         'view'        => __('admin.user_product_interactions.interaction_types.view'),
                                         'click'       => __('admin.user_product_interactions.interaction_types.click'),
                                         'add_to_cart' => __('admin.user_product_interactions.interaction_types.add_to_cart'),
@@ -298,6 +299,7 @@ final class UserProductInteractionResource extends Resource
                         $state >= 2.5 => 'info',
                         default       => 'danger',
                     })
+                    // Present the rating consistently while preserving the translated fallback message.
                     ->formatStateUsing(fn ($state) => $state ? $state . '/5' : __('admin.user_product_interactions.no_rating')),
                 TextColumn::make('count')
                     ->label(__('admin.user_product_interactions.count'))
