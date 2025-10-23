@@ -97,7 +97,7 @@ final class SliderForm
                                     ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                                     ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
                                     ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                                        // Hydrate using the shared helper documented in docs/forms/SEARCHABLE_INPUT_METADATA.md.
+                                        // Hydrate via helper to align with docs/forms/SEARCHABLE_INPUT_METADATA.md.
                                         SearchableInputHelper::hydrate(
                                             $component,
                                             $state,
@@ -109,7 +109,7 @@ final class SliderForm
                                             return;
                                         }
 
-                                        // Clear CTA URLs via the helper per docs/forms/SEARCHABLE_INPUT_METADATA.md guidance.
+                                        // Reset CTA URLs whenever lookup is cleared to avoid stale payloads.
                                         SearchableInputHelper::clear($set, ['button_url' => null]);
                                     })
                                     ->columnSpan(1),

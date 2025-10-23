@@ -58,7 +58,7 @@ final class SliderQuickActionsWidget extends Widget implements HasActions, HasFo
                     ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                     ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
                     ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                        // See docs/forms/SEARCHABLE_INPUT_METADATA.md for helper behaviour.
+                        // Hydrate via helper per docs/forms/SEARCHABLE_INPUT_METADATA.md expectations.
                         SearchableInputHelper::hydrate(
                             $component,
                             $state,
@@ -70,7 +70,7 @@ final class SliderQuickActionsWidget extends Widget implements HasActions, HasFo
                             return;
                         }
 
-                        // Keep state resets centralised per docs/forms/SEARCHABLE_INPUT_METADATA.md.
+                        // Clear persisted URLs when the lookup resets to avoid stale metadata.
                         SearchableInputHelper::clear($set, ['button_url' => null]);
                     }),
                 ColorPicker::make('background_color')

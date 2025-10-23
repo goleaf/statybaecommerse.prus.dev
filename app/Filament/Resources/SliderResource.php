@@ -113,7 +113,7 @@ final class SliderResource extends Resource
                         ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                         ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
                         ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                            // Hydrate via helper per docs/forms/SEARCHABLE_INPUT_METADATA.md.
+                            // Hydrate through helper to stay aligned with docs/forms/SEARCHABLE_INPUT_METADATA.md guidance.
                             SearchableInputHelper::hydrate(
                                 $component,
                                 $state,
@@ -125,7 +125,7 @@ final class SliderResource extends Resource
                                 return;
                             }
 
-                            // Clearing ensures no stale URLs linger (docs/forms/SEARCHABLE_INPUT_METADATA.md).
+                            // Clear button URL metadata whenever the selection resets.
                             SearchableInputHelper::clear($set, ['button_url' => null]);
                         })
                         ->columnSpanFull(),

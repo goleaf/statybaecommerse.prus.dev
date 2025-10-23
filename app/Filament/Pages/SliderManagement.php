@@ -129,7 +129,7 @@ class SliderManagement extends Page implements HasActions, HasForms
                                 ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                                 ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
                                 ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                                    // Follow docs/forms/SEARCHABLE_INPUT_METADATA.md helper guidance.
+                                    // Hydrate via the shared helper so documented metadata rules stay consistent.
                                     SearchableInputHelper::hydrate(
                                         $component,
                                         $state,
@@ -141,7 +141,7 @@ class SliderManagement extends Page implements HasActions, HasForms
                                         return;
                                     }
 
-                                    // Reset the persisted URL per docs/forms/SEARCHABLE_INPUT_METADATA.md.
+                                    // Clearing ensures dependent URL payloads vanish per docs/forms/SEARCHABLE_INPUT_METADATA.md.
                                     SearchableInputHelper::clear($set, ['button_url' => null]);
                                 }),
                         ]),
@@ -314,7 +314,7 @@ class SliderManagement extends Page implements HasActions, HasForms
                                     ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                                     ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
                                     ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                                        // Keep hydration aligned with docs/forms/SEARCHABLE_INPUT_METADATA.md.
+                                        // Reuse helper hydration so repeater slides follow documented metadata lifecycle.
                                         SearchableInputHelper::hydrate(
                                             $component,
                                             $state,
@@ -326,7 +326,7 @@ class SliderManagement extends Page implements HasActions, HasForms
                                             return;
                                         }
 
-                                        // Flush stale repeater URLs per docs/forms/SEARCHABLE_INPUT_METADATA.md guidance.
+                                        // Reset slide-specific URLs when selections clear via the helper.
                                         SearchableInputHelper::clear($set, ['link' => null]);
                                     }),
                             ])

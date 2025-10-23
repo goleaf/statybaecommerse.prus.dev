@@ -9,7 +9,8 @@ use App\Enums\OrderStatus;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\Order;
 use App\Support\Filament\Components\Flatpickr;
-use App\Support\Search\AddressSearch;
+use App\Support\Filament\SearchableInputHelper;
+use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\AssociateAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -24,6 +25,8 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
@@ -79,23 +82,29 @@ class OrdersRelationManager extends BaseRelationManager
                             })
                             ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
                             ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                                // Keep hydration aligned with docs/forms/SEARCHABLE_INPUT_METADATA.md.
+                                // Hydrate through the shared helper to ensure status options remain canonical.
                                 SearchableInputHelper::hydrate(
                                     $component,
                                     $state,
-                                    static fn (string $value): ?array => [
-                                        'value' => $value,
-                                        'label' => OrderStatus::tryFrom($value)?->getLabel() ?? $value,
-                                    ],
+                                    static function (string $value): ?array {
+                                        $label = OrderStatus::tryFrom($value)?->getLabel() ?? $value;
+
+                                        return [
+                                            'value' => $value,
+                                            'label' => $label,
+                                        ];
+                                    },
                                 );
                             })
-                            ->afterStateUpdated(function (?string $state, callable $set): void {
-                                if ($state !== null && $state !== '') {
+                            ->afterStateUpdated(function (?string $state, Set $set): void {
+                                if ($state === null || $state === '') {
+                                    // Clear persisted status when wiped.
+                                    SearchableInputHelper::clear($set, ['status' => null]);
+
                                     return;
                                 }
 
-                                // Clear status selection with the helper contract.
-                                SearchableInputHelper::clear($set, ['status' => null]);
+                                $set('status', $state);
                             }),
                         TextInput::make('total_amount')
                             ->label(__('orders.total_amount'))
