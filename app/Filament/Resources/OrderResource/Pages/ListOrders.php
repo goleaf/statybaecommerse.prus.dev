@@ -6,6 +6,8 @@ namespace App\Filament\Resources\OrderResource\Pages;
 
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\OrderResource;
+use App\Filament\Resources\OrderResource\Widgets\OrderResourceStats;
+use App\Filament\Resources\OrderResource\Widgets\OrderRevenueTrend;
 use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
@@ -26,6 +28,20 @@ final class ListOrders extends BaseListRecords
         return [
             Actions\CreateAction::make()
                 ->visible(fn () => AuthorizationMatrix::check('orders', 'create')),
+        ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            OrderResourceStats::class,
+        ];
+    }
+
+    protected function getFooterWidgets(): array
+    {
+        return [
+            OrderRevenueTrend::class,
         ];
     }
 }
