@@ -8,7 +8,9 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\FeatureFlagResource\Pages;
 use App\Models\FeatureFlag;
-use Filament\Tables\Actions\DeleteAction as TableDeleteAction;
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\EnabledScope;
+use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
@@ -65,6 +67,14 @@ final class FeatureFlagResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('feature_flags.title');
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes([
+            ActiveScope::class,
+            EnabledScope::class,
+        ]);
     }
 
     /**
