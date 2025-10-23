@@ -13,6 +13,7 @@ use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
 use App\Models\SystemSettingHistory;
 use App\Models\User;
+use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;

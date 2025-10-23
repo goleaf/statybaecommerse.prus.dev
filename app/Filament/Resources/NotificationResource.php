@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Forms\Components\Flatpickr;
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\NotificationResource\Pages;
 use App\Models\Notification;
 use App\Support\Filament\Filters\SingleDateFilter;
+use App\Support\Concerns\HasNav;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\DeleteBulkAction;
@@ -35,11 +36,14 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use UnitEnum;
-use Filament\Schemas\Schema;
 
 final class NotificationResource extends Resource
 {
+    use HasNav;
+
     private const READ_STATE_READ = 'read';
 
     private const READ_STATE_UNREAD = 'unread';
@@ -58,15 +62,15 @@ final class NotificationResource extends Resource
 
     protected static bool $shouldRegisterNavigation = false;
 
-    public static function getNavigationIcon(): string
-    {
-        return 'heroicon-o-bell';
-    }
+    /**
+     * Persist the icon so the shared navigation helper can reflect on it.
+     */
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-bell';
 
-    public static function getNavigationGroup(): string
-    {
-        return 'System';
-    }
+    /**
+     * Persist the navigation group for consistent lookups across the codebase.
+     */
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 3;
 
