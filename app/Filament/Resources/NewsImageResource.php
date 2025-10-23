@@ -45,7 +45,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Storage;
-use Throwable;
 use UnitEnum;
 
 final class NewsImageResource extends Resource
@@ -118,7 +117,7 @@ final class NewsImageResource extends Resource
                                                 '1:1',
                                             ])
                                             ->live()
-                                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                            ->afterStateUpdated(function ($state, callable $set) {
                                                 if (! $state) {
                                                     return;
                                                 }
@@ -132,14 +131,34 @@ final class NewsImageResource extends Resource
                                                 $set('file_size', $disk->size($state));
                                                 $set('mime_type', $disk->mimeType($state));
 
-                                                $imageInfo = null;
-                                                $imagePath = null;
+                                                $path = null;
 
-                                                if (method_exists($disk, 'path')) {
+                                                try {
+                                                    $path = $disk->path($state);
+                                                } catch (\Throwable $exception) {
+                                                    $path = null;
+                                                }
+
+                                                if ($path && ! file_exists($path)) {
+                                                    $path = null;
+                                                }
+
+                                                if (! $path && method_exists($disk, 'temporaryUrl')) {
                                                     try {
-                                                        $imagePath = $disk->path($state);
-                                                    } catch (Throwable) {
-                                                        $imagePath = null;
+                                                        $path = $disk->temporaryUrl($state, now()->addMinutes(5));
+                                                    } catch (\Throwable $exception) {
+                                                        $path = null;
+                                                    }
+                                                }
+
+                                                if ($path) {
+                                                    $imageInfo = @getimagesize($path);
+
+                                                    if ($imageInfo) {
+                                                        $set('dimensions', [
+                                                            'width' => $imageInfo[0],
+                                                            'height' => $imageInfo[1],
+                                                        ]);
                                                     }
 
                                                     if ($temporaryUrl) {
