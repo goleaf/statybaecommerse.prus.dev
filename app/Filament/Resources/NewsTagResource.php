@@ -9,6 +9,7 @@ use App\Support\Concerns\HasNav;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\NewsTagResource\Pages;
 use App\Models\NewsTag;
+use App\Models\Translations\NewsTagTranslation;
 use BackedEnum;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -37,7 +38,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Str;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 final class NewsTagResource extends Resource
@@ -77,7 +78,7 @@ final class NewsTagResource extends Resource
                         ->label(__('admin.news_tags.form.fields.slug'))
                         ->required()
                         ->maxLength(255)
-                        ->unique(ignoreRecord: true),
+                        ->unique(NewsTag::class, 'slug', ignoreRecord: true),
                     Textarea::make('description')
                         ->label(__('admin.news_tags.form.fields.description'))
                         ->rows(3)
@@ -104,6 +105,7 @@ final class NewsTagResource extends Resource
                 ->schema([
                     Repeater::make('translations')
                         ->label(__('admin.news_tags.form.fields.translations'))
+                        ->relationship('translations')
                         ->schema([
                             Select::make('locale')
                                 ->label(__('admin.news_tags.form.fields.locale'))
@@ -124,6 +126,7 @@ final class NewsTagResource extends Resource
                         ])
                         ->columns(2)
                         ->collapsible()
+                        ->defaultItems(1)
                         ->itemLabel(fn (array $state): ?string => $state['locale'] ?? null),
                 ])
                 ->columns(1)
@@ -261,10 +264,7 @@ final class NewsTagResource extends Resource
                     ->icon('heroicon-o-document-duplicate')
                     ->color('info')
                     ->action(function (NewsTag $record): void {
-                        $newTag = $record->replicate();
-                        $newTag->name = $record->name . ' (Copy)';
-                        $newTag->slug = $record->slug . '-copy';
-                        $newTag->save();
+                        self::duplicateRecord($record);
 
                         Notification::make()
                             ->title(__('admin.news_tags.duplicated_successfully'))
@@ -306,12 +306,7 @@ final class NewsTagResource extends Resource
                         ->icon('heroicon-o-document-duplicate')
                         ->color('info')
                         ->action(function (Collection $records): void {
-                            $records->each(function (NewsTag $record): void {
-                                $newTag = $record->replicate();
-                                $newTag->name = $record->name . ' (Copy)';
-                                $newTag->slug = $record->slug . '-copy';
-                                $newTag->save();
-                            });
+                            $records->each(fn (NewsTag $record): NewsTag => self::duplicateRecord($record));
                             Notification::make()
                                 ->title(__('admin.news_tags.bulk_duplicated_successfully'))
                                 ->success()
@@ -337,5 +332,68 @@ final class NewsTagResource extends Resource
             'view'   => Pages\ViewNewsTag::route('/{record}'),
             'edit'   => Pages\EditNewsTag::route('/{record}/edit'),
         ];
+    }
+
+    private static function duplicateRecord(NewsTag $record): NewsTag
+    {
+        $record->loadMissing('translations');
+
+        $duplicate = $record->replicate();
+        $duplicate->name = self::generateDuplicateName($record->name);
+        $duplicate->slug = self::generateDuplicateSlug($record->slug);
+        $duplicate->save();
+
+        foreach ($record->translations as $translation) {
+            $duplicate->translations()->create([
+                'locale' => $translation->locale,
+                'name' => self::generateDuplicateName($translation->name),
+                'slug' => self::generateDuplicateSlug($translation->slug, $translation->locale),
+                'description' => $translation->description,
+            ]);
+        }
+
+        return $duplicate;
+    }
+
+    private static function generateDuplicateName(?string $name): string
+    {
+        $base = $name ?: __('admin.news_tags.single');
+        $pattern = '/\s*\(Copy(?: (\d+))?\)$/i';
+        $baseName = preg_replace($pattern, '', $base) ?: $base;
+
+        $candidate = $baseName.' (Copy)';
+        $index = 2;
+
+        while (NewsTag::where('name', $candidate)->exists()) {
+            $candidate = $baseName.' (Copy '.$index.')';
+            $index++;
+        }
+
+        return $candidate;
+    }
+
+    private static function generateDuplicateSlug(?string $slug, ?string $locale = null): string
+    {
+        $base = $slug ? preg_replace('/-copy(?:-\d+)?$/i', '', $slug) : 'news-tag';
+        $base = $base ? Str::slug($base) : 'news-tag';
+
+        $candidate = $base.'-copy';
+        $index = 2;
+
+        $exists = function (string $value) use ($locale): bool {
+            $translationQuery = NewsTagTranslation::query()->where('slug', $value);
+            if ($locale !== null) {
+                $translationQuery->where('locale', $locale);
+            }
+
+            return NewsTag::where('slug', $value)->exists() || $translationQuery->exists();
+        };
+
+        while ($exists($candidate)) {
+            $candidate = $base.'-copy-'.$index;
+            $index++;
+        }
+
+        return $candidate;
     }
 }

@@ -56,7 +56,7 @@ final class VariantAnalyticsResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Inventory';
+    protected static BackedEnum|UnitEnum|string|null $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 2;
 
