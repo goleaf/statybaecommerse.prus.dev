@@ -1,22 +1,24 @@
 <?php
 
-use Monolog\Formatter\JsonFormatter;
+use App\Logging\CustomizeFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
 use Monolog\Processor\PsrLogMessageProcessor;
 
-$stackChannels = explode(',', (string) env('LOG_STACK', 'single'));
+$sentryDsn = (string) env('SENTRY_LARAVEL_DSN', env('SENTRY_DSN', ''));
+$sentryAvailable = $sentryDsn !== '' && class_exists(\Sentry\Laravel\Integration::class);
 
-if (env('APP_ENV') === 'production') {
-    $stackChannels = ['daily_json'];
+$configuredStackChannels = array_filter(array_map(
+    static fn (string $channel): ?string => $channel !== '' ? $channel : null,
+    explode(',', (string) env('LOG_STACK', 'daily'))
+));
 
-    $sentryDsn = (string) (env('SENTRY_LARAVEL_DSN') ?? env('SENTRY_DSN', ''));
-
-    if ($sentryDsn !== '') {
-        $stackChannels[] = 'sentry';
-    }
+if ($sentryAvailable) {
+    $configuredStackChannels[] = 'sentry';
 }
+
+$stackChannels = $configuredStackChannels === [] ? ['daily'] : array_values(array_unique($configuredStackChannels));
 
 return [
 
@@ -111,6 +113,9 @@ return [
                 'appendNewline' => true,
             ],
             'replace_placeholders' => true,
+            'tap' => [
+                CustomizeFormatter::class,
+            ],
         ],
 
         'slack' => [
@@ -154,6 +159,11 @@ return [
         'sentry' => [
             'driver' => 'sentry',
             'level'  => env('SENTRY_LOG_LEVEL', env('LOG_LEVEL', 'error')),
+        ],
+
+        'sentry' => [
+            'driver' => 'sentry',
+            'level' => env('SENTRY_LOG_LEVEL', env('LOG_LEVEL', 'error')),
         ],
 
         'sentry' => [
