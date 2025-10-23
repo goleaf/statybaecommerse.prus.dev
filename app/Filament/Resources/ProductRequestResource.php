@@ -31,7 +31,10 @@ final class ProductRequestResource extends Resource
 
     protected static ?string $model = ProductRequest::class;
 
-    
+    /**
+     * @var string|BackedEnum|null Navigation icon identifier.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-clipboard-document-list';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
