@@ -6,7 +6,7 @@ namespace App\Filament\Components;
 
 use Closure;
 use Filament\Forms\Components\Select;
-use Filament\Support\Components\Attributes\ExposedLivewireMethod;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Renderless;
@@ -47,10 +47,7 @@ final class AutocompleteSelect extends Select
 
     protected ?string $searchQuery = null;
 
-    /**
-     * @var array<string, array<int, array{value: string, label: string, data: array<string, mixed>}>>
-     */
-    protected array $searchResultCache = [];
+    protected ?array $formattedResultsCache = null;
 
     public static function make(?string $name = null): static
     {
@@ -176,44 +173,17 @@ final class AutocompleteSelect extends Select
 
     public function getSearchResults(string $search = ''): array
     {
-        if ($search !== '') {
-            $this->setSearchQuery($search);
-        } elseif ($this->searchQuery === null || $this->searchQuery === '') {
-            $this->searchResults = collect();
+        $search = trim($search);
 
-            return [];
-        } else {
-            $this->performSearch();
+        if ($this->searchQuery === $search && $this->formattedResultsCache !== null) {
+            return $this->formattedResultsCache;
         }
 
-        return ($this->searchResults ?? collect())
-            ->mapWithKeys(function (array $item): array {
-                $value = $item['value'] ?? null;
-                $label = $item['label']
-                    ?? (is_array($item['data'] ?? null)
-                        ? ($item['data'][$this->getLabelField() ?? 'name'] ?? (string) $value)
-                        : (string) $value);
+        $this->searchQuery = $search;
 
-                    if (is_array($data)) {
-                        $payload = is_array($data['payload'] ?? null) ? $data['payload'] : $data;
-                    }
+        $this->searchResults = $this->performSearch($search);
 
-                    if ($label === '' && array_key_exists('name', $payload)) {
-                        $name = $payload['name'];
-
-                        if (is_string($name)) {
-                            $label = $name;
-                        }
-                    }
-
-                    if ($label === '') {
-                        $label = $value;
-                    }
-
-                    return [$value => $label];
-                },
-            )
-            ->all();
+        return $this->formattedResultsCache = $this->formatResults($this->searchResults);
     }
 
     protected function resolveSearchResults(?string $search = null): Collection
@@ -236,17 +206,18 @@ final class AutocompleteSelect extends Select
 
     public function setSearchQuery(?string $query): static
     {
-        $normalizedQuery = $this->normalizeSearchQuery($query);
+        $query = $query !== null ? trim($query) : null;
 
-        $this->searchQuery = $normalizedQuery;
+        $this->searchQuery = $query;
 
-        if ($normalizedQuery === null) {
-            $this->searchResults = $this->emptyResults();
+        if (empty($query)) {
+            $this->searchResults = collect();
+            $this->formattedResultsCache = [];
 
             return $this;
         }
 
-        $this->searchResults = $this->performSearch($normalizedQuery);
+        $this->formattedResultsCache = $this->getSearchResults($query);
 
         return $this;
     }
@@ -256,55 +227,59 @@ final class AutocompleteSelect extends Select
         return $this->searchQuery;
     }
 
-    /**
-     * @return Collection<int, array{value: string, label: string, data: array<string, mixed>}>
-     */
     protected function performSearch(string $search): Collection
     {
-        $normalizedSearch = $this->normalizeSearchQuery($search);
-
-        if ($normalizedSearch === null || $this->shouldSkipSearch($normalizedSearch) || $this->modelClass === null) {
-            return $this->emptyResults();
+        if (! $this->modelClass || $search === '' || mb_strlen($search) < $this->minSearchLength) {
+            return collect();
         }
 
-        $cacheKey = $this->cacheKey($normalizedSearch);
-
-        if (array_key_exists($cacheKey, $this->searchResultCache)) {
-            /** @var array<int, array{value: string, label: string, data: array<string, mixed>}> $cachedResults */
-            $cachedResults = $this->searchResultCache[$cacheKey];
-
-            /** @var Collection<int, array{value: string, label: string, data: array<string, mixed>}> $collection */
-            $collection = new Collection($cachedResults);
-
-            return $collection;
-        }
-
-        /** @var class-string<Model> $modelClass */
-        $modelClass = $this->modelClass;
-
-        $model = app($modelClass);
-
-        if (! $model instanceof Model) {
-            return $this->emptyResults();
-        }
-
+        /** @var Model $model */
+        $model = app($this->modelClass);
         $searchField = $this->searchField ?? $this->getLabelField();
 
         $valueField = $this->getValueField();
         $labelField = $this->getLabelField();
 
+        $terms = collect(preg_split('/\s+/u', $search, -1, PREG_SPLIT_NO_EMPTY));
+
         $query = $model
-            ->newQueryWithoutScopes()
-            ->where($searchField, 'like', '%'.$this->searchQuery.'%')
+            ->newQuery()
+            ->when(
+                $terms->isNotEmpty(),
+                fn (Builder $builder): Builder => $builder->where(function (Builder $query) use ($searchField, $terms): void {
+                    foreach ($terms as $term) {
+                        $query->where($searchField, 'like', '%'.$term.'%');
+                    }
+                }),
+            )
             ->limit($this->maxSearchResults);
 
-        $this->searchResults = $query->get()->map(function (Model $item) use ($valueField, $labelField) {
+        return $query->get()->map(function (Model $item) use ($valueField, $labelField) {
             return [
                 'value' => $item->{$valueField},
                 'label' => $item->{$labelField},
                 'data'  => $item->toArray(),
             ];
         });
+    }
+
+    /**
+     * @param  Collection<int, array{value:mixed,label:scalar|null,data:array}>  $results
+     * @return array<mixed, scalar|null>
+     */
+    protected function formatResults(Collection $results): array
+    {
+        return $results
+            ->mapWithKeys(function (array $item): array {
+                $value = $item['value'] ?? null;
+                $label = $item['label']
+                    ?? (is_array($item['data'] ?? null)
+                        ? ($item['data']['name'] ?? (string) $value)
+                        : (string) $value);
+
+                return $value !== null ? [$value => $label] : [];
+            })
+            ->all();
     }
 
     public function getViewData(): array
