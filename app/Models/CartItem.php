@@ -35,6 +35,19 @@ final class CartItem extends Model
 
     protected $casts = ['quantity' => 'integer', 'minimum_quantity' => 'integer', 'unit_price' => 'decimal:2', 'discount_amount' => 'decimal:2', 'total_price' => 'decimal:2', 'price' => 'decimal:2', 'product_snapshot' => 'array', 'attributes' => 'array'];
 
+    protected static function booted(): void
+    {
+        // Align persisted price metrics whenever the record is created or updated through Filament forms.
+        self::saving(function (CartItem $item): void {
+            $unitPrice = (float) ($item->unit_price ?? 0.0);
+            $quantity = (int) ($item->quantity ?? 1);
+            $discount = (float) ($item->discount_amount ?? 0.0);
+
+            $item->price ??= $unitPrice;
+            $item->total_price ??= max(0, ($unitPrice * $quantity) - $discount);
+        });
+    }
+
     /**
      * The accessors to append to the model's array form.
      *
@@ -126,7 +139,7 @@ final class CartItem extends Model
     /**
      * Handle scopeForSession functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeForSession($query, string $sessionId)
     {
@@ -136,7 +149,7 @@ final class CartItem extends Model
     /**
      * Handle scopeForUser functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeForUser($query, int $userId)
     {
@@ -146,7 +159,7 @@ final class CartItem extends Model
     /**
      * Handle scopeForProduct functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeForProduct($query, int $productId)
     {
