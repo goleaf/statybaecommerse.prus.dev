@@ -41,9 +41,10 @@ use UnitEnum;
 
 final class DocumentTemplateResource extends Resource
 {
-    use HasNav;
-
-    
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Documents';
+    }
 
     protected static ?string $model = DocumentTemplate::class;
 
