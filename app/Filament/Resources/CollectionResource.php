@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Filament\Components\Combobox;
 use App\Filament\Resources\CollectionResource\Pages;
 use App\Models\Collection;
 use BackedEnum;
@@ -190,13 +189,9 @@ final class CollectionResource extends Resource
                 ->columns(2),
             Section::make(__('collections.collection_info'))
                 ->schema([
-                    Select::make('products')
+                    Combobox::make('products')
                         ->label(__('translations.products'))
                         ->relationship('products', 'name')
-                        ->multiple()
-                        ->searchable()
-                        ->boxSearchs()
-                        ->height('350px')
                         ->preload(),
                 ]),
             Section::make(__('collections.seo_info'))

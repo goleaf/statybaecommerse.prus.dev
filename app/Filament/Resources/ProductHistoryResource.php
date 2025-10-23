@@ -12,9 +12,6 @@ use App\Filament\Resources\ProductHistoryResource\Widgets\ProductHistoryStatsWid
 use App\Filament\Resources\ProductHistoryResource\Widgets\RecentProductChangesWidget;
 use App\Models\ProductHistory;
 use BackedEnum;
-use DateTimeInterface;
-use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\Select as SelectInput;
-use EncoreDigitalGroup\Filament\Helpers\InputTypes\Text\TextInput as TextInputInput;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
@@ -35,7 +32,7 @@ final class ProductHistoryResource extends Resource
 
     protected static ?string $model = ProductHistory::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clock';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-clock';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
@@ -160,13 +157,11 @@ final class ProductHistoryResource extends Resource
                     ])
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
-                        $from = self::formatDateFilterValue($data['from'] ?? null);
-                        if ($from !== null) {
-                            $indicators[] = __('product_history.from') . ': ' . $from;
+                        if ($data['from'] ?? null) {
+                            $indicators[] = __('product_history.from') . ': ' . $data['from'];
                         }
-                        $until = self::formatDateFilterValue($data['until'] ?? null);
-                        if ($until !== null) {
-                            $indicators[] = __('product_history.until') . ': ' . $until;
+                        if ($data['until'] ?? null) {
+                            $indicators[] = __('product_history.until') . ': ' . $data['until'];
                         }
 
                         return $indicators;

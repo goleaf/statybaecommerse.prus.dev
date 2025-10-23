@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Filament\Components\Combobox;
 use App\Filament\Resources\RecommendationConfigResourceSimple\Pages;
 use App\Models\RecommendationConfigSimple;
 use Filament\Actions\Action;
@@ -123,14 +124,10 @@ final class RecommendationConfigResourceSimple extends Resource
             Section::make(__('recommendation_configs_simple.filtering'))
                 ->schema([
                     Grid::make(2)
-                        ->schema([
-                            Select::make('products')
+                        ->components([
+                            Combobox::make('products')
                                 ->label(__('recommendation_configs_simple.products'))
                                 ->relationship('products', 'name')
-                                ->multiple()
-                                ->searchable()
-                                ->boxSearchs(true)
-                                ->height('360px')
                                 ->preload()
                                 ->afterStateHydrated(fn (Combobox $component, ?array $state) => $component->state(collect($state)->filter()->sort()->values()->toArray()))
                                 ->dehydrateStateUsing(fn (?array $state) => collect($state)->filter()->sort()->values()->toArray())
@@ -144,10 +141,6 @@ final class RecommendationConfigResourceSimple extends Resource
                             Combobox::make('categories')
                                 ->label(__('recommendation_configs_simple.categories'))
                                 ->relationship('categories', 'name')
-                                ->multiple()
-                                ->searchable()
-                                ->boxSearchs(true)
-                                ->height('360px')
                                 ->preload()
                                 ->afterStateHydrated(fn (Combobox $component, ?array $state) => $component->state(collect($state)->filter()->sort()->values()->toArray()))
                                 ->dehydrateStateUsing(fn (?array $state) => collect($state)->filter()->sort()->values()->toArray())

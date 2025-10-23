@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Filament\Components\Combobox;
 use App\Filament\Resources\CampaignResource\Pages;
 use App\Filament\Resources\CampaignResource\RelationManagers\TranslationsRelationManager;
 use App\Models\Campaign;
@@ -142,37 +141,21 @@ final class CampaignResource extends Resource
                     Combobox::make('targetCategories')
                         ->label(self::label('campaigns.fields.target_categories', 'Target categories'))
                         ->relationship('targetCategories', 'name')
-                        ->boxSearchs()
-                        ->height('360px')
-                        ->optionsLabel(fn (): string => self::label('campaigns.combobox.options.target_categories', 'Available categories'))
-                        ->selectedLabel(fn (): string => self::label('campaigns.combobox.selected.target_categories', 'Selected categories'))
                         ->preload()
                         ->columnSpanFull(),
                     Combobox::make('targetProducts')
                         ->label(self::label('campaigns.fields.target_products', 'Target products'))
                         ->relationship('targetProducts', 'name')
-                        ->boxSearchs()
-                        ->height('360px')
-                        ->optionsLabel(fn (): string => self::label('campaigns.combobox.options.target_products', 'Available products'))
-                        ->selectedLabel(fn (): string => self::label('campaigns.combobox.selected.target_products', 'Selected products'))
                         ->preload()
                         ->columnSpanFull(),
                     Combobox::make('targetCustomerGroups')
                         ->label(self::label('campaigns.fields.target_customer_groups', 'Target customer groups'))
                         ->relationship('targetCustomerGroups', 'name')
-                        ->boxSearchs()
-                        ->height('360px')
-                        ->optionsLabel(fn (): string => self::label('campaigns.combobox.options.target_customer_groups', 'Available customer groups'))
-                        ->selectedLabel(fn (): string => self::label('campaigns.combobox.selected.target_customer_groups', 'Selected customer groups'))
                         ->preload()
                         ->columnSpanFull(),
                     Combobox::make('discounts')
                         ->label(self::label('campaigns.fields.discounts', 'Discounts'))
                         ->relationship('discounts', 'name')
-                        ->boxSearchs()
-                        ->height('360px')
-                        ->optionsLabel(fn (): string => self::label('campaigns.combobox.options.discounts', 'Available discounts'))
-                        ->selectedLabel(fn (): string => self::label('campaigns.combobox.selected.discounts', 'Selected discounts'))
                         ->preload()
                         ->columnSpanFull(),
                 ]),
@@ -236,18 +219,13 @@ final class CampaignResource extends Resource
                 TextColumn::make('status')
                     ->label(self::label('campaigns.fields.status', 'Status'))
                     ->badge()
-                    ->formatStateUsing(
-                        fn (?string $state): string => self::label(
-                            'campaigns.status.'.($state ?? 'unknown'),
-                            $state ? Str::headline($state) : 'Unknown'
-                        )
-                    )
+                    ->formatStateUsing(fn (string $state): string => self::label('campaigns.status.' . $state, Str::headline($state)))
                     ->colors([
-                        'primary' => fn (?string $state): bool => in_array($state, ['draft', 'scheduled'], true),
-                        'success' => fn (?string $state): bool => $state === 'active',
-                        'warning' => fn (?string $state): bool => $state === 'paused',
-                        'info' => fn (?string $state): bool => $state === 'completed',
-                        'danger' => fn (?string $state): bool => $state === 'cancelled',
+                        'primary' => fn (string $state): bool => in_array($state, ['draft', 'scheduled']),
+                        'success' => fn (string $state): bool => $state === 'active',
+                        'warning' => fn (string $state): bool => $state === 'paused',
+                        'info'    => fn (string $state): bool => $state === 'completed',
+                        'danger'  => fn (string $state): bool => $state === 'cancelled',
                     ]),
                 IconColumn::make('is_active')
                     ->label(self::label('campaigns.fields.is_active', 'Active'))
@@ -273,7 +251,7 @@ final class CampaignResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('conversion_rate')
                     ->label(self::label('campaigns.fields.conversion_rate', 'Conversion rate'))
-                    ->formatStateUsing(fn (?float $state): string => number_format($state ?? 0.0, 2).'%')
+                    ->formatStateUsing(fn ($state): string => number_format((float) $state, 2) . '%')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('translations_count')
