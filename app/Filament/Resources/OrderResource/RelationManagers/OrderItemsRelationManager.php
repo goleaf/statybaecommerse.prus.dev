@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\OrderItem;
-use App\Support\Filament\ProductVariantFieldHelper;
-use App\Support\Filament\SearchableInputHelper;
-use App\Support\Search\ProductVariantSearch;
+use App\Models\Product;
+use App\Models\ProductVariant;
+use App\Support\Search\ProductSearch;
+use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -20,8 +22,8 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\BadgeColumn;
@@ -65,7 +67,64 @@ final class OrderItemsRelationManager extends BaseRelationManager
                     ->icon('heroicon-o-cube')
                     ->schema([
                         Grid::make(2)
-                            ->schema([
+                            ->components([
+                                SearchableInput::make('product_lookup')
+                                    ->label(__('orders.product'))
+                                    ->placeholder(__('orders.product_search_placeholder'))
+                                    ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
+                                    ->dehydrated(false)
+                                    ->onItemSelected(function (SearchResult $item): void {
+                                        app()->call(function (Set $set) use ($item): void {
+                                            $rawId = $item->get('product_id');
+
+                                            if (! is_numeric($rawId)) {
+                                                $rawId = $item->value();
+                                            }
+
+                                            if (! is_numeric($rawId)) {
+                                                return;
+                                            }
+
+                                            $productId = (int) $rawId;
+
+                                            if ($productId <= 0) {
+                                                return;
+                                            }
+
+                                            $product = Product::query()
+                                                ->select(['id', 'name', 'sku', 'price'])
+                                                ->find($productId);
+
+                                            if (! $product instanceof Product) {
+                                                return;
+                                            }
+
+                                            $set('product_id', $productId);
+                                            $set('product_variant_id', null);
+
+                                            $name = $product->getAttribute('name');
+                                            if (is_array($name)) {
+                                                $locale = app()->getLocale();
+                                                $value = $name[$locale] ?? reset($name);
+                                                if (is_string($value)) {
+                                                    $set('name', $value);
+                                                }
+                                            } elseif (is_string($name)) {
+                                                $set('name', $name);
+                                            }
+
+                                            $sku = $product->getAttribute('sku');
+                                            if (is_string($sku)) {
+                                                $set('sku', $sku);
+                                            }
+
+                                            $price = $product->getAttribute('price');
+                                            if (is_numeric($price)) {
+                                                $set('unit_price', number_format((float) $price, 2, '.', ''));
+                                            }
+                                        });
+                                    })
+                                    ->suffixIcon('heroicon-o-magnifying-glass'),
                                 Select::make('product_variant_id')
                                     ->label(__('orders.product_variant'))
                                     ->placeholder(__('orders.lookups.variant_placeholder'))

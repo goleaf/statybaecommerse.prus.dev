@@ -1,62 +1,33 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'navigation_label' => 'Sliders',
-    'plural' => 'Sliders',
-    'single' => 'Slider',
+    'plural'           => 'Sliders',
+    'single'           => 'Slider',
 
     'basic_information' => 'Basic Information',
-    'media' => 'Media',
-    'appearance' => 'Appearance',
-    'settings' => 'Settings',
+    'media'             => 'Media',
+    'appearance'        => 'Appearance',
+    'settings'          => 'Settings',
 
-    'title' => 'Title',
-    'description' => 'Description',
-    'button_text' => 'Button Text',
-    'button_url' => 'Button URL',
-    'image' => 'Image',
-    'background_color' => 'Background Color',
-    'text_color' => 'Text Color',
-    'sort_order' => 'Sort Order',
-    'is_active' => 'Active',
-    'created_at' => 'Created At',
-    'updated_at' => 'Updated At',
-
-    'link_search' => [
-        'placeholder' => 'Search products, categories, collections, or paste a URL',
-        'types' => [
-            'static' => 'Static page',
-            'product' => 'Product',
-            'category' => 'Category',
-            'collection' => 'Collection',
-            'post' => 'Blog post',
-        ],
-        'static_links' => [
-            'home' => [
-                'route' => 'home',
-                'label' => 'Homepage',
-                'description' => 'Main storefront landing page.',
-            ],
-            'products' => [
-                'route' => 'frontend.products.index',
-                'label' => 'All products',
-                'description' => 'Browse the full catalogue.',
-            ],
-            'collections' => [
-                'route' => 'frontend.collections.index',
-                'label' => 'Collections overview',
-                'description' => 'Curated product collections.',
-            ],
-            'posts' => [
-                'route' => 'frontend.posts.index',
-                'label' => 'Blog posts',
-                'description' => 'Latest articles from our team.',
-            ],
-            'contact' => [
-                'route' => 'frontend.contact.index',
-                'label' => 'Contact page',
-                'description' => 'Ways for customers to reach support.',
-            ],
-        ],
+    'title'                   => 'Title',
+    'description'             => 'Description',
+    'button_text'             => 'Button Text',
+    'button_url'              => 'Button URL',
+    'link_target'             => 'Internal link helper',
+    'link_target_placeholder' => 'Search posts or collections…',
+    'link_target_hint'        => 'Selecting a result fills the button URL. You can still paste any custom link.',
+    'link_types'              => [
+        'post'       => 'Post',
+        'collection' => 'Collection',
     ],
+    'image'            => 'Image',
+    'background_color' => 'Background Color',
+    'text_color'       => 'Text Color',
+    'sort_order'       => 'Sort Order',
+    'is_active'        => 'Active',
+    'created_at'       => 'Created At',
+    'updated_at'       => 'Updated At',
 ];

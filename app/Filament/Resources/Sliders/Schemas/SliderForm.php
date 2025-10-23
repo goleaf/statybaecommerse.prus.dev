@@ -4,11 +4,17 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Sliders\Schemas;
 
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use App\Support\Search\ContentLinkSearch;
+use DefStudio\SearchableInput\DTO\SearchResult;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 
 final class SliderForm
 {
@@ -75,13 +81,30 @@ final class SliderForm
                 Section::make(__('admin.sliders.call_to_action'))
                     ->description(__('admin.sliders.call_to_action_description'))
                     ->components([
-                        Grid::make(2)
+                        Grid::make(3)
                             ->components([
                                 TextInput::make('button_text')
                                     ->label(__('admin.sliders.button_text'))
                                     ->maxLength(255)
                                     ->columnSpan(1),
-                                SearchableInput::make('button_url')
+                                SearchableInput::make('link_target')
+                                    ->label(__('admin.sliders.link_target'))
+                                    ->placeholder(__('admin.sliders.link_target_placeholder'))
+                                    ->searchUsing(fn (string $search): array => ContentLinkSearch::suggestions($search))
+                                    ->onItemSelected(function (SearchResult $item): void {
+                                        app()->call(function (Set $set) use ($item): void {
+                                            $url = $item->value();
+
+                                            if ($url !== '') {
+                                                $set('button_url', $url);
+                                            }
+                                        });
+                                    })
+                                    ->dehydrated(false)
+                                    ->helperText(__('admin.sliders.link_target_hint'))
+                                    ->suffixIcon('heroicon-o-link')
+                                    ->columnSpan(1),
+                                TextInput::make('button_url')
                                     ->label(__('admin.sliders.button_url'))
                                     ->placeholder(__('admin.sliders.link_search.placeholder'))
                                     ->maxLength(255)

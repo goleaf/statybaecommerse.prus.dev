@@ -8,7 +8,10 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\SliderResource\Pages;
 use App\Models\Slider;
+use App\Support\Search\ContentLinkSearch;
 use BackedEnum;
+use DefStudio\SearchableInput\DTO\SearchResult;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
@@ -17,6 +20,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup as TableBulkActionGroup;
 use Filament\Tables\Actions\DeleteAction as TableDeleteAction;
@@ -93,7 +97,23 @@ final class SliderResource extends Resource
                         ->rows(3)
                         ->maxLength(500)
                         ->columnSpanFull(),
-                    SearchableInput::make('button_url')
+                    SearchableInput::make('link_target')
+                        ->label(__('sliders.link_target'))
+                        ->placeholder(__('sliders.link_target_placeholder'))
+                        ->searchUsing(fn (string $search): array => ContentLinkSearch::suggestions($search))
+                        ->onItemSelected(function (SearchResult $item): void {
+                            app()->call(function (Set $set) use ($item): void {
+                                $url = $item->value();
+
+                                if ($url !== '') {
+                                    $set('button_url', $url);
+                                }
+                            });
+                        })
+                        ->dehydrated(false)
+                        ->helperText(__('sliders.link_target_hint'))
+                        ->suffixIcon('heroicon-o-link'),
+                    TextInput::make('button_url')
                         ->label(__('sliders.button_url'))
                         ->placeholder(__('sliders.link_search.placeholder'))
                         ->maxLength(255)

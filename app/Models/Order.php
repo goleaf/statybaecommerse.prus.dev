@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Carbon;
+use Schema;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Translatable\HasTranslations;
@@ -52,7 +52,7 @@ final class Order extends Model
 
     public array $translatable = ['notes', 'billing_address', 'shipping_address'];
 
-    protected $fillable = ['number', 'user_id', 'status', 'subtotal', 'tax_amount', 'shipping_amount', 'discount_amount', 'total', 'currency', 'billing_address', 'shipping_address', 'notes', 'shipped_at', 'delivered_at', 'channel_id', 'shipping_option_id', 'partner_id', 'payment_status', 'payment_method', 'payment_reference', 'transactions'];
+    protected $fillable = ['number', 'user_id', 'status', 'subtotal', 'tax_amount', 'shipping_amount', 'discount_amount', 'total', 'currency', 'billing_address', 'shipping_address', 'notes', 'shipped_at', 'delivered_at', 'channel_id', 'shipping_option_id', 'partner_id', 'coupon_id', 'payment_status', 'payment_method', 'payment_reference'];
 
     /**
      * Handle casts functionality with proper error handling.
@@ -94,6 +94,11 @@ final class Order extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function coupon(): BelongsTo
+    {
+        return $this->belongsTo(Coupon::class);
     }
 
     /**
@@ -331,7 +336,7 @@ final class Order extends Model
     {
         // Prefer explicit payment status when present and non-null
         if (Schema::hasColumn($this->getTable(), 'payment_status')) {
-            $query = $query->where(function ($q): void {
+            $query = $query->where(function ($q) {
                 $q->whereNotNull('payment_status')->whereIn('payment_status', ['paid', 'captured', 'settled', 'authorized']);
             });
         }
@@ -422,41 +427,5 @@ final class Order extends Model
     public function getFormattedTotalAttribute(): string
     {
         return number_format((float) $this->total, 2) . ' ' . $this->currency;
-    }
-
-    /**
-     * Normalise dynamic date inputs into an immutable Carbon instance so scope helpers behave consistently.
-     */
-    private static function toImmutableCarbon(CarbonInterface|DateTimeInterface|string $value): CarbonImmutable
-    {
-        if ($value instanceof CarbonImmutable) {
-            return $value;
-        }
-
-        if ($value instanceof CarbonInterface) {
-            return $value->toImmutable();
-        }
-
-        if ($value instanceof DateTimeInterface) {
-            return CarbonImmutable::make($value)
-                ?? CarbonImmutable::parse($value->format('Y-m-d H:i:s.u'), $value->getTimezone());
-        }
-
-        return CarbonImmutable::parse((string) $value);
-    }
-
-    /**
-     * @return array{0: CarbonImmutable, 1: CarbonImmutable}
-     */
-    private static function normalizeRange(CarbonInterface|DateTimeInterface|string $start, CarbonInterface|DateTimeInterface|string $end): array
-    {
-        $startAt = self::toImmutableCarbon($start);
-        $endAt = self::toImmutableCarbon($end);
-
-        if ($startAt->greaterThan($endAt)) {
-            [$startAt, $endAt] = [$endAt, $startAt];
-        }
-
-        return [$startAt, $endAt];
     }
 }

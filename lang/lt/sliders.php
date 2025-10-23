@@ -1,62 +1,33 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'navigation_label' => 'Skaidrių valdymas',
-    'plural' => 'Skaidrės',
-    'single' => 'Skaidrė',
+    'plural'           => 'Skaidrės',
+    'single'           => 'Skaidrė',
 
     'basic_information' => 'Pagrindinė informacija',
-    'media' => 'Medija',
-    'appearance' => 'Išvaizda',
-    'settings' => 'Nustatymai',
+    'media'             => 'Medija',
+    'appearance'        => 'Išvaizda',
+    'settings'          => 'Nustatymai',
 
-    'title' => 'Pavadinimas',
-    'description' => 'Aprašymas',
-    'button_text' => 'Mygtuko tekstas',
-    'button_url' => 'Mygtuko URL',
-    'image' => 'Paveikslėlis',
-    'background_color' => 'Fono spalva',
-    'text_color' => 'Teksto spalva',
-    'sort_order' => 'Rūšiavimo tvarka',
-    'is_active' => 'Aktyvus',
-    'created_at' => 'Sukurta',
-    'updated_at' => 'Atnaujinta',
-
-    'link_search' => [
-        'placeholder' => 'Ieškokite produktų, kategorijų, kolekcijų arba įklijuokite nuorodą',
-        'types' => [
-            'static' => 'Statinis puslapis',
-            'product' => 'Produktas',
-            'category' => 'Kategorija',
-            'collection' => 'Kolekcija',
-            'post' => 'Tinklaraščio įrašas',
-        ],
-        'static_links' => [
-            'home' => [
-                'route' => 'home',
-                'label' => 'Pagrindinis puslapis',
-                'description' => 'Pagrindinis parduotuvės puslapis.',
-            ],
-            'products' => [
-                'route' => 'frontend.products.index',
-                'label' => 'Visi produktai',
-                'description' => 'Peržiūrėkite visą katalogą.',
-            ],
-            'collections' => [
-                'route' => 'frontend.collections.index',
-                'label' => 'Kolekcijų apžvalga',
-                'description' => 'Kruopščiai atrinktos produktų kolekcijos.',
-            ],
-            'posts' => [
-                'route' => 'frontend.posts.index',
-                'label' => 'Tinklaraštis',
-                'description' => 'Naujausi mūsų komandos straipsniai.',
-            ],
-            'contact' => [
-                'route' => 'frontend.contact.index',
-                'label' => 'Kontaktai',
-                'description' => 'Klientų aptarnavimo kontaktai.',
-            ],
-        ],
+    'title'                   => 'Pavadinimas',
+    'description'             => 'Aprašymas',
+    'button_text'             => 'Mygtuko tekstas',
+    'button_url'              => 'Mygtuko URL',
+    'link_target'             => 'Vidinių nuorodų paieška',
+    'link_target_placeholder' => 'Ieškoti įrašų ar kolekcijų…',
+    'link_target_hint'        => 'Pasirinkta reikšmė užpildys mygtuko URL, tačiau galite įklijuoti ir savo nuorodą.',
+    'link_types'              => [
+        'post'       => 'Įrašas',
+        'collection' => 'Kolekcija',
     ],
+    'image'            => 'Paveikslėlis',
+    'background_color' => 'Fono spalva',
+    'text_color'       => 'Teksto spalva',
+    'sort_order'       => 'Rūšiavimo tvarka',
+    'is_active'        => 'Aktyvus',
+    'created_at'       => 'Sukurta',
+    'updated_at'       => 'Atnaujinta',
 ];
