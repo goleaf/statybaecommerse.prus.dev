@@ -55,9 +55,9 @@ final class ReviewResource extends Resource
     /**
      * @var string|BackedEnum|null Allow enum-backed navigation grouping.
      */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::ContentManagement;
+    protected static \Filament\Navigation\NavigationGroup|array|string|null $navigationGroup = NavigationGroup::ContentManagement->value;
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
     {
         // Convert enum-backed navigation groups into translated labels automatically.
         $group = self::$navigationGroup;

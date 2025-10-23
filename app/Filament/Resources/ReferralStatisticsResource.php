@@ -34,7 +34,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 final class ReferralStatisticsResource extends Resource
 {
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
     {
         return 'Referral';
     }

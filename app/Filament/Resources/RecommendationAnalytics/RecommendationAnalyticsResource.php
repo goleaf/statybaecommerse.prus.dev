@@ -31,7 +31,7 @@ final class RecommendationAnalyticsResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'action';
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
     {
         return 'Analytics';
     }

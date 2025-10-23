@@ -21,7 +21,7 @@ final class AuditTrailResource extends Resource
 {
     protected static ?string $model = AuditTrail::class;
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Security';
+    protected static \Filament\Navigation\NavigationGroup|array|string|null $navigationGroup = 'Security';
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-clipboard-document-check';
 

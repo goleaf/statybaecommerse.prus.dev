@@ -6,8 +6,8 @@ namespace App\Support\Concerns;
 
 use App\Support\Nav;
 use BackedEnum;
+use Filament\Navigation\NavigationGroup as FilamentNavigationGroup;
 use Illuminate\Contracts\Support\Htmlable;
-use UnitEnum;
 use Throwable;
 
 /**
@@ -21,7 +21,7 @@ trait HasNav
     /**
      * Resolve the translated navigation group label for the resource.
      */
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): FilamentNavigationGroup|array|string|null
     {
         return Nav::groupForResource(static::class);
     }
