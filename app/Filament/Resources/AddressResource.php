@@ -93,10 +93,7 @@ final class AddressResource extends Resource
     }
 
     /**
-     * Configure the Filament form schema using the v4 `Schema` contract so downstream
-     * consumers resolve the same container pipeline that powers `Schema::components([...])`
-     * definitions. Returning the schema keeps the resource compatible with Filament's
-     * stricter signature expectations while documenting the component wiring strategy.
+     * Configure the Filament form schema while returning the v4 Form contract explicitly.
      */
     public static function form(Form $form): Form
     {
@@ -327,8 +324,7 @@ final class AddressResource extends Resource
     }
 
     /**
-     * Configure the Filament table while returning the provided Table instance so the
-     * resource method signature aligns with Filament v4's stricter contract.
+     * Configure the Filament table with comprehensive columns, filters, and actions.
      */
     public static function table(Table $table): Table
     {
