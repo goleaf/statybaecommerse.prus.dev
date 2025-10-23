@@ -2,126 +2,125 @@
 
 declare(strict_types=1);
 
-use App\Support\Filament\Components\SearchableComponentHelper;
+use App\Support\Filament\SearchableComponentHelper;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
-use Filament\Forms\Set;
-use Filament\Schemas\Components\Component;
 
-it('hydrates the searchable input with the normalised payload', function (): void {
+it('hydrates the searchable component with the canonical payload tuple', function (): void {
+    // Arrange: prime the component with a fake record that exposes metadata.
     $component = SearchableInput::make('product_id');
 
     SearchableComponentHelper::hydrate(
-        component: $component,
-        state: 5,
-        resolveRecord: static fn (int $identifier): array => [
-            'id' => $identifier,
-            'name' => 'Demo Product',
+        $component,
+        42,
+        static fn (int $identifier): ?array => [
+            'id'    => $identifier,
+            'label' => 'Example Product',
+            'sku'   => 'SKU-42',
         ],
-        normalizePayload: static fn (array $record): array => [
-            'value' => $record['id'],
-            'label' => $record['name'],
-            'payload' => [
-                'product_id' => $record['id'],
-                'sku' => 'DEMO-001',
-            ],
-        ],
+        static function (array $record): array {
+            return [
+                'value'   => $record['id'],
+                'label'   => $record['label'],
+                'payload' => [
+                    'sku' => $record['sku'],
+                ],
+            ];
+        },
     );
 
-    expect($component->getState())->toBe('5')
-        ->and($component->getOptions())
-        ->toMatchArray(['5' => 'Demo Product'])
-        ->and($component->getPayload())
-        ->toMatchArray([
-            'product_id' => 5,
-            'sku' => 'DEMO-001',
-        ]);
+    // Assert: the helper persists state/options and injects canonical payload keys.
+    expect($component->getState())->toBe('42');
+    expect($component->getOptions())->toBe(['42' => 'Example Product']);
+    expect($component->getPayload())->toBe([
+        'sku'   => 'SKU-42',
+        'id'    => '42',
+        'label' => 'Example Product',
+    ]);
 });
 
-it('syncs selected records and clears stale selections', function (): void {
+it('synchronises identifiers and payload metadata when selections change', function (): void {
+    // Arrange: mimic Filament\Forms\Set with a closure capturing field updates.
     $component = SearchableInput::make('product_id');
+    $fields = [
+        'product_id'      => null,
+        'product_payload' => ['id' => null, 'label' => '', 'sku' => null],
+        'cleared'         => false,
+    ];
 
-    $set = new class extends Set {
-        /** @var array<string, mixed> */
-        public array $values = [];
-
-        public function __construct()
-        {
-            parent::__construct(new class extends Component {
-                protected string $view = 'filament-support::components.actions';
-            });
-        }
-
-        public function __invoke(string | Component $path, mixed $state, bool $isAbsolute = false, bool $shouldCallUpdatedHooks = false): mixed
-        {
-            $this->values[(string) $path] = $state;
-
-            return $state;
-        }
+    $set = static function (string $field, mixed $value) use (&$fields): void {
+        $fields[$field] = $value;
     };
 
-    $syncedPayload = [];
-    $cleared = false;
-
+    // Act: sync a valid selection.
     SearchableComponentHelper::syncSelectedRecord(
-        component: $component,
-        state: '42',
-        set: $set,
-        attribute: 'product_id',
-        resolveRecord: static fn (string $identifier): array => [
-            'id' => (int) $identifier,
-            'name' => 'Inventory Widget',
+        $component,
+        '55',
+        $set,
+        'product_id',
+        static fn (string $identifier): ?array => [
+            'id'    => (int) $identifier,
+            'label' => 'Cached Product',
+            'sku'   => 'SYNC-55',
         ],
-        normalizePayload: static fn (array $record): array => [
-            'value' => $record['id'],
-            'label' => $record['name'],
-            'payload' => [
-                'product_id' => $record['id'],
-                'price' => 19.99,
-            ],
-        ],
-        onSync: static function (array $normalised) use (&$syncedPayload): void {
-            $syncedPayload = $normalised['payload'];
+        static function (array $record): array {
+            return [
+                'value'   => $record['id'],
+                'label'   => $record['label'],
+                'payload' => [
+                    'sku' => $record['sku'],
+                ],
+            ];
         },
-        onClear: static function () use (&$cleared): void {
-            $cleared = true;
+        'product_payload',
+        ['id' => null, 'label' => '', 'sku' => null],
+        static function () use (&$fields): void {
+            $fields['cleared'] = true;
         },
     );
 
-    expect($set->values['product_id'] ?? null)->toBe(42)
-        ->and($component->getState())->toBe('42')
-        ->and($component->getOptions())
-        ->toMatchArray(['42' => 'Inventory Widget'])
-        ->and($component->getPayload())
-        ->toMatchArray([
-            'product_id' => 42,
-            'price' => 19.99,
-        ])
-        ->and($syncedPayload)
-        ->toMatchArray([
-            'product_id' => 42,
-            'price' => 19.99,
-        ])
-        ->and($cleared)->toBeFalse();
+    // Assert: the identifier is normalised, payload cached, and UI updated.
+    expect($fields['product_id'])->toBe(55);
+    expect($fields['product_payload'])->toBe([
+        'sku'   => 'SYNC-55',
+        'id'    => '55',
+        'label' => 'Cached Product',
+    ]);
+    expect($component->getState())->toBe('55');
+    expect($component->getOptions())->toBe(['55' => 'Cached Product']);
+    expect($component->getPayload())->toBe([
+        'sku'   => 'SYNC-55',
+        'id'    => '55',
+        'label' => 'Cached Product',
+    ]);
 
+    // Act: clearing the lookup should reset everything and trigger the clean-up callback.
     SearchableComponentHelper::syncSelectedRecord(
-        component: $component,
-        state: '',
-        set: $set,
-        attribute: 'product_id',
-        resolveRecord: static fn (string $identifier): ?array => null,
-        normalizePayload: static fn (array $record): array => $record,
-        onSync: static function (): void {
-            // No-op for the empty branch.
-        },
-        onClear: static function () use (&$cleared): void {
-            $cleared = true;
+        $component,
+        null,
+        $set,
+        'product_id',
+        static fn (): ?array => null,
+        static fn (): array => [
+            'value'   => null,
+            'label'   => null,
+            'payload' => [],
+        ],
+        'product_payload',
+        ['id' => null, 'label' => '', 'sku' => null],
+        static function () use (&$fields): void {
+            $fields['cleared'] = true;
         },
     );
 
-    expect($set->values['product_id'] ?? null)->toBeNull()
-        ->and($component->getState())->toBeNull()
-        ->and($component->getOptions())->toBeEmpty()
-        ->and($component->getPayload())
-        ->toBe([])
-        ->and($cleared)->toBeTrue();
+    // Assert: the helper clears identifiers, payloads, and emits the clean-up callback once.
+    expect($fields['product_id'])->toBeNull();
+    expect($fields['product_payload'])->toBe([
+        'id'    => null,
+        'label' => '',
+        'sku'   => null,
+    ]);
+    expect($fields['cleared'])->toBeTrue();
+    expect($component->getState())->toBeNull();
+    expect($component->getOptions())->toBe([]);
+    expect($component->getPayload())->toBe([]);
 });
