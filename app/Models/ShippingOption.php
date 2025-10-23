@@ -49,6 +49,7 @@ final class ShippingOption extends Model
         'estimated_days_max',
         'metadata',
         'shipping_matrix',
+        'zone_id',
     ];
 
     protected function casts(): array
@@ -63,9 +64,10 @@ final class ShippingOption extends Model
             'max_order_amount'   => 'decimal:2',
             'estimated_days_min' => 'integer',
             'estimated_days_max' => 'integer',
-            'sort_order' => 'integer',
-            'metadata' => 'array',
-            'shipping_matrix' => 'array',
+            'sort_order'         => 'integer',
+            'metadata'           => 'array',
+            'shipping_matrix'    => 'array',
+            'zone_id'            => 'integer',
         ];
     }
 
@@ -113,6 +115,14 @@ final class ShippingOption extends Model
     }
 
     /**
+     * Shipping options belong to a geographic zone for localization logic.
+     */
+    public function zone(): BelongsTo
+    {
+        return $this->belongsTo(Zone::class);
+    }
+
+    /**
      * Handle scopeEnabled functionality with proper error handling.
      *
      * @param  Builder<self>           $query
@@ -153,6 +163,18 @@ final class ShippingOption extends Model
 
     public function scopeByZone(Builder $query, int|string $zoneId): Builder
     {
+        return $query->where('zone_id', $zoneId);
+    }
+
+    /**
+     * Scope shipping options by zone while tolerating null filters.
+     */
+    public function scopeByZone(Builder $query, null|int|string $zoneId): Builder
+    {
+        if ($zoneId === null || $zoneId === '') {
+            return $query;
+        }
+
         return $query->where('zone_id', $zoneId);
     }
 
