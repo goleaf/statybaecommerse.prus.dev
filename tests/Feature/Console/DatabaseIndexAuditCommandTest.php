@@ -17,11 +17,38 @@ final class DatabaseIndexAuditCommandTest extends TestCase
     public function test_duplicate_indexes_are_flagged_and_cleanup_resolves_them(): void
     {
         Schema::dropIfExists('duplicate_index_examples');
+        Schema::dropIfExists('order_items');
+        Schema::dropIfExists('orders');
+        Schema::dropIfExists('products');
 
         Schema::create('duplicate_index_examples', static function (Blueprint $table): void {
             $table->id();
             $table->string('slug');
             $table->unsignedBigInteger('category_id')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('orders', static function (Blueprint $table): void {
+            $table->id();
+            $table->unsignedBigInteger('customer_id');
+            $table->string('status');
+            $table->timestamps();
+        });
+
+        Schema::create('order_items', static function (Blueprint $table): void {
+            $table->id();
+            $table->unsignedBigInteger('order_id');
+            $table->unsignedBigInteger('product_id');
+            $table->unsignedInteger('quantity');
+            $table->timestamps();
+        });
+
+        Schema::create('products', static function (Blueprint $table): void {
+            $table->id();
+            $table->unsignedBigInteger('category_id');
+            $table->boolean('is_visible')->default(true);
+            $table->unsignedInteger('inventory');
+            $table->decimal('price', 10, 2);
             $table->timestamps();
         });
 
@@ -39,16 +66,36 @@ final class DatabaseIndexAuditCommandTest extends TestCase
         $this->assertStringContainsString('duplicate_index_examples', $output);
         $this->assertStringContainsString('duplicate_index_examples_slug_idx_duplicate', $output);
         $this->assertStringContainsString('duplicate_index_examples_category_slug_idx_duplicate', $output);
+        $this->assertStringContainsString('orders: add [status, created_at]', $output);
+        $this->assertStringContainsString('order_items: add [order_id, product_id]', $output);
+        $this->assertStringContainsString('products: add [is_visible, price]', $output);
 
         Schema::table('duplicate_index_examples', static function (Blueprint $table): void {
             $table->dropIndex('duplicate_index_examples_slug_idx_duplicate');
             $table->dropIndex('duplicate_index_examples_category_slug_idx_duplicate');
         });
 
+        Schema::table('orders', static function (Blueprint $table): void {
+            // Add the composite indexes the audit expects for analytics and CRM flows.
+            $table->index(['status', 'created_at'], 'index_orders_status_created_at');
+            $table->index(['customer_id', 'created_at'], 'index_orders_customer_created_at');
+        });
+
+        Schema::table('order_items', static function (Blueprint $table): void {
+            // Ensure order to product lookups lean on a composite index.
+            $table->index(['order_id', 'product_id'], 'order_items_order_product_idx');
+        });
+
+        Schema::table('products', static function (Blueprint $table): void {
+            // Provide coverage for storefront filters.
+            $table->index(['is_visible', 'price'], 'products_visibility_price_idx');
+            $table->index(['category_id', 'is_visible'], 'products_category_visibility_idx');
+        });
+
         $exitCodeAfterCleanup = Artisan::call('db:audit-indexes');
         $outputAfterCleanup = Artisan::output();
 
         $this->assertSame(0, $exitCodeAfterCleanup, 'Expected command to pass after removing duplicates.');
-        $this->assertStringContainsString('No duplicate indexes found', $outputAfterCleanup);
+        $this->assertStringContainsString('No duplicate indexes found and all recommended composites are present', $outputAfterCleanup);
     }
 }
