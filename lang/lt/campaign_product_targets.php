@@ -3,7 +3,10 @@
 return [
     'single' => 'Kampanijos produkto taikinys',
     'plural' => 'Kampanijos produktų taikiniai',
-    'navigation' => 'Produktų taikiniai',
+    // Provide the nested navigation label used by the admin panel sidebar.
+    'navigation' => [
+        'label' => 'Kampanijos taikiniai',
+    ],
     'tab_label' => 'Skirtukai',
     'tabs' => [
         'all' => 'Visi taikiniai',
