@@ -1,5 +1,5 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
+#!/usr/bin/env sh
+# Ensure the Composer CI suite runs before pushing while relying on Husky's modern shim for PATH setup.
 
 set -eu
 
