@@ -83,6 +83,7 @@ final class CustomerGroup extends Model
             'type' => 'string',
             'metadata' => 'array',
             'conditions' => 'array',
+            'deleted_at' => 'datetime',
         ];
     }
 
