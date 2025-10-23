@@ -7,7 +7,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Bug Fixes
-* Normalized the Collection Filament resource navigation metadata, translations, and fillable definitions so the comprehensive test suite and admin menus align with the v4 schema expectations.
+* Restored the Category Filament resource by dropping storefront-only scopes, wiring slug auto-generation, and surfacing active/visible toggles plus filters so admin CRUD flows and their regression tests can manage hidden or inactive categories again.
 * Re-enabled flexible system setting translations by replacing the locale uniqueness constraint with an index, restoring soft delete support, and trimming the fillable contract so replication and counting scenarios match the documented API.
 * Preserved Attribute validation rule strings while still decoding JSON arrays, refreshed the Filament form so arrays render as comma-separated chips, and added regression coverage for both storage paths.
 * Reintroduced the `regions` schema with defensive guards and rebuilt the `customers`/`orders` relationship so SQLite-backed factories and analytics widgets can create location-aware records without missing column errors during tests.

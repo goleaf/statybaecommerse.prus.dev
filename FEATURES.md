@@ -17,7 +17,7 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
-- Filament autocomplete fields now ignore restrictive global scopes during lookups, so merchandising and catalog admins can find freshly seeded records without waiting for scope configuration tweaks.
+- Category management now auto-synchronises slugs, exposes visibility toggles, and ignores storefront-only scopes so Filament admins can activate, hide, or bulk-manage categories without leaving the list view.
 - Brands page now features a light-themed layout, shared card components, and refreshed translations so the partner directory feels consistent across locales.
 - Collection resource navigation, translations, and fillable definitions were synchronised with the Filament v4 schema so admin operators and regression tests see the same field set across languages.
 - Region-to-city lookups and the dedicated customers table are restored for the SQLite harness, ensuring analytics sparklines, customer factories, and Filament resources can attach geographic metadata without migration errors.
