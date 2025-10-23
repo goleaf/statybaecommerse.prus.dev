@@ -44,11 +44,7 @@ final class ApiKeyResource extends Resource
      */
     protected static $navigationIcon = 'heroicon-o-key';
 
-    /**
-     * Navigation group for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
+    /** @var string|BackedEnum|null Using BackedEnum removes the redundant UnitEnum import for navigation grouping. */
     protected static $navigationGroup = null;
 
     protected static ?int $navigationSort = 4;

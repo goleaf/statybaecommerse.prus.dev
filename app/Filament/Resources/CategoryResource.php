@@ -18,12 +18,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Tables;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
@@ -34,22 +29,16 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 
 final class CategoryResource extends Resource
 {
-    /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
+    /** @var string|BackedEnum|null Explicit docblock avoids deprecated typed properties in Filament v4. */
     protected static $navigationIcon = 'heroicon-o-tag';
 
-    /**
-     * Navigation group for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
+    /** @var string|BackedEnum|null Navigation grouped via enum for clarity without needing UnitEnum import. */
     protected static $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 3;
@@ -224,11 +213,14 @@ final class CategoryResource extends Resource
                         $state = $column->getState();
                         $record = $column->getRecord();
                         if ($record->parent) {
-                            // Use the Str helper to avoid deprecated string helper aliases while building the breadcrumb label.
+                            // Use Str helper so localized multibyte characters stay intact when nesting category names.
                             return Str::of($record->parent->name)
-                                ->append(' → ')
-                                ->append((string) $state)
-                                ->toString();
+                                ->when(
+                                    filled($state),
+                                    fn (Stringable $stringable): Stringable => $stringable->append(' → ' . (string) $state),
+                                    fn (Stringable $stringable): Stringable => $stringable,
+                                )
+                                ->value();
                         }
 
                         return $state;
@@ -281,15 +273,16 @@ final class CategoryResource extends Resource
                 TrashedFilter::make(),
             ])
             ->actions([
-                ViewAction::make()
+                Tables\Actions\ViewAction::make()
                     ->visible(fn () => AuthorizationMatrix::check('categories', 'view')),
-                EditAction::make()
+                Tables\Actions\EditAction::make()
                     ->visible(fn () => AuthorizationMatrix::check('categories', 'update')),
-                Action::make('toggle_active')
+                Tables\Actions\Action::make('toggle_active')
                     ->label(fn (Category $record): string => $record->is_active ? __('categories.deactivate') : __('categories.activate'))
                     ->icon(fn (Category $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                     ->color(fn (Category $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (Category $record): void {
+                        // Simple toggle keeps business logic within the action while keeping tests deterministic.
                         $record->update(['is_active' => ! $record->is_active]);
                         Notification::make()
                             ->title($record->is_active ? __('categories.activated_successfully') : __('categories.deactivated_successfully'))
@@ -300,14 +293,15 @@ final class CategoryResource extends Resource
                     ->visible(fn () => AuthorizationMatrix::check('categories', 'update')),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make()
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make()
                         ->visible(fn () => AuthorizationMatrix::check('categories', 'delete')),
-                    BulkAction::make('activate')
+                    Tables\Actions\BulkAction::make('activate')
                         ->label(__('categories.activate_selected'))
                         ->icon('heroicon-o-eye')
                         ->color('success')
                         ->action(function (Collection $records): void {
+                            // Batch activate keeps UI consistent for administrators managing seasonal categories.
                             $records->each->update(['is_active' => true]);
                             Notification::make()
                                 ->title(__('categories.bulk_activated_success'))
@@ -316,11 +310,12 @@ final class CategoryResource extends Resource
                         })
                         ->requiresConfirmation()
                         ->visible(fn () => AuthorizationMatrix::check('categories', 'update')),
-                    BulkAction::make('deactivate')
+                    Tables\Actions\BulkAction::make('deactivate')
                         ->label(__('categories.deactivate_selected'))
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
                         ->action(function (Collection $records): void {
+                            // Batch deactivate leverages the same pattern for clarity when cleaning up catalog entries.
                             $records->each->update(['is_active' => false]);
                             Notification::make()
                                 ->title(__('categories.bulk_deactivated_success'))

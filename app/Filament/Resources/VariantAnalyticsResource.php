@@ -22,12 +22,7 @@ use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Tables;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use BackedEnum;
@@ -50,14 +45,10 @@ final class VariantAnalyticsResource extends Resource
 {
     protected static ?string $model = VariantAnalytics::class;
 
-    /** @var string|\BackedEnum|null */
+    /** @var string|BackedEnum|null Typed via docblock to align with Filament v4 navigation expectations. */
     protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    /**
-     * @var string|\BackedEnum|null
-     *
-     * Keep the navigation entry grouped with the rest of the inventory dashboards.
-     */
+    /** @var string|BackedEnum|null Keep analytics grouped without redundant UnitEnum imports. */
     protected static $navigationGroup = NavigationGroup::Inventory;
 
     public static function getNavigationGroup(): BackedEnum|string|null
