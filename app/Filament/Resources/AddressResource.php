@@ -10,8 +10,8 @@ use App\Enums\AddressType;
 use App\Filament\Resources\AddressResource\Pages;
 use App\Models\Address;
 use App\Models\City;
-use App\Models\User;
 use App\Models\Country;
+use App\Models\User;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\AddressSearch;
 use App\Support\Search\CustomerSearch;
@@ -112,7 +112,7 @@ final class AddressResource extends Resource
                             ->searchUsing(fn (string $search): array => CustomerSearch::byEmailPhoneName($search))
                             ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
                             ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?Address $record): void {
-                                // Hydrate via helper consistent with docs/forms/SEARCHABLE_INPUT_METADATA.md.
+                                // Hydrate via the shared helper so the metadata lifecycle matches the documentation.
                                 SearchableInputHelper::hydrate(
                                     $component,
                                     $state,
@@ -140,6 +140,7 @@ final class AddressResource extends Resource
                             })
                             ->afterStateUpdated(function (?string $state, Set $set): void {
                                 if ($state === null || $state === '') {
+                                    // Reset the stored relation id when the lookup clears.
                                     SearchableInputHelper::clear($set, ['user_id' => null]);
 
                                     return;
@@ -220,13 +221,13 @@ final class AddressResource extends Resource
                             ->searchUsing(fn (string $term): array => AddressSearch::cityResults($term))
                             ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
                             ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?Address $record): void {
-                                // Hydrate via helper to reuse metadata lifecycle (docs/forms/SEARCHABLE_INPUT_METADATA.md).
+                                // Hydrate via helper so the metadata lifecycle mirrors docs/forms/SEARCHABLE_INPUT_METADATA.md.
                                 SearchableInputHelper::hydrate(
                                     $component,
                                     $state,
                                     static function (int $value) use ($record): ?array {
                                         $city = $record?->cityById ?? City::query()
-                                            ->select(['id', 'name'])
+                                            ->select(['id', 'name', 'country_code'])
                                             ->find($value);
 
                                         if (! $city instanceof City) {
@@ -242,7 +243,10 @@ final class AddressResource extends Resource
                             })
                             ->afterStateUpdated(function (?string $state, Set $set): void {
                                 if ($state === null || $state === '') {
-                                    SearchableInputHelper::clear($set, ['city_id' => null]);
+                                    // Clear cached identifiers when the lookup resets.
+                                    SearchableInputHelper::clear($set, [
+                                        'city_id' => null,
+                                    ]);
 
                                     return;
                                 }

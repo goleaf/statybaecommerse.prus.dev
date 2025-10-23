@@ -17,7 +17,7 @@ Stick to these keys (or extend them centrally in the search service) so downstre
 
 The Alpine helper embedded in `filament/components/autocomplete-select.blade.php` pushes the selected `SearchResult` payload into Livewire via `selectResult(result)` and removes it with `removeItem(item)` for multi-select fields. Both methods update the hidden form state so back-end hooks see the same payload Livewire receives.【F:resources/views/filament/components/autocomplete-select.blade.php†L21-L101】【F:resources/views/filament/components/autocomplete-select.blade.php†L108-L157】 When queries shrink below the minimum length, `performSearch()` clears cached results to avoid surfacing stale metadata from a previous lookup.【F:resources/views/filament/components/autocomplete-select.blade.php†L67-L89】
 
-On the PHP side, reuse the existing closures that hydrate or clear dependent fields instead of duplicating logic. For example, the order form clears billing and shipping payloads when a user wipes the lookup, otherwise it resolves the cached `AddressSearch::payload()` structure into the associated `KeyValue` fields.【F:app/Filament/Resources/OrderResource.php†L312-L354】 Cart item forms follow the same pattern, using product metadata to fill name, SKU, unit price, and resetting related variant selections when the base product changes.【F:app/Filament/Resources/CartItemResource.php†L16-L56】
+On the PHP side, reuse the shared `App\Support\Filament\SearchableInputHelper` so hydration and clearing logic stays centralised. The helper exposes `hydrate()` for normalising existing selections into `[value, label]` tuples and `clear()` for resetting dependent fields whenever a lookup is wiped, keeping Livewire state aligned with the documented payload contract.【F:app/Support/Filament/SearchableInputHelper.php†L7-L54】
 
 The reusable PHP glue now lives in `App\Support\Filament\SearchableComponentHelper`. Hydrate existing records with `SearchableComponentHelper::hydrate()` so the component restores the canonical `SearchResult` payload, and rely on `SearchableComponentHelper::sync()` inside `afterStateUpdated` callbacks to keep model keys, labels, and metadata aligned. The helper also clears stale state automatically when the user wipes a lookup, which keeps Livewire from retaining orphaned payloads.
 
@@ -34,5 +34,5 @@ Replicate these patterns for any new searchable inputs so metadata remains autho
 
 ## Follow-up checklist
 
-- [x] Replace bespoke hydration closures with `SearchableComponentHelper::hydrate()`/`clear()` so every resource stays aligned.
+- [x] Adopt the shared helper once it lands and replace bespoke hydration closures.
 - [ ] Request a team review of this document whenever the helper contract changes to keep the documentation accurate.

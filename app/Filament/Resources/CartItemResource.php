@@ -94,7 +94,7 @@ final class CartItemResource extends Resource
                                 ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
                                 ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?CartItem $record): void {
-                                    // Hydration funnels through the shared helper (docs/forms/SEARCHABLE_INPUT_METADATA.md).
+                                    // Hydrate via helper to keep metadata contract in sync with documentation.
                                     SearchableInputHelper::hydrate(
                                         $component,
                                         $state,
@@ -117,7 +117,7 @@ final class CartItemResource extends Resource
                                 // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
                                 ->afterStateUpdated(function (?string $state, Forms\Set $set): void {
                                     if ($state === null || $state === '') {
-                                        // Reset product payload when the selection clears (docs/forms/SEARCHABLE_INPUT_METADATA.md).
+                                        // Clear dependent metadata when the lookup resets.
                                         SearchableInputHelper::clear($set, [
                                             'product_id'         => null,
                                             'product_name'       => null,

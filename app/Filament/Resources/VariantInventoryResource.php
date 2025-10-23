@@ -93,93 +93,87 @@ final class VariantInventoryResource extends Resource
                 Section::make(__('admin.variant_inventory.basic_information'))
                     ->columns(2)
                     ->schema([
-                        Grid::make(2)
-                            ->schema([
-                                SearchableInput::make('variant_id')
-                                    ->label(__('admin.variant_inventory.variant'))
-                                    ->placeholder(__('admin.variant_inventory.variant_placeholder'))
-                                    ->required()
-                                    ->searchUsing(fn (string $value): array => ProductVariantSearch::results($value))
-                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                        // Delegate hydration to the helper described in docs/forms/SEARCHABLE_INPUT_METADATA.md.
-                                        SearchableInputHelper::hydrate(
-                                            $component,
-                                            $state,
-                                            static function (int $value): ?array {
-                                                $variant = ProductVariant::query()
-                                                    ->select(['id', 'product_id', 'sku', 'name', 'price'])
-                                                    ->with(['product:id,sku,name'])
-                                                    ->find($value);
+                        // Row 1: searchable selectors align with the two-column section layout.
+                        SearchableInput::make('variant_id')
+                            ->label(__('admin.variant_inventory.variant'))
+                            ->placeholder(__('admin.variant_inventory.variant_placeholder'))
+                            ->required()
+                            ->searchUsing(fn (string $value): array => ProductVariantSearch::results($value))
+                            ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                            ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                // Hydrate via helper for metadata consistency.
+                                SearchableInputHelper::hydrate(
+                                    $component,
+                                    $state,
+                                    static function (int $value): ?array {
+                                        $variant = ProductVariant::query()
+                                            ->select(['id', 'product_id', 'sku', 'name', 'price'])
+                                            ->with(['product:id,sku,name'])
+                                            ->find($value);
 
-                                                if (! $variant instanceof ProductVariant) {
-                                                    return null;
-                                                }
-
-                                                return [
-                                                    'value' => $variant->getKey(),
-                                                    'label' => ProductVariantSearch::label($variant),
-                                                ];
-                                            },
-                                        );
-                                    })
-                                    ->afterStateUpdated(function (?string $state, Set $set): void {
-                                        if ($state === null || $state === '') {
-                                            // Reset variant linkage per docs/forms/SEARCHABLE_INPUT_METADATA.md guidance.
-                                            SearchableInputHelper::clear($set, ['variant_id' => null]);
-
-                                            return;
+                                        if (! $variant instanceof ProductVariant) {
+                                            return null;
                                         }
 
-                                        $set('variant_id', (int) $state);
-                                    }),
-                                SearchableInput::make('location_id')
-                                    ->label(__('admin.variant_inventory.location'))
-                                    ->placeholder(__('admin.variant_inventory.location_placeholder'))
-                                    ->required()
-                                    ->searchUsing(fn (string $value): array => LocationSearch::results($value))
-                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                        // Hydration routes through the shared helper (docs/forms/SEARCHABLE_INPUT_METADATA.md).
-                                        SearchableInputHelper::hydrate(
-                                            $component,
-                                            $state,
-                                            static function (int $value): ?array {
-                                                $location = Location::query()
-                                                    ->select(['id', 'name', 'code', 'city', 'country_code'])
-                                                    ->find($value);
+                                        return [
+                                            'value' => $variant->getKey(),
+                                            'label' => ProductVariantSearch::label($variant),
+                                        ];
+                                    },
+                                );
+                            })
+                            ->afterStateUpdated(function (?string $state, Set $set): void {
+                                if ($state === null || $state === '') {
+                                    SearchableInputHelper::clear($set, ['variant_id' => null]);
 
-                                                if (! $location instanceof Location) {
-                                                    return null;
-                                                }
+                                    return;
+                                }
 
-                                                return [
-                                                    'value' => $location->getKey(),
-                                                    'label' => LocationSearch::label($location),
-                                                ];
-                                            },
-                                        );
-                                    })
-                                    ->afterStateUpdated(function (?string $state, Set $set): void {
-                                        if ($state === null || $state === '') {
-                                            // Clearing removes cached payloads as documented in docs/forms/SEARCHABLE_INPUT_METADATA.md.
-                                            SearchableInputHelper::clear($set, ['location_id' => null]);
+                                $set('variant_id', (int) $state);
+                            }),
+                        SearchableInput::make('location_id')
+                            ->label(__('admin.variant_inventory.location'))
+                            ->placeholder(__('admin.variant_inventory.location_placeholder'))
+                            ->required()
+                            ->searchUsing(fn (string $value): array => LocationSearch::results($value))
+                            ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                            ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                // Hydrate via helper to mirror docs/forms/SEARCHABLE_INPUT_METADATA.md lifecycle.
+                                SearchableInputHelper::hydrate(
+                                    $component,
+                                    $state,
+                                    static function (int $value): ?array {
+                                        $location = Location::query()
+                                            ->select(['id', 'name', 'code', 'city', 'country_code'])
+                                            ->find($value);
 
-                                            return;
+                                        if (! $location instanceof Location) {
+                                            return null;
                                         }
 
-                                        $set('location_id', (int) $state);
-                                    }),
-                            ]),
-                        Grid::make(2)
-                            ->schema([
-                                TextInput::make('warehouse_code')
-                                    ->label(__('admin.variant_inventory.warehouse_code'))
-                                    ->maxLength(50),
-                                TextInput::make('batch_number')
-                                    ->label(__('admin.variant_inventory.batch_number'))
-                                    ->maxLength(100),
-                            ]),
+                                        return [
+                                            'value' => $location->getKey(),
+                                            'label' => LocationSearch::label($location),
+                                        ];
+                                    },
+                                );
+                            })
+                            ->afterStateUpdated(function (?string $state, Set $set): void {
+                                if ($state === null || $state === '') {
+                                    SearchableInputHelper::clear($set, ['location_id' => null]);
+
+                                    return;
+                                }
+
+                                $set('location_id', (int) $state);
+                            }),
+                        // Row 2: warehouse and batch identifiers reuse the same column count for clarity.
+                        TextInput::make('warehouse_code')
+                            ->label(__('admin.variant_inventory.warehouse_code'))
+                            ->maxLength(50),
+                        TextInput::make('batch_number')
+                            ->label(__('admin.variant_inventory.batch_number'))
+                            ->maxLength(100),
                     ]),
                 Section::make(__('admin.variant_inventory.stock_levels'))
                     ->columns(3)

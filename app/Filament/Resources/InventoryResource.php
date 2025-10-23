@@ -7,9 +7,8 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\InventoryResource\Pages;
 use App\Models\Inventory;
 use App\Models\Product;
-use App\Support\Filament\SearchableComponentHelper;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;
-use App\Support\Search\SearchResultPayload;
 use BackedEnum;
 use Closure;
 use DefStudio\SearchableInput\DTO\SearchResult;
@@ -88,79 +87,47 @@ final class InventoryResource extends Resource
                                 ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
                                 ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?Inventory $record): void {
-                                    // Use the shared helper so the searchable input always restores the canonical search result
-                                    // payload, ensuring the label and metadata stay aligned with ProductSearch::label().
-                                    SearchableComponentHelper::hydrate(
-                                        component: $component,
-                                        state: $state,
-                                        resolveResult: function (int|string $identifier) use ($record): ?SearchResult {
-                                            $product = $record?->product ?? Product::query()
-                                                ->select(['id', 'sku', 'name', 'price'])
-                                                ->find((int) $identifier);
+                                    // Hydrate via shared helper per docs/forms/SEARCHABLE_INPUT_METADATA.md guidance.
+                                    SearchableInputHelper::hydrate(
+                                        $component,
+                                        $state,
+                                        static function (int $value) use ($record): ?array {
+                                            $product = $record?->product;
+
+                                            if (! $product instanceof Product || $product->getKey() !== $value) {
+                                                $product = Product::query()
+                                                    ->select(['id', 'sku', 'name'])
+                                                    ->find($value);
+                                            }
 
                                             if (! $product instanceof Product) {
                                                 return null;
                                             }
 
-                                            $rawName = $product->getAttribute('name');
-                                            $name = is_array($rawName)
-                                                ? (string) ($rawName[app()->getLocale()] ?? reset($rawName) ?? '')
-                                                : (string) ($rawName ?? '');
-                                            $rawPrice = $product->getAttribute('price');
-                                            $price = is_numeric($rawPrice) ? (float) $rawPrice : 0.0;
-
-                                            return SearchResultPayload::normalise(
-                                                SearchResult::make(
-                                                    value: (string) $product->getKey(),
-                                                    label: ProductSearch::label($product),
-                                                ),
-                                                [
-                                                    'product_id' => $product->getKey(),
-                                                    'sku'        => (string) ($product->getAttribute('sku') ?? ''),
-                                                    'name'       => $name,
-                                                    'price'      => $price,
-                                                ],
-                                            );
+                                            return [
+                                                'value' => $product->getKey(),
+                                                'label' => ProductSearch::label($product),
+                                            ];
                                         },
                                     );
                                 })
-                                // Behaviour documented at docs/forms/SEARCHABLE_INPUT_METADATA.md to keep helper usage aligned.
-                                ->afterStateUpdated(function (SearchableInput $component, ?string $state, callable $set): void {
-                                    SearchableComponentHelper::sync(
-                                        component: $component,
-                                        state: $state,
-                                        set: $set,
-                                        targetField: 'product_id',
-                                        resolveResult: static function (int|string $identifier): ?SearchResult {
-                                            $product = Product::query()
-                                                ->select(['id', 'sku', 'name', 'price'])
-                                                ->find((int) $identifier);
+                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                    if ($state === null || $state === '') {
+                                        // Reset persisted identifiers when lookup clears.
+                                        SearchableInputHelper::clear($set, ['product_id' => null]);
 
-                                            if (! $product instanceof Product) {
-                                                return null;
-                                            }
+                                        return;
+                                    }
 
-                                            $rawName = $product->getAttribute('name');
-                                            $name = is_array($rawName)
-                                                ? (string) ($rawName[app()->getLocale()] ?? reset($rawName) ?? '')
-                                                : (string) ($rawName ?? '');
-                                            $rawPrice = $product->getAttribute('price');
-                                            $price = is_numeric($rawPrice) ? (float) $rawPrice : 0.0;
+                                    $product = Product::query()
+                                        ->select(['id'])
+                                        ->find((int) $state);
 
-                                            return SearchResultPayload::normalise(
-                                                SearchResult::make(
-                                                    value: (string) $product->getKey(),
-                                                    label: ProductSearch::label($product),
-                                                ),
-                                                [
-                                                    'product_id' => $product->getKey(),
-                                                    'sku'        => (string) ($product->getAttribute('sku') ?? ''),
-                                                    'name'       => $name,
-                                                    'price'      => $price,
-                                                ],
-                                            );
-                                        },
-                                    );
+                                    if (! $product instanceof Product) {
+                                        return;
+                                    }
+
+                                    $set('product_id', $product->getKey());
                                 }),
                             Select::make('location_id')
                                 ->label(__('Location'))

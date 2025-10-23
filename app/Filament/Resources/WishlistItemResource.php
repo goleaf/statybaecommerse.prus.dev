@@ -170,7 +170,7 @@ final class WishlistItemResource extends Resource
                                     ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
                                     ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
                                     ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?WishlistItem $record): void {
-                                        // Helper enforces metadata lifecycle rules (docs/forms/SEARCHABLE_INPUT_METADATA.md).
+                                        // Hydrate through helper to keep metadata lifecycle aligned with docs.
                                         SearchableInputHelper::hydrate(
                                             $component,
                                             $state,
@@ -193,7 +193,6 @@ final class WishlistItemResource extends Resource
                                     // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
                                     ->afterStateUpdated(function (?string $state, callable $set): void {
                                         if ($state === null || $state === '') {
-                                            // Reset dependent variant linkage per docs/forms/SEARCHABLE_INPUT_METADATA.md.
                                             SearchableInputHelper::clear($set, [
                                                 'product_id' => null,
                                                 'variant_id' => null,

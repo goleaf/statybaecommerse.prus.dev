@@ -72,7 +72,7 @@ final class ProductRequestResource extends Resource
                     ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
                     ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
                     ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?ProductRequest $record): void {
-                        // Hydrate consistently with docs/forms/SEARCHABLE_INPUT_METADATA.md guidance.
+                        // Hydrate via helper so metadata lifecycle mirrors docs/forms/SEARCHABLE_INPUT_METADATA.md.
                         SearchableInputHelper::hydrate(
                             $component,
                             $state,

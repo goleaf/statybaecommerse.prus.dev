@@ -96,7 +96,7 @@ final class PriceResource extends Resource
                                     ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
                                     ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
                                     ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                        // Hydrate via helper per docs/forms/SEARCHABLE_INPUT_METADATA.md contract.
+                                        // Hydrate via helper to align with docs/forms/SEARCHABLE_INPUT_METADATA.md.
                                         SearchableInputHelper::hydrate(
                                             $component,
                                             $state,
@@ -118,7 +118,6 @@ final class PriceResource extends Resource
                                     })
                                     ->afterStateUpdated(function (?string $state, Set $set): void {
                                         if ($state === null || $state === '') {
-                                            // Ensure cleared lookups drop the persisted id (docs/forms/SEARCHABLE_INPUT_METADATA.md).
                                             SearchableInputHelper::clear($set, ['product_id' => null]);
 
                                             return;
