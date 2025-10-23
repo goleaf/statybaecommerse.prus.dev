@@ -9,7 +9,10 @@ use App\Enums\ModerationState;
 use App\Filament\Resources\PostResource\Pages;
 use App\Filament\Resources\PostResource\RelationManagers;
 use App\Models\Post;
+use App\Support\Filament\Components\Flatpickr;
 use App\Support\Seo\LocaleUrlGenerator;
+use Awcodes\BadgeableColumn\Components\Badge;
+use Awcodes\BadgeableColumn\Components\BadgeableColumn;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Components\Grid;
@@ -29,7 +32,6 @@ use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
@@ -50,8 +52,6 @@ use pxlrbt\FilamentExcel\Columns\Column as ExcelColumn;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use RuntimeException;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
 
 /**
  * PostResource
@@ -312,10 +312,10 @@ final class PostResource extends Resource
                                 return [
                                     'label' => __('View (:locale): :title', [
                                         'locale' => strtoupper($locale),
-                                        'title' => $title,
+                                        'title'  => $title,
                                     ]),
-                                    'url' => $url,
-                                    'icon' => 'heroicon-o-document-text',
+                                    'url'   => $url,
+                                    'icon'  => 'heroicon-o-document-text',
                                     'color' => 'primary',
                                 ];
                             })
@@ -328,20 +328,40 @@ final class PostResource extends Resource
                     ->label(__('posts.fields.user_id'))
                     ->sortable()
                     ->searchable(),
-                IconColumn::make('featured')
-                    ->label(__('posts.fields.featured'))
-                    ->boolean()
-                    ->trueIcon('heroicon-o-star')
-                    ->falseIcon('heroicon-o-star')
-                    ->trueColor('warning')
-                    ->falseColor('gray'),
-                IconColumn::make('is_pinned')
-                    ->label(__('posts.fields.is_pinned'))
-                    ->boolean()
-                    ->trueIcon('heroicon-o-thumbtack')
-                    ->falseIcon('heroicon-o-thumbtack')
-                    ->trueColor('success')
-                    ->falseColor('gray'),
+                BadgeableColumn::make('moderation_state')
+                    ->label(__('posts.fields.moderation_state'))
+                    ->formatStateUsing(fn (?ModerationState $state): string => $state?->label() ?? __('posts.badges.moderation_unknown'))
+                    ->sortable()
+                    ->asPills()
+                    ->prefixBadges(function (Post $record): array {
+                        // Pair workflow moderation with publishing status for faster review triage.
+                        $statusColor = match ($record->status) {
+                            'published' => 'success',
+                            'archived'  => 'danger',
+                            'draft'     => 'warning',
+                            default     => 'gray',
+                        };
+
+                        return [
+                            Badge::make('status')
+                                ->label(__('posts.status.' . $record->status))
+                                ->color($statusColor),
+                        ];
+                    })
+                    ->suffixBadges(function (Post $record): array {
+                        // Surface promotional flags and comment settings inline with moderation.
+                        return collect([
+                            Badge::make('featured')
+                                ->label($record->featured ? __('posts.badges.featured') : __('posts.badges.standard'))
+                                ->color($record->featured ? 'warning' : 'gray'),
+                            Badge::make('pinned')
+                                ->label($record->is_pinned ? __('posts.badges.pinned') : __('posts.badges.not_pinned'))
+                                ->color($record->is_pinned ? 'success' : 'gray'),
+                            Badge::make('comments')
+                                ->label($record->allow_comments ? __('posts.badges.comments_on') : __('posts.badges.comments_off'))
+                                ->color($record->allow_comments ? 'primary' : 'gray'),
+                        ])->filter()->values()->all();
+                    }),
                 TextColumn::make('published_at')
                     ->label(__('posts.fields.published_at'))
                     ->dateTime()
@@ -673,6 +693,15 @@ final class PostResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->with(['user:id,name']);
+    }
+
+    /**
+     * @return Builder<Post>
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with(['user:id,name']);
     }
 
     /**

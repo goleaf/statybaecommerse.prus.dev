@@ -13,11 +13,13 @@ use App\Filament\Resources\ProductResource\RelationManagers\DocumentsRelationMan
 use App\Filament\Resources\ProductResource\RelationManagers\ImagesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\ReviewsRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
-use App\Filament\Widgets\InlineCharts\ProductSales30DaysChart;
-use App\Models\Product;
 use App\Filament\Widgets\InlineCharts\ProductSalesSparkline;
+use App\Models\Product;
 use App\Support\Authorization\AuthorizationMatrix;
+use App\Support\Filament\Components\Flatpickr;
 use App\Support\Seo\LocaleUrlGenerator;
+use Awcodes\BadgeableColumn\Components\Badge;
+use Awcodes\BadgeableColumn\Components\BadgeableColumn;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\ActionGroup;
@@ -27,7 +29,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
@@ -46,8 +47,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
-use Filament\Support\Enums\Size;
-use Filament\Tables\Columns\IconColumn;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
@@ -59,17 +59,15 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use LaraZeus\InlineChart\Tables\Columns\InlineChart as InlineChartColumn;
-use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
+use LaraZeus\InlineChart\Tables\Columns\InlineChart;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
-use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
-use UnitEnum;
+use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
-use App\Support\Filament\Components\Flatpickr;
-use LaraZeus\InlineChart\Tables\Columns\InlineChart;
+use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
+use UnitEnum;
 
 /**
  * ProductResource
@@ -460,9 +458,74 @@ final class ProductResource extends Resource implements DefinesExportColumns
                     ->size(50),
                 BadgeableColumn::make('name')
                     ->label(__('products.fields.name'))
-                    ->searchable()
+                    ->searchable(['name', 'sku', 'brand.name'])
                     ->sortable()
-                    ->limit(50),
+                    ->limit(50)
+                    ->asPills()
+                    ->tooltip(fn (Product $record): ?string => mb_strlen((string) $record->name) > 50 ? $record->name : null)
+                    ->prefixBadges(function (Product $record): array {
+                        // Surface SKU and brand context directly beside the product title for rapid identification.
+                        return collect([
+                            filled($record->sku)
+                                ? Badge::make('sku')
+                                    ->label(__('products.badges.sku', ['sku' => $record->sku]))
+                                    ->color('gray')
+                                    ->weight('medium')
+                                : null,
+                            $record->brand?->name
+                                ? Badge::make('brand')
+                                    ->label(__('products.badges.brand', ['brand' => $record->brand->name]))
+                                    ->color('info')
+                                : null,
+                        ])->filter()->values()->all();
+                    })
+                    ->suffixBadges(function (Product $record): array {
+                        // Highlight merchandising state, inventory health, and engagement metrics inline with the name.
+                        $statusColor = match ($record->status) {
+                            'published' => 'success',
+                            'archived'  => 'warning',
+                            'draft'     => 'gray',
+                            default     => 'gray',
+                        };
+
+                        $approvedReviews = (int) ($record->approved_reviews_count ?? $record->reviews_count ?? 0);
+                        $averageRating = $record->approved_reviews_avg_rating ?? $record->average_rating ?? null;
+
+                        $badges = [
+                            Badge::make('status')
+                                ->label(__('products.status.' . $record->status))
+                                ->color($statusColor),
+                            Badge::make('visibility')
+                                ->label($record->is_visible ? __('products.badges.visible') : __('products.badges.hidden'))
+                                ->color($record->is_visible ? 'success' : 'gray'),
+                        ];
+
+                        if ($record->is_featured) {
+                            $badges[] = Badge::make('featured')
+                                ->label(__('products.badges.featured'))
+                                ->color('warning');
+                        }
+
+                        $badges[] = Badge::make('stock')
+                            ->label(__('products.badges.stock', ['count' => number_format((float) $record->stock_quantity)]))
+                            ->color(match (true) {
+                                $record->stock_quantity <= 0  => 'danger',
+                                $record->stock_quantity <= 10 => 'warning',
+                                default                       => 'success',
+                            });
+
+                        $badges[] = Badge::make('reviews')
+                            ->label(__('products.badges.reviews', ['count' => number_format($approvedReviews)]))
+                            ->color($approvedReviews > 0 ? 'primary' : 'gray');
+
+                        if ($averageRating) {
+                            $badges[] = Badge::make('rating')
+                                ->label(__('products.badges.rating', ['rating' => number_format((float) $averageRating, 1)]))
+                                ->color('info');
+                        }
+
+                        return collect($badges)->filter()->values()->all();
+                    }),
                 ViewColumn::make('quick_links')
                     ->label(__('Quick links'))
                     ->view('filament.tables.columns.list-group')
@@ -493,10 +556,10 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                 return [
                                     'label' => __('Storefront (:locale): :name', [
                                         'locale' => strtoupper($locale),
-                                        'name' => $name,
+                                        'name'   => $name,
                                     ]),
-                                    'url' => $url,
-                                    'icon' => 'heroicon-o-arrow-top-right-on-square',
+                                    'url'   => $url,
+                                    'icon'  => 'heroicon-o-arrow-top-right-on-square',
                                     'color' => 'primary',
                                 ];
                             })
@@ -505,15 +568,6 @@ final class ProductResource extends Resource implements DefinesExportColumns
                             ->all();
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('sku')
-                    ->label(__('products.fields.sku'))
-                    ->searchable()
-                    ->sortable()
-                    ->copyable(),
-                TextColumn::make('brand.name')
-                    ->label(__('products.fields.brand'))
-                    ->sortable()
-                    ->toggleable(),
                 TextColumn::make('price')
                     ->label(__('products.fields.price'))
                     ->money('EUR')
@@ -525,21 +579,6 @@ final class ProductResource extends Resource implements DefinesExportColumns
                     ->maxWidth(160)
                     ->maxHeight(48)
                     ->icon('heroicon-o-chart-bar'),
-                TextColumn::make('stock_quantity')
-                    ->label(__('products.fields.stock'))
-                    ->sortable()
-                    ->badge()
-                    ->color(fn (int $state): string => match (true) {
-                        $state <= 0  => 'danger',
-                        $state <= 10 => 'warning',
-                        default      => 'success',
-                    }),
-                IconColumn::make('is_visible')
-                    ->label(__('products.fields.is_visible'))
-                    ->boolean(),
-                IconColumn::make('is_featured')
-                    ->label(__('products.fields.is_featured'))
-                    ->boolean(),
                 TextColumn::make('compare_price')
                     ->label(__('products.fields.compare_price'))
                     ->money('EUR')
@@ -555,15 +594,6 @@ final class ProductResource extends Resource implements DefinesExportColumns
                     ->suffix(' kg')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('reviews_count')
-                    ->label(__('products.fields.reviews_count'))
-                    ->sortable()
-                    ->toggleable(),
-                TextColumn::make('average_rating')
-                    ->label(__('products.fields.average_rating'))
-                    ->formatStateUsing(fn ($state) => $state ? number_format($state, 1) . ' ⭐' : 'No ratings')
-                    ->sortable()
-                    ->toggleable(),
                 TextColumn::make('published_at')
                     ->label(__('products.fields.published_at'))
                     ->dateTime()

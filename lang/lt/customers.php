@@ -3,14 +3,14 @@
 declare(strict_types=1);
 
 return [
-    'title'  => 'Klientai',
-    'plural' => 'Klientai',
-    'single' => 'Klientas',
-    'orders' => 'Užsakymai',
-    'order_number_label' => 'Užsakymas Nr. :number',
-    'order_placed_on' => 'Pateiktas :date',
-    'reviews' => 'Atsiliepimai',
-    'review_for_product' => 'Atsiliepimas apie :product',
+    'title'                 => 'Klientai',
+    'plural'                => 'Klientai',
+    'single'                => 'Klientas',
+    'orders'                => 'Užsakymai',
+    'order_number_label'    => 'Užsakymas Nr. :number',
+    'order_placed_on'       => 'Pateiktas :date',
+    'reviews'               => 'Atsiliepimai',
+    'review_for_product'    => 'Atsiliepimas apie :product',
     'review_rating_tooltip' => 'Įvertinimas :rating/5 — :title',
 
     'basic_information'    => 'Pagrindinė informacija',
@@ -99,6 +99,17 @@ return [
     'bulk_verified_success'    => 'Sėkmingai patvirtinti pasirinkti įrašai',
     'bulk_activated_success'   => 'Sėkmingai aktyvuoti pasirinkti įrašai',
     'bulk_deactivated_success' => 'Sėkmingai deaktyvuoti pasirinkti įrašai',
+    'badges'                   => [
+        'country'    => 'Šalis: :country',
+        'city'       => 'Miestas: :city',
+        'company'    => 'Įmonė: :company',
+        'active'     => 'Aktyvus',
+        'inactive'   => 'Neaktyvus',
+        'verified'   => 'Patvirtintas',
+        'unverified' => 'Nepatvirtintas',
+        'orders'     => 'Užsakymai: :count',
+        'ltv'        => 'Gyvenimo vertė: :total',
+    ],
     'sparkline' => [
         'orders_label' => 'Užsakymai per paskutines :days dienas',
     ],
