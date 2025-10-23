@@ -16,7 +16,7 @@ use OpenApi\Attributes as OA;
  *
  * HTTP controller handling SystemSettingController related web requests, responses, and business logic with proper validation and error handling.
  */
-#[OA\Tag(name: 'System Settings', description: 'Public system configuration endpoints')]
+#[OA\Tag(name: 'System Settings', description: 'Public system configuration lookup endpoints.')]
 final class SystemSettingController extends Controller
 {
     /**
@@ -128,38 +128,30 @@ final class SystemSettingController extends Controller
      */
     #[OA\Get(
         path: '/api/system-settings',
-        operationId: 'listSystemSettings',
-        summary: 'List public system settings as a key/value map.',
+        summary: 'List public system settings.',
         tags: ['System Settings'],
         parameters: [
             new OA\QueryParameter(
                 name: 'group',
                 description: 'Filter settings by group.',
                 required: false,
-                schema: new OA\Schema(type: 'string')
+                schema: new OA\Schema(type: 'string'),
             ),
             new OA\QueryParameter(
                 name: 'category',
                 description: 'Filter settings by category slug.',
                 required: false,
-                schema: new OA\Schema(type: 'string')
+                schema: new OA\Schema(type: 'string'),
             ),
             new OA\QueryParameter(
                 name: 'keys',
-                description: 'Comma separated list of keys to include.',
+                description: 'Comma separated list of setting keys to include.',
                 required: false,
-                schema: new OA\Schema(type: 'string')
+                schema: new OA\Schema(type: 'string'),
             ),
         ],
         responses: [
-            new OA\Response(
-                response: 200,
-                description: 'Settings returned as an associative array.',
-                content: new OA\JsonContent(
-                    type: 'object',
-                    additionalProperties: new OA\Schema(type: 'string', nullable: true)
-                )
-            ),
+            new OA\Response(response: 200, ref: '#/components/responses/SystemSettingsIndex'),
         ]
     )]
     public function api(Request $request): JsonResponse
@@ -205,28 +197,19 @@ final class SystemSettingController extends Controller
      */
     #[OA\Get(
         path: '/api/system-settings/{key}',
-        operationId: 'getSystemSettingByKey',
-        summary: 'Retrieve a public system setting by key.',
+        summary: 'Retrieve a single system setting by key.',
         tags: ['System Settings'],
         parameters: [
             new OA\PathParameter(
                 name: 'key',
-                description: 'System setting key.',
+                description: 'Unique setting key.',
                 required: true,
-                schema: new OA\Schema(type: 'string')
+                schema: new OA\Schema(type: 'string'),
             ),
         ],
         responses: [
-            new OA\Response(
-                response: 200,
-                description: 'Setting found.',
-                content: new OA\JsonContent(ref: '#/components/schemas/SystemSettingResource')
-            ),
-            new OA\Response(
-                response: 404,
-                description: 'Setting not found.',
-                content: new OA\JsonContent(ref: '#/components/schemas/GenericErrorMessage')
-            ),
+            new OA\Response(response: 200, ref: '#/components/responses/SystemSettingItem'),
+            new OA\Response(response: 404, ref: '#/components/responses/SystemSettingNotFound'),
         ]
     )]
     public function apiByKey(string $key): JsonResponse
@@ -259,15 +242,10 @@ final class SystemSettingController extends Controller
      */
     #[OA\Get(
         path: '/api/system-settings/categories',
-        operationId: 'listSystemSettingCategories',
-        summary: 'List system setting categories with counts.',
+        summary: 'List public system setting categories.',
         tags: ['System Settings'],
         responses: [
-            new OA\Response(
-                response: 200,
-                description: 'Categories returned.',
-                content: new OA\JsonContent(ref: '#/components/schemas/SystemSettingCategoryCollection')
-            ),
+            new OA\Response(response: 200, ref: '#/components/responses/SystemSettingCategories'),
         ]
     )]
     public function categories(): JsonResponse
@@ -298,15 +276,10 @@ final class SystemSettingController extends Controller
      */
     #[OA\Get(
         path: '/api/system-settings/groups',
-        operationId: 'listSystemSettingGroups',
-        summary: 'List groups aggregated from system settings.',
+        summary: 'List public system setting groups.',
         tags: ['System Settings'],
         responses: [
-            new OA\Response(
-                response: 200,
-                description: 'Groups returned.',
-                content: new OA\JsonContent(ref: '#/components/schemas/SystemSettingGroupCollection')
-            ),
+            new OA\Response(response: 200, ref: '#/components/responses/SystemSettingGroups'),
         ]
     )]
     public function groups(): JsonResponse
