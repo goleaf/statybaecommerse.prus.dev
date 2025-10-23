@@ -91,6 +91,7 @@ final class AnalyticsEventResource extends Resource
                                     'login'       => __('analytics_events.types.login'),
                                     'logout'      => __('analytics_events.types.logout'),
                                     'search'      => __('analytics_events.types.search'),
+                                    'scroll'      => __('analytics_events.types.scroll'),
                                     'download'    => __('analytics_events.types.download'),
                                     'custom'      => __('analytics_events.types.custom'),
                                     // Extended set to avoid validation issues on edit
@@ -315,6 +316,7 @@ final class AnalyticsEventResource extends Resource
                         'login'       => __('analytics_events.types.login'),
                         'logout'      => __('analytics_events.types.logout'),
                         'search'      => __('analytics_events.types.search'),
+                        'scroll'      => __('analytics_events.types.scroll'),
                         'download'    => __('analytics_events.types.download'),
                         'custom'      => __('analytics_events.types.custom'),
                     ]),

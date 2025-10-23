@@ -7,7 +7,8 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Bug Fixes
-* Normalised API behaviour by routing campaign click endpoints through the v1 stack, fixing rate limit headers, hardening user contract hydration against missing wishlist columns, formatting analytics timestamps deterministically, and ensuring factories emit unique category slugs so feature tests pass on SQLite.
+* Restored the storefront's Untitled UI icon set and provided local fallbacks for Filament's grid components so Blade view caching no longer fails and every referenced marketing icon renders predictably.
+* Fixed the analytics event admin suite by replacing the missing widget-tab component with an inline Blade layout, adding the missing "scroll" event type option and translation, constraining the `byUser` scope to the signed-in actor, and ordering audit log API results by timestamp/id so update entries appear before their creation log.
 * Re-enabled flexible system setting translations by replacing the locale uniqueness constraint with an index, restoring soft delete support, and trimming the fillable contract so replication and counting scenarios match the documented API.
 * Preserved Attribute validation rule strings while still decoding JSON arrays, refreshed the Filament form so arrays render as comma-separated chips, and added regression coverage for both storage paths.
 * Reintroduced the `regions` schema with defensive guards and rebuilt the `customers`/`orders` relationship so SQLite-backed factories and analytics widgets can create location-aware records without missing column errors during tests.

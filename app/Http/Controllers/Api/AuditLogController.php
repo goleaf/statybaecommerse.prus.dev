@@ -23,8 +23,9 @@ final class AuditLogController extends Controller
 
         $query = AuditLog::query()
             ->with('user')
-            ->latest('created_at')
-            ->orderByDesc('id'); // Stabilize ordering when timestamps match to keep the most recent mutation at the top.
+            // Order by timestamp and primary key to keep the most recent mutation at the top even when created_at ties occur.
+            ->orderByDesc('created_at')
+            ->orderByDesc('id');
 
         // Allow callers to scope audit logs to a concrete model type.
         if (! empty($validated['entity_type'])) {

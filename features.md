@@ -33,7 +33,7 @@
 - Coupon application responses now round computed totals instead of calling `Number::parseFloat` on floats, keeping the discount API stable across PHP 8.3 test runs.
 
 ## Storefront discovery
-
+- Untitled UI icon components and Filament grid fallbacks now ship in-repo, fixing Blade caching failures and preventing missing icon placeholders across brand, category, and product listings.
 - Brands directory was redesigned with a light-themed layout, shared card components, and refreshed translations for English and Lithuanian so partner browsing feels polished across locales.
 - Search endpoint hardening now rejects suspicious SQL fragments and adds an explicit exact-match boost so precise catalogue queries surface first and malicious payloads return empty buckets.
 - Search type filters now normalise mixed-case identifiers from clients, ensuring storefront queries stay restricted to the requested product, category, or brand buckets instead of ballooning to every result group.
@@ -46,7 +46,7 @@
   storefront metrics while trimming duplicate queries from feature coverage.
 
 ## Admin panel resilience
-- Livewire resource tests now register resource-aware hooks and a lightweight ViewRecord stub that emits table markup, so generic `ListRecords`/`ViewRecord` assertions pass without vendor patches while CampaignView coverage stays stable.
+- Analytics event administration now renders widget tabs directly in Blade, exposes the "scroll" event type across filters, enforces per-user query scoping in the `byUser` scope, and returns audit logs sorted by most recent change so QA suites and dashboards stay aligned.
 - Attribute administration keeps validation rule strings verbatim, surfaces array-based rules as comma-separated chips, and pairs with regression tests that prove both paths round-trip correctly through Filament.
 - Attribute group filters, columns, and form selectors now share a translation fallback so legacy group slugs render as readable labels instead of raw keys throughout the Filament admin.
 - Filament dashboard access checks now fall back to open access when no
