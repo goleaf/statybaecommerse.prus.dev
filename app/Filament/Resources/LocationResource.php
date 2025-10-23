@@ -370,7 +370,7 @@ final class LocationResource extends Resource
                         if ($value === 'yes') {
                             $query->whereNotNull('latitude')->whereNotNull('longitude');
                         } elseif ($value === 'no') {
-                            $query->where(function ($q): void {
+                            $query->where(function ($q) {
                                 $q->whereNull('latitude')->orWhereNull('longitude');
                             });
                         }
