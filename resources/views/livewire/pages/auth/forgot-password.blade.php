@@ -1,4 +1,6 @@
 <?php
+use App\Support\Security\Captcha\CaptchaManager;
+use App\Support\Security\SuspiciousIpMonitor;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\RateLimiter;
@@ -31,7 +33,30 @@ new #[Layout('components.layouts.base')] class extends Component
             'email' => ['required', 'string', 'email'],
         ]);
 
-        $this->ensureIsNotRateLimited();
+        $captchaManager = app(CaptchaManager::class);
+        $monitor = app(SuspiciousIpMonitor::class);
+
+        $this->ensureIsNotRateLimited($captchaManager, $monitor);
+
+        if ($captchaManager->shouldChallenge($this->throttleKey(), 'auth.password_reset')) {
+            $this->syncCaptchaState($captchaManager);
+
+            $this->validate([
+                'captchaToken'    => ['required', 'string'],
+                'captchaResponse' => ['required', 'string'],
+            ]);
+
+            if (! $captchaManager->verify($this->throttleKey(), 'auth.password_reset', (string) $this->captchaToken, (string) $this->captchaResponse)) {
+                $this->syncCaptchaState($captchaManager, true);
+                $this->captchaResponse = '';
+
+                throw ValidationException::withMessages([
+                    'captchaResponse' => __('The security check response did not match. Please try again.'),
+                ]);
+            }
+        } else {
+            $this->syncCaptchaState($captchaManager);
+        }
 
         RateLimiter::hit($this->throttleKey(), $this->decaySeconds());
 
@@ -61,11 +86,29 @@ new #[Layout('components.layouts.base')] class extends Component
         session()->flash('status', __($status));
     }
 
-    private function ensureIsNotRateLimited(): void
+    public function hydrate(CaptchaManager $captchaManager): void
+    {
+        $this->syncCaptchaState($captchaManager);
+    }
+
+    public function refreshCaptcha(CaptchaManager $captchaManager): void
+    {
+        $this->syncCaptchaState($captchaManager, true);
+    }
+
+    private function ensureIsNotRateLimited(CaptchaManager $captchaManager, SuspiciousIpMonitor $monitor): void
     {
         if (! RateLimiter::tooManyAttempts($this->throttleKey(), $this->maxAttempts())) {
             return;
         }
+
+        $captchaManager->markRequired($this->throttleKey(), 'auth.password_reset');
+        $monitor->record($this->ipAddress(), 'password-reset-rate-limit', [
+            'email'        => $this->email,
+            'attempts'     => RateLimiter::attempts($this->throttleKey()),
+            'max_attempts' => $this->maxAttempts(),
+        ]);
+        $this->syncCaptchaState($captchaManager, true);
 
         event(new Lockout(request()));
 
@@ -79,12 +122,52 @@ new #[Layout('components.layouts.base')] class extends Component
         ]);
     }
 
+    private function syncCaptchaState(CaptchaManager $captchaManager, bool $forceRefresh = false): void
+    {
+        if (! $captchaManager->shouldChallenge($this->throttleKey(), 'auth.password_reset')) {
+            $this->resetCaptcha();
+
+            return;
+        }
+
+        $challenge = $captchaManager->challenge($this->throttleKey(), 'auth.password_reset', $forceRefresh);
+
+        if ($challenge === null) {
+            $this->resetCaptcha();
+
+            return;
+        }
+
+        $questionChanged = $this->captchaQuestion !== $challenge->question();
+
+        $this->captchaQuestion = $challenge->question();
+        $this->captchaToken = $challenge->token();
+
+        if ($forceRefresh || $questionChanged) {
+            $this->captchaResponse = '';
+        }
+    }
+
     private function throttleKey(): string
     {
         $ip = request()->ip();
         $ipAddress = is_string($ip) && $ip !== '' ? $ip : 'unknown';
 
-        return Str::transliterate('password-reset|'.Str::lower($this->email).'|'.$ipAddress);
+        return Str::transliterate('password-reset|' . Str::lower($this->email) . '|' . $ipAddress);
+    }
+
+    private function resetCaptcha(): void
+    {
+        $this->captchaQuestion = null;
+        $this->captchaToken = null;
+        $this->captchaResponse = null;
+    }
+
+    private function ipAddress(): string
+    {
+        $ip = request()->ip();
+
+        return is_string($ip) && $ip !== '' ? $ip : 'unknown';
     }
 
     private function maxAttempts(): int
