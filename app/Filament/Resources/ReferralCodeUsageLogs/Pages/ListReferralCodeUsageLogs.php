@@ -8,7 +8,7 @@ use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\ReferralCodeUsageLogs\ReferralCodeUsageLogResource;
 use Filament\Actions\CreateAction;
 
-final class ListReferralCodeUsageLogs extends BaseListRecords
+final class ListReferralCodeUsageLogs extends ListRecords
 {
     protected static string $resource = ReferralCodeUsageLogResource::class;
 
