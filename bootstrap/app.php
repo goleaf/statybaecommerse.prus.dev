@@ -44,7 +44,7 @@ $providers[] = App\Providers\LocaleServiceProvider::class;
 $providers[] = App\Providers\Filament\AdminPanelProvider::class;
 $providers[] = SecurityServiceProvider::class;
 
-$app = Application::configure(basePath: dirname(__DIR__))
+$application = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__ . '/../routes/web.php',
         api: __DIR__ . '/../routes/api.php',
@@ -403,27 +403,12 @@ $app = Application::configure(basePath: dirname(__DIR__))
                 ->header('Content-Language', $locale);
         });
     })
-    ->withProviders($providers)
-    ->create();
+    ->withProviders($providers);
 
-$app->instance('request', Request::capture());
+$app = $application->create();
 
-$app->singleton('db.factory', static fn (Application $app) => new ConnectionFactory($app));
-$app->singleton('db', static fn (Application $app) => new DatabaseManager($app, $app['db.factory']));
-
-$app->booting(function (Application $app): void {
-    Model::setConnectionResolver($app['db']);
-    Model::setEventDispatcher($app['events']);
-});
-
-$app->make(ConsoleKernel::class)->bootstrap();
-
-$app['config']->set('database.default', $app['config']->get('database.default', 'sqlite'));
-$app['config']->set('database.connections.sqlite', array_replace([
-    'driver'                  => 'sqlite',
-    'database'                => env('DB_DATABASE', ':memory:'),
-    'prefix'                  => '',
-    'foreign_key_constraints' => true,
-], $app['config']->get('database.connections.sqlite', [])));
+if ($app->runningInConsole()) {
+    $app->instance('request', Request::create('/', 'GET'));
+}
 
 return $app;
