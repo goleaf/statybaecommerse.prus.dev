@@ -81,9 +81,7 @@ final class Document extends Model
     /**
      * Handle template functionality with proper error handling.
      *
-     * @return BelongsTo<DocumentTemplate, static>
-     *
-     * @phpstan-return BelongsTo<DocumentTemplate, Document>
+     * @return BelongsTo<DocumentTemplate, Document>
      */
     public function template(): BelongsTo
     {
@@ -96,9 +94,7 @@ final class Document extends Model
     /**
      * Handle documentable functionality with proper error handling.
      *
-     * @return MorphTo<Model, static>
-     *
-     * @phpstan-return MorphTo<Model, Document>
+     * @return MorphTo<Model, Document>
      */
     public function documentable(): MorphTo
     {
@@ -109,19 +105,9 @@ final class Document extends Model
     }
 
     /**
-     * Handle auditLogs functionality with proper error handling.
-     */
-    public function auditLogs(): MorphMany
-    {
-        return $this->morphMany(AuditLog::class, 'entity')->latest('created_at');
-    }
-
-    /**
      * Handle creator functionality with proper error handling.
      *
-     * @return BelongsTo<User, static>
-     *
-     * @phpstan-return BelongsTo<User, Document>
+     * @return BelongsTo<User, Document>
      */
     public function creator(): BelongsTo
     {
@@ -142,28 +128,6 @@ final class Document extends Model
         $relation = $this->belongsTo(User::class, 'updated_by');
 
         return $relation;
-    }
-
-    /**
-     * Expose a chronological audit trail so the UI and API can surface changes.
-     *
-     * @return MorphMany<AuditLog, Document>
-     */
-    public function auditLogs(): MorphMany
-    {
-        return $this->morphMany(AuditLog::class, 'entity')->latest('created_at');
-    }
-
-    /**
-     * Handle updater functionality with proper error handling.
-     *
-     * @return BelongsTo<User, static>
-     *
-     * @phpstan-return BelongsTo<User, Document>
-     */
-    public function updater(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'updated_by');
     }
 
     /**
