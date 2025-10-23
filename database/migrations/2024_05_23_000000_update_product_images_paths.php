@@ -27,7 +27,16 @@ return new class extends Migration {
 
                     $normalized = ltrim($path, '/');
 
-                    // Skip already-normalised or external URLs so we do not corrupt remote assets.
+                    if (Str::contains($normalized, '://') || Str::startsWith($normalized, 'data:')) {
+                        // Skip remote assets or embedded data URIs to avoid corrupting external paths.
+                        continue;
+                    }
+
+                    if (str_contains($normalized, '..')) {
+                        // Skip suspicious relative segments that could introduce traversal issues.
+                        continue;
+                    }
+
                     if (Str::startsWith($normalized, 'storage/')) {
                         continue;
                     }
