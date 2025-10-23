@@ -30,8 +30,8 @@ class ListCampaignViews extends BaseListRecords
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereMonth('viewed_at', now()->month)->whereYear('viewed_at', now()->year))
                 ->badge(fn () => $this->getResource()::getEloquentQuery()->whereMonth('viewed_at', now()->month)->whereYear('viewed_at', now()->year)->count()),
             'registered_users' => Tab::make(__('campaign_views.tabs.registered_users'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereNotNull('user_id'))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->whereNotNull('user_id')->count()),
+                ->modifyQueryUsing(fn (Builder $query) => $query->whereNotNull('customer_id'))
+                ->badge(fn () => $this->getResource()::getEloquentQuery()->whereNotNull('customer_id')->count()),
             'guests' => Tab::make(__('campaign_views.tabs.guests'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereNull('customer_id'))
                 ->badge(fn () => $this->getResource()::getEloquentQuery()->whereNull('customer_id')->count()),
