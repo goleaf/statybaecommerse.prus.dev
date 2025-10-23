@@ -39,7 +39,9 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 -### Latest updates
-- Admin panel regression suite now seeds the Filament authorization matrix, hardens exception redirects, and skips Vite asset loading when the manifest is missing so `/admin` checks run without 500s during tests.
+
+- Admin demo data now seeds deterministic countries, catalogues, orders, and SEO rows while the orders scope skip keeps Filament dashboards aware of the seeded history.
+- Admin seeder logging now routes through a CLI-aware helper so PHPUnit and CI can execute the fixture without tripping on a null console while still printing progress locally.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
 - Attribute group selectors now reuse a shared translation helper so historical slugs render as human-readable labels across Filament forms, filters, and tables instead of exposing raw keys.
@@ -210,8 +212,6 @@ composer run dev
 | Background processing | `app/Jobs`, `app/Listeners`, `app/Notifications`, `app/Console`                                     | Horizon manages queues; recurring tasks registered through `Console/Kernel.php`.                                                                                                                            |
 | Frontend assets       | `resources/views`, `resources/js`, `resources/css`, `tailwind.config.js`, `vite.config.js`          | Uses Tailwind v4 + Vite; Livewire Volt pages bridge server-driven UI to the storefront.                                                                                                                     |
 | Quality & automation  | `Makefile`, `composer.json` scripts, `package.json` scripts, `scripts/*.mjs`, `autofix-realtime.sh` | Make targets wrap Composer/NPM scripts; MCP tooling (`mcp/filament-docs-server.js`) serves Filament component docs locally.                                                                                 |
-
-> ℹ️ **Git hook reliability**: Husky's bootstrap shim (`.husky/_/husky.sh`) is kept executable and aligned with the legacy v9 behavior so our pre-commit, lint, and formatting hooks continue to run even while Husky v10 emits deprecation banners.
 
 ## Data and integration dependencies
 

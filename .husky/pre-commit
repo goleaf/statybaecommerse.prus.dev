@@ -41,15 +41,13 @@ if [ -s "$TMP_STAGED_PHP" ]; then
     fi
 
     echo "Running PHPStan on staged PHP files..."
-    if command -v mapfile >/dev/null 2>&1; then
-        # Read staged paths into an array so newer PHPStan versions without --paths-file still analyse the same subset.
-        mapfile -t PHPSTAN_PATHS < "$TMP_STAGED_PHP"
-        if [ "${#PHPSTAN_PATHS[@]}" -gt 0 ]; then
-            "$PHPSTAN" analyse -c phpstan.neon --memory-limit=1G --no-progress "${PHPSTAN_PATHS[@]}"
+    if ! "$PHPSTAN" analyse -c phpstan.neon --memory-limit=1G --no-progress --paths-file="$TMP_STAGED_PHP"; then
+        # PHPStan < 1.11 does not recognise --paths-file, so expand the staged list manually as a fallback.
+        echo "Falling back to manual path expansion for PHPStan"
+        set -- $(cat "$TMP_STAGED_PHP")
+        if [ "$#" -gt 0 ]; then
+            "$PHPSTAN" analyse -c phpstan.neon --memory-limit=1G --no-progress "$@"
         fi
-    else
-        # POSIX fallback when mapfile is unavailable; xargs preserves spaces safely via newline separation.
-        xargs "$PHPSTAN" analyse -c phpstan.neon --memory-limit=1G --no-progress < "$TMP_STAGED_PHP"
     fi
 fi
 

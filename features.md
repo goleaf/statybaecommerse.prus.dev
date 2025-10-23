@@ -13,6 +13,8 @@
 
 ## Data integrity & seeding
 
+- AdminSeeder now ships deterministic catalogues, locations, orders, and SEO metadata while the order scope tweak keeps dashboards aware of the seeded history during test runs.
+- AdminSeeder logging now routes through a guard that skips console output when no command is bound, letting CI pipelines and PHPUnit exercise the fixture without null-command crashes.
 - Demo store seeder now calls the collection and collection-product seeders, ensuring curated collections always feature representative products during fresh installs and automated demos.
 - PHPUnit harness now provisions a shared `database/testing.sqlite` file, runs a focused SQLite migration that seeds Spatie permission tables and variant attribute pivots, and registers Filament SearchableInput payload macros so suites share deterministic schema state without losing compatibility.
 - Region hierarchies and the `customers` table now provision automatically during SQLite migrations, ensuring factories, analytics widgets, and Filament resources can persist customer journeys without manual schema patches.
@@ -50,7 +52,7 @@
 - OpenAPI documentation now mirrors the lean product meta payload and nullable media thumbnails emitted by the presenter, keeping schema validators and client SDKs in sync with production responses.
 
 ## Admin panel resilience
-- Admin login flows now route unauthenticated users to the Filament login even in test runs without compiled assets, thanks to the hardened exception handler, Vite manifest guard, and seeded authorization roles exercised by the updated regression tests.
+
 - Attribute administration keeps validation rule strings verbatim, surfaces array-based rules as comma-separated chips, and pairs with regression tests that prove both paths round-trip correctly through Filament.
 - Attribute group filters, columns, and form selectors now share a translation fallback so legacy group slugs render as readable labels instead of raw keys throughout the Filament admin.
 - Filament dashboard access checks now fall back to open access when no
