@@ -15,6 +15,7 @@
         "barryvdh/laravel-dompdf": "^3.1",
         "bezhansalleh/filament-shield": "^4.0",
         "dutchcodingcompany/filament-socialite": "^3.0",
+        "encoredigitalgroup/filament-helpers": "^4.0@rc",
         "filament/filament": "^4.1",
         "filament/spatie-laravel-media-library-plugin": "^4.0",
         "kenepa/resource-lock": "^4.0",
@@ -231,7 +232,7 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "platform": {
-            "php": "8.2.14"
+            "php": "8.3.0"
         },
         "allow-plugins": {
             "pestphp/pest-plugin": true,

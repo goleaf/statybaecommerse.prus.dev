@@ -12,10 +12,12 @@ use App\Filament\Resources\ProductHistoryResource\Widgets\ProductHistoryStatsWid
 use App\Filament\Resources\ProductHistoryResource\Widgets\RecentProductChangesWidget;
 use App\Models\ProductHistory;
 use BackedEnum;
+use DateTimeInterface;
+use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\Select as SelectInput;
+use EncoreDigitalGroup\Filament\Helpers\InputTypes\Text\TextInput as TextInputInput;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -33,7 +35,7 @@ final class ProductHistoryResource extends Resource
 
     protected static ?string $model = ProductHistory::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-clock';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clock';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
@@ -74,11 +76,9 @@ final class ProductHistoryResource extends Resource
                     SelectInput::make('action', __('product_history.action'))
                         ->required()
                         ->options(self::actionOptions()),
-                    SearchableInput::make('field_name')
-                        ->label(__('product_history.field_name'))
-                        ->maxLength(255)
-                        ->searchUsing(fn (string $search): array => self::searchFieldNames($search))
-                        ->options(fn (): array => self::fieldNameOptions()),
+                    TextInputInput::make('field_name', __('product_history.field_name'))
+                        ->columnSpan(1)
+                        ->maxLength(255),
                 ]),
             Section::make(__('product_history.details'))
                 ->columns(2)
@@ -160,11 +160,13 @@ final class ProductHistoryResource extends Resource
                     ])
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
-                        if ($data['from'] ?? null) {
-                            $indicators[] = __('product_history.from') . ': ' . $data['from'];
+                        $from = self::formatDateFilterValue($data['from'] ?? null);
+                        if ($from !== null) {
+                            $indicators[] = __('product_history.from') . ': ' . $from;
                         }
-                        if ($data['until'] ?? null) {
-                            $indicators[] = __('product_history.until') . ': ' . $data['until'];
+                        $until = self::formatDateFilterValue($data['until'] ?? null);
+                        if ($until !== null) {
+                            $indicators[] = __('product_history.until') . ': ' . $until;
                         }
 
                         return $indicators;
@@ -174,8 +176,14 @@ final class ProductHistoryResource extends Resource
                         $until = self::formatDateFilterValue($data['until'] ?? null);
 
                         return $query
-                            ->when($data['from'] ?? null, fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date))
-                            ->when($data['until'] ?? null, fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date));
+                            ->when(
+                                $from,
+                                static fn (Builder $query) => $query->whereDate('created_at', '>=', $from)
+                            )
+                            ->when(
+                                $until,
+                                static fn (Builder $query) => $query->whereDate('created_at', '<=', $until)
+                            );
                     }),
             ]);
     }
@@ -299,55 +307,6 @@ final class ProductHistoryResource extends Resource
         $encoded = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 
         return is_string($encoded) ? $encoded : '';
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private static function fieldNameOptions(): array
-    {
-        return ProductHistory::query()
-            ->select('field_name')
-            ->whereNotNull('field_name')
-            ->distinct()
-            ->orderBy('field_name')
-            ->pluck('field_name')
-            ->mapWithKeys(static fn (mixed $field): array => [
-                (string) $field => self::fieldLabel((string) $field),
-            ])
-            ->all();
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    private static function searchFieldNames(string $search): array
-    {
-        $term = trim($search);
-
-        if ($term === '') {
-            return [];
-        }
-
-        return ProductHistory::query()
-            ->select('field_name')
-            ->whereNotNull('field_name')
-            ->where('field_name', 'like', "%{$term}%")
-            ->distinct()
-            ->orderBy('field_name')
-            ->limit(20)
-            ->pluck('field_name')
-            ->map(static fn (mixed $field): string => self::fieldLabel((string) $field))
-            ->values()
-            ->all();
-    }
-
-    private static function fieldLabel(string $field): string
-    {
-        $translationKey = 'admin.product_history.fields.' . $field;
-        $translated = __($translationKey);
-
-        return $translated === $translationKey ? $field : $translated;
     }
 
     private static function formatDateFilterValue(mixed $value): ?string
