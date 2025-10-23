@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Scopes\StatusScope;
 use App\Models\Translations\CampaignConversionTranslation;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Builder;
@@ -28,16 +27,29 @@ use Illuminate\Support\Carbon;
  *
  * @mixin \Eloquent
  */
-// We avoid the generic ActiveScope because campaign conversions rely on lifecycle
-// statuses like "completed" rather than boolean flags such as "is_active".
-#[ScopedBy([StatusScope::class])]
+// Campaign conversions expose analytics across the full lifecycle, so we avoid
+// attaching broad "active" scopes that would hide completed or historical rows.
 final class CampaignConversion extends Model
 {
     use HasFactory, HasTranslations;
 
     public $timestamps = false;
 
-    protected string $translationModel = CampaignConversionTranslation::class;
+    /**
+     * Explicit translation model keeps HasTranslations aware of the pivot table.
+     */
+    public string $translationModel = CampaignConversionTranslation::class;
+
+    /**
+     * Ensure date-range scopes work deterministically during analytics queries.
+     */
+    protected static function booted(): void
+    {
+        self::creating(static function (self $conversion): void {
+            // Tests and reporting expect a value, so seed a sensible default.
+            $conversion->converted_at ??= now();
+        });
+    }
 
     protected $fillable = ['campaign_id', 'click_id', 'order_id', 'customer_id', 'conversion_type', 'conversion_value', 'session_id', 'conversion_data', 'converted_at', 'status', 'source', 'medium', 'campaign_name', 'utm_content', 'utm_term', 'referrer', 'ip_address', 'user_agent', 'device_type', 'browser', 'os', 'country', 'city', 'is_mobile', 'is_tablet', 'is_desktop', 'conversion_duration', 'page_views', 'time_on_site', 'bounce_rate', 'exit_page', 'landing_page', 'funnel_step', 'attribution_model', 'conversion_path', 'touchpoints', 'last_click_attribution', 'first_click_attribution', 'linear_attribution', 'time_decay_attribution', 'position_based_attribution', 'data_driven_attribution', 'conversion_window', 'lookback_window', 'assisted_conversions', 'assisted_conversion_value', 'total_conversions', 'total_conversion_value', 'conversion_rate', 'cost_per_conversion', 'roi', 'roas', 'lifetime_value', 'customer_acquisition_cost', 'payback_period', 'notes', 'tags', 'custom_attributes'];
 

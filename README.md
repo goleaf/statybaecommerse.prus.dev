@@ -23,6 +23,9 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
   analytics widgets build customer journeys without missing foreign keys during PHPUnit runs.
 - SearchableInput payload macros are registered lazily with safer fallbacks, and the SQLite testing harness now spins up one
   database per parallel worker so hydrate/clear flows avoid TypeErrors and filesystem locks during `php artisan test --parallel`.
+- Campaign conversion analytics now keep their translation model, timestamps, and
+  scope filters aligned so ROI/ROAS dashboards and PHPUnit coverage see the same
+  completed conversions without fighting `is_active` guards.
 - Brands directory now ships with a light-focused layout, shared card components, and complete EN/LT copy so visitors get a consistent multilingual experience.
 - Localized slug routing and demo collection seeding were hardened, keeping home-page product links, category listings, and collection showcases working out of the box.
 - Test harness now provisions a shared `database/testing.sqlite` datastore during `createApplication`, runs focused SQLite-only migrations (including Spatie permission and attribute pivots), and registers Filament SearchableInput payload macros so PHPUnit suites reuse the same schema while keeping component helpers v4-compatible.

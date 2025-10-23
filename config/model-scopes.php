@@ -46,7 +46,6 @@ return [
         App\Models\CollectionRule::class,
         App\Models\AdminUser::class,
         App\Models\CampaignClick::class,
-        App\Models\CampaignConversion::class,
         App\Models\CampaignCustomerSegment::class,
         App\Models\CampaignProductTarget::class,
         App\Models\CampaignSchedule::class,
@@ -82,6 +81,9 @@ return [
         App\Models\RecommendationCache::class,
         App\Models\ReferralReward::class,
         App\Models\ReferralRewardLog::class,
+        // Campaign conversions remain scope-free so completed and historical
+        // records stay visible for analytics, hence they are intentionally left
+        // out of this ActiveScope configuration.
     ],
 
     PublishedScope::class => [
