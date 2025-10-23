@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Api\AuditLogController;
+use App\Http\Controllers\Api\V1\HealthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -50,4 +50,7 @@ Route::prefix('api/v1')
     }
 })->name('api.autocomplete.search');
 
-Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('api.audit-logs.index');
+Route::prefix('v1')->group(function (): void {
+    Route::get('health', [HealthController::class, 'health'])->name('api.v1.health');
+    Route::get('ready', [HealthController::class, 'ready'])->name('api.v1.ready');
+});
