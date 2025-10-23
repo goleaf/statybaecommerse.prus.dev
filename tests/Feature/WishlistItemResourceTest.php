@@ -128,9 +128,7 @@ class WishlistItemResourceTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function wishlist_user_placeholder_updates_when_wishlist_changes(): void
     {
         $this->actingAs($this->adminUser);
@@ -143,9 +141,7 @@ class WishlistItemResourceTest extends TestCase
             ->assertSee($this->regularUser->name);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function admin_can_edit_wishlist_item(): void
     {
         $this->actingAs($this->adminUser);
@@ -204,9 +200,7 @@ class WishlistItemResourceTest extends TestCase
             );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function move_to_cart_action_creates_cart_item_with_correct_pricing(): void
     {
         $this->actingAs($this->adminUser);
@@ -228,9 +222,7 @@ class WishlistItemResourceTest extends TestCase
         $this->assertEquals(129.99, (float) ($cartItem->product_snapshot['price'] ?? 0));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function bulk_move_to_cart_uses_product_pricing_when_variant_missing(): void
     {
         $this->actingAs($this->adminUser);
@@ -265,9 +257,7 @@ class WishlistItemResourceTest extends TestCase
         $this->assertEquals(150.00, (float) ($cartItem->product_snapshot['price'] ?? 0));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function admin_can_filter_wishlist_items_by_product(): void
     {
         $this->actingAs($this->adminUser);

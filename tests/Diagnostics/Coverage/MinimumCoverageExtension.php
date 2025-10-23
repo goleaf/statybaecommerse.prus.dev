@@ -16,6 +16,9 @@ use PHPUnit\Runner\Extension\ParameterCollection;
 use PHPUnit\TextUI\Configuration\Configuration;
 use RuntimeException;
 use SebastianBergmann\CodeCoverage\Util\Percentage;
+use function extension_loaded;
+use function ini_get;
+use function str_contains;
 
 /**
  * PHPUnit extension that enforces a configurable minimum line coverage percentage.
@@ -33,6 +36,10 @@ final class MinimumCoverageExtension implements Extension
         $this->defaultThreshold = $parameters->has('threshold')
             ? (float) $parameters->get('threshold')
             : 65.0;
+
+        if (! self::coverageDriverAvailable()) {
+            return;
+        }
 
         // Register the subscriber that checks the aggregated coverage once execution finishes.
         $facade->registerSubscriber(new class($this->defaultThreshold) implements ExecutionFinishedSubscriber {
@@ -94,5 +101,20 @@ final class MinimumCoverageExtension implements Extension
 
         // Ensure coverage is collected so the subscriber can evaluate the final metrics.
         $facade->requireCodeCoverageCollection();
+    }
+
+    private static function coverageDriverAvailable(): bool
+    {
+        if (extension_loaded('xdebug')) {
+            $mode = (string) ini_get('xdebug.mode');
+
+            return $mode === '' || str_contains($mode, 'coverage');
+        }
+
+        if (extension_loaded('pcov')) {
+            return true;
+        }
+
+        return false;
     }
 }

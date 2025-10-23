@@ -7,10 +7,9 @@ namespace Tests\Feature;
 use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use PHPUnit\Framework\Attributes\CoversNothing;
 
-/**
- * @coversNothing
- */
+#[CoversNothing]
 final class AdminNavigationSnapshotTest extends TestCase
 {
     use RefreshDatabase;

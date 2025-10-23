@@ -20,7 +20,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
-use RuntimeException;
 
 beforeEach(function (): void {
     Schema::dropIfExists('fake_exports');
@@ -269,6 +268,6 @@ final class FailingOrderExportable extends TestOrderExportable
 {
     public function map(Model $model, array $columns): array
     {
-        throw new RuntimeException('broken export');
+        throw new \RuntimeException('broken export');
     }
 }

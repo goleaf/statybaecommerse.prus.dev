@@ -6,7 +6,6 @@ use App\Console\Commands\DataImportCommand;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use ReflectionMethod;
 
 it('restores foreign key enforcement after truncation failure', function (): void {
     Schema::dropIfExists('fk_children');
