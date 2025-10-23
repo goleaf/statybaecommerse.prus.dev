@@ -8,9 +8,7 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\FeatureFlagResource\Pages;
 use App\Models\FeatureFlag;
-use App\Models\Scopes\ActiveScope;
-use App\Models\Scopes\EnabledScope;
-use Filament\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteAction as TableDeleteAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
