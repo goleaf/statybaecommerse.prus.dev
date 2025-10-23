@@ -30,9 +30,12 @@ final class KibanaContextProcessor
         $environment = $this->environment !== '' ? $this->environment : (string) config('app.env', 'production');
 
         $extra['service'] = [
-            'name' => $serviceName,
+            'name'        => $serviceName,
             'environment' => $environment,
         ];
+
+        // Capture the current process identifier when available so logs remain traceable.
+        $pid = getmypid();
 
         if ($pid !== false) {
             $extra['process'] = [

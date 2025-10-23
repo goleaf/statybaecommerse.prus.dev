@@ -5,8 +5,8 @@ declare(strict_types=1);
 use App\Http\Controllers\Api\AuditLogController;
 use App\Http\Controllers\Api\AuthenticatedUserController;
 use App\Http\Controllers\Api\AutocompleteSearchController;
-use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\ExportDownloadController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\SearchController;
 use Illuminate\Support\Facades\Route;
@@ -44,7 +44,8 @@ Route::prefix('v1')
 
 Route::middleware('auth:sanctum')
     ->prefix('notifications')
-    ->as('api.notifications.')
+    // Use the versioned route namespace so legacy consumers keep parity with the v1 contract.
+    ->as('api.v1.notifications.')
     ->withoutMiddleware(['throttle:api.default', 'throttle:api.read'])
     ->group(function (): void {
         Route::middleware('throttle:api.notifications.read')->group(function (): void {

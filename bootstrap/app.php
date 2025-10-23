@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Exceptions\Domain\DomainException;
 use App\Http\Middleware\AddSecurityHeaders;
-use App\Http\Middleware\AttachCorrelationId;
 use App\Providers\SecurityServiceProvider;
 use App\Services\TranslationService;
 use App\Support\ApiErrorResponse;
@@ -286,6 +285,11 @@ $app = Application::configure(basePath: dirname(__DIR__))
                 title: ApiErrorResponse::titleFor(ErrorCodes::VALIDATION_FAILED, $locale),
                 context: ['violations' => $violations],
                 locale: $locale,
+                // Surface the familiar Laravel validation keys alongside the RFC 7807 payload.
+                extra: [
+                    'message' => $detail,
+                    'errors'  => $exception->errors(),
+                ],
             );
         });
 
@@ -396,21 +400,21 @@ $app = Application::configure(basePath: dirname(__DIR__))
             $correlationHeader = $resolveCorrelationHeader();
 
             $errorCode = match (true) {
-                $throwable instanceof ValidationException => ErrorCode::ValidationFailed,
+                $throwable instanceof ValidationException     => ErrorCode::ValidationFailed,
                 $throwable instanceof AuthenticationException => ErrorCode::Unauthorized,
-                $throwable instanceof AuthorizationException => ErrorCode::Forbidden,
+                $throwable instanceof AuthorizationException  => ErrorCode::Forbidden,
                 $throwable instanceof ModelNotFoundException, $throwable instanceof NotFoundHttpException => ErrorCode::NotFound,
                 $throwable instanceof HttpExceptionInterface && $throwable->getStatusCode() === 404 => ErrorCode::NotFound,
                 $throwable instanceof HttpExceptionInterface && $throwable->getStatusCode() === 401 => ErrorCode::Unauthorized,
                 $throwable instanceof HttpExceptionInterface && $throwable->getStatusCode() === 403 => ErrorCode::Forbidden,
                 $throwable instanceof HttpExceptionInterface && $throwable->getStatusCode() === 422 => ErrorCode::ValidationFailed,
-                default => ErrorCode::ServerError,
+                default                                                                             => ErrorCode::ServerError,
             };
 
             $status = match (true) {
-                $throwable instanceof ValidationException => $throwable->status,
+                $throwable instanceof ValidationException    => $throwable->status,
                 $throwable instanceof HttpExceptionInterface => $throwable->getStatusCode(),
-                default => $errorCode->defaultStatus(),
+                default                                      => $errorCode->defaultStatus(),
             };
 
             $details = [
