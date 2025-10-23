@@ -2,7 +2,7 @@ name: CI + Auto Merge
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [opened, synchronize, reopened, ready_for_review, labeled]
     branches:
       - main
       - master
@@ -26,4 +26,4 @@ jobs:
           MERGE_FORKS: false
           MERGE_RETRIES: 10
           MERGE_RETRY_SLEEP: 10000
-          MERGE_LABELS: ""
+          MERGE_LABELS: "automerge"
