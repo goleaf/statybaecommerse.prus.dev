@@ -21,7 +21,7 @@
 - Hardened the campaign product target schema migration with the columns used by the model/resource and guarded the legacy product image path normalization against missing columns.
 - Converted Variant Analytics navigation icon handling to an explicit accessor and removed duplicate UnitEnum imports from custom Filament widgets to satisfy PHP 8.4 autoloading rules.
 - Restored typed navigation icons for the Menu, Enum Management, and Variant Analytics resources while cleaning up redundant `UnitEnum` imports in favor of fully qualified annotations.
-- Reworked variant inventory and analytics resources to embrace Filament v4 section column layouts while centralising percentage formatting helpers for consistent reporting.
+- Corrected Variant Pricing Rule table action imports and monetary formatting while standardizing Filament page navigation icon annotations to avoid enum autoload collisions during admin workflows.
 - Routed the Menu activation toggle through Filament's success notification system to standardize feedback messaging.
 - Added localized LaraZeus list group quick links to the product, order, customer, and post view record pages so relationship collections surface with consistent icons, tooltips, and storefront URLs.
 - Grouped the Product History resource's custom Flatpickr helper with other `App\` imports so reviewers spot bespoke components faster during diffs.

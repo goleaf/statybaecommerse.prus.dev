@@ -8,9 +8,6 @@ use App\Forms\Components\Flatpickr;
 use App\Models\Slider;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Search\ContentLinkSearch;
-use App\Support\Search\SearchableComponentHelper;
-use BackedEnum;
-use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
@@ -44,7 +41,10 @@ class SliderManagement extends Page implements HasActions, HasForms
 {
     use InteractsWithActions, InteractsWithForms;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    /**
+     * Navigation icon override (string|\BackedEnum|null).
+     */
+    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationLabel = 'Slider Management';
 

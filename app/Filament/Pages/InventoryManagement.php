@@ -6,7 +6,6 @@ namespace App\Filament\Pages;
 
 use App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
 use App\Models\Product;
-use BackedEnum;
 use Filament\Actions\BulkAction;
 use Filament\Forms\Components\Select;
 use Filament\Pages\Page;
@@ -24,7 +23,10 @@ final class InventoryManagement extends Page implements HasTable
     use HasToggleableTable;
     use InteractsWithTable;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
+    /**
+     * Navigation icon override (string|\BackedEnum|null).
+     */
+    protected static $navigationIcon = 'heroicon-o-archive-box';
 
     public static function getNavigationGroup(): string|UnitEnum|null
     {
@@ -41,6 +43,9 @@ final class InventoryManagement extends Page implements HasTable
         return 'Inventory Management';
     }
 
+    /**
+     * Build the product inventory table with adjustable bulk controls.
+     */
     public function table(Table $table): Table
     {
         $table = $table
