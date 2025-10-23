@@ -6,7 +6,7 @@ namespace App\Http\Middleware;
 
 use App\Models\ApiKey;
 use Closure;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -14,28 +14,31 @@ final class EnsurePartnerApiScope
 {
     public function handle(Request $request, Closure $next, string ...$scopes): Response
     {
-        /** @var ApiKey|null $apiKey */
+        if ($scopes === []) {
+            return $next($request);
+        }
+
         $apiKey = $request->attributes->get('partner_api_key');
 
         if (! $apiKey instanceof ApiKey) {
-            return $this->forbiddenResponse();
+            $this->reject('Missing partner API key.', Response::HTTP_UNAUTHORIZED);
         }
 
-        $granted = collect($scopes)
-            ->filter(fn ($scope) => $scope !== '')
-            ->every(fn ($scope) => in_array($scope, $apiKey->permissions ?? [], true));
-
-        if (! $granted) {
-            return $this->forbiddenResponse();
+        if (! $apiKey->hasAnyScope($scopes)) {
+            $this->reject('Insufficient partner API permissions.', Response::HTTP_FORBIDDEN);
         }
+
+        $request->attributes->set('partner_api_required_scopes', array_values($scopes));
 
         return $next($request);
     }
 
-    private function forbiddenResponse(): JsonResponse
+    private function reject(string $message, int $status): never
     {
-        return response()->json([
-            'message' => 'Forbidden.',
-        ], 403);
+        throw new HttpResponseException(
+            response()->json([
+                'message' => $message,
+            ], $status)
+        );
     }
 }
