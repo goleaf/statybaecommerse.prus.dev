@@ -23,6 +23,7 @@ A curated map of the most useful documents for day-to-day development and operat
 - [FILAMENT_V4_IMPLEMENTATION_SUMMARY](analysis/FILAMENT_V4_IMPLEMENTATION_SUMMARY.md) – component patterns and conventions for building admin UI.
 - [NEWS_RESOURCE_IMPLEMENTATION_SUMMARY](analysis/NEWS_RESOURCE_IMPLEMENTATION_SUMMARY.md) & [COMPANY_RESOURCE_ANALYSIS](analysis/COMPANY_RESOURCE_ANALYSIS.md) – worked examples of resources and permissions in action.
 - [REFERRAL_SYSTEM_IMPLEMENTATION](REFERRAL_SYSTEM_IMPLEMENTATION.md) – loyalty and referral programme operations for support teams.
+- [Table Column Resizing](ui/RESIZED_COLUMNS.md) – how column width adjustments are saved, reset, and recovered when troubleshooting.
 
 ### 5. Troubleshoot & Maintain
 - [TERMINAL_FREEZING_FIXES](TERMINAL_FREEZING_FIXES.md) – remedies for common local environment hiccups.
