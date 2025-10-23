@@ -139,6 +139,18 @@ final class Product extends Model implements HasMedia, TranslatableRecord
                 // Ensure persisted rich text never exceeds the sanitized allow-list.
                 $product->{$field} = $sanitizer->sanitize($value);
             }
+
+            // Keep publication metadata and status in sync so the storefront
+            // repositories that honour the PublishedScope do not drop fresh
+            // records that were scheduled via factories or seeders without a
+            // matching status flag.
+            if ($product->published_at !== null && $product->published_at <= now()) {
+                $currentStatus = (string) ($product->status ?? '');
+
+                if ($currentStatus === '' || in_array($currentStatus, ['draft', 'pending'], true)) {
+                    $product->status = 'published';
+                }
+            }
         });
     }
 
