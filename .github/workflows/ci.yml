@@ -24,6 +24,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify migrations are frozen
+        run: php scripts/check-frozen-migrations.php
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -235,6 +240,11 @@ PY
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify migrations are frozen
+        run: php scripts/check-frozen-migrations.php
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
