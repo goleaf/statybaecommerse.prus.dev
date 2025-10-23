@@ -1,8 +1,10 @@
-#!/bin/sh
-# Husky pre-commit hook executes local QA commands without relying on the deprecated bootstrap helper.
+#!/usr/bin/env sh
+# Bootstrap the Husky v9 runtime to execute the project-specific pre-commit checks.
+. "$(dirname "$0")/_/h"
 
 set -eu
 
+# Temporary files ensure we only target staged changes for each toolchain check.
 TMP_STAGED_PHP=$(mktemp)
 TMP_STAGED_JS=$(mktemp)
 TMP_STAGED_PRETTIER=$(mktemp)
