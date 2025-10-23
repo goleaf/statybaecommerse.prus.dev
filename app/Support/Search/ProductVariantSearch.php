@@ -39,7 +39,46 @@ final class ProductVariantSearch
             ->get();
 
         return $variants
-            ->map(static fn (ProductVariant $variant): SearchResult => self::toResult($variant))
+            ->map(static function (ProductVariant $variant): SearchResult {
+                /** @var int|string|null $identifier */
+                $identifier = $variant->getKey();
+
+                /** @var string|null $rawName */
+                $rawName = $variant->getAttribute('name');
+                /** @var string|null $rawSku */
+                $rawSku = $variant->getAttribute('sku');
+                /** @var float|int|string|null $rawPrice */
+                $rawPrice = $variant->getAttribute('price');
+
+                $name = $rawName ?? '';
+                $sku = $rawSku ?? '';
+                $price = is_numeric($rawPrice) ? (float) $rawPrice : 0.0;
+
+                $product = $variant->getRelationValue('product');
+                $productName = $product instanceof Product ? self::resolveName($product->getAttribute('name')) : '';
+                $productSku = $product instanceof Product ? (string) ($product->getAttribute('sku') ?? '') : '';
+
+                $labelFragments = array_filter([
+                    $sku !== '' ? $sku : null,
+                    $name !== '' ? $name : null,
+                    $productName !== '' ? __('orders.lookups.variant_product', ['product' => $productName]) : null,
+                ]);
+
+                $label = trim(implode(' • ', $labelFragments));
+
+                $result = SearchResult::make((string) ($identifier ?? ''), $label !== '' ? $label : __('orders.lookups.variant_unknown'));
+
+                // Bundle both the variant details and parent product context into the payload.
+                return SearchResultPayload::normalise($result, [
+                    'variant_id'   => $variant->getKey(),
+                    'sku'          => $sku,
+                    'name'         => $name,
+                    'price'        => $price,
+                    'product_id'   => $variant->getAttribute('product_id'),
+                    'product_sku'  => $productSku,
+                    'product_name' => $productName,
+                ]);
+            })
             ->all();
     }
 

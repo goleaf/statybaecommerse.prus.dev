@@ -33,7 +33,22 @@ final class PartnerSearch
             ->get();
 
         return $partners
-            ->map(static fn (Partner $partner): SearchResult => self::toResult($partner))
+            ->map(static function (Partner $partner): SearchResult {
+                /** @var int|string|null $identifier */
+                $identifier = $partner->getKey();
+
+                $label = self::label($partner);
+
+                $result = SearchResult::make((string) ($identifier ?? ''), $label);
+
+                // Offer the partner metadata via the payload for downstream automation hooks.
+                return SearchResultPayload::normalise($result, [
+                    'partner_id' => $partner->getKey(),
+                    'name'       => self::stringValue($partner->getAttribute('name')),
+                    'code'       => self::stringValue($partner->getAttribute('code')),
+                    'email'      => self::stringValue($partner->getAttribute('contact_email')),
+                ]);
+            })
             ->all();
     }
 
@@ -94,23 +109,5 @@ final class PartnerSearch
     private static function stringValue(mixed $value): string
     {
         return is_string($value) ? $value : '';
-    }
-
-    private static function toResult(Partner $partner): SearchResult
-    {
-        /** @var int|string|null $identifier */
-        $identifier = $partner->getKey();
-
-        $label = self::label($partner);
-
-        $result = SearchResult::make((string) ($identifier ?? ''), $label);
-
-        $result
-            ->withData('partner_id', $partner->getKey())
-            ->withData('name', self::stringValue($partner->getAttribute('name')))
-            ->withData('code', self::stringValue($partner->getAttribute('code')))
-            ->withData('email', self::stringValue($partner->getAttribute('contact_email')));
-
-        return $result;
     }
 }

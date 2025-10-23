@@ -32,7 +32,22 @@ final class ChannelSearch
             ->get();
 
         return $channels
-            ->map(static fn (Channel $channel): SearchResult => self::toResult($channel))
+            ->map(static function (Channel $channel): SearchResult {
+                /** @var int|string|null $identifier */
+                $identifier = $channel->getKey();
+
+                $label = self::label($channel);
+
+                $result = SearchResult::make((string) ($identifier ?? ''), $label);
+
+                // Ship the identifying and descriptive channel data together inside the payload.
+                return SearchResultPayload::normalise($result, [
+                    'channel_id' => $channel->getKey(),
+                    'name'       => self::stringValue($channel->getAttribute('name')),
+                    'code'       => self::stringValue($channel->getAttribute('code')),
+                    'type'       => self::stringValue($channel->getAttribute('type')),
+                ]);
+            })
             ->all();
     }
 
@@ -98,23 +113,5 @@ final class ChannelSearch
     private static function stringValue(mixed $value): string
     {
         return is_string($value) ? $value : '';
-    }
-
-    private static function toResult(Channel $channel): SearchResult
-    {
-        /** @var int|string|null $identifier */
-        $identifier = $channel->getKey();
-
-        $label = self::label($channel);
-
-        $result = SearchResult::make((string) ($identifier ?? ''), $label);
-
-        $result
-            ->withData('channel_id', $channel->getKey())
-            ->withData('name', self::stringValue($channel->getAttribute('name')))
-            ->withData('code', self::stringValue($channel->getAttribute('code')))
-            ->withData('type', self::stringValue($channel->getAttribute('type')));
-
-        return $result;
     }
 }
