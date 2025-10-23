@@ -42,6 +42,7 @@
 
 ## Content safety and compliance
 - Established an allow-listed HTML sanitizer that runs on product descriptions, translations, and legal documents to prevent script injection.
+- The sanitizer now removes entire `<script>`, `<style>`, and `<template>` elements instead of leaving their inline payloads behind, keeping sanitized storefront and admin content free from executable remnants.
 - Added a storefront `<x-sanitized-html>` component so any rendered rich text automatically passes through the sanitizer.
 - Shipped the `php artisan maintenance:sanitize-html` command to reprocess legacy content in bulk.
 

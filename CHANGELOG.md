@@ -8,6 +8,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 
 ### Enhancements
 * Optimized the storefront autocomplete pipeline by trimming and caching queries, reusing injected services, and exposing sanitized highlight metadata so the dropdown renders without raw `<mark>` tags while delivering faster product, brand, and category lookups.
+* Hardened HTML sanitization by removing entire `<script>`, `<style>`, and `<template>` elements instead of unwrapping them, blocking executable payloads from surfacing in storefront or admin renders while keeping safe markup intact.
 ### Features & Enhancements
 * Refactored the localized search results page with a guided hero, contextual metrics, and refreshed empty states so catalog queries like Makita surface faster insights and recovery actions.
 
