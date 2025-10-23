@@ -5,9 +5,6 @@ declare(strict_types=1);
 use App\Support\Security\CspNonce;
 
 if (! function_exists('csp_nonce')) {
-    /**
-     * Resolve the current request's CSP nonce so Blade templates can opt-in to strict policies.
-     */
     function csp_nonce(): string
     {
         return app(CspNonce::class)->value();

@@ -15,6 +15,7 @@ use App\Models\SystemSetting;
 use App\Observers\UserAttributionObserver;
 use App\Services\DocumentService;
 use App\Support\Health\HealthReporter;
+use App\Support\Security\CspNonce;
 use App\Support\Tracing\Trace;
 use App\Support\Tracing\TraceContext;
 use App\View\Creators\CartDataCreator;
@@ -41,7 +42,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Vite;
-use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
 
@@ -60,6 +60,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(HealthReporterContract::class, HealthReporter::class);
+        $this->app->scoped(CspNonce::class, fn (): CspNonce => new CspNonce());
 
         if ($this->app->runningInConsole()) {
             // Register import utilities and override the core db:seed command with a profiled variant.
@@ -99,25 +100,11 @@ class AppServiceProvider extends ServiceProvider
         Livewire::component('live-notification-feed', LiveNotificationFeed::class);
 
         if (method_exists(Livewire::class, 'useCspNonce')) {
-            // Provide the same nonce helper to Livewire so inline hooks honour the CSP.
             Livewire::useCspNonce(static fn (): string => csp_nonce());
         }
 
         if (method_exists(Vite::class, 'useCspNonce')) {
-            // Ensure generated asset tags from Vite inherit the request-specific nonce value.
             Vite::useCspNonce(static fn (): string => csp_nonce());
-        }
-
-        if (! Testable::hasMacro('assertCanSeeFormData')) {
-            Testable::macro('assertCanSeeFormData', function (array $data): Testable {
-                foreach (Arr::dot($data) as $value) {
-                    if (is_scalar($value) && $value !== null) {
-                        $this->assertSee((string) $value, escape: false);
-                    }
-                }
-
-                return $this;
-            });
         }
 
         if (! class_exists(\Filament\Forms\Form::class) && class_exists(\Filament\Schemas\Schema::class)) {
