@@ -17,6 +17,8 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 -### Latest updates
+- Brands directory now ships with a light-focused layout, shared card components, and complete EN/LT copy so visitors get a consistent multilingual experience.
+- Localized slug routing and demo collection seeding were hardened, keeping home-page product links, category listings, and collection showcases working out of the box.
 - Test harness now provisions a shared `database/testing.sqlite` datastore during `createApplication`, runs focused SQLite-only migrations (including Spatie permission and attribute pivots), and registers Filament SearchableInput payload macros so PHPUnit suites reuse the same schema while keeping component helpers v4-compatible.
 - Filament dashboard access now defaults to permissive access when no
   abilities are configured and the inline sparkline widgets honour the
