@@ -128,7 +128,7 @@
                         </p>
                     </div>
 
-                    @include('frontend.catalogue.product-grid', ['products' => $featuredProducts, 'columns' => 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'])
+                    <livewire:home.product-shelf :preset="'featured'" :limit="8" />
                 </div>
             </div>
         </section>
@@ -147,52 +147,24 @@
                         </div>
                         <div class="grid gap-6 sm:grid-cols-2">
                             <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-                                <div class="flex items-center justify-between">
-                                    <h3 class="text-xl font-semibold text-gray-900">{{ __('frontend/home.sections.catalogue.lists.categories.title') }}</h3>
-                                    <a href="{{ route('frontend.categories.index') }}" class="text-sm font-semibold text-indigo-600 hover:text-indigo-700">{{ __('frontend/home.sections.catalogue.lists.categories.link') }}</a>
-                                </div>
-                                <p class="mt-2 text-sm text-gray-600">{{ __('frontend/home.sections.catalogue.lists.categories.subtitle') }}</p>
-                                <ul class="mt-4 space-y-3">
-                                    @forelse($popularCategories as $popularCategory)
-                                        <li class="flex items-center justify-between rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3">
-                                            <div>
-                                                <p class="text-sm font-semibold text-gray-900">{{ $popularCategory->name }}</p>
-                                                @if($popularCategory->visible_products_count ?? false)
-                                                    <p class="text-xs text-gray-500">{{ __('frontend/home.sections.catalogue.lists.categories.item_count', ['count' => $popularCategory->visible_products_count]) }}</p>
-                                                @endif
-                                            </div>
-                                            <x-untitledui-arrow-up-right class="h-4 w-4 text-indigo-500" />
-                                        </li>
-                                    @empty
-                                        <li class="rounded-2xl border border-dashed border-gray-200 bg-white px-4 py-6 text-sm text-gray-500">
-                                            {{ __('frontend/home.sections.catalogue.lists.categories.empty') }}
-                                        </li>
-                                    @endforelse
-                                </ul>
+                                <x-untitledui-folder-open class="h-10 w-10 text-indigo-500" />
+                                <h3 class="mt-4 text-xl font-semibold text-gray-900">{{ __('frontend/home.sections.catalogue.cards.categories.title') }}</h3>
+                                <p class="mt-2 text-sm text-gray-600">{{ __('frontend/home.sections.catalogue.cards.categories.subtitle') }}</p>
+                                <a href="{{ route('frontend.categories.index') }}"
+                                   class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-700">
+                                    {{ __('frontend/home.sections.catalogue.cards.categories.link') }}
+                                    <x-untitledui-arrow-narrow-right class="h-4 w-4" />
+                                </a>
                             </div>
                             <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-                                <div class="flex items-center justify-between">
-                                    <h3 class="text-xl font-semibold text-gray-900">{{ __('frontend/home.sections.catalogue.lists.brands.title') }}</h3>
-                                    <a href="{{ route('frontend.brands.index') }}" class="text-sm font-semibold text-rose-600 hover:text-rose-700">{{ __('frontend/home.sections.catalogue.lists.brands.link') }}</a>
-                                </div>
-                                <p class="mt-2 text-sm text-gray-600">{{ __('frontend/home.sections.catalogue.lists.brands.subtitle') }}</p>
-                                <ul class="mt-4 space-y-3">
-                                    @forelse($topBrands as $topBrand)
-                                        <li class="flex items-center justify-between rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3">
-                                            <div>
-                                                <p class="text-sm font-semibold text-gray-900">{{ $topBrand->name }}</p>
-                                                @if($topBrand->visible_products_count ?? false)
-                                                    <p class="text-xs text-gray-500">{{ __('frontend/home.sections.catalogue.lists.brands.item_count', ['count' => $topBrand->visible_products_count]) }}</p>
-                                                @endif
-                                            </div>
-                                            <x-untitledui-arrow-up-right class="h-4 w-4 text-rose-500" />
-                                        </li>
-                                    @empty
-                                        <li class="rounded-2xl border border-dashed border-gray-200 bg-white px-4 py-6 text-sm text-gray-500">
-                                            {{ __('frontend/home.sections.catalogue.lists.brands.empty') }}
-                                        </li>
-                                    @endforelse
-                                </ul>
+                                <x-untitledui-briefcase class="h-10 w-10 text-rose-500" />
+                                <h3 class="mt-4 text-xl font-semibold text-gray-900">{{ __('frontend/home.sections.catalogue.cards.brands.title') }}</h3>
+                                <p class="mt-2 text-sm text-gray-600">{{ __('frontend/home.sections.catalogue.cards.brands.subtitle') }}</p>
+                                <a href="{{ route('frontend.brands.index') }}"
+                                   class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-rose-600 hover:text-rose-700">
+                                    {{ __('frontend/home.sections.catalogue.cards.brands.link') }}
+                                    <x-untitledui-arrow-narrow-right class="h-4 w-4" />
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -215,23 +187,10 @@
                         </p>
                     </div>
 
-                    <div class="space-y-12">
-                        <div class="space-y-4">
-                            <h3 class="text-xl font-semibold text-white">{{ __('frontend/home.sections.highlights.latest.title') }}</h3>
-                            @include('frontend.catalogue.product-grid', ['products' => $latestProducts, 'columns' => 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4', 'emptyMessage' => __('frontend/home.sections.highlights.latest.empty')])
-                        </div>
-                        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                            @foreach($topBrands as $brand)
-                                <article class="rounded-2xl border border-white/10 bg-white/10 p-5 backdrop-blur-sm">
-                                    <h3 class="text-lg font-semibold text-white">{{ $brand->name }}</h3>
-                                    <p class="mt-2 text-sm text-slate-200">{{ \Illuminate\Support\Str::limit(strip_tags($brand->description ?? __('frontend/home.sections.highlights.brands.fallback_description')), 90) }}</p>
-                                    <a href="{{ route('frontend.brands.show', $brand) }}" class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-emerald-200 hover:text-white">
-                                        {{ __('frontend/home.sections.highlights.brands.cta') }}
-                                        <x-untitledui-arrow-up-right class="h-4 w-4" />
-                                    </a>
-                                </article>
-                            @endforeach
-                        </div>
+                    <div class="space-y-16">
+                        <livewire:home.product-shelf :preset="'latest'" :limit="8" />
+                        <livewire:home.product-shelf :preset="'trending'" :limit="8" />
+                        <livewire:home.product-shelf :preset="'sale'" :limit="12" />
                     </div>
                 </div>
             </div>
