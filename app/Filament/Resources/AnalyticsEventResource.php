@@ -77,29 +77,7 @@ final class AnalyticsEventResource extends Resource
                                 ->helperText(__('analytics_events.event_name_help')),
                             Select::make('event_type')
                                 ->label(__('analytics_events.event_type'))
-                                ->options([
-                                    'page_view'   => __('analytics_events.types.page_view'),
-                                    'click'       => __('analytics_events.types.click'),
-                                    'form_submit' => __('analytics_events.types.form_submit'),
-                                    'purchase'    => __('analytics_events.types.purchase'),
-                                    'signup'      => __('analytics_events.types.signup'),
-                                    'login'       => __('analytics_events.types.login'),
-                                    'logout'      => __('analytics_events.types.logout'),
-                                    'search'      => __('analytics_events.types.search'),
-                                    'download'    => __('analytics_events.types.download'),
-                                    'custom'      => __('analytics_events.types.custom'),
-                                    // Extended set to avoid validation issues on edit
-                                    'product_view'      => __('analytics_events.types.product_view'),
-                                    'add_to_cart'       => __('analytics_events.types.add_to_cart'),
-                                    'remove_from_cart'  => __('analytics_events.types.remove_from_cart'),
-                                    'user_register'     => __('analytics_events.types.user_register'),
-                                    'user_login'        => __('analytics_events.types.user_login'),
-                                    'user_logout'       => __('analytics_events.types.user_logout'),
-                                    'newsletter_signup' => __('analytics_events.types.newsletter_signup'),
-                                    'contact_form'      => __('analytics_events.types.contact_form'),
-                                    'video_play'        => __('analytics_events.types.video_play'),
-                                    'social_share'      => __('analytics_events.types.social_share'),
-                                ])
+                                ->options(AnalyticsEvent::eventTypeOptions())
                                 ->default('custom'),
                         ]),
                     Textarea::make('description')
@@ -300,18 +278,7 @@ final class AnalyticsEventResource extends Resource
             ])
             ->filters([
                 SelectFilter::make('event_type')
-                    ->options([
-                        'page_view'   => __('analytics_events.types.page_view'),
-                        'click'       => __('analytics_events.types.click'),
-                        'form_submit' => __('analytics_events.types.form_submit'),
-                        'purchase'    => __('analytics_events.types.purchase'),
-                        'signup'      => __('analytics_events.types.signup'),
-                        'login'       => __('analytics_events.types.login'),
-                        'logout'      => __('analytics_events.types.logout'),
-                        'search'      => __('analytics_events.types.search'),
-                        'download'    => __('analytics_events.types.download'),
-                        'custom'      => __('analytics_events.types.custom'),
-                    ]),
+                    ->options(AnalyticsEvent::eventTypeOptions()),
                 SelectFilter::make('user_id')
                     ->relationship('user', 'name')
                     ->preload(),
