@@ -7,6 +7,8 @@ namespace App\Models;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\StatusScope;
 use App\Observers\OrderObserver;
+use Carbon\CarbonInterface;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -17,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use Schema;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -259,10 +262,6 @@ final class Order extends Model
         return $query->whereIn('status', ['delivered', 'completed']);
     }
 
-    /**
-     * Constrain the query to orders created within the provided window so the
-     * standalone orders_created_at_index can accelerate analytics workloads.
-     */
     public function scopeCreatedBetween(Builder $query, CarbonInterface|DateTimeInterface|string $start, CarbonInterface|DateTimeInterface|string $end): Builder
     {
         [$startAt, $endAt] = self::normalizeRange($start, $end);
@@ -270,28 +269,16 @@ final class Order extends Model
         return $query->whereBetween($query->qualifyColumn('created_at'), [$startAt, $endAt]);
     }
 
-    /**
-     * Constrain the query to orders created at or after the provided boundary while
-     * still leaning on the created_at covering index for efficient scans.
-     */
     public function scopeCreatedSince(Builder $query, CarbonInterface|DateTimeInterface|string $start): Builder
     {
         return $query->where($query->qualifyColumn('created_at'), '>=', self::toImmutableCarbon($start));
     }
 
-    /**
-     * Constrain the query to orders created up to the provided timestamp, relying on
-     * the created_at index to keep descending windows fast.
-     */
     public function scopeCreatedUntil(Builder $query, CarbonInterface|DateTimeInterface|string $end): Builder
     {
         return $query->where($query->qualifyColumn('created_at'), '<=', self::toImmutableCarbon($end));
     }
 
-    /**
-     * Restrict the query to orders created on a specific day, which maps neatly to the
-     * standalone created_at index when used across dashboard widgets.
-     */
     public function scopeCreatedOn(Builder $query, CarbonInterface|DateTimeInterface|string $date): Builder
     {
         $day = self::toImmutableCarbon($date);
@@ -336,7 +323,7 @@ final class Order extends Model
     {
         // Prefer explicit payment status when present and non-null
         if (Schema::hasColumn($this->getTable(), 'payment_status')) {
-            $query = $query->where(function ($q) {
+            $query = $query->where(function ($q): void {
                 $q->whereNotNull('payment_status')->whereIn('payment_status', ['paid', 'captured', 'settled', 'authorized']);
             });
         }
@@ -427,5 +414,33 @@ final class Order extends Model
     public function getFormattedTotalAttribute(): string
     {
         return number_format((float) $this->total, 2) . ' ' . $this->currency;
+    }
+
+    private static function toImmutableCarbon(CarbonInterface|DateTimeInterface|string $value): Carbon
+    {
+        if ($value instanceof CarbonInterface) {
+            return $value->copy();
+        }
+
+        if ($value instanceof DateTimeInterface) {
+            return Carbon::make($value)?->copy() ?? Carbon::parse($value->format('Y-m-d H:i:s.u'), $value->getTimezone());
+        }
+
+        return Carbon::parse((string) $value);
+    }
+
+    /**
+     * @return array{0: Carbon, 1: Carbon}
+     */
+    private static function normalizeRange(CarbonInterface|DateTimeInterface|string $start, CarbonInterface|DateTimeInterface|string $end): array
+    {
+        $startAt = self::toImmutableCarbon($start);
+        $endAt = self::toImmutableCarbon($end);
+
+        if ($startAt->greaterThan($endAt)) {
+            [$startAt, $endAt] = [$endAt, $startAt];
+        }
+
+        return [$startAt, $endAt];
     }
 }

@@ -39,14 +39,13 @@ class AdvancedAnalyticsWidget extends ChartWidget
             $dates[] = $date->format('M d');
 
             // Revenue
-            $revenue = Order::query()
-                ->where('status', '!=', 'cancelled')
-                ->createdOnDate($date)
+            $revenue = Order::where('status', '!=', 'cancelled')
+                ->createdOn($date)
                 ->sum('total');
             $revenueData[] = $revenue;
 
             // Orders
-            $orders = Order::query()->createdOnDate($date)->count();
+            $orders = Order::createdOn($date)->count();
             $ordersData[] = $orders;
 
             // New Users

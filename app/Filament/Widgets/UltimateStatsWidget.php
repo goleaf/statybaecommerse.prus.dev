@@ -337,9 +337,8 @@ class UltimateStatsWidget extends BaseWidget
         $data = [];
         for ($i = 6; $i >= 0; $i--) {
             $date = Carbon::now()->subDays($i);
-            $revenue = Order::query()
-                ->where('status', '!=', 'cancelled')
-                ->createdOnDate($date)
+            $revenue = Order::where('status', '!=', 'cancelled')
+                ->createdOn($date)
                 ->sum('total');
             $data[] = $revenue;
         }
@@ -352,7 +351,7 @@ class UltimateStatsWidget extends BaseWidget
         $data = [];
         for ($i = 6; $i >= 0; $i--) {
             $date = Carbon::now()->subDays($i);
-            $orders = Order::query()->createdOnDate($date)->count();
+            $orders = Order::createdOn($date)->count();
             $data[] = $orders;
         }
 

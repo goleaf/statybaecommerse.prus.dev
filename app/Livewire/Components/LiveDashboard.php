@@ -90,11 +90,36 @@ final class LiveDashboard extends Component
     #[Computed(persist: true, seconds: 60)]
     public function realTimeStats(): array
     {
-        return TagAwareCache::remember(CacheKeys::dashboardStats($this->timeRange), CacheKeys::TTL_MINUTE, function () {
-            $timeCondition = $this->getTimeCondition();
+        return Cache::remember(CacheKeys::dashboardStats($this->timeRange), CacheKeys::TTL_MINUTE, function () {
+            $since = $this->getSinceTimestamp();
 
-            return ['products' => ['total' => Product::where('is_visible', true)->count(), 'new_today' => Product::where('is_visible', true)->where($timeCondition)->count(), 'featured' => Product::where('is_featured', true)->where('is_visible', true)->count(), 'low_stock' => Product::where('stock_quantity', '<', 10)->where('is_visible', true)->count()], 'orders' => ['total' => Order::count(), 'today' => Order::where($timeCondition)->count(), 'pending' => Order::where('status', 'pending')->count(), 'completed' => Order::where('status', 'completed')->count(), 'revenue' => Order::where('status', 'completed')->where($timeCondition)->sum('total_amount')], 'users' => ['total' => User::count(), 'new_today' => User::where($timeCondition)->count(), 'active' => User::where('last_activity_at', '>=', now()->subHours(24))->count()], 'reviews' => ['total' => Review::where('is_approved', true)->count(), 'today' => Review::where('is_approved', true)->where($timeCondition)->count(), 'pending' => Review::where('is_approved', false)->count(), 'avg_rating' => Review::where('is_approved', true)->avg('rating') ?? 0]];
-        }, [CacheKeys::dashboardTag()]);
+            return [
+                'products' => [
+                    'total'     => Product::where('is_visible', true)->count(),
+                    'new_today' => Product::where('is_visible', true)->where('created_at', '>=', $since)->count(),
+                    'featured'  => Product::where('is_featured', true)->where('is_visible', true)->count(),
+                    'low_stock' => Product::where('stock_quantity', '<', 10)->where('is_visible', true)->count(),
+                ],
+                'orders' => [
+                    'total'     => Order::count(),
+                    'today'     => Order::createdSince($since)->count(),
+                    'pending'   => Order::where('status', 'pending')->count(),
+                    'completed' => Order::where('status', 'completed')->count(),
+                    'revenue'   => Order::where('status', 'completed')->createdSince($since)->sum('total_amount'),
+                ],
+                'users' => [
+                    'total'     => User::count(),
+                    'new_today' => User::where('created_at', '>=', $since)->count(),
+                    'active'    => User::where('last_activity_at', '>=', Carbon::now()->subHours(24))->count(),
+                ],
+                'reviews' => [
+                    'total'      => Review::where('is_approved', true)->count(),
+                    'today'      => Review::where('is_approved', true)->where('created_at', '>=', $since)->count(),
+                    'pending'    => Review::where('is_approved', false)->count(),
+                    'avg_rating' => Review::where('is_approved', true)->avg('rating') ?? 0,
+                ],
+            ];
+        });
     }
 
     /**
@@ -103,11 +128,51 @@ final class LiveDashboard extends Component
     #[Computed(persist: true, seconds: 120)]
     public function liveActivity(): array
     {
-        return TagAwareCache::remember(CacheKeys::dashboardActivity($this->timeRange), CacheKeys::TTL_TWO_MINUTES, function () {
-            $timeCondition = $this->getTimeCondition();
+        return Cache::remember(CacheKeys::dashboardActivity($this->timeRange), CacheKeys::TTL_TWO_MINUTES, function () {
+            $since = $this->getSinceTimestamp();
 
-            return ['recent_orders' => Order::with(['user'])->where($timeCondition)->orderBy('created_at', 'desc')->limit(5)->get()->map(fn ($order) => ['id' => $order->id, 'user_name' => $order->user?->name ?? 'Guest', 'total' => $order->total_amount, 'status' => $order->status, 'created_at' => $order->created_at->diffForHumans()]), 'recent_reviews' => Review::with(['product', 'user'])->where('is_approved', true)->where($timeCondition)->orderBy('created_at', 'desc')->limit(5)->get()->map(fn ($review) => ['id' => $review->id, 'product_name' => $review->product?->name ?? 'Unknown', 'user_name' => $review->user?->name ?? 'Anonymous', 'rating' => $review->rating, 'created_at' => $review->created_at->diffForHumans()]), 'popular_products' => Product::with(['brand'])->where('is_visible', true)->whereHas('reviews')->withCount('reviews')->orderBy('reviews_count', 'desc')->limit(5)->get()->map(fn ($product) => ['id' => $product->id, 'name' => $product->name, 'brand' => $product->brand?->name, 'reviews_count' => $product->reviews_count, 'price' => $product->price])];
-        }, [CacheKeys::dashboardTag()]);
+            return [
+                'recent_orders' => Order::with(['user'])
+                    ->createdSince($since)
+                    ->orderBy('created_at', 'desc')
+                    ->limit(5)
+                    ->get()
+                    ->map(fn ($order) => [
+                        'id'         => $order->id,
+                        'user_name'  => $order->user?->name ?? 'Guest',
+                        'total'      => $order->total_amount,
+                        'status'     => $order->status,
+                        'created_at' => $order->created_at->diffForHumans(),
+                    ]),
+                'recent_reviews' => Review::with(['product', 'user'])
+                    ->where('is_approved', true)
+                    ->where('created_at', '>=', $since)
+                    ->orderBy('created_at', 'desc')
+                    ->limit(5)
+                    ->get()
+                    ->map(fn ($review) => [
+                        'id'           => $review->id,
+                        'product_name' => $review->product?->name ?? 'Unknown',
+                        'user_name'    => $review->user?->name ?? 'Anonymous',
+                        'rating'       => $review->rating,
+                        'created_at'   => $review->created_at->diffForHumans(),
+                    ]),
+                'popular_products' => Product::with(['brand'])
+                    ->where('is_visible', true)
+                    ->whereHas('reviews')
+                    ->withCount('reviews')
+                    ->orderBy('reviews_count', 'desc')
+                    ->limit(5)
+                    ->get()
+                    ->map(fn ($product) => [
+                        'id'            => $product->id,
+                        'name'          => $product->name,
+                        'brand'         => $product->brand?->name,
+                        'reviews_count' => $product->reviews_count,
+                        'price'         => $product->price,
+                    ]),
+            ];
+        });
     }
 
     /**
@@ -141,16 +206,16 @@ final class LiveDashboard extends Component
     /**
      * Handle getTimeCondition functionality with proper error handling.
      */
-    private function getTimeRangeStart(): \Illuminate\Support\Carbon
+    private function getSinceTimestamp(): Carbon
     {
         $now = Carbon::now();
 
         return match ($this->timeRange) {
-            '1h' => now()->copy()->subHour(),
-            '24h' => now()->copy()->subDay(),
-            '7d' => now()->copy()->subWeek(),
-            '30d' => now()->copy()->subMonth(),
-            default => now()->copy()->subDay(),
+            '1h'    => $now->copy()->subHour(),
+            '24h'   => $now->copy()->subDay(),
+            '7d'    => $now->copy()->subWeek(),
+            '30d'   => $now->copy()->subMonth(),
+            default => $now->copy()->subDay(),
         };
     }
 
