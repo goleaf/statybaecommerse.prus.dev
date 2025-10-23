@@ -9,6 +9,8 @@ use App\Filament\Resources\CartItemResource;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
+use Filament\Resources\Components\Tab;
+use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListCartItems extends BaseListRecords
