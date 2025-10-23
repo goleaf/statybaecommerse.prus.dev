@@ -6,6 +6,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CampaignProductTargetResource\Pages;
 use App\Models\CampaignProductTarget;
+use App\Models\Scopes\ActiveScope;
+use BackedEnum;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
@@ -15,14 +17,13 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
-use Filament\Infolists\Components\Grid as InfolistGrid;
 use Filament\Infolists\Components\IconEntry;
-use Filament\Infolists\Components\KeyValueEntry as InfolistKeyValueEntry;
+use Filament\Infolists\Components\KeyValueEntry;
 use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
@@ -36,177 +37,172 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 
 /**
- * CampaignProductTargetResource
- *
- * Provides a comprehensive Filament admin resource for managing campaign product targeting rules.
+ * CampaignProductTargetResource renders the marketing targeting controls in Filament.
  */
 final class CampaignProductTargetResource extends Resource
 {
     /**
-     * The Eloquent model backing the resource.
+     * @var class-string<\Illuminate\Database\Eloquent\Model> The backing Eloquent model.
      */
     protected static ?string $model = CampaignProductTarget::class;
 
-    /**
-     * @var string|\BackedEnum|null Define the marketing navigation icon without introducing typed properties.
-     */
+    /** @var string|BackedEnum|null Provide a marketing-focused icon for the navigation menu. */
     protected static $navigationIcon = 'heroicon-o-bullseye';
 
+    /**
+     * Define the navigation group to keep marketing tooling together.
+     */
     public static function getNavigationGroup(): ?string
     {
-        return 'Marketing';
+        return __('campaign_product_targets.navigation_group');
     }
 
+    /**
+     * Provide the navigation label so Lithuanian/English admins see localised text.
+     */
     public static function getNavigationLabel(): string
     {
         return __('campaign_product_targets.navigation');
     }
 
+    /**
+     * Provide the plural label for the resource listing.
+     */
     public static function getPluralModelLabel(): string
     {
         return __('campaign_product_targets.plural');
     }
 
+    /**
+     * Provide the singular label for record detail pages.
+     */
     public static function getModelLabel(): string
     {
         return __('campaign_product_targets.single');
     }
 
+    /**
+     * Build the marketing targeting form schema.
+     */
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Section::make(__('campaign_product_targets.sections.assignment'))
-                    ->description(__('campaign_product_targets.sections.assignment_help'))
-                    ->schema([
-                        Grid::make(2)
-                            ->schema([
-                                Select::make('campaign_id')
-                                    ->label(__('campaign_product_targets.fields.campaign'))
-                                    ->relationship('campaign', 'name', fn (Builder $query) => $query->withoutGlobalScopes())
-                                    ->searchable()
-                                    ->preload()
-                                    ->required()
-                                    ->helperText(__('campaign_product_targets.help.campaign')),
-                                Select::make('target_type')
-                                    ->label(__('campaign_product_targets.fields.target_type'))
-                                    ->options([
-                                        'product' => __('campaign_product_targets.types.product'),
-                                        'category' => __('campaign_product_targets.types.category'),
-                                        'brand' => __('campaign_product_targets.types.brand'),
-                                        'collection' => __('campaign_product_targets.types.collection'),
-                                    ])
-                                    ->required()
-                                    ->reactive()
-                                    ->helperText(__('campaign_product_targets.help.target_type'))
-                                    ->afterStateUpdated(static function (?string $state, callable $set): void {
-                                        // Reset dependent selectors when the target type changes so we do not persist stale IDs.
-                                        if ($state === null) {
-                                            return;
-                                        }
-
-                                        $set('product_id', null);
-                                        $set('category_id', null);
-                                        $set('brand_id', null);
-                                        $set('collection_id', null);
-                                    }),
-                            ]),
-                        Grid::make(2)
-                            ->schema([
-                                Select::make('product_id')
-                                    ->label(__('campaign_product_targets.fields.product'))
-                                    ->relationship('product', 'name', fn (Builder $query) => $query->withoutGlobalScopes())
-                                    ->searchable()
-                                    ->preload()
-                                    ->visible(fn (Get $get): bool => $get('target_type') === 'product')
-                                    ->required(fn (Get $get): bool => $get('target_type') === 'product')
-                                    ->helperText(__('campaign_product_targets.help.product')),
-                                Select::make('category_id')
-                                    ->label(__('campaign_product_targets.fields.category'))
-                                    ->relationship('category', 'name', fn (Builder $query) => $query->withoutGlobalScopes())
-                                    ->searchable()
-                                    ->preload()
-                                    ->visible(fn (Get $get): bool => $get('target_type') === 'category')
-                                    ->required(fn (Get $get): bool => $get('target_type') === 'category')
-                                    ->helperText(__('campaign_product_targets.help.category')),
-                                Select::make('brand_id')
-                                    ->label(__('campaign_product_targets.fields.brand'))
-                                    ->relationship('brand', 'name', fn (Builder $query) => $query->withoutGlobalScopes())
-                                    ->searchable()
-                                    ->preload()
-                                    ->visible(fn (Get $get): bool => $get('target_type') === 'brand')
-                                    ->required(fn (Get $get): bool => $get('target_type') === 'brand')
-                                    ->helperText(__('campaign_product_targets.help.brand')),
-                                Select::make('collection_id')
-                                    ->label(__('campaign_product_targets.fields.collection'))
-                                    ->relationship('collection', 'name', fn (Builder $query) => $query->withoutGlobalScopes())
-                                    ->searchable()
-                                    ->preload()
-                                    ->visible(fn (Get $get): bool => $get('target_type') === 'collection')
-                                    ->required(fn (Get $get): bool => $get('target_type') === 'collection')
-                                    ->helperText(__('campaign_product_targets.help.collection')),
-                            ])
-                            ->columnSpanFull(),
-                    ]),
-                Section::make(__('campaign_product_targets.sections.behaviour'))
-                    ->description(__('campaign_product_targets.sections.behaviour_help'))
-                    ->schema([
-                        Grid::make(3)
-                            ->schema([
-                                TextInput::make('priority')
-                                    ->label(__('campaign_product_targets.fields.priority'))
-                                    ->numeric()
-                                    ->default(0)
-                                    ->minValue(0)
-                                    ->helperText(__('campaign_product_targets.help.priority')),
-                                TextInput::make('weight')
-                                    ->label(__('campaign_product_targets.fields.weight'))
-                                    ->numeric()
-                                    ->default(1)
-                                    ->minValue(0)
-                                    ->helperText(__('campaign_product_targets.help.weight')),
-                                TextInput::make('sort_order')
-                                    ->label(__('campaign_product_targets.fields.sort_order'))
-                                    ->numeric()
-                                    ->default(0)
-                                    ->minValue(0)
-                                    ->helperText(__('campaign_product_targets.help.sort_order')),
-                            ]),
-                        Grid::make(2)
-                            ->schema([
-                                Toggle::make('is_active')
-                                    ->label(__('campaign_product_targets.fields.is_active'))
-                                    ->default(true)
-                                    ->helperText(__('campaign_product_targets.help.is_active')),
-                                Toggle::make('is_featured')
-                                    ->label(__('campaign_product_targets.fields.is_featured'))
-                                    ->default(false)
-                                    ->helperText(__('campaign_product_targets.help.is_featured')),
-                            ]),
-                    ]),
-                Section::make(__('campaign_product_targets.sections.metadata'))
-                    ->description(__('campaign_product_targets.sections.metadata_help'))
-                    ->schema([
-                        KeyValue::make('conditions')
-                            ->label(__('campaign_product_targets.fields.conditions'))
-                            ->keyLabel(__('campaign_product_targets.fields.condition_key'))
-                            ->valueLabel(__('campaign_product_targets.fields.condition_value'))
-                            ->addButtonLabel(__('campaign_product_targets.actions.add_condition'))
-                            ->columnSpanFull()
-                            ->helperText(__('campaign_product_targets.help.conditions')),
-                        Textarea::make('notes')
-                            ->label(__('campaign_product_targets.fields.notes'))
-                            ->rows(4)
-                            ->columnSpanFull()
-                            ->helperText(__('campaign_product_targets.help.notes')),
-                    ]),
-            ]);
+        return $form->schema([
+            Section::make(__('campaign_product_targets.sections.assignment'))
+                ->description(__('campaign_product_targets.descriptions.assignment'))
+                ->schema([
+                    Grid::make(2)
+                        ->schema([
+                            Select::make('campaign_id')
+                                ->label(__('campaign_product_targets.fields.campaign'))
+                                ->relationship('campaign', 'name', fn (Builder $query) => $query->withoutGlobalScopes())
+                                ->searchable()
+                                ->preload()
+                                ->required()
+                                ->columnSpan(1),
+                            Select::make('target_type')
+                                ->label(__('campaign_product_targets.fields.target_type'))
+                                ->options([
+                                    'product' => __('campaign_product_targets.target_types.product'),
+                                    'category' => __('campaign_product_targets.target_types.category'),
+                                    'brand' => __('campaign_product_targets.target_types.brand'),
+                                    'collection' => __('campaign_product_targets.target_types.collection'),
+                                ])
+                                ->required()
+                                ->live()
+                                ->columnSpan(1),
+                        ]),
+                    Grid::make(2)
+                        ->schema([
+                            Select::make('product_id')
+                                ->label(__('campaign_product_targets.fields.product'))
+                                ->relationship('product', 'name', fn (Builder $query) => $query->withoutGlobalScopes())
+                                ->searchable()
+                                ->preload()
+                                ->live()
+                                ->required(fn (Get $get): bool => $get('target_type') === 'product')
+                                ->visible(fn (Get $get): bool => $get('target_type') === 'product'),
+                            Select::make('category_id')
+                                ->label(__('campaign_product_targets.fields.category'))
+                                ->relationship('category', 'name', fn (Builder $query) => $query->withoutGlobalScopes())
+                                ->searchable()
+                                ->preload()
+                                ->live()
+                                ->required(fn (Get $get): bool => $get('target_type') === 'category')
+                                ->visible(fn (Get $get): bool => $get('target_type') === 'category'),
+                            Select::make('brand_id')
+                                ->label(__('campaign_product_targets.fields.brand'))
+                                ->relationship('brand', 'name', fn (Builder $query) => $query->withoutGlobalScopes())
+                                ->searchable()
+                                ->preload()
+                                ->live()
+                                ->required(fn (Get $get): bool => $get('target_type') === 'brand')
+                                ->visible(fn (Get $get): bool => $get('target_type') === 'brand'),
+                            Select::make('collection_id')
+                                ->label(__('campaign_product_targets.fields.collection'))
+                                ->relationship('collection', 'name', fn (Builder $query) => $query->withoutGlobalScopes())
+                                ->searchable()
+                                ->preload()
+                                ->live()
+                                ->required(fn (Get $get): bool => $get('target_type') === 'collection')
+                                ->visible(fn (Get $get): bool => $get('target_type') === 'collection'),
+                        ])
+                        ->columnSpanFull(),
+                ]),
+            Section::make(__('campaign_product_targets.sections.optimisation'))
+                ->description(__('campaign_product_targets.descriptions.optimisation'))
+                ->schema([
+                    Grid::make(3)
+                        ->schema([
+                            TextInput::make('priority')
+                                ->label(__('campaign_product_targets.fields.priority'))
+                                ->numeric()
+                                ->minValue(0)
+                                ->maxValue(100)
+                                ->default(0)
+                                ->helperText(__('campaign_product_targets.hints.priority')),
+                            TextInput::make('weight')
+                                ->label(__('campaign_product_targets.fields.weight'))
+                                ->numeric()
+                                ->minValue(0)
+                                ->default(0)
+                                ->helperText(__('campaign_product_targets.hints.weight')),
+                            TextInput::make('sort_order')
+                                ->label(__('campaign_product_targets.fields.sort_order'))
+                                ->numeric()
+                                ->minValue(0)
+                                ->default(0)
+                                ->helperText(__('campaign_product_targets.hints.sort_order')),
+                        ]),
+                    Grid::make(2)
+                        ->schema([
+                            Toggle::make('is_active')
+                                ->label(__('campaign_product_targets.fields.is_active'))
+                                ->default(true),
+                            Toggle::make('is_featured')
+                                ->label(__('campaign_product_targets.fields.is_featured'))
+                                ->default(false),
+                        ]),
+                    KeyValue::make('conditions')
+                        ->label(__('campaign_product_targets.fields.conditions'))
+                        ->keyLabel(__('campaign_product_targets.fields.condition_key'))
+                        ->valueLabel(__('campaign_product_targets.fields.condition_value'))
+                        ->columnSpanFull()
+                        ->helperText(__('campaign_product_targets.hints.conditions')),
+                    Textarea::make('notes')
+                        ->label(__('campaign_product_targets.fields.notes'))
+                        ->rows(3)
+                        ->columnSpanFull()
+                        ->helperText(__('campaign_product_targets.hints.notes')),
+                ]),
+        ]);
     }
 
+    /**
+     * Configure the marketing table with campaign targeting insights.
+     */
     public static function table(Table $table): Table
     {
         return $table
@@ -214,245 +210,211 @@ final class CampaignProductTargetResource extends Resource
                 TextColumn::make('id')
                     ->label(__('campaign_product_targets.columns.id'))
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
                 TextColumn::make('campaign.name')
                     ->label(__('campaign_product_targets.columns.campaign'))
-                    ->sortable()
                     ->searchable()
-                    ->wrap(),
+                    ->sortable(),
                 TextColumn::make('target_type')
                     ->label(__('campaign_product_targets.columns.target_type'))
                     ->badge()
-                    ->formatStateUsing(fn (string $state): string => __('campaign_product_targets.types.' . $state))
-                    ->color(fn (string $state): string => match ($state) {
-                        'product' => 'success',
-                        'category' => 'warning',
-                        'brand' => 'info',
-                        'collection' => 'primary',
-                        default => 'gray',
-                    })
+                    ->formatStateUsing(fn (string $state): string => __('campaign_product_targets.target_types.' . $state))
                     ->sortable(),
                 TextColumn::make('target_name')
                     ->label(__('campaign_product_targets.columns.target_name'))
-                    ->wrap()
-                    ->searchable(query: static function (Builder $query, string $search): Builder {
-                        // Allow the global table search to match names across related models.
-                        return $query->where(function (Builder $query) use ($search): void {
-                            $query
-                                ->whereHas('product', static function (Builder $productQuery) use ($search): void {
-                                    $productQuery->where('name', 'like', "%{$search}%");
-                                })
-                                ->orWhereHas('category', static function (Builder $categoryQuery) use ($search): void {
-                                    $categoryQuery->where('name', 'like', "%{$search}%");
-                                })
-                                ->orWhereHas('brand', static function (Builder $brandQuery) use ($search): void {
-                                    $brandQuery->where('name', 'like', "%{$search}%");
-                                })
-                                ->orWhereHas('collection', static function (Builder $collectionQuery) use ($search): void {
-                                    $collectionQuery->where('name', 'like', "%{$search}%");
-                                })
-                                ->orWhereHas('campaign', static function (Builder $campaignQuery) use ($search): void {
-                                    $campaignQuery->where('name', 'like', "%{$search}%");
-                                });
-                        });
-                    }),
+                    ->searchable([
+                        'product.name',
+                        'category.name',
+                        'brand.name',
+                        'collection.name',
+                    ])
+                    ->wrap(),
                 TextColumn::make('priority')
                     ->label(__('campaign_product_targets.columns.priority'))
                     ->numeric()
                     ->sortable(),
+                TextColumn::make('weight')
+                    ->label(__('campaign_product_targets.columns.weight'))
+                    ->numeric()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('is_active')
                     ->label(__('campaign_product_targets.columns.is_active'))
-                    ->boolean()
-                    ->sortable(),
+                    ->boolean(),
                 IconColumn::make('is_featured')
                     ->label(__('campaign_product_targets.columns.is_featured'))
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('created_at')
+                    ->label(__('campaign_product_targets.columns.created_at'))
+                    ->dateTime()
+                    ->since()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
                     ->label(__('campaign_product_targets.columns.updated_at'))
                     ->dateTime()
+                    ->since()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('priority', 'desc')
-            ->recordUrl(fn (CampaignProductTarget $record): string => static::getUrl('view', ['record' => $record]))
             ->filters([
                 SelectFilter::make('campaign_id')
                     ->label(__('campaign_product_targets.filters.campaign'))
                     ->relationship('campaign', 'name', fn (Builder $query) => $query->withoutGlobalScopes())
                     ->searchable()
-                    ->indicator(__('campaign_product_targets.filters.campaign_indicator')),
+                    ->preload(),
                 SelectFilter::make('target_type')
                     ->label(__('campaign_product_targets.filters.target_type'))
                     ->options([
-                        'product' => __('campaign_product_targets.types.product'),
-                        'category' => __('campaign_product_targets.types.category'),
-                        'brand' => __('campaign_product_targets.types.brand'),
-                        'collection' => __('campaign_product_targets.types.collection'),
-                    ])
-                    ->indicator(__('campaign_product_targets.filters.target_type_indicator')),
+                        'product' => __('campaign_product_targets.target_types.product'),
+                        'category' => __('campaign_product_targets.target_types.category'),
+                        'brand' => __('campaign_product_targets.target_types.brand'),
+                        'collection' => __('campaign_product_targets.target_types.collection'),
+                    ]),
                 TernaryFilter::make('is_active')
                     ->label(__('campaign_product_targets.filters.is_active'))
-                    ->indicator(__('campaign_product_targets.filters.is_active_indicator')),
+                    ->boolean(),
+                TernaryFilter::make('is_featured')
+                    ->label(__('campaign_product_targets.filters.is_featured'))
+                    ->boolean(),
                 Filter::make('high_priority')
                     ->label(__('campaign_product_targets.filters.high_priority'))
                     ->query(fn (Builder $query): Builder => $query->where('priority', '>=', 80))
                     ->toggle(),
                 Filter::make('recent')
                     ->label(__('campaign_product_targets.filters.recent'))
-                    ->query(fn (Builder $query): Builder => $query->where('created_at', '>=', Carbon::now()->subDays(7)))
+                    ->query(fn (Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(7)))
                     ->toggle(),
             ])
             ->actions([
-                ViewAction::make()
-                    ->label(__('campaign_product_targets.actions.view')),
-                EditAction::make()
-                    ->label(__('campaign_product_targets.actions.edit')),
-                DeleteAction::make()
-                    ->label(__('campaign_product_targets.actions.delete')),
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                     BulkAction::make('activate')
                         ->label(__('campaign_product_targets.bulk.activate'))
-                        ->icon('heroicon-o-bolt')
+                        ->icon('heroicon-o-eye')
                         ->color('success')
                         ->requiresConfirmation()
-                        ->action(static function (EloquentCollection $records): void {
-                            // Activate each selected target atomically.
-                            $records->each(static function (CampaignProductTarget $record): void {
-                                $record->update(['is_active' => true]);
-                            });
+                        ->action(function (Collection $records): void {
+                            // Ensure all selected targets are set active in one go.
+                            $records->each->update(['is_active' => true]);
 
                             Notification::make()
-                                ->title(__('campaign_product_targets.notifications.activated_title'))
+                                ->title(__('campaign_product_targets.notifications.activated'))
                                 ->success()
                                 ->send();
-                        })
-                        ->deselectRecordsAfterCompletion(),
+                        }),
                     BulkAction::make('deactivate')
                         ->label(__('campaign_product_targets.bulk.deactivate'))
-                        ->icon('heroicon-o-pause-circle')
+                        ->icon('heroicon-o-eye-slash')
                         ->color('warning')
                         ->requiresConfirmation()
-                        ->action(static function (EloquentCollection $records): void {
-                            // Deactivate each selected target atomically.
-                            $records->each(static function (CampaignProductTarget $record): void {
-                                $record->update(['is_active' => false]);
-                            });
+                        ->action(function (Collection $records): void {
+                            // Ensure all selected targets are disabled quickly.
+                            $records->each->update(['is_active' => false]);
 
                             Notification::make()
-                                ->title(__('campaign_product_targets.notifications.deactivated_title'))
+                                ->title(__('campaign_product_targets.notifications.deactivated'))
                                 ->success()
                                 ->send();
-                        })
-                        ->deselectRecordsAfterCompletion(),
+                        }),
                     BulkAction::make('feature')
                         ->label(__('campaign_product_targets.bulk.feature'))
                         ->icon('heroicon-o-star')
-                        ->color('info')
+                        ->color('success')
                         ->requiresConfirmation()
-                        ->action(static function (EloquentCollection $records): void {
-                            // Mark each selected target as featured.
-                            $records->each(static function (CampaignProductTarget $record): void {
-                                $record->update(['is_featured' => true]);
-                            });
+                        ->action(function (Collection $records): void {
+                            // Promote selections to featured content.
+                            $records->each->update(['is_featured' => true]);
 
                             Notification::make()
-                                ->title(__('campaign_product_targets.notifications.featured_title'))
+                                ->title(__('campaign_product_targets.notifications.featured'))
                                 ->success()
                                 ->send();
-                        })
-                        ->deselectRecordsAfterCompletion(),
+                        }),
                     BulkAction::make('unfeature')
                         ->label(__('campaign_product_targets.bulk.unfeature'))
                         ->icon('heroicon-o-star')
-                        ->color('gray')
+                        ->color('warning')
                         ->requiresConfirmation()
-                        ->action(static function (EloquentCollection $records): void {
-                            // Remove the featured flag from each selected target.
-                            $records->each(static function (CampaignProductTarget $record): void {
-                                $record->update(['is_featured' => false]);
-                            });
+                        ->action(function (Collection $records): void {
+                            // Remove feature status from the chosen targets.
+                            $records->each->update(['is_featured' => false]);
 
                             Notification::make()
-                                ->title(__('campaign_product_targets.notifications.unfeatured_title'))
+                                ->title(__('campaign_product_targets.notifications.unfeatured'))
                                 ->success()
                                 ->send();
-                        })
-                        ->deselectRecordsAfterCompletion(),
-                    DeleteBulkAction::make()
-                        ->label(__('campaign_product_targets.bulk.delete')),
+                        }),
                 ]),
-            ]);
+            ])
+            ->defaultSort('priority', 'desc')
+            ->striped()
+            ->paginated([10, 25, 50, 100]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    /**
+     * Configure the infolist for the dedicated view page.
+     */
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist
-            ->schema([
-                InfolistSection::make(__('campaign_product_targets.sections.assignment'))
-                    ->schema([
-                        InfolistGrid::make(2)
-                            ->schema([
-                                TextEntry::make('campaign.name')
-                                    ->label(__('campaign_product_targets.columns.campaign')),
-                                TextEntry::make('target_type')
-                                    ->label(__('campaign_product_targets.columns.target_type'))
-                                    ->formatStateUsing(fn (string $state): string => __('campaign_product_targets.types.' . $state)),
-                                TextEntry::make('target_name')
-                                    ->label(__('campaign_product_targets.columns.target_name'))
-                                    ->columnSpanFull(),
-                                TextEntry::make('target_identifier')
-                                    ->label(__('campaign_product_targets.columns.target_identifier'))
-                                    ->columnSpanFull(),
-                            ]),
-                    ]),
-                InfolistSection::make(__('campaign_product_targets.sections.behaviour'))
-                    ->schema([
-                        InfolistGrid::make(3)
-                            ->schema([
-                                TextEntry::make('priority')
-                                    ->label(__('campaign_product_targets.columns.priority')),
-                                TextEntry::make('weight')
-                                    ->label(__('campaign_product_targets.columns.weight')),
-                                TextEntry::make('sort_order')
-                                    ->label(__('campaign_product_targets.columns.sort_order')),
-                            ]),
-                        InfolistGrid::make(2)
-                            ->schema([
-                                IconEntry::make('is_active')
-                                    ->label(__('campaign_product_targets.columns.is_active'))
-                                    ->boolean(),
-                                IconEntry::make('is_featured')
-                                    ->label(__('campaign_product_targets.columns.is_featured'))
-                                    ->boolean(),
-                            ]),
-                    ]),
-                InfolistSection::make(__('campaign_product_targets.sections.metadata'))
-                    ->schema([
-                        InfolistKeyValueEntry::make('conditions')
-                            ->label(__('campaign_product_targets.fields.conditions'))
-                            ->columnSpanFull(),
-                        TextEntry::make('notes')
-                            ->label(__('campaign_product_targets.fields.notes'))
-                            ->columnSpanFull()
-                            ->markdown(),
-                        TextEntry::make('created_at')
-                            ->label(__('campaign_product_targets.columns.created_at'))
-                            ->dateTime(),
-                        TextEntry::make('updated_at')
-                            ->label(__('campaign_product_targets.columns.updated_at'))
-                            ->dateTime(),
-                    ]),
-            ]);
+        return $schema->schema([
+            InfolistSection::make(__('campaign_product_targets.sections.assignment'))
+                ->schema([
+                    TextEntry::make('campaign.name')
+                        ->label(__('campaign_product_targets.columns.campaign')),
+                    TextEntry::make('target_type')
+                        ->label(__('campaign_product_targets.columns.target_type'))
+                        ->badge()
+                        ->formatStateUsing(fn (string $state): string => __('campaign_product_targets.target_types.' . $state)),
+                    TextEntry::make('target_name')
+                        ->label(__('campaign_product_targets.columns.target_name')),
+                    TextEntry::make('target_identifier')
+                        ->label(__('campaign_product_targets.columns.target_identifier'))
+                        ->placeholder(__('campaign_product_targets.placeholders.no_identifier')),
+                ])
+                ->columns(2),
+            InfolistSection::make(__('campaign_product_targets.sections.optimisation'))
+                ->schema([
+                    TextEntry::make('priority')
+                        ->label(__('campaign_product_targets.columns.priority')),
+                    TextEntry::make('weight')
+                        ->label(__('campaign_product_targets.columns.weight')),
+                    TextEntry::make('sort_order')
+                        ->label(__('campaign_product_targets.columns.sort_order')),
+                    IconEntry::make('is_active')
+                        ->label(__('campaign_product_targets.columns.is_active'))
+                        ->boolean(),
+                    IconEntry::make('is_featured')
+                        ->label(__('campaign_product_targets.columns.is_featured'))
+                        ->boolean(),
+                    KeyValueEntry::make('conditions')
+                        ->label(__('campaign_product_targets.fields.conditions'))
+                        ->placeholder(__('campaign_product_targets.placeholders.no_conditions')),
+                    TextEntry::make('notes')
+                        ->label(__('campaign_product_targets.fields.notes'))
+                        ->placeholder(__('campaign_product_targets.placeholders.no_notes')),
+                ])
+                ->columns(2),
+        ]);
     }
 
+    /**
+     * Provide relations for the resource; none are defined yet to keep focus tight.
+     */
     public static function getRelations(): array
     {
         return [];
     }
 
+    /**
+     * Register Filament pages for CRUD + dedicated view support.
+     */
     public static function getPages(): array
     {
         return [
@@ -463,6 +425,9 @@ final class CampaignProductTargetResource extends Resource
         ];
     }
 
+    /**
+     * Expose globally searchable attributes for quick admin lookups.
+     */
     public static function getGloballySearchableAttributes(): array
     {
         return [
@@ -471,12 +436,28 @@ final class CampaignProductTargetResource extends Resource
             'category.name',
             'brand.name',
             'collection.name',
+            'notes',
         ];
     }
 
+    /**
+     * Show a badge with the active record count in the navigation.
+     */
+    public static function getNavigationBadge(): ?string
+    {
+        $count = self::getEloquentQuery()->count();
+
+        return $count > 0 ? (string) $count : null;
+    }
+
+    /**
+     * @return Builder<CampaignProductTarget> Ensure the admin view ignores the ActiveScope.
+     */
     public static function getEloquentQuery(): Builder
     {
-        // Ensure administrators can manage both active and inactive targets.
-        return parent::getEloquentQuery()->withoutGlobalScopes();
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                ActiveScope::class,
+            ]);
     }
 }

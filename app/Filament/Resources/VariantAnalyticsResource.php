@@ -32,6 +32,7 @@ use BackedEnum;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
@@ -45,16 +46,18 @@ final class VariantAnalyticsResource extends Resource
 {
     protected static ?string $model = VariantAnalytics::class;
 
-    /**
-     * @var string|\BackedEnum|null Typed navigation icon ensures the analytics section resolves enum-backed overrides cleanly.
-     */
-    protected static ?string $navigationIcon = 'heroicon-o-chart-bar-square';
-
-    // Ensure inventory analytics stay grouped centrally for merchandising reviewers.
-    /** @var string|BackedEnum|null */
+    /** @var string|\BackedEnum|null Ensure inventory analytics stay grouped centrally. */
     protected static $navigationGroup = NavigationGroup::Inventory;
 
-    public static function getNavigationGroup(): BackedEnum|string|null
+    /**
+     * Resolve the navigation icon through an accessor to support enum-backed overrides.
+     */
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-chart-bar-square';
+    }
+
+    public static function getNavigationGroup(): ?string
     {
         // Centralize the NavigationGroup handling to leverage enum labels and document the navigation cleanup.
         $group = static::$navigationGroup;

@@ -15,13 +15,19 @@ use Illuminate\Support\Carbon;
 final class EnhancedEcommerceOverview extends StatsOverviewWidget
 {
     /**
-     * Navigation icon override (Filament expects a string identifier).
+     * @var string|\BackedEnum|null Navigation icon override for Filament menus.
      */
-    protected static ?string $navigationIcon = 'heroicon-o-presentation-chart-line';
+    protected static $navigationIcon = 'heroicon-o-presentation-chart-line';
 
+    /**
+     * @var string|null Friendly label for the widget entry.
+     */
     protected static $navigationLabel = 'Enh. E-commerce Overview';
 
-    protected static ?string $navigationGroup = 'Dashboard';
+    /**
+     * @var string|null Dashboard group keeps analytics widgets together.
+     */
+    protected static $navigationGroup = 'Dashboard';
 
     protected string $maxHeight = '32rem';
 
