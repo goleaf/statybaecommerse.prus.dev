@@ -31,7 +31,8 @@ use Filament\Schemas\Schema;
 use Filament\Schemas\Schema;
 final class DocumentResource extends Resource
 {
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document';
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-document';
 
     protected static ?string $model = Document::class;
 
@@ -59,7 +60,7 @@ final class DocumentResource extends Resource
         return __('admin.documents.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema
             ->schema([

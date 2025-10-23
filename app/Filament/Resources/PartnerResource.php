@@ -29,16 +29,15 @@ final class PartnerResource extends Resource
 
     protected static ?string $model = Partner::class;
 
-    /**
-     * Navigation icon identifier required by Filament.
-     */
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-user-group';
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-user-group';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Marketing';
+    /** @var string|\UnitEnum|null */
+    protected static \UnitEnum|string|null $navigationGroup = 'Marketing';
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         // Build the Partner form using the Section helper to keep layouts consistent.

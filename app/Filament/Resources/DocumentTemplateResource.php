@@ -45,7 +45,8 @@ use Filament\Schemas\Schema;
  */
 final class DocumentTemplateResource extends Resource
 {
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
 
     public static function getNavigationGroup(): string|UnitEnum|null
     {
@@ -85,7 +86,7 @@ final class DocumentTemplateResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema->schema([
             Tabs::make('document_template_form')

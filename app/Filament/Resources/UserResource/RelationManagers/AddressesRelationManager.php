@@ -33,7 +33,7 @@ class AddressesRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Addresses';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
         return $schema
             ->components([

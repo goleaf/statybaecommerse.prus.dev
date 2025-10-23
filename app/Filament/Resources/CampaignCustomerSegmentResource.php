@@ -43,12 +43,8 @@ final class CampaignCustomerSegmentResource extends Resource
 {
     protected static ?string $model = CampaignCustomerSegment::class;
 
-    /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-users';
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-users';
 
     protected static ?string $recordTitleAttribute = 'segment_type';
 
@@ -72,7 +68,7 @@ final class CampaignCustomerSegmentResource extends Resource
         return __('campaign_customer_segments.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema->schema([
             Section::make(__('campaign_customer_segments.tabs.basic_information'))

@@ -44,7 +44,8 @@ final class ReferralRewardLogResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'action';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Analytics';
+    /** @var string|\UnitEnum|null */
+    protected static \UnitEnum|string|null $navigationGroup = 'Analytics';
 
     public static function getNavigationLabel(): string
     {
@@ -61,7 +62,7 @@ final class ReferralRewardLogResource extends Resource
         return __('admin.referral_reward_logs.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema
             ->schema([

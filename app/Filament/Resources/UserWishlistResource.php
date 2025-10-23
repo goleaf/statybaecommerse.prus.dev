@@ -43,7 +43,8 @@ final class UserWishlistResource extends Resource
         return 'heroicon-o-heart';
     }
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Users';
+    /** @var string|\UnitEnum|null */
+    protected static \UnitEnum|string|null $navigationGroup = 'Users';
 
     protected static ?int $navigationSort = 8;
 
@@ -62,7 +63,7 @@ final class UserWishlistResource extends Resource
         return __('admin.user_wishlists.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema
             ->components([

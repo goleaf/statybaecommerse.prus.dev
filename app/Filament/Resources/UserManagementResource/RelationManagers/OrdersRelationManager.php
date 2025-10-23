@@ -27,7 +27,7 @@ final class OrdersRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Orders';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
         return $schema
             ->components([

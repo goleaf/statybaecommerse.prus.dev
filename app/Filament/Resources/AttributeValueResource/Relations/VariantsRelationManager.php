@@ -26,7 +26,7 @@ class VariantsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Variants';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
         return $schema
             ->schema([

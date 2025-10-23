@@ -37,12 +37,8 @@ final class EmailCampaignResource extends Resource
 
     protected static ?int $navigationSort = 4;
 
-    /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|null Navigation icon identifier.
-     */
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-envelope';
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-envelope';
 
     public static function getNavigationLabel(): string
     {
@@ -59,7 +55,7 @@ final class EmailCampaignResource extends Resource
         return __('admin.email_campaigns.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema->schema([
             Section::make(__('admin.email_campaigns.basic_information'))

@@ -52,12 +52,8 @@ final class VariantImageResource extends Resource
 
     protected static ?string $model = VariantImage::class;
 
-    /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-photo';
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-photo';
 
     public static function getNavigationGroup(): ?string
     {
@@ -81,7 +77,7 @@ final class VariantImageResource extends Resource
         return __('admin.variant_images.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema->components([
             Section::make(__('admin.variant_images.basic_information'))

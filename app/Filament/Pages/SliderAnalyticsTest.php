@@ -12,12 +12,8 @@ final class SliderAnalyticsTest extends BaseDashboard
 
     protected static ?string $navigationLabel = 'Slider Analytics Test';
 
-    /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?int $navigationSort = 3;
 

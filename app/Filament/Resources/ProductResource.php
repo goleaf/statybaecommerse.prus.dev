@@ -179,7 +179,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
         return __('products.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema
             ->components([

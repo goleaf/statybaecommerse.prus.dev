@@ -47,7 +47,8 @@ final class UserProductInteractionResource extends Resource
 {
     protected static ?string $model = UserProductInteraction::class;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Users';
+    /** @var string|\UnitEnum|null */
+    protected static \UnitEnum|string|null $navigationGroup = 'Users';
 
     public static function getNavigationLabel(): string
     {
@@ -64,7 +65,7 @@ final class UserProductInteractionResource extends Resource
         return __('admin.user_product_interactions.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema
             ->schema([

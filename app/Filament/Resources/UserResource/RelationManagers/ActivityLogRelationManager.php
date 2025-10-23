@@ -19,7 +19,7 @@ final class ActivityLogRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'admin.sections.activity_log';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
         return $schema
             ->components([

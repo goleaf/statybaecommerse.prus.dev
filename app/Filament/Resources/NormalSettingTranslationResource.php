@@ -34,7 +34,8 @@ final class NormalSettingTranslationResource extends Resource
 {
     protected static ?string $model = NormalSettingTranslation::class;
 
-    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::System;
+    /** @var string|\UnitEnum|null */
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 16;
 
@@ -65,7 +66,7 @@ final class NormalSettingTranslationResource extends Resource
         return __('admin.normal_setting_translations.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema
             ->schema([

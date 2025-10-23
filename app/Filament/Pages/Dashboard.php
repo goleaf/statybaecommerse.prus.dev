@@ -11,12 +11,8 @@ class Dashboard extends BaseDashboard
 {
     protected static ?int $navigationSort = 1;
 
-    /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-home';
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-home';
 
     protected static ?string $title = 'Dashboard';
 

@@ -77,7 +77,7 @@ final class ReportResource extends Resource
         return __('reports.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema
             ->columns(3)

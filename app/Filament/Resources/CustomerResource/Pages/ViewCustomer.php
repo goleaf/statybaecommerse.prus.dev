@@ -36,7 +36,7 @@ final class ViewCustomer extends ViewRecord
         ];
     }
 
-    public function infolist(Schema $schema): Schema
+    public function infolist(Infolist $infolist): Infolist
     {
         return $schema->schema([
             ListEntry::make('customerQuickLinks')

@@ -34,7 +34,8 @@ final class RecommendationConfigResource extends Resource
 
     protected static ?string $model = RecommendationConfig::class;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Analytics';
+    /** @var string|\UnitEnum|null */
+    protected static \UnitEnum|string|null $navigationGroup = 'Analytics';
 
     protected static ?int $navigationSort = 11;
 
@@ -55,7 +56,7 @@ final class RecommendationConfigResource extends Resource
         return __('recommendation_configs.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema->schema([
             Section::make(__('recommendation_config.sections.basic_info'))

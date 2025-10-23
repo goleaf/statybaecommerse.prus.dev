@@ -72,7 +72,7 @@ final class ChannelResource extends Resource
         return __('admin.channels.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema
             ->schema([

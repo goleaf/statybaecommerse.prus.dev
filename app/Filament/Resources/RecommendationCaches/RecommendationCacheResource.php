@@ -29,7 +29,8 @@ final class RecommendationCacheResource extends Resource
 
     protected static ?string $model = RecommendationCache::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?int $navigationSort = 20;
 
@@ -58,7 +59,7 @@ final class RecommendationCacheResource extends Resource
         return __('admin.recommendation_caches.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return RecommendationCacheForm::configure($schema);
     }
