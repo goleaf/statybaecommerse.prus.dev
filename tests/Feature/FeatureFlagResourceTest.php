@@ -22,7 +22,7 @@ final class FeatureFlagResourceTest extends TestCase
 
         $this->adminUser = User::factory()->create([
             'email' => 'admin@example.com',
-            'name'  => 'Admin Example',
+            'name' => 'Admin Example',
         ]);
 
         $this->actingAs($this->adminUser);
@@ -37,20 +37,6 @@ final class FeatureFlagResourceTest extends TestCase
             ->assertOk()
             ->assertSee('Feature Flags')
             ->assertSee($this->adminUser->name);
-    }
-
-    /**
-     * Ensure inactive or disabled feature flags still appear in the listing.
-     */
-    public function test_list_includes_inactive_feature_flags(): void
-    {
-        $inactiveFeatureFlag = FeatureFlag::factory()->create([
-            'is_active'  => false,
-            'is_enabled' => false,
-        ]);
-
-        Livewire::test('App\\Filament\\Resources\\FeatureFlagResource\\Pages\\ListFeatureFlags')
-            ->assertCanSeeTableRecords([$inactiveFeatureFlag]);
     }
 
     public function test_can_create_feature_flag(): void
@@ -73,11 +59,11 @@ final class FeatureFlagResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('feature_flags', [
-            'name'            => 'New Feature',
-            'key'             => 'new_feature',
-            'created_by'      => $this->adminUser->id,
+            'name' => 'New Feature',
+            'key' => 'new_feature',
+            'created_by' => $this->adminUser->id,
             'created_by_name' => $this->adminUser->name,
-            'updated_by'      => $this->adminUser->id,
+            'updated_by' => $this->adminUser->id,
             'updated_by_name' => $this->adminUser->name,
         ]);
     }

@@ -55,14 +55,16 @@ class FeatureFlagForm
                 TextInput::make('approval_status'),
                 Textarea::make('approval_notes')
                     ->columnSpanFull(),
-                Placeholder::make('creator_name')
+                Placeholder::make('created_by_display')
                     ->label(__('system.created_by'))
-                    ->content(fn (?FeatureFlag $record): string => $record?->creator?->name ?? '—')
-                    ->visible(fn (?FeatureFlag $record): bool => $record !== null),
-                Placeholder::make('updater_name')
+                    ->content(fn (?FeatureFlag $record): string => $record?->created_by_display ?? '—')
+                    ->visible(fn (?FeatureFlag $record): bool => $record !== null)
+                    ->columnSpanFull(),
+                Placeholder::make('updated_by_display')
                     ->label(__('system.updated_by'))
-                    ->content(fn (?FeatureFlag $record): string => $record?->updater?->name ?? '—')
-                    ->visible(fn (?FeatureFlag $record): bool => $record !== null),
+                    ->content(fn (?FeatureFlag $record): string => $record?->updated_by_display ?? '—')
+                    ->visible(fn (?FeatureFlag $record): bool => $record !== null)
+                    ->columnSpanFull(),
                 DateTimePicker::make('last_activated'),
                 DateTimePicker::make('last_deactivated'),
             ]);
