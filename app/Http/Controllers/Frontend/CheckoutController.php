@@ -9,6 +9,9 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Services\Cart\CartLifecycleService;
 use App\Services\Pricing\PriceCalculator;
+use App\Support\ApiErrorResponse;
+use App\Support\ErrorCodes;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -30,13 +33,12 @@ final class CheckoutController extends Controller
         $items = $this->getCartItems($request);
 
         return view('frontend.checkout.index', [
-            'cart' => $this->buildCartSummary(),
-            'user' => $request->user(),
-            'addresses' => $request->user()?->addresses()->latest()->get() ?? collect(),
+            'cartItems' => $items,
+            'summary'   => $this->summarize($items),
         ]);
     }
 
-    public function process(Request $request, CartLifecycleService $cartLifecycleService): RedirectResponse
+    public function process(Request $request, CartLifecycleService $cartLifecycleService): RedirectResponse|JsonResponse
     {
         $throttleKey = $this->checkoutThrottleKey($request);
         $maxAttempts = Config::get('checkout.rate_limit.attempts', 3);
@@ -66,20 +68,23 @@ final class CheckoutController extends Controller
 
         $items = $this->getCartItems($request);
         if ($items->isEmpty()) {
-            return $this->respondError($request, __('Your cart is empty.'), 422, 'frontend.cart.index');
+            if ($request->expectsJson()) {
+                // Produce a structured error payload when the cart has no purchasable items.
+                return ApiErrorResponse::problem(
+                    request: $request,
+                    errorCode: ErrorCodes::CHECKOUT_CART_EMPTY,
+                    detail: __('errors.messages.checkout_empty'),
+                    status: 422,
+                    title: ApiErrorResponse::titleFor(ErrorCodes::CHECKOUT_CART_EMPTY),
+                );
+            }
+
+            return redirect()->route('frontend.cart.index')->with('error', __('Your cart is empty.'));
         }
 
         $validated = $request->validate([
-            'full_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255'],
-            'phone' => ['nullable', 'string', 'max:50'],
-            'address_line_1' => ['required', 'string', 'max:255'],
-            'address_line_2' => ['nullable', 'string', 'max:255'],
-            'city' => ['required', 'string', 'max:120'],
-            'postal_code' => ['required', 'string', 'max:32'],
-            'country' => ['required', 'string', 'max:120'],
-            'payment_method' => ['required', 'string', 'max:50'],
-            'notes' => ['nullable', 'string'],
+            'payment_method' => ['required', 'string', 'max:255'],
+            'confirm'        => ['accepted'],
         ]);
 
         $order = DB::transaction(function () use ($items, $request, $validated) {
@@ -87,34 +92,34 @@ final class CheckoutController extends Controller
             $breakdown = app(PriceCalculator::class)->breakdown($subtotal);
 
             $order = Order::query()->create([
-                'number' => Str::upper(Str::random(10)),
-                'user_id' => $request->user()?->id,
-                'status' => 'processing',
-                'subtotal' => $breakdown->subtotal,
-                'tax_amount' => $breakdown->tax,
-                'shipping_amount' => $breakdown->shipping,
-                'discount_amount' => $breakdown->discount,
-                'total' => $breakdown->total,
-                'currency' => $breakdown->currency,
-                'billing_address' => [],
-                'shipping_address' => [],
-                'payment_status' => 'paid',
-                'payment_method' => $validated['payment_method'],
+                'number'            => Str::upper(Str::random(10)),
+                'user_id'           => $request->user()?->id,
+                'status'            => 'processing',
+                'subtotal'          => $breakdown->subtotal,
+                'tax_amount'        => $breakdown->tax,
+                'shipping_amount'   => $breakdown->shipping,
+                'discount_amount'   => $breakdown->discount,
+                'total'             => $breakdown->total,
+                'currency'          => $breakdown->currency,
+                'billing_address'   => [],
+                'shipping_address'  => [],
+                'payment_status'    => 'paid',
+                'payment_method'    => $validated['payment_method'],
                 'payment_reference' => (string) Str::uuid(),
             ]);
 
             foreach ($items as $item) {
                 OrderItem::query()->create([
-                    'order_id' => $order->getKey(),
-                    'product_id' => $item->product_id,
+                    'order_id'           => $order->getKey(),
+                    'product_id'         => $item->product_id,
                     'product_variant_id' => $item->product_variant_id,
-                    'name' => $item->product_snapshot['name'] ?? $item->product?->name,
-                    'sku' => $item->product_snapshot['sku'] ?? $item->product?->sku,
-                    'quantity' => $item->quantity,
-                    'unit_price' => (float) $item->price,
-                    'price' => (float) $item->price,
-                    'total' => $item->calculateSubtotal(),
-                    'notes' => $item->notes,
+                    'name'               => $item->product_snapshot['name'] ?? $item->product?->name,
+                    'sku'                => $item->product_snapshot['sku'] ?? $item->product?->sku,
+                    'quantity'           => $item->quantity,
+                    'unit_price'         => (float) $item->price,
+                    'price'              => (float) $item->price,
+                    'total'              => $item->calculateSubtotal(),
+                    'notes'              => $item->notes,
                 ]);
             }
 
@@ -139,14 +144,23 @@ final class CheckoutController extends Controller
 
         $request->session()->put('checkout.last_order_id', $order->getKey());
 
-                return $order;
-            });
-        } catch (Throwable $exception) {
-            Log::error('Checkout processing failed.', [
-                'exception' => $exception,
-                'user_id' => $request->user()?->getKey(),
-                'cart_items' => $items->pluck('id')->all(),
-            ]);
+        if ($request->expectsJson()) {
+            // Return a compact success document for API clients that initiate checkout via AJAX.
+            return response()->json([
+                'success' => true,
+                'message' => __('Order placed successfully.'),
+                'order'   => [
+                    'id'       => $order->getKey(),
+                    'number'   => $order->number,
+                    'status'   => $order->status,
+                    'total'    => (float) $order->total,
+                    'currency' => $order->currency,
+                ],
+            ], 201);
+        }
+
+        return redirect()->route('frontend.checkout.success')->with('status', __('Order placed successfully.'));
+    }
 
             return $this->respondError($request, __('ecommerce.payment_failed'), 500);
         }
@@ -202,12 +216,25 @@ final class CheckoutController extends Controller
 
         return CartItem::query()
             ->where(function ($query) use ($sessionId, $userId): void {
+                $hasCondition = false;
+
                 if ($sessionId !== '') {
                     $query->where('session_id', $sessionId);
+                    $hasCondition = true;
                 }
 
                 if ($userId !== null) {
-                    $query->orWhere('user_id', $userId);
+                    if ($hasCondition) {
+                        $query->orWhere('user_id', (int) $userId);
+                    } else {
+                        $query->where('user_id', (int) $userId);
+                        $hasCondition = true;
+                    }
+                }
+
+                if (! $hasCondition) {
+                    // Prevent accidental full scans when no ownership context is available.
+                    $query->whereRaw('1 = 0');
                 }
             })
             ->orderBy('created_at')

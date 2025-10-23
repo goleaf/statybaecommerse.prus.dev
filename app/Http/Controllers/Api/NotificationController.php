@@ -17,10 +17,9 @@ use App\Http\Requests\Api\NotificationShowRequest;
 use App\Http\Requests\Api\NotificationStatsRequest;
 use App\Models\Notification;
 use App\Services\NotificationService;
-use App\Support\ListQuery\ListQueryDefinition;
-use App\Support\ListQuery\ListQueryValidator;
-use App\Support\ListQuery\ListResponse;
-use Illuminate\Database\Eloquent\Builder;
+use App\Support\ApiErrorResponse;
+use App\Support\ErrorCodes;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
@@ -39,9 +38,9 @@ final class NotificationController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => array_map(static fn (NotificationPayloadData $payload): array => $payload->toArray(), $page->items()),
-            'meta' => $page->meta(),
-            'links' => $page->links(),
+            'data'    => array_map(static fn (NotificationPayloadData $payload): array => $payload->toArray(), $page->items()),
+            'meta'    => $page->meta(),
+            'links'   => $page->links(),
         ]);
     }
 
@@ -52,7 +51,7 @@ final class NotificationController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $stats->toArray(),
+            'data'    => $stats->toArray(),
         ]);
     }
 
@@ -69,7 +68,7 @@ final class NotificationController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Notification marked as read',
-            'data' => $payload->toArray(),
+            'data'    => $payload->toArray(),
         ]);
     }
 
@@ -86,7 +85,7 @@ final class NotificationController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Notification marked as unread',
-            'data' => $payload->toArray(),
+            'data'    => $payload->toArray(),
         ]);
     }
 
@@ -98,7 +97,7 @@ final class NotificationController extends Controller
         return response()->json([
             'success' => true,
             'message' => "Marked {$count} notifications as read",
-            'count' => $count,
+            'count'   => $count,
         ]);
     }
 
@@ -110,7 +109,7 @@ final class NotificationController extends Controller
         return response()->json([
             'success' => true,
             'message' => "Marked {$count} notifications as unread",
-            'count' => $count,
+            'count'   => $count,
         ]);
     }
 
@@ -126,7 +125,7 @@ final class NotificationController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $payload->toArray(),
+            'data'    => $payload->toArray(),
         ]);
     }
 
@@ -157,17 +156,21 @@ final class NotificationController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => array_map(static fn (NotificationPayloadData $payload): array => $payload->toArray(), $page->items()),
-            'meta' => $page->meta(),
-            'links' => $page->links(),
+            'data'    => array_map(static fn (NotificationPayloadData $payload): array => $payload->toArray(), $page->items()),
+            'meta'    => $page->meta(),
+            'links'   => $page->links(),
         ]);
     }
 
     private function notFoundResponse(): JsonResponse
     {
-        return response()->json([
-            'success' => false,
-            'message' => 'Notification not found',
-        ], 404);
+        // Normalize missing resource responses to the shared problem+json structure.
+        return ApiErrorResponse::problem(
+            request: request(),
+            errorCode: ErrorCodes::NOT_FOUND,
+            detail: __('notifications.errors.not_found'),
+            status: 404,
+            title: ApiErrorResponse::titleFor(ErrorCodes::NOT_FOUND),
+        );
     }
 }

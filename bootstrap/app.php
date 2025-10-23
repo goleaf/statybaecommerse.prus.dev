@@ -79,8 +79,10 @@ $app = Application::configure(basePath: dirname(__DIR__))
             'partner.api.auth'       => App\Http\Middleware\EnsurePartnerApiKey::class,
             'partner.api.scope'      => App\Http\Middleware\EnsurePartnerApiScope::class,
             'partner.api.rate_limit' => App\Http\Middleware\EnsurePartnerApiRateLimit::class,
-            'abilities'          => Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
-            'ability'            => Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,
+            // Surface Sanctum's middleware aliases for SPA and token authentication.
+            'sanctum.stateful' => Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            'abilities'        => Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,
+            'ability'          => Laravel\Sanctum\Http\Middleware\CheckForAllAbilities::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
