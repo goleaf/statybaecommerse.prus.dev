@@ -166,11 +166,13 @@ final class VariantStockHistoryResource extends Resource
                     ->label(__('admin.variant_stock_histories.fields.change_reason'))
                     ->formatStateUsing(fn (string $state): string => __('admin.variant_stock_histories.change_reasons.' . $state))
                     ->colors([
-                        'success' => ['sale'],
-                        'info'    => ['return', 'reserve', 'unreserve'],
-                        'warning' => ['adjustment', 'expired'],
+                        'success' => 'sale',
+                        'info'    => 'return',
+                        'primary' => 'reserve',
+                        // Collapse multiple destructive reasons under the shared danger palette without overriding array keys.
                         'danger'  => ['damage', 'theft'],
-                        'gray'    => ['manual'],
+                        'warning' => 'expired',
+                        'gray'    => 'manual',
                     ]),
                 TextColumn::make('changedBy.name')
                     ->label(__('admin.variant_stock_histories.fields.changed_by'))

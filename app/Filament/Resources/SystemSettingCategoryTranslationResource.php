@@ -29,8 +29,6 @@ use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
-use Filament\Schemas\Schema;
 
 use Filament\Schemas\Schema;
 /**
@@ -48,11 +46,15 @@ final class SystemSettingCategoryTranslationResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-language';
+    /**
+     * @var string|\BackedEnum|null Navigation icon override retained as docblock for Filament compatibility.
+     */
+    protected static $navigationIcon = 'heroicon-o-language';
 
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = 'Settings';
+    /**
+     * @var string|\UnitEnum|null Navigation group assignment stored without a typed property to avoid enum collisions.
+     */
+    protected static $navigationGroup = 'Settings';
 
     protected static bool $shouldRegisterNavigation = false;
 
