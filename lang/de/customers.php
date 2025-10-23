@@ -66,6 +66,14 @@ return [
         'en' => 'Englisch',
     ],
 
+    // Badge-Beschriftungen für lokalisierte Kundenstatus.
+    'badges' => [
+        'active'     => 'Aktiv',
+        'inactive'   => 'Inaktiv',
+        'verified'   => 'Verifiziert',
+        'unverified' => 'Nicht verifiziert',
+    ],
+
     'email_verified'  => 'E-Mail verifiziert',
     'verified_only'   => 'Nur verifizierte',
     'unverified_only' => 'Nur nicht verifizierte',

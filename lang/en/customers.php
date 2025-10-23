@@ -66,6 +66,14 @@ return [
         'en' => 'English',
     ],
 
+    // Badge labels for localized status chips.
+    'badges' => [
+        'active'     => 'Active',
+        'inactive'   => 'Inactive',
+        'verified'   => 'Verified',
+        'unverified' => 'Unverified',
+    ],
+
     'email_verified'  => 'Email Verified',
     'verified_only'   => 'Verified Only',
     'unverified_only' => 'Unverified Only',
