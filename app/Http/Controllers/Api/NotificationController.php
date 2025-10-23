@@ -65,9 +65,9 @@ final class NotificationController extends Controller
             return $this->notFoundResponse();
         }
 
+        // Return only the normalized payload to ensure the public contract stays minimal.
         return response()->json([
             'success' => true,
-            'message' => 'Notification marked as read',
             'data'    => $payload->toArray(),
         ]);
     }
@@ -82,9 +82,9 @@ final class NotificationController extends Controller
             return $this->notFoundResponse();
         }
 
+        // Provide the refreshed payload without auxiliary message keys for parity with tests.
         return response()->json([
             'success' => true,
-            'message' => 'Notification marked as unread',
             'data'    => $payload->toArray(),
         ]);
     }
@@ -94,9 +94,9 @@ final class NotificationController extends Controller
         $user = $this->requireUser($request);
         $count = $this->notificationService->markAllAsReadForUser($user);
 
+        // Keep the response lean by exposing the affected count directly.
         return response()->json([
             'success' => true,
-            'message' => "Marked {$count} notifications as read",
             'count'   => $count,
         ]);
     }
@@ -106,9 +106,9 @@ final class NotificationController extends Controller
         $user = $this->requireUser($request);
         $count = $this->notificationService->markAllAsUnreadForUser($user);
 
+        // Mirror the mark-all-read response shape to avoid ambiguous messaging fields.
         return response()->json([
             'success' => true,
-            'message' => "Marked {$count} notifications as unread",
             'count'   => $count,
         ]);
     }
@@ -139,9 +139,9 @@ final class NotificationController extends Controller
             return $this->notFoundResponse();
         }
 
+        // Acknowledge deletion success without redundant message payloads.
         return response()->json([
             'success' => true,
-            'message' => 'Notification deleted',
         ]);
     }
 
