@@ -1,182 +1,182 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://prus.dev/contracts/order.v1.schema.json",
-  "title": "Order contract v1",
-  "type": "object",
-  "additionalProperties": false,
-  "required": ["contract", "version", "data", "meta"],
-  "properties": {
-    "contract": {
-      "const": "order"
-    },
-    "version": {
-      "type": "string",
-      "pattern": "^v1(\\.\\d+)?$"
-    },
-    "data": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "item": {
-          "$ref": "#/$defs/order"
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://prus.dev/contracts/order.v1.schema.json",
+    "title": "Order contract v1",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["contract", "version", "data", "meta"],
+    "properties": {
+        "contract": {
+            "const": "order"
         },
-        "items": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/order"
-          }
-        }
-      },
-      "anyOf": [
-        {
-          "required": ["item"]
+        "version": {
+            "type": "string",
+            "pattern": "^v1(\\.\\d+)?$"
         },
-        {
-          "required": ["items"]
-        }
-      ]
-    },
-    "meta": {
-      "type": "object",
-      "additionalProperties": true
-    }
-  },
-  "$defs": {
-    "address": {
-      "type": "object",
-      "additionalProperties": true,
-      "properties": {
-        "first_name": {
-          "type": ["string", "null"]
-        },
-        "last_name": {
-          "type": ["string", "null"]
-        },
-        "company": {
-          "type": ["string", "null"]
-        },
-        "line1": {
-          "type": ["string", "null"]
-        },
-        "city": {
-          "type": ["string", "null"]
-        },
-        "country": {
-          "type": ["string", "null"]
-        },
-        "postal_code": {
-          "type": ["string", "null"]
-        }
-      }
-    },
-    "order_item": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["id", "product_id", "name", "quantity", "unit_price", "total"],
-      "properties": {
-        "id": {
-          "type": "integer"
-        },
-        "product_id": {
-          "type": ["integer", "null"]
-        },
-        "name": {
-          "type": "string"
-        },
-        "quantity": {
-          "type": "integer",
-          "minimum": 1
-        },
-        "unit_price": {
-          "type": "number"
-        },
-        "total": {
-          "type": "number"
-        }
-      }
-    },
-    "totals": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["subtotal", "tax", "shipping", "discount", "total", "currency"],
-      "properties": {
-        "subtotal": {
-          "type": "number"
-        },
-        "tax": {
-          "type": "number"
-        },
-        "shipping": {
-          "type": "number"
-        },
-        "discount": {
-          "type": "number"
-        },
-        "total": {
-          "type": "number"
-        },
-        "currency": {
-          "type": "string",
-          "minLength": 3,
-          "maxLength": 3
-        }
-      }
-    },
-    "order": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["id", "number", "status", "totals", "items", "links"],
-      "properties": {
-        "id": {
-          "type": "integer"
-        },
-        "number": {
-          "type": "string"
-        },
-        "status": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["state", "payment_state"],
-          "properties": {
-            "state": {
-              "type": "string"
+        "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "item": {
+                    "$ref": "#/$defs/order"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/order"
+                    }
+                }
             },
-            "payment_state": {
-              "type": ["string", "null"]
+            "anyOf": [
+                {
+                    "required": ["item"]
+                },
+                {
+                    "required": ["items"]
+                }
+            ]
+        },
+        "meta": {
+            "type": "object",
+            "additionalProperties": true
+        }
+    },
+    "$defs": {
+        "address": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+                "first_name": {
+                    "type": ["string", "null"]
+                },
+                "last_name": {
+                    "type": ["string", "null"]
+                },
+                "company": {
+                    "type": ["string", "null"]
+                },
+                "line1": {
+                    "type": ["string", "null"]
+                },
+                "city": {
+                    "type": ["string", "null"]
+                },
+                "country": {
+                    "type": ["string", "null"]
+                },
+                "postal_code": {
+                    "type": ["string", "null"]
+                }
             }
-          }
+        },
+        "order_item": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "product_id", "name", "quantity", "unit_price", "total"],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "product_id": {
+                    "type": ["integer", "null"]
+                },
+                "name": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "unit_price": {
+                    "type": "number"
+                },
+                "total": {
+                    "type": "number"
+                }
+            }
         },
         "totals": {
-          "$ref": "#/$defs/totals"
-        },
-        "items": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/order_item"
-          }
-        },
-        "billing_address": {
-          "$ref": "#/$defs/address"
-        },
-        "shipping_address": {
-          "$ref": "#/$defs/address"
-        },
-        "placed_at": {
-          "type": ["string", "null"],
-          "format": "date-time"
-        },
-        "links": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["self"],
-          "properties": {
-            "self": {
-              "type": "string",
-              "format": "uri"
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["subtotal", "tax", "shipping", "discount", "total", "currency"],
+            "properties": {
+                "subtotal": {
+                    "type": "number"
+                },
+                "tax": {
+                    "type": "number"
+                },
+                "shipping": {
+                    "type": "number"
+                },
+                "discount": {
+                    "type": "number"
+                },
+                "total": {
+                    "type": "number"
+                },
+                "currency": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 3
+                }
             }
-          }
+        },
+        "order": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "number", "status", "totals", "items", "links"],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "number": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["state", "payment_state"],
+                    "properties": {
+                        "state": {
+                            "type": "string"
+                        },
+                        "payment_state": {
+                            "type": ["string", "null"]
+                        }
+                    }
+                },
+                "totals": {
+                    "$ref": "#/$defs/totals"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/order_item"
+                    }
+                },
+                "billing_address": {
+                    "$ref": "#/$defs/address"
+                },
+                "shipping_address": {
+                    "$ref": "#/$defs/address"
+                },
+                "placed_at": {
+                    "type": ["string", "null"],
+                    "format": "date-time"
+                },
+                "links": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["self"],
+                    "properties": {
+                        "self": {
+                            "type": "string",
+                            "format": "uri"
+                        }
+                    }
+                }
+            }
         }
-      }
     }
-  }
 }
