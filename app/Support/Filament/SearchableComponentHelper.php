@@ -5,76 +5,89 @@ declare(strict_types=1);
 namespace App\Support\Filament;
 
 use Closure;
+use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 
 final class SearchableComponentHelper
 {
     /**
-     * Hydrate a SearchableInput with deterministic state, options, and payload metadata.
+     * Hydrate a searchable component with its canonical SearchResult option.
      *
-     * @template TRecord of object|array
-     *
-     * @param int|string|null                                                                           $state             Current raw component state from the form.
-     * @param Closure(int|string|null): (?TRecord)                                                      $recordResolver    Callback that resolves the backing record or null when missing.
-     * @param Closure(TRecord): array{value: int|string, label: string, payload?: array<string, mixed>} $payloadNormaliser Shapes the UI payload.
+     * @param  Closure(int|string):?SearchResult  $resolveResult  Resolves a persisted state into a SearchResult DTO.
      */
-    public static function hydrate(
-        SearchableInput $component,
-        int|string|null $state,
-        Closure $recordResolver,
-        Closure $payloadNormaliser,
-    ): void {
-        // Abort hydration when no identifier is present so stale UI state does not linger.
-        if ($state === null || $state === '') {
+    public static function hydrate(SearchableInput $component, int|string|null $state, Closure $resolveResult): void
+    {
+        if (blank($state)) {
             self::clear($component);
 
             return;
         }
 
-        $record = $recordResolver($state);
+        $result = $resolveResult($state);
 
-        // Clear the component whenever the lookup misses to avoid exposing mismatched labels.
-        if ($record === null) {
+        if (! $result instanceof SearchResult) {
             self::clear($component);
 
             return;
         }
 
-        $normalised = $payloadNormaliser($record);
-
-        $value = (string) ($normalised['value'] ?? $state);
-        $label = (string) ($normalised['label'] ?? $value);
-
-        /** @var array<string, mixed> $payload */
-        $payload = $normalised['payload'] ?? [];
-
-        // Guarantee the payload always surfaces the identifier and label for downstream consumers.
-        $payload['id'] ??= $value;
-        $payload['label'] ??= $label;
-
-        // Apply the canonical state, option label, and metadata payload to the component in one place.
-        $component
-            ->state($value)
-            ->options([
-                $value => $label,
-            ])
-            ->meta('payload', $payload);
+        self::applyResult($component, $result);
     }
 
     /**
-     * Reset the component and optionally let callers clear related form fields via callbacks.
+     * Synchronise the underlying model key with the component state.
+     *
+     * The helper keeps the component options in sync with the canonical payload and wipes
+     * everything when the state is empty so Livewire does not keep stale labels or metadata.
+     *
+     * @param  Closure(int|string):?SearchResult  $resolveResult  Resolves the current state into a SearchResult DTO.
+     * @param  callable(string, mixed):void  $set  Filament's Set helper (or compatible callable) for updating state.
      */
-    public static function clear(SearchableInput $component, Closure ...$resetCallbacks): void
+    public static function sync(
+        SearchableInput $component,
+        ?string $state,
+        callable $set,
+        string $targetField,
+        Closure $resolveResult
+    ): void {
+        if ($state === null || $state === '') {
+            $set($targetField, null);
+            self::clear($component);
+
+            return;
+        }
+
+        $result = $resolveResult($state);
+
+        if (! $result instanceof SearchResult) {
+            $set($targetField, null);
+            self::clear($component);
+
+            return;
+        }
+
+        $value = $result->value();
+        $set($targetField, is_numeric($value) ? (int) $value : $value);
+
+        self::applyResult($component, $result);
+    }
+
+    /**
+     * Reset the component back to an empty state.
+     */
+    public static function clear(SearchableInput $component): void
     {
-        // Drop any previously selected value, label, or payload so dependent inputs do not see stale state.
         $component
             ->state(null)
-            ->options([])
-            ->meta('payload', []);
+            ->options([]);
+    }
 
-        // Allow callers to reset additional form state (e.g. dependent fields, payload mirrors, etc.).
-        foreach ($resetCallbacks as $callback) {
-            $callback();
-        }
+    private static function applyResult(SearchableInput $component, SearchResult $result): void
+    {
+        // Inject the canonical state and single-option list so Filament renders the stored label
+        // and metadata payload exactly as the search services define it.
+        $component
+            ->state($result->value())
+            ->options([$result]);
     }
 }

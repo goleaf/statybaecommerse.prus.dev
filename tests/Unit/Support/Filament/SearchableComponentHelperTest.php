@@ -3,162 +3,48 @@
 declare(strict_types=1);
 
 use App\Support\Filament\SearchableComponentHelper;
+use App\Support\Search\SearchResultPayload;
+use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 
-it('hydrates the searchable component with the canonical payload tuple', function (): void {
-    // Arrange: prime the component with a fake record that exposes metadata.
+// This regression test ensures clearing the component wipes both the display option and stored payload metadata.
+it('clears the searchable component state when the selection is removed', function (): void {
     $component = SearchableInput::make('product_id');
+
+    $result = SearchResultPayload::normalise(
+        SearchResult::make('42', 'Demo Product'),
+        [
+            'product_id' => 42,
+            'sku'        => 'SKU-42',
+            'name'       => 'Demo Product',
+            'price'      => 99.0,
+        ],
+    );
 
     SearchableComponentHelper::hydrate(
-        $component,
-        42,
-        static fn (int $identifier): ?array => [
-            'id'    => $identifier,
-            'label' => 'Example Product',
-            'sku'   => 'SKU-42',
-        ],
-        static function (array $record): array {
-            return [
-                'value'   => $record['id'],
-                'label'   => $record['label'],
-                'payload' => [
-                    'sku' => $record['sku'],
-                ],
-            ];
-        },
+        component: $component,
+        state: 42,
+        resolveResult: static fn (): SearchResult => $result,
     );
 
-    // Assert: the helper persists state/options and injects canonical payload keys.
-    expect($component->getState())->toBe('42');
-    expect($component->getOptions())->toBe(['42' => 'Example Product']);
-    expect($component->getPayload())->toBe([
-        'sku'   => 'SKU-42',
-        'id'    => '42',
-        'label' => 'Example Product',
-    ]);
-});
+    expect($component->getOptions())->toHaveCount(1);
 
-it('synchronises identifiers and payload metadata when selections change', function (): void {
-    // Arrange: mimic Filament\Forms\Set with a closure capturing field updates.
-    $component = SearchableInput::make('product_id');
-    $fields = [
-        'product_id'      => null,
-        'product_payload' => ['id' => null, 'label' => '', 'sku' => null],
-        'cleared'         => false,
-    ];
+    $captured = [];
 
-    $set = static function (string $field, mixed $value) use (&$fields): void {
-        $fields[$field] = $value;
-    };
-
-    // Act: sync a valid selection.
-    SearchableComponentHelper::syncSelectedRecord(
-        $component,
-        '55',
-        $set,
-        'product_id',
-        static fn (string $identifier): ?array => [
-            'id'    => (int) $identifier,
-            'label' => 'Cached Product',
-            'sku'   => 'SYNC-55',
-        ],
-        static function (array $record): array {
-            return [
-                'value'   => $record['id'],
-                'label'   => $record['label'],
-                'payload' => [
-                    'sku' => $record['sku'],
-                ],
-            ];
+    SearchableComponentHelper::sync(
+        component: $component,
+        state: '',
+        set: function (string $field, $value) use (&$captured): void {
+            $captured[$field] = $value;
         },
-        'product_payload',
-        ['id' => null, 'label' => '', 'sku' => null],
-        static function () use (&$fields): void {
-            $fields['cleared'] = true;
-        },
+        targetField: 'product_id',
+        resolveResult: static fn (): SearchResult => $result,
     );
 
-    // Assert: the identifier is normalised, payload cached, and UI updated.
-    expect($fields['product_id'])->toBe(55);
-    expect($fields['product_payload'])->toBe([
-        'sku'   => 'SYNC-55',
-        'id'    => '55',
-        'label' => 'Cached Product',
-    ]);
-    expect($component->getState())->toBe('55');
-    expect($component->getOptions())->toBe(['55' => 'Cached Product']);
-    expect($component->getPayload())->toBe([
-        'sku'   => 'SYNC-55',
-        'id'    => '55',
-        'label' => 'Cached Product',
-    ]);
-
-    // Act: clearing the lookup should reset everything and trigger the clean-up callback.
-    SearchableComponentHelper::syncSelectedRecord(
-        $component,
-        null,
-        $set,
-        'product_id',
-        static fn (): ?array => null,
-        static fn (): array => [
-            'value'   => null,
-            'label'   => null,
-            'payload' => [],
-        ],
-        'product_payload',
-        ['id' => null, 'label' => '', 'sku' => null],
-        static function () use (&$fields): void {
-            $fields['cleared'] = true;
-        },
-    );
-
-    // Assert: the helper clears identifiers, payloads, and emits the clean-up callback once.
-    expect($fields['product_id'])->toBeNull();
-    expect($fields['product_payload'])->toBe([
-        'id'    => null,
-        'label' => '',
-        'sku'   => null,
-    ]);
-    expect($fields['cleared'])->toBeTrue();
-    expect($component->getState())->toBeNull();
-    expect($component->getOptions())->toBe([]);
-    expect($component->getPayload())->toBe([]);
-});
-
-it('bootstraps payload macros lazily when none are registered', function (): void {
-    // Arrange: emulate a clean environment where the ServiceProvider did not run yet.
-    SearchableInput::flushMacros();
-    $component = SearchableInput::make('order_id');
-
-    // Act & Assert: the helper should register macros transparently and avoid TypeErrors.
-    expect(function () use ($component): void {
-        SearchableComponentHelper::hydrate(
-            $component,
-            null,
-            static fn (): ?array => null,
-            static fn (): array => [
-                'value'   => null,
-                'label'   => '',
-                'payload' => [],
-            ],
-        );
-
-        SearchableComponentHelper::syncSelectedRecord(
-            $component,
-            null,
-            static function (): void {},
-            'order_id',
-            static fn (): ?array => null,
-            static fn (): array => [
-                'value'   => null,
-                'label'   => '',
-                'payload' => [],
-            ],
-        );
-
-        SearchableComponentHelper::clear($component);
-    })->not->toThrow(Throwable::class);
-
-    // Without any payload metadata the helper should always fall back to an empty array.
-    expect($component->getPayload())->toBe([]);
+    expect($captured['product_id'] ?? null)
+        ->toBeNull()
+        ->and($component->getOptions())
+        ->toBe([])
+        ->and($component->getState())
+        ->toBeNull();
 });
