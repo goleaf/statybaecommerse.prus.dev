@@ -116,9 +116,12 @@ final class BackupVerifyCommand extends Command
             return null;
         }
 
+        /** @var array<int, string> $directories */
         $directories = array_values(array_filter(
             File::directories($storageRoot),
-            static fn ($path): bool => is_string($path) && File::isDirectory($path),
+            static function ($path): bool {
+                return is_string($path) && File::isDirectory($path);
+            },
         ));
 
         if ($directories === []) {
