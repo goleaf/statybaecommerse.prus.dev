@@ -14,7 +14,8 @@ use App\Models\FeatureFlag;
 use App\Models\SystemSetting;
 use App\Observers\UserAttributionObserver;
 use App\Services\DocumentService;
-use App\Support\Html\HtmlSanitizer;
+use App\Support\Logging\LogContext;
+use App\Support\Logging\StructuredLogger;
 use App\View\Creators\CartDataCreator;
 use App\View\Creators\GlobalDataCreator;
 use App\View\Creators\LocalizationCreator;
@@ -77,7 +78,10 @@ class AppServiceProvider extends ServiceProvider
             });
         }
 
-        $this->app->bind(ProductRepositoryInterface::class, EloquentProductRepository::class);
+        $this->app->scoped(LogContext::class, static fn (): LogContext => new LogContext());
+        $this->app->scoped(StructuredLogger::class, function ($app): StructuredLogger {
+            return new StructuredLogger($app->make(LogContext::class));
+        });
     }
 
     public function boot(): void

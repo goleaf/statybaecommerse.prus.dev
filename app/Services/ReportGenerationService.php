@@ -8,8 +8,9 @@ use App\Models\AnalyticsEvent;
 use App\Models\Product;
 use App\Models\Report;
 use App\Models\User;
-use App\Services\Pricing\PriceCalculator;
-use Illuminate\Support\Facades\Log;
+use App\Support\Logging\StructuredLogger;
+use Throwable;
+use function collect;
 
 /**
  * ReportGenerationService
@@ -18,56 +19,68 @@ use Illuminate\Support\Facades\Log;
  */
 final class ReportGenerationService
 {
+    public function __construct(private readonly StructuredLogger $logger)
+    {
+    }
+
     /**
      * Handle generateSalesReport functionality with proper error handling.
      */
     public function generateSalesReport(array $filters = []): array
     {
-        $timeout = now()->addMinutes(5);
-        // 5 minute timeout for sales report generation
-        $query = AnalyticsEvent::where('event_type', 'purchase')->with(['user', 'trackable'])->whereNotNull('value');
-        // Apply filters
-        if (isset($filters['date_from'])) {
-            $query->where('created_at', '>=', $filters['date_from']);
-        }
-        if (isset($filters['date_to'])) {
-            $query->where('created_at', '<=', $filters['date_to']);
-        }
-        if (isset($filters['user_id'])) {
-            $query->where('user_id', $filters['user_id']);
-        }
-        $salesData = [];
-        $totalRevenue = 0;
-        $processedCount = 0;
-        $query->cursor()->takeUntilTimeout($timeout)->each(function ($event) use (&$salesData, &$totalRevenue, &$processedCount) {
-            $processedCount++;
-            $value = (float) ($event->value ?? 0);
-            $totalRevenue += $value;
-            $date = $event->created_at->format('Y-m-d');
-            if (! isset($salesData[$date])) {
-                $salesData[$date] = ['date' => $date, 'revenue' => 0, 'transactions' => 0, 'users' => collect()];
+        $operation = $this->logger->operation('report_sales', [
+            'filters' => $filters,
+        ]);
+
+        try {
+            $timeout = now()->addMinutes(5);
+            // 5 minute timeout for sales report generation
+            $query = AnalyticsEvent::where('event_type', 'purchase')->with(['user', 'trackable'])->whereNotNull('value');
+            // Apply filters
+            if (isset($filters['date_from'])) {
+                $query->where('created_at', '>=', $filters['date_from']);
             }
-            $salesData[$date]['revenue'] += $value;
-            $salesData[$date]['transactions']++;
-            $salesData[$date]['users']->push($event->user_id);
-        });
-        // Calculate unique users per day
-        foreach ($salesData as &$day) {
-            $day['unique_users'] = $day['users']->unique()->count();
-            unset($day['users']);
+            if (isset($filters['date_to'])) {
+                $query->where('created_at', '<=', $filters['date_to']);
+            }
+            if (isset($filters['user_id'])) {
+                $query->where('user_id', $filters['user_id']);
+            }
+            $salesData = [];
+            $totalRevenue = 0;
+            $processedCount = 0;
+            $query->cursor()->takeUntilTimeout($timeout)->each(function ($event) use (&$salesData, &$totalRevenue, &$processedCount) {
+                $processedCount++;
+                $value = (float) ($event->value ?? 0);
+                $totalRevenue += $value;
+                $date = $event->created_at->format('Y-m-d');
+                if (! isset($salesData[$date])) {
+                    $salesData[$date] = ['date' => $date, 'revenue' => 0, 'transactions' => 0, 'users' => collect()];
+                }
+                $salesData[$date]['revenue'] += $value;
+                $salesData[$date]['transactions']++;
+                $salesData[$date]['users']->push($event->user_id);
+            });
+            // Calculate unique users per day
+            foreach ($salesData as &$day) {
+                $day['unique_users'] = $day['users']->unique()->count();
+                unset($day['users']);
+            }
+            $result = ['summary' => ['total_revenue' => $totalRevenue, 'total_transactions' => $processedCount, 'days_covered' => count($salesData), 'processed_events' => $processedCount], 'daily_data' => array_values($salesData)];
+
+            $operation->finish([
+                'processed_events' => $processedCount,
+                'total_revenue' => $totalRevenue,
+                'days_covered' => count($salesData),
+                'timeout_reached' => now()->greaterThan($timeout),
+            ]);
+
+            return $result;
+        } catch (Throwable $throwable) {
+            $operation->fail($throwable);
+
+            throw $throwable;
         }
-        $calculator = app(PriceCalculator::class);
-        $totals = $calculator->breakdown($totalRevenue);
-        $summary = $totals->toSummary();
-
-        foreach ($salesData as &$day) {
-            $day['formatted_revenue'] = app_money_format($day['revenue'], $summary['currency']);
-        }
-        unset($day);
-
-        Log::info('Sales report generated', ['processed_events' => $processedCount, 'total_revenue' => $totalRevenue, 'days_covered' => count($salesData), 'timeout_reached' => now()->greaterThan($timeout)]);
-
-        return ['summary' => $summary + ['total_revenue' => $summary['total'], 'total_transactions' => $processedCount, 'days_covered' => count($salesData), 'processed_events' => $processedCount], 'daily_data' => array_values($salesData)];
     }
 
     /**
@@ -75,33 +88,48 @@ final class ReportGenerationService
      */
     public function generateProductAnalyticsReport(array $filters = []): array
     {
-        $timeout = now()->addMinutes(10);
-        // 10 minute timeout for product analytics
-        $query = Product::with(['categories', 'brand', 'media'])->where('is_visible', true);
-        // Apply filters
-        if (isset($filters['category_id'])) {
-            $query->whereHas('categories', function ($q) use ($filters) {
-                $q->where('id', $filters['category_id']);
-            });
-        }
-        if (isset($filters['brand_id'])) {
-            $query->where('brand_id', $filters['brand_id']);
-        }
-        if (isset($filters['price_min'])) {
-            $query->where('price', '>=', $filters['price_min']);
-        }
-        if (isset($filters['price_max'])) {
-            $query->where('price', '<=', $filters['price_max']);
-        }
-        $productData = [];
-        $processedCount = 0;
-        $query->cursor()->takeUntilTimeout($timeout)->each(function ($product) use (&$productData, &$processedCount) {
-            $processedCount++;
-            $productData[] = ['id' => $product->id, 'name' => $product->name, 'sku' => $product->sku, 'price' => $product->price, 'stock_quantity' => $product->stock_quantity, 'brand' => $product->brand?->name, 'categories' => $product->categories->pluck('name')->toArray(), 'has_images' => $product->media->isNotEmpty(), 'is_featured' => $product->is_featured, 'created_at' => $product->created_at->format('Y-m-d H:i:s')];
-        });
-        Log::info('Product analytics report generated', ['processed_products' => $processedCount, 'timeout_reached' => now()->greaterThan($timeout)]);
+        $operation = $this->logger->operation('report_product_analytics', [
+            'filters' => $filters,
+        ]);
 
-        return ['summary' => ['total_products' => $processedCount, 'processed_products' => $processedCount], 'products' => $productData];
+        try {
+            $timeout = now()->addMinutes(10);
+            // 10 minute timeout for product analytics
+            $query = Product::with(['categories', 'brand', 'media'])->where('is_visible', true);
+            // Apply filters
+            if (isset($filters['category_id'])) {
+                $query->whereHas('categories', function ($q) use ($filters) {
+                    $q->where('id', $filters['category_id']);
+                });
+            }
+            if (isset($filters['brand_id'])) {
+                $query->where('brand_id', $filters['brand_id']);
+            }
+            if (isset($filters['price_min'])) {
+                $query->where('price', '>=', $filters['price_min']);
+            }
+            if (isset($filters['price_max'])) {
+                $query->where('price', '<=', $filters['price_max']);
+            }
+            $productData = [];
+            $processedCount = 0;
+            $query->cursor()->takeUntilTimeout($timeout)->each(function ($product) use (&$productData, &$processedCount) {
+                $processedCount++;
+                $productData[] = ['id' => $product->id, 'name' => $product->name, 'sku' => $product->sku, 'price' => $product->price, 'stock_quantity' => $product->stock_quantity, 'brand' => $product->brand?->name, 'categories' => $product->categories->pluck('name')->toArray(), 'has_images' => $product->media->isNotEmpty(), 'is_featured' => $product->is_featured, 'created_at' => $product->created_at->format('Y-m-d H:i:s')];
+            });
+            $result = ['summary' => ['total_products' => $processedCount, 'processed_products' => $processedCount], 'products' => $productData];
+
+            $operation->finish([
+                'processed_products' => $processedCount,
+                'timeout_reached' => now()->greaterThan($timeout),
+            ]);
+
+            return $result;
+        } catch (Throwable $throwable) {
+            $operation->fail($throwable);
+
+            throw $throwable;
+        }
     }
 
     /**
@@ -109,36 +137,52 @@ final class ReportGenerationService
      */
     public function generateUserActivityReport(array $filters = []): array
     {
-        $timeout = now()->addMinutes(8);
-        // 8 minute timeout for user activity report
-        $query = AnalyticsEvent::with(['user'])->whereNotNull('user_id');
-        // Apply filters
-        if (isset($filters['date_from'])) {
-            $query->where('created_at', '>=', $filters['date_from']);
-        }
-        if (isset($filters['date_to'])) {
-            $query->where('created_at', '<=', $filters['date_to']);
-        }
-        if (isset($filters['event_type'])) {
-            $query->where('event_type', $filters['event_type']);
-        }
-        $userActivity = [];
-        $processedCount = 0;
-        $query->cursor()->takeUntilTimeout($timeout)->each(function ($event) use (&$userActivity, &$processedCount) {
-            $processedCount++;
-            $userId = $event->user_id;
-            if (! isset($userActivity[$userId])) {
-                $userActivity[$userId] = ['user_id' => $userId, 'user_name' => $event->user?->name ?? 'Unknown', 'user_email' => $event->user?->email ?? 'Unknown', 'events' => [], 'total_events' => 0, 'last_activity' => null];
-            }
-            $userActivity[$userId]['events'][] = ['type' => $event->event_type, 'url' => $event->url, 'created_at' => $event->created_at->format('Y-m-d H:i:s')];
-            $userActivity[$userId]['total_events']++;
-            if (! $userActivity[$userId]['last_activity'] || $event->created_at->greaterThan($userActivity[$userId]['last_activity'])) {
-                $userActivity[$userId]['last_activity'] = $event->created_at->format('Y-m-d H:i:s');
-            }
-        });
-        Log::info('User activity report generated', ['processed_events' => $processedCount, 'unique_users' => count($userActivity), 'timeout_reached' => now()->greaterThan($timeout)]);
+        $operation = $this->logger->operation('report_user_activity', [
+            'filters' => $filters,
+        ]);
 
-        return ['summary' => ['total_events' => $processedCount, 'unique_users' => count($userActivity), 'processed_events' => $processedCount], 'user_activity' => array_values($userActivity)];
+        try {
+            $timeout = now()->addMinutes(8);
+            // 8 minute timeout for user activity report
+            $query = AnalyticsEvent::with(['user'])->whereNotNull('user_id');
+            // Apply filters
+            if (isset($filters['date_from'])) {
+                $query->where('created_at', '>=', $filters['date_from']);
+            }
+            if (isset($filters['date_to'])) {
+                $query->where('created_at', '<=', $filters['date_to']);
+            }
+            if (isset($filters['event_type'])) {
+                $query->where('event_type', $filters['event_type']);
+            }
+            $userActivity = [];
+            $processedCount = 0;
+            $query->cursor()->takeUntilTimeout($timeout)->each(function ($event) use (&$userActivity, &$processedCount) {
+                $processedCount++;
+                $userId = $event->user_id;
+                if (! isset($userActivity[$userId])) {
+                    $userActivity[$userId] = ['user_id' => $userId, 'user_name' => $event->user?->name ?? 'Unknown', 'user_email' => $event->user?->email ?? 'Unknown', 'events' => [], 'total_events' => 0, 'last_activity' => null];
+                }
+                $userActivity[$userId]['events'][] = ['type' => $event->event_type, 'url' => $event->url, 'created_at' => $event->created_at->format('Y-m-d H:i:s')];
+                $userActivity[$userId]['total_events']++;
+                if (! $userActivity[$userId]['last_activity'] || $event->created_at->greaterThan($userActivity[$userId]['last_activity'])) {
+                    $userActivity[$userId]['last_activity'] = $event->created_at->format('Y-m-d H:i:s');
+                }
+            });
+            $result = ['summary' => ['total_events' => $processedCount, 'unique_users' => count($userActivity), 'processed_events' => $processedCount], 'user_activity' => array_values($userActivity)];
+
+            $operation->finish([
+                'processed_events' => $processedCount,
+                'unique_users' => count($userActivity),
+                'timeout_reached' => now()->greaterThan($timeout),
+            ]);
+
+            return $result;
+        } catch (Throwable $throwable) {
+            $operation->fail($throwable);
+
+            throw $throwable;
+        }
     }
 
     /**
@@ -146,25 +190,44 @@ final class ReportGenerationService
      */
     public function generateSystemReport(): array
     {
-        $timeout = now()->addMinutes(15);
-        // 15 minute timeout for comprehensive system report
-        $report = ['generated_at' => now()->toISOString(), 'timeout' => $timeout->toISOString(), 'sections' => []];
-        // Generate each section with individual timeouts
-        $sections = ['users' => fn () => $this->generateUserStats(), 'products' => fn () => $this->generateProductStats(), 'analytics' => fn () => $this->generateAnalyticsStats()];
-        foreach ($sections as $sectionName => $sectionGenerator) {
-            if (now()->greaterThan($timeout)) {
-                Log::warning('System report generation timeout reached', ['completed_sections' => array_keys($report['sections']), 'remaining_sections' => array_keys($sections)]);
-                break;
-            }
-            try {
-                $report['sections'][$sectionName] = $sectionGenerator();
-            } catch (\Exception $e) {
-                Log::error("Failed to generate {$sectionName} section", ['error' => $e->getMessage()]);
-                $report['sections'][$sectionName] = ['error' => $e->getMessage()];
-            }
-        }
+        $operation = $this->logger->operation('report_system');
 
-        return $report;
+        try {
+            $timeout = now()->addMinutes(15);
+            // 15 minute timeout for comprehensive system report
+            $report = ['generated_at' => now()->toISOString(), 'timeout' => $timeout->toISOString(), 'sections' => []];
+            // Generate each section with individual timeouts
+            $sections = ['users' => fn () => $this->generateUserStats(), 'products' => fn () => $this->generateProductStats(), 'analytics' => fn () => $this->generateAnalyticsStats()];
+            foreach ($sections as $sectionName => $sectionGenerator) {
+                if (now()->greaterThan($timeout)) {
+                    $this->logger->log('warning', 'system_report_timeout', [
+                        'completed_sections' => array_keys($report['sections']),
+                        'remaining_sections' => array_keys($sections),
+                    ]);
+                    break;
+                }
+                try {
+                    $report['sections'][$sectionName] = $sectionGenerator();
+                } catch (\Exception $e) {
+                    $this->logger->log('error', 'system_report_section_failed', [
+                        'section' => $sectionName,
+                        'error' => $e->getMessage(),
+                    ]);
+                    $report['sections'][$sectionName] = ['error' => $e->getMessage()];
+                }
+            }
+
+            $operation->finish([
+                'sections_generated' => array_keys($report['sections']),
+                'timeout_reached' => now()->greaterThan($timeout),
+            ]);
+
+            return $report;
+        } catch (Throwable $throwable) {
+            $operation->fail($throwable);
+
+            throw $throwable;
+        }
     }
 
     /**
