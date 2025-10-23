@@ -28,7 +28,7 @@
             "sort_algorithm": "alpha"
         },
         "phpdoc_align": {
-            "align": "vertical"
+            "align": "tag"
         },
         "phpdoc_order": {
             "order": [
