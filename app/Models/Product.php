@@ -15,7 +15,7 @@ use App\Traits\HasTranslations;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -1283,7 +1283,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         if (empty($images)) {
             return ['src' => null, 'srcset' => '', 'sizes' => '', 'alt' => $this->name];
         }
-        $srcset = [$images['xs'] ?? null ? $images['xs'] . ' 150w' : null, $images['sm'] ?? null ? $images['sm'] . ' 300w' : null, $images['md'] ?? null ? $images['md'] . ' 500w' : null, $images['lg'] ?? null ? $images['lg'] . ' 800w' : null, $images['xl'] ?? null ? $images['xl'] . ' 1200w' : null];
+        $srcset = [$images['xs'] ?? null ? $images['xs'].' 150w' : null, $images['sm'] ?? null ? $images['sm'].' 300w' : null, $images['md'] ?? null ? $images['md'].' 500w' : null, $images['lg'] ?? null ? $images['lg'].' 800w' : null, $images['xl'] ?? null ? $images['xl'].' 1200w' : null];
         $sizeKey = $defaultSize ?? 'md';
 
         return ['src' => $images[$sizeKey] ?? $images['md'], 'srcset' => implode(', ', array_filter($srcset)), 'sizes' => '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 300px', 'alt' => __('translations.product_image_alt', ['name' => $this->name, 'number' => 1])];

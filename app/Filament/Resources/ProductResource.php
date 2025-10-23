@@ -773,39 +773,22 @@ final class ProductResource extends Resource implements DefinesExportColumns
             ->defaultSort('created_at', 'desc');
     }
 
-    public static function shouldRegisterNavigation(): bool
+    /**
+     * @return Builder<Product>
+     */
+    public static function getEloquentQuery(): Builder
     {
-        return static::canViewAny();
-    }
-
-    public static function canViewAny(): bool
-    {
-        return static::authorizeProduct(null, 'viewAny');
-    }
-
-    public static function canCreate(): bool
-    {
-        return static::authorizeProduct(null, 'create');
-    }
-
-    public static function canView(Product $record): bool
-    {
-        return static::authorizeProduct($record, 'view');
-    }
-
-    public static function canEdit(Product $record): bool
-    {
-        return static::authorizeProduct($record, 'update');
-    }
-
-    public static function canDelete(Product $record): bool
-    {
-        return static::authorizeProduct($record, 'delete');
-    }
-
-    public static function canRestore(Product $record): bool
-    {
-        return static::authorizeProduct($record, 'restore');
+        return parent::getEloquentQuery()
+            ->with([
+                'brand:id,name',
+                'primaryImage',
+            ])
+            ->withCount([
+                'reviews as approved_reviews_count' => fn (Builder $query): Builder => $query->where('is_approved', true),
+            ])
+            ->withAvg([
+                'reviews as approved_reviews_avg_rating' => fn (Builder $query): Builder => $query->where('is_approved', true),
+            ], 'rating');
     }
 
     public static function getRelations(): array
