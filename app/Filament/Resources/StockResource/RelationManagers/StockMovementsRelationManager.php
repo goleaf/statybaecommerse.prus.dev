@@ -22,7 +22,7 @@ use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 class StockMovementsRelationManager extends BaseRelationManager
 {
@@ -92,7 +92,7 @@ class StockMovementsRelationManager extends BaseRelationManager
                     ->label(__('inventory.notes'))
                     ->rows(3)
                     ->maxLength(1000),
-                Flatpickr::make('moved_at')->asDateTime()
+                Flatpickr::makeDateTime('moved_at')
                     ->label(__('inventory.moved_at'))
                     ->default(now())
                     ->required(),

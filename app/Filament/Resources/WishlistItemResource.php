@@ -51,7 +51,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use RuntimeException;
 use UnitEnum;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 /**
  * WishlistItemResource
@@ -491,9 +491,9 @@ final class WishlistItemResource extends Resource
                     ),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::make('created_from')->asDateTime()
+                        Flatpickr::makeDateTime('created_from')
                             ->label(__('admin.wishlist_items.filters.created_from')),
-                        Flatpickr::make('created_until')->asDateTime()
+                        Flatpickr::makeDateTime('created_until')
                             ->label(__('admin.wishlist_items.filters.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

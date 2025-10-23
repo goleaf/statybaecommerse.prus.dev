@@ -37,7 +37,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use UnitEnum;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 final class UserProductInteractionResource extends Resource
 {
@@ -136,12 +136,12 @@ final class UserProductInteractionResource extends Resource
                                     ->minValue(1)
                                     ->default(1)
                                     ->helperText(__('admin.user_product_interactions.count_help')),
-                                Flatpickr::make('first_interaction')->asDateTime()
+                                Flatpickr::makeDateTime('first_interaction')
                                     ->label(__('admin.user_product_interactions.first_interaction'))
                                     ->default(now())
                                     ->displayFormat('d/m/Y H:i')
                                     ->seconds(false),
-                                Flatpickr::make('last_interaction')->asDateTime()
+                                Flatpickr::makeDateTime('last_interaction')
                                     ->label(__('admin.user_product_interactions.last_interaction'))
                                     ->default(now())
                                     ->displayFormat('d/m/Y H:i')

@@ -25,7 +25,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 /**
  * PriceListResource
@@ -104,9 +104,9 @@ final class PriceListResource extends Resource
                         ->label(__('price_lists.is_default')),
                     Toggle::make('auto_apply')
                         ->label(__('price_lists.auto_apply')),
-                    Flatpickr::make('starts_at')->asDateTime()
+                    Flatpickr::makeDateTime('starts_at')
                         ->label(__('price_lists.starts_at')),
-                    Flatpickr::make('ends_at')->asDateTime()
+                    Flatpickr::makeDateTime('ends_at')
                         ->label(__('price_lists.ends_at')),
                     TextInput::make('min_order_amount')
                         ->label(__('price_lists.min_order_amount'))
@@ -225,9 +225,9 @@ final class PriceListResource extends Resource
                 Filter::make('starts_at')
                     ->label(__('price_lists.valid_from'))
                     ->form([
-                        Flatpickr::make('starts_from')->asDateTime()
+                        Flatpickr::makeDateTime('starts_from')
                             ->label(__('price_lists.starts_at_from')),
-                        Flatpickr::make('starts_until')->asDateTime()
+                        Flatpickr::makeDateTime('starts_until')
                             ->label(__('price_lists.starts_at_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
@@ -244,9 +244,9 @@ final class PriceListResource extends Resource
                 Filter::make('ends_at')
                     ->label(__('price_lists.ends_at'))
                     ->form([
-                        Flatpickr::make('ends_from')->asDateTime()
+                        Flatpickr::makeDateTime('ends_from')
                             ->label(__('price_lists.ends_at_from')),
-                        Flatpickr::make('ends_until')->asDateTime()
+                        Flatpickr::makeDateTime('ends_until')
                             ->label(__('price_lists.ends_at_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

@@ -34,7 +34,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 /**
  * OrderDocumentsRelationManager
@@ -156,7 +156,7 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
                                     ->label(__('orders.access_password'))
                                     ->password()
                                     ->maxLength(255),
-                                Flatpickr::make('expires_at')->asDateTime()
+                                Flatpickr::makeDateTime('expires_at')
                                     ->label(__('orders.expires_at')),
                             ]),
                     ])

@@ -8,7 +8,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 class ReferralStatisticsForm
 {
@@ -19,7 +19,7 @@ class ReferralStatisticsForm
                 Select::make('user_id')
                     ->relationship('user', 'name')
                     ->required(),
-                Flatpickr::make('date')->asDate()
+                Flatpickr::makeDate('date')
                     ->required(),
                 TextInput::make('total_referrals')
                     ->required()

@@ -25,8 +25,6 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms;
-use App\Support\Filament\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -59,7 +57,7 @@ use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 /**
  * OrderResource
@@ -477,9 +475,9 @@ final class OrderResource extends Resource implements DefinesExportColumns
                 ->schema([
                     Grid::make(2)
                         ->schema([
-                            Flatpickr::make('shipped_at')->asDateTime()
+                            Flatpickr::makeDateTime('shipped_at')
                                 ->label(__('orders.fields.shipped_at')),
-                            Flatpickr::make('delivered_at')->asDateTime()
+                            Flatpickr::makeDateTime('delivered_at')
                                 ->label(__('orders.fields.delivered_at')),
                         ]),
                     TextInput::make('tracking_number')
@@ -712,9 +710,11 @@ final class OrderResource extends Resource implements DefinesExportColumns
                     ->label(__('orders.fields.items_count')),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::make('range')
+                        Flatpickr::makeRange('range')
                             ->label(__('orders.created_at'))
-                            ->asDateRange('Y-m-d'),
+                            
+                            ->format('Y-m-d')
+                            ->displayFormat('Y-m-d'),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,

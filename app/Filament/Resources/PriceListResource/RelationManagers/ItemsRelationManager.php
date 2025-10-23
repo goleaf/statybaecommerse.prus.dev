@@ -14,7 +14,7 @@ use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 final class ItemsRelationManager extends BaseRelationManager
 {
@@ -72,11 +72,11 @@ final class ItemsRelationManager extends BaseRelationManager
                     ->numeric()
                     ->minValue(1),
 
-                Flatpickr::make('valid_from')->asDateTime()
+                Flatpickr::makeDateTime('valid_from')
                     ->label(__('price_list_items.valid_from'))
                     ->default(now()),
 
-                Flatpickr::make('valid_until')->asDateTime()
+                Flatpickr::makeDateTime('valid_until')
                     ->label(__('price_list_items.valid_until'))
                     ->after('valid_from'),
 

@@ -38,7 +38,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 final class LocationResource extends Resource
 {
@@ -212,10 +212,10 @@ final class LocationResource extends Resource
                             Toggle::make('is_closed')
                                 ->label(__('locations.fields.is_closed'))
                                 ->live(),
-                            Flatpickr::make('open_time')->asTime()
+                            Flatpickr::makeTime('open_time')
                                 ->label(__('locations.fields.open_time'))
                                 ->visible(fn ($get) => ! $get('is_closed')),
-                            Flatpickr::make('close_time')->asTime()
+                            Flatpickr::makeTime('close_time')
                                 ->label(__('locations.fields.close_time'))
                                 ->visible(fn ($get) => ! $get('is_closed')),
                         ])

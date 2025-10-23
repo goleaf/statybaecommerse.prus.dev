@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Number;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 class OrderShippingsTable
 {
@@ -137,9 +137,9 @@ class OrderShippingsTable
                 Filter::make('shipped_at')
                     ->label(__('Shipped at'))
                     ->form([
-                        Flatpickr::make('shipped_from')->asDateTime()
+                        Flatpickr::makeDateTime('shipped_from')
                             ->label(__('Shipped from')),
-                        Flatpickr::make('shipped_until')->asDateTime()
+                        Flatpickr::makeDateTime('shipped_until')
                             ->label(__('Shipped until')),
                     ])
                     ->query(static function (Builder $query, array $data): Builder {

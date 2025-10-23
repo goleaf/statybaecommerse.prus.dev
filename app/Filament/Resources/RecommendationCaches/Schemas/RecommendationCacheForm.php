@@ -12,7 +12,7 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 final class RecommendationCacheForm
 {
@@ -59,7 +59,7 @@ final class RecommendationCacheForm
                             ->label(__('admin.recommendation_caches.recommendations'))
                             ->columnSpanFull()
                             ->default([]),
-                        Flatpickr::make('expires_at')->asDateTime()
+                        Flatpickr::makeDateTime('expires_at')
                             ->label(__('admin.recommendation_caches.expires_at'))
                             ->required()
                             ->seconds(false)

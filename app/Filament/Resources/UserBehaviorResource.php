@@ -16,7 +16,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use App\Support\Filament\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
@@ -36,7 +35,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 /**
  * UserBehaviorResource
@@ -133,7 +132,7 @@ final class UserBehaviorResource extends Resource
                             ->options(self::behaviorTypeOptions())
                             ->required()
                             ->searchable(),
-                        Flatpickr::make('created_at')->asDateTime()
+                        Flatpickr::makeDateTime('created_at')
                             ->label(__('admin.user_behaviors.created_at'))
                             ->default(now())
                             ->displayFormat('d/m/Y H:i:s'),
@@ -282,9 +281,11 @@ final class UserBehaviorResource extends Resource
                     ]),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::make('range')
+                        Flatpickr::makeRange('range')
                             ->label(__('admin.user_behaviors.created_at'))
-                            ->asDateRange('Y-m-d'),
+                            
+                            ->format('Y-m-d')
+                            ->displayFormat('Y-m-d'),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,

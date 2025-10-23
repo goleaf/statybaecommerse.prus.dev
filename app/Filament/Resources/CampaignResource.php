@@ -13,7 +13,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use App\Support\Filament\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -34,7 +33,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Novadaemon\FilamentCombobox\Combobox;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 final class CampaignResource extends Resource
 {
@@ -112,10 +111,10 @@ final class CampaignResource extends Resource
                 ->schema([
                     Grid::make(2)
                         ->schema([
-                            Flatpickr::make('starts_at')->asDateTime()
+                            Flatpickr::makeDateTime('starts_at')
                                 ->label(self::label('campaigns.fields.start_date', 'Start date'))
                                 ->seconds(false),
-                            Flatpickr::make('ends_at')->asDateTime()
+                            Flatpickr::makeDateTime('ends_at')
                                 ->label(self::label('campaigns.fields.end_date', 'End date'))
                                 ->seconds(false),
                             TextInput::make('max_uses')
@@ -301,9 +300,11 @@ final class CampaignResource extends Resource
                     ->relationship('channel', 'name'),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::make('range')
+                        Flatpickr::makeRange('range')
                             ->label(self::label('campaigns.fields.created_at', 'Created at'))
-                            ->asDateRange('Y-m-d'),
+                            
+                            ->format('Y-m-d')
+                            ->displayFormat('Y-m-d'),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,

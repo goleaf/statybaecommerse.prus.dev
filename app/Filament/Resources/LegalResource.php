@@ -27,7 +27,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use UnitEnum;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 final class LegalResource extends Resource
 {
@@ -91,7 +91,7 @@ final class LegalResource extends Resource
                                     ->label(__('legal.sort_order'))
                                     ->numeric()
                                     ->default(0),
-                                Flatpickr::make('published_at')->asDateTime()
+                                Flatpickr::makeDateTime('published_at')
                                     ->label(__('legal.published_at'))
                                     ->seconds(false)
                                     ->timezone(config('app.timezone')),

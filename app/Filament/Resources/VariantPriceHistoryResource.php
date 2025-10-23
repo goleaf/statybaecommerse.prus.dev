@@ -15,7 +15,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 final class VariantPriceHistoryResource extends Resource
 {
@@ -77,10 +77,10 @@ final class VariantPriceHistoryResource extends Resource
                     ->relationship('changedBy', 'name')
                     ->searchable()
                     ->preload(),
-                Flatpickr::make('effective_from')->asDateTime()
+                Flatpickr::makeDateTime('effective_from')
                     ->label('Effective From')
                     ->required(),
-                Flatpickr::make('effective_until')->asDateTime()
+                Flatpickr::makeDateTime('effective_until')
                     ->label('Effective Until')
                     ->after('effective_from'),
             ]);
@@ -201,9 +201,9 @@ final class VariantPriceHistoryResource extends Resource
                     ->preload(),
                 Tables\Filters\Filter::make('effective_date_range')
                     ->form([
-                        Flatpickr::make('effective_from')->asDate()
+                        Flatpickr::makeDate('effective_from')
                             ->label('Effective From'),
-                        Flatpickr::make('effective_until')->asDate()
+                        Flatpickr::makeDate('effective_until')
                             ->label('Effective Until'),
                     ])
                     ->query(function ($query, array $data) {

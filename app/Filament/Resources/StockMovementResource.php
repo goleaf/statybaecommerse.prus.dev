@@ -27,7 +27,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use LaraZeus\Quantity\Components\Quantity;
 use UnitEnum;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 /**
  * StockMovementResource
@@ -117,7 +117,7 @@ final class StockMovementResource extends Resource
                         ->label(__('stock_movement.fields.notes'))
                         ->maxLength(1000)
                         ->rows(3),
-                    Flatpickr::make('moved_at')->asDateTime()
+                    Flatpickr::makeDateTime('moved_at')
                         ->label(__('stock_movement.fields.moved_at'))
                         ->required()
                         ->default(now()),
@@ -178,10 +178,10 @@ final class StockMovementResource extends Resource
                     ->preload(),
                 Filter::make('moved_at')
                     ->form([
-                        Flatpickr::make('moved_from')->asDate()
+                        Flatpickr::makeDate('moved_from')
                             ->label(__('stock_movement.fields.moved_at'))
                             ->placeholder(__('stock_movement.filters.from')),
-                        Flatpickr::make('moved_to')->asDate()
+                        Flatpickr::makeDate('moved_to')
                             ->label(__('stock_movement.fields.moved_at'))
                             ->placeholder(__('stock_movement.filters.to')),
                     ])
