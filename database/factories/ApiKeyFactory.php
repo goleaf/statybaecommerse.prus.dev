@@ -28,6 +28,8 @@ final class ApiKeyFactory extends Factory
 
         $credentials = ApiKey::generateCredentials();
 
+        $credentials = ApiKey::generateCredentials();
+
         return [
             'key' => $credentials['hashed'],
             'name' => sprintf('%s API Access', $this->faker->company()),

@@ -222,4 +222,14 @@ final class ApiKey extends Model
     {
         return Collection::make(Arr::wrap($this->scopes))->filter()->values();
     }
+
+    /**
+     * Retrieve the scopes as a collection for easier handling in Filament.
+     *
+     * @return Collection<int, string>
+     */
+    public function scopesAsCollection(): Collection
+    {
+        return Collection::make(Arr::wrap($this->scopes))->filter()->values();
+    }
 }
