@@ -12,7 +12,14 @@ use App\Models\ProductVariant;
 use App\Models\VariantAnalytics;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
-use Filament\Forms;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -33,12 +40,12 @@ final class VariantAnalyticsResource extends Resource
     protected static ?string $model = VariantAnalytics::class;
 
     /**
-     * @var string|BackedEnum|null Ensure Filament interprets the icon while supporting enums without forcing an import.
+     * Ensure Filament interprets the icon while supporting enums without forcing an import.
      */
-    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    /** @var string|\BackedEnum|UnitEnum|null Ensure inventory analytics stay grouped centrally. */
-    protected static $navigationGroup = NavigationGroup::Inventory;
+    /** Ensure inventory analytics stay grouped centrally via typed declaration. */
+    protected static NavigationGroup|string|null $navigationGroup = NavigationGroup::Inventory;
 
     /**
      * Resolve the navigation icon through an accessor to support enum-backed overrides.
