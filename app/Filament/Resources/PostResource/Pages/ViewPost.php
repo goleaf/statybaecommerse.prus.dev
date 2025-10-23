@@ -30,7 +30,10 @@ final class ViewPost extends ViewRecord
         return $infolist->schema([
             ListEntry::make('postQuickLinks')
                 ->heading(__('Quick links'))
+                ->list()
                 ->state(function (Post $record): array {
+                    // Honour the active locale when building storefront and author shortcuts.
+                    $locale = app()->getLocale();
                     $record->loadMissing(['user']);
 
                     $items = [
@@ -41,7 +44,7 @@ final class ViewPost extends ViewRecord
                             ->color('primary')
                             ->url(route('frontend.posts.show', $record))
                             ->tooltip(__('Open the public article for :title', [
-                                'title' => $record->getTranslatedTitle(),
+                                'title' => $record->getTranslatedTitle($locale),
                             ]))
                             ->toArray(),
                     ];
@@ -65,7 +68,8 @@ final class ViewPost extends ViewRecord
                 ->heading(__('posts.tags'))
                 ->list()
                 ->state(function (Post $record): array {
-                    $tags = collect(explode(',', (string) $record->getTranslatedTags()))
+                    // Split translated tag strings into individual localized quick filters.
+                    $tags = collect(explode(',', (string) $record->getTranslatedTags(app()->getLocale())))
                         ->map(fn (string $tag): string => trim($tag))
                         ->filter()
                         ->values();
@@ -87,11 +91,13 @@ final class ViewPost extends ViewRecord
                 ->heading(__('Moderation history'))
                 ->list()
                 ->state(function (Post $record): array {
+                    // Present moderation decisions with localized labels and timestamps.
+                    $locale = app()->getLocale();
                     $record->loadMissing(['approvals.user']);
 
                     return $record->approvals
                         ->sortByDesc('decided_at')
-                        ->map(function (PostApproval $approval) use ($record): array {
+                        ->map(function (PostApproval $approval) use ($record, $locale): array {
                             $decision = $approval->decision;
                             $color = match ($decision) {
                                 'approved' => 'success',
@@ -106,7 +112,7 @@ final class ViewPost extends ViewRecord
 
                             return ListItem::make()
                                 ->id('post-approval-' . $approval->getKey())
-                                ->label(__('Decision: :decision', ['decision' => __($decision)]))
+                                ->label(__('Decision: :decision', ['decision' => __($decision, [], $locale)]))
                                 ->icon('heroicon-m-check-badge')
                                 ->color($color)
                                 ->url($userUrl)

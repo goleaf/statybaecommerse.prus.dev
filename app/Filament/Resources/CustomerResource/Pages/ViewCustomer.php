@@ -36,7 +36,9 @@ final class ViewCustomer extends ViewRecord
         return $infolist->schema([
             ListEntry::make('customerQuickLinks')
                 ->heading(__('Quick links'))
+                ->list()
                 ->state(function (Customer $record): array {
+                    // Provide quick actions with consistent formatting for localized admins.
                     $items = [];
 
                     if (filled($record->email)) {
@@ -67,6 +69,7 @@ final class ViewCustomer extends ViewRecord
                 ->heading(__('customers.orders'))
                 ->list()
                 ->state(function (Customer $record): array {
+                    // Pull the latest orders and render localized metadata for each list entry.
                     $record->loadMissing(['orders']);
 
                     return $record->orders
@@ -89,13 +92,15 @@ final class ViewCustomer extends ViewRecord
                 ->heading(__('customers.reviews'))
                 ->list()
                 ->state(function (Customer $record): array {
+                    // Load related products and translate review metadata per locale.
+                    $locale = app()->getLocale();
                     $record->loadMissing(['reviews.product']);
 
                     return $record->reviews
                         ->sortByDesc('created_at')
-                        ->map(function (Review $review): array {
-                            $productName = $review->product?->getTranslation('name') ?? $review->product?->name ?? __('products.title');
-                            $reviewTitle = $review->getTranslation('title') ?? Str::limit($review->getTranslation('content') ?? '', 40);
+                        ->map(function (Review $review) use ($locale): array {
+                            $productName = $review->product?->getTranslation('name', $locale) ?? $review->product?->name ?? __('products.title');
+                            $reviewTitle = $review->getTranslation('title', $locale) ?? Str::limit($review->getTranslation('content', $locale) ?? '', 40);
 
                             return ListItem::make()
                                 ->id('customer-review-' . $review->getKey())
