@@ -14,19 +14,34 @@ This runbook describes how to audit index coverage with the `db:audit-indexes` a
 php artisan db:audit-indexes
 ```
 
-The command prints a summary of missing or unused indexes. Run it in the environment that matches the schema you are about to optimize (local feature branch, staging, etc.). Save the output in your ticket or PR so you can compare it after applying migrations.
+The command now performs two layers of analysis:
+
+1. **Duplicate detection** – highlights overlapping indexes so you can drop redundant definitions.
+2. **Commerce composite suggestions** – recommends battle-tested index combinations for `orders`, `order_items`, and `products` to keep analytics dashboards and storefront filters fast.
+
+Run it in the environment that matches the schema you are about to optimize (local feature branch, staging, etc.). Save the output in your ticket or PR so you can compare it after applying migrations.
+
+Example (with deliberate duplicates and missing composites):
+
+```text
+Duplicate indexes detected:
+- duplicate_index_examples on [slug] (unique: no) via [duplicate_index_examples_slug_idx, duplicate_index_examples_slug_idx_duplicate]
+- duplicate_index_examples on [category_id, slug] (unique: no) via [duplicate_index_examples_category_slug_idx, duplicate_index_examples_category_slug_idx_duplicate]
+Suggested composite indexes for commerce hotspots:
+- orders: add [status, created_at] (recommended name: index_orders_status_created_at) → Speeds up order analytics by filtering status windows in dashboards.
+- products: add [is_visible, price] (recommended name: products_visibility_price_idx) → Keeps price range filters and merchandising widgets responsive.
+```
 
 ### Filtering the audit
 
-You can narrow the audit to a specific connection or table:
+You can narrow the audit to a specific connection:
 
 ```bash
 # Audit a non-default connection
 db_connection=analytics php artisan db:audit-indexes
-
-# Audit a single table
-php artisan db:audit-indexes --table=orders
 ```
+
+> **Tip:** Use `--json` to capture a machine-readable payload containing both duplicates and recommendations when you want to post-process the findings in CI.
 
 > **Tip:** Run the audit both before and after migrations so you can confirm that warnings about missing indexes are resolved.
 
