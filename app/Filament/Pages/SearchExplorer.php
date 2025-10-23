@@ -12,9 +12,11 @@ use Filament\Pages\Page;
 final class SearchExplorer extends Page
 {
     /**
-     * @var string|BackedEnum|null
+     * Navigation icon that Filament displays for this page.
+     *
+     * @var string|BackedEnum|null Filament navigation icon identifier.
      */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-magnifying-glass-circle';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-magnifying-glass-circle';
 
     protected static \UnitEnum|string|null $navigationGroup = 'Search';
 

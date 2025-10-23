@@ -20,9 +20,11 @@ use Throwable;
 final class CacheMaintenance extends Page
 {
     /**
-     * @var string|BackedEnum|null
+     * Navigation icon that Filament displays for this page.
+     *
+     * @var string|BackedEnum|null Filament navigation icon identifier.
      */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-server-stack';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-server-stack';
 
     protected static \UnitEnum|string|null $navigationGroup = 'System';
 
