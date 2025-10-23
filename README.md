@@ -17,6 +17,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 ### Latest updates
+- Added an initial `customer_groups` table migration so downstream enhancements (missing fields, soft deletes, translations) run without errors during `php artisan migrate:fresh --seed` on clean environments.
 - Stock reservation migrations now stage foreign keys after their parent tables exist, preventing `php artisan migrate:fresh --seed` from failing on pristine databases while keeping cascade rules in place for live systems.
 - Filament admin navigation now standardises every icon and group declaration on the BackedEnum/UnitEnum union types mandated by v4, eliminating the PHP 8.3 fatals that previously surfaced during `composer install`.
 - Logged the Oct 21–22, 2025 PR triage outcome directly in `docs/analysis/CURRENT_SYSTEM_STATUS.md`, highlighting which Husky and Filament fixes are ready to merge, which legacy branches to close as superseded, and which submissions still need action so maintainers can prioritise reviews without re-scraping GitHub.
