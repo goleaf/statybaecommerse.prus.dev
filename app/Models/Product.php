@@ -887,6 +887,31 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
+     * Handle scopeEnabled functionality with proper error handling.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     */
+    public function scopeEnabled($query)
+    {
+        $schema = $this->getConnection()->getSchemaBuilder();
+        $table = $this->getTable();
+
+        if ($schema->hasColumn($table, 'is_enabled')) {
+            return $query->where('is_enabled', true);
+        }
+
+        if ($schema->hasColumn($table, 'is_active')) {
+            return $query->where('is_active', true);
+        }
+
+        if ($schema->hasColumn($table, 'status')) {
+            return $query->where('status', 'published');
+        }
+
+        return $query;
+    }
+
+    /**
      * Handle scopeFeatured functionality with proper error handling.
      *
      * @param mixed $query
