@@ -6,12 +6,6 @@ return [
     'title'  => 'Kunden',
     'plural' => 'Kunden',
     'single' => 'Kunde',
-    'orders' => 'Bestellungen',
-    'order_number_label' => 'Bestellung Nr. :number',
-    'order_placed_on' => 'Aufgegeben am :date',
-    'reviews' => 'Bewertungen',
-    'review_for_product' => 'Bewertung für :product',
-    'review_rating_tooltip' => 'Bewertet mit :rating/5 — :title',
 
     'basic_information'    => 'Grundinformationen',
     'account_settings'     => 'Kontoeinstellungen',
@@ -50,7 +44,6 @@ return [
     'verified'     => 'Verifiziert',
     'unverified'   => 'Nicht verifiziert',
     'orders_count' => 'Bestellanzahl',
-    'orders_trend' => 'Bestelltrend',
     'total_spent'  => 'Insgesamt ausgegeben',
     'created_at'   => 'Erstellt am',
     'updated_at'   => 'Aktualisiert am',
@@ -64,14 +57,6 @@ return [
     'languages' => [
         'lt' => 'Litauisch',
         'en' => 'Englisch',
-    ],
-
-    // Badge-Beschriftungen für lokalisierte Kundenstatus.
-    'badges' => [
-        'active'     => 'Aktiv',
-        'inactive'   => 'Inaktiv',
-        'verified'   => 'Verifiziert',
-        'unverified' => 'Nicht verifiziert',
     ],
 
     'email_verified'  => 'E-Mail verifiziert',
@@ -95,7 +80,4 @@ return [
     'bulk_verified_success'    => 'Ausgewählte Einträge erfolgreich verifiziert',
     'bulk_activated_success'   => 'Ausgewählte Einträge erfolgreich aktiviert',
     'bulk_deactivated_success' => 'Ausgewählte Einträge erfolgreich deaktiviert',
-    'sparkline' => [
-        'orders_label' => 'Bestellungen der letzten :days Tage',
-    ],
 ];

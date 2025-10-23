@@ -50,7 +50,6 @@ return [
     'verified'     => 'Verified',
     'unverified'   => 'Unverified',
     'orders_count' => 'Orders Count',
-    'orders_trend' => 'Orders Trend',
     'total_spent'  => 'Total Spent',
     'created_at'   => 'Created At',
     'updated_at'   => 'Updated At',
@@ -64,14 +63,6 @@ return [
     'languages' => [
         'lt' => 'Lithuanian',
         'en' => 'English',
-    ],
-
-    // Badge labels for localized status chips.
-    'badges' => [
-        'active'     => 'Active',
-        'inactive'   => 'Inactive',
-        'verified'   => 'Verified',
-        'unverified' => 'Unverified',
     ],
 
     'email_verified'  => 'Email Verified',

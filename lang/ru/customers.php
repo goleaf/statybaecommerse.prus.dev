@@ -6,12 +6,6 @@ return [
     'title'  => 'Клиенты',
     'plural' => 'Клиенты',
     'single' => 'Клиент',
-    'orders' => 'Заказы',
-    'order_number_label' => 'Заказ № :number',
-    'order_placed_on' => 'Размещён :date',
-    'reviews' => 'Отзывы',
-    'review_for_product' => 'Отзыв о :product',
-    'review_rating_tooltip' => 'Оценка :rating/5 — :title',
 
     'basic_information'    => 'Основная информация',
     'account_settings'     => 'Настройки учетной записи',
@@ -50,7 +44,6 @@ return [
     'verified'     => 'Подтверждён',
     'unverified'   => 'Не подтверждён',
     'orders_count' => 'Количество заказов',
-    'orders_trend' => 'Динамика заказов',
     'total_spent'  => 'Всего потрачено',
     'created_at'   => 'Создано',
     'updated_at'   => 'Обновлено',
@@ -64,14 +57,6 @@ return [
     'languages' => [
         'lt' => 'Литовский',
         'en' => 'Английский',
-    ],
-
-    // Подписи бейджей для статусов клиентов.
-    'badges' => [
-        'active'     => 'Активен',
-        'inactive'   => 'Неактивен',
-        'verified'   => 'Подтверждён',
-        'unverified' => 'Не подтверждён',
     ],
 
     'email_verified'  => 'Электронная почта подтверждена',
@@ -95,7 +80,4 @@ return [
     'bulk_verified_success'    => 'Выбранные записи успешно подтверждены',
     'bulk_activated_success'   => 'Выбранные записи успешно активированы',
     'bulk_deactivated_success' => 'Выбранные записи успешно деактивированы',
-    'sparkline' => [
-        'orders_label' => 'Заказы за последние :days дней',
-    ],
 ];

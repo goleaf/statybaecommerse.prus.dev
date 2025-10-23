@@ -50,7 +50,6 @@ return [
     'verified'     => 'Patvirtintas',
     'unverified'   => 'Nepatvirtintas',
     'orders_count' => 'Užsakymų skaičius',
-    'orders_trend' => 'Užsakymų dinamika',
     'total_spent'  => 'Išleista iš viso',
     'created_at'   => 'Sukurta',
     'updated_at'   => 'Atnaujinta',
@@ -64,14 +63,6 @@ return [
     'languages' => [
         'lt' => 'Lietuvių',
         'en' => 'English',
-    ],
-
-    // Ženklelių vertimai klientų būsenoms.
-    'badges' => [
-        'active'     => 'Aktyvus',
-        'inactive'   => 'Neaktyvus',
-        'verified'   => 'Patvirtintas',
-        'unverified' => 'Nepatvirtintas',
     ],
 
     'email_verified'  => 'El. paštas patvirtintas',
