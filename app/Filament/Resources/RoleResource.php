@@ -12,7 +12,6 @@ use BackedEnum;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Actions\DeleteAction;
@@ -25,6 +24,7 @@ use Illuminate\Support\Str;
 use UnitEnum;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class RoleResource extends Resource
 {
     protected static ?string $model = Role::class;

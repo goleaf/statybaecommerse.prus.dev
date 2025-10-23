@@ -12,13 +12,13 @@ use App\Filament\Resources\SystemSettingDependencies\Schemas\SystemSettingDepend
 use App\Filament\Resources\SystemSettingDependencies\Tables\SystemSettingDependenciesTable;
 use App\Models\SystemSettingDependency;
 use BackedEnum;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 class SystemSettingDependencyResource extends Resource
 {
     use HasNav;
@@ -29,8 +29,7 @@ class SystemSettingDependencyResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return SystemSettingDependencyForm::configure($form);
+        return SystemSettingDependencyForm::configure($schema);
     }
 
     public static function table(Table $table): Table

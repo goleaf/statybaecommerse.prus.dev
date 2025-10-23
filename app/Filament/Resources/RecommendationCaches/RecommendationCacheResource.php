@@ -14,7 +14,6 @@ use App\Filament\Resources\RecommendationCaches\Schemas\RecommendationCacheForm;
 use App\Filament\Resources\RecommendationCaches\Tables\RecommendationCachesTable;
 use App\Models\RecommendationCache;
 use BackedEnum;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -22,6 +21,7 @@ use Filament\Tables\Table;
 use UnitEnum;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class RecommendationCacheResource extends Resource
 {
     use HasNav;
@@ -59,8 +59,7 @@ final class RecommendationCacheResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return RecommendationCacheForm::configure($form);
+        return RecommendationCacheForm::configure($schema);
     }
 
     public static function table(Table $table): Table

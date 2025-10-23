@@ -12,7 +12,6 @@ use App\Filament\Resources\Countries\Pages\ViewCountry;
 use App\Filament\Resources\Countries\Schemas\CountryForm;
 use App\Filament\Resources\Countries\Tables\CountriesTable;
 use App\Models\Country;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
@@ -20,6 +19,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 /**
  * CountryResource
  *
@@ -47,8 +47,7 @@ final class CountryResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return CountryForm::configure($form);
+        return CountryForm::configure($schema);
     }
 
     public static function table(Table $table): Table

@@ -6,7 +6,6 @@ namespace App\Filament\Resources\NewsCategoryResource\RelationManagers;
 
 use App\Models\News;
 use Filament\Forms;
-use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\News;
 use App\Support\Filament\Components\Flatpickr;
@@ -19,6 +18,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class NewsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'news';

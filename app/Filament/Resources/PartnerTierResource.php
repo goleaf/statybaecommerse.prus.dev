@@ -9,7 +9,6 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\PartnerTierResource\Pages;
 use App\Models\PartnerTier;
 use Filament\Forms;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
@@ -18,9 +17,11 @@ use Illuminate\Support\Number;
 use UnitEnum;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class PartnerTierResource extends Resource
 {
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-star';
+    /** @var string|\BackedEnum|null */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Marketing';
 

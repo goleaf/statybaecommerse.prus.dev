@@ -25,7 +25,6 @@ use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Schema;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
@@ -44,6 +43,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class CouponUsageResource extends Resource
 {
     use HasNav;

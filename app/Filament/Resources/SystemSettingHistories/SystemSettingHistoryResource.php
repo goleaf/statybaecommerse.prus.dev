@@ -13,13 +13,13 @@ use App\Filament\Resources\SystemSettingHistories\Schemas\SystemSettingHistoryFo
 use App\Filament\Resources\SystemSettingHistories\Tables\SystemSettingHistoriesTable;
 use App\Models\SystemSettingHistory;
 use BackedEnum;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 class SystemSettingHistoryResource extends Resource
 {
     use HasNav;
@@ -30,8 +30,7 @@ class SystemSettingHistoryResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return SystemSettingHistoryForm::configure($form);
+        return SystemSettingHistoryForm::configure($schema);
     }
 
     public static function table(Table $table): Table

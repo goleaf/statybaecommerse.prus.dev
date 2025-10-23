@@ -17,6 +17,7 @@ use Filament\Tables\Table;
 use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
 use BackedEnum;
 
+use BackedEnum;
 final class InventoryManagement extends Page implements HasTable
 {
     use ConfiguresToggleableTableLayout;
@@ -26,7 +27,7 @@ final class InventoryManagement extends Page implements HasTable
     /**
      * @var string|BackedEnum|null Navigation icon override documented to avoid redundant enum imports.
      */
-    /** @var string|\BackedEnum|null */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-archive-box';
 

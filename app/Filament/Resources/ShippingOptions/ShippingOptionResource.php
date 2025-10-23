@@ -12,13 +12,13 @@ use App\Filament\Resources\ShippingOptions\Schemas\ShippingOptionForm;
 use App\Filament\Resources\ShippingOptions\Tables\ShippingOptionsTable;
 use App\Models\ShippingOption;
 use BackedEnum;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 class ShippingOptionResource extends Resource
 {
     use HasNav;
@@ -29,8 +29,7 @@ class ShippingOptionResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return ShippingOptionForm::configure($form);
+        return ShippingOptionForm::configure($schema);
     }
 
     public static function table(Table $table): Table

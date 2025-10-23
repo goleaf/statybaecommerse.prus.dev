@@ -21,7 +21,6 @@ use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -40,6 +39,12 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
+/**
+ * DocumentTemplateResource
+ *
+ * Filament v4 resource for DocumentTemplate management in the admin panel with comprehensive CRUD operations, filters, and actions.
+ */
 final class DocumentTemplateResource extends Resource
 {
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';

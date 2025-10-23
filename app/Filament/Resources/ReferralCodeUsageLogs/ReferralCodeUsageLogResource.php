@@ -12,7 +12,6 @@ use App\Filament\Resources\ReferralCodeUsageLogs\Schemas\ReferralCodeUsageLogFor
 use App\Filament\Resources\ReferralCodeUsageLogs\Tables\ReferralCodeUsageLogsTable;
 use App\Models\ReferralCodeUsageLog;
 use BackedEnum;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -20,6 +19,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class ReferralCodeUsageLogResource extends Resource
 {
     use HasNav;
@@ -33,8 +33,7 @@ final class ReferralCodeUsageLogResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return ReferralCodeUsageLogForm::configure($form);
+        return ReferralCodeUsageLogForm::configure($schema);
     }
 
     public static function table(Table $table): Table

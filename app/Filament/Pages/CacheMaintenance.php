@@ -7,8 +7,7 @@ namespace App\Filament\Pages;
 use App\Services\Shared\ComponentPerformanceService;
 use Filament\Actions\Action;
 use Filament\Forms;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
+use Filament\Forms\Components\Section;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
@@ -18,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 use Throwable;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class CacheMaintenance extends Page
 {
     /**
