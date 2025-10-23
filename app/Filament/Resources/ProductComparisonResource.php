@@ -16,10 +16,10 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use App\Support\Filament\Filters\DateRangeFilter;
+use Filament\Forms\Components\Flatpickr;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -148,31 +148,17 @@ final class ProductComparisonResource extends Resource
                     ->preload(),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::make('created_from')
-                            ->time(false)
-                            ->format('Y-m-d')
+                        Flatpickr::make('range')
+                            ->label(__('product_comparisons.created_at'))
                             ->rangePicker()
-                            ->label(__('product_comparisons.created_from')),
-                        Flatpickr::make('created_until')
-                            ->time(false)
                             ->format('Y-m-d')
-                            ->rangePicker()
-                            ->label(__('product_comparisons.created_until')),
+                            ->displayFormat('Y-m-d'),
                     ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        $createdFrom = data_get($data, 'created_from');
-                        $createdUntil = data_get($data, 'created_until');
-
-                        return $query
-                            ->when(
-                                $createdFrom,
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
-                            )
-                            ->when(
-                                $createdUntil,
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
-                            );
-                    }),
+                    ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
+                        $query,
+                        $data['range'] ?? null,
+                        'created_at',
+                    )),
             ])
             ->actions([
                 ViewAction::make(),

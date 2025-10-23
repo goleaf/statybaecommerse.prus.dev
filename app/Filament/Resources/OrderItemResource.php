@@ -9,9 +9,14 @@ use App\Filament\Resources\OrderItemResource\Pages;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Support\Filament\Filters\DateRangeFilter;
+use App\Support\Search\ProductSearch;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -333,16 +338,11 @@ final class OrderItemResource extends Resource
                     ->preload(),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::make('created_from')
-                            ->time(false)
-                            ->format('Y-m-d')
+                        Flatpickr::make('range')
+                            ->label(__('order_items.created_at'))
                             ->rangePicker()
-                            ->label(__('order_items.created_from')),
-                        Flatpickr::make('created_until')
-                            ->time(false)
                             ->format('Y-m-d')
-                            ->rangePicker()
-                            ->label(__('order_items.created_until')),
+                            ->displayFormat('Y-m-d'),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,

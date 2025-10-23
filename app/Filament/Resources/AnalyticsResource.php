@@ -9,13 +9,14 @@ use App\Support\Concerns\HasNav;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\AnalyticsResource\Pages;
 use App\Models\Order;
-
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\Summaries\Average;
 use Filament\Tables\Columns\Summaries\Sum;
 use Filament\Tables\Columns\TextColumn;
+use App\Support\Filament\Filters\DateRangeFilter;
+use Filament\Forms\Components\Flatpickr;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Grouping\Group;
@@ -154,30 +155,17 @@ final class AnalyticsResource extends Resource
                 Filter::make('created_at')
                     ->label(__('analytics.order_date_range'))
                     ->form([
-                        Flatpickr::make('created_from')
-                            ->time(false)
-                            ->format('Y-m-d')
-                            ->rangePicker()
+                        Flatpickr::make('range')
                             ->label(__('analytics.from_date'))
-                            ->placeholder(__('analytics.from_date')),
-                        Flatpickr::make('created_until')
-                            ->time(false)
-                            ->format('Y-m-d')
                             ->rangePicker()
-                            ->label(__('analytics.until_date'))
-                            ->placeholder(__('analytics.until_date')),
+                            ->format('Y-m-d')
+                            ->displayFormat('Y-m-d'),
                     ])
-                    ->indicateUsing(function (array $data): array {
-                        return array_filter([
-                            filled($data['created_from'] ?? null) ? __('analytics.from_date').': '.$data['created_from'] : null,
-                            filled($data['created_until'] ?? null) ? __('analytics.until_date').': '.$data['created_until'] : null,
-                        ]);
-                    })
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when($data['created_from'] ?? null, fn (Builder $q, $date): Builder => $q->whereDate('created_at', '>=', $date))
-                            ->when($data['created_until'] ?? null, fn (Builder $q, $date): Builder => $q->whereDate('created_at', '<=', $date));
-                    }),
+                    ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
+                        $query,
+                        $data['range'] ?? null,
+                        'created_at',
+                    )),
                 Filter::make('high_value')
                     ->label(__('analytics.high_value_orders'))
                     ->query(fn (Builder $query): Builder => $query->where('total', '>=', 500))
