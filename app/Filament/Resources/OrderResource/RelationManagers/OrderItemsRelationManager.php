@@ -71,25 +71,16 @@ final class OrderItemsRelationManager extends BaseRelationManager
                                     ->placeholder(__('orders.lookups.variant_placeholder'))
                                     ->required()
                                     ->reactive()
-                                    ->searchUsing(fn (string $value): array => ProductVariantSearch::results($value))
-                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                // Refer to docs/filament/searchable-inputs.md for helper usage guidance and payload expectations.
-                                    ->afterStateHydrated(fn (SearchableInput $component, ?int $state) => ProductVariantFieldHelper::hydrateSearchableVariant($component, $state))
-                                    ->afterStateUpdated(function (?string $state, Set $set, Get $get): void {
-                                        if ($state === null || $state === '') {
-                                            // Reset dependent fields when the variant lookup clears.
-                                            SearchableInputHelper::clear($set, [
-                                                'product_variant_id' => null,
-                                                'product_id'         => null,
-                                                'name'               => null,
-                                                'sku'                => null,
-                                                'unit_price'         => null,
-                                                'total'              => 0,
-                                            ]);
-
-                                            ProductVariantFieldHelper::handleVariantSelection(null, $set, $get);
-
-                                            return;
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get): void {
+                                        if ($state) {
+                                            $variant = ProductVariant::find($state);
+                                            if ($variant) {
+                                                $set('unit_price', $variant->price);
+                                                $set('total', $variant->price * ($get('quantity') ?? 1));
+                                                $set('product_id', $variant->product_id);
+                                                $set('name', $variant->name ?? ($variant->product->name ?? ''));
+                                                $set('sku', $variant->sku ?? ($variant->product->sku ?? ''));
+                                            }
                                         }
 
                                         ProductVariantFieldHelper::handleVariantSelection($state, $set, $get);
@@ -248,47 +239,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
                     ),
             ])
             ->headerActions([
-                RelationManagerRepeaterAction::make()
-                    ->label('Quick edit items')
-                    ->icon('heroicon-m-pencil-square')
-                    ->modalHeading('Edit order items')
-                    ->modalWidth('5xl')
-                    ->configureRepeater(function (Repeater $repeater): Repeater {
-                        return $repeater
-                            ->collapsible()
-                            ->defaultItems(0)
-                            ->schema([
-                                Hidden::make('id'),
-                                Hidden::make('product_variant_id'),
-                                TextInput::make('name')
-                                    ->label(__('orders.fields.product'))
-                                    ->readOnly()
-                                    ->dehydrated(false),
-                                TextInput::make('sku')
-                                    ->label(__('orders.fields.sku'))
-                                    ->readOnly()
-                                    ->dehydrated(false),
-                                TextInput::make('quantity')
-                                    ->label(__('orders.fields.quantity'))
-                                    ->numeric()
-                                    ->minValue(1)
-                                    ->required(),
-                                TextInput::make('unit_price')
-                                    ->label(__('orders.fields.unit_price'))
-                                    ->numeric()
-                                    ->prefix('€')
-                                    ->required(),
-                                TextInput::make('discount_amount')
-                                    ->label(__('orders.fields.discount_amount'))
-                                    ->numeric()
-                                    ->prefix('€')
-                                    ->default(0),
-                                Textarea::make('notes')
-                                    ->label(__('orders.item_notes'))
-                                    ->rows(2)
-                                    ->columnSpanFull(),
-                            ]);
-                    }),
+                RelationManagerRepeaterAction::make(),
                 \Filament\Actions\CreateAction::make()
                     ->label(__('orders.add_item'))
                     ->icon('heroicon-o-plus')

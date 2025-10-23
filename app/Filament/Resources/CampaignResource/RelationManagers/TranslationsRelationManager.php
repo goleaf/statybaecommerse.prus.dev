@@ -16,6 +16,7 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class TranslationsRelationManager extends BaseRelationManager
 {
@@ -91,7 +92,8 @@ final class TranslationsRelationManager extends BaseRelationManager
                     ->options($this->localeOptions()),
             ])
             ->headerActions([
-                CreateAction::make(),
+                RelationManagerRepeaterAction::make(),
+                Tables\Actions\CreateAction::make(),
             ])
             ->actions([
                 EditAction::make(),

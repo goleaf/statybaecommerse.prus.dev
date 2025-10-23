@@ -28,6 +28,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 /**
  * OrderShippingRelationManager
@@ -244,6 +245,7 @@ final class OrderShippingRelationManager extends BaseRelationManager
                     ),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 \Filament\Actions\CreateAction::make()
                     ->label(__('orders.add_shipping'))
                     ->icon('heroicon-o-plus')

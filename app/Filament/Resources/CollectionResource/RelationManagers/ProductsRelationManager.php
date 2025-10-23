@@ -12,6 +12,7 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class ProductsRelationManager extends BaseRelationManager
 {
@@ -126,6 +127,7 @@ final class ProductsRelationManager extends BaseRelationManager
                     ->preload(),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\AttachAction::make()
                     ->label(__('admin.collections.actions.add_product'))
                     ->preloadRecordSelect()

@@ -13,6 +13,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class UsagesRelationManager extends BaseRelationManager
 {
@@ -108,6 +109,7 @@ final class UsagesRelationManager extends BaseRelationManager
                     ->query(fn (Builder $query): Builder => $query->whereNotNull('order_id')),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

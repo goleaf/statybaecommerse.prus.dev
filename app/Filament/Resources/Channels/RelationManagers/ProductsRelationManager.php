@@ -17,6 +17,7 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 class ProductsRelationManager extends BaseRelationManager
 {
@@ -44,6 +45,7 @@ class ProductsRelationManager extends BaseRelationManager
                 //
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 CreateAction::make(),
                 AttachAction::make(),
             ])

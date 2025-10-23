@@ -36,7 +36,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Str;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 class OrdersRelationManager extends BaseRelationManager
 {
@@ -302,6 +302,7 @@ class OrdersRelationManager extends BaseRelationManager
                     }),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 CreateAction::make()
                     ->label(__('orders.create_order')),
                 AssociateAction::make()

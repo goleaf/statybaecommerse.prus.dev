@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class ChildrenRelationManager extends BaseRelationManager
 {
@@ -118,6 +119,7 @@ final class ChildrenRelationManager extends BaseRelationManager
                 Tables\Filters\TernaryFilter::make('is_visible'),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

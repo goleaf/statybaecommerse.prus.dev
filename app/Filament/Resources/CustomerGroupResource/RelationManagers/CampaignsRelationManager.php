@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class CampaignsRelationManager extends BaseRelationManager
 {
@@ -72,6 +73,7 @@ final class CampaignsRelationManager extends BaseRelationManager
                     ]),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\AttachAction::make()
                     ->label(__('customer_groups.attach_campaign')),
             ])

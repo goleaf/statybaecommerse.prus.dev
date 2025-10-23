@@ -8,6 +8,7 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class PartnersRelationManager extends BaseRelationManager
 {
@@ -77,9 +78,8 @@ final class PartnersRelationManager extends BaseRelationManager
                     ->native(false),
             ])
             ->headerActions([
-                Tables\Actions\AttachAction::make()
-                    ->preloadRecordSelect()
-                    ->recordSelectSearchColumns(['name', 'code']),
+                RelationManagerRepeaterAction::make(),
+                AttachAction::make()->preloadRecordSelect(),
             ])
             ->actions([
                 Tables\Actions\DetachAction::make(),

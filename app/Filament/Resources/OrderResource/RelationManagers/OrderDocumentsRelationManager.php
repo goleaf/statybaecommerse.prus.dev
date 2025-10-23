@@ -31,6 +31,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 /**
  * OrderDocumentsRelationManager
@@ -286,6 +287,7 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
                     ),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 CreateAction::make()
                     ->label(__('orders.add_document'))
                     ->icon('heroicon-o-plus')

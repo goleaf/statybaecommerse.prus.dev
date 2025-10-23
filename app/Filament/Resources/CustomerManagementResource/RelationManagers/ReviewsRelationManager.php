@@ -20,6 +20,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 class ReviewsRelationManager extends BaseRelationManager
 {
@@ -55,6 +56,7 @@ class ReviewsRelationManager extends BaseRelationManager
                 //
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 CreateAction::make(),
                 AssociateAction::make(),
             ])

@@ -20,6 +20,7 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class OrdersRelationManager extends BaseRelationManager
 {
@@ -29,26 +30,26 @@ final class OrdersRelationManager extends BaseRelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $form->schema([
-            TextInput::make('number')
-                ->label(__('orders.fields.number'))
-                ->disabled()
-                ->dehydrated(false),
-            Select::make('status')
-                ->label(__('orders.fields.status'))
-                ->options(OrderStatus::getOptions())
-                ->required(),
-            TextInput::make('total')
-                ->label(__('orders.fields.total'))
-                ->numeric()
-                ->prefix(fn (?\App\Models\Order $record): string => $record?->currency ?? 'EUR')
-                ->disabled()
-                ->dehydrated(false),
-            Textarea::make('notes')
-                ->label(__('orders.fields.notes'))
-                ->maxLength(1000)
-                ->columnSpanFull(),
-        ]);
+        return $form
+            ->components([
+                Forms\Components\TextInput::make('order_number')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\Select::make('status')
+                    ->options([
+                        'pending'    => 'Pending',
+                        'processing' => 'Processing',
+                        'shipped'    => 'Shipped',
+                        'delivered'  => 'Delivered',
+                        'cancelled'  => 'Cancelled',
+                    ])
+                    ->required(),
+                Forms\Components\TextInput::make('total')
+                    ->numeric()
+                    ->prefix('€'),
+                Forms\Components\Textarea::make('notes')
+                    ->maxLength(1000),
+            ]);
     }
 
     public function table(Table $table): Table
@@ -63,23 +64,26 @@ final class OrdersRelationManager extends BaseRelationManager
                 TextColumn::make('status')
                     ->label(__('orders.fields.status'))
                     ->badge()
-                    ->icon(fn (string $state): string => OrderStatus::from($state)->getIcon())
-                    ->color(fn (string $state): string => OrderStatus::from($state)->getColor())
-                    ->formatStateUsing(fn (string $state): string => OrderStatus::from($state)->getLabel()),
-                TextColumn::make('total')
-                    ->label(__('orders.fields.total'))
-                    ->money(fn (\App\Models\Order $record): string => $record->currency ?? 'EUR')
-                    ->sortable(),
-                TextColumn::make('created_at')
-                    ->label(__('orders.fields.created_at'))
-                    ->dateTime()
-                    ->sortable(),
+                    ->color(fn (string $state): string => match ($state) {
+                        'pending'    => 'warning',
+                        'processing' => 'info',
+                        'shipped'    => 'primary',
+                        'delivered'  => 'success',
+                        'cancelled'  => 'danger',
+                        default      => 'gray',
+                    }),
+                Tables\Columns\TextColumn::make('total')
+                    ->money('EUR'),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime(),
             ])
             ->filters([
-                SelectFilter::make('status')
-                    ->label(__('orders.fields.status'))
-                    ->options(OrderStatus::getOptions()),
-                TrashedFilter::make(),
+                Tables\Filters\SelectFilter::make('status'),
+                Tables\Filters\TrashedFilter::make(),
+            ])
+            ->headerActions([
+                RelationManagerRepeaterAction::make(),
+                Tables\Actions\CreateAction::make(),
             ])
             ->headerActions([])
             ->actions([

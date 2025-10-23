@@ -13,7 +13,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class ItemsRelationManager extends BaseRelationManager
 {
@@ -184,6 +184,7 @@ final class ItemsRelationManager extends BaseRelationManager
                     ->query(fn (Builder $query): Builder => $query->where('valid_until', '<', now())),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make(),
                 Tables\Actions\AttachAction::make(),
             ])
