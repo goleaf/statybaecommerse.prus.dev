@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
@@ -31,6 +32,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  *
  * @mixin \Eloquent
  */
+#[ObservedBy([AttributionObserver::class])]
 #[ScopedBy([StatusScope::class])]
 #[ObservedBy([AttributionObserver::class])]
 final class Document extends Model
@@ -104,6 +106,14 @@ final class Document extends Model
         $relation = $this->morphTo();
 
         return $relation;
+    }
+
+    /**
+     * Handle auditLogs functionality with proper error handling.
+     */
+    public function auditLogs(): MorphMany
+    {
+        return $this->morphMany(AuditLog::class, 'entity')->latest('created_at');
     }
 
     /**

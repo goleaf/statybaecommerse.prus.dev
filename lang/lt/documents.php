@@ -65,6 +65,22 @@ return [
     'related_model_id' => 'Susijusio modelio ID',
     'metadata' => 'Metaduomenys',
     'add_variable' => 'Pridėti kintamąjį',
+    'audit' => [
+        'title' => 'Audito žurnalas',
+        'action' => 'Veiksmas',
+        'performed_by' => 'Vykdytojas',
+        'logged_at' => 'Užfiksuota',
+        'before' => 'Prieš',
+        'after' => 'Po',
+        'empty' => 'Audito įrašų dar nėra.',
+        'system' => 'Sistema',
+    ],
+    'audit_actions' => [
+        'created' => 'Sukurta',
+        'updated' => 'Atnaujinta',
+        'deleted' => 'Ištrinta',
+        'restored' => 'Atkurta',
+    ],
 
     // Document Actions
     'generate'     => 'Generuoti dokumentą',
