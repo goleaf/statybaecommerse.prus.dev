@@ -4,83 +4,90 @@ declare(strict_types=1);
 
 namespace App\Support;
 
+use DomainException;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
+use Throwable;
 
 final class ApiErrorResponse
 {
-    private const DEFAULT_PROBLEM_BASE_URI = 'https://prus.dev/problems';
-
-    private function __construct()
+    public static function fromThrowable(Throwable $exception, Request $request): JsonResponse
     {
-    }
+        $correlationId = (string) Str::uuid();
+        $status = SymfonyResponse::HTTP_INTERNAL_SERVER_ERROR;
+        $code = 'server_error';
+        $message = __('An unexpected error occurred.');
+        $details = [];
 
-    /**
-     * Build an RFC 7807 problem details response enriched with correlation metadata.
-     *
-     * @param  array<string, mixed>  $context
-     * @param  array<string, mixed>  $extra
-     */
-    public static function problem(
-        Request $request,
-        string $errorCode,
-        string $detail,
-        int $status,
-        ?string $title = null,
-        array $context = [],
-        ?string $locale = null,
-        array $extra = []
-    ): JsonResponse {
-        ErrorCodes::assertValid($errorCode);
+        if ($exception instanceof ValidationException) {
+            $status = $exception->status;
+            $code = 'validation_error';
+            $message = $exception->getMessage() ?: __('The given data was invalid.');
+            $details = ['errors' => $exception->errors()];
+        } elseif ($exception instanceof AuthenticationException) {
+            $status = SymfonyResponse::HTTP_UNAUTHORIZED;
+            $code = 'unauthenticated';
+            $message = $exception->getMessage() ?: __('Unauthenticated.');
+        } elseif ($exception instanceof AuthorizationException) {
+            $status = SymfonyResponse::HTTP_FORBIDDEN;
+            $code = 'forbidden';
+            $message = $exception->getMessage() ?: __('This action is unauthorized.');
+        } elseif ($exception instanceof ModelNotFoundException || $exception instanceof NotFoundHttpException) {
+            $status = SymfonyResponse::HTTP_NOT_FOUND;
+            $code = 'resource_not_found';
+            $message = __('Resource not found.');
+        } elseif ($exception instanceof TooManyRequestsHttpException) {
+            $status = SymfonyResponse::HTTP_TOO_MANY_REQUESTS;
+            $code = 'rate_limited';
+            $message = $exception->getMessage() ?: __('Too many requests.');
+            $retryAfter = $exception->getHeaders()['Retry-After'] ?? null;
+            if ($retryAfter !== null) {
+                $details['retry_after'] = is_numeric($retryAfter) ? (int) $retryAfter : $retryAfter;
+            }
+        } elseif ($exception instanceof DomainException) {
+            $status = SymfonyResponse::HTTP_BAD_REQUEST;
+            $code = 'domain_error';
+            $message = $exception->getMessage() ?: __('A domain error occurred.');
+        } elseif ($exception instanceof HttpExceptionInterface) {
+            $status = $exception->getStatusCode();
+            $code = 'http_error';
+            $message = $exception->getMessage() ?: (SymfonyResponse::$statusTexts[$status] ?? __('HTTP error.'));
+        }
 
-        $locale ??= RequestContext::resolveLocale($request);
-        $traceId = RequestContext::resolveTraceId($request);
-        $problem = [
-            'type' => self::typeFor($errorCode),
-            'title' => $title ?? self::titleFor($errorCode, $locale),
-            'status' => $status,
-            'detail' => $detail,
-            'instance' => $request->fullUrl(),
-            'error' => array_filter([
-                'code' => $errorCode,
-                'context' => $context,
-            ], static fn (mixed $value) => $value !== null && $value !== []),
-            'correlation' => [
-                'trace_id' => $traceId,
-                'correlation_id' => $traceId,
-            ],
-            'meta' => [
-                'locale' => $locale,
-                'timestamp' => now()->toIso8601String(),
+        $context = [
+            'correlation_id' => $correlationId,
+            'exception' => $exception,
+            'request_url' => $request->fullUrl(),
+            'request_method' => $request->method(),
+        ];
+
+        if ($status >= SymfonyResponse::HTTP_INTERNAL_SERVER_ERROR) {
+            Log::error($message, $context);
+        } else {
+            Log::warning($message, $context);
+        }
+
+        $payload = [
+            'error' => [
+                'code' => $code,
+                'message' => $message,
+                'details' => empty($details) ? null : $details,
+                'correlation_id' => $correlationId,
             ],
         ];
 
-        if ($extra !== []) {
-            $problem = array_replace_recursive($problem, $extra);
-        }
-
-        $response = response()->json($problem, $status);
-
-        $response->headers->set(RequestContext::correlationHeader(), $traceId);
-        $response->headers->set('Content-Language', $locale);
-        $response->headers->set('Content-Type', 'application/problem+json');
-
-        return $response;
-    }
-
-    public static function typeFor(string $errorCode): string
-    {
-        $base = (string) config('app.problem_base_uri', self::DEFAULT_PROBLEM_BASE_URI);
-
-        return rtrim($base, '/').'/'.$errorCode;
-    }
-
-    public static function titleFor(string $errorCode, ?string $locale = null): string
-    {
-        // Prefer localized labels from the translation files and gracefully
-        // fall back to the built-in descriptions if a translation is missing.
-        return ErrorCodes::title($errorCode, $locale)
-            ?? ErrorCodes::describe($errorCode)
-            ?? 'Application error';
+        return response()
+            ->json($payload, $status)
+            ->header('Content-Type', 'application/problem+json');
     }
 }
