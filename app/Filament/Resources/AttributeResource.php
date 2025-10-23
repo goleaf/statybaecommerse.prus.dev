@@ -27,9 +27,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Str;
-use JsonException;
-use Stringable;
 
 final class AttributeResource extends Resource
 {
@@ -37,9 +34,12 @@ final class AttributeResource extends Resource
 
     protected static ?string $model = Attribute::class;
 
-    
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
-    
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Products';
+    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -292,8 +292,8 @@ final class AttributeResource extends Resource
                     ->color('gray'),
                 TextColumn::make('type')
                     ->label(__('attributes.type'))
-                    ->formatStateUsing(fn (string $state): string => __("attributes.types.{$state}"))
-                    ->color(fn (string $state): string => match ($state) {
+                    ->formatStateUsing(fn (?string $state): string => $state ? __("attributes.types.{$state}") : __('attributes.none'))
+                    ->color(fn (?string $state): string => match ($state) {
                         'text'        => 'blue',
                         'number'      => 'green',
                         'select'      => 'purple',
@@ -303,6 +303,7 @@ final class AttributeResource extends Resource
                         'datetime'    => 'indigo',
                         'color'       => 'red',
                         'file'        => 'gray',
+                        'image'       => 'cyan',
                         'url'         => 'teal',
                         default       => 'gray',
                     }),
