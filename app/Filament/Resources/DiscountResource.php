@@ -80,7 +80,7 @@ final class DiscountResource extends Resource
     private static function generateDuplicateSlug(string $name): string
     {
         $baseSlug = Str::slug($name) ?: 'discount';
-        $candidate = $baseSlug . '-copy';
+        $candidate = $baseSlug.'-copy';
         $suffix = 2;
 
         while (Discount::withoutGlobalScopes()->withTrashed()->where('slug', $candidate)->exists()) {
