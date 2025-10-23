@@ -20,14 +20,10 @@ use Stringable;
  */
 final class SearchableComponentHelper
 {
-    /**
-     * Meta key used to stash the canonical payload when macros are unavailable upstream.
-     */
-    private const PAYLOAD_META_KEY = 'searchable_component_payload';
+    public const PAYLOAD_META_KEY = 'searchable_payload';
 
-    /**
-     * Guard flag so payload macros register only once during the request lifecycle.
-     */
+    private const FALLBACK_META_KEY = 'searchable_payload_fallback';
+
     private static bool $payloadMacrosRegistered = false;
 
     private function __construct() {}
@@ -72,11 +68,11 @@ final class SearchableComponentHelper
     /**
      * Sync a SearchableInput selection with a related attribute and optional payload snapshot.
      *
-     * @param callable(string, mixed): mixed $set           Filament Set helper (or compatible callable) for persisting state.
-     * @param Closure(string|int): (object|array|null)      $resolveRecord   Resolves the selected record for payload extraction.
-     * @param Closure(object|array): NormalisedPayload      $normalizePayload Normalises the record into the helper tuple.
-     * @param array<array-key, mixed>|Arrayable|null        $emptyPayload    Default payload when the lookup is cleared.
-     * @param Closure                                       ...$clearRelated Optional callbacks executed after the component clears.
+     * @param callable(string, mixed): mixed           $set              Filament Set helper (or compatible callable) for persisting state.
+     * @param Closure(string|int): (object|array|null) $resolveRecord    Resolves the selected record for payload extraction.
+     * @param Closure(object|array): NormalisedPayload $normalizePayload Normalises the record into the helper tuple.
+     * @param array<array-key, mixed>|Arrayable|null   $emptyPayload     Default payload when the lookup is cleared.
+     * @param Closure                                  ...$clearRelated  Optional callbacks executed after the component clears.
      */
     public static function syncSelectedRecord(
         SearchableInput $component,
@@ -89,6 +85,8 @@ final class SearchableComponentHelper
         array|Arrayable|null $emptyPayload = null,
         Closure ...$clearRelated,
     ): void {
+        self::ensurePayloadMacros();
+
         $emptyPayload = self::normaliseEmptyPayload($emptyPayload);
 
         self::ensurePayloadMacros();
@@ -228,7 +226,7 @@ final class SearchableComponentHelper
     /**
      * Normalise payload arrays so every consumer receives the canonical `{id, label, ...}` structure.
      *
-     * @param array<array-key, mixed>|Arrayable|null $payload
+     * @param  array<array-key, mixed>|Arrayable|null $payload
      * @return array<string, mixed>
      */
     private static function normalisePayload(array|Arrayable|null $payload, string $value, string $label): array
@@ -258,7 +256,7 @@ final class SearchableComponentHelper
     /**
      * Provide a predictable empty payload when the lookup resets.
      *
-     * @param array<array-key, mixed>|Arrayable|null $payload
+     * @param  array<array-key, mixed>|Arrayable|null $payload
      * @return array<string, mixed>
      */
     private static function normaliseEmptyPayload(array|Arrayable|null $payload): array
@@ -285,27 +283,68 @@ final class SearchableComponentHelper
     }
 
     /**
-     * Register macros that persist payload data when the upstream package omits them.
+     * Register payload helper macros the first time the helper is exercised so downstream calls stay type-safe.
+     */
+    public static function registerPayloadMacros(): void
+    {
+        self::ensurePayloadMacros();
+    }
+
+    /**
+     * Lazily attach payload macros to the SearchableInput component.
      */
     private static function ensurePayloadMacros(): void
     {
         if (self::$payloadMacrosRegistered) {
+            if (SearchableInput::hasMacro('payload') && SearchableInput::hasMacro('getPayload')) {
+                return;
+            }
+
+            // When tests flush macros mid-run we need to re-register them, so mark the flag for another pass.
+            self::$payloadMacrosRegistered = false;
+        }
+
+        if (! class_exists(SearchableInput::class)) {
             return;
         }
 
         if (! SearchableInput::hasMacro('payload')) {
             SearchableInput::macro('payload', function (array $payload): SearchableInput {
                 /** @var SearchableInput $this */
-                return $this->meta(SearchableComponentHelper::PAYLOAD_META_KEY, $payload);
+                $meta = method_exists($this, 'getMeta') ? $this->getMeta() : [];
+                $meta = is_array($meta) ? $meta : [];
+                $meta[SearchableComponentHelper::PAYLOAD_META_KEY] = $payload;
+
+                return $this->meta($meta);
+            });
+        }
+
+        if (! SearchableInput::hasMacro('fallbackPayload')) {
+            SearchableInput::macro('fallbackPayload', function (?array $payload = null): SearchableInput {
+                /** @var SearchableInput $this */
+                $meta = method_exists($this, 'getMeta') ? $this->getMeta() : [];
+                $meta = is_array($meta) ? $meta : [];
+                $meta[SearchableComponentHelper::FALLBACK_META_KEY] = $payload ?? [];
+
+                return $this->meta($meta);
             });
         }
 
         if (! SearchableInput::hasMacro('getPayload')) {
             SearchableInput::macro('getPayload', function (): array {
                 /** @var SearchableInput $this */
-                $payload = $this->getMeta(SearchableComponentHelper::PAYLOAD_META_KEY);
+                $meta = method_exists($this, 'getMeta') ? $this->getMeta() : [];
+                $meta = is_array($meta) ? $meta : [];
 
-                return is_array($payload) ? $payload : [];
+                if (array_key_exists(SearchableComponentHelper::PAYLOAD_META_KEY, $meta)) {
+                    return (array) $meta[SearchableComponentHelper::PAYLOAD_META_KEY];
+                }
+
+                if (array_key_exists(SearchableComponentHelper::FALLBACK_META_KEY, $meta)) {
+                    return (array) $meta[SearchableComponentHelper::FALLBACK_META_KEY];
+                }
+
+                return [];
             });
         }
 

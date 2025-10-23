@@ -144,3 +144,41 @@ it('synchronises identifiers and payload metadata when selections change', funct
     expect($component->getOptions())->toBe([]);
     expect($component->getPayload())->toBe([]);
 });
+
+it('bootstraps payload macros lazily when none are registered', function (): void {
+    // Arrange: emulate a clean environment where the ServiceProvider did not run yet.
+    SearchableInput::flushMacros();
+    $component = SearchableInput::make('order_id');
+
+    // Act & Assert: the helper should register macros transparently and avoid TypeErrors.
+    expect(function () use ($component): void {
+        SearchableComponentHelper::hydrate(
+            $component,
+            null,
+            static fn (): ?array => null,
+            static fn (): array => [
+                'value'   => null,
+                'label'   => '',
+                'payload' => [],
+            ],
+        );
+
+        SearchableComponentHelper::syncSelectedRecord(
+            $component,
+            null,
+            static function (): void {},
+            'order_id',
+            static fn (): ?array => null,
+            static fn (): array => [
+                'value'   => null,
+                'label'   => '',
+                'payload' => [],
+            ],
+        );
+
+        SearchableComponentHelper::clear($component);
+    })->not->toThrow(Throwable::class);
+
+    // Without any payload metadata the helper should always fall back to an empty array.
+    expect($component->getPayload())->toBe([]);
+});

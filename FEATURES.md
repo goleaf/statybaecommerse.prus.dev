@@ -20,6 +20,7 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Brands page now features a light-themed layout, shared card components, and refreshed translations so the partner directory feels consistent across locales.
 - Localized product/category routing plus collection seeding were hardened, ensuring homepage product links, category landing pages, and collection showcases load without 404s or empty states.
 - PHPUnit harness now boots a shared `database/testing.sqlite` schema (including Spatie permission tables and variant attribute pivots) and registers Filament SearchableInput payload macros so admin feature suites stay v4-compatible while reusing deterministic migrations.
+- Parallel test execution now provisions per-worker SQLite databases using Laravel's parallel token, and the SearchableInput payload macros register on demand so hydrate/sync helpers avoid TypeErrors even when the provider layer has not initialised them yet.
 - Filament dashboard access now defaults to an open posture when no
   permissions are configured and inline sparkline widgets comply with the
   nullable model contract, preventing dashboard and widget regressions.
@@ -37,7 +38,7 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Test infrastructure now provisions an on-disk SQLite database and conditionally seeds customer group metadata, preventing the observer test suite from failing with missing table or column errors.
 - API search now short-circuits suspicious payloads and boosts exact-title matches so catalogue lookups stay precise while SQL injection attempts return empty responses.
 - Search experiences normalise mixed-case `types[]` filters so targeted product/category/brand lookups keep the requested scope even when storefront clients send capitalised identifiers.
-- Developer experience improvements ensure PHPUnit and Pest share a persistent SQLite test database, preventing missing-table failures when exercising product APIs locally.
+- Attribute management in the Filament admin preserves plain string validation rules, converts stored arrays into readable comma-separated chips, and carries new regression tests that guarantee both storage paths round-trip without JSON artefacts.
 - The custom Edit Profile page now imports `Filament\\Schemas\\Schema`, keeping Filament authentication tooling aligned with v4 expectations and eliminating namespace-related fatal errors during automated runs.
 - Discount Redemption admin tooling now groups under Marketing with a warning navigation badge, uses Filament v4 badge styling for status indicators, and ships with a HasTable-aware Pest harness so table schemas build successfully during tests.
 - Pest-powered test helpers now wrap the `login()` helper in a function-existence guard so repeated bootstrap cycles during `php artisan test` runs avoid fatal redeclaration errors.

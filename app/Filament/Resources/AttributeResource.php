@@ -148,54 +148,13 @@ final class AttributeResource extends Resource
                         ->label(__('attributes.validation_rules'))
                         ->helperText(__('attributes.validation_rules_help'))
                         ->placeholder('required|min:3')
-                        ->formatStateUsing(static function (mixed $state): ?string {
+                        ->formatStateUsing(static function ($state): ?string {
                             // Avoid leaking raw JSON to the interface by presenting array payloads as comma-separated strings.
                             if (is_array($state)) {
-                                return implode(', ', array_map(
-                                    static function (mixed $rule): string {
-                                        if (is_string($rule)) {
-                                            return $rule;
-                                        }
-
-                                        if (is_numeric($rule)) {
-                                            return (string) $rule;
-                                        }
-
-                                        if ($rule instanceof Stringable) {
-                                            return (string) $rule;
-                                        }
-
-                                        try {
-                                            return json_encode($rule, JSON_THROW_ON_ERROR);
-                                        } catch (JsonException) {
-                                            return '';
-                                        }
-                                    },
-                                    $state
-                                ));
+                                return implode(', ', array_map(static fn ($rule): string => (string) $rule, $state));
                             }
 
-                            if ($state === null) {
-                                return null;
-                            }
-
-                            if (is_string($state)) {
-                                return $state;
-                            }
-
-                            if (is_numeric($state)) {
-                                return (string) $state;
-                            }
-
-                            if ($state instanceof Stringable) {
-                                return (string) $state;
-                            }
-
-                            try {
-                                return json_encode($state, JSON_THROW_ON_ERROR);
-                            } catch (JsonException) {
-                                return null;
-                            }
+                            return $state;
                         })
                         ->dehydrateStateUsing(static function ($state) {
                             // When authors enter multiple rules separated by commas we hydrate them back into an array so the
