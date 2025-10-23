@@ -41,7 +41,11 @@ final class VariantPricingRuleResource extends Resource
 {
     protected static ?string $model = VariantPricingRule::class;
 
-    /** @var string|\UnitEnum|null Ensure the navigation group remains compatible with Filament enums. */
+    /**
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
     protected static $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 10;
@@ -85,6 +89,7 @@ final class VariantPricingRuleResource extends Resource
      */
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 Section::make(__('variant_pricing_rules.basic_information'))
@@ -184,6 +189,7 @@ final class VariantPricingRuleResource extends Resource
      */
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('name')

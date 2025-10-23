@@ -8,7 +8,6 @@ use App\Enums\DocumentTemplateCategory;
 use App\Enums\DocumentTemplateType;
 use App\Filament\Resources\DocumentTemplateResource\Pages;
 use App\Models\DocumentTemplate;
-use BackedEnum;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -39,7 +38,12 @@ use Filament\Schemas\Schema;
 
 final class DocumentTemplateResource extends Resource
 {
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-document-text';
 
     public static function getNavigationGroup(): string|UnitEnum|null
     {
@@ -81,6 +85,7 @@ final class DocumentTemplateResource extends Resource
      */
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Tabs::make('document_template_form')
                 ->tabs([
@@ -191,6 +196,7 @@ final class DocumentTemplateResource extends Resource
      */
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->withCount('documents'))
             ->columns([

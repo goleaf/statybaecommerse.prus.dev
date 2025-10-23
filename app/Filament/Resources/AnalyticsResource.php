@@ -18,8 +18,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as TranslatableResource;
-use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Schemas\Schema;
 
@@ -29,12 +27,19 @@ final class AnalyticsResource extends Resource
 
     protected static ?string $model = Order::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
     /**
-     * Preserve the typed navigation group union to keep enum-backed grouping working across PHP upgrades.
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Analytics;
+    protected static $navigationGroup = NavigationGroup::Analytics;
 
     public static function getNavigationLabel(): string
     {
@@ -70,14 +75,13 @@ final class AnalyticsResource extends Resource
 
     public static function form(Form $form): Form
     {
-        // Keep the dashboard read-only by returning the base form configuration untouched.
+        // Filament 4 expects returning the Form builder instance.
         return $form;
     }
 
     public static function table(Table $table): Table
     {
-        $currency = config('app.currency', 'EUR');
-
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->query(fn (Builder $query): Builder => $query->with(['user'])->withCount('items'))
             ->defaultSort('created_at', 'desc')

@@ -7,9 +7,6 @@ namespace App\Filament\Resources;
 use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\UserBehaviorResource\Pages;
 use App\Models\UserBehavior;
-use App\Support\Filament\Components\Flatpickr;
-use App\Support\Filament\Filters\DateRangeFilter;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -33,7 +30,6 @@ use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Schemas\Schema;
 
@@ -49,14 +45,18 @@ final class UserBehaviorResource extends Resource
     protected static ?string $model = UserBehavior::class;
 
     /**
-     * Filament navigation icon identifier.
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
+    protected static $navigationIcon = 'heroicon-o-document-text';
 
     /**
-     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static UnitEnum|string|null $navigationGroup = 'Users';
+    protected static $navigationGroup = 'Users';
 
     protected static ?int $navigationSort = 5;
 
@@ -93,6 +93,7 @@ final class UserBehaviorResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 Section::make(__('admin.user_behaviors.basic_information'))
@@ -174,6 +175,7 @@ final class UserBehaviorResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('user.name')

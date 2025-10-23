@@ -35,17 +35,8 @@ class TranslationsRelationManager extends BaseRelationManager
 
     public function form(Form $form): Form
     {
-        return $this->sanitizePayload($data);
-    }
-
-    protected function mutateFormDataBeforeSave(array $data): array
-    {
-        return $this->sanitizePayload($data);
-    }
-
-    public function form(Schema $schema): Schema
-    {
-        return $schema
+        // Filament 4 expects returning the Form builder instance.
+        return $form
             ->schema([
                 Section::make('Translation Details')
                     ->schema([
@@ -128,6 +119,7 @@ class TranslationsRelationManager extends BaseRelationManager
 
     public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->recordTitleAttribute('title')
             ->columns([

@@ -8,7 +8,6 @@ use App\Enums\NavigationGroup;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
 use App\Support\Authorization\AuthorizationMatrix;
-use BackedEnum;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
@@ -35,15 +34,23 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
-use UnitEnum;
-use Filament\Schemas\Schema;
+use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 
 final class CategoryResource extends Resource
 {
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-tag';
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
+    /**
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 3;
 
@@ -103,7 +110,8 @@ final class CategoryResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form->schema([
+        // Filament 4 expects returning the Form builder instance.
+        return $form->components([
             Section::make(__('categories.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -200,6 +208,7 @@ final class CategoryResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 ImageColumn::make('image')

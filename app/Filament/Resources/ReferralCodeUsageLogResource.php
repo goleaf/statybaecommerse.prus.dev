@@ -12,8 +12,6 @@ use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use UnitEnum;
-use Filament\Schemas\Schema;
 
 /**
  * ReferralCodeUsageLogResource
@@ -31,9 +29,11 @@ final class ReferralCodeUsageLogResource extends Resource
     protected static ?string $recordTitleAttribute = 'ip_address';
 
     /**
-     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static UnitEnum|string|null $navigationGroup = 'Analytics';
+    protected static $navigationGroup = 'Analytics';
 
     public static function getNavigationLabel(): string
     {
@@ -52,121 +52,14 @@ final class ReferralCodeUsageLogResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Section::make(__('admin.referral_code_usage_logs.basic_information'))
-                    ->schema([
-                        Grid::make(2)
-                            ->schema([
-                                Select::make('referral_code_id')
-                                    ->label(__('admin.referral_code_usage_logs.referral_code'))
-                                    ->relationship('referralCode', 'code')
-                                    ->required()
-                                    ->searchable()
-                                    ->preload(),
-                                Select::make('user_id')
-                                    ->label(__('admin.referral_code_usage_logs.user'))
-                                    ->relationship('user', 'name')
-                                    ->searchable()
-                                    ->preload()
-                                    ->nullable(),
-                                TextInput::make('ip_address')
-                                    ->label(__('admin.referral_code_usage_logs.ip_address'))
-                                    ->ip()
-                                    ->required()
-                                    ->maxLength(45),
-                                TextInput::make('referrer')
-                                    ->label(__('admin.referral_code_usage_logs.referrer'))
-                                    ->url()
-                                    ->maxLength(255),
-                                TextInput::make('user_agent')
-                                    ->label(__('admin.referral_code_usage_logs.user_agent'))
-                                    ->maxLength(500),
-                            ]),
-                        KeyValue::make('metadata')
-                            ->label(__('admin.referral_code_usage_logs.metadata'))
-                            ->keyLabel(__('referral.form.metadata_key'))
-                            ->valueLabel(__('referral.form.metadata_value'))
-                            ->helperText(__('admin.referral_code_usage_logs.metadata_help'))
-                            ->nullable()
-                            ->columnSpanFull(),
-                    ]),
-            ]);
+        // Filament 4 expects returning the Form builder instance.
+        return ReferralCodeUsageLogFormSchema::configure($form);
     }
 
     public static function table(Table $table): Table
     {
-        return $table
-            ->query(
-                ReferralCodeUsageLog::query()->with([
-                    'referralCode:id,code',
-                    'user:id,name',
-                ]),
-            )
-            ->columns([
-                TextColumn::make('referralCode.code')
-                    ->label(__('admin.referral_code_usage_logs.referral_code'))
-                    ->searchable()
-                    ->sortable()
-                    ->copyable(),
-                TextColumn::make('user.name')
-                    ->label(__('admin.referral_code_usage_logs.user'))
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('ip_address')
-                    ->label(__('admin.referral_code_usage_logs.ip_address'))
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('referrer')
-                    ->label(__('admin.referral_code_usage_logs.referrer'))
-                    ->limit(30)
-                    ->tooltip(function (TextColumn $column): ?string {
-                        $state = $column->getState();
-
-                        if (! is_string($state) || $state === '') {
-                            return null;
-                        }
-
-                        return strlen((string) $state) > 30 ? $state : null;
-                    }),
-                TextColumn::make('user_agent')
-                    ->label(__('admin.referral_code_usage_logs.user_agent'))
-                    ->limit(50)
-                    ->tooltip(function (TextColumn $column): ?string {
-                        $state = $column->getState();
-
-                        if (! is_string($state) || $state === '') {
-                            return null;
-                        }
-
-                        return strlen((string) $state) > 50 ? $state : null;
-                    }),
-                TextColumn::make('created_at')
-                    ->label(__('admin.common.created_at'))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->filters([
-                SelectFilter::make('referral_code_id')
-                    ->label(__('admin.referral_code_usage_logs.referral_code'))
-                    ->relationship('referralCode', 'code')
-                    ->searchable(),
-                SelectFilter::make('user_id')
-                    ->label(__('admin.referral_code_usage_logs.user'))
-                    ->relationship('user', 'name')
-                    ->searchable(),
-            ])
-            ->actions([
-                ViewAction::make(),
-                EditAction::make(),
-            ])
-            ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ])
-            ->defaultSort('created_at', 'desc');
+        // Filament 4 expects returning the Table builder instance.
+        return ReferralCodeUsageLogsTableSchema::configure($table);
     }
 
     public static function getRelations(): array

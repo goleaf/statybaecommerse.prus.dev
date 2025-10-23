@@ -11,7 +11,6 @@ use App\Filament\Resources\AttributeValueResource\Pages;
 use App\Filament\Resources\AttributeValueResource\Relations\ProductsRelationManager as AttributeValueProductsRelationManager;
 use App\Filament\Resources\AttributeValueResource\Relations\VariantsRelationManager as AttributeValueVariantsRelationManager;
 use App\Models\AttributeValue;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -45,8 +44,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
-use UnitEnum;
-use Filament\Schemas\Schema;
 
 final class AttributeValueResource extends Resource
 {
@@ -54,9 +51,19 @@ final class AttributeValueResource extends Resource
 
     protected static ?string $model = AttributeValue::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-tag';
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
+    /**
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 3;
 
@@ -79,6 +86,7 @@ final class AttributeValueResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Section::make(__('attribute_values.basic_information'))
                 ->schema([
@@ -160,6 +168,7 @@ final class AttributeValueResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('attribute.name')

@@ -12,7 +12,7 @@ use App\Filament\Resources\NewsTags\Pages\ViewNewsTag;
 use App\Filament\Resources\NewsTags\Schemas\NewsTagForm;
 use App\Filament\Resources\NewsTags\Tables\NewsTagsTable;
 use App\Models\NewsTag;
-use BackedEnum;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
@@ -24,15 +24,22 @@ class NewsTagResource extends Resource
 
     protected static ?string $model = NewsTag::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return NewsTagForm::configure($form);
     }
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return NewsTagsTable::configure($table);
     }
 

@@ -8,21 +8,27 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\PartnerTierResource\Pages;
 use App\Models\PartnerTier;
-use BackedEnum;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Number;
-use UnitEnum;
-use Filament\Schemas\Schema;
 
 final class PartnerTierResource extends Resource
 {
     /**
-     * Navigation icon identifier displayed in the Filament sidebar (string or BackedEnum).
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
+    protected static $navigationIcon = 'heroicon-o-star';
+
+    /**
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationGroup = 'Marketing';
 
     protected static ?string $model = PartnerTier::class;
 
@@ -35,6 +41,7 @@ final class PartnerTierResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 Forms\Components\Section::make(__('admin.partner_tiers.sections.basic_information'))
@@ -93,6 +100,7 @@ final class PartnerTierResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')

@@ -8,9 +8,10 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\SliderTranslationResource\Pages;
 use App\Models\SliderTranslation;
-use BackedEnum;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -22,9 +23,6 @@ use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
-use UnitEnum;
-use Filament\Schemas\Schema;
 
 /**
  * SliderTranslationResource
@@ -38,18 +36,22 @@ final class SliderTranslationResource extends Resource
     protected static ?string $model = SliderTranslation::class;
 
     /**
-     * @var string|BackedEnum|null Icon used for the navigation menu.
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?int $navigationSort = 3;
 
     protected static ?string $recordTitleAttribute = 'title';
 
     /**
-     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static UnitEnum|string|null $navigationGroup = 'Content Management';
+    protected static $navigationGroup = 'Content Management';
 
     public static function getNavigationLabel(): string
     {
@@ -68,6 +70,7 @@ final class SliderTranslationResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Section::make(__('admin.slider_translations.basic_information'))
                 ->components([
@@ -108,6 +111,7 @@ final class SliderTranslationResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('slider.name')

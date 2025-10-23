@@ -10,8 +10,12 @@ use App\Filament\Resources\VariantImageResource\Pages;
 use App\Models\ProductVariant;
 use App\Models\VariantImage;
 use App\Support\Storage\SecureStorage;
-use BackedEnum;
-use Filament\Forms\Components\DatePicker;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
@@ -53,9 +57,11 @@ final class VariantImageResource extends Resource
     protected static ?string $model = VariantImage::class;
 
     /**
-     * Navigation icon override (string|\BackedEnum|null).
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-photo';
+    protected static $navigationIcon = 'heroicon-o-photo';
 
     public static function getNavigationGroup(): ?string
     {
@@ -81,6 +87,7 @@ final class VariantImageResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->components([
             Section::make(__('admin.variant_images.basic_information'))
                 ->schema([
@@ -206,6 +213,7 @@ final class VariantImageResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 ImageColumn::make('image_path')

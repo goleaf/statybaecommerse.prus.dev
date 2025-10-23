@@ -58,7 +58,15 @@ final class PriceListItemResource extends Resource
 
     protected static UnitEnum|string|null $navigationGroup = 'Products';
 
-    protected static ?string $recordTitleAttribute = 'display_name';
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-currency-euro';
+    }
+
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Products';
+    }
 
     /**
      * Handle getNavigationLabel functionality with proper error handling.
@@ -89,6 +97,7 @@ final class PriceListItemResource extends Resource
      */
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 Section::make(__('price_list_items.basic_information'))
@@ -194,6 +203,7 @@ final class PriceListItemResource extends Resource
      */
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('priceList.name')

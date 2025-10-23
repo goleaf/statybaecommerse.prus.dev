@@ -22,7 +22,7 @@ class OrdersRelationManager extends BaseRelationManager
 
     public function table(Table $table): Table
     {
-        // Filament 4 expects the fluent Table builder, so we configure it before returning.
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('number')

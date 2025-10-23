@@ -128,23 +128,23 @@ final class BrandResource extends Resource
      */
     public static function form(Form $form): Form
     {
-        return $form->schema([
-            Section::make(__('admin/brands.sections.basic_information'))
-                ->schema([
-                    Grid::make(2)
-                        ->schema([
-                            TextInput::make('name')
-                                ->label(__('admin/brands.fields.name'))
-                                ->required()
-                                ->maxLength(255)
-                                ->live(onBlur: true)
-                                ->afterStateUpdated(fn (string $operation, $state, SchemaSet $set) => $operation === 'create' ? $set('slug', Str::slug($state)) : null),
-                            TextInput::make('slug')
-                                ->label(__('admin/brands.fields.slug'))
-                                ->required()
-                                ->unique(ignoreRecord: true)
-                                ->rules(['alpha_dash']),
-                        ]),
+        // Filament 4 expects returning the Form builder instance.
+        return $form->components([
+            Section::make(__('brands.basic_information'))
+                ->components([
+                    LanguageTabs::make([
+                        TextInput::make('name')
+                            ->label(__('brands.name'))
+                            ->required()
+                            ->maxLength(255),
+                        TextInput::make('slug')
+                            ->label(__('brands.slug'))
+                            ->required()
+                            ->maxLength(255),
+                        Textarea::make('description')
+                            ->label(__('brands.description'))
+                            ->rows(3),
+                    ]),
                     TextInput::make('website')
                         ->label(__('admin/brands.fields.website'))
                         ->url()
@@ -215,6 +215,7 @@ final class BrandResource extends Resource
      */
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 ImageColumn::make('logo')

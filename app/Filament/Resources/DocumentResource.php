@@ -8,9 +8,8 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\DocumentResource\Pages;
 use App\Models\Document;
-use BackedEnum;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
@@ -29,7 +28,12 @@ use Filament\Schemas\Schema;
 
 final class DocumentResource extends Resource
 {
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document';
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-document';
 
     protected static ?string $model = Document::class;
 
@@ -59,6 +63,7 @@ final class DocumentResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 Section::make(__('admin.documents.form.sections.basic_information'))
@@ -133,6 +138,7 @@ final class DocumentResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('name')

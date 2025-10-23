@@ -43,8 +43,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
-use UnitEnum;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
 
 final class SeoDataResource extends Resource
@@ -53,9 +51,11 @@ final class SeoDataResource extends Resource
     protected static ?string $model = SeoData::class;
 
     /**
-     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Content;
+    protected static $navigationGroup = NavigationGroup::Content;
 
     public static function getNavigationLabel(): string
     {
@@ -231,6 +231,7 @@ final class SeoDataResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('title')

@@ -24,7 +24,9 @@ final class InventoryManagement extends Page implements HasTable
     use InteractsWithTable;
 
     /**
-     * Navigation icon override (string|\BackedEnum|null).
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
     protected static $navigationIcon = 'heroicon-o-archive-box';
 
@@ -45,6 +47,7 @@ final class InventoryManagement extends Page implements HasTable
 
     public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         $table = $table
             ->query(Product::query())
             ->columns([

@@ -73,6 +73,7 @@ final class CartItemResource extends Resource
      */
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Section::make(__('cart_items.basic_information'))
                 ->schema([
@@ -252,6 +253,7 @@ final class CartItemResource extends Resource
      */
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 // Present the owning user with search and sorting capabilities for administrative triage.

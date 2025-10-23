@@ -8,8 +8,6 @@ use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\VariantStockResource\Pages;
 use App\Models\Location;
 use App\Models\VariantInventory;
-use App\Support\Filament\Components\Flatpickr;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -31,7 +29,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
-use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Schemas\Schema;
 
@@ -41,16 +38,23 @@ final class VariantStockResource extends Resource
 
     protected static ?string $model = VariantInventory::class;
 
-    /** Navigation icon for the resource (string|\BackedEnum|null). */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-archive-box';
 
     /**
-     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static UnitEnum|string|null $navigationGroup = 'Inventory';
+    protected static $navigationGroup = 'Inventory';
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Section::make('Stock Details')
                 ->schema([
@@ -126,6 +130,7 @@ final class VariantStockResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('variant.product.name')->label('Product')->searchable()->sortable(),

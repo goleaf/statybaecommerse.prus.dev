@@ -39,10 +39,7 @@ final class NewsCategoryResource extends Resource
 
     protected static ?string $model = NewsCategory::class;
 
-    /**
-     * @return string|Htmlable|BackedEnum|null ensure icon compatibility with enum-aware navigation.
-     */
-    public static function getNavigationIcon(): string|Htmlable|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
     {
         return 'heroicon-o-tag';
     }
@@ -61,6 +58,7 @@ final class NewsCategoryResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Section::make(__('news_categories.sections.category_information'))
                 ->schema([
@@ -146,6 +144,7 @@ final class NewsCategoryResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('name')

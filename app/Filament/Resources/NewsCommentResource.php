@@ -11,7 +11,6 @@ use App\Models\NewsComment;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\ApprovedScope;
 use App\Models\Scopes\VisibleScope;
-use BackedEnum;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -43,7 +42,12 @@ final class NewsCommentResource extends Resource
 
     protected static ?string $model = NewsComment::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chat-bubble-left-ellipsis';
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-chat-bubble-left-ellipsis';
 
     public static function getNavigationGroup(): UnitEnum|string|null
     {
@@ -69,6 +73,7 @@ final class NewsCommentResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Section::make(__('admin.news_comments.basic_information'))
                 ->description(__('admin.news_comments.basic_information_description'))
@@ -150,6 +155,7 @@ final class NewsCommentResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('news.title')

@@ -29,12 +29,8 @@ final class ItemsRelationManager extends BaseRelationManager
 
     public function form(Form $form): Form
     {
-        return __('price_lists.relation_managers.items.title');
-    }
-
-    public function form(Schema $schema): Schema
-    {
-        return $schema
+        // Filament 4 expects returning the Form builder instance.
+        return $form
             ->components([
                 Forms\Components\Select::make('product_id')
                     ->label(__('price_list_items.product'))
@@ -101,6 +97,7 @@ final class ItemsRelationManager extends BaseRelationManager
 
     public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->recordTitleAttribute('product.name')
             ->columns([

@@ -35,6 +35,7 @@ final class DashboardRecentOrdersTable extends BaseTableWidget
 
     public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->query(fn () => $this->tableRepository->recentOrdersQuery()->limit(10))
             ->columns([

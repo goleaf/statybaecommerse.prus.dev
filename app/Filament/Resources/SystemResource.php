@@ -8,8 +8,6 @@ use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\SystemResource\Pages;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
-use App\Support\Filament\Components\Flatpickr;
-use BackedEnum;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
@@ -42,7 +40,6 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Schemas\Schema;
 
@@ -69,11 +66,21 @@ final class SystemResource extends Resource
 
     protected static ?string $model = SystemSetting::class;
 
-    protected static UnitEnum|string|null $navigationGroup = 'System';
+    /**
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationGroup = 'System';
 
     protected static ?int $navigationSort = 1;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     protected static ?string $navigationLabel = null;
 
@@ -120,6 +127,7 @@ final class SystemResource extends Resource
      */
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 Tabs::make('System Configuration')
@@ -519,6 +527,7 @@ final class SystemResource extends Resource
      */
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('key')

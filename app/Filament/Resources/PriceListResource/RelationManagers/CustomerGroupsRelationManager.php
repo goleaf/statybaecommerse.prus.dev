@@ -22,6 +22,7 @@ final class CustomerGroupsRelationManager extends BaseRelationManager
 
     public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->recordTitleAttribute('name')
             ->columns([

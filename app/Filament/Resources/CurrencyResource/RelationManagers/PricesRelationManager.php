@@ -30,7 +30,8 @@ final class PricesRelationManager extends BaseRelationManager
 
     public function form(Form $form): Form
     {
-        return $schema
+        // Filament 4 expects returning the Form builder instance.
+        return $form
             ->components([
                 Forms\Components\Select::make('priceable_type')
                     ->options([
@@ -69,6 +70,7 @@ final class PricesRelationManager extends BaseRelationManager
 
     public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->recordTitleAttribute('amount')
             ->columns([

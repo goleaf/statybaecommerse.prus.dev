@@ -20,8 +20,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use UnitEnum;
-use Filament\Schemas\Schema;
 
 final class NormalSettingResource extends Resource
 {
@@ -30,9 +28,11 @@ final class NormalSettingResource extends Resource
     protected static ?string $model = NormalSetting::class;
 
     /**
-     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static UnitEnum|string|null $navigationGroup = 'System';
+    protected static $navigationGroup = 'System';
 
     protected static ?int $navigationSort = 8;
 
@@ -55,6 +55,7 @@ final class NormalSettingResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Tabs::make(__('admin.normal_settings.tabs.label'))
                 ->tabs([
@@ -106,6 +107,7 @@ final class NormalSettingResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('key')

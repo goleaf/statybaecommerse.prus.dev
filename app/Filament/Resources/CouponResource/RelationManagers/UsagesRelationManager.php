@@ -29,7 +29,8 @@ final class UsagesRelationManager extends BaseRelationManager
 
     public function form(Form $form): Form
     {
-        return $schema->schema([
+        // Filament 4 expects returning the Form builder instance.
+        return $form->schema([
             Forms\Components\Select::make('user_id')
                 ->label(__('admin.common.user'))
                 ->relationship('user', 'name')
@@ -54,6 +55,7 @@ final class UsagesRelationManager extends BaseRelationManager
 
     public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->recordTitleAttribute('used_at')
             ->columns([

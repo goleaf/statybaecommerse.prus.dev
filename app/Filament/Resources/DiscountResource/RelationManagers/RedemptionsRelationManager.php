@@ -32,6 +32,7 @@ final class RedemptionsRelationManager extends BaseRelationManager
 
     public function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Section::make('Redemption Details')
                 ->schema([
@@ -92,6 +93,7 @@ final class RedemptionsRelationManager extends BaseRelationManager
 
     public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->recordTitleAttribute('code.code')
             ->columns([

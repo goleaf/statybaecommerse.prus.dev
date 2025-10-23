@@ -35,7 +35,8 @@ final class TranslationsRelationManager extends BaseRelationManager
 
     public function form(Form $form): Form
     {
-        return $schema->schema([
+        // Filament 4 expects returning the Form builder instance.
+        return $form->schema([
             Section::make(__('translations.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -78,6 +79,7 @@ final class TranslationsRelationManager extends BaseRelationManager
 
     public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('locale')

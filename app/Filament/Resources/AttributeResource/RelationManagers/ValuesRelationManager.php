@@ -23,7 +23,8 @@ final class ValuesRelationManager extends BaseRelationManager
 
     public function form(Form $form): Form
     {
-        return $schema
+        // Filament 4 expects returning the Form builder instance.
+        return $form
             ->schema([
                 Forms\Components\TextInput::make('value')
                     ->label(__('translations.value'))
@@ -41,6 +42,7 @@ final class ValuesRelationManager extends BaseRelationManager
 
     public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->recordTitleAttribute('value')
             ->columns([

@@ -8,7 +8,12 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\SystemSettingResource\Pages;
 use App\Models\SystemSetting;
-use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
@@ -30,9 +35,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Support\Collection;
-use UnitEnum;
-use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * SystemSettingResource
@@ -49,10 +52,18 @@ class SystemSettingResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'key';
 
-    /** @var string|BackedEnum|null */
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
     protected static $navigationIcon = 'heroicon-o-cog-6-tooth';
 
-    /** @var string|UnitEnum|null */
+    /**
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
     protected static $navigationGroup = 'Settings';
 
     public static function getNavigationLabel(): string
@@ -79,6 +90,7 @@ class SystemSettingResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 Section::make(__('system_settings.basic_information'))
@@ -235,6 +247,7 @@ class SystemSettingResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('key')

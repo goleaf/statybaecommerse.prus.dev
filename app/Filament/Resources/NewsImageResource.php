@@ -56,7 +56,10 @@ final class NewsImageResource extends Resource
 
     
 
-    
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|string|null
+    {
+        return 'heroicon-o-photo';
+    }
 
     protected static ?int $navigationSort = 4;
 
@@ -77,6 +80,7 @@ final class NewsImageResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 Tabs::make(__('admin.news_images.tabs'))
@@ -304,6 +308,7 @@ final class NewsImageResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 ImageColumn::make('file_path')

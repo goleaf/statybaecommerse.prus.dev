@@ -47,7 +47,10 @@ final class NewsTagResource extends Resource
 
     protected static ?string $model = NewsTag::class;
 
-    
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-tag';
+    }
 
     
 
@@ -65,6 +68,7 @@ final class NewsTagResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             FormSection::make(__('admin.news_tags.form.sections.basic_information'))
                 ->schema([
@@ -150,6 +154,7 @@ final class NewsTagResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('name')

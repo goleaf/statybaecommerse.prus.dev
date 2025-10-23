@@ -84,7 +84,7 @@ final class ProductVariantResource extends Resource
         return __('product_variants.single');
     }
 
-    public static function getNavigationIcon(): string|BackedEnum|Htmlable|null
+    public static function getNavigationIcon(): string|BackedEnum|\UnitEnum|Htmlable|null
     {
         return 'heroicon-o-squares-2x2';
     }
@@ -93,6 +93,7 @@ final class ProductVariantResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 Tabs::make('Variant Information')
@@ -361,6 +362,7 @@ final class ProductVariantResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 ImageColumn::make('primaryImage.thumbnail_url')

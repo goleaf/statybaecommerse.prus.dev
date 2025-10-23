@@ -53,6 +53,11 @@ final class DiscountRedemptionResource extends Resource
         return 'Discounts';
     }
 
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|string|null
+    {
+        return 'heroicon-o-ticket';
+    }
+
     public static function getPluralModelLabel(): string
     {
         return __('admin.discount_redemptions.plural');
@@ -65,6 +70,7 @@ final class DiscountRedemptionResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Section::make(__('admin.discount_redemptions.form.sections.basic_information'))
                 ->schema([
@@ -150,6 +156,7 @@ final class DiscountRedemptionResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->defaultSort('redeemed_at', 'desc')
             ->columns([

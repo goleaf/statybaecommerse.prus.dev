@@ -8,7 +8,6 @@ use App\Forms\Components\Flatpickr;
 use App\Support\DateRange;
 use App\Models\Slider;
 use App\Support\Filament\Components\Flatpickr;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Pages\Dashboard as BaseDashboard;
@@ -26,7 +25,12 @@ class SliderAnalytics extends BaseDashboard
 
     protected static ?string $navigationLabel = 'Slider Analytics';
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?int $navigationSort = 3;
 

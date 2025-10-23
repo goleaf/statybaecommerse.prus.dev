@@ -11,7 +11,7 @@ use App\Filament\Resources\SystemSettingCategories\Pages\ListSystemSettingCatego
 use App\Filament\Resources\SystemSettingCategories\Schemas\SystemSettingCategoryForm;
 use App\Filament\Resources\SystemSettingCategories\Tables\SystemSettingCategoriesTable;
 use App\Models\SystemSettingCategory;
-use BackedEnum;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
@@ -25,15 +25,22 @@ class SystemSettingCategoryResource extends Resource
 
     protected static ?string $model = SystemSettingCategory::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return SystemSettingCategoryForm::configure($form);
     }
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return SystemSettingCategoriesTable::configure($table);
     }
 

@@ -18,13 +18,9 @@ final class DiscountConditionTableWidget extends BaseWidget
 
     protected static ?string $heading = null;
 
-    protected function getHeading(): ?string
-    {
-        return __('discount_conditions.widgets.recent_conditions');
-    }
-
     public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->query(
                 DiscountCondition::query()->latest('created_at')->limit(10)
