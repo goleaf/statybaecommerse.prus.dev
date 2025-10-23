@@ -305,15 +305,6 @@ final class ReferralCodeResource extends Resource
         ];
     }
 
-    public static function getWidgets(): array
-    {
-        return [
-            \App\Filament\Resources\ReferralCodeResource\Widgets\ReferralCodeStatsWidget::class,
-            \App\Filament\Resources\ReferralCodeResource\Widgets\ReferralCodeUsageChartWidget::class,
-            \App\Filament\Resources\ReferralCodeResource\Widgets\TopReferralCodesWidget::class,
-        ];
-    }
-
     public static function getGloballySearchableAttributes(): array
     {
         return ['code', 'title', 'description', 'campaign_id', 'source'];
