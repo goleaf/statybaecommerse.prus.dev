@@ -72,34 +72,10 @@ return [
                     'link' => 'Meet the brands',
                 ],
             ],
-            'lists' => [
-                'categories' => [
-                    'title' => 'Top catalogue categories',
-                    'subtitle' => 'Our most visited departments from heavy-duty tools to finishing materials.',
-                    'link' => 'View all',
-                    'item_count' => ':count listed products',
-                    'empty' => 'Catalogue will showcase categories once published.',
-                ],
-                'brands' => [
-                    'title' => 'Featured construction brands',
-                    'subtitle' => 'Leaders in professional equipment, insulation, and structural systems.',
-                    'link' => 'View all',
-                    'item_count' => ':count stocked items',
-                    'empty' => 'Brand showcases will appear soon.',
-                ],
-            ],
         ],
         'highlights' => [
             'title' => 'Stay inspired',
             'subtitle' => 'Keep up with trending, new-in, and best-value picks curated daily.',
-            'latest' => [
-                'title' => 'Latest arrivals from the warehouse',
-                'empty' => 'Fresh stock will appear shortly.',
-            ],
-            'brands' => [
-                'fallback_description' => 'Baltic construction favourite.',
-                'cta' => 'Explore brand',
-            ],
         ],
         'discovery' => [
             'title' => 'Why shop with us?',
