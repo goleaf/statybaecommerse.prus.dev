@@ -110,6 +110,7 @@ final class CartItemResource extends Resource
                                             (string) $product->getKey() => ProductSearch::label($product),
                                         ]);
                                 })
+                                // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
                                 ->afterStateUpdated(function (?string $state, Forms\Set $set): void {
                                     if ($state === null || $state === '') {
                                         return;

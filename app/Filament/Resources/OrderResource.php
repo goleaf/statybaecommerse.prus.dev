@@ -396,18 +396,9 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                 ->placeholder(__('orders.lookups.address_placeholder'))
                                 ->searchUsing(fn (string $value): array => AddressSearch::results($value))
                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                    AddressSearch::hydrateComponent($component, $state);
-                                })
-                                ->onItemSelected(function (SearchResult $item, SearchableInput $component, Set $set): void {
-                                    SearchableComponentHelper::apply($component, $item);
-                                    $payload = $item->get('payload');
-
-                                    $set('billing_address', is_array($payload) ? $payload : []);
-                                })
-                                ->afterStateUpdated(function (?string $state, Set $set, SearchableInput $component): void {
-                                    if ($state === null || $state === '') {
-                                        SearchableComponentHelper::forget($component);
+                                // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
+                                ->afterStateUpdated(function (?int $state, Set $set): void {
+                                    if ($state === null) {
                                         $set('billing_address', []);
 
                                         return;
@@ -426,18 +417,9 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                 ->placeholder(__('orders.lookups.address_placeholder'))
                                 ->searchUsing(fn (string $value): array => AddressSearch::results($value))
                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                    AddressSearch::hydrateComponent($component, $state);
-                                })
-                                ->onItemSelected(function (SearchResult $item, SearchableInput $component, Set $set): void {
-                                    SearchableComponentHelper::apply($component, $item);
-                                    $payload = $item->get('payload');
-
-                                    $set('shipping_address', is_array($payload) ? $payload : []);
-                                })
-                                ->afterStateUpdated(function (?string $state, Set $set, SearchableInput $component): void {
-                                    if ($state === null || $state === '') {
-                                        SearchableComponentHelper::forget($component);
+                                // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
+                                ->afterStateUpdated(function (?int $state, Set $set): void {
+                                    if ($state === null) {
                                         $set('shipping_address', []);
 
                                         return;
