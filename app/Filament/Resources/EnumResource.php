@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\EnumResource\Pages;
 use App\Models\EnumValue;
 use BackedEnum;
@@ -34,20 +35,29 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
-use Filament\Schemas\Schema;
 
 final class EnumResource extends Resource
 {
     protected static ?string $model = EnumValue::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
+    /**
+     * Expose the navigation icon in a BackedEnum-friendly format for Filament.
+     *
+     * @var string|\BackedEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-squares-2x2';
+
+    /**
+     * Default to the system navigation group to mirror enum management placement.
+     */
+    protected static string|BackedEnum|null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 2;
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): ?string
     {
-        return trans('admin.enums.navigation_groups.system');
+        // Align the label with the NavigationGroup enum so translations stay in sync.
+        return NavigationGroup::System->label();
     }
 
     public static function getNavigationLabel(): string

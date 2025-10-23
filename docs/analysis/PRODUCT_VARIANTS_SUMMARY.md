@@ -46,3 +46,6 @@ I have successfully created a comprehensive product variants system for your Lar
 - All features are production-ready!
 
 The system is now **fully functional** and provides world-class variant management capabilities! 🎊
+
+### 🛠️ **Maintenance Notes**
+- Variant price history entries now require an explicit **Old Price** so change deltas remain accurate for Filament 4 reports.

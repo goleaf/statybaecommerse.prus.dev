@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\EnumValueResource\Pages;
+use BackedEnum;
 use App\Models\EnumValue;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -32,8 +32,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
-use Filament\Schemas\Schema;
 
 final class EnumValueResource extends Resource
 {
@@ -41,7 +39,16 @@ final class EnumValueResource extends Resource
 
     protected static ?string $model = EnumValue::class;
 
-    
+    /**
+     * Ensure enum values live under the same translated system navigation group.
+     */
+    protected static string|BackedEnum|null $navigationGroup = NavigationGroup::System;
+
+    public static function getNavigationGroup(): ?string
+    {
+        // Delegate to the NavigationGroup enum for consistent localization.
+        return NavigationGroup::System->label();
+    }
 
     protected static ?int $navigationSort = 1;
 
