@@ -6,6 +6,8 @@ namespace App\Domain\Product\Exceptions;
 
 use RuntimeException;
 
+use function sprintf;
+
 /**
  * Domain-specific exception used when a product cannot be located.
  */
