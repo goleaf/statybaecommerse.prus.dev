@@ -2,127 +2,133 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature\Console;
-
-use App\Support\Repositories\ProductRepository;
-use App\Support\Repositories\UserRepository;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
-use Tests\TestCase;
+use Illuminate\Support\Str;
+use Symfony\Component\Console\Command\Command;
 
-final class BackupCommandTest extends TestCase
-{
-    public function test_backup_prepare_and_verify_round_trip(): void
-    {
-        $storagePath = storage_path('framework/testing/backups');
-        $snapshotDirectory = storage_path('framework/testing/backup-snapshot');
-        $snapshotPath = $snapshotDirectory . '/database.sqlite';
-        $mediaPath = storage_path('framework/testing/backup-media');
-        $workingPath = storage_path('framework/testing/backup-working');
-        $verificationDatabase = $workingPath . '/database.sqlite';
+it('creates and verifies a sqlite backup snapshot with metadata counts', function (): void {
+    $uuid = Str::uuid()->toString();
+    $backupRoot = storage_path('framework/testing/backups/' . $uuid);
+    $snapshotDatabasePath = storage_path('framework/testing/databases/' . $uuid . '/snapshot.sqlite');
+    $mediaRoot = storage_path('framework/testing/media/' . $uuid);
+    $workingRoot = storage_path('framework/testing/verify-working/' . $uuid);
+    $verificationDatabasePath = storage_path('framework/testing/databases/' . $uuid . '/verification.sqlite');
 
-        File::deleteDirectory($storagePath);
-        File::deleteDirectory($snapshotDirectory);
-        File::deleteDirectory($mediaPath);
-        File::deleteDirectory($workingPath);
+    File::ensureDirectoryExists($backupRoot);
+    File::ensureDirectoryExists(dirname($snapshotDatabasePath));
+    File::ensureDirectoryExists($mediaRoot);
+    File::ensureDirectoryExists(dirname($verificationDatabasePath));
 
-        File::ensureDirectoryExists($snapshotDirectory);
-        File::put($snapshotPath, '');
-        File::ensureDirectoryExists($mediaPath);
-        File::put($mediaPath . '/placeholder.txt', 'media');
+    File::put($snapshotDatabasePath, '');
 
-        Config::set('backup.storage_path', $storagePath);
-        Config::set('backup.media_paths', [$mediaPath]);
-        Config::set('backup.connection', 'backup-snapshot');
-        Config::set('backup.repositories', [
-            'users'    => UserRepository::class,
-            'products' => ProductRepository::class,
+    File::put($mediaRoot . '/example.txt', 'media');
+
+    config()->set('backup.media_paths', [$mediaRoot]);
+    config()->set('backup.storage_path', $backupRoot);
+    config()->set('backup.connection', 'backup_snapshot');
+    config()->set('backup.repositories', [
+        'users'    => \App\Support\Repositories\UserRepository::class,
+        'products' => \App\Support\Repositories\ProductRepository::class,
+    ]);
+    config()->set('backup.verify.connection_name', 'backup_verify');
+    config()->set('backup.verify.working_path', $workingRoot);
+    config()->set('backup.verify.connection', [
+        'driver'                  => 'sqlite',
+        'database'                => $verificationDatabasePath,
+        'prefix'                  => '',
+        'foreign_key_constraints' => true,
+    ]);
+
+    config()->set('database.connections.backup_snapshot', [
+        'driver'                  => 'sqlite',
+        'database'                => $snapshotDatabasePath,
+        'prefix'                  => '',
+        'foreign_key_constraints' => true,
+    ]);
+
+    DB::purge('backup_snapshot');
+
+    Schema::connection('backup_snapshot')->create('users', function (Blueprint $table): void {
+        $table->id();
+        $table->string('name');
+        $table->string('email')->unique();
+        $table->string('password');
+        $table->timestamps();
+    });
+
+    Schema::connection('backup_snapshot')->create('products', function (Blueprint $table): void {
+        $table->id();
+        $table->string('name');
+        $table->decimal('price', 8, 2);
+        $table->timestamps();
+    });
+
+    DB::connection('backup_snapshot')->table('users')->insert([
+        ['name' => 'Ada Lovelace', 'email' => 'ada@example.test', 'password' => bcrypt('secret'), 'created_at' => now(), 'updated_at' => now()],
+        ['name' => 'Alan Turing', 'email' => 'alan@example.test', 'password' => bcrypt('secret'), 'created_at' => now(), 'updated_at' => now()],
+    ]);
+
+    DB::connection('backup_snapshot')->table('products')->insert([
+        ['name' => 'Concrete Mix', 'price' => 49.99, 'created_at' => now(), 'updated_at' => now()],
+        ['name' => 'Safety Helmet', 'price' => 19.50, 'created_at' => now(), 'updated_at' => now()],
+        ['name' => 'Laser Measure', 'price' => 89.00, 'created_at' => now(), 'updated_at' => now()],
+    ]);
+
+    try {
+        $prepareExitCode = Artisan::call('backup:prepare', [
+            '--connection'   => 'backup_snapshot',
+            '--storage-path' => $backupRoot,
         ]);
 
-        Config::set('database.connections.backup-snapshot', [
-            'driver'                  => 'sqlite',
-            'database'                => $snapshotPath,
-            'prefix'                  => '',
-            'foreign_key_constraints' => true,
-        ]);
+        expect($prepareExitCode)->toBe(Command::SUCCESS);
 
-        Config::set('backup.verify.connection_name', 'backup-verify-test');
-        Config::set('backup.verify.working_path', $workingPath);
-        Config::set('backup.verify.connection', [
-            'driver'                  => 'sqlite',
-            'database'                => $verificationDatabase,
-            'prefix'                  => '',
-            'foreign_key_constraints' => true,
-        ]);
+        $directories = collect(File::directories($backupRoot))->sort()->values();
+        expect($directories)->toHaveCount(1);
 
-        Schema::connection('backup-snapshot')->dropIfExists('users');
-        Schema::connection('backup-snapshot')->dropIfExists('products');
+        $latestBackupPath = $directories->first();
+        $metadataPath = $latestBackupPath . '/metadata.json';
 
-        Schema::connection('backup-snapshot')->create('users', function (Blueprint $table): void {
-            $table->increments('id');
-            $table->string('name');
-            $table->timestamps();
-        });
-
-        Schema::connection('backup-snapshot')->create('products', function (Blueprint $table): void {
-            $table->increments('id');
-            $table->string('name');
-            $table->decimal('price', 8, 2);
-            $table->timestamps();
-        });
-
-        DB::connection('backup-snapshot')->table('users')->insert([
-            ['name' => 'Alice', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Bob', 'created_at' => now(), 'updated_at' => now()],
-        ]);
-
-        DB::connection('backup-snapshot')->table('products')->insert([
-            ['name' => 'Widget', 'price' => 9.99, 'created_at' => now(), 'updated_at' => now()],
-        ]);
-
-        self::assertSame(0, Artisan::call('backup:prepare'));
-
-        $directories = File::directories($storagePath);
-        self::assertCount(1, $directories);
-
-        $backupPath = $directories[0];
-        $metadataPath = $backupPath . '/metadata.json';
-        self::assertFileExists($metadataPath);
+        expect(File::exists($metadataPath))->toBeTrue();
 
         /** @var array<string, mixed> $metadata */
         $metadata = json_decode(File::get($metadataPath), true, 512, JSON_THROW_ON_ERROR);
 
-        self::assertSame('backup-snapshot', $metadata['connection']['name']);
-        self::assertSame('sqlite', $metadata['connection']['driver']);
-        self::assertSame(
-            [
-                'users'    => UserRepository::class,
-                'products' => ProductRepository::class,
-            ],
-            $metadata['repositories'],
-        );
+        expect($metadata['connection'])->toMatchArray([
+            'name'   => 'backup_snapshot',
+            'driver' => 'sqlite',
+        ]);
 
-        self::assertSame([
+        expect($metadata['counts'])->toMatchArray([
             'users'    => 2,
-            'products' => 1,
-        ], $metadata['counts']);
+            'products' => 3,
+        ]);
 
-        self::assertSame(0, Artisan::call('backup:verify', [
-            '--storage-path' => $storagePath,
-            '--working-path' => $workingPath,
-            '--connection'   => 'backup-verify-test',
-        ]));
+        expect($metadata['repositories'])->toBe([
+            'users'    => \App\Support\Repositories\UserRepository::class,
+            'products' => \App\Support\Repositories\ProductRepository::class,
+        ]);
 
-        $verifiedUsers = DB::connection('backup-verify-test')->table('users')->count();
-        $verifiedProducts = DB::connection('backup-verify-test')->table('products')->count();
+        expect($metadata['artifacts']['database']['filename'])->toBe('database.sqlite');
+        expect($metadata['artifacts']['database']['driver'])->toBe('sqlite');
+        expect($metadata['artifacts']['media']['filename'])->toBe('media.tar.gz');
+        expect($metadata['media_paths'])->toContain($mediaRoot);
 
-        self::assertSame(2, $verifiedUsers);
-        self::assertSame(1, $verifiedProducts);
+        $verifyExitCode = Artisan::call('backup:verify', [
+            '--storage-path' => $backupRoot,
+            '--working-path' => $workingRoot,
+            '--connection'   => 'backup_verify',
+        ]);
 
-        self::assertDirectoryDoesNotExist($workingPath);
+        expect($verifyExitCode)->toBe(Command::SUCCESS);
+        expect(File::exists($verificationDatabasePath))->toBeTrue();
+    } finally {
+        File::deleteDirectory($backupRoot);
+        File::deleteDirectory($mediaRoot);
+        File::deleteDirectory($workingRoot);
+        File::deleteDirectory(dirname($snapshotDatabasePath));
     }
-}
+});
