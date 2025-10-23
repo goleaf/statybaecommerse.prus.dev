@@ -32,7 +32,6 @@ return [
     'total' => 'Total',
     'created' => 'Created',
     'updated' => 'Updated',
-    'channel' => 'Channel',
     // Summary Labels
     'total_revenue' => 'Total Revenue',
     'avg_order_value' => 'Avg Order Value',

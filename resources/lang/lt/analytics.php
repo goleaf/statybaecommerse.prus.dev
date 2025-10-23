@@ -32,7 +32,6 @@ return [
     'total' => 'Suma',
     'created' => 'Sukurta',
     'updated' => 'Atnaujinta',
-    'channel' => 'Kanalas',
     // Summary Labels
     'total_revenue' => 'Bendros pajamos',
     'avg_order_value' => 'Vidutinė užsakymo vertė',
