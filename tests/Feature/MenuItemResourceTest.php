@@ -68,8 +68,8 @@ class MenuItemResourceTest extends TestCase
 
         MenuItem::factory()->create([
             'menu_id' => $menu->id,
-            'label' => 'Contact',
-            'url' => null,
+            'label'   => 'Contact',
+            'url'     => null,
         ]);
 
         $this
@@ -220,36 +220,68 @@ class MenuItemResourceTest extends TestCase
             ->assertDontSee('About');
     }
 
-    public function test_edit_form_parent_select_only_lists_same_menu_roots(): void
+    public function test_parent_field_only_lists_parents_from_selected_menu(): void
     {
-        $menuA = Menu::factory()->create(['name' => 'Primary Menu']);
-        $menuB = Menu::factory()->create(['name' => 'Secondary Menu']);
+        $menuA = Menu::factory()->create();
+        $menuB = Menu::factory()->create();
 
-        $parentInMenuA = MenuItem::factory()->create([
-            'menu_id' => $menuA->id,
-            'label'   => 'Primary Parent',
-        ]);
-
-        $parentInMenuB = MenuItem::factory()->create([
-            'menu_id' => $menuB->id,
-            'label'   => 'Secondary Parent',
-        ]);
-
-        $child = MenuItem::factory()->create([
+        $menuARoot = MenuItem::factory()->create([
             'menu_id'   => $menuA->id,
-            'parent_id' => $parentInMenuA->id,
-            'label'     => 'Primary Child',
+            'parent_id' => null,
+            'label'     => 'Menu A Root',
         ]);
 
-        $response = $this->get("/admin/menu-items/{$child->id}/edit");
+        $menuBRoot = MenuItem::factory()->create([
+            'menu_id'   => $menuB->id,
+            'parent_id' => null,
+            'label'     => 'Menu B Root',
+        ]);
 
-        $response->assertOk();
+        Livewire::test(\App\Filament\Resources\MenuItemResource\Pages\CreateMenuItem::class)
+            ->fillForm([
+                'menu_id' => $menuA->id,
+            ])
+            ->assertFormFieldExists('parent_id', function (Field $field) use ($menuARoot, $menuBRoot): bool {
+                $this->assertInstanceOf(SelectComponent::class, $field);
 
-        $content = $response->getContent();
+                $options = $field->getOptions();
 
-        $this->assertStringContainsString('<option value="' . $parentInMenuA->id . '"', $content);
-        $this->assertStringNotContainsString('<option value="' . $child->id . '"', $content);
-        $this->assertStringNotContainsString('<option value="' . $parentInMenuB->id . '"', $content);
+                $this->assertArrayHasKey((string) $menuARoot->id, $options);
+                $this->assertArrayNotHasKey((string) $menuBRoot->id, $options);
+
+                return true;
+            });
+    }
+
+    public function test_parent_field_does_not_allow_selecting_current_record(): void
+    {
+        $menu = Menu::factory()->create();
+
+        $sibling = MenuItem::factory()->create([
+            'menu_id'   => $menu->id,
+            'parent_id' => null,
+            'label'     => 'Sibling Root',
+        ]);
+
+        $record = MenuItem::factory()->create([
+            'menu_id'   => $menu->id,
+            'parent_id' => null,
+            'label'     => 'Editing Root',
+        ]);
+
+        Livewire::test(\App\Filament\Resources\MenuItemResource\Pages\EditMenuItem::class, [
+            'record' => $record->getRouteKey(),
+        ])
+            ->assertFormFieldExists('parent_id', function (Field $field) use ($record, $sibling): bool {
+                $this->assertInstanceOf(SelectComponent::class, $field);
+
+                $options = $field->getOptions();
+
+                $this->assertArrayNotHasKey((string) $record->id, $options);
+                $this->assertArrayHasKey((string) $sibling->id, $options);
+
+                return true;
+            });
     }
 
     public function test_can_filter_menu_items_by_visibility(): void
