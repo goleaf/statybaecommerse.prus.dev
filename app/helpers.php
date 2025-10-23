@@ -307,6 +307,17 @@ if (! function_exists('debug_order')) {
     }
 }
 
+if (! function_exists('safe_asset')) {
+    function safe_asset(string $path): string
+    {
+        if (! app()->bound('request') || ! app('request') instanceof \Illuminate\Http\Request) {
+            return '/'.ltrim($path, '/');
+        }
+
+        return asset($path);
+    }
+}
+
 if (! function_exists('media_placeholder_url')) {
     function media_placeholder_url(string $key, ?string $variant = null, ?string $default = null): string
     {
@@ -319,7 +330,7 @@ if (! function_exists('media_placeholder_url')) {
 if (! function_exists('app_placeholder_url')) {
     function app_placeholder_url(): string
     {
-        return media_placeholder_url('app', null, asset('images/placeholder.jpg'));
+        return media_placeholder_url('app', null, safe_asset('images/placeholder.jpg'));
     }
 }
 
@@ -327,8 +338,8 @@ if (! function_exists('product_placeholder_url')) {
     function product_placeholder_url(?string $variant = null): string
     {
         $fallback = $variant === 'thumb'
-            ? asset('images/placeholder-product.png')
-            : asset('images/placeholder-product.jpg');
+            ? safe_asset('images/placeholder-product.png')
+            : safe_asset('images/placeholder-product.jpg');
 
         $key = $variant === 'thumb' ? 'product_png' : 'product';
 
@@ -339,7 +350,7 @@ if (! function_exists('product_placeholder_url')) {
 if (! function_exists('og_placeholder_url')) {
     function og_placeholder_url(): string
     {
-        return media_placeholder_url('og', null, asset('images/og-default.jpg'));
+        return media_placeholder_url('og', null, safe_asset('images/og-default.jpg'));
     }
 }
 
