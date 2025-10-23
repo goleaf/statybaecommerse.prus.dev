@@ -97,14 +97,12 @@ final class RecommendationBlockResource extends Resource
                         ->rows(3),
                     Select::make('type')
                         ->label(__('recommendation_blocks.type'))
-                        // Ensure the UI values stay in sync with domain helpers.
-                        ->options(RecommendationBlockOptions::types())
+                        ->options(self::getTypeOptions())
                         ->required()
                         ->native(false),
                     Select::make('position')
                         ->label(__('recommendation_blocks.position'))
-                        // Position options rely on the same helper for filters and selects.
-                        ->options(RecommendationBlockOptions::positions())
+                        ->options(self::getPositionOptions())
                         ->required()
                         ->native(false),
                 ]),
@@ -165,6 +163,7 @@ final class RecommendationBlockResource extends Resource
                     ->copyable(),
                 TextColumn::make('type')
                     ->label(__('recommendation_blocks.type'))
+                    ->formatStateUsing(fn (string $state): string => __('recommendation_blocks.types.' . $state))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'featured' => 'success',
@@ -176,6 +175,7 @@ final class RecommendationBlockResource extends Resource
                     }),
                 TextColumn::make('position')
                     ->label(__('recommendation_blocks.position'))
+                    ->formatStateUsing(fn (string $state): string => __('recommendation_blocks.positions.' . $state))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'top'     => 'success',
@@ -217,10 +217,10 @@ final class RecommendationBlockResource extends Resource
             ->filters([
                 SelectFilter::make('type')
                     ->label(__('recommendation_blocks.type'))
-                    ->options(RecommendationBlockOptions::types()),
+                    ->options(self::getTypeOptions()),
                 SelectFilter::make('position')
                     ->label(__('recommendation_blocks.position'))
-                    ->options(RecommendationBlockOptions::positions()),
+                    ->options(self::getPositionOptions()),
                 TernaryFilter::make('is_active')
                     ->label(__('recommendation_blocks.is_active'))
                     ->placeholder(__('recommendation_blocks.filters.all_records'))
@@ -235,6 +235,37 @@ final class RecommendationBlockResource extends Resource
                     DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    /**
+     * Get available recommendation block types mapped to their translations.
+     *
+     * @return array<string, string>
+     */
+    protected static function getTypeOptions(): array
+    {
+        return [
+            'featured' => __('recommendation_blocks.types.featured'),
+            'related' => __('recommendation_blocks.types.related'),
+            'similar' => __('recommendation_blocks.types.similar'),
+            'trending' => __('recommendation_blocks.types.trending'),
+            'recent' => __('recommendation_blocks.types.recent'),
+        ];
+    }
+
+    /**
+     * Get available recommendation block positions mapped to their translations.
+     *
+     * @return array<string, string>
+     */
+    protected static function getPositionOptions(): array
+    {
+        return [
+            'top' => __('recommendation_blocks.positions.top'),
+            'bottom' => __('recommendation_blocks.positions.bottom'),
+            'sidebar' => __('recommendation_blocks.positions.sidebar'),
+            'inline' => __('recommendation_blocks.positions.inline'),
+        ];
     }
 
     public static function getRelations(): array
