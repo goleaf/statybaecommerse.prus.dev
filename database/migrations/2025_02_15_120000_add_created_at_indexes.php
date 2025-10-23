@@ -22,9 +22,16 @@ return new class extends Migration
         $this->dropCreatedAtIndex('users', 'users_created_at_index');
     }
 
+    /**
+     * Safely add an index on the created_at column when both the table and column exist.
+     */
     private function addCreatedAtIndex(string $tableName, string $indexName): void
     {
         if (! Schema::hasTable($tableName)) {
+            return;
+        }
+
+        if (! Schema::hasColumn($tableName, 'created_at')) {
             return;
         }
 
@@ -33,10 +40,14 @@ return new class extends Migration
                 return;
             }
 
+            // Ensure we only create the index once to avoid duplicate key errors in production deployments.
             $table->index('created_at', $indexName);
         });
     }
 
+    /**
+     * Drop the created_at index when present to keep rollbacks idempotent.
+     */
     private function dropCreatedAtIndex(string $tableName, string $indexName): void
     {
         if (! Schema::hasTable($tableName) || ! $this->indexExists($tableName, $indexName)) {
@@ -48,10 +59,20 @@ return new class extends Migration
         });
     }
 
+    /**
+     * Determine whether the target index already exists without assuming Doctrine is installed.
+     */
     private function indexExists(string $tableName, string $indexName): bool
     {
-        $schemaManager = Schema::getConnection()->getDoctrineSchemaManager();
-        $indexes = $schemaManager->listTableIndexes($tableName);
+        $connection = Schema::getConnection();
+
+        if (! method_exists($connection, 'getDoctrineSchemaManager')) {
+            // When Doctrine DBAL is missing (such as in lightweight testing setups), we skip the check.
+            return false;
+        }
+
+        $schemaManager = $connection->getDoctrineSchemaManager();
+        $indexes = $schemaManager->listTableIndexes($connection->getTablePrefix() . $tableName);
 
         return array_key_exists($indexName, $indexes);
     }

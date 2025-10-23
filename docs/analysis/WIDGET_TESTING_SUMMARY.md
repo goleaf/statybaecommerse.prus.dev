@@ -37,9 +37,9 @@
 - Added proper error handling for problematic model factories
 
 ### **📊 Index Verification Updates (2025-02-15)**
-- Added dedicated `orders_created_at_index` (plus supporting `products` and `users` indexes) via `2025_02_15_120000_add_created_at_indexes.php` to align analytics widgets with time-based filters.
-- Refactored widgets (`ComprehensiveStatsWidget`, `EcommerceOverview`, `RealtimeAnalyticsWidget`, `EnhancedEcommerceOverview`, `SimplifiedStatsWidget`) and the `LiveDashboard` component to use the new `Order` date scopes.
-- Introduced `tests/Feature/Database/OrderCreatedAtIndexTest.php`, which captures SQLite `EXPLAIN QUERY PLAN` output and asserts the engine relies on `orders_created_at_index` for the `createdBetween`/`createdSince` scopes, ensuring analytics queries stay index-backed.
+- Added dedicated `orders_created_at_index` (with matching `products` and `users` indexes) to accelerate analytics scopes that rely on date filters.
+- Updated dashboard widgets and Livewire dashboards to consume the reusable `Order` date scopes so the new index is always engaged.
+- Introduced `tests/Feature/Database/OrderCreatedAtIndexTest.php` to capture SQLite `EXPLAIN QUERY PLAN` output and assert that the `createdBetween`/`createdSince` scopes remain index-backed.
 
 ### **📈 Widget Categories Tested**
 

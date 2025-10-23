@@ -40,10 +40,11 @@ use Spatie\Translatable\HasTranslations;
  * @method static \Illuminate\Database\Eloquent\Builder|Order newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Order newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Order query()
- * @method static \Illuminate\Database\Eloquent\Builder|Order createdBetween(CarbonInterface $start, CarbonInterface $end)
- * @method static \Illuminate\Database\Eloquent\Builder|Order createdSince(CarbonInterface $start)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order createdBetween(CarbonInterface|DateTimeInterface|string $start, CarbonInterface|DateTimeInterface|string $end)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order createdSince(CarbonInterface|DateTimeInterface|string $start)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order createdOn(CarbonInterface|DateTimeInterface|string $date)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order createdToday()
  * @method static \Illuminate\Database\Eloquent\Builder|Order createdThisMonth()
- * @method static \Illuminate\Database\Eloquent\Builder|Order createdOnDate(CarbonInterface $date)
  *
  * @mixin \Eloquent
  */
