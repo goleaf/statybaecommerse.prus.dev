@@ -8,6 +8,9 @@ use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\EnumValueResource;
 use App\Models\EnumValue;
 use Filament\Actions;
+use Filament\Resources\Pages\ListRecords;
+use App\Filament\WidgetTabs\Components\WidgetTab;
+use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListEnumValues extends BaseListRecords
@@ -25,8 +28,39 @@ class ListEnumValues extends BaseListRecords
 
     public function getWidgetTabs(): array
     {
-        $tabs = [
-            'all' => Tab::make(__('admin.enum_values.tabs.all')),
+        return [
+            'all' => WidgetTab::make('All Enum Values')
+                ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
+            'product_status' => WidgetTab::make('Product Status')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'product_status'))
+                ->value(fn () => $this->getResource()::getModel()::where('type', 'product_status')->count()),
+            'order_status' => WidgetTab::make('Order Status')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'order_status'))
+                ->value(fn () => $this->getResource()::getModel()::where('type', 'order_status')->count()),
+            'payment_status' => WidgetTab::make('Payment Status')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'payment_status'))
+                ->value(fn () => $this->getResource()::getModel()::where('type', 'payment_status')->count()),
+            'shipping_status' => WidgetTab::make('Shipping Status')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'shipping_status'))
+                ->value(fn () => $this->getResource()::getModel()::where('type', 'shipping_status')->count()),
+            'user_role' => WidgetTab::make('User Roles')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'user_role'))
+                ->value(fn () => $this->getResource()::getModel()::where('type', 'user_role')->count()),
+            'notification_type' => WidgetTab::make('Notification Types')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'notification_type'))
+                ->value(fn () => $this->getResource()::getModel()::where('type', 'notification_type')->count()),
+            'campaign_status' => WidgetTab::make('Campaign Status')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'campaign_status'))
+                ->value(fn () => $this->getResource()::getModel()::where('type', 'campaign_status')->count()),
+            'discount_type' => WidgetTab::make('Discount Types')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'discount_type'))
+                ->value(fn () => $this->getResource()::getModel()::where('type', 'discount_type')->count()),
+            'inventory_status' => WidgetTab::make('Inventory Status')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'inventory_status'))
+                ->value(fn () => $this->getResource()::getModel()::where('type', 'inventory_status')->count()),
+            'review_status' => WidgetTab::make('Review Status')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'review_status'))
+                ->value(fn () => $this->getResource()::getModel()::where('type', 'review_status')->count()),
         ];
 
         foreach (EnumValue::getTypes() as $type => $label) {

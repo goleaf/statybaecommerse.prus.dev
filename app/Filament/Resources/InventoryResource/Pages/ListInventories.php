@@ -9,6 +9,9 @@ use App\Filament\Resources\InventoryResource;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
+use Filament\Resources\Pages\ListRecords;
+use App\Filament\WidgetTabs\Components\WidgetTab;
+use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
@@ -84,10 +87,10 @@ class ListInventories extends BaseListRecords
             }
         }
 
-        return $query;
+        return $this->applyWidgetTabFilters($query);
     }
 
-    public function getTabs(): array
+    public function getWidgetTabs(): array
     {
         return [
             'all' => WidgetTab::make(__('admin.inventory.tabs.all'))

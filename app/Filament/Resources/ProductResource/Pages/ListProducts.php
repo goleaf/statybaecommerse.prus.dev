@@ -6,8 +6,11 @@ namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\ProductResource;
+use App\Filament\WidgetTabs\Components\WidgetTab;
+use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions;
+use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListProducts extends BaseListRecords

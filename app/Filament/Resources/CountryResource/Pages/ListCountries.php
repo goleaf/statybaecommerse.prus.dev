@@ -12,9 +12,11 @@ use App\Filament\Resources\CountryResource\Widgets\CountriesStatsWidget;
 use App\Filament\Resources\CountryResource\Widgets\CountriesWithVatWidget;
 use App\Filament\Resources\CountryResource\Widgets\CountryDetailsWidget;
 use App\Filament\Resources\CountryResource\Widgets\EuMembersWidget;
+use App\Filament\WidgetTabs\Components\WidgetTab;
+use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
+use App\Filament\WidgetTabs\Enums\WidgetTabTheme;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Resources\Components\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListCountries extends BaseListRecords
@@ -65,24 +67,25 @@ class ListCountries extends BaseListRecords
         ];
     }
 
-    public function getTabs(): array
+    public function getWidgetTabs(): array
     {
         return [
-            'all' => Tab::make(__('countries.filters.all'))
-                ->icon('heroicon-o-globe-alt'),
-            'active' => Tab::make(__('countries.statuses.active'))
+            'all' => WidgetTab::make(__('countries.filters.all'))
+                ->icon('heroicon-o-globe-alt')
+                ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
+            'active' => WidgetTab::make(__('countries.statuses.active'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_active', true))
-                ->badge(fn () => \App\Models\Country::where('is_active', true)->count())
+                ->value(fn () => \App\Models\Country::where('is_active', true)->count())
                 ->icon('heroicon-o-check-circle')
-                ->badgeColor('success'),
-            'eu_members' => Tab::make(__('countries.fields.is_eu_member'))
+                ->theme(WidgetTabTheme::Success),
+            'eu_members' => WidgetTab::make(__('countries.fields.is_eu_member'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_eu_member', true))
-                ->badge(fn () => \App\Models\Country::where('is_eu_member', true)->count())
+                ->value(fn () => \App\Models\Country::where('is_eu_member', true)->count())
                 ->icon('heroicon-o-flag')
-                ->badgeColor('primary'),
-            'vat_countries' => Tab::make(__('countries.fields.requires_vat'))
+                ->theme(WidgetTabTheme::Info),
+            'vat_countries' => WidgetTab::make(__('countries.fields.requires_vat'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('requires_vat', true))
-                ->badge(fn () => \App\Models\Country::where('requires_vat', true)->count())
+                ->value(fn () => \App\Models\Country::where('requires_vat', true)->count())
                 ->icon('heroicon-o-calculator')
                 ->theme(WidgetTabTheme::Warning),
         ];
