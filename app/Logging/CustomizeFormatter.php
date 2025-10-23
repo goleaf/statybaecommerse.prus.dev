@@ -23,8 +23,8 @@ final class CustomizeFormatter
             return;
         }
 
-        $monolog->pushProcessor(new TraceContextProcessor);
-        $monolog->pushProcessor(new KibanaContextProcessor);
+        $monolog->pushProcessor(new TraceContextProcessor());
+        $monolog->pushProcessor(new KibanaContextProcessor());
 
         foreach ($monolog->getHandlers() as $handler) {
             if (method_exists($handler, 'setFormatter')) {

@@ -20,10 +20,7 @@ final class DataImportExport extends Page
 {
     protected string $view = 'filament.pages.data-import-export';
 
-    public static function getNavigationIcon(): BackedEnum|string|null
-    {
-        return 'heroicon-o-arrow-down-tray';
-    }
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-arrow-down-tray';
 
     public ?string $provider = 'xml';
 

@@ -21,15 +21,9 @@ use UnitEnum;
 
 final class CacheMaintenance extends Page
 {
-    public static function getNavigationIcon(): BackedEnum|string|null
-    {
-        return 'heroicon-o-server-stack';
-    }
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-server-stack';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'System';
-    }
+    protected static UnitEnum|string|null $navigationGroup = 'System';
 
     protected static ?string $title = 'Cache Maintenance';
 

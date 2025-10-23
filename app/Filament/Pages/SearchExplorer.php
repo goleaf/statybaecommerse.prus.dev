@@ -13,15 +13,9 @@ use UnitEnum;
 
 final class SearchExplorer extends Page
 {
-    public static function getNavigationIcon(): BackedEnum|string|null
-    {
-        return 'heroicon-o-magnifying-glass-circle';
-    }
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-magnifying-glass-circle';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Search';
-    }
+    protected static UnitEnum|string|null $navigationGroup = 'Search';
 
     protected static ?string $title = 'Search Explorer';
 
