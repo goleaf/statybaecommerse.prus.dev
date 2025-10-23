@@ -16,21 +16,6 @@ final class ProductVariantAttributeMatrixServiceTest extends TestCase
 {
     use DatabaseTransactions;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        static $migrated = false;
-
-        if (! $migrated) {
-            // Build the SQLite schema once to ensure factories have the expected tables during tests.
-            $this->artisan('migrate:fresh', ['--database' => 'sqlite']);
-            $migrated = true;
-        }
-
-        $this->beginDatabaseTransaction();
-    }
-
     public function test_sync_creates_and_clears_pivot_relations(): void
     {
         $attribute = Attribute::factory()->create(['name' => 'Material', 'slug' => 'material-test']);

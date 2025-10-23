@@ -13,10 +13,8 @@ use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Schema;
-use RuntimeException;
+use Tests\Support\TestingDatabase;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -24,7 +22,7 @@ abstract class TestCase extends BaseTestCase
 
     private bool $createdEnvFile = false;
 
-    private ?string $sqliteDatabasePath = null;
+    private string $sqliteDatabasePath;
 
     private ?Panel $resolvedAdminPanel = null;
 
@@ -35,27 +33,10 @@ abstract class TestCase extends BaseTestCase
 
     protected function setUp(): void
     {
-        // Resolve the SQLite database path before the application boots so migrations
-        // can target a persistent file instead of the default in-memory database that
-        // loses tables between separate PDO connections.
-        $this->sqliteDatabasePath = dirname(__DIR__) . '/database/testing.sqlite';
-
-        if (! file_exists($this->sqliteDatabasePath)) {
-            // Create the SQLite file eagerly to avoid runtime race conditions when the
-            // framework attempts to run the first migration during the boot cycle.
-            if (@touch($this->sqliteDatabasePath) === false) {
-                throw new RuntimeException('Unable to create the testing SQLite database file.');
-            }
-        }
-
-        // Force the environment to rely on the persistent SQLite database file for
-        // every test execution so RefreshDatabase operates consistently.
-        putenv('DB_CONNECTION=sqlite');
-        putenv('DB_DATABASE=' . $this->sqliteDatabasePath);
-        $_ENV['DB_CONNECTION'] = 'sqlite';
-        $_ENV['DB_DATABASE'] = $this->sqliteDatabasePath;
-        $_SERVER['DB_CONNECTION'] = 'sqlite';
-        $_SERVER['DB_DATABASE'] = $this->sqliteDatabasePath;
+        // Resolve the shared SQLite database location before the application boots so the
+        // parent setup sequence works with the same persistent datastore prepared by
+        // Tests\Support\TestingDatabase.
+        $this->sqliteDatabasePath = TestingDatabase::path();
 
         parent::setUp();
 
@@ -80,8 +61,8 @@ abstract class TestCase extends BaseTestCase
         // Point the connection to the same persistent SQLite database file that was
         // created before bootstrapping so model factories run against real tables.
         Config::set('database.connections.sqlite.database', $this->sqliteDatabasePath);
-        Config::set('app.key', 'base64:' . base64_encode(random_bytes(32)));
-        // Ensure Telescope doesn't use MySQL during tests and avoid watchers overhead
+        Config::set('app.key', 'base64:'.base64_encode(random_bytes(32)));
+        // Ensure Telescope doesn't use MySQL during tests and avoid watchers overhead.
         Config::set('telescope.enabled', false);
         Config::set('telescope.storage.database.connection', 'sqlite');
 
@@ -129,12 +110,6 @@ abstract class TestCase extends BaseTestCase
 
         parent::tearDown();
 
-        // Clean up the temporary SQLite database file after each test run to prevent stale
-        // state from impacting subsequent tests or developers running the suite locally.
-        if ($this->sqliteDatabasePath !== null && file_exists($this->sqliteDatabasePath)) {
-            unlink($this->sqliteDatabasePath);
-            $this->sqliteDatabasePath = null;
-        }
     }
 
     protected function resolveAdminPanel(): Panel

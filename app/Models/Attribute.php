@@ -21,7 +21,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use JsonException;
-use Stringable;
 
 /**
  * Attribute
@@ -58,31 +57,6 @@ final class Attribute extends Model
     }
 
     /**
-     * Persist validation rules without double-encoding plain strings while still supporting array input.
-     */
-    protected function validationRules(): EloquentAttribute
-    {
-        return EloquentAttribute::make(
-            get: static function (?string $value) {
-                if ($value === null) {
-                    return null;
-                }
-
-                $decoded = json_decode($value, true);
-
-                return json_last_error() === JSON_ERROR_NONE ? $decoded : $value;
-            },
-            set: static function ($value) {
-                if (is_array($value)) {
-                    return json_encode($value);
-                }
-
-                return $value;
-            }
-        );
-    }
-
-    /**
      * The accessors to append to the model's array form.
      *
      * @var array<int, string>
@@ -94,7 +68,7 @@ final class Attribute extends Model
     protected $translatable = ['name'];
 
     /**
-     * Provide a typed accessor/mutator so plain strings survive hydration while arrays remain JSON encoded in storage.
+     * Preserve validation rule strings while still decoding JSON arrays for callers that expect them.
      */
     protected function validationRules(): EloquentAttribute
     {
@@ -112,46 +86,49 @@ final class Attribute extends Model
                     return $value;
                 }
 
-                try {
-                    $decoded = json_decode($value, true, 512, JSON_THROW_ON_ERROR);
-                } catch (JsonException) {
-                    return $value;
+                $decoded = json_decode($value, true);
+
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    return $decoded;
                 }
 
-                return is_array($decoded) ? $decoded : $value;
+                return $value;
             },
             set: static function ($value): mixed {
                 if ($value === null) {
                     return null;
                 }
 
-                if ($value instanceof Arrayable) {
-                    $value = $value->toArray();
-                }
-
                 if (is_array($value)) {
-                    return self::encodeValidationRuleArray($value);
+                    return self::encodeValidationRules($value);
                 }
 
-                if ($value instanceof Stringable) {
-                    return (string) $value;
+                if (is_string($value)) {
+                    $decoded = json_decode($value, true);
+
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        return $value;
+                    }
+
+                    return self::encodeValidationRules($value);
                 }
 
-                return $value;
+                return self::encodeValidationRules((string) $value);
             }
         );
     }
 
     /**
-     * JSON encode rule arrays with error tolerance so invalid payloads never bubble up as fatal exceptions.
+     * Encode validation rule payloads to JSON while tolerating scalar inputs.
      */
-    private static function encodeValidationRuleArray(array $value): string
+    private static function encodeValidationRules(mixed $value): string
     {
         try {
             return json_encode($value, JSON_THROW_ON_ERROR);
         } catch (JsonException) {
-            // Developers occasionally persist rule objects; casting to strings maintains compatibility.
-            return json_encode(array_map(static fn ($rule): string => (string) $rule, $value), JSON_THROW_ON_ERROR);
+            // Fall back to a simple string representation so the JSON column still
+            // stores a valid payload even when custom objects are supplied.
+            return json_encode((string) $value, JSON_THROW_ON_ERROR);
         }
     }
 

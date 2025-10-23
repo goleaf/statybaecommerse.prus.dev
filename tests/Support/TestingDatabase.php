@@ -25,8 +25,6 @@ final class TestingDatabase
      */
     private static ?string $databasePath = null;
 
-    private static ?string $parallelToken = null;
-
     /**
      * Guard migrations so they only execute once per PHPUnit process.
      */
@@ -48,31 +46,9 @@ final class TestingDatabase
      */
     public static function path(): string
     {
-        if (self::$databasePath !== null) {
-            return self::$databasePath;
+        if (self::$databasePath === null) {
+            self::$databasePath = base_path('database/testing.sqlite');
         }
-
-        $token = $_SERVER['TEST_TOKEN']
-            ?? $_ENV['TEST_TOKEN']
-            ?? getenv('TEST_TOKEN')
-            ?? null;
-
-        if (is_string($token) && $token !== '') {
-            self::$parallelToken = $token;
-            // Normalise the token for filesystem usage so worker-specific databases remain predictable.
-            $database = sprintf('testing_parallel_%s.sqlite', preg_replace('/[^A-Za-z0-9_-]/', '', $token));
-        } else {
-            self::$parallelToken = null;
-            $database = 'testing.sqlite';
-        }
-
-        $basePath = realpath(__DIR__ . '/../../');
-
-        if ($basePath === false) {
-            $basePath = dirname(__DIR__, 2);
-        }
-
-        self::$databasePath = $basePath . '/database/' . $database;
 
         return self::$databasePath;
     }
@@ -108,9 +84,9 @@ final class TestingDatabase
         Config::set('database.connections.sqlite.foreign_key_constraints', true);
         Config::set('database.connections.sqlite.prefix', '');
         Config::set('database.connections.testing', [
-            'driver'                  => 'sqlite',
-            'database'                => $databasePath,
-            'prefix'                  => '',
+            'driver' => 'sqlite',
+            'database' => $databasePath,
+            'prefix' => '',
             'foreign_key_constraints' => true,
         ]);
 
@@ -137,15 +113,15 @@ final class TestingDatabase
 
         Artisan::call('migrate:fresh', [
             '--database' => 'sqlite',
-            '--force'    => true,
+            '--force' => true,
         ]);
 
         // Apply targeted migrations that only exist for the SQLite testing harness.
         if (is_dir(base_path('tests/database/migrations'))) {
             Artisan::call('migrate', [
                 '--database' => 'sqlite',
-                '--path'     => 'tests/database/migrations',
-                '--force'    => true,
+                '--path' => 'tests/database/migrations',
+                '--force' => true,
             ]);
         }
 
@@ -159,12 +135,13 @@ final class TestingDatabase
      */
     public static function teardown(): void
     {
-        if (self::$databasePath !== null && file_exists(self::$databasePath)) {
-            unlink(self::$databasePath);
+        $databasePath = self::path();
+
+        if (file_exists($databasePath)) {
+            unlink($databasePath);
         }
 
         self::$databasePath = null;
-        self::$parallelToken = null;
         self::$migrationsRan = false;
         self::$teardownRegistered = false;
         RefreshDatabaseState::$migrated = false;
