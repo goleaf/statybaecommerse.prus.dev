@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\Pages;
 
-use App\Filament\Concerns\HasResizableColumns;
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\OrderResource;
 use App\Filament\Resources\OrderResource\Widgets\OrderResourceStats;
 use App\Filament\Resources\OrderResource\Widgets\OrderRevenueTrend;
 use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions;
-use App\Filament\Pages\Support\BaseListRecords;
+use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
+use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable;
 
 final class ListOrders extends BaseListRecords
 {
-    use HasResizableColumns;
+    use Translatable;
 
     protected static string $resource = OrderResource::class;
 
@@ -25,6 +26,7 @@ final class ListOrders extends BaseListRecords
         }
 
         return [
+            LocaleSwitcher::make(),
             Actions\CreateAction::make()
                 ->visible(fn () => AuthorizationMatrix::check('orders', 'create')),
         ];

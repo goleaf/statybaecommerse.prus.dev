@@ -54,7 +54,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Route;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
 
@@ -72,7 +72,7 @@ use UnitEnum;
  */
 final class OrderResource extends Resource implements DefinesExportColumns
 {
-    use HasNav;
+    use Translatable;
 
     protected static ?string $model = Order::class;
 

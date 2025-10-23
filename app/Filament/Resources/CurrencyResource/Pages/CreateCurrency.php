@@ -7,18 +7,18 @@ namespace App\Filament\Resources\CurrencyResource\Pages;
 use App\Filament\Resources\CurrencyResource;
 use Filament\Resources\Pages\CreateRecord;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatable as SpatieTranslatableCreateRecord;
+use LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatable;
 
 final class CreateCurrency extends CreateRecord
 {
-    use SpatieTranslatableCreateRecord; // Keep track of locale-specific form payloads during creation.
+    use Translatable;
 
     protected static string $resource = CurrencyResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            LocaleSwitcher::make(), // Allow admins to switch locales before entering translated values.
+            LocaleSwitcher::make(),
             ...parent::getHeaderActions(),
         ];
     }

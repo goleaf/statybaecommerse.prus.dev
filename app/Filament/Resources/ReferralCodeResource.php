@@ -31,12 +31,12 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
-use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use UnitEnum;
 
 final class ReferralCodeResource extends Resource
 {
-    use HasNav;
+    use Translatable;
 
     protected static ?string $model = ReferralCode::class;
 

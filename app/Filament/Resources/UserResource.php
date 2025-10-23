@@ -37,6 +37,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use UnitEnum;
 
 /**
@@ -46,7 +47,7 @@ use UnitEnum;
  */
 final class UserResource extends Resource implements DefinesExportColumns
 {
-    use HasNav;
+    use Translatable;
 
     protected static ?string $model = User::class;
 
