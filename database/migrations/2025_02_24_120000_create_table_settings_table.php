@@ -15,11 +15,19 @@ return new class extends Migration
             return;
         }
 
-        Schema::create('table_settings', function (Blueprint $table): void {
+        $adminUsersAvailable = Schema::hasTable('admin_users');
+
+        Schema::create('table_settings', function (Blueprint $table) use ($adminUsersAvailable): void {
             $table->id();
-            $table->foreignIdFor(AdminUser::class, 'user_id')
-                ->constrained('admin_users')
-                ->cascadeOnDelete();
+
+            if ($adminUsersAvailable) {
+                $table->foreignIdFor(AdminUser::class, 'user_id')
+                    ->constrained('admin_users')
+                    ->cascadeOnDelete();
+            } else {
+                $table->unsignedBigInteger('user_id');
+            }
+
             $table->string('resource');
             $table->json('styles')->nullable();
             $table->timestamps();

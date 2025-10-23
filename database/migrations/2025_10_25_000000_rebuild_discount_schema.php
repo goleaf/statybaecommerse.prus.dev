@@ -471,6 +471,18 @@ return new class extends Migration
     }
 
     /**
+     * Drop the provided indexes while tolerating absent entries across supported drivers.
+     *
+     * @param array<int, string> $indexes
+     */
+    private function dropSqliteIndexes(string $table, array $indexes): void
+    {
+        foreach ($indexes as $index) {
+            $this->dropIndexIfExists($index, $table);
+        }
+    }
+
+    /**
      * @param array<string, int> $available
      */
     private function value(object $row, array $available, string $column, mixed $default = null): mixed

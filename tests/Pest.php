@@ -7,17 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Support\TestingDatabase;
 
 uses(Tests\TestCase::class)->in('Feature', 'Unit', 'admin', 'frontend', 'Performance');
 
 
 beforeAll(function () {
-    $testingDatabasePath = database_path('testing.sqlite');
-
-    if (! file_exists($testingDatabasePath)) {
-        // Ensure the shared SQLite database file is available for all tests.
-        touch($testingDatabasePath);
-    }
+    $testingDatabasePath = TestingDatabase::path();
+    TestingDatabase::ensureExists();
 
     $envPath = base_path('.env');
     if (! file_exists($envPath)) {

@@ -5,12 +5,29 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use App\Models\Company;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 final class CompanyModelTest extends TestCase
 {
-    use RefreshDatabase;
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        if (! Schema::hasTable('companies')) {
+            Artisan::call('migrate', [
+                '--database' => 'sqlite',
+                '--path'     => 'database/migrations/2025_09_14_163833_create_companies_table.php',
+                '--force'    => true,
+            ]);
+        }
+
+        if (Schema::hasTable('companies')) {
+            // Ensure each test starts from a clean slate when the schema already exists.
+            Company::query()->delete();
+        }
+    }
 
     public function test_can_create_company(): void
     {

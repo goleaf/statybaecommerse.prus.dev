@@ -12,6 +12,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 uses()->group('inline-widgets');
@@ -19,12 +20,30 @@ uses()->group('inline-widgets');
 RefreshDatabaseState::$migrated = true;
 
 beforeEach(function (): void {
-    Schema::dropIfExists('order_items');
-    Schema::dropIfExists('orders');
-    Schema::dropIfExists('products');
-    Schema::dropIfExists('customers');
+    $previousConnection = DB::getDefaultConnection();
+    $previousConfig = config('database.connections.inline_charts_sqlite');
 
-    Schema::create('products', function (Blueprint $table): void {
+    test()->inlineChartsPreviousConnection = $previousConnection;
+    test()->inlineChartsPreviousConfig = $previousConfig;
+
+    config([
+        'database.default' => 'inline_charts_sqlite',
+        'database.connections.inline_charts_sqlite' => [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+            'foreign_key_constraints' => true,
+        ],
+    ]);
+
+    DB::purge('inline_charts_sqlite');
+    DB::setDefaultConnection('inline_charts_sqlite');
+    Schema::connection('inline_charts_sqlite')->dropIfExists('order_items');
+    Schema::connection('inline_charts_sqlite')->dropIfExists('orders');
+    Schema::connection('inline_charts_sqlite')->dropIfExists('products');
+    Schema::connection('inline_charts_sqlite')->dropIfExists('customers');
+
+    Schema::connection('inline_charts_sqlite')->create('products', function (Blueprint $table): void {
         $table->id();
         $table->string('name');
         $table->string('slug')->unique();
@@ -35,7 +54,7 @@ beforeEach(function (): void {
         $table->timestamps();
     });
 
-    Schema::create('orders', function (Blueprint $table): void {
+    Schema::connection('inline_charts_sqlite')->create('orders', function (Blueprint $table): void {
         $table->id();
         $table->unsignedBigInteger('customer_id')->nullable();
         $table->unsignedBigInteger('user_id')->nullable();
@@ -46,7 +65,7 @@ beforeEach(function (): void {
         $table->softDeletes();
     });
 
-    Schema::create('order_items', function (Blueprint $table): void {
+    Schema::connection('inline_charts_sqlite')->create('order_items', function (Blueprint $table): void {
         $table->id();
         $table->unsignedBigInteger('order_id')->nullable();
         $table->unsignedBigInteger('product_id');
@@ -58,7 +77,7 @@ beforeEach(function (): void {
         $table->timestamps();
     });
 
-    Schema::create('customers', function (Blueprint $table): void {
+    Schema::connection('inline_charts_sqlite')->create('customers', function (Blueprint $table): void {
         $table->id();
         $table->string('name');
         $table->string('email')->unique();
@@ -74,6 +93,20 @@ beforeEach(function (): void {
 
 afterEach(function (): void {
     Carbon::setTestNow();
+    DB::disconnect('inline_charts_sqlite');
+    DB::purge('inline_charts_sqlite');
+
+    $previousConnection = test()->inlineChartsPreviousConnection ?? 'sqlite';
+    DB::setDefaultConnection($previousConnection);
+    config(['database.default' => $previousConnection]);
+
+    $previousConfig = test()->inlineChartsPreviousConfig ?? null;
+
+    if ($previousConfig === null) {
+        config()->offsetUnset('database.connections.inline_charts_sqlite');
+    } else {
+        config(['database.connections.inline_charts_sqlite' => $previousConfig]);
+    }
 });
 
 it('returns dataset data for the product inline chart widget', function (): void {

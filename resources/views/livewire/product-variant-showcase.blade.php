@@ -10,20 +10,25 @@
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             @foreach($products as $product)
+                @php
+                    $loopProductName = $product->trans('name') ?? $product->name;
+                    $loopProductDescription = $product->trans('short_description') ?? $product->short_description ?? $product->trans('description') ?? $product->description;
+                    $loopProductBrand = optional($product->brand)?->trans('name') ?? optional($product->brand)->name;
+                @endphp
                 <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors cursor-pointer
                     {{ $selectedProduct && $selectedProduct->id === $product->id ? 'border-blue-500 bg-blue-50' : '' }}"
                     wire:click="selectProduct({{ $product->id }})"
                 >
                     <div class="flex items-center justify-between mb-2">
-                        <h3 class="font-medium text-gray-900">{{ $product->name }}</h3>
+                        <h3 class="font-medium text-gray-900">{{ $loopProductName }}</h3>
                         <span class="text-sm text-gray-500">{{ $product->variants->count() }} {{ __('product_variants.showcase.variants_count') }}</span>
                     </div>
                     
-                    @if($product->brand)
-                        <p class="text-sm text-gray-600 mb-2">{{ __('product_variants.showcase.brand') }}: {{ $product->brand->name }}</p>
+                    @if($loopProductBrand)
+                        <p class="text-sm text-gray-600 mb-2">{{ __('product_variants.showcase.brand') }}: {{ $loopProductBrand }}</p>
                     @endif
                     
-                    <p class="text-sm text-gray-500 line-clamp-2">{{ $product->description }}</p>
+                    <p class="text-sm text-gray-500 line-clamp-2">{{ $loopProductDescription }}</p>
                     
                     <div class="mt-3 flex items-center justify-between">
                         <span class="text-lg font-bold text-gray-900">€{{ number_format($product->price, 2) }}</span>
@@ -45,6 +50,9 @@
             
             @php
                 $stats = $this->getProductStats();
+                $selectedProductName = $selectedProduct->trans('name') ?? $selectedProduct->name;
+                $selectedProductDescription = $selectedProduct->trans('description') ?? $selectedProduct->description;
+                $selectedProductBrand = optional($selectedProduct->brand)?->trans('name') ?? optional($selectedProduct->brand)->name;
             @endphp
             
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">

@@ -311,22 +311,17 @@ final class SearchableComponentHelper
         if (! SearchableInput::hasMacro('payload')) {
             SearchableInput::macro('payload', function (array $payload): SearchableInput {
                 /** @var SearchableInput $this */
-                $meta = method_exists($this, 'getMeta') ? $this->getMeta() : [];
-                $meta = is_array($meta) ? $meta : [];
-                $meta[SearchableComponentHelper::PAYLOAD_META_KEY] = $payload;
-
-                return $this->meta($meta);
+                return $this->meta(SearchableComponentHelper::PAYLOAD_META_KEY, $payload);
             });
         }
 
         if (! SearchableInput::hasMacro('fallbackPayload')) {
             SearchableInput::macro('fallbackPayload', function (?array $payload = null): SearchableInput {
                 /** @var SearchableInput $this */
-                $meta = method_exists($this, 'getMeta') ? $this->getMeta() : [];
-                $meta = is_array($meta) ? $meta : [];
-                $meta[SearchableComponentHelper::FALLBACK_META_KEY] = $payload ?? [];
-
-                return $this->meta($meta);
+                return $this->meta(
+                    SearchableComponentHelper::FALLBACK_META_KEY,
+                    $payload ?? [],
+                );
             });
         }
 

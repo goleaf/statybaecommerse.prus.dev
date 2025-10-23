@@ -13,7 +13,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('customers', function (Blueprint $table): void {
+        $countriesAvailable = Schema::hasTable('countries');
+        $citiesAvailable = Schema::hasTable('cities');
+        $companiesAvailable = Schema::hasTable('companies');
+
+        Schema::create('customers', function (Blueprint $table) use ($countriesAvailable, $citiesAvailable, $companiesAvailable): void {
             // Primary identifier and personal contact details.
             $table->id();
             $table->string('name');
@@ -23,11 +27,24 @@ return new class extends Migration
             $table->string('postal_code')->nullable();
 
             // Optional location references so analytics can aggregate by geography.
-            $table->foreignId('country_id')->nullable()->constrained('countries')->nullOnDelete();
-            $table->foreignId('city_id')->nullable()->constrained('cities')->nullOnDelete();
+            if ($countriesAvailable) {
+                $table->foreignId('country_id')->nullable()->constrained('countries')->nullOnDelete();
+            } else {
+                $table->unsignedBigInteger('country_id')->nullable();
+            }
+
+            if ($citiesAvailable) {
+                $table->foreignId('city_id')->nullable()->constrained('cities')->nullOnDelete();
+            } else {
+                $table->unsignedBigInteger('city_id')->nullable();
+            }
 
             // Associate customers with companies for B2B flows.
-            $table->foreignId('company_id')->nullable()->constrained('companies')->nullOnDelete();
+            if ($companiesAvailable) {
+                $table->foreignId('company_id')->nullable()->constrained('companies')->nullOnDelete();
+            } else {
+                $table->unsignedBigInteger('company_id')->nullable();
+            }
 
             // Operational metadata used by filters, automation and auditing.
             $table->boolean('is_active')->default(true);

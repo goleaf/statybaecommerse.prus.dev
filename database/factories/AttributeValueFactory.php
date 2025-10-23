@@ -91,4 +91,54 @@ final class AttributeValueFactory extends Factory
             'is_active' => false,
         ]);
     }
+
+    public function configure(): static
+    {
+        return $this->afterCreating(function (AttributeValue $attributeValue): void {
+            $this->createTranslations($attributeValue);
+        });
+    }
+
+    private function createTranslations(AttributeValue $attributeValue): void
+    {
+        if (! method_exists($attributeValue, 'translations') || $attributeValue->translations()->exists()) {
+            return;
+        }
+
+        $defaultLocale = config('app.locale', 'en');
+        $locales = $this->supportedLocales();
+
+        $translations = collect($locales)->map(function (string $locale) use ($attributeValue, $defaultLocale): array {
+            $value = $attributeValue->value;
+
+            return [
+                'locale'      => $locale,
+                'value'       => $locale === $defaultLocale ? $value : "{$value} ({$locale})",
+                'description' => $locale === $defaultLocale ? ($attributeValue->description ?? null) : null,
+            ];
+        })->values()->all();
+
+        if ($translations !== []) {
+            $attributeValue->translations()->createMany($translations);
+        }
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function supportedLocales(): array
+    {
+        $locales = config('app.supported_locales', ['lt', 'en']);
+
+        if (is_string($locales)) {
+            $locales = explode(',', $locales);
+        }
+
+        return collect($locales)
+            ->map(static fn ($locale): string => trim((string) $locale))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+    }
 }

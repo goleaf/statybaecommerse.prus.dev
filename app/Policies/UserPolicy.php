@@ -12,10 +12,6 @@ final class UserPolicy
 {
     public function viewAny(AdminUser|User $user): bool
     {
-        if (! $user instanceof AdminUser) {
-            return false;
-        }
-
         return AuthorizationMatrix::check('users', 'viewAny', $user);
     }
 
@@ -32,7 +28,7 @@ final class UserPolicy
         return $user->is($model);
     }
 
-    public function create(AdminUser $user): bool
+    public function create(AdminUser|User $user): bool
     {
         return AuthorizationMatrix::check('users', 'create', $user);
     }
@@ -50,17 +46,17 @@ final class UserPolicy
         return $user->is($model);
     }
 
-    public function delete(AdminUser $user, User $model): bool
+    public function delete(AdminUser|User $user, User $model): bool
     {
         return AuthorizationMatrix::check('users', 'delete', $user);
     }
 
-    public function restore(AdminUser $user, User $model): bool
+    public function restore(AdminUser|User $user, User $model): bool
     {
         return AuthorizationMatrix::check('users', 'update', $user);
     }
 
-    public function forceDelete(AdminUser $user, User $model): bool
+    public function forceDelete(AdminUser|User $user, User $model): bool
     {
         return AuthorizationMatrix::check('users', 'delete', $user);
     }

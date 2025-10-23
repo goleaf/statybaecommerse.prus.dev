@@ -44,12 +44,12 @@
                                         <div class="flex items-center">
                                             @if($request->product->getMainImage())
                                                 <img src="{{ $request->product->getMainImage() }}" 
-                                                     alt="{{ $request->product->name }}" 
+                                                     alt="{{ $request->product->trans('name') ?? $request->product->name }}" 
                                                      class="w-10 h-10 object-cover rounded-lg mr-3">
                                             @endif
                                             <div>
                                                 <div class="text-sm font-medium text-gray-900">
-                                                    {{ $request->product->name }}
+                                                    {{ $request->product->trans('name') ?? $request->product->name }}
                                                 </div>
                                                 <div class="text-sm text-gray-500">
                                                     {{ $request->product->sku }}
@@ -129,4 +129,3 @@
     </div>
 </div>
 @endsection
-

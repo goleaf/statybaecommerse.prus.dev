@@ -75,7 +75,9 @@ final class EnsurePartnerApiKey
         /** @var ApiKey|null $apiKey */
         $apiKey = ApiKey::query()
             ->where('key', $hashed)
-            ->where('active', true)
+            ->where(function ($query): void {
+                $query->where('is_active', true)->orWhere('active', true);
+            })
             ->first();
 
         return $apiKey;

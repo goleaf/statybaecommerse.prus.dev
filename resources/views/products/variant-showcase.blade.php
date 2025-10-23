@@ -28,12 +28,12 @@
                          wire:key="product-{{ $product->id }}">
                         @if($product->main_image)
                             <img src="{{ $product->main_image }}" 
-                                 alt="{{ $product->name }}"
+                                 alt="{{ $product->trans('name') ?? $product->name }}"
                                  class="w-full h-48 object-cover rounded-lg mb-3">
                         @endif
                         
-                        <h3 class="font-semibold text-gray-900 mb-2">{{ $product->name }}</h3>
-                        <p class="text-sm text-gray-600 mb-2">{{ $product->short_description }}</p>
+                        <h3 class="font-semibold text-gray-900 mb-2">{{ $product->trans('name') ?? $product->name }}</h3>
+                        <p class="text-sm text-gray-600 mb-2">{{ $product->trans('short_description') ?? $product->short_description ?? $product->trans('description') ?? $product->description }}</p>
                         
                         <div class="flex items-center justify-between">
                             <span class="text-lg font-bold text-blue-600">
@@ -53,8 +53,8 @@
             <div class="bg-white rounded-lg shadow-sm border p-6 mb-8">
                 <div class="flex items-start justify-between mb-6">
                     <div class="flex-1">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ $selectedProduct->name }}</h2>
-                        <p class="text-gray-600 mb-4">{{ $selectedProduct->description }}</p>
+                        <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ $selectedProduct->trans('name') ?? $selectedProduct->name }}</h2>
+                        <p class="text-gray-600 mb-4">{{ $selectedProduct->trans('description') ?? $selectedProduct->description }}</p>
                         
                         <div class="flex items-center gap-4">
                             <span class="text-2xl font-bold text-blue-600">
@@ -62,7 +62,7 @@
                             </span>
                             @if($selectedProduct->brand)
                                 <span class="text-sm text-gray-500">
-                                    {{ __('product_variants.showcase.brand') }}: {{ $selectedProduct->brand->name }}
+                                    {{ __('product_variants.showcase.brand') }}: {{ $selectedProduct->brand?->trans('name') ?? $selectedProduct->brand->name }}
                                 </span>
                             @endif
                         </div>
@@ -70,7 +70,7 @@
                     
                     @if($selectedProduct->main_image)
                         <img src="{{ $selectedProduct->main_image }}" 
-                             alt="{{ $selectedProduct->name }}"
+                             alt="{{ $selectedProduct->trans('name') ?? $selectedProduct->name }}"
                              class="w-32 h-32 object-cover rounded-lg">
                     @endif
                 </div>

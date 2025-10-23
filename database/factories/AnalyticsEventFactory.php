@@ -39,8 +39,8 @@ final class AnalyticsEventFactory extends Factory
                 '375x667',
                 '414x896',
             ]),
-            'trackable_type' => $this->faker->optional()->randomElement([Product::class]),
-            'trackable_id'   => $this->faker->optional()->randomElement([Product::factory()]),
+            'trackable_type' => null,
+            'trackable_id'   => null,
             'value'          => $this->faker->optional()->randomFloat(2, 0, 1000),
             'currency'       => 'EUR',
             'properties'     => [

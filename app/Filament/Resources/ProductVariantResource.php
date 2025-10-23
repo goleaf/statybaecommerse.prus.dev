@@ -49,6 +49,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
 use UnitEnum;
+use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 
 /**
  * ProductVariantResource
@@ -118,20 +119,22 @@ final class ProductVariantResource extends Resource
                                             ]),
                                         SchemaGrid::make(2)
                                             ->schema([
-                                                TextInput::make('name')
-                                                    ->label(__('product_variants.fields.name'))
-                                                    ->required()
-                                                    ->maxLength(255),
                                                 TextInput::make('barcode')
                                                     ->label(__('product_variants.fields.barcode'))
                                                     ->maxLength(255),
+                                                TextInput::make('variant_sku_suffix')
+                                                    ->label(__('product_variants.fields.variant_sku_suffix'))
+                                                    ->maxLength(50),
                                             ]),
-                                        Textarea::make('description_lt')
-                                            ->label(__('product_variants.fields.description_lt'))
-                                            ->rows(3),
-                                        Textarea::make('description_en')
-                                            ->label(__('product_variants.fields.description_en'))
-                                            ->rows(3),
+                                        LanguageTabs::make([
+                                            TextInput::make('name')
+                                                ->label(__('product_variants.fields.name'))
+                                                ->required()
+                                                ->maxLength(255),
+                                            Textarea::make('description')
+                                                ->label(__('product_variants.fields.description'))
+                                                ->rows(3),
+                                        ])->columnSpanFull(),
                                     ]),
                                 SchemaSection::make('Pricing')
                                     ->schema([
@@ -246,18 +249,14 @@ final class ProductVariantResource extends Resource
                                     ]),
                                 SchemaSection::make('SEO Settings')
                                     ->schema([
-                                        TextInput::make('seo_title_lt')
-                                            ->label(__('product_variants.fields.seo_title_lt'))
-                                            ->maxLength(255),
-                                        TextInput::make('seo_title_en')
-                                            ->label(__('product_variants.fields.seo_title_en'))
-                                            ->maxLength(255),
-                                        Textarea::make('seo_description_lt')
-                                            ->label(__('product_variants.fields.seo_description_lt'))
-                                            ->rows(3),
-                                        Textarea::make('seo_description_en')
-                                            ->label(__('product_variants.fields.seo_description_en'))
-                                            ->rows(3),
+                                        LanguageTabs::make([
+                                            TextInput::make('seo_title')
+                                                ->label(__('product_variants.fields.seo_title'))
+                                                ->maxLength(255),
+                                            Textarea::make('seo_description')
+                                                ->label(__('product_variants.fields.seo_description'))
+                                                ->rows(3),
+                                        ])->columnSpanFull(),
                                     ]),
                             ]),
                         SchemaTab::make('Attributes & Variants')
@@ -281,6 +280,18 @@ final class ProductVariantResource extends Resource
                             ]),
                     ])
                     ->columnSpanFull(),
+            ]);
+    }
+
+    /**
+     * @return Builder<ProductVariant>
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with([
+                'translations',
+                'product.translations',
             ]);
     }
 
@@ -374,11 +385,13 @@ final class ProductVariantResource extends Resource
                 TextColumn::make('product.name')
                     ->label(__('product_variants.fields.product'))
                     ->sortable()
-                    ->searchable(),
+                    ->searchable(['product.name', 'product.translations.name'])
+                    ->formatStateUsing(fn ($state, ProductVariant $record): string => $record->product?->trans('name') ?? (string) $state),
                 TextColumn::make('name')
                     ->label(__('product_variants.fields.name'))
-                    ->searchable()
-                    ->sortable(),
+                    ->searchable(['name', 'translations.name'])
+                    ->sortable()
+                    ->formatStateUsing(fn ($state, ProductVariant $record): string => $record->getLocalizedName()),
                 TextColumn::make('sku')
                     ->label(__('product_variants.fields.sku'))
                     ->searchable()
@@ -604,11 +617,15 @@ final class ProductVariantResource extends Resource
         }
 
         return Product::query()
-            ->select(['name', 'sku'])
+            ->select(['id', 'name', 'sku'])
+            ->with('translations')
             ->where(function (Builder $query) use ($term): void {
                 $query
                     ->where('name', 'like', "%{$term}%")
-                    ->orWhere('sku', 'like', "%{$term}%");
+                    ->orWhere('sku', 'like', "%{$term}%")
+                    ->orWhereHas('translations', static function (Builder $relation) use ($term): void {
+                        $relation->where('name', 'like', "%{$term}%");
+                    });
             })
             ->orderBy('name')
             ->limit(15)
@@ -616,7 +633,9 @@ final class ProductVariantResource extends Resource
             ->map(static function (Product $product): string {
                 $sku = $product->sku;
 
-                return ltrim(($sku ? "[{$sku}] " : '') . $product->name);
+                $name = $product->trans('name') ?? $product->name;
+
+                return ltrim(($sku ? "[{$sku}] " : '') . $name);
             })
             ->unique()
             ->values()

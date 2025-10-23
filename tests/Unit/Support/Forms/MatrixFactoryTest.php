@@ -37,12 +37,16 @@ it('builds a permissions section with module toggle grids', function (): void {
         statePath: 'custom_permissions',
     );
 
-    expect($section)
-        ->toBeInstanceOf(Section::class)
-        ->and($section->getHeading())->toBe('Permissions')
-        ->and($section->getStatePath())->toBe('custom_permissions');
+    expect($section)->toBeInstanceOf(Section::class);
 
-    $moduleSections = $section->getChildComponents();
+    $evaluatedSection = evaluate_schema_components($section)[0];
+
+    expect($evaluatedSection)
+        ->toBeInstanceOf(Section::class)
+        ->and($evaluatedSection->getHeading())->toBe('Permissions')
+        ->and($evaluatedSection->getStatePath())->toBe('custom_permissions');
+
+    $moduleSections = $evaluatedSection->getChildComponents();
 
     expect($moduleSections)
         ->toHaveCount(2);
@@ -137,7 +141,15 @@ it('builds a checkbox matrix using the Zeus component', function (): void {
  */
 function evaluate_grid_schema(Grid $grid): array
 {
-    // Wrap the grid in a temporary schema so Filament assigns an evaluation container before retrieving child components.
+    return evaluate_schema_components($grid)[0]->getChildComponents();
+}
+
+/**
+ * @return array<int, Component>
+ */
+function evaluate_schema_components(Component $component): array
+{
+    // Wrap the component in a temporary schema so Filament assigns an evaluation container before retrieving child components.
     return Schema::make(new class extends LivewireComponent implements HasSchemas {
         public function makeFilamentTranslatableContentDriver(): ?TranslatableContentDriver
         {
@@ -169,8 +181,6 @@ function evaluate_grid_schema(Grid $grid): array
             return null;
         }
     })
-        ->components([$grid])
-        ->getComponents()[0]
-        ->getChildComponents();
+        ->components([$component])
+        ->getComponents();
 }
-

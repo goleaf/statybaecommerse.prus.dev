@@ -49,6 +49,8 @@ class ProductVariantFactory extends Factory
                 $variant->variant_attribute_matrix = $this->generateDefaultMatrix($variant);
             })
             ->afterCreating(function (ProductVariant $variant): void {
+                $this->createTranslations($variant);
+
                 $matrix = $variant->variant_attribute_matrix;
 
                 if (empty($matrix)) {
@@ -86,6 +88,68 @@ class ProductVariantFactory extends Factory
             ->mapWithKeys(fn ($attribute) => [
                 'attribute_'.$attribute->getKey() => $attribute->values->first()->getKey(),
             ])
+            ->all();
+    }
+
+    private function createTranslations(ProductVariant $variant): void
+    {
+        if (! method_exists($variant, 'translations')) {
+            return;
+        }
+
+        $relation = $variant->translations();
+        $connection = $relation->getQuery()->getConnection();
+        $schema = $connection->getSchemaBuilder();
+        $translationsTable = $relation->getRelated()->getTable();
+
+        if (! $schema->hasTable($translationsTable)) {
+            return;
+        }
+
+        if ($relation->exists()) {
+            return;
+        }
+
+        $defaultLocale = config('app.locale', 'en');
+        $locales = $this->supportedLocales();
+        $faker = fake();
+        $description = $faker->paragraph();
+
+        $payload = collect($locales)->map(function (string $locale) use ($variant, $defaultLocale, $faker, $description): array {
+            $name = $locale === $defaultLocale
+                ? ($variant->name ?? $faker->words(2, true))
+                : Str::title($faker->words(3, true));
+
+            return [
+                'locale'          => $locale,
+                'name'            => $name,
+                'description'     => $description,
+                'seo_title'       => $faker->sentence(6),
+                'seo_description' => $faker->sentence(12),
+            ];
+        })->values()->all();
+
+        if ($payload !== []) {
+            $variant->translations()->createMany($payload);
+        }
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function supportedLocales(): array
+    {
+        $locales = config('app.supported_locales', ['lt', 'en']);
+
+        if (is_string($locales)) {
+            $locales = explode(',', $locales);
+        }
+
+        return collect($locales)
+            ->map(static fn ($locale): string => trim((string) $locale))
+            ->filter()
+            ->unique()
+            ->values()
             ->all();
     }
 }

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\UseCases\Cache;
 
+use App\Models\Category;
 use App\Observers\Concerns\ResolvesSupportedLocales;
+use App\Services\CacheInvalidationService;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTagHelper;
 use Illuminate\Support\Facades\Cache;
@@ -12,10 +14,13 @@ use Illuminate\Support\Facades\Log;
 
 final class InvalidateCategoryCache
 {
+    use ResolvesSupportedLocales;
+
     public function __construct(private readonly CacheInvalidationService $cacheInvalidationService) {}
 
     public function __invoke(?Category $category = null): void
     {
+        $categoryId = $category?->getKey();
         $usedTags = false;
 
         if (CacheTagHelper::supportsTags()) {

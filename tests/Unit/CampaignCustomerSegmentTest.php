@@ -8,6 +8,7 @@ use App\Models\Campaign;
 use App\Models\CampaignCustomerSegment;
 use App\Models\CustomerGroup;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 
 final class CampaignCustomerSegmentTest extends TestCase
@@ -22,8 +23,17 @@ final class CampaignCustomerSegmentTest extends TestCase
     {
         parent::setUp();
 
+        Config::set('factory.seed_campaign_relations', false);
+
         $this->campaign = Campaign::factory()->create();
         $this->customerGroup = CustomerGroup::factory()->create();
+    }
+
+    protected function tearDown(): void
+    {
+        Config::set('factory.seed_campaign_relations', true);
+
+        parent::tearDown();
     }
 
     public function test_can_create_campaign_customer_segment(): void

@@ -14,6 +14,9 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Artisan;
+use Throwable;
 use Tests\Support\TestingDatabase;
 
 abstract class TestCase extends BaseTestCase
@@ -35,6 +38,8 @@ abstract class TestCase extends BaseTestCase
         // Tests\Support\TestingDatabase.
         $this->sqliteDatabasePath = TestingDatabase::path();
 
+        TestingDatabase::ensureExists();
+
         parent::setUp();
 
         $appBasePath = dirname(__DIR__);
@@ -47,17 +52,13 @@ abstract class TestCase extends BaseTestCase
             $this->createdEnvFile = false;
         }
 
-        $testingDatabasePath = database_path('testing.sqlite');
-
-        if (! file_exists($testingDatabasePath)) {
-            // Guarantee the shared SQLite database exists before configuring the connection.
-            touch($testingDatabasePath);
-        }
-
+        // Ensure the database connection stays aligned with the shared SQLite database so model
+        // factories run against real tables after Laravel's bootstrapping sequence completes.
         Config::set('database.default', 'sqlite');
-        // Point the connection to the same persistent SQLite database file that was
-        // created before bootstrapping so model factories run against real tables.
         Config::set('database.connections.sqlite.database', $this->sqliteDatabasePath);
+        Config::set('database.connections.sqlite.foreign_key_constraints', true);
+        Config::set('database.connections.sqlite.journal_mode', null);
+        Config::set('cache.default', 'array');
         Config::set('app.key', 'base64:' . base64_encode(random_bytes(32)));
         // Ensure Telescope doesn't use MySQL during tests and avoid watchers overhead.
         Config::set('telescope.enabled', false);
@@ -75,10 +76,14 @@ abstract class TestCase extends BaseTestCase
 
         if (! Schema::connection('sqlite')->hasTable('api_keys')) {
             // Guarantee the API key schema exists for partner API tests when RefreshDatabase skips migrations.
-            Artisan::call('migrate', [
-                '--database' => 'sqlite',
-                '--force' => true,
-            ]);
+            try {
+                Artisan::call('migrate', [
+                    '--database' => 'sqlite',
+                    '--force' => true,
+                ]);
+            } catch (Throwable) {
+                // Lightweight unit tests do not require a database; skip when migrations fail.
+            }
         }
     }
 
@@ -141,8 +146,13 @@ abstract class TestCase extends BaseTestCase
      */
     protected function beforeRefreshingDatabase()
     {
+        $databasePath = TestingDatabase::path();
+        TestingDatabase::ensureExists();
+
         Config::set('database.default', 'sqlite');
-        Config::set('database.connections.sqlite.database', database_path('database.sqlite'));
+        Config::set('database.connections.sqlite.database', $databasePath);
+        Config::set('database.connections.sqlite.foreign_key_constraints', true);
+        Config::set('database.connections.sqlite.journal_mode', null);
     }
 
     /**

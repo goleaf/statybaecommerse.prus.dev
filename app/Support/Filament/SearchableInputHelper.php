@@ -31,6 +31,8 @@ final class SearchableInputHelper
      */
     public static function hydrate(SearchableInput $component, int|string|null $state, Closure $optionResolver): void
     {
+        SearchableComponentHelper::registerPayloadMacros();
+
         $normalised = self::normaliseState($state);
 
         if ($normalised === null) {
@@ -55,9 +57,7 @@ final class SearchableInputHelper
             ->state($value)
             ->options([$value => $label]);
 
-        if (method_exists($component, 'payload')) {
-            $component->payload($payload);
-        }
+        $component->payload($payload);
     }
 
     /**
@@ -79,13 +79,12 @@ final class SearchableInputHelper
      */
     private static function resetComponent(SearchableInput $component): void
     {
+        SearchableComponentHelper::registerPayloadMacros();
+
         $component
             ->state(null)
-            ->options([]);
-
-        if (method_exists($component, 'payload')) {
-            $component->payload([]);
-        }
+            ->options([])
+            ->payload([]);
     }
 
     private static function normaliseState(int|string|null $state): int|string|null

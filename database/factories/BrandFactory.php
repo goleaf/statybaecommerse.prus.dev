@@ -51,6 +51,15 @@ class BrandFactory extends Factory
 
     public function definition(): array
     {
+        $brand = new Brand();
+        $connection = $brand->newQuery()->getConnection();
+        $schema = $connection->getSchemaBuilder();
+        $table = $brand->getTable();
+
+        $hasTable = $schema->hasTable($table);
+        $hasIsVisible = $hasTable && $schema->hasColumn($table, 'is_visible');
+        $hasIsActive = $hasTable && $schema->hasColumn($table, 'is_active');
+
         $lithuanianBrands = [
             'Makita Tools LT',
             'Bosch Lietuva',
@@ -81,7 +90,7 @@ class BrandFactory extends Factory
 
         $name = Arr::random($lithuanianBrands);
 
-        return [
+        $attributes = [
             'name'        => $name,
             'slug'        => Str::slug($name) . '-' . $this->faker->unique()->randomNumber(),
             'website'     => $this->faker->boolean(70) ? 'https://' . Str::slug($name) . '.lt' : null,
@@ -89,11 +98,19 @@ class BrandFactory extends Factory
             // Keep generated brands visible/active so API queries honouring the scoped
             // filters can retrieve them during contract verification.
             'is_enabled'      => true,
-            'is_visible'      => true,
-            'is_active'       => true,
             'seo_title'       => $name . ' - Profesionalūs įrankiai statybininkams',
             'seo_description' => 'Aukštos kokybės ' . strtolower($name) . ' įrankiai ir įranga statybos darbams Lietuvoje.',
         ];
+
+        if ($hasIsVisible) {
+            $attributes['is_visible'] = true;
+        }
+
+        if ($hasIsActive) {
+            $attributes['is_active'] = true;
+        }
+
+        return $attributes;
     }
 
     private function generateLithuanianDescription(string $brandName): string

@@ -9,6 +9,7 @@ use Filament\Schemas\Schema;
 use App\Enums\DocumentTemplateCategory;
 use App\Enums\DocumentTemplateType;
 use App\Filament\Resources\DocumentTemplateResource\Pages;
+use App\Filament\Resources\DocumentTemplateResource\RelationManagers\DocumentsRelationManager;
 use App\Models\DocumentTemplate;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
@@ -383,7 +384,7 @@ final class DocumentTemplateResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            DocumentsRelationManager::class,
         ];
     }
 

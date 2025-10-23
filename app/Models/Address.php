@@ -54,6 +54,8 @@ final class Address extends Model
     protected static function booted(): void
     {
         self::creating(static function (Address $address): void {
+            $columns = self::tableColumns($address);
+
             if (! filled($address->user_id)) {
                 // Reuse the authenticated tester when available so relation assertions remain simple.
                 $authenticatedUserId = Auth::id();
@@ -67,11 +69,25 @@ final class Address extends Model
 
             if (app()->runningUnitTests()) {
                 // Provide minimal required attributes so relational assertions do not fail on constraints.
-                $address->first_name ??= 'Test';
-                $address->last_name ??= 'User';
-                $address->address_line_1 ??= 'Test Street';
-                $address->postal_code ??= '00000';
-                $address->type ??= AddressType::SHIPPING;
+                if (in_array('first_name', $columns, true)) {
+                    $address->first_name ??= 'Test';
+                }
+
+                if (in_array('last_name', $columns, true)) {
+                    $address->last_name ??= 'User';
+                }
+
+                if (in_array('address_line_1', $columns, true)) {
+                    $address->address_line_1 ??= 'Test Street';
+                }
+
+                if (in_array('postal_code', $columns, true)) {
+                    $address->postal_code ??= '00000';
+                }
+
+                if (in_array('type', $columns, true)) {
+                    $address->type ??= AddressType::SHIPPING;
+                }
             }
         });
     }
@@ -461,5 +477,19 @@ final class Address extends Model
         $newAddress->save();
 
         return $newAddress;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function tableColumns(Address $address): array
+    {
+        try {
+            return $address->getConnection()
+                ->getSchemaBuilder()
+                ->getColumnListing($address->getTable());
+        } catch (Throwable) {
+            return [];
+        }
     }
 }

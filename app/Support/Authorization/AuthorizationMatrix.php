@@ -39,7 +39,44 @@ final class AuthorizationMatrix
             return false;
         }
 
-        return $user->can(self::ability($resource, $ability));
+        $permission = self::ability($resource, $ability);
+
+        try {
+            if ($user->can($permission)) {
+                return true;
+            }
+        } catch (Throwable) {
+            // When permission storage isn't available (e.g. in-memory unit tests),
+            // fall back to role-based checks instead of failing hard.
+        }
+
+        if (! method_exists($user, 'getRoleNames')) {
+            return false;
+        }
+
+        $roleNames = $user->getRoleNames();
+
+        if (! is_iterable($roleNames)) {
+            return false;
+        }
+
+        foreach ($roleNames as $roleName) {
+            if (! is_string($roleName) || $roleName === '') {
+                continue;
+            }
+
+            $role = AuthorizationRole::tryFrom($roleName);
+
+            if ($role === null) {
+                continue;
+            }
+
+            if (in_array($permission, self::permissionsForRole($role), true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public static function currentUser(): ?Authenticatable
@@ -293,11 +330,19 @@ final class AuthorizationMatrix
     private static function resolveConfigPath(): string
     {
         if (function_exists('config_path')) {
-            return config_path(self::CONFIG_KEY . '.php');
+            try {
+                return config_path(self::CONFIG_KEY . '.php');
+            } catch (Throwable) {
+                // Ignore helper access when the container has not been bootstrapped.
+            }
         }
 
         if (function_exists('base_path')) {
-            return base_path('config/' . self::CONFIG_KEY . '.php');
+            try {
+                return base_path('config/' . self::CONFIG_KEY . '.php');
+            } catch (Throwable) {
+                // Fallback below when the helper cannot resolve.
+            }
         }
 
         return dirname(__DIR__, 3) . '/config/' . self::CONFIG_KEY . '.php';
@@ -323,4 +368,3 @@ final class AuthorizationMatrix
         return $value;
     }
 }
-

@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Contracts\TranslatableRecord;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\StatusScope;
 use App\Observers\ProductVariantObserver;
 use App\Traits\HasProductPricing;
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -41,11 +43,27 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  */
 #[ObservedBy([ProductVariantObserver::class])]
 #[ScopedBy([ActiveScope::class, EnabledScope::class, StatusScope::class])]
-final class ProductVariant extends Model implements HasMedia
+final class ProductVariant extends Model implements HasMedia, TranslatableRecord
 {
-    use HasFactory, HasProductPricing, InteractsWithMedia, SoftDeletes;
+    use HasFactory;
+    use HasProductPricing;
+    use HasTranslations;
+    use InteractsWithMedia;
+    use SoftDeletes;
 
     protected $table = 'product_variants';
+
+    protected string $translationModel = \App\Models\Translations\ProductVariantTranslation::class;
+
+    /**
+     * @var array<int, string>
+     */
+    protected array $translatable = [
+        'name',
+        'description',
+        'seo_title',
+        'seo_description',
+    ];
 
     protected $fillable = [
         'product_id', 'sku', 'name', 'variant_name_lt', 'variant_name_en',
@@ -542,13 +560,23 @@ final class ProductVariant extends Model implements HasMedia
      */
     public function getLocalizedName(?string $locale = null): string
     {
-        $locale = $locale ?: app()->getLocale();
+        $locale ??= app()->getLocale();
 
-        return match ($locale) {
-            'lt' => $this->variant_name_lt ?: $this->name,
-            'en' => $this->variant_name_en ?: $this->name,
-            default => $this->name,
-        };
+        $translated = $this->trans('name', $locale);
+
+        if (! filled($translated)) {
+            $translated = match ($locale) {
+                'lt' => $this->variant_name_lt,
+                'en' => $this->variant_name_en,
+                default => null,
+            };
+        }
+
+        if (! filled($translated)) {
+            $translated = $this->name ?? '';
+        }
+
+        return (string) $translated;
     }
 
     /**
@@ -556,13 +584,19 @@ final class ProductVariant extends Model implements HasMedia
      */
     public function getLocalizedDescription(?string $locale = null): ?string
     {
-        $locale = $locale ?: app()->getLocale();
+        $locale ??= app()->getLocale();
 
-        return match ($locale) {
-            'lt' => $this->description_lt,
-            'en' => $this->description_en,
-            default => null,
-        };
+        $translated = $this->trans('description', $locale);
+
+        if (! filled($translated)) {
+            $translated = match ($locale) {
+                'lt' => $this->description_lt,
+                'en' => $this->description_en,
+                default => null,
+            };
+        }
+
+        return $translated;
     }
 
     /**
@@ -570,13 +604,19 @@ final class ProductVariant extends Model implements HasMedia
      */
     public function getLocalizedSeoTitle(?string $locale = null): ?string
     {
-        $locale = $locale ?: app()->getLocale();
+        $locale ??= app()->getLocale();
 
-        return match ($locale) {
-            'lt' => $this->seo_title_lt,
-            'en' => $this->seo_title_en,
-            default => null,
-        };
+        $translated = $this->trans('seo_title', $locale);
+
+        if (! filled($translated)) {
+            $translated = match ($locale) {
+                'lt' => $this->seo_title_lt,
+                'en' => $this->seo_title_en,
+                default => null,
+            };
+        }
+
+        return $translated;
     }
 
     /**
@@ -584,13 +624,19 @@ final class ProductVariant extends Model implements HasMedia
      */
     public function getLocalizedSeoDescription(?string $locale = null): ?string
     {
-        $locale = $locale ?: app()->getLocale();
+        $locale ??= app()->getLocale();
 
-        return match ($locale) {
-            'lt' => $this->seo_description_lt,
-            'en' => $this->seo_description_en,
-            default => null,
-        };
+        $translated = $this->trans('seo_description', $locale);
+
+        if (! filled($translated)) {
+            $translated = match ($locale) {
+                'lt' => $this->seo_description_lt,
+                'en' => $this->seo_description_en,
+                default => null,
+            };
+        }
+
+        return $translated;
     }
 
     /**

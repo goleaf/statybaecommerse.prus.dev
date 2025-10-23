@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use Throwable;
 
 /**
  * City
@@ -53,24 +54,41 @@ final class City extends Model
     protected static function booted(): void
     {
         self::creating(static function (City $city): void {
-            if (filled($city->slug)) {
-                return;
-            }
+            $columns = self::tableColumns($city);
+            $supportsSlug = in_array('slug', $columns, true);
+            $supportsCode = in_array('code', $columns, true);
 
-            // Derive a stable slug from the provided name while gracefully handling translated payloads.
             $name = $city->name;
             if (is_array($name)) {
                 $name = (string) ($name['en'] ?? $name['lt'] ?? reset($name) ?: '');
             }
+            $slugCandidate = Str::slug((string) $name);
 
-            $slug = Str::slug((string) $name);
-            $city->slug = $slug !== '' ? $slug : Str::uuid()->toString();
+            if ($supportsSlug && blank($city->slug)) {
+                // Derive a stable slug from the provided name while gracefully handling translated payloads.
+                $city->slug = $slugCandidate !== '' ? $slugCandidate : Str::uuid()->toString();
+            }
 
-            if (blank($city->code)) {
+            if ($supportsCode && blank($city->code)) {
                 // Generate a deterministic fallback code for fixtures that omit the field.
-                $city->code = strtoupper(Str::limit($slug, 10, '')) ?: strtoupper(Str::random(6));
+                $slugSource = $city->slug ?? $slugCandidate;
+                $city->code = strtoupper(Str::limit($slugSource, 10, '')) ?: strtoupper(Str::random(6));
             }
         });
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function tableColumns(City $city): array
+    {
+        try {
+            return $city->getConnection()
+                ->getSchemaBuilder()
+                ->getColumnListing($city->getTable());
+        } catch (Throwable) {
+            return [];
+        }
     }
 
     /**

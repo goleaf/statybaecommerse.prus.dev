@@ -6,8 +6,10 @@ namespace App\Services\Cart;
 
 use App\Models\CartItem;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Contracts\Session\Session as SessionStore;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -17,7 +19,16 @@ final class CartService
 {
     private const SESSION_KEY = 'cart';
 
-    public function __construct(private readonly Session $session) {}
+    public function __construct(private readonly SessionStore $session) {}
+
+    public function clear(?int $userId, string $sessionId, ?string $fallbackSessionId = null): void
+    {
+        if ($fallbackSessionId === null) {
+            $storedSessionId = Session::get('cart_session_id');
+            $fallbackSessionId = is_string($storedSessionId) ? $storedSessionId : null;
+        }
+
+        $sessionIds = $this->normalizeSessionIds($sessionId, $fallbackSessionId);
 
         $this->clearCartSessions($sessionIds);
         $this->clearCartStorage($userId, $sessionIds);
@@ -25,7 +36,11 @@ final class CartService
         $this->forgetCachedSummary($userId, $sessionIds);
 
         if (function_exists('debug_cart')) {
-            debug_cart('clear', ['session_id' => $sessionId, 'user_id' => $userId]);
+            debug_cart('clear', [
+                'session_id' => $sessionId,
+                'user_id' => $userId,
+                'session_ids' => $sessionIds,
+            ]);
         }
     }
 
@@ -49,6 +64,21 @@ final class CartService
         }
 
         return $this->buildSummaryFromDatabase($userId, $sessionId);
+    }
+
+    public function getCount(?int $userId, string $sessionId): int
+    {
+        $summary = $this->getSummary($userId, $sessionId);
+
+        return (int) $summary['count'];
+    }
+
+    public function getSessionCount(): int
+    {
+        $userIdentifier = Auth::id();
+        $userId = is_numeric($userIdentifier) ? (int) $userIdentifier : null;
+
+        return $this->getCount($userId, $this->session->getId());
     }
 
     /**

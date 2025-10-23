@@ -71,8 +71,8 @@ final class SearchResultPayload
         // Cast every key to string so PHPStan and downstream consumers consistently handle
         // associative payloads, even if a legacy provider returns numeric indexes.
         $payload = [];
-        foreach ($payloadSource as $key => $value) {
-            $payload[(string) $key] = $value;
+        foreach ($payloadSource as $key => $itemValue) {
+            $payload[(string) $key] = $itemValue;
         }
 
         if (! array_key_exists('id', $payload)) {

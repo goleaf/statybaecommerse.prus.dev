@@ -30,24 +30,12 @@ final class ProductSalesSparkline extends InlineChartWidget
     protected ?string $maxHeight = '48';
 
     /**
-     * Cache the resolved dataset across renders so Livewire avoids recomputing the helper output.
-     *
-     * @var array<string, mixed>
-     */
-    private array $cachedDataset = [];
-
-    /**
-     * Hash of the dataset passed to the frontend, used by tests and the Blade view for diffing.
-     */
-    public ?string $dataChecksum = null;
-
-    /**
      * Capture the optional product record and seed the dataset cache during component boot.
      */
     public function mount(?Product $record = null): void
     {
         $this->record = $record;
-        $this->refreshDataset();
+        parent::mount();
     }
 
     /**
@@ -56,7 +44,8 @@ final class ProductSalesSparkline extends InlineChartWidget
     public function updatedRecord(?Product $record): void
     {
         $this->record = $record;
-        $this->refreshDataset();
+        $this->cachedData = null;
+        $this->updateChartData();
     }
 
     /**
@@ -66,11 +55,17 @@ final class ProductSalesSparkline extends InlineChartWidget
      */
     protected function getData(): array
     {
-        if ($this->cachedDataset === []) {
-            $this->refreshDataset();
+        if (! $this->record instanceof Product) {
+            return $this->formatDataset([], [], __('products.sparkline.revenue_label', ['days' => 0]));
         }
 
-        return $this->cachedDataset;
+        $series = ProductSeries::dailySales($this->record);
+
+        return $this->formatDataset(
+            $series['labels'],
+            $series['revenue'],
+            __('products.sparkline.revenue_label', ['days' => count($series['labels'])]),
+        );
     }
 
     /**
@@ -96,35 +91,5 @@ final class ProductSalesSparkline extends InlineChartWidget
             ],
             'labels' => $labels,
         ];
-    }
-
-    /**
-     * Refresh the cached dataset and checksum so both backend tests and the view stay aligned.
-     */
-    private function refreshDataset(): void
-    {
-        $this->cachedDataset = $this->resolveDataset();
-        // Cast the JSON payload to a string so checksum generation stays deterministic for Chart.js consumers.
-        $this->dataChecksum = md5((string) json_encode($this->cachedDataset));
-    }
-
-    /**
-     * Resolve the helper output into the structure required by the InlineChart widget contract.
-     *
-     * @return array<string, mixed>
-     */
-    private function resolveDataset(): array
-    {
-        if (! $this->record instanceof Product) {
-            return $this->formatDataset([], [], __('products.sparkline.revenue_label', ['days' => 0]));
-        }
-
-        $series = ProductSeries::dailySales($this->record);
-
-        return $this->formatDataset(
-            $series['labels'],
-            $series['revenue'],
-            __('products.sparkline.revenue_label', ['days' => count($series['labels'])])
-        );
     }
 }

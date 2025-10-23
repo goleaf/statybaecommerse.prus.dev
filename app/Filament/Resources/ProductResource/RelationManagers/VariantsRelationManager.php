@@ -74,11 +74,13 @@ final class VariantsRelationManager extends BaseRelationManager
     {
         // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with('translations'))
             ->recordTitleAttribute('name')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable()
-                    ->sortable(),
+                    ->searchable(['name', 'translations.name'])
+                    ->sortable()
+                    ->formatStateUsing(fn ($state, ProductVariant $record): string => $record->getLocalizedName()),
                 Tables\Columns\TextColumn::make('sku')
                     ->sortable()
                     ->copyable()

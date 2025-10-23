@@ -10,8 +10,8 @@ use InvalidArgumentException;
 final class NotificationFilterData
 {
     private function __construct(
-        private readonly ?string $type,
-        private readonly ?bool $read,
+        public readonly ?string $type,
+        public readonly ?bool $read,
     ) {
         if ($this->type !== null && $this->type === '') {
             throw new InvalidArgumentException('Notification type cannot be an empty string.');

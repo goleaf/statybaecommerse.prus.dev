@@ -64,12 +64,17 @@
                 @else
                     <div class="space-y-4">
                         @foreach($cartItems as $item)
+                            @php
+                                $itemProduct = $item->product;
+                                $itemProductName = $itemProduct?->trans('name') ?? $itemProduct?->name;
+                                $itemBrandName = optional($itemProduct?->brand)?->trans('name') ?? optional($itemProduct?->brand)->name;
+                            @endphp
                             <div class="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                                 <!-- Product Image -->
                                 <div class="flex-shrink-0">
                                     <img 
-                                        src="{{ $item->product->getFirstMediaUrl('images', 'thumb') ?: product_placeholder_url('thumb') }}"
-                                        alt="{{ $item->product->name }}"
+                                        src="{{ $itemProduct?->getFirstMediaUrl('images', 'thumb') ?: product_placeholder_url('thumb') }}"
+                                        alt="{{ $itemProductName }}"
                                         class="w-12 h-12 object-cover rounded-md"
                                     >
                                 </div>
@@ -77,10 +82,10 @@
                                 <!-- Product Details -->
                                 <div class="flex-1 min-w-0">
                                     <h4 class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                        {{ $item->product->name }}
+                                        {{ $itemProductName }}
                                     </h4>
                                     <p class="text-xs text-gray-500 dark:text-gray-400">
-                                        {{ $item->product->brand?->name }}
+                                        {{ $itemBrandName }}
                                     </p>
                                     <p class="text-sm font-semibold text-blue-600 dark:text-blue-400">
                                         {{ app_money_format($item->price) }}

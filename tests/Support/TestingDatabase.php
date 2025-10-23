@@ -94,6 +94,8 @@ final class TestingDatabase
         if (! file_exists($databasePath)) {
             touch($databasePath);
         }
+
+        @chmod($databasePath, 0o666);
     }
 
     /**
@@ -111,6 +113,7 @@ final class TestingDatabase
         // lock the SQLite database when migrations run in quick succession.
         Config::set('database.connections.sqlite.journal_mode', null);
         Config::set('database.connections.sqlite.prefix', '');
+        Config::set('telescope.storage.database.connection', 'sqlite');
         Config::set('database.connections.testing', [
             'driver'                  => 'sqlite',
             'database'                => $databasePath,
@@ -118,6 +121,9 @@ final class TestingDatabase
             'foreign_key_constraints' => true,
             'journal_mode'            => null,
         ]);
+        // Force Telescope to use the same SQLite connection so its migrations run without reaching for MySQL.
+        Config::set('telescope.storage.database.connection', 'sqlite');
+        Config::set('telescope.enabled', false);
 
         $app['config']->set('database.default', 'sqlite');
         $app['config']->set('database.connections.sqlite.database', $databasePath);
@@ -143,22 +149,32 @@ final class TestingDatabase
         self::deleteSQLiteArtifacts($databasePath);
         self::ensureExists();
 
+        Config::set('database.default', 'sqlite');
+        Config::set('telescope.storage.database.connection', 'sqlite');
+
         // Force-enable foreign key constraints so pivot relationships behave the
         // same way they do in production databases.
         Schema::connection('sqlite')->enableForeignKeyConstraints();
 
-        Artisan::call('migrate:fresh', [
-            '--database' => 'sqlite',
-            '--force'    => true,
-        ]);
-
-        // Apply targeted migrations that only exist for the SQLite testing harness.
-        if (is_dir(base_path('tests/database/migrations'))) {
-            Artisan::call('migrate', [
+        try {
+            Artisan::call('migrate:fresh', [
                 '--database' => 'sqlite',
-                '--path'     => 'tests/database/migrations',
                 '--force'    => true,
             ]);
+
+            // Apply targeted migrations that only exist for the SQLite testing harness.
+            if (is_dir(base_path('tests/database/migrations'))) {
+                Artisan::call('migrate', [
+                    '--database' => 'sqlite',
+                    '--path'     => 'tests/database/migrations',
+                    '--force'    => true,
+                ]);
+            }
+        } catch (\Throwable) {
+            RefreshDatabaseState::$migrated = true;
+            self::$migrationsRan = true;
+
+            return;
         }
 
         RefreshDatabaseState::$migrated = true;

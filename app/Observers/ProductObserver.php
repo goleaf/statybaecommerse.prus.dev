@@ -7,6 +7,7 @@ namespace App\Observers;
 use App\Models\Product;
 use App\Services\CacheInvalidationService;
 use App\Services\Images\GradientImageService;
+use App\UseCases\Cache\InvalidateProductCache;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 

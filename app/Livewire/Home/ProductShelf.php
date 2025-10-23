@@ -7,17 +7,16 @@ namespace App\Livewire\Home;
 use App\Livewire\Concerns\WithCart;
 use App\Livewire\Concerns\WithNotifications;
 use App\Models\Product;
-use App\Services\Shared\CacheService as SharedCacheService;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTagHelper;
+use App\Support\Cache\CacheTags;
+use App\Support\Cache\TagAwareCache;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Cache\TaggableStore;
-use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -54,10 +53,8 @@ final class ProductShelf extends Component implements HasSchemas
     #[Computed]
     public function products(): EloquentCollection
     {
-        $cacheKey = sprintf('home:shelf:%s:%d:%s', $this->preset, $this->limit, app()->getLocale());
-
+        $locale = app()->getLocale();
         $cacheKey = CacheKeys::homeShelf($this->preset, $this->limit, $locale);
-        $store = Cache::getStore();
 
         $callback = function () use ($locale): EloquentCollection {
             $query = Product::query()
@@ -74,42 +71,42 @@ final class ProductShelf extends Component implements HasSchemas
                 ->where('published_at', '<=', now())
                 ->whereNull('deleted_at');
 
-                $query = match ($this->preset) {
-                    'latest' => $query->orderByDesc('published_at'),
-                    'sale'   => $query
-                        ->where(function ($saleQuery): void {
-                            $saleQuery
-                                ->whereNotNull('sale_price')
-                                ->whereColumn('sale_price', '<', 'price')
-                                ->orWhere(function ($compareQuery): void {
-                                    $compareQuery
-                                        ->whereNotNull('compare_price')
-                                        ->whereColumn('compare_price', '>', 'price');
-                                });
-                        })
-                        ->orderByDesc('updated_at')
-                        ->orderByDesc('published_at'),
-                    'trending' => $query
-                        ->withSum('orderItems as orders_quantity', 'quantity')
-                        ->orderByDesc('orders_quantity')
-                        ->orderByDesc('reviews_count')
-                        ->orderByDesc('published_at'),
-                    default => $query
-                        ->where('is_featured', true)
-                        ->orderBy('sort_order')
-                        ->orderByDesc('published_at'),
-                };
+            $query = match ($this->preset) {
+                'latest' => $query->orderByDesc('published_at'),
+                'sale' => $query
+                    ->where(function ($saleQuery): void {
+                        $saleQuery
+                            ->whereNotNull('sale_price')
+                            ->whereColumn('sale_price', '<', 'price')
+                            ->orWhere(function ($compareQuery): void {
+                                $compareQuery
+                                    ->whereNotNull('compare_price')
+                                    ->whereColumn('compare_price', '>', 'price');
+                            });
+                    })
+                    ->orderByDesc('updated_at')
+                    ->orderByDesc('published_at'),
+                'trending' => $query
+                    ->withSum('orderItems as orders_quantity', 'quantity')
+                    ->orderByDesc('orders_quantity')
+                    ->orderByDesc('reviews_count')
+                    ->orderByDesc('published_at'),
+                default => $query
+                    ->where('is_featured', true)
+                    ->orderBy('sort_order')
+                    ->orderByDesc('published_at'),
+            };
 
             return $query->limit($this->limit)->get();
         };
 
-        if ($store instanceof TaggableStore) {
-            $tags = CacheTagHelper::merge(CacheTagHelper::products(), CacheTagHelper::locale($locale));
+        $tags = CacheTagHelper::merge(
+            CacheTagHelper::products(),
+            CacheTagHelper::locale($locale),
+            [CacheTags::home()]
+        );
 
-            return Cache::tags($tags)->remember($cacheKey, CacheKeys::TTL_MINUTE, $callback);
-        }
-
-        return Cache::remember($cacheKey, CacheKeys::TTL_MINUTE, $callback);
+        return TagAwareCache::remember($cacheKey, CacheKeys::TTL_MINUTE, $callback, $tags);
     }
 
     public function productShelf(Schema $schema): Schema
