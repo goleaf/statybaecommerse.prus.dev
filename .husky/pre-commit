@@ -1,6 +1,5 @@
 #!/usr/bin/env sh
-# Load Husky's helper which wires up PATH before running our quality gates.
-. "$(dirname -- "$0")/_/h"
+# Execute pre-commit quality gates with Husky's modern shim already providing PATH access.
 
 set -eu
 

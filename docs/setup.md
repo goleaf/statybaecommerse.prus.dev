@@ -38,7 +38,7 @@ Optional but helpful: Redis (for queue experiments) and pnpm (mirrors npm comman
 npm install
 ```
 
-> ✅ Running `npm install` also refreshes the Husky hook shim so older clones keep sourcing the modern `_/h` helper. Re-run `npm run prepare` if hooks stop firing—it reruns the install step and regenerates `.husky/_/husky.sh` via `scripts/ensure-husky-shim.mjs`.
+> ✅ Husky hooks install automatically during `npm install`. If hooks ever stop running, execute `npm run prepare` to refresh the modern shim.
 
 If you prefer the automated route, run `make setup` after cloning—it performs all three steps, copies the `.env`, and prepares the SQLite database.
 
@@ -99,9 +99,11 @@ You have two options:
     Visit the storefront at <http://127.0.0.1:8000> and the admin at <http://127.0.0.1:8000/admin>.
 
 2. **All-in-one Make target**
+
     ```bash
     make dev
     ```
+
     This spins up the PHP server, queue worker, Vite, and Pail log viewer together.
 
 Stop background commands with `Ctrl+C` when you are done.
@@ -119,15 +121,15 @@ You can explore more helper commands in the `Makefile` (`make test`, `make analy
 
 ## 8. Common issues & quick fixes (FAQ)
 
-| Symptom                                                      | Resolution                                                                                                                   |
-| ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `Class "PDO" not found` or `could not find driver`           | Ensure PHP’s SQLite extension is enabled (`php -m                                                                            | grep sqlite`). On macOS with Homebrew: `brew install php` and restart your shell. |
-| `APP_KEY` related errors                                     | Run `php artisan key:generate` after creating `.env`.                                                                        |
-| Migrations fail because the SQLite file is read-only         | Verify the `database/` folder and `database.sqlite` file are writable (`chmod 664 database/database.sqlite`).                |
-| `npm run dev` fails with OpenSSL or incompatible Node errors | Confirm `node -v` reports ≥20. Reinstall via `nvm install 20` or `brew install node@20`.                                     |
-| Admin panel styles are missing                               | Ensure Vite is running (`npm run dev`) or run `npm run build` for a static build.                                            |
-| Queue jobs pile up                                           | Switch to synchronous processing locally by setting `QUEUE_CONNECTION=sync` in `.env` and rerun `php artisan queue:restart`. |
-| Storage symlink missing 404s for media                       | Execute `php artisan storage:link` to recreate `public/storage`.                                                             |
+| Symptom                                                      | Resolution                                                                                                                             |
+| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `Class "PDO" not found` or `could not find driver`           | Ensure PHP’s SQLite extension is enabled (`php -m \| grep sqlite`). On macOS with Homebrew: `brew install php` and restart your shell. |
+| `APP_KEY` related errors                                     | Run `php artisan key:generate` after creating `.env`.                                                                                  |
+| Migrations fail because the SQLite file is read-only         | Verify the `database/` folder and `database.sqlite` file are writable (`chmod 664 database/database.sqlite`).                          |
+| `npm run dev` fails with OpenSSL or incompatible Node errors | Confirm `node -v` reports ≥20. Reinstall via `nvm install 20` or `brew install node@20`.                                               |
+| Admin panel styles are missing                               | Ensure Vite is running (`npm run dev`) or run `npm run build` for a static build.                                                      |
+| Queue jobs pile up                                           | Switch to synchronous processing locally by setting `QUEUE_CONNECTION=sync` in `.env` and rerun `php artisan queue:restart`.           |
+| Storage symlink missing 404s for media                       | Execute `php artisan storage:link` to recreate `public/storage`.                                                                       |
 
 ---
 
