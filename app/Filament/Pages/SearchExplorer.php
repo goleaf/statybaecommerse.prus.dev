@@ -8,7 +8,6 @@ use App\Data\SearchQueryData;
 use App\Services\SearchService;
 use BackedEnum;
 use Filament\Pages\Page;
-
 final class SearchExplorer extends Page
 {
     /**
@@ -18,7 +17,10 @@ final class SearchExplorer extends Page
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-magnifying-glass-circle';
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Search';
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Search';
+    }
 
     protected static ?string $title = 'Search Explorer';
 
