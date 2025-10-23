@@ -4,7 +4,7 @@
 
 | Method | URI | Name | Action | Middleware |
 | --- | --- | --- | --- | --- |
-| GET | api/v1/user | api.v1.user.show | App\\Http\\Controllers\\Api\\AuthenticatedUserController | auth:sanctum, abilities:profile.read, throttle:api.read |
+| GET | api/v1/user | api.v1.user.show | App\\Http\\Controllers\\Api\\AuthenticatedUserController | auth:sanctum, abilities:profile.read, throttle:api.profile, throttle:api.read |
 | POST | api/v1/autocomplete-search | api.v1.autocomplete.search | App\\Http\\Controllers\\Api\\AutocompleteSearchController | auth:sanctum, abilities:system.autocomplete, throttle:api.autocomplete |
 | GET | api/v1/notifications | api.v1.notifications.index | App\\Http\\Controllers\\Api\\NotificationController@index | auth:sanctum, throttle:api.notifications.read, abilities:notifications.read |
 | GET | api/v1/notifications/stats | api.v1.notifications.stats | App\\Http\\Controllers\\Api\\NotificationController@stats | auth:sanctum, throttle:api.notifications.read, abilities:notifications.read |

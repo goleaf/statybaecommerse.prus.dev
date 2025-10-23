@@ -10,7 +10,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Introduced operator-aware system setting dependencies with explicit condition values, refreshed Filament forms, and resilient evaluation helpers for richer admin automation.
 
 ### Maintenance
-* Consolidated the CI pipeline into a PHP 8.2/8.3 matrix that uploads coverage artifacts, reuses Composer caches per version, and enforces the shared flat ESLint config before building assets.
+* Introduced layered per-user and per-IP API throttles with structured 429 responses, refreshed security configuration defaults, and updated route documentation for dedicated read/write buckets.
 * Migrated Filament resources, relation managers, custom pages, and widgets to the v4 Schema API while normalizing navigation icon docblocks so BackedEnum-powered metadata stays compatible with upstream traits (#1070).
 * Refactored the product API flow to run through dedicated application use cases, a presenter, and an Eloquent-backed repository so contract responses stay stable while filtering non-displayable catalogue entries.
 * Centralized Filament navigation metadata by adopting the `HasNav` trait on notifications, hardening the Nav helper against recursion, and documenting the `Schema::components([...])` pipeline for the Address resource.

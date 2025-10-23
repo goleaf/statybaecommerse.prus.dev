@@ -17,7 +17,7 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
-- CI now runs a PHP 8.2/8.3 test matrix with cached Composer installs, coverage artifacts, and a shared ESLint flat config so code quality checks complete in one consolidated workflow run.
+- API rate limiting now layers per-user and per-IP budgets with structured logging and updated route/security documentation so integrators can separate read and write traffic when tuning clients.
 - Filament admin resources, relation managers, widgets, and standalone pages now follow the Schema-based API with normalized navigation icon docblocks, eliminating BackedEnum collisions while documenting how each builder composes the new schema pipeline.
 - Product API contract delivery now runs through dedicated application-layer use cases, a presenter, and an Eloquent repository, ensuring storefront consumers receive filtered, displayable catalogue data without breaking schema guarantees.
 - Notification administration delegates navigation metadata to the Nav registry with recursion safeguards, and address management documents its Filament `Schema::components([...])` pipeline for reviewers aligning with v4 expectations.

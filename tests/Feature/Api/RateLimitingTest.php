@@ -19,7 +19,8 @@ final class RateLimitingTest extends TestCase
         $originalConfig = config('security.rate_limiting.api.read');
 
         config([
-            'security.rate_limiting.api.read.per_ip' => 1,
+            // Allow plenty of room for authenticated requests while clamping IP traffic tightly.
+            'security.rate_limiting.api.read.per_ip'   => 1,
             'security.rate_limiting.api.read.per_user' => 100,
         ]);
 
@@ -50,21 +51,23 @@ final class RateLimitingTest extends TestCase
         $originalConfig = config('security.rate_limiting.api.read');
 
         config([
-            'security.rate_limiting.api.read.per_ip' => 100,
+            // Force the per-user limiter to a single request so the follow-up call is throttled.
+            'security.rate_limiting.api.read.per_ip'   => 100,
             'security.rate_limiting.api.read.per_user' => 1,
         ]);
 
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        RateLimiter::clear('user:'.$user->id.'|api.read');
+        RateLimiter::clear('user:' . $user->id . '|api.read');
         RateLimiter::clear('ip:127.0.0.1|api.read');
 
         $this->getJson(route('api.v1.health'))->assertOk();
         $secondResponse = $this->getJson(route('api.v1.health'));
         $secondResponse->assertTooManyRequests();
 
-        RateLimiter::clear('user:'.$user->id.'|api.read');
+        RateLimiter::clear('user:' . $user->id . '|api.read');
+        RateLimiter::clear('ip:127.0.0.1|api.read');
         config(['security.rate_limiting.api.read' => $originalConfig]);
     }
 }
