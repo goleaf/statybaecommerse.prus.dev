@@ -11,6 +11,8 @@ use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Livewire\Livewire;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Tests\TestCase;
 
 final class NotificationResourceTest extends TestCase
@@ -162,7 +164,7 @@ final class NotificationResourceTest extends TestCase
         ]);
 
         Livewire::test(\App\Filament\Resources\NotificationResource\Pages\ListNotifications::class)
-            ->filterTable('user_id', $user1->id)
+            ->filterTable(SelectFilter::make('user_id'), $user1->id)
             ->assertCanSeeTableRecords([$notification1])
             ->assertCanNotSeeTableRecords([$notification2]);
     }
@@ -183,7 +185,7 @@ final class NotificationResourceTest extends TestCase
         ]);
 
         Livewire::test(\App\Filament\Resources\NotificationResource\Pages\ListNotifications::class)
-            ->filterTable('type', 'info')
+            ->filterTable(SelectFilter::make('notification_type'), 'info')
             ->assertCanSeeTableRecords([$infoNotification])
             ->assertCanNotSeeTableRecords([$successNotification]);
     }
@@ -204,7 +206,7 @@ final class NotificationResourceTest extends TestCase
         ]);
 
         Livewire::test(\App\Filament\Resources\NotificationResource\Pages\ListNotifications::class)
-            ->filterTable('read_state', true)
+            ->filterTable(TernaryFilter::make('is_read'), true)
             ->assertCanSeeTableRecords([$readNotification])
             ->assertCanNotSeeTableRecords([$unreadNotification]);
     }
@@ -226,9 +228,8 @@ final class NotificationResourceTest extends TestCase
 
         $notification->refresh();
 
-        $this->assertEquals(Carbon::now(), $notification->read_at);
-
-        Carbon::setTestNow();
+        expect($notification->is_read)->toBeTrue();
+        expect($notification->read_at)->not->toBeNull();
     }
 
     public function test_can_mark_notification_as_unread(): void
@@ -246,7 +247,8 @@ final class NotificationResourceTest extends TestCase
 
         $notification->refresh();
 
-        $this->assertNull($notification->read_at);
+        expect($notification->is_read)->toBeFalse();
+        expect($notification->read_at)->toBeNull();
     }
 
     public function test_can_bulk_mark_as_read(): void

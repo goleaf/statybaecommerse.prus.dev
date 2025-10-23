@@ -6,6 +6,8 @@ use App\Filament\Resources\NotificationResource;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 
 uses(RefreshDatabase::class);
 
@@ -99,14 +101,14 @@ describe('NotificationResource', function () {
 
         it('can filter notifications by type', function () {
             livewire(NotificationResource\Pages\ListNotifications::class)
-                ->filterTable('notification_type', ['value' => 'order'])
+                ->filterTable(SelectFilter::make('notification_type'), 'order')
                 ->assertCanSeeTableRecord($this->notifications->first())
                 ->assertCanNotSeeTableRecord($this->notifications->last());
         });
 
         it('can filter notifications by read status', function () {
             livewire(NotificationResource\Pages\ListNotifications::class)
-                ->filterTable('read_state', true)
+                ->filterTable(TernaryFilter::make('is_read'), true)
                 ->assertCanSeeTableRecord($this->notifications->get(1))
                 ->assertCanNotSeeTableRecord($this->notifications->first());
         });
@@ -180,6 +182,58 @@ describe('NotificationResource', function () {
                 $this->assertDatabaseMissing('notifications', [
                     'id' => $notification->id,
                 ]);
+            }
+        });
+
+        it('updates read state through row actions', function () {
+            $notification = Notification::factory()->create([
+                'notifiable_type' => User::class,
+                'notifiable_id' => $this->adminUser->id,
+                'is_read' => false,
+                'read_at' => null,
+            ]);
+
+            livewire(NotificationResource\Pages\ListNotifications::class)
+                ->callTableAction('mark_as_read', $notification);
+
+            $notification->refresh();
+
+            expect($notification->is_read)->toBeTrue();
+            expect($notification->read_at)->not->toBeNull();
+
+            livewire(NotificationResource\Pages\ListNotifications::class)
+                ->callTableAction('mark_as_unread', $notification);
+
+            $notification->refresh();
+
+            expect($notification->is_read)->toBeFalse();
+            expect($notification->read_at)->toBeNull();
+        });
+
+        it('updates read state through bulk actions', function () {
+            $notifications = Notification::factory()->count(2)->create([
+                'notifiable_type' => User::class,
+                'notifiable_id' => $this->adminUser->id,
+                'is_read' => false,
+                'read_at' => null,
+            ]);
+
+            livewire(NotificationResource\Pages\ListNotifications::class)
+                ->callTableBulkAction('bulk_mark_as_read', $notifications);
+
+            foreach ($notifications as $notification) {
+                $notification->refresh();
+                expect($notification->is_read)->toBeTrue();
+                expect($notification->read_at)->not->toBeNull();
+            }
+
+            livewire(NotificationResource\Pages\ListNotifications::class)
+                ->callTableBulkAction('bulk_mark_as_unread', $notifications);
+
+            foreach ($notifications as $notification) {
+                $notification->refresh();
+                expect($notification->is_read)->toBeFalse();
+                expect($notification->read_at)->toBeNull();
             }
         });
     });
