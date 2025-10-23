@@ -8,7 +8,7 @@ use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\NewsCategories\NewsCategoryResource;
 use Filament\Actions\CreateAction;
 
-final class ListNewsCategories extends BaseListRecords
+final class ListNewsCategories extends ListRecords
 {
     protected static string $resource = NewsCategoryResource::class;
 
