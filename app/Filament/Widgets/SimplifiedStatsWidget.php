@@ -156,9 +156,9 @@ class SimplifiedStatsWidget extends BaseWidget
                     $date = isset($data['date']) ? (string) $data['date'] : '';
 
                     return [
-                        $date => [
-                            'revenue' => isset($data['revenue']) ? (float) $data['revenue'] : 0.0,
-                            'orders' => isset($data['total_orders']) ? (int) $data['total_orders'] : 0,
+                        $row->date => [
+                            'revenue' => (float) $row->revenue,
+                            'orders'  => (int) $row->total_orders,
                         ],
                     ];
                 })
@@ -178,7 +178,7 @@ class SimplifiedStatsWidget extends BaseWidget
 
             return [
                 'revenue' => $revenueChart,
-                'orders' => $ordersChart,
+                'orders'  => $ordersChart,
             ];
         }, [CacheKeys::dashboardTag()]);
 
@@ -240,27 +240,27 @@ class SimplifiedStatsWidget extends BaseWidget
 
             return [
                 'orders' => [
-                    'total_revenue' => $totalRevenue,
-                    'last_month_revenue' => $lastMonthRevenue,
-                    'total_orders' => $totalOrders,
-                    'last_month_orders' => $lastMonthOrders,
+                    'total_revenue'      => (float) ($orderStats->total_revenue ?? 0),
+                    'last_month_revenue' => (float) ($orderStats->last_month_revenue ?? 0),
+                    'total_orders'       => (int) ($orderStats->total_orders ?? 0),
+                    'last_month_orders'  => (int) ($orderStats->last_month_orders ?? 0),
                 ],
                 'users' => [
-                    'total_users' => $totalUsers,
-                    'new_users_this_month' => $newUsersThisMonth,
+                    'total_users'          => (int) ($userStats->total_users ?? 0),
+                    'new_users_this_month' => (int) ($userStats->new_users_this_month ?? 0),
                 ],
                 'products' => [
-                    'total_products' => (int) ($productStats->total_products ?? 0),
+                    'total_products'  => (int) ($productStats->total_products ?? 0),
                     'active_products' => (int) ($productStats->active_products ?? 0),
                 ],
                 'catalog' => [
                     'total_categories' => (int) DB::table('categories')->count(),
-                    'total_brands' => (int) DB::table('brands')->count(),
+                    'total_brands'     => (int) DB::table('brands')->count(),
                 ],
                 'reviews' => [
-                    'total_reviews' => (int) ($reviewStats->total_reviews ?? 0),
+                    'total_reviews'    => (int) ($reviewStats->total_reviews ?? 0),
                     'approved_reviews' => (int) ($reviewStats->approved_reviews ?? 0),
-                    'avg_rating' => (float) ($reviewStats->avg_rating ?? 0),
+                    'avg_rating'       => (float) ($reviewStats->avg_rating ?? 0),
                 ],
             ];
         }, [CacheKeys::dashboardTag()]);

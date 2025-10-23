@@ -22,50 +22,36 @@ return new class extends Migration
         $this->dropCreatedAtIndex('users', 'users_created_at_index');
     }
 
-    private function addCreatedAtIndex(string $table, string $indexName): void
+    private function addCreatedAtIndex(string $tableName, string $indexName): void
     {
-        if (! Schema::hasTable($table)) {
+        if (! Schema::hasTable($tableName)) {
             return;
         }
 
-        if (! Schema::hasColumn($table, 'created_at')) {
-            return;
-        }
+        Schema::table($tableName, function (Blueprint $table) use ($tableName, $indexName): void {
+            if ($this->indexExists($tableName, $indexName)) {
+                return;
+            }
 
-        if ($this->indexExists($table, $indexName)) {
-            return;
-        }
-
-        Schema::table($table, function (Blueprint $table) use ($indexName) {
             $table->index('created_at', $indexName);
         });
     }
 
-    private function dropCreatedAtIndex(string $table, string $indexName): void
+    private function dropCreatedAtIndex(string $tableName, string $indexName): void
     {
-        if (! Schema::hasTable($table)) {
+        if (! Schema::hasTable($tableName) || ! $this->indexExists($tableName, $indexName)) {
             return;
         }
 
-        if (! $this->indexExists($table, $indexName)) {
-            return;
-        }
-
-        Schema::table($table, function (Blueprint $table) use ($indexName) {
+        Schema::table($tableName, function (Blueprint $table) use ($indexName): void {
             $table->dropIndex($indexName);
         });
     }
 
-    private function indexExists(string $table, string $indexName): bool
+    private function indexExists(string $tableName, string $indexName): bool
     {
-        $connection = Schema::getConnection();
-
-        if (! method_exists($connection, 'getDoctrineSchemaManager')) {
-            return false;
-        }
-
-        $schemaManager = $connection->getDoctrineSchemaManager();
-        $indexes = $schemaManager->listTableIndexes($connection->getTablePrefix().$table);
+        $schemaManager = Schema::getConnection()->getDoctrineSchemaManager();
+        $indexes = $schemaManager->listTableIndexes($tableName);
 
         return array_key_exists($indexName, $indexes);
     }

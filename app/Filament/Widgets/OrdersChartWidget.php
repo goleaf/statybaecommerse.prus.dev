@@ -29,11 +29,10 @@ final class OrdersChartWidget extends ChartWidget
             $endOfMonth = $date->copy()->endOfMonth();
 
             return [
-                'month' => $date->format('M Y'),
-                'orders' => Order::query()
-                    ->createdBetween($startOfMonth, $endOfMonth)
+                'month'  => $date->format('M Y'),
+                'orders' => Order::createdInMonth($date)
                     ->count(),
-                'revenue' => Order::query()
+                'revenue' => Order::createdInMonth($date)
                     ->where('status', '!=', 'cancelled')
                     ->createdBetween($startOfMonth, $endOfMonth)
                     ->sum('total'),

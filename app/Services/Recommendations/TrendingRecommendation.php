@@ -171,7 +171,7 @@ final class TrendingRecommendation extends BaseRecommendation
      */
     private function getPreviousSalesSubquery(int $timeWindow): \Illuminate\Database\Eloquent\Builder
     {
-        return \App\Models\OrderItem::query()->selectRaw('product_id, COUNT(*) as previous_sales')->whereHas('order', function ($query) use ($timeWindow) {
+        return \App\Models\OrderItem::query()->selectRaw('product_id, COUNT(*) as previous_sales')->whereHas('order', function ($query) use ($timeWindow): void {
             $query->whereIn('status', ['completed', 'delivered'])->createdBetween(now()->subDays($timeWindow * 2), now()->subDays($timeWindow));
         })->groupBy('product_id');
     }
