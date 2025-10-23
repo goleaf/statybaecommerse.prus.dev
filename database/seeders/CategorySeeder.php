@@ -945,24 +945,38 @@ final class CategorySeeder extends Seeder
 
     private function supportedLocales(): array
     {
-        // Resolve the supported locales from configuration, handling both array and comma separated formats. This
-        // avoids issues where casting an array to string would return "Array" which then breaks locale detection.
-        $configuredLocales = config('app.supported_locales', ['lt', 'en', 'ru', 'de']);
+        // Gather locale configuration from every canonical source, allowing the seeder to remain resilient even when
+        // projects customise their localisation settings or leave certain keys unset.
+        $configuredSources = [
+            config('app.supported_locales'),
+            config('shared.localization.supported_locales'),
+            config('app.locale'),
+            config('app.fallback_locale'),
+        ];
 
-        // Normalize into an array so we can process the locales consistently regardless of configuration format.
-        $locales = is_string($configuredLocales)
-            ? explode(',', $configuredLocales)
-            : (is_array($configuredLocales) ? $configuredLocales : []);
+        $locales = collect($configuredSources)
+            ->filter(static fn ($value) => $value !== null && $value !== '')
+            ->flatMap(static function ($value) {
+                if (is_string($value)) {
+                    return explode(',', $value);
+                }
 
-        // Clean up the locale list by trimming whitespace, removing empty entries, ensuring uniqueness and providing
-        // a sensible fallback set to guarantee all expected translations exist for the seeder.
-        return collect($locales)
-            ->map(fn ($locale) => trim((string) $locale))
+                if (is_iterable($value)) {
+                    return collect($value)->all();
+                }
+
+                return [$value];
+            })
+            ->map(static fn ($locale) => Str::lower(trim((string) $locale)))
             ->filter()
             ->unique()
-            ->whenEmpty(fn ($collection) => collect(['lt', 'en', 'ru', 'de']))
-            ->values()
-            ->all();
+            ->values();
+
+        if ($locales->isEmpty()) {
+            $locales = collect(['lt', 'en', 'ru', 'de']);
+        }
+
+        return $locales->all();
     }
 
     private function translateLike(string $text, string $locale): string

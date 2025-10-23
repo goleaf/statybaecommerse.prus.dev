@@ -828,12 +828,6 @@ UserProductInteractionResource is now fully functional with maximum Filament v4 
 
 ### 📊 Implementation Strategy
 
-#### Phase 1: Fix Critical Compatibility Issues
-1. Update all resources to use Filament v4 Schema class
-2. Fix navigation group type declarations
-3. Ensure proper imports and method signatures
-4. Test all resources for compilation errors
-
 #### Phase 2: Create Missing Resources
 1. Create 8 missing resources with full CRUD
 2. Add comprehensive translations (LT/EN)
@@ -883,6 +877,28 @@ UserProductInteractionResource is now fully functional with maximum Filament v4 
 - [ ] Re-run Composer autoload discovery to confirm fatal error resolved
 - [ ] Execute targeted Pest suite for touched resources after fixes
 - [ ] Normalize navigation icon/docblock definitions across Analytics and other resources blocking composer install (2025-10-22)
+- [ ]
+### 2025-10-23 – Filament Authorization Regression
+- [ ] Investigate `Tests\\Feature\\Authorization\\FilamentAuthorizationTest` failures for product and user management scenarios
+- [ ] Validate role/permission seeding for viewer and manager personas used in authorization tests
+- [ ] Patch Filament policies/resources to align with expected access matrix (viewers browse only, managers limited CRUD)
+- [ ] Update Lithuanian/English translations for any newly exposed actions or messages
+- [ ] Add/adjust Pest coverage mirroring authorization expectations
+- [ ] Run targeted `php artisan test --filter=FilamentAuthorizationTest` and resolve regressions
+- [ ] Prepare summary for inclusion in commit and deployment notes
+
+### 2025-10-23 – API Contract Regression Investigation
+- [ ] Inspect failing API feature tests for campaign clicks, category tree performance, and contract payloads
+- [ ] Identify schema/transform regressions causing contract mismatches (campaign, category, product, brand, order, user endpoints)
+- [ ] Implement fixes with translation coverage and tailwind-compliant resources as needed
+- [ ] Validate fixes via targeted Pest runs (`CampaignClickListingTest`, `CategoryQueryPerformanceTest`, `ContractValidationTest`)
+- [ ] Document findings and update related resource tests if additional coverage is required
+
+### 2025-10-23 – Contract & Media Regression Hotfix
+- [ ] Analyze failing contract validation endpoints (product search, category tree, brand show, order show, user profile)
+- [ ] Inspect secure media download flow for encoded path handling and response headers
+- [ ] Implement fixes with bilingual translations, schema alignment, and Tailwind compliance
+- [ ] Validate changes via targeted Pest suites (`ContractValidationTest`, `SecureMediaDownloadControllerTest`)
 
 ## 2025-10-22 – Active Work Log
 - Refactor SliderTranslationResource to the Filament v4 schema/table patterns with relationship-driven selects and tooltip hardening.
