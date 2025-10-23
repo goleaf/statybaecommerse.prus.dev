@@ -231,7 +231,7 @@ final class EnumValueResource extends Resource
                     ->query(fn (Builder $query): Builder => $query->where('is_default', true)),
                 Filter::make('high_usage')
                     ->label(__('admin.enum_values.filters.high_usage'))
-                    ->query(fn (Builder $query): Builder => $query->where('usage_count', '>', 50)),
+                    ->query(fn (Builder $query): Builder => $query->where('metadata->usage_count', '>', 50)),
             ])
             ->actions([
                 Action::make('activate')
@@ -287,7 +287,7 @@ final class EnumValueResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    BulkAction::make('activate')
+                    BulkAction::make('bulk_activate')
                         ->label(__('admin.enum_values.actions.bulk_activate'))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
@@ -298,7 +298,7 @@ final class EnumValueResource extends Resource
                                 ->success()
                                 ->send();
                         }),
-                    BulkAction::make('deactivate')
+                    BulkAction::make('bulk_deactivate')
                         ->label(__('admin.enum_values.actions.bulk_deactivate'))
                         ->icon('heroicon-o-x-circle')
                         ->color('gray')
@@ -309,6 +309,18 @@ final class EnumValueResource extends Resource
                                 ->success()
                                 ->send();
                         }),
+                    BulkAction::make('set_default')
+                        ->label(__('admin.enum_values.actions.set_default'))
+                        ->icon('heroicon-o-star')
+                        ->color('warning')
+                        ->action(function (Collection $records): void {
+                            $records->each->setAsDefault();
+                            Notification::make()
+                                ->title(__('admin.enum_values.set_as_default_successfully'))
+                                ->success()
+                                ->send();
+                        })
+                        ->requiresConfirmation(),
                     BulkAction::make('cleanup_unused')
                         ->label(__('admin.enum_values.actions.cleanup_unused'))
                         ->icon('heroicon-o-trash')
