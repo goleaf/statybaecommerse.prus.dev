@@ -10,6 +10,7 @@ use App\Repositories\Search\CategorySearchRepository;
 use App\Repositories\Search\ProductSearchRepository;
 use App\Services\Search\ScoutSearchEngine;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 final class SearchService
 {
@@ -36,6 +37,15 @@ final class SearchService
         $queryData = $isAggregated
             ? $query
             : $this->legacyQueryData((string) $query, $limit);
+
+        // Immediately short-circuit any suspicious looking queries so we do not even
+        // attempt to send them towards the database layer (defence in depth against
+        // SQL injection style payloads that might bypass upstream validation).
+        if ($this->isSuspiciousQuery($queryData->query())) {
+            return $isAggregated
+                ? $this->emptyAggregatedPayload($queryData)
+                : [];
+        }
 
         $cachePayload = array_merge($queryData->context(), [
             'page' => $queryData->page(),
@@ -203,5 +213,63 @@ final class SearchService
     private function shouldUseScout(): bool
     {
         return config('search.driver') === 'scout' && config('search.scout.enabled');
+    }
+
+    /**
+     * Determine if the incoming query looks like an SQL injection attempt.
+     */
+    private function isSuspiciousQuery(string $query): bool
+    {
+        $normalized = Str::lower($query);
+
+        // Simple heuristics that catch the most common payload styles without
+        // being overly aggressive for legitimate catalogue searches.
+        $dangerousFragments = [
+            "' or ",
+            '" or ',
+            '--',
+            ';',
+            '/*',
+            '*/',
+            ' union ',
+            ' select ',
+        ];
+
+        foreach ($dangerousFragments as $fragment) {
+            if (str_contains($normalized, $fragment)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Build the standard aggregated payload for the suspicious query branch.
+     */
+    private function emptyAggregatedPayload(SearchQueryData $queryData): array
+    {
+        // We keep the meta structure identical to successful searches so the
+        // API contract remains predictable for callers.
+        return [
+            'data' => [],
+            'meta' => [
+                'query' => $queryData->query(),
+                'page' => $queryData->page(),
+                'per_page' => $queryData->perPage(),
+                'max_per_page' => SearchQueryData::MAX_PER_PAGE,
+                'total_results' => 0,
+                'returned' => 0,
+                'has_more' => false,
+                'took_ms' => 0,
+                'types' => $queryData->types(),
+                'cached' => false,
+            ],
+            'buckets' => [
+                'product' => 0,
+                'category' => 0,
+                'brand' => 0,
+            ],
+        ];
     }
 }
