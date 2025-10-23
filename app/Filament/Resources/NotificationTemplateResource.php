@@ -14,6 +14,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -67,18 +68,20 @@ final class NotificationTemplateResource extends Resource
             ->schema([
                 Section::make(__('admin.notification_templates.basic_information'))
                     ->schema([
-                        SchemaGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 TextInput::make('name')
                                     ->label(__('admin.notification_templates.name'))
                                     ->required()
                                     ->maxLength(255)
                                     ->live(onBlur: true)
-                                    ->afterStateUpdated(
-                                        fn (string $context, $state, callable $set) => $context === 'create'
-                                            ? $set('slug', Str::slug((string) $state))
-                                            : null,
-                                    ),
+                                    ->afterStateUpdated(function (string $operation, ?string $state, callable $set): void {
+                                        if ($operation !== 'create' || $state === null || $state === '') {
+                                            return;
+                                        }
+
+                                        $set('slug', Str::slug($state));
+                                    }),
                                 TextInput::make('slug')
                                     ->label(__('admin.notification_templates.slug'))
                                     ->required()
@@ -103,7 +106,7 @@ final class NotificationTemplateResource extends Resource
                                     ->helperText(__('admin.notification_templates.event_help')),
                             ]),
                     ]),
-                SchemaSection::make(__('admin.notification_templates.content'))
+                Section::make(__('admin.notification_templates.content'))
                     ->schema([
                         TextInput::make('subject')
                             ->label(__('admin.notification_templates.subject'))
@@ -122,9 +125,12 @@ final class NotificationTemplateResource extends Resource
                     ]),
                 Section::make(__('admin.notification_templates.status'))
                     ->schema([
-                        Toggle::make('is_active')
-                            ->label(__('admin.notification_templates.is_active'))
-                            ->default(true),
+                        Grid::make(1)
+                            ->schema([
+                                Toggle::make('is_active')
+                                    ->label(__('admin.notification_templates.is_active'))
+                                    ->default(true),
+                            ]),
                     ]),
             ]);
     }
@@ -167,7 +173,11 @@ final class NotificationTemplateResource extends Resource
                             return null;
                         }
 
-                        return strlen($state) > 50 ? $state : null;
+                        if (! is_string($state)) {
+                            return null;
+                        }
+
+                        return Str::length($state) > 50 ? $state : null;
                     }),
                 IconColumn::make('is_active')
                     ->label(__('admin.notification_templates.is_active'))
@@ -195,7 +205,7 @@ final class NotificationTemplateResource extends Resource
                 EditAction::make(),
                 DeleteAction::make(),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
