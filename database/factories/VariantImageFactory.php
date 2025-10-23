@@ -18,17 +18,20 @@ final class VariantImageFactory extends Factory
     {
         return [
             'variant_id' => \App\Models\ProductVariant::factory(),
-            'image_path' => $this->faker->imageUrl(800, 600, 'products'),
-            'alt_text' => $this->faker->sentence(3),
-            'description' => $this->faker->optional()->sentence(10),
+            // Persist a relative path that mirrors the convention used by the resource forms.
+            'image_path' => 'variant-images/' . $this->faker->unique()->uuid . '.jpg',
+            'alt_text'   => $this->faker->sentence(3),
             'sort_order' => $this->faker->numberBetween(0, 100),
             'is_primary' => $this->faker->boolean(20),  // 20% chance of being primary
-            'is_active' => $this->faker->boolean(90),
-            'file_size' => $this->faker->numberBetween(50_000, 5_000_000),
-            'dimensions' => sprintf('%dx%d', 800, 600),
+            'is_active'  => true,                               // Default to active so global scopes match admin expectations
+            'file_size'  => $this->faker->numberBetween(10240, 5 * 1024 * 1024),
+            'dimensions' => $this->faker->numberBetween(600, 1200) . 'x' . $this->faker->numberBetween(400, 900),
         ];
     }
 
+    /**
+     * Helper state to guarantee the image is primary for testing scenarios.
+     */
     public function primary(): static
     {
         return $this->state(fn (array $attributes) => [
@@ -37,6 +40,9 @@ final class VariantImageFactory extends Factory
         ]);
     }
 
+    /**
+     * Helper state for explicitly non-primary images.
+     */
     public function secondary(): static
     {
         return $this->state(fn (array $attributes) => [
