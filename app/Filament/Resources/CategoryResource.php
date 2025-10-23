@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
 use App\Support\Authorization\AuthorizationMatrix;
@@ -22,12 +21,12 @@ use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
@@ -43,7 +42,13 @@ use UnitEnum;
 
 final class CategoryResource extends Resource
 {
-    use HasNav;
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
+
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
+
+    protected static ?int $navigationSort = 3;
+
+    protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?string $model = Category::class;
 
@@ -87,36 +92,6 @@ final class CategoryResource extends Resource
         return AuthorizationMatrix::check('categories', 'update');
     }
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return Gate::allows('viewAny', Category::class);
-    }
-
-    public static function canView(Category $record): bool
-    {
-        return Gate::allows('view', $record);
-    }
-
-    public static function canCreate(): bool
-    {
-        return Gate::allows('create', Category::class);
-    }
-
-    public static function canEdit(Category $record): bool
-    {
-        return Gate::allows('update', $record);
-    }
-
-    public static function canDelete(Category $record): bool
-    {
-        return Gate::allows('delete', $record);
-    }
-
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-tag';
-    }
-
     public static function getPluralModelLabel(): string
     {
         return __('categories.plural');
@@ -139,7 +114,11 @@ final class CategoryResource extends Resource
                                 ->required()
                                 ->maxLength(255)
                                 ->live(onBlur: true)
-                                ->afterStateUpdated(fn (string $operation, $state, Set $set) => $operation === 'create' ? $set('slug', Str::slug($state)) : null),
+                                ->afterStateUpdated(function (string $operation, $state, Set $set): void {
+                                    if ($operation === 'create') {
+                                        $set('slug', Str::slug($state));
+                                    }
+                                }),
                             TextInput::make('slug')
                                 ->label(__('categories.slug'))
                                 ->unique(ignoreRecord: true)
@@ -294,7 +273,7 @@ final class CategoryResource extends Resource
                 TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()
+                ViewAction::make()
                     ->visible(fn () => AuthorizationMatrix::check('categories', 'view')),
                 EditAction::make()
                     ->visible(fn () => AuthorizationMatrix::check('categories', 'update')),
