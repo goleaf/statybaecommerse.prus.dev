@@ -6,6 +6,12 @@ namespace App\Filament\Resources\CountryResource\Pages;
 
 use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\CountryResource;
+use App\Filament\Resources\CountryResource\Widgets\CountriesByRegionWidget;
+use App\Filament\Resources\CountryResource\Widgets\CountriesOverviewWidget;
+use App\Filament\Resources\CountryResource\Widgets\CountriesStatsWidget;
+use App\Filament\Resources\CountryResource\Widgets\CountriesWithVatWidget;
+use App\Filament\Resources\CountryResource\Widgets\CountryDetailsWidget;
+use App\Filament\Resources\CountryResource\Widgets\EuMembersWidget;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tab;
@@ -42,6 +48,24 @@ class ListCountries extends BaseListRecords
     }
 
     protected function getHeaderWidgets(): array
+    {
+        return [
+            CountriesOverviewWidget::class,
+            CountriesStatsWidget::class,
+            CountriesByRegionWidget::class,
+        ];
+    }
+
+    protected function getFooterWidgets(): array
+    {
+        return [
+            CountriesWithVatWidget::class,
+            EuMembersWidget::class,
+            CountryDetailsWidget::class,
+        ];
+    }
+
+    public function getTabs(): array
     {
         return [
             'all' => Tab::make(__('countries.filters.all'))
