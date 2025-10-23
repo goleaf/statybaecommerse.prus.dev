@@ -12,7 +12,9 @@ final class BrandCatalogueDataProvider
 {
     use BuildsProductCatalogueQuery;
 
-    public function __construct(private readonly ProductCatalogueDataProvider $products) {}
+    public function __construct(private readonly ProductCatalogueDataProvider $products)
+    {
+    }
 
     public function index(): array
     {

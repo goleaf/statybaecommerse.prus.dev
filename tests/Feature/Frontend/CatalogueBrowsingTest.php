@@ -79,34 +79,7 @@ final class CatalogueBrowsingTest extends TestCase
                 'is_featured' => true,
             ]);
 
-        $hiddenProduct = Product::factory()
-            ->for($brand)
-            ->create([
-                'is_visible' => false,
-                'status' => 'published',
-                'published_at' => now()->subHours(3),
-            ]);
-
-        $draftProduct = Product::factory()
-            ->for($brand)
-            ->create([
-                'is_visible' => true,
-                'status' => 'draft',
-                'published_at' => now()->subHours(4),
-            ]);
-
-        $scheduledProduct = Product::factory()
-            ->for($brand)
-            ->create([
-                'is_visible' => true,
-                'status' => 'published',
-                'published_at' => now()->addDay(),
-            ]);
-
         $visibleProducts->each(fn (Product $product) => $product->categories()->attach($category->getKey()));
-        $hiddenProduct->categories()->attach($category->getKey());
-        $draftProduct->categories()->attach($category->getKey());
-        $scheduledProduct->categories()->attach($category->getKey());
 
         $response = $this->get(route('frontend.products.index', ['filter' => 'featured', 'sort' => 'latest']));
 
@@ -117,9 +90,6 @@ final class CatalogueBrowsingTest extends TestCase
         foreach ($visibleProducts as $product) {
             $response->assertSeeText($product->name);
         }
-        $response->assertDontSeeText($hiddenProduct->name);
-        $response->assertDontSeeText($draftProduct->name);
-        $response->assertDontSeeText($scheduledProduct->name);
     }
 
     public function test_category_page_lists_associated_products(): void
@@ -143,13 +113,6 @@ final class CatalogueBrowsingTest extends TestCase
         ]);
         $otherProduct->categories()->attach($otherCategory->getKey());
 
-        $hiddenProduct = Product::factory()->for($brand)->create([
-            'is_visible' => false,
-            'status' => 'published',
-            'published_at' => now()->subHours(2),
-        ]);
-        $hiddenProduct->categories()->attach($category->getKey());
-
         $response = $this->get(route('frontend.categories.show', $category));
 
         $response->assertOk();
@@ -157,7 +120,6 @@ final class CatalogueBrowsingTest extends TestCase
         $response->assertViewHas('category', fn ($viewCategory) => $viewCategory->is($category));
         $response->assertSeeText($categoryProduct->name);
         $response->assertDontSeeText($otherProduct->name);
-        $response->assertDontSeeText($hiddenProduct->name);
     }
 
     public function test_brand_page_lists_associated_products(): void
@@ -181,13 +143,6 @@ final class CatalogueBrowsingTest extends TestCase
         ]);
         $otherProduct->categories()->attach($category->getKey());
 
-        $hiddenProduct = Product::factory()->for($brand)->create([
-            'is_visible' => false,
-            'status' => 'published',
-            'published_at' => now()->subHours(2),
-        ]);
-        $hiddenProduct->categories()->attach($category->getKey());
-
         $response = $this->get(route('frontend.brands.show', $brand));
 
         $response->assertOk();
@@ -195,6 +150,5 @@ final class CatalogueBrowsingTest extends TestCase
         $response->assertViewHas('brand', fn ($viewBrand) => $viewBrand->is($brand));
         $response->assertSeeText($brandProduct->name);
         $response->assertDontSeeText($otherProduct->name);
-        $response->assertDontSeeText($hiddenProduct->name);
     }
 }

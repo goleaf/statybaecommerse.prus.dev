@@ -6,34 +6,27 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
-use App\Models\Product;
-use Illuminate\View\View;
+use App\Support\Frontend\DataProviders\CategoryCatalogueDataProvider;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
 
 final class CategoryController extends Controller
 {
-    public function index(): View
+    public function __construct(private readonly CategoryCatalogueDataProvider $dataProvider)
     {
-        $categories = Category::query()
-            ->withCount('products')
-            ->orderBy('name')
-            ->get();
-
-        return view('frontend.categories.index', compact('categories'));
     }
 
-    public function show(Category $category): View
+    public function index(Request $request): View
     {
-        $category->load(['children']);
+        $data = $this->dataProvider->index();
 
-        $products = Product::query()
-            ->with(['brand'])
-            ->whereHas('categories', fn ($query) => $query->whereKey($category->getKey()))
-            ->paginate(12)
-            ->withQueryString();
+        return view('frontend.categories.index', $data);
+    }
 
-        return view('frontend.categories.show', [
-            'category' => $category,
-            'products' => $products,
-        ]);
+    public function show(Category $category, Request $request): View
+    {
+        $data = $this->dataProvider->show($category, $request->all());
+
+        return view('frontend.categories.show', $data);
     }
 }
