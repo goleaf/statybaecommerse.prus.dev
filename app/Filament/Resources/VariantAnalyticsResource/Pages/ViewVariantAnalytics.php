@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\VariantAnalyticsResource\Pages;
 
 use App\Filament\Resources\VariantAnalyticsResource;
+use App\Models\VariantAnalytics;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
@@ -78,7 +79,7 @@ final class ViewVariantAnalytics extends ViewRecord
 
                                 TextEntry::make('conversion_rate')
                                     ->label(__('admin.variant_analytics.conversion_rate'))
-                                    ->formatStateUsing(fn ($state) => number_format($state, 2).'%')
+                                    ->formatStateUsing(fn ($state) => number_format($state, 2) . '%')
                                     ->columnSpan(1),
                             ]),
                     ]),
@@ -89,25 +90,25 @@ final class ViewVariantAnalytics extends ViewRecord
                             ->schema([
                                 TextEntry::make('click_through_rate')
                                     ->label(__('admin.variant_analytics.ctr'))
-                                    ->getStateUsing(fn ($record) => $record->click_through_rate)
+                                    ->getStateUsing(fn (VariantAnalytics $record) => $record->click_through_rate)
                                     ->formatStateUsing(fn ($state) => number_format($state, 2) . '%')
                                     ->columnSpan(1),
 
                                 TextEntry::make('add_to_cart_rate')
                                     ->label(__('admin.variant_analytics.atc_rate'))
-                                    ->getStateUsing(fn ($record) => $record->add_to_cart_rate)
+                                    ->getStateUsing(fn (VariantAnalytics $record) => $record->add_to_cart_rate)
                                     ->formatStateUsing(fn ($state) => number_format($state, 2) . '%')
                                     ->columnSpan(1),
 
                                 TextEntry::make('purchase_rate')
                                     ->label(__('admin.variant_analytics.purchase_rate'))
-                                    ->getStateUsing(fn ($record) => $record->purchase_rate)
+                                    ->getStateUsing(fn (VariantAnalytics $record) => $record->purchase_rate)
                                     ->formatStateUsing(fn ($state) => number_format($state, 2) . '%')
                                     ->columnSpan(1),
 
                                 TextEntry::make('average_revenue_per_purchase')
                                     ->label(__('admin.variant_analytics.avg_revenue'))
-                                    ->getStateUsing(fn ($record) => $record->average_revenue_per_purchase)
+                                    ->getStateUsing(fn (VariantAnalytics $record) => $record->average_revenue_per_purchase)
                                     ->money('EUR')
                                     ->columnSpan(1),
                             ]),

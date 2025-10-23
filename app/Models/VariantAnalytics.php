@@ -44,14 +44,14 @@ final class VariantAnalytics extends Model
     protected function casts(): array
     {
         return [
-            'product_id' => 'integer',
-            'date' => 'date',
-            'date_bucket' => 'string',
-            'views' => 'integer',
-            'clicks' => 'integer',
-            'add_to_cart' => 'integer',
-            'purchases' => 'integer',
-            'revenue' => 'decimal:4',
+            'product_id'      => 'integer',
+            'date'            => 'date',
+            'date_bucket'     => 'string',
+            'views'           => 'integer',
+            'clicks'          => 'integer',
+            'add_to_cart'     => 'integer',
+            'purchases'       => 'integer',
+            'revenue'         => 'decimal:4',
             'conversion_rate' => 'decimal:4',
         ];
     }
@@ -65,7 +65,7 @@ final class VariantAnalytics extends Model
     }
 
     /**
-     * Get the product that this analytics row refers to.
+     * Get the product that owns the analytics.
      */
     public function product(): BelongsTo
     {
@@ -197,28 +197,28 @@ final class VariantAnalytics extends Model
         $now = now();
 
         $payload = [
-            'product_id' => $productId,
-            'variant_id' => $variantId,
-            'date' => $normalizedDate,
-            'date_bucket' => $bucket,
-            'views' => (int) ($data['views'] ?? 0),
-            'clicks' => (int) ($data['clicks'] ?? 0),
-            'add_to_cart' => (int) ($data['add_to_cart'] ?? 0),
-            'purchases' => (int) ($data['purchases'] ?? 0),
-            'revenue' => (float) ($data['revenue'] ?? 0),
+            'product_id'      => $productId,
+            'variant_id'      => $variantId,
+            'date'            => $normalizedDate,
+            'date_bucket'     => $bucket,
+            'views'           => (int) ($data['views'] ?? 0),
+            'clicks'          => (int) ($data['clicks'] ?? 0),
+            'add_to_cart'     => (int) ($data['add_to_cart'] ?? 0),
+            'purchases'       => (int) ($data['purchases'] ?? 0),
+            'revenue'         => (float) ($data['revenue'] ?? 0),
             'conversion_rate' => $data['conversion_rate'] ?? null,
-            'created_at' => $now,
-            'updated_at' => $now,
+            'created_at'      => $now,
+            'updated_at'      => $now,
         ];
 
         $updates = [
-            'updated_at' => $now,
-            'date' => $normalizedDate,
-            'views' => self::incrementExpression('views'),
-            'clicks' => self::incrementExpression('clicks'),
+            'updated_at'  => $now,
+            'date'        => $normalizedDate,
+            'views'       => self::incrementExpression('views'),
+            'clicks'      => self::incrementExpression('clicks'),
             'add_to_cart' => self::incrementExpression('add_to_cart'),
-            'purchases' => self::incrementExpression('purchases'),
-            'revenue' => self::incrementExpression('revenue'),
+            'purchases'   => self::incrementExpression('purchases'),
+            'revenue'     => self::incrementExpression('revenue'),
         ];
 
         if (array_key_exists('conversion_rate', $data)) {
