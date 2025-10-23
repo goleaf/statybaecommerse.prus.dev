@@ -40,7 +40,7 @@ final class FeatureFlagResourceTest extends TestCase
     }
 
     /**
-     * Ensure the listing includes flags hidden by default model scopes.
+     * Ensure inactive or disabled feature flags still appear in the listing.
      */
     public function test_list_includes_inactive_feature_flags(): void
     {
