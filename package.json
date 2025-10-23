@@ -19,10 +19,7 @@
         "e2e:smoke": "node scripts/e2e-smoke.mjs",
         "e2e:routes": "node scripts/check-routes.mjs",
         "e2e:console": "node scripts/check-console.mjs",
-        "lint:commits": "commitlint --from=HEAD~1",
-        "prepare": "husky install",
-        "release": "release-please release --manifest .release-please-manifest.json --config release-please-config.json",
-        "release:pr": "release-please release-pr --manifest .release-please-manifest.json --config release-please-config.json"
+        "prepare": "husky"
     },
     "devDependencies": {
         "@commitlint/cli": "^20.1.0",
