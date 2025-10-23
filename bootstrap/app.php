@@ -1,14 +1,22 @@
 <?php
 
-use App\Exceptions\Domain\DomainException;
-use App\Http\Middleware\AttachCorrelationId;
-use App\Services\TranslationService;
+use App\Exceptions\CodeStyleException;
+use App\Support\ErrorCodes;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 // Load the Filament compatibility shims before the application boots so the
 // legacy class aliases are always available during early package discovery.
@@ -56,33 +64,79 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->render(function (DomainException $exception, Request $request) {
-            $availableLocales = TranslationService::getAvailableLocales();
-            $preferred = $request->getPreferredLanguage($availableLocales);
-            $locale = is_string($preferred) && $preferred !== ''
-                ? $preferred
-                : (is_string(app()->getLocale()) && app()->getLocale() !== ''
-                    ? app()->getLocale()
-                    : TranslationService::getDefaultLocale());
+        $resolveCorrelationId = static function (Request $request): string {
+            $correlationId = $request->attributes->get('correlation_id');
 
-            if (! in_array($locale, $availableLocales, true)) {
-                $locale = TranslationService::getDefaultLocale();
+            if (! is_string($correlationId) || $correlationId === '') {
+                $correlationId = (string) Str::uuid();
+                $request->attributes->set('correlation_id', $correlationId);
             }
 
-            app()->setLocale($locale);
+            return $correlationId;
+        };
 
-            $message = TranslationService::get($exception->translationKey(), $exception->context(), $locale);
+        $exceptions->report(function (\Throwable $throwable) use ($resolveCorrelationId): void {
+            $request = request();
+            $correlationId = $request instanceof Request
+                ? $resolveCorrelationId($request)
+                : (string) Str::uuid();
 
-            $correlationId = $request->attributes->get('correlation_id')
-                ?? (app()->bound('request_correlation_id')
-                    ? (string) app()->make('request_correlation_id')
-                    : Str::uuid()->toString());
+            Log::error($throwable->getMessage(), [
+                'exception' => $throwable,
+                'correlation_id' => $correlationId,
+            ]);
+        });
+
+        $exceptions->render(function (\Throwable $throwable, Request $request) use ($resolveCorrelationId) {
+            if (! $request->expectsJson() && ! $request->wantsJson()) {
+                return null;
+            }
+
+            $correlationId = $resolveCorrelationId($request);
+
+            [$status, $code] = match (true) {
+                $throwable instanceof ValidationException => [422, ErrorCodes::VALIDATION_FAILED],
+                $throwable instanceof AuthenticationException => [401, ErrorCodes::AUTHENTICATION_FAILED],
+                $throwable instanceof AuthorizationException => [403, ErrorCodes::AUTHORIZATION_FAILED],
+                $throwable instanceof ModelNotFoundException => [404, ErrorCodes::MODEL_NOT_FOUND],
+                $throwable instanceof NotFoundHttpException => [404, ErrorCodes::ROUTE_NOT_FOUND],
+                $throwable instanceof MethodNotAllowedHttpException => [405, ErrorCodes::METHOD_NOT_ALLOWED],
+                $throwable instanceof TooManyRequestsHttpException => [429, ErrorCodes::TOO_MANY_REQUESTS],
+                $throwable instanceof CodeStyleException => [422, ErrorCodes::CODE_STYLE_VIOLATION],
+                $throwable instanceof HttpExceptionInterface => [
+                    $throwable->getStatusCode(),
+                    match ($throwable->getStatusCode()) {
+                        503 => ErrorCodes::SERVICE_UNAVAILABLE,
+                        404 => ErrorCodes::ROUTE_NOT_FOUND,
+                        405 => ErrorCodes::METHOD_NOT_ALLOWED,
+                        401 => ErrorCodes::AUTHENTICATION_FAILED,
+                        403 => ErrorCodes::AUTHORIZATION_FAILED,
+                        429 => ErrorCodes::TOO_MANY_REQUESTS,
+                        default => ErrorCodes::UNKNOWN_ERROR,
+                    },
+                ],
+                $throwable instanceof \RuntimeException => [500, ErrorCodes::RUNTIME_ERROR],
+                default => [500, ErrorCodes::UNKNOWN_ERROR],
+            };
+
+            $messageKey = "errors.$code";
+            $message = trans($messageKey);
+
+            if ($message === $messageKey) {
+                $fallbackKey = 'errors.' . ErrorCodes::UNKNOWN_ERROR;
+                $fallback = trans($fallbackKey);
+                $message = $fallback === $fallbackKey
+                    ? __('An unexpected error occurred.')
+                    : $fallback;
+            }
 
             return response()->json([
-                'code' => $exception->errorCode(),
-                'message' => $message,
-                'correlation_id' => $correlationId,
-            ], $exception->status());
+                'error' => [
+                    'code' => $code,
+                    'message' => $message,
+                    'correlation_id' => $correlationId,
+                ],
+            ], $status);
         });
     })
     ->withProviders((function (): array {
