@@ -88,6 +88,12 @@ return [
         'is_visible' => 'Visible',
         'approve_selected' => 'Approve Selected',
         'disapprove_selected' => 'Disapprove Selected',
+        'approve' => 'Approve',
+        'disapprove' => 'Disapprove',
+        'confirm_approve_heading' => 'Approve comment?',
+        'confirm_approve_description' => 'This will mark the comment as approved and visible to readers.',
+        'confirm_disapprove_heading' => 'Disapprove comment?',
+        'confirm_disapprove_description' => 'This will mark the comment as unapproved and hide it from readers.',
     ],
     'news_images' => [
         'navigation_label' => 'News Images',
