@@ -22,7 +22,13 @@ use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Support\Facades\Number;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use BackedEnum;
@@ -46,7 +52,12 @@ final class VariantAnalyticsResource extends Resource
 {
     protected static ?string $model = VariantAnalytics::class;
 
-    /** @var string|\BackedEnum|null Ensure inventory analytics stay grouped centrally. */
+    /**
+     * @var string|BackedEnum|null Ensure Filament interprets the icon while supporting enums.
+     */
+    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
+
+    /** @var string|BackedEnum|null Ensure inventory analytics stay grouped centrally. */
     protected static $navigationGroup = NavigationGroup::Inventory;
 
     /**
@@ -59,8 +70,8 @@ final class VariantAnalyticsResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        // Centralize the NavigationGroup handling to leverage enum labels and document the navigation cleanup.
-        $group = static::$navigationGroup;
+        // Centralize the NavigationGroup handling to leverage enum labels.
+        $group = self::$navigationGroup;
 
         return $group instanceof NavigationGroup ? $group->label() : $group; // Provide Filament with the concrete navigation label.
     }
@@ -164,12 +175,14 @@ final class VariantAnalyticsResource extends Resource
                                                 $views = (float) $get('views');
                                                 $clicks = (float) $get('clicks');
 
-                                                if ($views > 0.0) {
-                                                    return self::formatPercentage(($clicks / $views) * 100);
-                                                }
+                                                        if ($views > 0.0) {
+                                                            // Use the shared Number facade to guarantee consistent percentage formatting.
+                                                            return Number::percentage($clicks / $views, 2);
+                                                        }
 
-                                                return self::formatPercentage(0);
-                                            }),
+                                                        return Number::percentage(0.0, 2);
+                                                    }),
+                                            ]),
                                     ]),
                                 Section::make(__('admin.variant_analytics.conversion_metrics'))
                                     ->columns(3)
@@ -206,33 +219,36 @@ final class VariantAnalyticsResource extends Resource
                                                 $clicks = (float) $get('clicks');
                                                 $addToCart = (float) $get('add_to_cart');
 
-                                                if ($clicks > 0.0) {
-                                                    return self::formatPercentage(($addToCart / $clicks) * 100);
-                                                }
+                                                        if ($clicks > 0.0) {
+                                                            // Keep add-to-cart percentages aligned with Filament's formatting helper.
+                                                            return Number::percentage($addToCart / $clicks, 2);
+                                                        }
 
-                                                return self::formatPercentage(0);
-                                            }),
-                                        Placeholder::make('purchase_rate')
-                                            ->label(__('admin.variant_analytics.purchase_rate'))
-                                            ->content(static function (callable $get): string {
-                                                $addToCart = (float) $get('add_to_cart');
-                                                $purchases = (float) $get('purchases');
+                                                        return Number::percentage(0.0, 2);
+                                                    }),
+                                                Placeholder::make('purchase_rate')
+                                                    ->label(__('admin.variant_analytics.purchase_rate'))
+                                                    ->content(static function (callable $get): string {
+                                                        $addToCart = (float) $get('add_to_cart');
+                                                        $purchases = (float) $get('purchases');
 
-                                                if ($addToCart > 0.0) {
-                                                    return self::formatPercentage(($purchases / $addToCart) * 100);
-                                                }
+                                                        if ($addToCart > 0.0) {
+                                                            // Apply the shared percentage helper so conversion math renders uniformly.
+                                                            return Number::percentage($purchases / $addToCart, 2);
+                                                        }
 
-                                                return self::formatPercentage(0);
-                                            }),
-                                        TextInput::make('conversion_rate')
-                                            ->label(__('admin.variant_analytics.conversion_rate'))
-                                            ->numeric()
-                                            ->minValue(0)
-                                            ->maxValue(100)
-                                            ->step(0.0001)
-                                            ->suffix('%')
-                                            ->default(0)
-                                            ->helperText(__('admin.variant_analytics.conversion_rate_help')),
+                                                        return Number::percentage(0.0, 2);
+                                                    }),
+                                                TextInput::make('conversion_rate')
+                                                    ->label(__('admin.variant_analytics.conversion_rate'))
+                                                    ->numeric()
+                                                    ->minValue(0)
+                                                    ->maxValue(100)
+                                                    ->step(0.0001)
+                                                    ->suffix('%')
+                                                    ->default(0)
+                                                    ->helperText(__('admin.variant_analytics.conversion_rate_help')),
+                                            ]),
                                     ]),
                             ]),
                         Forms\Components\Tabs\Tab::make(__('admin.variant_analytics.additional_data'))
@@ -296,7 +312,10 @@ final class VariantAnalyticsResource extends Resource
                 Tables\Columns\TextColumn::make('click_through_rate')
                     ->label(__('admin.variant_analytics.ctr'))
                     ->getStateUsing(static fn (VariantAnalytics $record): float => (float) $record->click_through_rate)
-                    ->formatStateUsing(static fn (float|int|null $state): string => self::formatPercentage($state))
+                    ->formatStateUsing(static function (float|int|null $state): string {
+                        // Stored values represent full percentages, so divide by 100 before formatting.
+                        return Number::percentage(((float) $state) / 100, 2);
+                    })
                     ->sortable(false)
                     ->toggleable()
                     ->badge()
@@ -324,7 +343,10 @@ final class VariantAnalyticsResource extends Resource
                 Tables\Columns\TextColumn::make('add_to_cart_rate')
                     ->label(__('admin.variant_analytics.atc_rate'))
                     ->getStateUsing(static fn (VariantAnalytics $record): float => (float) $record->add_to_cart_rate)
-                    ->formatStateUsing(static fn (float|int|null $state): string => self::formatPercentage($state))
+                    ->formatStateUsing(static function (float|int|null $state): string {
+                        // Stored values represent full percentages, so divide by 100 before formatting.
+                        return Number::percentage(((float) $state) / 100, 2);
+                    })
                     ->sortable(false)
                     ->toggleable()
                     ->badge()
@@ -352,7 +374,10 @@ final class VariantAnalyticsResource extends Resource
                 Tables\Columns\TextColumn::make('purchase_rate')
                     ->label(__('admin.variant_analytics.purchase_rate'))
                     ->getStateUsing(static fn (VariantAnalytics $record): float => (float) $record->purchase_rate)
-                    ->formatStateUsing(static fn (float|int|null $state): string => self::formatPercentage($state))
+                    ->formatStateUsing(static function (float|int|null $state): string {
+                        // Stored values represent full percentages, so divide by 100 before formatting.
+                        return Number::percentage(((float) $state) / 100, 2);
+                    })
                     ->sortable(false)
                     ->toggleable()
                     ->badge()
@@ -386,7 +411,10 @@ final class VariantAnalyticsResource extends Resource
                     ->color('info'),
                 Tables\Columns\TextColumn::make('conversion_rate')
                     ->label(__('admin.variant_analytics.conversion_rate'))
-                    ->formatStateUsing(static fn (float|int|null $state): string => self::formatPercentage($state))
+                    ->formatStateUsing(static function (float|int|null $state): string {
+                        // Stored values represent full percentages, so divide by 100 before formatting.
+                        return Number::percentage(((float) $state) / 100, 2);
+                    })
                     ->sortable()
                     ->toggleable()
                     ->badge()
