@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\StatusScope;
 use App\Observers\OrderObserver;
 use Carbon\CarbonImmutable;
@@ -50,7 +49,7 @@ use Spatie\Translatable\HasTranslations;
  * @mixin \Eloquent
  */
 #[ObservedBy([OrderObserver::class])]
-#[ScopedBy([ActiveScope::class, StatusScope::class])]
+#[ScopedBy([StatusScope::class])]
 final class Order extends Model
 {
     use HasFactory, HasTranslations, LogsActivity, SoftDeletes;

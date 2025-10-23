@@ -51,18 +51,8 @@ final class OrderContract
                 'state'         => (string) $order->status,
                 'payment_state' => $order->payment_status,
             ],
-            'totals' => [
-                // Stick to the contract schema by publishing the core monetary
-                // aggregates without the richer presentation extras that the pricing
-                // service exposes internally.
-                'subtotal' => (float) $order->subtotal,
-                'tax'      => (float) $order->tax_amount,
-                'shipping' => (float) $order->shipping_amount,
-                'discount' => (float) $order->discount_amount,
-                'total'    => (float) $order->total,
-                'currency' => (string) ($order->currency ?? config('app.currency', 'EUR')),
-            ],
-            'items' => $order->items->map(static fn ($item): array => [
+            'totals' => $breakdown->toContractTotals(),
+            'items'  => $order->items->map(static fn ($item): array => [
                 'id'         => $item->getKey(),
                 'product_id' => $item->product_id,
                 'name'       => (string) $item->name,

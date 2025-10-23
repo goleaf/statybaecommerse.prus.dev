@@ -32,15 +32,29 @@ final class UserContract
 
     private static function mapUser(User $user): array
     {
+        // Preload relations that back the envelope so downstream JSON encoding
+        // doesn't trigger N+1 queries for large dashboard payloads.
         $user->loadMissing(['addresses', 'orders', 'wishlists.items.product']);
         $safeAttributes = $user->toApiSafeArray();
 
-        $wishlistedProducts = $user->wishlists
-            ->flatMap(static fn ($wishlist) => $wishlist->items->map(static fn ($item) => $item->product)->filter())
-            ->filter()
-            ->unique(static fn ($product) => $product?->getKey())
-            ->map(static fn ($product) => $product ? Arr::except($product->toArray(), ['pivot']) : null)
-            ->filter()
+        $wishlistItems = $user->wishlists
+            ->flatMap(static function ($wishlist) {
+                return $wishlist->items->map(static function ($item) use ($wishlist) {
+                    return [
+                        'wishlist_id'   => $wishlist->getKey(),
+                        'wishlist_name' => (string) $wishlist->name,
+                        'product'       => $item->product ? [
+                            'id'   => $item->product->getKey(),
+                            'name' => (string) $item->product->name,
+                            'slug' => (string) $item->product->slug,
+                        ] : null,
+                        'variant_id' => $item->variant_id,
+                        'quantity'   => $item->quantity,
+                        'notes'      => $item->notes,
+                        'added_at'   => $item->created_at?->toISOString(),
+                    ];
+                });
+            })
             ->values()
             ->all();
 
@@ -81,7 +95,7 @@ final class UserContract
             'orders' => $user->orders->map(static function ($order) {
                 return Arr::except($order->toArray(), ['user_id']);
             })->all(),
-            'wishlist' => $wishlistedProducts,
+            'wishlist' => $wishlistItems,
             'links'    => [
                 'self' => route('account'),
             ],

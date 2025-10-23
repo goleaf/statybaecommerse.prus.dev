@@ -26,14 +26,14 @@ final class PriceBreakdown
     public function toArray(): array
     {
         return [
-            'subtotal' => $this->subtotal,
+            'subtotal'        => $this->subtotal,
             'discount_amount' => $this->discount,
-            'taxable_amount' => $this->taxableAmount,
-            'tax_amount' => $this->tax,
+            'taxable_amount'  => $this->taxableAmount,
+            'tax_amount'      => $this->tax,
             'shipping_amount' => $this->shipping,
-            'total' => $this->total,
-            'currency' => $this->currency,
-            'vat_rate' => $this->vatRate,
+            'total'           => $this->total,
+            'currency'        => $this->currency,
+            'vat_rate'        => $this->vatRate,
         ];
     }
 
@@ -43,12 +43,29 @@ final class PriceBreakdown
     public function toSummary(): array
     {
         return $this->toArray() + [
-            'formatted_subtotal' => app_money_format($this->subtotal, $this->currency),
+            'formatted_subtotal'        => app_money_format($this->subtotal, $this->currency),
             'formatted_discount_amount' => app_money_format($this->discount, $this->currency),
-            'formatted_taxable_amount' => app_money_format($this->taxableAmount, $this->currency),
-            'formatted_tax_amount' => app_money_format($this->tax, $this->currency),
+            'formatted_taxable_amount'  => app_money_format($this->taxableAmount, $this->currency),
+            'formatted_tax_amount'      => app_money_format($this->tax, $this->currency),
             'formatted_shipping_amount' => app_money_format($this->shipping, $this->currency),
-            'formatted_total' => app_money_format($this->total, $this->currency),
+            'formatted_total'           => app_money_format($this->total, $this->currency),
+        ];
+    }
+
+    /**
+     * Map the totals into the lean structure that our public contract expects.
+     *
+     * @return array<string, float|string>
+     */
+    public function toContractTotals(): array
+    {
+        return [
+            'subtotal' => $this->subtotal,
+            'tax'      => $this->tax,
+            'shipping' => $this->shipping,
+            'discount' => $this->discount,
+            'total'    => $this->total,
+            'currency' => $this->currency,
         ];
     }
 

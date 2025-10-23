@@ -41,9 +41,15 @@ final class BrandContract
         $data = ['items' => $mapped];
 
         if ($paginator instanceof LengthAwarePaginator) {
-            // Surface pagination totals via meta to keep the payload aligned with the
-            // published schema that disallows additional fields alongside the items
-            // collection.
+            // Surface pagination details alongside other metadata to respect the
+            // published JSON schema that disallows arbitrary members under the
+            // data payload for collection responses.
+            $meta['pagination'] = [
+                'current_page' => $paginator->currentPage(),
+                'last_page'    => $paginator->lastPage(),
+                'per_page'     => $paginator->perPage(),
+                'total'        => $paginator->total(),
+            ];
             $meta['total'] = $paginator->total();
         } else {
             $meta['total'] = count($mapped);
