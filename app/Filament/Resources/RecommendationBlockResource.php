@@ -122,8 +122,6 @@ final class RecommendationBlockResource extends Resource
                     Combobox::make('products')
                         ->label(__('recommendation_blocks.products'))
                         ->relationship('products', 'name', fn (Builder $query) => $query->withoutGlobalScopes())
-                        ->relationshipDefaults(preload: false)
-                        // Shared Combobox defaults apply JS rendering and search helpers.
                         ->height('320px')
                         ->afterStateHydrated(function ($state, callable $set): void {
                             $set('products', collect($state)->sort()->values()->all());
