@@ -109,6 +109,7 @@ Call `SearchableComponentHelper::clear($component);` whenever you need to wipe a
 - Register `afterStateHydrated` closures on your Filament form components to call `SearchableComponentHelper::hydrate()` with a finder closure and normaliser that return the `[value, label, payload]` tuple described above. This keeps edit forms and relation managers aligned when records are re-opened.
 - Pair `afterStateUpdated` hooks with `SearchableComponentHelper::syncSelectedRecord()` so related attributes update automatically and dependent payloads can be cached or cleared through the optional callbacks.
 - Prefer returning a payload array that is already shaped for the downstream Livewire data structure you need. The helper simply forwards the normalised payload, making the component the single source of truth for metadata.
+- Keep resource `form()` signatures aligned with Filament's documented `public static function form(Form $form): Form` contract. Static analysis and Composer's package discovery checks rely on this signature, so mismatches can halt installs before searchable components boot.
 
 ## Related guidelines
 
