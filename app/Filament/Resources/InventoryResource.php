@@ -7,8 +7,8 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\InventoryResource\Pages;
 use App\Models\Inventory;
 use App\Models\Product;
+use App\Support\Filament\SearchableComponentHelper;
 use App\Support\Search\ProductSearch;
-use App\Support\Search\SearchableComponentHelper;
 use App\Support\Search\SearchResultPayload;
 use DefStudio\SearchableInput\DTO\SearchResult;
 use BackedEnum;
@@ -18,7 +18,7 @@ use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Set;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
@@ -88,45 +88,77 @@ final class InventoryResource extends Resource
                                 ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
                                 ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?Inventory $record): void {
+                                    // Resolve the persisted product into the shared SearchResult helper so Filament can
+                                    // repopulate the label and metadata payload without duplicating query logic.
                                     SearchableComponentHelper::hydrate(
-                                        $component,
-                                        $state,
-                                        function (int|string $productId) use ($record): ?\DefStudio\SearchableInput\DTO\SearchResult {
-                                            $product = $record?->product;
-
-                                            if (! $product instanceof Product || (int) $product->getKey() !== (int) $productId) {
-                                                $product = Product::query()
-                                                    ->select(['id', 'sku', 'name'])
-                                                    ->find((int) $productId);
-                                            }
+                                        component: $component,
+                                        state: $state,
+                                        resolveResult: function (int|string $identifier) use ($record): ?SearchResult {
+                                            $product = $record?->product ?? Product::query()
+                                                ->select(['id', 'sku', 'name', 'price'])
+                                                ->find((int) $identifier);
 
                                             if (! $product instanceof Product) {
                                                 return null;
                                             }
 
-                                            return self::buildProductSearchResult($product);
+                                            $rawName = $product->getAttribute('name');
+                                            $name = is_array($rawName)
+                                                ? (string) ($rawName[app()->getLocale()] ?? reset($rawName) ?? '')
+                                                : (string) ($rawName ?? '');
+                                            $rawPrice = $product->getAttribute('price');
+                                            $price = is_numeric($rawPrice) ? (float) $rawPrice : 0.0;
+
+                                            return SearchResultPayload::normalise(
+                                                SearchResult::make(
+                                                    value: (string) $product->getKey(),
+                                                    label: ProductSearch::label($product),
+                                                ),
+                                                [
+                                                    'product_id' => $product->getKey(),
+                                                    'sku'        => (string) ($product->getAttribute('sku') ?? ''),
+                                                    'name'       => $name,
+                                                    'price'      => $price,
+                                                ],
+                                            );
                                         },
                                     );
-
-                                    // Reference the searchable input helper docs for behaviour overview.
-                                    // See docs/i18n/SEARCHABLE_INPUT.md for expectations when hydrating/clearing selections.
                                 })
-                                ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
-                                    SearchableComponentHelper::syncSelectedRecord(
+                                // Behaviour documented at docs/forms/SEARCHABLE_INPUT_METADATA.md to keep helper usage aligned.
+                                ->afterStateUpdated(function (SearchableInput $component, ?string $state, callable $set): void {
+                                    SearchableComponentHelper::sync(
                                         component: $component,
                                         state: $state,
                                         set: $set,
-                                        attribute: 'product_id',
-                                        resolver: static function (string $productId): ?\DefStudio\SearchableInput\DTO\SearchResult {
+                                        targetField: 'product_id',
+                                        resolveResult: static function (int|string $identifier): ?SearchResult {
                                             $product = Product::query()
-                                                ->select(['id', 'sku', 'name'])
-                                                ->find((int) $productId);
+                                                ->select(['id', 'sku', 'name', 'price'])
+                                                ->find((int) $identifier);
 
                                             if (! $product instanceof Product) {
                                                 return null;
                                             }
 
-                                            return self::buildProductSearchResult($product);
+                                            $rawName = $product->getAttribute('name');
+                                            $name = is_array($rawName)
+                                                ? (string) ($rawName[app()->getLocale()] ?? reset($rawName) ?? '')
+                                                : (string) ($rawName ?? '');
+                                            $rawPrice = $product->getAttribute('price');
+                                            $price = is_numeric($rawPrice) ? (float) $rawPrice : 0.0;
+
+                                            return SearchResultPayload::normalise(
+                                                SearchResult::make(
+                                                    value: (string) $product->getKey(),
+                                                    label: ProductSearch::label($product),
+                                                ),
+                                                [
+                                                    'product_id' => $product->getKey(),
+                                                    'sku'        => (string) ($product->getAttribute('sku') ?? ''),
+                                                    'name'       => $name,
+                                                    'price'      => $price,
+                                                ],
+                                            );
                                         },
                                     );
                                 }),
