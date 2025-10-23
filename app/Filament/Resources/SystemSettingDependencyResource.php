@@ -155,7 +155,19 @@ final class SystemSettingDependencyResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        if (! is_string($state) || $state === '') {
+                        if ($state === null) {
+                            return null;
+                        }
+
+                        if (! is_string($state)) {
+                            if (! is_scalar($state)) {
+                                return null;
+                            }
+
+                            $state = (string) $state;
+                        }
+
+                        if ($state === '') {
                             return null;
                         }
 
