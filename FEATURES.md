@@ -20,7 +20,8 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
-- Storefront contract validation now passes end-to-end: published products stay discoverable, brand listings expose pagination through metadata, order endpoints respect scoped lookups with lean totals, and customer profiles hydrate wishlists without missing pivot tables.
+- Untitled UI storefront icons now live as dedicated Blade components alongside a Filament grid fallback, eliminating missing-component errors during Blade caching while keeping marketing pages styled correctly.
+- Analytics dashboards now inline their widget tab Blade markup, expand the event type catalogue with scroll tracking, enforce per-user analytics scopes during tests, and deliver audit logs sorted by most recent change for predictable API responses.
 - Brands page now features a light-themed layout, shared card components, and refreshed translations so the partner directory feels consistent across locales.
 - Product API endpoints now honour eager-loaded review aggregates so cached rating/count metrics stay in sync while
   trimming redundant queries from feature and regression suites.
