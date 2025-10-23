@@ -85,8 +85,102 @@ jobs:
         run: >-
           composer test -- --coverage-clover build/coverage-${{ matrix.php-version }}.xml
 
-      - name: Upload coverage artifact
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install Composer dependencies
+        run: composer install ${{ env.COMPOSER_FLAGS }}
+
+      - name: Prepare SQLite environment
+        run: |
+          DB_PATH="${GITHUB_WORKSPACE}/database/database.sqlite"
+          cat <<ENV > .env
+          APP_NAME=Laravel
+          APP_ENV=testing
+          APP_KEY=
+          APP_DEBUG=true
+          APP_URL=http://localhost
+          APP_LOCALE=lt
+          APP_FALLBACK_LOCALE=en
+          APP_FAKER_LOCALE=en_US
+          LOG_CHANNEL=stack
+          LOG_LEVEL=debug
+          DB_CONNECTION=sqlite
+          DB_DATABASE=${DB_PATH}
+          BROADCAST_DRIVER=log
+          CACHE_DRIVER=array
+          FILESYSTEM_DISK=local
+          QUEUE_CONNECTION=sync
+          SESSION_DRIVER=array
+          SESSION_LIFETIME=120
+          MAIL_MAILER=log
+          MAIL_HOST=localhost
+          MAIL_PORT=1025
+          MAIL_ENCRYPTION=null
+          MAIL_USERNAME=null
+          MAIL_PASSWORD=null
+          MAIL_FROM_ADDRESS="hello@example.com"
+          MAIL_FROM_NAME="Laravel"
+          ENV
+          touch "$DB_PATH"
+          php artisan key:generate
+
+      - name: Run database migrations and seeds
+        run: php artisan migrate:fresh --seed --force
+
+      - name: Run PHPUnit tests
+        run: php artisan test --no-ansi
+
+      - name: Upload PHPUnit coverage
         if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phpunit-coverage
+          path: storage/app/coverage
+          if-no-files-found: warn
+          retention-days: 14
+
+  node-build:
+    name: Node Build
+    runs-on: ubuntu-latest
+    needs: phpunit
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Cache node modules
+        id: npm-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build assets with Vite
+        run: npm run build
+
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: coverage-php-${{ matrix.php-version }}
@@ -105,5 +199,74 @@ jobs:
       - name: Run ESLint (fail on drift)
         run: npx --yes eslint@9 . --max-warnings=0
 
-      - name: Build frontend assets
-        run: npm run build
+      - name: Bootstrap storage directories
+        run: |
+          php artisan storage:link
+          mkdir -p storage/app/public
+          mkdir -p storage/framework/cache
+          mkdir -p storage/framework/sessions
+          mkdir -p storage/framework/views
+
+      - name: Run database migrations with seeders
+        run: php artisan migrate:fresh --seed --force
+
+      - name: Download compiled assets
+        uses: actions/download-artifact@v4
+        with:
+          name: vite-build
+          path: public/build
+
+      - name: Start Laravel server
+        run: |
+          php artisan serve --host=127.0.0.1 --port=8000 > /tmp/laravel-server.log 2>&1 &
+          echo "SERVER_PID=$!" >> "$GITHUB_ENV"
+
+      - name: Wait for application
+        run: |
+          for i in {1..30}; do
+            if curl -sSf http://127.0.0.1:8000 > /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::Laravel application did not become ready." >&2
+          if [ -f /tmp/laravel-server.log ]; then
+            echo '--- server log ---'
+            cat /tmp/laravel-server.log
+            echo '-------------------'
+          fi
+          exit 1
+
+      - name: Run Lighthouse audits
+        env:
+          TARGET_URL: http://127.0.0.1:8000
+          LH_MIN_PERFORMANCE: '0.8'
+          LH_MIN_ACCESSIBILITY: '0.9'
+        run: node scripts/lighthouse.mjs
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: storage/lighthouse
+          retention-days: 14
+
+      - name: Stop Laravel server
+        if: always()
+        run: |
+          if [ -n "${SERVER_PID}" ]; then
+            kill ${SERVER_PID} || true
+          fi
+
+  secret-scan:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        with:
+          additional_args: --no-banner --redact
