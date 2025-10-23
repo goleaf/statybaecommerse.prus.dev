@@ -42,7 +42,7 @@ use UnitEnum;
 
 final class UserProductInteractionResource extends Resource
 {
-    use HasNav;
+    protected static ?string $model = UserProductInteraction::class;
 
     protected static UnitEnum|string|null $navigationGroup = 'Users';
 
