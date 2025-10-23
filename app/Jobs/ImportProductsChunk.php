@@ -23,6 +23,21 @@ class ImportProductsChunk implements ShouldQueue
 {
     use InteractsWithQueue, Queueable, SerializesModels;
 
+    /**
+     * Number of job attempts before failing.
+     */
+    public int $tries = 5;
+
+    /**
+     * Define retry backoff windows (in seconds).
+     *
+     * @return array<int, int>
+     */
+    public function backoff(): array
+    {
+        return [30, 90, 180, 300, 600];
+    }
+
     /** @var array<int,array<string,mixed>> */
     private array $rows;
 
@@ -42,7 +57,7 @@ class ImportProductsChunk implements ShouldQueue
         // Use LazyCollection with timeout to prevent long-running import operations
         $timeout = now()->addMinutes(10);
         // 10 minute timeout for import chunks
-        LazyCollection::make($this->rows)->takeUntilTimeout($timeout)->each(function ($row) {
+        LazyCollection::make($this->rows)->takeUntilTimeout($timeout)->each(function ($row): void {
             $slug = (string) ($row['slug'] ?? '');
             $name = (string) ($row['name'] ?? '');
             if ($slug === '' && $name !== '') {

@@ -16,6 +16,11 @@ final class RunMinimalSeedJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    /**
+     * Number of job attempts before failing.
+     */
+    public int $tries = 1;
+
     public function handle(): void
     {
         Artisan::call('db:seed', [

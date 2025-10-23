@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Contracts\SystemNotificationSender;
 use App\Models\User;
 use App\Notifications\TestNotification;
 use Illuminate\Support\Collection;
@@ -15,7 +16,7 @@ use Illuminate\Support\LazyCollection;
  *
  * Service class containing LiveNotificationService business logic, external integrations, and complex operations with proper error handling and logging.
  */
-final class LiveNotificationService
+final class LiveNotificationService implements SystemNotificationSender
 {
     /**
      * Handle sendToAdmins functionality with proper error handling.
@@ -25,9 +26,9 @@ final class LiveNotificationService
         // Use LazyCollection with timeout to prevent long-running notification operations
         $timeout = now()->addSeconds(30);
         // 30 second timeout for admin notifications
-        User::whereHas('roles', function ($query) {
+        User::whereHas('roles', function ($query): void {
             $query->whereIn('name', ['administrator', 'manager']);
-        })->cursor()->takeUntilTimeout($timeout)->each(function ($user) use ($title, $message, $type) {
+        })->cursor()->takeUntilTimeout($timeout)->each(function ($user) use ($title, $message, $type): void {
             $this->sendToUser($user, $title, $message, $type);
         });
     }
@@ -50,7 +51,7 @@ final class LiveNotificationService
         // Use LazyCollection with timeout to prevent long-running bulk notification operations
         $timeout = now()->addMinutes(2);
         // 2 minute timeout for bulk user notifications
-        LazyCollection::make($users)->takeUntilTimeout($timeout)->each(function ($user) use ($title, $message, $type) {
+        LazyCollection::make($users)->takeUntilTimeout($timeout)->each(function ($user) use ($title, $message, $type): void {
             $this->sendToUser($user, $title, $message, $type);
         });
     }
