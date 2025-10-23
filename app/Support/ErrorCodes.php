@@ -6,45 +6,28 @@ namespace App\Support;
 
 final class ErrorCodes
 {
-    /**
-     * Generic HTTP & framework level errors.
-     */
-    public const SERVER_ERROR = 'server.error';
-
-    public const BAD_REQUEST = 'http.bad_request';
-
-    public const NOT_FOUND = 'http.not_found';
-
-    public const METHOD_NOT_ALLOWED = 'http.method_not_allowed';
-
-    public const TOO_MANY_REQUESTS = 'http.too_many_requests';
-
-    public const UNAUTHORIZED = 'auth.unauthorized';
-
-    public const FORBIDDEN = 'auth.forbidden';
-
-    public const VALIDATION_FAILED = 'validation.failed';
-
-    /**
-     * Domain level error codes.
-     */
     public const ORDER_NOT_FOUND = 'orders.not_found';
 
     public const INVENTORY_INSUFFICIENT = 'inventory.insufficient';
 
-    /**
-     * Returns the canonical translation key for a given error code.
-     */
-    public static function translationKey(string $errorCode): string
-    {
-        return 'errors.'.$errorCode;
-    }
+    public const VALIDATION_FAILED = 'validation.failed';
 
-    /**
-     * Returns the normalized translation key used by the TranslationService implementation.
-     */
-    public static function normalizedTranslationKey(string $errorCode): string
+    public const HTTP_NOT_FOUND = 'http.not_found';
+
+    public const HTTP_METHOD_NOT_ALLOWED = 'http.method_not_allowed';
+
+    public const HTTP_FORBIDDEN = 'http.forbidden';
+
+    public const HTTP_UNAUTHORIZED = 'http.unauthorized';
+
+    public const HTTP_TOO_MANY_REQUESTS = 'http.too_many_requests';
+
+    public const HTTP_BAD_REQUEST = 'http.bad_request';
+
+    public const INTERNAL_SERVER_ERROR = 'internal.server_error';
+
+    public static function messageKey(string $code): string
     {
-        return str_replace('.', '_', self::translationKey($errorCode));
+        return 'errors.'.$code;
     }
 }

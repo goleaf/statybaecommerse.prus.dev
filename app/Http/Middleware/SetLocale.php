@@ -20,38 +20,33 @@ final class SetLocale
         // Allow explicit override via query (?locale=xx)
         $queryLocale = $request->query('locale');
 
-        $supportedLocales = array_values(array_filter(
-            TranslationService::getAvailableLocales(),
-            static fn ($value) => is_string($value) && $value !== ''
-        ));
+        // Determine supported locales from configuration
+        $supported = config('app.supported_locales', ['lt', 'en']);
+        $supportedLocales = is_array($supported)
+            ? $supported
+            : array_filter(array_map('trim', explode(',', (string) $supported)));
+        $supportedLocales = array_values(array_filter(array_map('trim', $supportedLocales)));
 
         $headerLocale = $request->getPreferredLanguage($supportedLocales);
 
-        $candidates = [
-            $routeLocale,
-            $queryLocale,
-            Session::get('locale'),
-            Session::get('app.locale'),
-            $request->cookie('app_locale'),
-            auth()->check() ? auth()->user()->preferred_locale ?? null : null,
-            $headerLocale,
-        ];
+        // Get locale from query, session (both keys), cookie, Accept-Language header, or user preference
+        $locale = $routeLocale
+            ?? $queryLocale
+            ?? Session::get('locale')
+            ?? Session::get('app.locale')
+            ?? $request->cookie('app_locale')
+            ?? (auth()->check() ? auth()->user()->preferred_locale ?? null : null)
+            ?? (is_string($headerLocale) && $headerLocale !== '' ? $headerLocale : null)
+            ?? config('app.locale', 'lt');
 
-        $locale = null;
-        foreach ($candidates as $candidate) {
-            if (is_string($candidate) && $candidate !== '' && in_array($candidate, $supportedLocales, true)) {
-                $locale = $candidate;
-                break;
-            }
-        }
-
-        if ($locale === null) {
-            $locale = TranslationService::getDefaultLocale();
+        if (! in_array($locale, $supportedLocales, true)) {
+            $locale = is_string($headerLocale) && in_array($headerLocale, $supportedLocales, true)
+                ? $headerLocale
+                : (string) (config('app.locale', 'lt'));
         }
 
         // Set application locale
         App::setLocale($locale);
-        App::setFallbackLocale(TranslationService::getFallbackLocale());
         $request->attributes->set('resolved_locale', $locale);
 
         // Store in session and cookie for persistence

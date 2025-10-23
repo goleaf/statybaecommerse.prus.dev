@@ -2,36 +2,35 @@
 
 declare(strict_types=1);
 
-use App\Support\ErrorCodes;
-
 return [
-    // @translators: Displayed when a requested page or record is missing (HTTP 404).
-    ErrorCodes::normalizedTranslationKey(ErrorCodes::NOT_FOUND) => 'Page not found.',
-
-    // @translators: Returned when request parameters are malformed or missing (HTTP 400).
-    ErrorCodes::normalizedTranslationKey(ErrorCodes::BAD_REQUEST) => 'The request could not be processed.',
-
-    // @translators: Returned when the HTTP method is not allowed for the endpoint (HTTP 405).
-    ErrorCodes::normalizedTranslationKey(ErrorCodes::METHOD_NOT_ALLOWED) => 'Method not allowed.',
-
-    // @translators: Shown when the system encounters an unexpected failure (HTTP 500).
-    ErrorCodes::normalizedTranslationKey(ErrorCodes::SERVER_ERROR) => 'Something went wrong. Please try again later.',
-
-    // @translators: Used when form submission fails validation and users must review inputs.
-    ErrorCodes::normalizedTranslationKey(ErrorCodes::VALIDATION_FAILED) => 'One or more fields require your attention.',
-
-    // @translators: Indicates the user needs to log in before accessing the requested content.
-    ErrorCodes::normalizedTranslationKey(ErrorCodes::UNAUTHORIZED) => 'Please sign in to continue.',
-
-    // @translators: Indicates the user is logged in but does not have permission for the action.
-    ErrorCodes::normalizedTranslationKey(ErrorCodes::FORBIDDEN) => 'You do not have permission to perform this action.',
-
-    // @translators: Used when the user has exceeded the allowed number of requests (HTTP 429).
-    ErrorCodes::normalizedTranslationKey(ErrorCodes::TOO_MANY_REQUESTS) => 'Too many attempts. Please slow down.',
-
-    // @translators: Domain-specific error when an order cannot be found.
-    ErrorCodes::normalizedTranslationKey(ErrorCodes::ORDER_NOT_FOUND) => 'Order :order could not be found.',
-
-    // @translators: Domain-specific error when stock levels are insufficient.
-    ErrorCodes::normalizedTranslationKey(ErrorCodes::INVENTORY_INSUFFICIENT) => 'Inventory for SKU :sku is unavailable.',
+    'orders' => [
+        // @translators: Displayed when a requested order number does not exist.
+        'not_found' => 'Order :order could not be found.',
+    ],
+    'inventory' => [
+        // @translators: Displayed when stock is insufficient for the requested SKU.
+        'insufficient' => 'Inventory for SKU :sku is unavailable.',
+    ],
+    'http' => [
+        // @translators: Generic message for missing resources (HTTP 404).
+        'not_found' => 'The requested resource could not be found.',
+        // @translators: Displayed when a user is not authenticated (HTTP 401).
+        'unauthorized' => 'Authentication is required to access this resource.',
+        // @translators: Displayed when a user lacks permission (HTTP 403).
+        'forbidden' => 'You do not have permission to perform this action.',
+        // @translators: Displayed when the HTTP method is not allowed (HTTP 405).
+        'method_not_allowed' => 'The requested HTTP method is not allowed.',
+        // @translators: Displayed for malformed client requests (HTTP 400).
+        'bad_request' => 'The request could not be understood by the server.',
+        // @translators: Displayed when the client is rate limited (HTTP 429).
+        'too_many_requests' => 'Too many requests were made. Please try again later.',
+    ],
+    'validation' => [
+        // @translators: Displayed when validation fails for submitted data.
+        'failed' => 'The submitted data is invalid.',
+    ],
+    'internal' => [
+        // @translators: Fallback message for unexpected server errors (HTTP 500).
+        'server_error' => 'An unexpected error occurred.',
+    ],
 ];

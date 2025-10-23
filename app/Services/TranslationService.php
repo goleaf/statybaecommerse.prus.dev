@@ -40,7 +40,7 @@ final class TranslationService
      */
     public static function normalizeKey(string $key): string
     {
-        return str_replace('.', '_', $key);
+        return $key;
     }
 
     /**

@@ -16,10 +16,12 @@ abstract class DomainException extends Exception
 
     /**
      * @param  string  $errorCode  Machine readable error code (e.g. `orders.not_found`).
-     * @param  string|null  $translationKey  Optional translation key; defaults to the canonical key derived from the error code.
+     * @param  string|null  $translationKey  Explicit translation key used to localize the human readable message.
      * @param  array<string, mixed>  $context  Placeholder replacements that will be injected into the translation string.
      * @param  int  $status  HTTP status code that best represents the failure.
      */
+    private readonly string $translationKey;
+
     public function __construct(
         private readonly string $errorCode,
         ?string $translationKey = null,
@@ -27,7 +29,7 @@ abstract class DomainException extends Exception
         private readonly int $status = 400,
         ?Exception $previous = null,
     ) {
-        $this->translationKey = $translationKey ?? ErrorCodes::translationKey($errorCode);
+        $this->translationKey = $translationKey ?? ErrorCodes::messageKey($errorCode);
 
         parent::__construct($this->translationKey, $status, $previous);
     }
