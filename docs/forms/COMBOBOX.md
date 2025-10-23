@@ -1,27 +1,27 @@
 # Combobox field reference
 
-The admin panel now leans on the `novadaemon/filament-combobox` plugin for relationship pickers that benefit from a two-column, searchable layout. The package ships with Filament and is available to every resource through the project wrapper `App\Filament\Components\Combobox`, which layers shared defaults on top of the upstream component.【F:composer.json†L11-L46】【F:app/Filament/Components/Combobox.php†L9-L49】
+The admin panel now leans on the `novadaemon/filament-combobox` plugin for relationship pickers that benefit from a two-column, searchable layout. We expose it through `App\Filament\Components\Combobox`, a thin wrapper around the vendor class that centralises our defaults and translation helpers.【F:composer.json†L11-L46】【F:app/Filament/Components/Combobox.php†L10-L54】
 
-To keep behaviour consistent across modules, prefer the thin wrapper at `App\Filament\Components\Combobox`, which preconfigures search panes, panel height, native select behaviour, and eager loading while exposing helper methods for localised column headers.【F:app/Filament/Components/Combobox.php†L7-L67】
+> **Shared defaults**: The wrapper automatically enables the dual search inputs and applies a 360 px panel height so most forms inherit a usable layout without extra method calls. Override `boxSearchs()` when you need to force the search boxes open or hidden (see the “simple” recommendation config) and adjust `height()` whenever a section demands a shorter or taller list, such as the news and discount modules.【F:app/Filament/Components/Combobox.php†L18-L26】【F:app/Filament/Resources/RecommendationConfigResourceSimple.php†L124-L159】【F:app/Filament/Resources/NewsResource.php†L135-L152】【F:app/Filament/Resources/DiscountConditionResource.php†L150-L170】
 
 ## Where it is used today
 
 | Resource | Field(s) | Notes |
 | --- | --- | --- |
-| `NewsResource` | `categories`, `tags` | Dual pickers for taxonomy assignment with localized column headers and taller panels for browsing.【F:app/Filament/Resources/NewsResource.php†L134-L155】 |
-| `CampaignResource` | `targetCategories`, `targetProducts`, `targetCustomerGroups`, `discounts` | Handles all targeting relationships in one section so marketers can manage large datasets without modal hopping.【F:app/Filament/Resources/CampaignResource.php†L140-L177】 |
-| `CollectionResource` | `products` | Lets merchandisers curate featured product lists with quick searching and preloaded options.【F:app/Filament/Resources/CollectionResource.php†L165-L175】 |
-| `RecommendationConfigResource` | `products`, `categories` | Keeps algorithm filters sorted and searchable while forcing consistent serialization of the stored arrays.【F:app/Filament/Resources/RecommendationConfigResource.php†L120-L139】 |
-| `RecommendationConfigResourceSimple` | `products`, `categories` | Extends the combobox with create-on-the-fly forms and deterministic sorting for simpler preset builders.【F:app/Filament/Resources/RecommendationConfigResourceSimple.php†L124-L162】 |
-| `DiscountConditionResource` | `products`, `categories` | Drives campaign eligibility targeting with custom column labels for “available” versus “selected” lists.【F:app/Filament/Resources/DiscountConditionResource.php†L142-L166】 |
+| `NewsResource` | `categories`, `tags` | Dual pickers for taxonomy assignment with localized column headers and taller panels for browsing.【F:app/Filament/Resources/NewsResource.php†L135-L154】 |
+| `CampaignResource` | `targetCategories`, `targetProducts`, `targetCustomerGroups`, `discounts` | Handles all targeting relationships in one section so marketers can manage large datasets without modal hopping.【F:app/Filament/Resources/CampaignResource.php†L141-L186】 |
+| `CollectionResource` | `products` | Lets merchandisers curate featured product lists with quick searching and preloaded options.【F:app/Filament/Resources/CollectionResource.php†L165-L174】 |
+| `RecommendationConfigResource` | `products`, `categories` | Keeps algorithm filters sorted and searchable while forcing consistent serialization of the stored arrays.【F:app/Filament/Resources/RecommendationConfigResource.php†L118-L135】 |
+| `RecommendationConfigResourceSimple` | `products`, `categories` | Extends the combobox with create-on-the-fly forms and deterministic sorting for simpler preset builders.【F:app/Filament/Resources/RecommendationConfigResourceSimple.php†L124-L159】 |
+| `DiscountConditionResource` | `products`, `categories` | Drives campaign eligibility targeting with custom column labels for “available” versus “selected” lists.【F:app/Filament/Resources/DiscountConditionResource.php†L150-L170】 |
 
 ## When to choose the combobox
 
 Use the combobox instead of `Select`/`MultiSelect` when you need:
 
-- **Side-by-side available/selected lists** so operators can see everything they have chosen without scrolling a single column.【F:app/Filament/Resources/NewsResource.php†L134-L155】【F:app/Filament/Resources/CampaignResource.php†L140-L177】
-- **Fast filtering across large, preloaded relationships**—each combobox can load hundreds of records and still remain usable because the search inputs live directly in the picker UI.【F:app/Filament/Resources/CollectionResource.php†L165-L175】【F:app/Filament/Resources/RecommendationConfigResource.php†L120-L139】
-- **Extra behaviours like inline create or deterministic ordering** that would otherwise require custom components (see the simple recommendation config’s `createOptionForm` and state sort logic).【F:app/Filament/Resources/RecommendationConfigResourceSimple.php†L124-L162】
+- **Side-by-side available/selected lists** so operators can see everything they have chosen without scrolling a single column.【F:app/Filament/Resources/NewsResource.php†L135-L154】【F:app/Filament/Resources/CampaignResource.php†L141-L186】
+- **Fast filtering across large, preloaded relationships**—each combobox can load hundreds of records and still remain usable because the search inputs live directly in the picker UI.【F:app/Filament/Resources/CollectionResource.php†L165-L174】【F:app/Filament/Resources/RecommendationConfigResource.php†L118-L135】
+- **Extra behaviours like inline create or deterministic ordering** that would otherwise require custom components (see the simple recommendation config’s `createOptionForm` and state sort logic).【F:app/Filament/Resources/RecommendationConfigResourceSimple.php†L124-L159】
 
 Stick with Filament’s native `Select` or `RelationManager` flows when you only need a lightweight dropdown, single-selection, or when the relationship exposes complex pivot data that the dual-list UI cannot capture.
 
@@ -29,17 +29,15 @@ Stick with Filament’s native `Select` or `RelationManager` flows when you only
 
 Every implementation follows a small set of options:
 
-- `relationshipDefaults(bool $preload = true, bool $showSearchBox = true)` is the wrapper helper that preloads the relationship, enables the search UI, and keeps the component in non-native mode across resources. Use the parameters to skip preloading (e.g., when a global scope needs to stay lazy) or hide the search box entirely.【F:app/Filament/Components/Combobox.php†L29-L49】【F:app/Filament/Resources/RecommendationBlockResource.php†L102-L131】
-- `boxSearchs([bool $visible])` remains available for edge cases when you need to override the wrapper defaults manually.【F:app/Filament/Components/Combobox.php†L37-L45】
-- `height('###px')` keeps the dual lists tall enough for comfortable browsing (320–360 px in current resources).【F:app/Filament/Resources/NewsResource.php†L134-L153】【F:app/Filament/Resources/CampaignResource.php†L140-L177】
-- `optionsLabel()` / `selectedLabel()` override the column headers so translators can localize “available” vs “selected” phrasing per resource.【F:app/Filament/Resources/NewsResource.php†L134-L153】【F:app/Filament/Resources/CampaignResource.php†L140-L177】【F:app/Filament/Resources/DiscountConditionResource.php†L142-L166】
-- Combine with standard Filament modifiers such as `relationship()`, `multiple()`, `preload()`, `searchable()`, and `createOptionForm()` to match the data model while keeping the combobox experience consistent.【F:app/Filament/Resources/CollectionResource.php†L165-L175】【F:app/Filament/Resources/RecommendationConfigResourceSimple.php†L124-L162】
-- When you need quick localisation, call `$combobox->withLocalizedLabels('module.combobox.options.key', 'module.combobox.selected.key')` to set both column headings lazily for the current language. Pair it with `$combobox->withLabels('Available', 'Selected')` for hard-coded admin-only copy when translations are unnecessary.【F:app/Filament/Components/Combobox.php†L28-L66】
+- `translatedLabels($availableKey, $selectedKey, ?$availableFallback = null, ?$selectedFallback = null)` sets both column headers with one call while safely falling back to inline copy when a locale is missing a string. Use fallbacks for multilingual rollouts (see campaigns) or rely on existing translation keys (news, discounts).【F:app/Filament/Components/Combobox.php†L32-L53】【F:app/Filament/Resources/CampaignResource.php†L143-L186】【F:app/Filament/Resources/NewsResource.php†L135-L152】【F:app/Filament/Resources/DiscountConditionResource.php†L150-L170】
+- `boxSearchs([bool $visible])` still toggles the search inputs, but the wrapper calls it for you. Only override it when you want the search UI expanded on load (`true`) or intentionally hidden (`false`).【F:app/Filament/Components/Combobox.php†L18-L26】【F:app/Filament/Resources/RecommendationConfigResourceSimple.php†L124-L159】
+- `height('###px')` overrides the shared 360 px default to accommodate tighter layouts or denser datasets (e.g. news at 320 px, discount conditions at 340 px).【F:app/Filament/Components/Combobox.php†L18-L26】【F:app/Filament/Resources/NewsResource.php†L135-L152】【F:app/Filament/Resources/DiscountConditionResource.php†L150-L170】
+- Combine with standard Filament modifiers such as `relationship()`, `multiple()`, `preload()`, `searchable()`, and `createOptionForm()` to match the data model while keeping the combobox experience consistent.【F:app/Filament/Resources/CollectionResource.php†L165-L174】【F:app/Filament/Resources/RecommendationConfigResourceSimple.php†L124-L159】
 
 ## Localization
 
 - News taxonomy headers live in `lang/en/news.php` and `lang/lt/news.php` under the `combobox` key so both panes follow newsroom wording.【F:lang/en/news.php†L177-L185】【F:lang/lt/news.php†L177-L185】
 - Discount condition labels (`Available products`, `Selected categories`, etc.) live next to the rest of the discount copy in `lang/en/discount_conditions.php` and should be mirrored in other locales when the feature rolls out beyond English.【F:lang/en/discount_conditions.php†L16-L33】
-- Campaign pickers resolve translation keys like `campaigns.combobox.options.target_categories`; if a locale does not provide them yet, the helper falls back to the inline English fallback so nothing breaks during rollout.【F:app/Filament/Resources/CampaignResource.php†L140-L177】【F:app/Filament/Resources/CampaignResource.php†L337-L344】
+- Campaign pickers resolve translation keys like `campaigns.combobox.options.target_categories`; if a locale does not provide them yet, the helper falls back to the inline English fallback so nothing breaks during rollout.【F:app/Filament/Resources/CampaignResource.php†L143-L186】【F:app/Filament/Resources/CampaignResource.php†L337-L344】
 
 Add any new combobox translations in the same module-specific language files to keep localisation discoverable for content and operations teams.

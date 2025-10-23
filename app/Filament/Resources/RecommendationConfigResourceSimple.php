@@ -129,9 +129,9 @@ final class RecommendationConfigResourceSimple extends Resource
                                 ->label(__('recommendation_configs_simple.products'))
                                 ->relationship('products', 'name')
                                 ->multiple()
-                                ->relationshipDefaults()
-                                // Shared Combobox defaults manage preload, search, and box UI.
-                                ->height('360px')
+                                ->searchable()
+                                ->boxSearchs(true)
+                                ->preload()
                                 ->afterStateHydrated(fn (Combobox $component, ?array $state) => $component->state(collect($state)->filter()->sort()->values()->toArray()))
                                 ->dehydrateStateUsing(fn (?array $state) => collect($state)->filter()->sort()->values()->toArray())
                                 ->createOptionForm([
@@ -145,9 +145,9 @@ final class RecommendationConfigResourceSimple extends Resource
                                 ->label(__('recommendation_configs_simple.categories'))
                                 ->relationship('categories', 'name')
                                 ->multiple()
-                                ->relationshipDefaults()
-                                // Shared Combobox defaults manage preload, search, and box UI.
-                                ->height('360px')
+                                ->searchable()
+                                ->boxSearchs(true)
+                                ->preload()
                                 ->afterStateHydrated(fn (Combobox $component, ?array $state) => $component->state(collect($state)->filter()->sort()->values()->toArray()))
                                 ->dehydrateStateUsing(fn (?array $state) => collect($state)->filter()->sort()->values()->toArray())
                                 ->createOptionForm([

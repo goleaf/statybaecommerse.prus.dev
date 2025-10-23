@@ -125,18 +125,16 @@ final class RecommendationConfigResource extends Resource
                                 ->label(__('recommendation_config.fields.products'))
                                 ->relationship('products', 'name')
                                 ->multiple()
-                                ->relationshipDefaults()
-                                // Shared Combobox defaults cover preload, search, and JS behaviour.
-                                ->height('360px')
+                                ->preload()
+                                ->searchable()
                                 ->formatStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state)
                                 ->dehydrateStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state),
                             Combobox::make('categories')
                                 ->label(__('recommendation_config.fields.categories'))
                                 ->relationship('categories', 'name')
                                 ->multiple()
-                                ->relationshipDefaults()
-                                // Shared Combobox defaults cover preload, search, and JS behaviour.
-                                ->height('360px')
+                                ->preload()
+                                ->searchable()
                                 ->formatStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state)
                                 ->dehydrateStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state),
                         ]),

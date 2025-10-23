@@ -148,21 +148,23 @@ final class DiscountConditionResource extends Resource
                                         Combobox::make('products')
                                             ->label(__('discount_conditions.products'))
                                             ->relationship('products', 'name')
-                                            ->relationshipDefaults()
-                                            // Shared Combobox defaults cover preload and search for relationships.
+                                            ->preload()
                                             ->height('340px')
-                                            ->optionsLabel(__('discount_conditions.products_options_label'))
-                                            ->selectedLabel(__('discount_conditions.products_selected_label'))
+                                            ->translatedLabels(
+                                                'discount_conditions.products_options_label',
+                                                'discount_conditions.products_selected_label',
+                                            )
                                             ->multiple()
                                             ->columnSpanFull(),
                                         Combobox::make('categories')
                                             ->label(__('discount_conditions.categories'))
                                             ->relationship('categories', 'name')
-                                            ->relationshipDefaults()
-                                            // Shared Combobox defaults cover preload and search for relationships.
+                                            ->preload()
                                             ->height('340px')
-                                            ->optionsLabel(__('discount_conditions.categories_options_label'))
-                                            ->selectedLabel(__('discount_conditions.categories_selected_label'))
+                                            ->translatedLabels(
+                                                'discount_conditions.categories_options_label',
+                                                'discount_conditions.categories_selected_label',
+                                            )
                                             ->multiple()
                                             ->columnSpanFull(),
                                     ]),

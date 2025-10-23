@@ -4,50 +4,52 @@ declare(strict_types=1);
 
 namespace App\Filament\Components;
 
+use Illuminate\Support\Facades\Lang;
 use Novadaemon\FilamentCombobox\Combobox as BaseCombobox;
 
 /**
- * Shared wrapper around the vendor Combobox component to centralize
- * the defaults we want across Filament resources.
+ * Application wrapper for the Novadaemon combobox component.
  */
-class Combobox extends BaseCombobox
+final class Combobox extends BaseCombobox
 {
     /**
-     * Bootstrap sensible defaults immediately after instantiation.
+     * Apply the default application-wide combobox settings.
      */
-    public static function make(?string $name = null): static
+    protected function setUp(): void
     {
-        /** @var static $component */
-        $component = parent::make($name);
+        parent::setUp();
 
-        return $component->applyBaseDefaults();
+        // Surface the dual search inputs by default so operators can filter quickly.
+        $this->boxSearchs();
+
+        // Provide a generous default height that works well for most admin layouts.
+        $this->height('360px');
     }
 
     /**
-     * Ensure the select renders with the modern combobox experience.
+     * Configure translated column headers with an optional plain-text fallback.
      */
-    protected function applyBaseDefaults(): static
-    {
-        // The wrapper always forces the JavaScript-powered dropdown.
-        $this->native(false);
+    public function translatedLabels(
+        string $availableKey,
+        string $selectedKey,
+        ?string $availableFallback = null,
+        ?string $selectedFallback = null,
+    ): static {
+        $this->optionsLabel($this->resolveLabel($availableKey, $availableFallback));
+        $this->selectedLabel($this->resolveLabel($selectedKey, $selectedFallback));
 
         return $this;
     }
 
     /**
-     * Apply the common relationship behaviours used throughout the admin.
+     * Resolve a translation key while gracefully falling back to a provided default string.
      */
-    public function relationshipDefaults(bool $shouldPreload = true, bool $shouldEnableSearchBox = true): static
+    private function resolveLabel(string $key, ?string $fallback): string
     {
-        if ($shouldPreload) {
-            $this->preload();
+        if (Lang::has($key)) {
+            return __($key);
         }
 
-        if ($shouldEnableSearchBox) {
-            $this->boxSearchs();
-        }
-
-        // Searching is universally expected when the combobox is displayed.
-        return $this->searchable();
+        return $fallback ?? $key;
     }
 }

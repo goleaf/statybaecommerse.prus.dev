@@ -31,6 +31,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
+use App\Support\Filament\Components\Flatpickr;
 
 final class CampaignResource extends Resource
 {
@@ -145,38 +146,46 @@ final class CampaignResource extends Resource
                     Combobox::make('targetCategories')
                         ->label(self::label('campaigns.fields.target_categories', 'Target categories'))
                         ->relationship('targetCategories', 'name')
-                        ->relationshipDefaults()
-                        // Shared Combobox defaults cover preload, search, and JS styling.
-                        ->height('360px')
-                        ->optionsLabel(fn (): string => self::label('campaigns.combobox.options.target_categories', 'Available categories'))
-                        ->selectedLabel(fn (): string => self::label('campaigns.combobox.selected.target_categories', 'Selected categories'))
+                        ->translatedLabels(
+                            'campaigns.combobox.options.target_categories',
+                            'campaigns.combobox.selected.target_categories',
+                            'Available categories',
+                            'Selected categories',
+                        )
+                        ->preload()
                         ->columnSpanFull(),
                     Combobox::make('targetProducts')
                         ->label(self::label('campaigns.fields.target_products', 'Target products'))
                         ->relationship('targetProducts', 'name')
-                        ->relationshipDefaults()
-                        // Shared Combobox defaults cover preload, search, and JS styling.
-                        ->height('360px')
-                        ->optionsLabel(fn (): string => self::label('campaigns.combobox.options.target_products', 'Available products'))
-                        ->selectedLabel(fn (): string => self::label('campaigns.combobox.selected.target_products', 'Selected products'))
+                        ->translatedLabels(
+                            'campaigns.combobox.options.target_products',
+                            'campaigns.combobox.selected.target_products',
+                            'Available products',
+                            'Selected products',
+                        )
+                        ->preload()
                         ->columnSpanFull(),
                     Combobox::make('targetCustomerGroups')
                         ->label(self::label('campaigns.fields.target_customer_groups', 'Target customer groups'))
                         ->relationship('targetCustomerGroups', 'name')
-                        ->relationshipDefaults()
-                        // Shared Combobox defaults cover preload, search, and JS styling.
-                        ->height('360px')
-                        ->optionsLabel(fn (): string => self::label('campaigns.combobox.options.target_customer_groups', 'Available customer groups'))
-                        ->selectedLabel(fn (): string => self::label('campaigns.combobox.selected.target_customer_groups', 'Selected customer groups'))
+                        ->translatedLabels(
+                            'campaigns.combobox.options.target_customer_groups',
+                            'campaigns.combobox.selected.target_customer_groups',
+                            'Available customer groups',
+                            'Selected customer groups',
+                        )
+                        ->preload()
                         ->columnSpanFull(),
                     Combobox::make('discounts')
                         ->label(self::label('campaigns.fields.discounts', 'Discounts'))
                         ->relationship('discounts', 'name')
-                        ->relationshipDefaults()
-                        // Shared Combobox defaults cover preload, search, and JS styling.
-                        ->height('360px')
-                        ->optionsLabel(fn (): string => self::label('campaigns.combobox.options.discounts', 'Available discounts'))
-                        ->selectedLabel(fn (): string => self::label('campaigns.combobox.selected.discounts', 'Selected discounts'))
+                        ->translatedLabels(
+                            'campaigns.combobox.options.discounts',
+                            'campaigns.combobox.selected.discounts',
+                            'Available discounts',
+                            'Selected discounts',
+                        )
+                        ->preload()
                         ->columnSpanFull(),
                 ]),
             Section::make(__('campaigns.sections.content'))

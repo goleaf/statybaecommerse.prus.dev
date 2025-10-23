@@ -190,9 +190,9 @@ final class CollectionResource extends Resource
                         ->label(__('translations.products'))
                         ->relationship('products', 'name')
                         ->multiple()
-                        ->relationshipDefaults()
-                        // Shared Combobox defaults manage search, preload, and JS rendering.
-                        ->height('350px'),
+                        ->searchable()
+                        ->height('350px')
+                        ->preload(),
                 ]),
             Section::make(__('collections.seo_info'))
                 ->schema([

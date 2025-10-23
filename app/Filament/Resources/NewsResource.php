@@ -140,19 +140,19 @@ class NewsResource extends Resource
                     Combobox::make('categories')
                         ->label(__('news.fields.categories'))
                         ->relationship('categories', 'name')
-                        ->relationshipDefaults(preload: false)
-                        // Shared Combobox defaults add async search + JS rendering.
                         ->height('320px')
-                        ->optionsLabel(__('news.combobox.categories.available'))
-                        ->selectedLabel(__('news.combobox.categories.selected')),
+                        ->translatedLabels(
+                            'news.combobox.categories.available',
+                            'news.combobox.categories.selected',
+                        ),
                     Combobox::make('tags')
                         ->label(__('news.fields.tags'))
                         ->relationship('tags', 'name')
-                        ->relationshipDefaults(preload: false)
-                        // Shared Combobox defaults add async search + JS rendering.
                         ->height('320px')
-                        ->optionsLabel(__('news.combobox.tags.available'))
-                        ->selectedLabel(__('news.combobox.tags.selected')),
+                        ->translatedLabels(
+                            'news.combobox.tags.available',
+                            'news.combobox.tags.selected',
+                        ),
                 ])
                 ->columns(2),
         ]);
