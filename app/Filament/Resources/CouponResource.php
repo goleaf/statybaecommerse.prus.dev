@@ -8,13 +8,9 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\CouponResource\Pages;
 use App\Models\Coupon;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -223,8 +219,8 @@ final class CouponResource extends Resource
                     ->label(__('coupons.type'))
                     ->formatStateUsing(fn (?string $state): string => $state ? __("coupons.types.{$state}") : '—')
                     ->color(fn (?string $state): string => match ($state) {
-                        'percentage'    => 'green',
-                        'fixed'         => 'blue',
+                        'percentage' => 'green',
+                        'fixed' => 'blue',
                         'free_shipping' => 'purple',
                         default         => 'gray',
                     }),
@@ -232,7 +228,7 @@ final class CouponResource extends Resource
                     ->label(__('coupons.value'))
                     ->formatStateUsing(function ($state, Coupon $record): string {
                         if ($record->type === 'percentage') {
-                            return is_null($state) ? '—' : $state . '%';
+                            return is_null($state) ? '—' : $state.'%';
                         }
 
                         if ($record->type === 'free_shipping') {
@@ -243,7 +239,7 @@ final class CouponResource extends Resource
                             return '—';
                         }
 
-                        return '€' . number_format((float) $state, 2);
+                        return '€'.number_format((float) $state, 2);
                     })
                     ->sortable(),
                 TextColumn::make('usage_limit')
