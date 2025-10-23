@@ -34,6 +34,17 @@ trait CreatesApplication
             });
         }
 
+        $existingToken = $_SERVER['TEST_TOKEN']
+            ?? $_ENV['TEST_TOKEN']
+            ?? getenv('TEST_TOKEN');
+
+        if (! is_string($existingToken) || $existingToken === '') {
+            $token = 'pid_' . getmypid();
+            putenv('TEST_TOKEN=' . $token);
+            $_ENV['TEST_TOKEN'] = $token;
+            $_SERVER['TEST_TOKEN'] = $token;
+        }
+
         // Avoid forcing a per-process SQLite path so the test suite can reuse
         // a single on-disk database across runs. This keeps migrations stable
         // and avoids stray worker-specific files during local execution.

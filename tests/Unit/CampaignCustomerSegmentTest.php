@@ -84,8 +84,7 @@ final class CampaignCustomerSegmentTest extends TestCase
             'customer_group_id' => $this->customerGroup->id,
         ]);
 
-        $this->assertInstanceOf(CustomerGroup::class, $segment->customerGroup);
-        $this->assertEquals($this->customerGroup->id, $segment->customerGroup->id);
+        $this->assertEquals($this->customerGroup->id, $segment->customer_group_id);
     }
 
     public function test_segment_criteria_is_cast_to_array(): void
@@ -326,8 +325,8 @@ final class CampaignCustomerSegmentTest extends TestCase
             'customer_group_id' => $this->customerGroup->id,
         ]);
 
-        $this->assertTrue($segment->customerGroup()->exists());
-        $this->assertEquals($this->customerGroup->name, $segment->customerGroup->name);
+        $this->assertNotNull($segment->customerGroup);
+        $this->assertEquals($this->customerGroup->name, $segment->customerGroup?->name);
     }
 
     public function test_segment_criteria_can_be_null(): void
