@@ -1,6 +1,5 @@
 #!/usr/bin/env sh
-# Use Husky's helper to keep PATH enriched before running Composer's CI suite.
-. "$(dirname -- "$0")/_/h"
+# Ensure the Composer CI suite runs before pushing while relying on Husky's modern shim for PATH setup.
 
 set -eu
 
