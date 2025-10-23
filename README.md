@@ -83,6 +83,7 @@ composer run dev
 | Run feature & unit tests | `make test` |
 | Static analysis | `make analyse` |
 | PHP formatting | `make format` |
+| Rector dry run | `composer rector -- --dry-run` |
 | Build production assets | `make build` |
 | Generate coverage locally | `php artisan test --coverage` |
 

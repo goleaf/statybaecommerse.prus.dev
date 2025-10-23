@@ -9,9 +9,172 @@ on:
       - main
 
 jobs:
+  migration-freeze:
+    name: Migration Freeze Guard
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch base branch
+        if: github.event_name == 'pull_request'
+        run: git fetch origin "${GITHUB_BASE_REF}:${GITHUB_BASE_REF}"
+
+      - name: Ensure historical migrations remain immutable
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
+            base_ref="origin/${GITHUB_BASE_REF}"
+            diff_range="${base_ref}...HEAD"
+          else
+            if git rev-parse --verify HEAD^ >/dev/null 2>&1; then
+              diff_range="HEAD^...HEAD"
+            else
+              echo "No parent commit to compare against; skipping migration freeze check."
+              exit 0
+            fi
+          fi
+
+          changed_files="$(git diff --name-status ${diff_range} -- database/migrations || true)"
+
+          if [[ -z "${changed_files}" ]]; then
+            exit 0
+          fi
+
+          violations="$(echo "${changed_files}" | awk '$1 != "A" && $1 != "?" {print $0}')"
+
+          if [[ -n "${violations}" ]]; then
+            echo "Detected modifications to existing migration files:"
+            echo "${violations}"
+            echo "Add a new forward-only migration instead of editing history."
+            exit 1
+          fi
+
+          echo "Migration freeze check passed."
+
+  php-lint-pint:
+    name: PHP Lint & Pint
+    runs-on: ubuntu-latest
+    needs: migration-freeze
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, intl, pdo_sqlite
+          coverage: none
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install Composer dependencies
+        run: composer install ${{ env.COMPOSER_FLAGS }}
+
+      - name: Validate PHP syntax
+        run: |
+          php_files="$(git ls-files '*.php')"
+          if [ -z "${php_files}" ]; then
+            echo "No PHP files found."
+            exit 0
+          fi
+          git ls-files -z '*.php' | xargs -0 -n1 -P4 php -l
+
+      - name: Run Pint
+        run: composer lint:php
+
+  phpstan:
+    name: PHPStan
+    runs-on: ubuntu-latest
+    needs: php-lint-pint
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, intl, pdo_sqlite
+          coverage: none
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install Composer dependencies
+        run: composer install ${{ env.COMPOSER_FLAGS }}
+
+      - name: Run PHPStan analysis
+        run: composer analyze
+
+  rector:
+    name: Rector (dry run)
+    runs-on: ubuntu-latest
+    needs: phpstan
+    # Keep Rector aligned with code quality gates before running PHPUnit.
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, intl, pdo_sqlite
+          coverage: none
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install Composer dependencies
+        run: composer install ${{ env.COMPOSER_FLAGS }}
+
+      - name: Run Rector in dry-run mode
+        run: composer rector -- --dry-run
+
   phpunit:
     name: PHPUnit
     runs-on: ubuntu-latest
+    # Run the test suite against the Renovate-supported PHP versions so
+    # dependency bumps get early feedback on cross-version compatibility.
+    strategy:
+      matrix:
+        php-version: ${{ fromJSON(github.event_name == 'pull_request' && startsWith(github.actor, 'renovate') ? '["8.2","8.3"]' : '["8.3"]') }}
+    # Depend on analysis and Rector gates to surface issues early.
+    needs: [phpstan, rector]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

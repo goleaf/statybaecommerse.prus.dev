@@ -10,7 +10,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Aligned Filament variant pricing and analytics resources with stricter action namespaces, clarified currency formatting, and refreshed navigation icon annotations to streamline BackedEnum usage across admin pages.
 * Synced Collection Rule resource signatures, modal reorder UX, and cache maintenance tooling with Filament v4 to retire legacy array fallbacks.
 * Delivered the Campaign Product Target management resource with localized strings, reinforced widget navigation metadata, and hardened media path migrations for safer marketing workflows.
-* Updated the Feature Flag resource to bypass active/enabled scopes so administrators can review inactive toggles directly from the listing view.
+* Added a Rector dry-run stage to CI and upgraded Rector configuration for Laravel 12 / PHP 8.2 coverage to prevent regressions earlier in the pipeline.
 
 ## [0.1.0] - 2025-10-20
 
