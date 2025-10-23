@@ -15,13 +15,8 @@ use App\Models\ProductVariant;
 use App\Models\UserWishlist;
 use App\Models\WishlistItem;
 use BackedEnum;
-use Filament\Actions\Action;
-use Filament\Actions\ActionGroup;
-use Filament\Actions\BulkAction as TableBulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use Exception;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid as FormGrid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section as FormSection;
@@ -32,6 +27,13 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\BulkAction as TableBulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -41,6 +43,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 /**
@@ -130,20 +133,20 @@ final class WishlistItemResource extends Resource
                                     ->createOptionUsing(function (array $data): int {
                                         return UserWishlist::create($data)->getKey();
                                     }),
-                                Placeholder::make('user_name')
+                                Placeholder::make('wishlist_user')
                                     ->label(__('admin.wishlist_items.fields.user'))
                                     ->content(function (callable $get): string {
                                         $wishlistId = $get('wishlist_id');
 
                                         if (! $wishlistId) {
-                                            return '-';
+                                            return '';
                                         }
 
                                         $wishlist = UserWishlist::with('user')->find($wishlistId);
 
-                                        return $wishlist?->user?->name ?? '-';
+                                        return $wishlist?->user?->name ?? '';
                                     })
-                                    ->reactive(),
+                                    ->columnSpanFull(),
                             ]),
                         FormGrid::make(2)
                             ->schema([
@@ -152,52 +155,12 @@ final class WishlistItemResource extends Resource
                                     ->placeholder('SKU / EAN / name')
                                     ->required()
                                     ->live()
-                                    ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
-                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
-                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?WishlistItem $record): void {
-                                        // Hydrate through helper to keep metadata lifecycle aligned with docs.
-                                        SearchableInputHelper::hydrate(
-                                            $component,
-                                            $state,
-                                            static function (int $value) use ($record): ?array {
-                                                $product = $record?->product ?? Product::query()
-                                                    ->select(['id', 'sku', 'name'])
-                                                    ->find($value);
-
-                                                if (! $product instanceof Product) {
-                                                    return null;
-                                                }
-
-                                                return [
-                                                    'value' => $product->getKey(),
-                                                    'label' => ProductSearch::label($product),
-                                                ];
-                                            },
-                                        );
-                                    })
-                                    // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
-                                    ->afterStateUpdated(function (?string $state, callable $set): void {
-                                        if ($state === null || $state === '') {
-                                            SearchableInputHelper::clear($set, [
-                                                'product_id' => null,
-                                                'variant_id' => null,
-                                            ]);
-
-                                            return;
-                                        }
-
-                                        $product = Product::query()
-                                            ->select(['id'])
-                                            ->find((int) $state);
-
-                                        if (! $product instanceof Product) {
-                                            return;
-                                        }
-
-                                        $set('product_id', $product->getKey());
-
-                                        if ($product->variants()->exists()) {
-                                            $set('variant_id', null);
+                                    ->afterStateUpdated(function ($state, callable $set): void {
+                                        if ($state) {
+                                            $product = Product::find($state);
+                                            if ($product && $product->variants()->exists()) {
+                                                $set('variant_id', null);
+                                            }
                                         }
                                     }),
                                 Select::make('variant_id')
@@ -538,7 +501,13 @@ final class WishlistItemResource extends Resource
                         ->color('success')
                         ->action(function (WishlistItem $record): void {
                             try {
-                                CartItem::create(self::buildCartItemPayload($record));
+                                // Create cart item logic here
+                                CartItem::create([
+                                    'user_id'    => $record->wishlist->user_id,
+                                    'product_id' => $record->product_id,
+                                    'variant_id' => $record->variant_id,
+                                    'quantity'   => $record->quantity,
+                                ]);
 
                                 FilamentNotification::make()
                                     ->title(__('admin.wishlist_items.moved_to_cart_successfully'))
@@ -577,7 +546,12 @@ final class WishlistItemResource extends Resource
                             try {
                                 $moved = 0;
                                 foreach ($records as $record) {
-                                    CartItem::create(self::buildCartItemPayload($record));
+                                    CartItem::create([
+                                        'user_id'    => $record->wishlist->user_id,
+                                        'product_id' => $record->product_id,
+                                        'variant_id' => $record->variant_id,
+                                        'quantity'   => $record->quantity,
+                                    ]);
                                     $moved++;
                                 }
 
