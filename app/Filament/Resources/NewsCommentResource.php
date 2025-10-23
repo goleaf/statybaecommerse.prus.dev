@@ -19,6 +19,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
@@ -42,7 +43,12 @@ final class NewsCommentResource extends Resource
 
     protected static ?string $model = NewsComment::class;
 
-    
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chat-bubble-left-ellipsis';
+
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Content';
+    }
 
     protected static ?int $navigationSort = 3;
 
@@ -71,14 +77,43 @@ final class NewsCommentResource extends Resource
                         ->schema([
                             Select::make('news_id')
                                 ->label(__('admin.news_comments.news'))
-                                ->options(fn () => News::query()->pluck('title', 'id')->toArray())
+                                ->relationship(
+                                    name: 'news',
+                                    titleAttribute: 'title',
+                                    modifyQueryUsing: fn (Builder $query): Builder => $query->withoutGlobalScopes([
+                                        ActiveScope::class,
+                                        ApprovedScope::class,
+                                        VisibleScope::class,
+                                    ])
+                                )
                                 ->required()
                                 ->searchable()
                                 ->preload()
                                 ->live(),
                             Select::make('parent_id')
                                 ->label(__('admin.news_comments.parent_comment'))
-                                ->options(fn () => NewsComment::query()->pluck('author_name', 'id')->toArray())
+                                ->options(function (Get $get, ?NewsComment $record): array {
+                                    $newsId = $get('news_id') ?? $record?->news_id;
+
+                                    if (! $newsId) {
+                                        return [];
+                                    }
+
+                                    $query = NewsComment::query()
+                                        ->withoutGlobalScopes([
+                                            ActiveScope::class,
+                                            ApprovedScope::class,
+                                            VisibleScope::class,
+                                        ])
+                                        ->where('news_id', $newsId)
+                                        ->orderBy('created_at');
+
+                                    if ($record?->exists) {
+                                        $query->whereKeyNot($record->getKey());
+                                    }
+
+                                    return $query->pluck('author_name', 'id')->all();
+                                })
                                 ->searchable()
                                 ->preload()
                                 ->live(),
@@ -174,7 +209,15 @@ final class NewsCommentResource extends Resource
             ->filters([
                 SelectFilter::make('news_id')
                     ->label(__('admin.news_comments.news'))
-                    ->options(fn () => News::query()->pluck('title', 'id')->toArray())
+                    ->relationship(
+                        'news',
+                        'title',
+                        modifyQueryUsing: fn (Builder $query): Builder => $query->withoutGlobalScopes([
+                            ActiveScope::class,
+                            ApprovedScope::class,
+                            VisibleScope::class,
+                        ])
+                    )
                     ->searchable()
                     ->preload(),
                 TernaryFilter::make('is_approved')
@@ -185,7 +228,15 @@ final class NewsCommentResource extends Resource
                     ->boolean(),
                 SelectFilter::make('parent_id')
                     ->label(__('admin.news_comments.parent_comment'))
-                    ->options(fn () => NewsComment::query()->pluck('author_name', 'id')->toArray())
+                    ->options(fn (): array => NewsComment::query()
+                        ->withoutGlobalScopes([
+                            ActiveScope::class,
+                            ApprovedScope::class,
+                            VisibleScope::class,
+                        ])
+                        ->orderBy('author_name')
+                        ->pluck('author_name', 'id')
+                        ->all())
                     ->searchable()
                     ->preload(),
             ])
@@ -208,8 +259,9 @@ final class NewsCommentResource extends Resource
                         ? __('admin.news_comments.confirm_disapprove_description')
                         : __('admin.news_comments.confirm_approve_description'))
                     ->action(function (NewsComment $record): void {
-                        $record->is_approved = ! $record->is_approved;
-                        $record->save();
+                        $record->forceFill([
+                            'is_approved' => ! $record->is_approved,
+                        ])->save();
                     }),
             ])
             ->bulkActions([
