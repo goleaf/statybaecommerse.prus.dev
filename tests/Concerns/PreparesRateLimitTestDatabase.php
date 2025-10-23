@@ -60,8 +60,15 @@ trait PreparesRateLimitTestDatabase
             'users',
         ];
 
-        foreach ($tablesToDrop as $table) {
-            Schema::dropIfExists($table);
+        // Temporarily relax foreign key checks so SQLite does not block the schema reset during rate limit tests.
+        Schema::disableForeignKeyConstraints();
+
+        try {
+            foreach ($tablesToDrop as $table) {
+                Schema::dropIfExists($table);
+            }
+        } finally {
+            Schema::enableForeignKeyConstraints();
         }
 
         Schema::create('users', function (Blueprint $table): void {

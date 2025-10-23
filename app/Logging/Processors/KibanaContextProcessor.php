@@ -34,7 +34,10 @@ final class KibanaContextProcessor
             'environment' => $environment,
         ];
 
-        if ($pid !== false) {
+        // Capture the current process identifier so Kibana dashboards can pivot on it when needed.
+        $pid = function_exists('getmypid') ? getmypid() : false;
+
+        if (is_int($pid) && $pid > 0) {
             $extra['process'] = [
                 'pid' => $pid,
             ];

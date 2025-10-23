@@ -19,8 +19,8 @@ final class ApiServiceProvider extends ServiceProvider
     public function boot(): void
     {
         RateLimiter::for('api.default', function (Request $request): array {
-            // Preserve the historical alias while delegating to the layered read throttle.
-            return $this->layeredLimits($request, 'api.read', $this->defaultRateLimitConfig());
+            // Preserve historical behaviour by emitting bare "user:{id}" keys for the default API limiter.
+            return $this->layeredLimits($request, 'api.default', $this->defaultRateLimitConfig(), '');
         });
 
         RateLimiter::for('api.read', function (Request $request): array {
@@ -44,7 +44,8 @@ final class ApiServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('api.profile', function (Request $request): array {
-            return $this->layeredLimits($request, 'api.profile', $this->profileRateLimitConfig());
+            // Use the short "profile" suffix so consumers clearing rate limit keys keep backwards compatibility.
+            return $this->layeredLimits($request, 'api.profile', $this->profileRateLimitConfig(), 'profile');
         });
 
         RateLimiter::for('api.exports', function (Request $request): array {
@@ -239,7 +240,19 @@ final class ApiServiceProvider extends ServiceProvider
     {
         $config = data_get(config('security.rate_limiting.api.notifications'), $type);
 
-        return $this->normalizeRateLimitConfig($config, $this->defaultRateLimitConfig());
+        $default = $this->defaultRateLimitConfig();
+
+        // Respect legacy notification throttles defined in api.rate_limits for smooth upgrades.
+        $legacy = $this->legacyRateLimitValue('notifications', null);
+
+        $fallback = [
+            'per_user' => $legacy ?? $default['per_user'],
+            'per_ip'   => $legacy ?? $default['per_ip'],
+        ];
+
+        $limits = $this->normalizeRateLimitConfig($config, $fallback);
+
+        return $this->applyLegacyOverride($legacy, $limits);
     }
 
     /**
@@ -249,10 +262,16 @@ final class ApiServiceProvider extends ServiceProvider
     {
         $config = config('security.rate_limiting.api.autocomplete');
 
-        return $this->normalizeRateLimitConfig($config, [
-            'per_user' => 30,
-            'per_ip'   => 30,
+        // Old configuration keys used api.rate_limits.autocomplete so honour them when present.
+        $legacy = $this->legacyRateLimitValue('autocomplete', null);
+        $baseline = $legacy ?? 30;
+
+        $limits = $this->normalizeRateLimitConfig($config, [
+            'per_user' => $baseline,
+            'per_ip'   => $baseline,
         ]);
+
+        return $this->applyLegacyOverride($legacy, $limits);
     }
 
     /**
@@ -272,7 +291,19 @@ final class ApiServiceProvider extends ServiceProvider
     {
         $config = config('security.rate_limiting.api.exports');
 
-        return $this->normalizeRateLimitConfig($config, $this->defaultRateLimitConfig());
+        $default = $this->defaultRateLimitConfig();
+
+        // Allow legacy export rate limits defined in the compact api.rate_limits array.
+        $legacy = $this->legacyRateLimitValue('exports', null);
+
+        $fallback = [
+            'per_user' => $legacy ?? $default['per_user'],
+            'per_ip'   => $legacy ?? $default['per_ip'],
+        ];
+
+        $limits = $this->normalizeRateLimitConfig($config, $fallback);
+
+        return $this->applyLegacyOverride($legacy, $limits);
     }
 
     /**
@@ -296,19 +327,36 @@ final class ApiServiceProvider extends ServiceProvider
         $baseline = max(1, (int) config('security.rate_limiting.defaults.minute', 60));
         $config = config('security.rate_limiting.api.default');
 
+        $legacyConfig = config('api.rate_limits.default');
+
+        if ($legacyConfig !== null) {
+            // Honour the single integer override when legacy configuration is still in play.
+            $legacyDefault = $this->normalizeLimitValue($legacyConfig, null);
+
+            if ($legacyDefault !== null) {
+                return [
+                    'per_user' => $legacyDefault,
+                    'per_ip'   => $legacyDefault,
+                ];
+            }
+        }
+
+        $fallback = [
+            'per_user' => $baseline,
+            'per_ip'   => $baseline,
+        ];
+
         if (! is_array($config)) {
-            $value = $this->normalizeLimitValue($config, $baseline);
+            $perUser = $this->normalizeLimitValue($config, $fallback['per_user']);
+            $perIp = $this->normalizeLimitValue($config, $fallback['per_ip']);
 
             return [
-                'per_user' => $value,
-                'per_ip'   => $value,
+                'per_user' => $perUser,
+                'per_ip'   => $perIp,
             ];
         }
 
-        return $this->normalizeRateLimitConfig($config, [
-            'per_user' => $baseline,
-            'per_ip'   => $baseline,
-        ]);
+        return $this->normalizeRateLimitConfig($config, $fallback);
     }
 
     /**
@@ -336,6 +384,36 @@ final class ApiServiceProvider extends ServiceProvider
             'per_ip' => array_key_exists('per_ip', $config)
                 ? $this->normalizeLimitValue($config['per_ip'], $fallback['per_ip'])
                 : $fallback['per_ip'],
+        ];
+    }
+
+    /**
+     * Resolve legacy flat rate limit definitions while keeping new configuration authoritative.
+     */
+    private function legacyRateLimitValue(string $key, ?int $fallback): ?int
+    {
+        // The older api.php file exposed a single integer per bucket; we normalise it here if present.
+        $legacy = config("api.rate_limits.$key");
+
+        if ($legacy === null) {
+            return $fallback;
+        }
+
+        return $this->normalizeLimitValue($legacy, $fallback);
+    }
+
+    /**
+     * Apply an old-style integer override to the resolved limit definition when provided.
+     */
+    private function applyLegacyOverride(?int $legacy, array $limits): array
+    {
+        if ($legacy === null) {
+            return $limits;
+        }
+
+        return [
+            'per_user' => $legacy,
+            'per_ip'   => $legacy,
         ];
     }
 
@@ -402,6 +480,11 @@ final class ApiServiceProvider extends ServiceProvider
 
     private function formatKey(string $type, string $identifier, string $bucket): string
     {
+        // When no bucket suffix is supplied we emit the legacy "type:identifier" key format.
+        if ($bucket === '') {
+            return sprintf('%s:%s', $type, $identifier);
+        }
+
         return sprintf('%s:%s|%s', $type, $identifier, $bucket);
     }
 
@@ -453,6 +536,8 @@ final class ApiServiceProvider extends ServiceProvider
     {
         $response = response()
             ->json([
+                // Include the numeric status in the payload so clients can branch on the body alone.
+                'status' => SymfonyResponse::HTTP_TOO_MANY_REQUESTS,
                 'error' => [
                     'code'    => 'rate_limit_exceeded',
                     'message' => __('Too many requests.'),
