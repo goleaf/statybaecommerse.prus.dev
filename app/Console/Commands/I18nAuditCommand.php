@@ -6,201 +6,202 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Collection;
-use InvalidArgumentException;
-use JsonException;
+use Symfony\Component\Finder\SplFileInfo;
 
 final class I18nAuditCommand extends Command
 {
-    protected $signature = 'i18n:audit';
+    protected $signature = 'i18n:audit {fallback? : Override the configured fallback locale}';
 
-    protected $description = 'Audit translation keys across locales.';
+    protected $description = 'Audit translation keys across locales using the fallback locale as the source of truth.';
 
-    public function handle(Filesystem $filesystem): int
+    private Filesystem $files;
+
+    public function __construct(Filesystem $files)
     {
-        $langPath = lang_path();
+        parent::__construct();
 
-        if (! $filesystem->isDirectory($langPath)) {
-            $this->error("Language path [{$langPath}] does not exist.");
-
-            return self::FAILURE;
-        }
-
-        $locales = $this->discoverLocales($filesystem, $langPath);
-
-        if ($locales->isEmpty()) {
-            $this->error('No translation locales were discovered.');
-
-            return self::FAILURE;
-        }
-
-        $fallbackLocale = config('app.fallback_locale');
-
-        if (empty($fallbackLocale)) {
-            $this->error('The fallback locale is not configured.');
-
-            return self::FAILURE;
-        }
-
-        if (! $locales->contains($fallbackLocale)) {
-            $this->warn("Fallback locale [{$fallbackLocale}] not found in lang directory. Using discovered locales to build master set.");
-        }
-
-        $masterKeys = $this->collectLocaleKeys($filesystem, $langPath, $fallbackLocale);
-
-        if ($masterKeys->isEmpty()) {
-            $this->error("No translation keys found for fallback locale [{$fallbackLocale}].");
-
-            return self::FAILURE;
-        }
-
-        $issues = [];
-
-        foreach ($locales->sort() as $locale) {
-            $keys = $this->collectLocaleKeys($filesystem, $langPath, $locale);
-
-            $missing = $masterKeys->diff($keys)->values();
-            $extra = $keys->diff($masterKeys)->values();
-
-            if ($missing->isNotEmpty() || $extra->isNotEmpty()) {
-                $issues[$locale] = [
-                    'missing' => $missing->all(),
-                    'extra' => $extra->all(),
-                ];
-            }
-        }
-
-        if (empty($issues)) {
-            $this->components->info('All locales are consistent with the master translation key set.');
-
-            return self::SUCCESS;
-        }
-
-        $this->displayIssues($issues);
-
-        return self::FAILURE;
+        $this->files = $files;
     }
 
-    /**
-     * @return Collection<int, string>
-     */
-    private function discoverLocales(Filesystem $filesystem, string $langPath): Collection
+    public function handle(): int
     {
-        $directories = collect($filesystem->directories($langPath))
-            ->map(static fn (string $path) => basename($path));
+        $fallback = (string) ($this->argument('fallback') ?: config('app.fallback_locale'));
+        $locales = $this->discoverLocales();
 
-        $files = collect($filesystem->files($langPath))
-            ->filter(static fn ($file) => in_array($file->getExtension(), ['php', 'json'], true))
-            ->map(static fn ($file) => $file->getBasename('.'.$file->getExtension()));
+        if ($locales === []) {
+            $this->error('No locales found in the lang directory.');
 
-        return $directories->merge($files)->unique()->values();
-    }
-
-    /**
-     * @return Collection<int, string>
-     */
-    private function collectLocaleKeys(Filesystem $filesystem, string $langPath, string $locale): Collection
-    {
-        $keys = collect();
-
-        $directory = $langPath.DIRECTORY_SEPARATOR.$locale;
-
-        if ($filesystem->isDirectory($directory)) {
-            foreach ($filesystem->allFiles($directory) as $file) {
-                if ($file->getExtension() !== 'php') {
-                    continue;
-                }
-
-                $prefix = str_replace(DIRECTORY_SEPARATOR, '.', $file->getRelativePathname());
-                $prefix = preg_replace('/\.php$/', '', $prefix) ?? '';
-
-                $data = $this->loadPhpTranslation($file->getPathname());
-
-                $keys = $keys->merge($this->flattenTranslationArray($data, $prefix));
-            }
+            return self::FAILURE;
         }
 
-        $rootPhp = $langPath.DIRECTORY_SEPARATOR.$locale.'.php';
+        if (! in_array($fallback, $locales, true)) {
+            $this->error("Fallback locale [{$fallback}] does not have any translation files.");
 
-        if ($filesystem->exists($rootPhp)) {
-            $data = $this->loadPhpTranslation($rootPhp);
-            $keys = $keys->merge($this->flattenTranslationArray($data));
+            return self::FAILURE;
         }
 
-        $rootJson = $langPath.DIRECTORY_SEPARATOR.$locale.'.json';
+        $masterKeys = $this->collectLocaleKeys($fallback);
+        sort($masterKeys);
 
-        if ($filesystem->exists($rootJson)) {
-            try {
-                $data = json_decode((string) $filesystem->get($rootJson), true, 512, JSON_THROW_ON_ERROR);
-            } catch (JsonException $exception) {
-                throw new InvalidArgumentException("Invalid JSON in translation file [{$rootJson}]: {$exception->getMessage()}");
-            }
+        $this->info("Auditing translations (fallback: {$fallback})");
 
-            $keys = $keys->merge(array_keys($data));
-        }
+        $hasIssues = false;
 
-        return $keys->unique()->sort()->values();
-    }
+        foreach ($locales as $locale) {
+            $localeKeys = $this->collectLocaleKeys($locale);
+            sort($localeKeys);
 
-    /**
-     * @return array<int, string>
-     */
-    private function flattenTranslationArray(array $translations, string $prefix = ''): array
-    {
-        $flattened = [];
+            $missing = array_values(array_diff($masterKeys, $localeKeys));
+            $extra = array_values(array_diff($localeKeys, $masterKeys));
 
-        foreach ($translations as $key => $value) {
-            $fullKey = $prefix !== '' ? $prefix.'.'.$key : (string) $key;
-
-            if (is_array($value)) {
-                $flattened = array_merge($flattened, $this->flattenTranslationArray($value, $fullKey));
+            if ($missing === [] && $extra === []) {
+                $this->line(" - {$locale}: OK");
 
                 continue;
             }
 
-            $flattened[] = $fullKey;
-        }
+            $hasIssues = true;
 
-        return $flattened;
-    }
+            $this->line(" - {$locale}:");
 
-    /**
-     * @return array<mixed>
-     */
-    private function loadPhpTranslation(string $path): array
-    {
-        $translations = require $path;
+            if ($missing !== []) {
+                $this->warn('   Missing ('.count($missing).'):');
 
-        if (! is_array($translations)) {
-            throw new InvalidArgumentException("Translation file [{$path}] must return an array.");
-        }
-
-        return $translations;
-    }
-
-    /**
-     * @param array<string, array<int, string>> $issues
-     */
-    private function displayIssues(array $issues): void
-    {
-        foreach ($issues as $locale => $diffs) {
-            $this->components->error("Locale [{$locale}] has inconsistencies");
-
-            if (! empty($diffs['missing'])) {
-                $this->line('  Missing keys:');
-                foreach ($diffs['missing'] as $key) {
-                    $this->line("    - {$key}");
+                foreach ($missing as $key) {
+                    $this->line("     • {$key}");
                 }
             }
 
-            if (! empty($diffs['extra'])) {
-                $this->line('  Extra keys:');
-                foreach ($diffs['extra'] as $key) {
-                    $this->line("    + {$key}");
+            if ($extra !== []) {
+                $this->warn('   Extra ('.count($extra).'):');
+
+                foreach ($extra as $key) {
+                    $this->line("     • {$key}");
                 }
             }
-
-            $this->newLine();
         }
+
+        if ($hasIssues) {
+            $this->error('Translation audit found discrepancies.');
+
+            return self::FAILURE;
+        }
+
+        $this->info('All locales match the fallback key set.');
+
+        return self::SUCCESS;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function collectLocaleKeys(string $locale): array
+    {
+        $keys = [];
+        $langPath = lang_path();
+
+        $directory = $langPath.DIRECTORY_SEPARATOR.$locale;
+        if ($this->files->isDirectory($directory)) {
+            /** @var SplFileInfo $file */
+            foreach ($this->files->allFiles($directory) as $file) {
+                if ($file->getExtension() !== 'php') {
+                    continue;
+                }
+
+                $relative = str_replace(['\\', '/'], '.', $file->getRelativePathname());
+                $relative = (string) preg_replace('/\.php$/', '', $relative);
+
+                $data = require $file->getRealPath();
+
+                if (! is_array($data)) {
+                    continue;
+                }
+
+                foreach ($this->flattenArrayKeys($data) as $key) {
+                    $keys[] = $relative !== '' ? $relative.'.'.$key : $key;
+                }
+            }
+        }
+
+        $rootPhp = $langPath.DIRECTORY_SEPARATOR.$locale.'.php';
+        if ($this->files->exists($rootPhp)) {
+            $data = require $rootPhp;
+
+            if (is_array($data)) {
+                foreach ($this->flattenArrayKeys($data) as $key) {
+                    $keys[] = $key;
+                }
+            }
+        }
+
+        $jsonPath = $langPath.DIRECTORY_SEPARATOR.$locale.'.json';
+        if ($this->files->exists($jsonPath)) {
+            $json = json_decode((string) $this->files->get($jsonPath), true, 512, JSON_THROW_ON_ERROR);
+
+            foreach (array_keys($json) as $key) {
+                $keys[] = (string) $key;
+            }
+        }
+
+        $keys = array_values(array_unique($keys));
+        sort($keys);
+
+        return $keys;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function flattenArrayKeys(array $data, string $prefix = ''): array
+    {
+        $keys = [];
+
+        foreach ($data as $key => $value) {
+            $key = (string) $key;
+            $fullKey = $prefix !== '' ? $prefix.'.'.$key : $key;
+
+            if (is_array($value) && $value !== []) {
+                $keys = array_merge($keys, $this->flattenArrayKeys($value, $fullKey));
+
+                continue;
+            }
+
+            $keys[] = $fullKey;
+        }
+
+        return $keys;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function discoverLocales(): array
+    {
+        $langPath = lang_path();
+
+        if (! $this->files->isDirectory($langPath)) {
+            return [];
+        }
+
+        $locales = [];
+
+        foreach ($this->files->directories($langPath) as $directory) {
+            $locales[] = basename($directory);
+        }
+
+        foreach ($this->files->files($langPath) as $file) {
+            $extension = $file->getExtension();
+
+            if (! in_array($extension, ['php', 'json'], true)) {
+                continue;
+            }
+
+            $locales[] = $file->getBasename('.'.$extension);
+        }
+
+        $locales = array_values(array_unique($locales));
+        sort($locales);
+
+        return $locales;
     }
 }

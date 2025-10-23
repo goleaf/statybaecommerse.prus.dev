@@ -29,26 +29,26 @@ class ListLegals extends BaseListRecords
     public function getWidgetTabs(): array
     {
         return [
-            'all' => WidgetTab::make(__('legal.tabs.all'))
-                ->icon('heroicon-o-document-text')
-                ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
-            'enabled' => WidgetTab::make(__('legal.tabs.enabled'))
+            'all' => Tab::make(__('legal.tabs.all'))
+                ->icon('heroicon-o-document-text'),
+
+            'enabled' => Tab::make(__('legal.tabs.enabled'))
                 ->icon('heroicon-o-check-circle')
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_enabled', true)),
 
-            'disabled' => WidgetTab::make(__('legal.tabs.disabled'))
+            'disabled' => Tab::make(__('legal.tabs.disabled'))
                 ->icon('heroicon-o-x-circle')
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_enabled', false)),
 
-            'required' => WidgetTab::make(__('legal.tabs.required'))
+            'required' => Tab::make(__('legal.tabs.required'))
                 ->icon('heroicon-o-exclamation-triangle')
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_required', true)),
 
-            'published' => WidgetTab::make(__('legal.tabs.published'))
+            'published' => Tab::make(__('legal.tabs.published'))
                 ->icon('heroicon-o-eye')
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereNotNull('published_at')),
 
-            'draft' => WidgetTab::make(__('legal.tabs.draft'))
+            'draft' => Tab::make(__('legal.tabs.draft'))
                 ->icon('heroicon-o-pencil')
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereNull('published_at')),
         ];
