@@ -11,6 +11,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 final class VariantPriceHistoryResource extends Resource
@@ -101,18 +102,39 @@ final class VariantPriceHistoryResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('price_change')
                     ->label('Change')
-                    ->formatStateUsing(function ($record) {
-                        if ($record->old_price && $record->new_price) {
-                            $change = $record->new_price - $record->old_price;
-                            $percentage = $record->old_price > 0 ? ($change / $record->old_price) * 100 : 0;
-                            $sign = $change >= 0 ? '+' : '';
-
-                            return $sign.'€'.number_format($change, 2).' ('.$sign.number_format($percentage, 1).'%)';
+                    ->state(function (VariantPriceHistory $record): ?float {
+                        if ($record->old_price === null || $record->new_price === null) {
+                            return null;
                         }
 
                         return (float) ($record->new_price - $record->old_price);
                     })
-                    ->sortable()
+                    ->formatStateUsing(function (?float $state, VariantPriceHistory $record): string {
+                        if ($state === null) {
+                            return '-';
+                        }
+
+                        $percentage = $record->old_price > 0
+                            ? ($state / $record->old_price) * 100
+                            : 0.0;
+
+                        $sign = $state >= 0 ? '+' : '';
+
+                        return sprintf(
+                            '%s€%s (%s%s%%)',
+                            $sign,
+                            number_format($state, 2),
+                            $sign,
+                            number_format($percentage, 1)
+                        );
+                    })
+                    ->sortable(query: function (Builder $query, string $direction): Builder {
+                        $direction = $direction === 'asc' ? 'asc' : 'desc';
+
+                        return $query->orderByRaw(
+                            '(COALESCE(new_price, 0) - COALESCE(old_price, 0)) '.$direction
+                        );
+                    })
                     ->color(fn ($record) => $record->isIncrease() ? 'success' : ($record->isDecrease() ? 'danger' : 'gray')),
                 Tables\Columns\TextColumn::make('price_type')
                     ->badge()
