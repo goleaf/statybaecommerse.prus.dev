@@ -8,8 +8,7 @@ use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\OrderShippingResource\Pages;
 use App\Models\Order;
 use App\Models\OrderShipping;
-use App\Models\Scopes\ActiveScope;
-use App\Models\Scopes\StatusScope;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -38,7 +37,6 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 final class OrderShippingResource extends Resource
 {
@@ -242,13 +240,16 @@ final class OrderShippingResource extends Resource
                     ->preload(),
                 SelectFilter::make('carrier_name')
                     ->label(__('admin.order_shippings.carrier_name'))
-                    ->options(fn () => OrderShipping::query()
-                        ->select('carrier_name')
-                        ->distinct()
-                        ->whereNotNull('carrier_name')
-                        ->orderBy('carrier_name')
-                        ->pluck('carrier_name', 'carrier_name')
-                        ->all())
+                    ->options(
+                        fn () => OrderShipping::query()
+                            ->select('carrier_name')
+                            ->whereNotNull('carrier_name')
+                            ->distinct()
+                            ->orderBy('carrier_name')
+                            ->pluck('carrier_name', 'carrier_name')
+                            ->filter()
+                            ->all(),
+                    )
                     ->searchable(),
                 Filter::make('shipped_at')
                     ->label(__('admin.order_shippings.shipped_at'))
