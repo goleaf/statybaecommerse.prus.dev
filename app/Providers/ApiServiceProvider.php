@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Models\ApiKey;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -36,6 +37,23 @@ final class ApiServiceProvider extends ServiceProvider
                 config('security.rate_limiting.api.autocomplete', 30),
                 $this->rateLimitKey($request, 'autocomplete')
             );
+        });
+
+        RateLimiter::for('partner.api', function (Request $request): Limit|array {
+            $apiKey = $this->resolvePartnerApiKey($request);
+
+            if ($apiKey === null) {
+                return Limit::perMinute(60)->by('partner_api:anonymous:'.$request->ip());
+            }
+
+            $key = 'partner_api:key:'.$apiKey->getKey();
+            $limit = $apiKey->rate_limit;
+
+            if ($limit === null || $limit <= 0) {
+                return Limit::none()->by($key);
+            }
+
+            return Limit::perMinute(max(1, (int) $limit))->by($key);
         });
     }
 
@@ -337,5 +355,30 @@ final class ApiServiceProvider extends ServiceProvider
         $numeric = (int) $interval;
 
         return $numeric > 0 ? $numeric : 1;
+    }
+
+    private function resolvePartnerApiKey(Request $request): ?ApiKey
+    {
+        $resolved = $request->attributes->get('partner_api_key');
+        if ($resolved instanceof ApiKey) {
+            return $resolved;
+        }
+
+        $header = $request->headers->get('X-Api-Key');
+        if (! is_string($header)) {
+            return null;
+        }
+
+        $trimmed = trim($header);
+        if ($trimmed === '') {
+            return null;
+        }
+
+        /** @var ApiKey|null $apiKey */
+        $apiKey = ApiKey::query()
+            ->where('key', ApiKey::hashKey($trimmed))
+            ->first();
+
+        return $apiKey;
     }
 }
