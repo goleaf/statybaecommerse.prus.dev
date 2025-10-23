@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductVariantResource\Pages;
+use App\Filament\Support\MatrixFactory;
 use App\Models\Attribute;
 use App\Models\AttributeValue;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Services\ProductVariantAttributeMatrixService;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
@@ -271,58 +273,12 @@ final class ProductVariantResource extends Resource
                             ->schema([
                                 Section::make('Variant Attribute Matrix')
                                     ->schema([
-                                        Repeater::make('attributeValueSelections')
-                                            ->label(__('product_variants.fields.attributes'))
-                                            ->statePath('attributeValueSelections')
-                                            ->default(fn (?ProductVariant $record): array => $record
-                                                ? $record->attributes()
-                                                    ->withPivot('attribute_id')
-                                                    ->get()
-                                                    ->map(fn (AttributeValue $value): array => [
-                                                        'attribute_id'       => $value->pivot->attribute_id,
-                                                        'attribute_value_id' => $value->getKey(),
-                                                    ])
-                                                    ->values()
-                                                    ->all()
-                                                : [])
-                                            ->dehydrated(false)
-                                            ->schema([
-                                                Select::make('attribute_id')
-                                                    ->label(__('product_variants.fields.attribute_name'))
-                                                    ->options(fn () => Attribute::query()
-                                                        ->orderBy('name')
-                                                        ->pluck('name', 'id'))
-                                                    ->searchable()
-                                                    ->preload()
-                                                    ->reactive()
-                                                    ->required()
-                                                    ->afterStateUpdated(function (Set $set): void {
-                                                        $set('attribute_value_id', null);
-                                                    }),
-                                                Select::make('attribute_value_id')
-                                                    ->label(__('product_variants.fields.attribute_value'))
-                                                    ->options(function (Get $get) {
-                                                        $attributeId = $get('attribute_id');
-
-                                                        if (blank($attributeId)) {
-                                                            return [];
-                                                        }
-
-                                                        return AttributeValue::query()
-                                                            ->where('attribute_id', $attributeId)
-                                                            ->orderBy('sort_order')
-                                                            ->get()
-                                                            ->mapWithKeys(fn (AttributeValue $value): array => [
-                                                                $value->getKey() => $value->display_value ?? $value->value,
-                                                            ])
-                                                            ->all();
-                                                    })
-                                                    ->searchable()
-                                                    ->preload()
-                                                    ->required()
-                                                    ->disabled(fn (Get $get): bool => blank($get('attribute_id'))),
-                                            ])
-                                            ->columns(2),
+                                        MatrixFactory::radioGrid(
+                                            'variant_attribute_matrix',
+                                            fn (Get $get): SupportCollection => self::attributeMatrixRows(
+                                                self::resolveMatrixProductId($get)
+                                            ),
+                                        ),
                                     ]),
                                 Section::make('Additional Data')
                                     ->schema([
@@ -339,74 +295,78 @@ final class ProductVariantResource extends Resource
 
     public static function syncVariantAttributeRelations(ProductVariant $variant, array $matrix = [], array $legacySelections = []): void
     {
-        $processedSelections = collect($selections)
-            ->map(fn ($selection): array => [
-                'attribute_id'       => data_get($selection, 'attribute_id'),
-                'attribute_value_id' => data_get($selection, 'attribute_value_id'),
-            ])
-            ->filter(fn (array $selection): bool => filled($selection['attribute_id']) && filled($selection['attribute_value_id']))
+        if ($legacySelections === [] && self::isLegacySelectionPayload($matrix)) {
+            $legacySelections = $matrix;
+            $matrix = [];
+        }
+
+        ProductVariantAttributeMatrixService::sync($variant, $matrix, $legacySelections);
+    }
+
+    private static function resolveMatrixProductId(Get $get): ?int
+    {
+        $productId = $get('product_id');
+
+        if (filled($productId)) {
+            return (int) $productId;
+        }
+
+        $recordId = request()?->route('record');
+
+        if (! $recordId) {
+            return null;
+        }
+
+        $recordId = (int) $recordId;
+
+        if (! array_key_exists($recordId, self::$matrixProductCache)) {
+            self::$matrixProductCache[$recordId] = ProductVariant::query()
+                ->select(['id', 'product_id'])
+                ->find($recordId)?->product_id;
+        }
+
+        $cached = self::$matrixProductCache[$recordId];
+
+        return $cached !== null ? (int) $cached : null;
+    }
+
+    private static function attributeMatrixRows(?int $productId): SupportCollection
+    {
+        $attributes = Attribute::query()
+            ->with(['values' => fn ($query) => $query->orderBy('sort_order')->orderBy('value')])
+            ->when($productId, fn ($query) => $query->whereHas('products', fn ($relation) => $relation->whereKey($productId)))
+            ->orderBy('sort_order')
+            ->get();
+
+        if ($attributes->isEmpty()) {
+            $attributes = Attribute::query()
+                ->with(['values' => fn ($query) => $query->orderBy('sort_order')])
+                ->orderBy('sort_order')
+                ->take(5)
+                ->get();
+        }
+
+        return $attributes
+            ->map(function (Attribute $attribute): array {
+                return [
+                    'key' => 'attribute_'.$attribute->getKey(),
+                    'attribute_id' => $attribute->getKey(),
+                    'label' => $attribute->trans('name') ?? $attribute->name,
+                    'options' => $attribute->values
+                        ->mapWithKeys(fn (AttributeValue $value): array => [
+                            (string) $value->getKey() => $value->display_value ?? $value->value,
+                        ])
+                        ->all(),
+                ];
+            })
+            ->filter(fn (array $row): bool => ! empty($row['options']))
             ->values();
     }
 
-        if ($processedSelections->isEmpty()) {
-            $variant->attributes()->detach();
-            $variant->variantAttributeValues()->delete();
-
-            return;
-        }
-
-        $attributeValues = AttributeValue::query()
-            ->with('attribute')
-            ->whereIn('id', $processedSelections->pluck('attribute_value_id')->all())
-            ->get()
-            ->keyBy(fn (AttributeValue $value) => $value->getKey());
-
-        $pivotData = [];
-        $variantAttributeValues = [];
-
-        foreach ($processedSelections as $index => $selection) {
-            $attributeValue = $attributeValues->get($selection['attribute_value_id']);
-
-            if (! $attributeValue) {
-                continue;
-            }
-
-            $attribute = $attributeValue->attribute;
-            $attributeId = $attribute?->getKey() ?? (int) $selection['attribute_id'];
-
-            $pivotData[$attributeValue->getKey()] = [
-                'attribute_id' => $attributeId,
-            ];
-
-            $variantAttributeValues[] = [
-                'variant_id'              => $variant->getKey(),
-                'attribute_id'            => $attributeId,
-                'attribute_name'          => $attribute?->name,
-                'attribute_value'         => $attributeValue->value,
-                'attribute_value_display' => $attributeValue->display_value ?? $attributeValue->value,
-                'attribute_value_lt'      => $attributeValue->getTranslation('value', 'lt', false) ?? $attributeValue->value,
-                'attribute_value_en'      => $attributeValue->getTranslation('value', 'en', false) ?? $attributeValue->value,
-                'attribute_value_slug'    => $attributeValue->slug,
-                'sort_order'              => $index,
-                'is_filterable'           => (bool) ($attribute?->is_filterable ?? true),
-                'is_searchable'           => (bool) ($attribute?->is_searchable ?? true),
-            ];
-        }
-
-        if (empty($pivotData)) {
-            $variant->attributes()->detach();
-            $variant->variantAttributeValues()->delete();
-
-            return;
-        }
-
-        $variant->attributes()->sync($pivotData);
-
-        $variant->variantAttributeValues()->delete();
-
-        if (! empty($variantAttributeValues)) {
-            $variant->variantAttributeValues()->createMany($variantAttributeValues);
-        }
+    private static function isLegacySelectionPayload(array $payload): bool
+    {
+        return collect($payload)
+            ->every(fn ($item): bool => is_array($item) && array_key_exists('attribute_id', $item) && array_key_exists('attribute_value_id', $item));
     }
 
     public static function table(Table $table): Table
