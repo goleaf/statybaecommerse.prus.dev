@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -46,66 +45,53 @@ return new class extends Migration
         try {
             Schema::dropIfExists($legacyTable);
             Schema::rename('discount_codes', $legacyTable);
-        } finally {
-            Schema::enableForeignKeyConstraints();
-        }
 
-        // Ensure the legacy table no longer holds the unique code index before copying.
-        $this->dropIndexIfExists('discount_codes_code_unique', $legacyTable);
+            Schema::create('discount_codes', function (Blueprint $table): void {
+                $table->id();
+                $table->foreignId('discount_id')->nullable()->constrained('discounts')->nullOnDelete();
+                $table->string('code')->unique();
+                $table->string('name')->nullable();
+                $table->text('description')->nullable();
+                $table->text('description_lt')->nullable();
+                $table->text('description_en')->nullable();
+                $table->string('type')->default('percentage');
+                $table->decimal('value', 10, 2)->default(0);
+                $table->decimal('minimum_amount', 10, 2)->default(0);
+                $table->decimal('maximum_discount', 10, 2)->nullable();
+                $table->timestamp('starts_at')->nullable();
+                $table->timestamp('expires_at')->nullable();
+                $table->timestamp('valid_from')->nullable();
+                $table->timestamp('valid_until')->nullable();
+                $table->integer('usage_limit')->nullable();
+                $table->integer('usage_limit_per_user')->nullable();
+                $table->integer('usage_count')->default(0);
+                $table->boolean('is_active')->default(true);
+                $table->boolean('is_public')->default(false);
+                $table->boolean('is_auto_apply')->default(false);
+                $table->boolean('is_stackable')->default(false);
+                $table->boolean('is_first_time_only')->default(false);
+                $table->foreignId('customer_group_id')->nullable()->constrained('customer_groups')->nullOnDelete();
+                $table->string('status')->default('inactive');
+                $table->json('metadata')->nullable();
+                $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+                $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+                $table->timestamps();
+                $table->softDeletes();
 
-        Schema::create('discount_codes', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('discount_id')->nullable()->constrained('discounts')->nullOnDelete();
-            $table->string('code');
-            $table->string('name')->nullable();
-            $table->text('description')->nullable();
-            $table->text('description_lt')->nullable();
-            $table->text('description_en')->nullable();
-            $table->string('type')->default('percentage');
-            $table->decimal('value', 10, 2)->default(0);
-            $table->decimal('minimum_amount', 10, 2)->default(0);
-            $table->decimal('maximum_discount', 10, 2)->nullable();
-            $table->timestamp('starts_at')->nullable();
-            $table->timestamp('expires_at')->nullable();
-            $table->timestamp('valid_from')->nullable();
-            $table->timestamp('valid_until')->nullable();
-            $table->integer('usage_limit')->nullable();
-            $table->integer('usage_limit_per_user')->nullable();
-            $table->integer('usage_count')->default(0);
-            $table->boolean('is_active')->default(true);
-            $table->boolean('is_public')->default(false);
-            $table->boolean('is_auto_apply')->default(false);
-            $table->boolean('is_stackable')->default(false);
-            $table->boolean('is_first_time_only')->default(false);
-            $table->foreignId('customer_group_id')->nullable()->constrained('customer_groups')->nullOnDelete();
-            $table->string('status')->default('inactive');
-            $table->json('metadata')->nullable();
-            // Create nullable author columns first; the foreign keys are attached later once engine compatibility is verified.
-            $table->foreignId('created_by')->nullable();
-            $table->foreignId('updated_by')->nullable();
-            $table->timestamps();
-            $table->softDeletes();
+                $table->index(['is_active', 'status', 'starts_at', 'expires_at'], 'discount_codes_active_window_idx');
+                $table->index(['discount_id', 'code'], 'discount_codes_discount_code_idx');
+                $table->index(['customer_group_id', 'status'], 'discount_codes_customer_status_idx');
+                $table->index(['valid_from', 'valid_until'], 'discount_codes_valid_window_idx');
+                $table->index(['created_by']);
+                $table->index(['updated_by']);
+            });
 
-            $table->unique('code', 'discount_codes_code_unique_new');
-            $table->index(['is_active', 'status', 'starts_at', 'expires_at'], 'discount_codes_active_window_idx');
-            $table->index(['discount_id', 'code'], 'discount_codes_discount_code_idx');
-            $table->index(['customer_group_id', 'status'], 'discount_codes_customer_status_idx');
-            $table->index(['valid_from', 'valid_until'], 'discount_codes_valid_window_idx');
-            $table->index(['created_by']);
-            $table->index(['updated_by']);
-        });
-
-        // Temporarily relax constraints while data is copied back to the rebuilt table.
-        Schema::disableForeignKeyConstraints();
-
-        try {
             $this->copyDiscountCodes($legacyTable, 'discount_codes');
+
             Schema::dropIfExists($legacyTable);
         } finally {
             Schema::enableForeignKeyConstraints();
         }
-
-        $this->safelyAttachUserForeignKeys('discount_codes', ['created_by', 'updated_by']);
     }
 
     private function rebuildDiscountRedemptions(): void
@@ -138,43 +124,35 @@ return new class extends Migration
             }
 
             Schema::rename('discount_redemptions', $legacyTable);
-        } finally {
-            Schema::enableForeignKeyConstraints();
-        }
 
-        Schema::create('discount_redemptions', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('discount_id')->nullable()->constrained('discounts')->nullOnDelete();
-            $table->foreignId('code_id')->nullable()->constrained('discount_codes')->nullOnDelete();
-            $table->foreignId('order_id')->nullable()->constrained('orders')->nullOnDelete();
-            // Defer user foreign key creation to avoid MySQL engine mismatches observed in production dumps.
-            $table->foreignId('user_id')->nullable();
-            $table->decimal('amount_saved', 12, 2)->default(0);
-            $table->char('currency_code', 3)->nullable();
-            $table->timestamp('redeemed_at')->nullable();
-            $table->string('status')->default('pending');
-            $table->string('notes')->nullable();
-            $table->ipAddress('ip_address')->nullable();
-            $table->string('user_agent')->nullable();
-            $table->json('metadata')->nullable();
-            $table->foreignId('created_by')->nullable();
-            $table->foreignId('updated_by')->nullable();
-            $table->timestamps();
-            $table->softDeletes();
+            Schema::create('discount_redemptions', function (Blueprint $table): void {
+                $table->id();
+                $table->foreignId('discount_id')->nullable()->constrained('discounts')->nullOnDelete();
+                $table->foreignId('code_id')->nullable()->constrained('discount_codes')->nullOnDelete();
+                $table->foreignId('order_id')->nullable()->constrained('orders')->nullOnDelete();
+                $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+                $table->decimal('amount_saved', 12, 2)->default(0);
+                $table->char('currency_code', 3)->nullable();
+                $table->timestamp('redeemed_at')->nullable();
+                $table->string('status')->default('pending');
+                $table->string('notes')->nullable();
+                $table->ipAddress('ip_address')->nullable();
+                $table->string('user_agent')->nullable();
+                $table->json('metadata')->nullable();
+                $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+                $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+                $table->timestamps();
+                $table->softDeletes();
 
-            $table->index(['discount_id', 'status'], 'discount_redemptions_discount_status_idx');
-            $table->index(['code_id', 'user_id'], 'discount_redemptions_code_user_idx');
-            $table->index(['user_id', 'status'], 'discount_redemptions_user_status_idx');
-            $table->index(['order_id', 'status'], 'discount_redemptions_order_status_idx');
-            $table->index(['redeemed_at']);
-            $table->index(['created_by']);
-            $table->index(['updated_by']);
-        });
+                $table->index(['discount_id', 'status'], 'discount_redemptions_discount_status_idx');
+                $table->index(['code_id', 'user_id'], 'discount_redemptions_code_user_idx');
+                $table->index(['user_id', 'status'], 'discount_redemptions_user_status_idx');
+                $table->index(['order_id', 'status'], 'discount_redemptions_order_status_idx');
+                $table->index(['redeemed_at']);
+                $table->index(['created_by']);
+                $table->index(['updated_by']);
+            });
 
-        // Temporarily relax constraints during the data restoration process.
-        Schema::disableForeignKeyConstraints();
-
-        try {
             $this->copyDiscountRedemptions($legacyTable, 'discount_redemptions');
 
             Schema::dropIfExists($legacyTable);
@@ -194,14 +172,14 @@ return new class extends Migration
                 });
 
                 $this->copyTable($legacyTranslations, 'discount_redemption_translations', [
-                    'id'                     => null,
+                    'id' => null,
                     'discount_redemption_id' => null,
-                    'locale'                 => null,
-                    'notes'                  => null,
-                    'status_description'     => null,
-                    'metadata_description'   => null,
-                    'created_at'             => null,
-                    'updated_at'             => null,
+                    'locale' => null,
+                    'notes' => null,
+                    'status_description' => null,
+                    'metadata_description' => null,
+                    'created_at' => null,
+                    'updated_at' => null,
                 ]);
 
                 Schema::dropIfExists($legacyTranslations);
@@ -209,8 +187,6 @@ return new class extends Migration
         } finally {
             Schema::enableForeignKeyConstraints();
         }
-
-        $this->safelyAttachUserForeignKeys('discount_redemptions', ['user_id', 'created_by', 'updated_by']);
     }
 
     private function rebuildCampaignDiscountPivot(): void
@@ -254,50 +230,44 @@ return new class extends Migration
 
     private function copyDiscountCodes(string $from, string $to): void
     {
-        $columnNames = array_values(Schema::getColumnListing($from));
-
-        /** @var array<int, string> $columnNames */
-        $columnNames = $columnNames;
-
-        /** @var array<string, int> $available */
-        $available = array_flip($columnNames);
+        $available = array_flip(Schema::getColumnListing($from));
 
         DB::table($from)->orderBy('id')->chunk(200, function ($rows) use ($available, $to): void {
             $batch = [];
 
             foreach ($rows as $row) {
                 $record = [
-                    'id'                   => $this->value($row, $available, 'id'),
-                    'discount_id'          => $this->value($row, $available, 'discount_id'),
-                    'code'                 => $this->value($row, $available, 'code'),
-                    'name'                 => $this->value($row, $available, 'name'),
-                    'description'          => $this->value($row, $available, 'description'),
-                    'description_lt'       => $this->value($row, $available, 'description_lt'),
-                    'description_en'       => $this->value($row, $available, 'description_en'),
-                    'type'                 => $this->value($row, $available, 'type', 'percentage'),
-                    'value'                => $this->value($row, $available, 'value', 0),
-                    'minimum_amount'       => $this->value($row, $available, 'minimum_amount', 0),
-                    'maximum_discount'     => $this->value($row, $available, 'maximum_discount'),
-                    'starts_at'            => $this->value($row, $available, 'starts_at'),
-                    'expires_at'           => $this->value($row, $available, 'expires_at'),
-                    'valid_from'           => $this->value($row, $available, 'valid_from'),
-                    'valid_until'          => $this->value($row, $available, 'valid_until'),
-                    'usage_limit'          => $this->value($row, $available, 'usage_limit', $this->value($row, $available, 'max_uses')),
+                    'id' => $this->value($row, $available, 'id'),
+                    'discount_id' => $this->value($row, $available, 'discount_id'),
+                    'code' => $this->value($row, $available, 'code'),
+                    'name' => $this->value($row, $available, 'name'),
+                    'description' => $this->value($row, $available, 'description'),
+                    'description_lt' => $this->value($row, $available, 'description_lt'),
+                    'description_en' => $this->value($row, $available, 'description_en'),
+                    'type' => $this->value($row, $available, 'type', 'percentage'),
+                    'value' => $this->value($row, $available, 'value', 0),
+                    'minimum_amount' => $this->value($row, $available, 'minimum_amount', 0),
+                    'maximum_discount' => $this->value($row, $available, 'maximum_discount'),
+                    'starts_at' => $this->value($row, $available, 'starts_at'),
+                    'expires_at' => $this->value($row, $available, 'expires_at'),
+                    'valid_from' => $this->value($row, $available, 'valid_from'),
+                    'valid_until' => $this->value($row, $available, 'valid_until'),
+                    'usage_limit' => $this->value($row, $available, 'usage_limit', $this->value($row, $available, 'max_uses')),
                     'usage_limit_per_user' => $this->value($row, $available, 'usage_limit_per_user'),
-                    'usage_count'          => $this->value($row, $available, 'usage_count', 0),
-                    'is_active'            => $this->value($row, $available, 'is_active', true),
-                    'is_public'            => $this->value($row, $available, 'is_public', false),
-                    'is_auto_apply'        => $this->value($row, $available, 'is_auto_apply', false),
-                    'is_stackable'         => $this->value($row, $available, 'is_stackable', false),
-                    'is_first_time_only'   => $this->value($row, $available, 'is_first_time_only', false),
-                    'customer_group_id'    => $this->value($row, $available, 'customer_group_id'),
-                    'status'               => $this->value($row, $available, 'status', 'inactive'),
-                    'metadata'             => $this->value($row, $available, 'metadata'),
-                    'created_by'           => $this->value($row, $available, 'created_by'),
-                    'updated_by'           => $this->value($row, $available, 'updated_by'),
-                    'created_at'           => $this->value($row, $available, 'created_at'),
-                    'updated_at'           => $this->value($row, $available, 'updated_at'),
-                    'deleted_at'           => $this->value($row, $available, 'deleted_at'),
+                    'usage_count' => $this->value($row, $available, 'usage_count', 0),
+                    'is_active' => $this->value($row, $available, 'is_active', true),
+                    'is_public' => $this->value($row, $available, 'is_public', false),
+                    'is_auto_apply' => $this->value($row, $available, 'is_auto_apply', false),
+                    'is_stackable' => $this->value($row, $available, 'is_stackable', false),
+                    'is_first_time_only' => $this->value($row, $available, 'is_first_time_only', false),
+                    'customer_group_id' => $this->value($row, $available, 'customer_group_id'),
+                    'status' => $this->value($row, $available, 'status', 'inactive'),
+                    'metadata' => $this->value($row, $available, 'metadata'),
+                    'created_by' => $this->value($row, $available, 'created_by'),
+                    'updated_by' => $this->value($row, $available, 'updated_by'),
+                    'created_at' => $this->value($row, $available, 'created_at'),
+                    'updated_at' => $this->value($row, $available, 'updated_at'),
+                    'deleted_at' => $this->value($row, $available, 'deleted_at'),
                 ];
 
                 if ($record['code'] === null) {
@@ -315,13 +285,7 @@ return new class extends Migration
 
     private function copyDiscountRedemptions(string $from, string $to): void
     {
-        $columnNames = array_values(Schema::getColumnListing($from));
-
-        /** @var array<int, string> $columnNames */
-        $columnNames = $columnNames;
-
-        /** @var array<string, int> $available */
-        $available = array_flip($columnNames);
+        $available = array_flip(Schema::getColumnListing($from));
 
         DB::table($from)->orderBy('id')->chunk(200, function ($rows) use ($available, $to): void {
             $batch = [];
@@ -335,24 +299,24 @@ return new class extends Migration
                 }
 
                 $record = [
-                    'id'            => $this->value($row, $available, 'id'),
-                    'discount_id'   => $this->value($row, $available, 'discount_id'),
-                    'code_id'       => $this->value($row, $available, 'code_id'),
-                    'order_id'      => $this->value($row, $available, 'order_id'),
-                    'user_id'       => $this->value($row, $available, 'user_id'),
-                    'amount_saved'  => $this->value($row, $available, 'amount_saved', 0),
+                    'id' => $this->value($row, $available, 'id'),
+                    'discount_id' => $this->value($row, $available, 'discount_id'),
+                    'code_id' => $this->value($row, $available, 'code_id'),
+                    'order_id' => $this->value($row, $available, 'order_id'),
+                    'user_id' => $this->value($row, $available, 'user_id'),
+                    'amount_saved' => $this->value($row, $available, 'amount_saved', 0),
                     'currency_code' => $this->value($row, $available, 'currency_code'),
-                    'redeemed_at'   => $redeemedAt,
-                    'status'        => $status,
-                    'notes'         => $this->value($row, $available, 'notes'),
-                    'ip_address'    => $this->value($row, $available, 'ip_address'),
-                    'user_agent'    => $this->value($row, $available, 'user_agent'),
-                    'metadata'      => $this->value($row, $available, 'metadata'),
-                    'created_by'    => $this->value($row, $available, 'created_by'),
-                    'updated_by'    => $this->value($row, $available, 'updated_by'),
-                    'created_at'    => $this->value($row, $available, 'created_at'),
-                    'updated_at'    => $this->value($row, $available, 'updated_at'),
-                    'deleted_at'    => $this->value($row, $available, 'deleted_at'),
+                    'redeemed_at' => $redeemedAt,
+                    'status' => $status,
+                    'notes' => $this->value($row, $available, 'notes'),
+                    'ip_address' => $this->value($row, $available, 'ip_address'),
+                    'user_agent' => $this->value($row, $available, 'user_agent'),
+                    'metadata' => $this->value($row, $available, 'metadata'),
+                    'created_by' => $this->value($row, $available, 'created_by'),
+                    'updated_by' => $this->value($row, $available, 'updated_by'),
+                    'created_at' => $this->value($row, $available, 'created_at'),
+                    'updated_at' => $this->value($row, $available, 'updated_at'),
+                    'deleted_at' => $this->value($row, $available, 'deleted_at'),
                 ];
 
                 $batch[] = $record;
@@ -365,7 +329,7 @@ return new class extends Migration
     }
 
     /**
-     * @param array<string, mixed> $columns
+     * @param  array<string, mixed>  $columns
      */
     private function copyTable(string $from, string $to, array $columns): void
     {
@@ -373,13 +337,7 @@ return new class extends Migration
             return;
         }
 
-        $columnNames = array_values(Schema::getColumnListing($from));
-
-        /** @var array<int, string> $columnNames */
-        $columnNames = $columnNames;
-
-        /** @var array<string, int> $available */
-        $available = array_flip($columnNames);
+        $available = array_flip(Schema::getColumnListing($from));
 
         DB::table($from)->orderBy('id')->chunk(200, function ($rows) use ($available, $columns, $to): void {
             $batch = [];
@@ -400,25 +358,8 @@ return new class extends Migration
         });
     }
 
-    private function dropIndexIfExists(string $indexName, string $table): void
-    {
-        $connection = Schema::getConnection()->getDriverName();
-
-        try {
-            if ($connection === 'mysql') {
-                DB::statement(sprintf('DROP INDEX %s ON %s', $indexName, $table));
-
-                return;
-            }
-
-            DB::statement(sprintf('DROP INDEX IF EXISTS %s', $indexName));
-        } catch (\Throwable) {
-            // Index was already removed or the driver does not support conditional drops.
-        }
-    }
-
     /**
-     * @param array<string, int> $available
+     * @param  array<string, int>  $available
      */
     private function value(object $row, array $available, string $column, mixed $default = null): mixed
     {
@@ -434,23 +375,10 @@ return new class extends Migration
             $foreignKeys = DB::select("PRAGMA foreign_key_list('{$table}')");
 
             foreach ($foreignKeys as $foreignKey) {
-                // Guard against drivers returning associative arrays instead of objects.
-                if (is_array($foreignKey)) {
-                    $foreignKey = (object) $foreignKey;
-                }
-
-                if (! is_object($foreignKey)) {
-                    continue;
-                }
-
-                $from = property_exists($foreignKey, 'from') ? $foreignKey->from : null;
-                $target = property_exists($foreignKey, 'table') ? $foreignKey->table : null;
-
                 if (
-                    is_string($from)
-                    && is_string($target)
-                    && strcasecmp($from, $column) === 0
-                    && strcasecmp($target, $referencedTable) === 0
+                    isset($foreignKey->from, $foreignKey->table)
+                    && strcasecmp((string) $foreignKey->from, $column) === 0
+                    && strcasecmp((string) $foreignKey->table, $referencedTable) === 0
                 ) {
                     return true;
                 }
@@ -471,36 +399,5 @@ return new class extends Migration
         }
 
         return false;
-    }
-
-    /**
-     * Attempt to attach user foreign keys after tables are rebuilt, tolerating legacy engine or collation mismatches.
-     *
-     * @param array<int, string> $columns Columns that should reference the users table when constraints are available.
-     */
-    private function safelyAttachUserForeignKeys(string $table, array $columns): void
-    {
-        if (! Schema::hasTable('users') || ! Schema::hasColumn('users', 'id')) {
-            return;
-        }
-
-        foreach ($columns as $column) {
-            if (! Schema::hasColumn($table, $column)) {
-                continue;
-            }
-
-            if ($this->hasForeignKey($table, $column, 'users')) {
-                continue;
-            }
-
-            try {
-                Schema::table($table, function (Blueprint $table) use ($column): void {
-                    // The foreign key is added conditionally to respect existing production dumps with MyISAM or system tables.
-                    $table->foreign($column)->references('id')->on('users')->nullOnDelete();
-                });
-            } catch (QueryException) {
-                // Silently continue when MySQL rejects the constraint so that data migrations still succeed.
-            }
-        }
     }
 };
