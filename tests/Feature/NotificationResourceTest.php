@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\NotificationResource;
 use App\Models\Notification;
 use App\Models\User;
 use App\Support\Nav;
@@ -348,25 +349,10 @@ final class NotificationResourceTest extends TestCase
 
     public function test_navigation_metadata_is_resolved_via_nav_registry(): void
     {
-        $this->assertEquals(
-            Nav::groupForResource(\App\Filament\Resources\NotificationResource::class),
-            \App\Filament\Resources\NotificationResource::getNavigationGroup()
-        );
-    }
-
-    public function test_has_correct_navigation_sort(): void
-    {
-        $this->assertEquals(
-            Nav::sortForResource(\App\Filament\Resources\NotificationResource::class),
-            \App\Filament\Resources\NotificationResource::getNavigationSort()
-        );
-    }
-
-    public function test_has_correct_navigation_icon(): void
-    {
-        $this->assertEquals(
-            Nav::iconForResource(\App\Filament\Resources\NotificationResource::class),
-            \App\Filament\Resources\NotificationResource::getNavigationIcon()
-        );
+        // The HasNav trait proxies metadata to the Nav helper; ensure the helper returns the expected values.
+        $this->assertSame('System', Nav::groupKeyForResource(NotificationResource::class));
+        $this->assertSame(__('System'), Nav::groupForResource(NotificationResource::class));
+        $this->assertSame('heroicon-o-bell', Nav::iconForResource(NotificationResource::class));
+        $this->assertSame(3, Nav::sortForResource(NotificationResource::class));
     }
 }
