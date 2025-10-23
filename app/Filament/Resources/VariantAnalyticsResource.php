@@ -44,7 +44,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Contracts\Support\Htmlable;
+use BackedEnum;
 use UnitEnum;
 
 /**
