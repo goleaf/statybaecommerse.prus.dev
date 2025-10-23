@@ -9,14 +9,6 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\VariantAnalyticsResource\Pages;
 use App\Models\VariantAnalytics;
 use BackedEnum;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
-use BackedEnum;
-use UnitEnum;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
@@ -56,6 +48,9 @@ final class VariantAnalyticsResource extends Resource
 {
     use HasNav;
 
+    /**
+     * @var string|BackedEnum|null Icon used for the navigation menu.
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';
@@ -161,10 +156,8 @@ final class VariantAnalyticsResource extends Resource
                                                     ->content(static function (callable $get): string {
                                                         $views = (float) $get('views');
                                                         $clicks = (float) $get('clicks');
-
-                                                        if ($views > 0.0) {
-                                                            // Respect Filament's locale-aware formatting when presenting the calculated percentage.
-                                                            return FilamentNumber::format(($clicks / $views) * 100, 2) . '%';
+                                                        if ($views > 0) {
+                                                            return number_format(($clicks / $views) * 100, 2) . '%';
                                                         }
 
                                                         // Ensure even the zero state flows through the same formatter pipeline.
@@ -209,10 +202,8 @@ final class VariantAnalyticsResource extends Resource
                                                     ->content(static function (callable $get): string {
                                                         $clicks = (float) $get('clicks');
                                                         $addToCart = (float) $get('add_to_cart');
-
-                                                        if ($clicks > 0.0) {
-                                                            // Respect Filament's locale-aware formatting when presenting the calculated percentage.
-                                                            return FilamentNumber::format(($addToCart / $clicks) * 100, 2) . '%';
+                                                        if ($clicks > 0) {
+                                                            return number_format(($addToCart / $clicks) * 100, 2) . '%';
                                                         }
 
                                                         // Ensure even the zero state flows through the same formatter pipeline.
@@ -223,10 +214,8 @@ final class VariantAnalyticsResource extends Resource
                                                     ->content(static function (callable $get): string {
                                                         $addToCart = (float) $get('add_to_cart');
                                                         $purchases = (float) $get('purchases');
-
-                                                        if ($addToCart > 0.0) {
-                                                            // Respect Filament's locale-aware formatting when presenting the calculated percentage.
-                                                            return FilamentNumber::format(($purchases / $addToCart) * 100, 2) . '%';
+                                                        if ($addToCart > 0) {
+                                                            return number_format(($purchases / $addToCart) * 100, 2) . '%';
                                                         }
 
                                                         // Ensure even the zero state flows through the same formatter pipeline.
@@ -303,11 +292,8 @@ final class VariantAnalyticsResource extends Resource
                     ->color('info'),
                 Tables\Columns\TextColumn::make('click_through_rate')
                     ->label(__('admin.variant_analytics.ctr'))
-                    ->getStateUsing(static fn (VariantAnalytics $record): float => (float) $record->click_through_rate)
-                    ->formatStateUsing(static function (float|int|null $state): string {
-                        // Use FilamentNumber so table exports and renders share the same percentage formatter.
-                        return FilamentNumber::format((float) ($state ?? 0), 2) . '%';
-                    })
+                    ->getStateUsing(fn ($record) => $record->click_through_rate)
+                    ->formatStateUsing(fn ($state) => number_format($state, 2) . '%')
                     ->sortable(false)
                     ->toggleable()
                     ->badge()
@@ -334,11 +320,8 @@ final class VariantAnalyticsResource extends Resource
                     ->color('warning'),
                 Tables\Columns\TextColumn::make('add_to_cart_rate')
                     ->label(__('admin.variant_analytics.atc_rate'))
-                    ->getStateUsing(static fn (VariantAnalytics $record): float => (float) $record->add_to_cart_rate)
-                    ->formatStateUsing(static function (float|int|null $state): string {
-                        // Use FilamentNumber so table exports and renders share the same percentage formatter.
-                        return FilamentNumber::format((float) ($state ?? 0), 2) . '%';
-                    })
+                    ->getStateUsing(fn ($record) => $record->add_to_cart_rate)
+                    ->formatStateUsing(fn ($state) => number_format($state, 2) . '%')
                     ->sortable(false)
                     ->toggleable()
                     ->badge()
@@ -365,11 +348,8 @@ final class VariantAnalyticsResource extends Resource
                     ->color('success'),
                 Tables\Columns\TextColumn::make('purchase_rate')
                     ->label(__('admin.variant_analytics.purchase_rate'))
-                    ->getStateUsing(static fn (VariantAnalytics $record): float => (float) $record->purchase_rate)
-                    ->formatStateUsing(static function (float|int|null $state): string {
-                        // Use FilamentNumber so table exports and renders share the same percentage formatter.
-                        return FilamentNumber::format((float) ($state ?? 0), 2) . '%';
-                    })
+                    ->getStateUsing(fn ($record) => $record->purchase_rate)
+                    ->formatStateUsing(fn ($state) => number_format($state, 2) . '%')
                     ->sortable(false)
                     ->toggleable()
                     ->badge()
@@ -403,10 +383,7 @@ final class VariantAnalyticsResource extends Resource
                     ->color('info'),
                 Tables\Columns\TextColumn::make('conversion_rate')
                     ->label(__('admin.variant_analytics.conversion_rate'))
-                    ->formatStateUsing(static function (float|int|null $state): string {
-                        // Use FilamentNumber so table exports and renders share the same percentage formatter.
-                        return FilamentNumber::format((float) ($state ?? 0), 2) . '%';
-                    })
+                    ->formatStateUsing(fn ($state) => number_format($state, 2) . '%')
                     ->sortable()
                     ->toggleable()
                     ->badge()
@@ -441,13 +418,11 @@ final class VariantAnalyticsResource extends Resource
 
                         return 'low';
                     })
-                    ->formatStateUsing(static function (?string $state): string {
-                        return match ($state) {
-                            'high'   => __('admin.variant_analytics.high_performing'),
-                            'medium' => __('admin.variant_analytics.medium_performing'),
-                            'low'    => __('admin.variant_analytics.low_performing'),
-                            default  => __('admin.variant_analytics.unknown'),
-                        };
+                    ->formatStateUsing(fn ($state) => match ($state) {
+                        'high'   => __('admin.variant_analytics.high_performing'),
+                        'medium' => __('admin.variant_analytics.medium_performing'),
+                        'low'    => __('admin.variant_analytics.low_performing'),
+                        default  => __('admin.variant_analytics.unknown')
                     })
                     ->colors([
                         'success' => 'high',

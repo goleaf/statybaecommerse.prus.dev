@@ -6,7 +6,6 @@ namespace App\Filament\Pages;
 
 use App\Models\Slider;
 use BackedEnum;
-use UnitEnum;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
