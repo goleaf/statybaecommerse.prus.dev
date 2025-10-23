@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Tests\Unit\Game;
 
 use App\Services\BattleService;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(BattleService::class)]
+/**
+ * @covers \App\Services\BattleService
+ */
 final class BattleServiceTest extends TestCase
 {
     public function test_simulate_battle_returns_attacker_victory_with_loot(): void
