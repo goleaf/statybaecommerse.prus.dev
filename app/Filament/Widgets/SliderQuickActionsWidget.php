@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Models\Slider;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ContentLinkSearch;
 use App\Support\Search\SearchableComponentHelper;
 use DefStudio\SearchableInput\DTO\SearchResult;
@@ -57,15 +58,20 @@ final class SliderQuickActionsWidget extends Widget implements HasActions, HasFo
                     ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                     ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
                     ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                        ContentLinkSearch::hydrateComponent($component, $state);
+                        // See docs/forms/SEARCHABLE_INPUT_METADATA.md for helper behaviour.
+                        SearchableInputHelper::hydrate(
+                            $component,
+                            $state,
+                            static fn (string $value): ?array => ['value' => $value, 'label' => $value],
+                        );
                     })
-                    ->onItemSelected(function (SearchResult $item, SearchableInput $component): void {
-                        SearchableComponentHelper::apply($component, $item);
-                    })
-                    ->afterStateUpdated(function (?string $state, SearchableInput $component): void {
-                        if ($state === null || $state === '') {
-                            SearchableComponentHelper::forget($component);
+                    ->afterStateUpdated(function (?string $state, callable $set): void {
+                        if ($state !== null && $state !== '') {
+                            return;
                         }
+
+                        // Keep state resets centralised per docs/forms/SEARCHABLE_INPUT_METADATA.md.
+                        SearchableInputHelper::clear($set, ['button_url' => null]);
                     }),
                 ColorPicker::make('background_color')
                     ->label(__('translations.background_color'))

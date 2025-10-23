@@ -8,6 +8,7 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\SliderResource\Pages;
 use App\Models\Slider;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ContentLinkSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\ColorPicker;
@@ -112,15 +113,20 @@ final class SliderResource extends Resource
                         ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                         ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
                         ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                            ContentLinkSearch::hydrateComponent($component, $state);
+                            // Hydrate via helper per docs/forms/SEARCHABLE_INPUT_METADATA.md.
+                            SearchableInputHelper::hydrate(
+                                $component,
+                                $state,
+                                static fn (string $value): ?array => ['value' => $value, 'label' => $value],
+                            );
                         })
-                        ->onItemSelected(function (SearchResult $item, SearchableInput $component): void {
-                            SearchableComponentHelper::apply($component, $item);
-                        })
-                        ->afterStateUpdated(function (?string $state, SearchableInput $component): void {
-                            if ($state === null || $state === '') {
-                                SearchableComponentHelper::forget($component);
+                        ->afterStateUpdated(function (?string $state, callable $set): void {
+                            if ($state !== null && $state !== '') {
+                                return;
                             }
+
+                            // Clearing ensures no stale URLs linger (docs/forms/SEARCHABLE_INPUT_METADATA.md).
+                            SearchableInputHelper::clear($set, ['button_url' => null]);
                         })
                         ->columnSpanFull(),
                 ]),

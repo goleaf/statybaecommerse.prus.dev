@@ -10,6 +10,7 @@ use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
@@ -93,27 +94,38 @@ final class CartItemResource extends Resource
                                 ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
                                 ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?CartItem $record): void {
-                                    if ($state === null) {
-                                        return;
-                                    }
+                                    // Hydration funnels through the shared helper (docs/forms/SEARCHABLE_INPUT_METADATA.md).
+                                    SearchableInputHelper::hydrate(
+                                        $component,
+                                        $state,
+                                        static function (int $value) use ($record): ?array {
+                                            $product = $record?->product ?? Product::query()
+                                                ->select(['id', 'sku', 'name'])
+                                                ->find($value);
 
-                                    $product = $record?->product ?? Product::query()
-                                        ->select(['id', 'sku', 'name'])
-                                        ->find($state);
+                                            if (! $product instanceof Product) {
+                                                return null;
+                                            }
 
-                                    if (! $product instanceof Product) {
-                                        return;
-                                    }
-
-                                    $component
-                                        ->state((string) $state)
-                                        ->options([
-                                            (string) $product->getKey() => ProductSearch::label($product),
-                                        ]);
+                                            return [
+                                                'value' => $product->getKey(),
+                                                'label' => ProductSearch::label($product),
+                                            ];
+                                        },
+                                    );
                                 })
                                 // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
                                 ->afterStateUpdated(function (?string $state, Forms\Set $set): void {
                                     if ($state === null || $state === '') {
+                                        // Reset product payload when the selection clears (docs/forms/SEARCHABLE_INPUT_METADATA.md).
+                                        SearchableInputHelper::clear($set, [
+                                            'product_id'         => null,
+                                            'product_name'       => null,
+                                            'product_sku'        => null,
+                                            'unit_price'         => null,
+                                            'product_variant_id' => null,
+                                        ]);
+
                                         return;
                                     }
 

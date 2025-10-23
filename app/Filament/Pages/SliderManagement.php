@@ -7,6 +7,7 @@ namespace App\Filament\Pages;
 use App\Forms\Components\Flatpickr;
 use App\Models\Slider;
 use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ContentLinkSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
@@ -128,15 +129,20 @@ class SliderManagement extends Page implements HasActions, HasForms
                                 ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                                 ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
                                 ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                                    ContentLinkSearch::hydrateComponent($component, $state);
+                                    // Follow docs/forms/SEARCHABLE_INPUT_METADATA.md helper guidance.
+                                    SearchableInputHelper::hydrate(
+                                        $component,
+                                        $state,
+                                        static fn (string $value): ?array => ['value' => $value, 'label' => $value],
+                                    );
                                 })
-                                ->onItemSelected(function (SearchResult $item, SearchableInput $component): void {
-                                    SearchableComponentHelper::apply($component, $item);
-                                })
-                                ->afterStateUpdated(function (?string $state, SearchableInput $component): void {
-                                    if ($state === null || $state === '') {
-                                        SearchableComponentHelper::forget($component);
+                                ->afterStateUpdated(function (?string $state, callable $set): void {
+                                    if ($state !== null && $state !== '') {
+                                        return;
                                     }
+
+                                    // Reset the persisted URL per docs/forms/SEARCHABLE_INPUT_METADATA.md.
+                                    SearchableInputHelper::clear($set, ['button_url' => null]);
                                 }),
                         ]),
                         TextInput::make('button_url')
@@ -308,15 +314,20 @@ class SliderManagement extends Page implements HasActions, HasForms
                                     ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                                     ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
                                     ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                                        ContentLinkSearch::hydrateComponent($component, $state);
+                                        // Keep hydration aligned with docs/forms/SEARCHABLE_INPUT_METADATA.md.
+                                        SearchableInputHelper::hydrate(
+                                            $component,
+                                            $state,
+                                            static fn (string $value): ?array => ['value' => $value, 'label' => $value],
+                                        );
                                     })
-                                    ->onItemSelected(function (SearchResult $item, SearchableInput $component): void {
-                                        SearchableComponentHelper::apply($component, $item);
-                                    })
-                                    ->afterStateUpdated(function (?string $state, SearchableInput $component): void {
-                                        if ($state === null || $state === '') {
-                                            SearchableComponentHelper::forget($component);
+                                    ->afterStateUpdated(function (?string $state, callable $set): void {
+                                        if ($state !== null && $state !== '') {
+                                            return;
                                         }
+
+                                        // Flush stale repeater URLs per docs/forms/SEARCHABLE_INPUT_METADATA.md guidance.
+                                        SearchableInputHelper::clear($set, ['link' => null]);
                                     }),
                             ])
                             ->collapsible()

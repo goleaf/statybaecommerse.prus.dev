@@ -19,7 +19,7 @@ The Alpine helper embedded in `filament/components/autocomplete-select.blade.php
 
 On the PHP side, defer to `App\Support\Filament\SearchableComponentHelper` so hydration and clearing logic stays centralised. The helper resolves the record, normalises it into a `[value, label, payload]` tuple, and pushes that shape back into the component while exposing optional callbacks for clearing related form state. See the [Searchable input helper usage](../filament/searchable-inputs.md) note for full examples and the expected normaliser contract.
 
-The reusable PHP glue now lives in `App\Support\Filament\SearchableComponentHelper`. Hydrate existing records with `SearchableComponentHelper::hydrate()` so the component restores the canonical `SearchResult` payload, and rely on `SearchableComponentHelper::sync()` inside `afterStateUpdated` callbacks to keep model keys, labels, and metadata aligned. The helper also clears stale state automatically when the user wipes a lookup, which keeps Livewire from retaining orphaned payloads.
+The shared PHP entry point lives at `App\Support\Filament\SearchableInputHelper` and exposes `hydrate()` and `clear()` helpers so both Livewire and PHP keep the same payload contract.【F:app/Support/Filament/SearchableInputHelper.php†L7-L54】 `hydrate()` normalises the option list for an existing selection, while `clear()` accepts a keyed array of field resets so dependent inputs (variant IDs, metadata payloads, etc.) never leak stale state when a user wipes the lookup.
 
 ## Integration examples
 

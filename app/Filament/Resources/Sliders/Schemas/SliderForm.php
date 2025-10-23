@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Sliders\Schemas;
 
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ContentLinkSearch;
 use App\Support\Search\SearchableComponentHelper;
 use DefStudio\SearchableInput\DTO\SearchResult;
@@ -96,15 +97,20 @@ final class SliderForm
                                     ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                                     ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
                                     ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                                        ContentLinkSearch::hydrateComponent($component, $state);
+                                        // Hydrate using the shared helper documented in docs/forms/SEARCHABLE_INPUT_METADATA.md.
+                                        SearchableInputHelper::hydrate(
+                                            $component,
+                                            $state,
+                                            static fn (string $value): ?array => ['value' => $value, 'label' => $value],
+                                        );
                                     })
-                                    ->onItemSelected(function (SearchResult $item, SearchableInput $component): void {
-                                        SearchableComponentHelper::apply($component, $item);
-                                    })
-                                    ->afterStateUpdated(function (?string $state, SearchableInput $component): void {
-                                        if ($state === null || $state === '') {
-                                            SearchableComponentHelper::forget($component);
+                                    ->afterStateUpdated(function (?string $state, callable $set): void {
+                                        if ($state !== null && $state !== '') {
+                                            return;
                                         }
+
+                                        // Clear CTA URLs via the helper per docs/forms/SEARCHABLE_INPUT_METADATA.md guidance.
+                                        SearchableInputHelper::clear($set, ['button_url' => null]);
                                     })
                                     ->columnSpan(1),
                             ]),

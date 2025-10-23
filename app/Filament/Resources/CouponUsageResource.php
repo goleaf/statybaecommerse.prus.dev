@@ -8,8 +8,14 @@ use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\CouponUsageResource\Pages;
 use App\Models\Coupon;
 use App\Models\CouponUsage;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
+use App\Models\Coupon;
+use App\Models\User;
+use App\Support\Filament\SearchableInputHelper;
+use App\Support\Search\CouponSearch;
+use App\Support\Search\CustomerSearch;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Grid;
@@ -73,7 +79,7 @@ final class CouponUsageResource extends Resource
                                                 ->searchUsing(fn (string $search): array => CouponSearch::byCode($search))
                                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
                                                 ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?CouponUsage $record): void {
-                                                    // Hydrate via helper to centralise metadata rules from the documentation.
+                                                    // Hydrate coupon lookup via helper per docs/forms/SEARCHABLE_INPUT_METADATA.md.
                                                     SearchableInputHelper::hydrate(
                                                         $component,
                                                         $state,
@@ -97,7 +103,6 @@ final class CouponUsageResource extends Resource
                                                 })
                                                 ->afterStateUpdated(function (?string $state, Set $set): void {
                                                     if ($state === null || $state === '') {
-                                                        // Clear the persisted relation id when the lookup resets.
                                                         SearchableInputHelper::clear($set, ['coupon_id' => null]);
 
                                                         return;
@@ -112,7 +117,7 @@ final class CouponUsageResource extends Resource
                                                 ->searchUsing(fn (string $search): array => CustomerSearch::byEmailPhoneName($search))
                                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
                                                 ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?CouponUsage $record): void {
-                                                    // Helper ensures metadata hydration matches docs/forms/SEARCHABLE_INPUT_METADATA.md.
+                                                    // Hydrate user lookup through helper as documented.
                                                     SearchableInputHelper::hydrate(
                                                         $component,
                                                         $state,
