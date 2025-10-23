@@ -11,11 +11,6 @@ use App\Filament\Resources\AddressResource\Pages;
 use App\Models\Address;
 use App\Models\City;
 use App\Models\Country;
-use App\Models\User;
-use App\Support\Filament\SearchableInputHelper;
-use App\Support\Search\AddressSearch;
-use App\Support\Search\CustomerSearch;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -25,9 +20,13 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Schemas\Schema;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -40,10 +39,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-
-if (! class_exists(Form::class) && class_exists(Schema::class)) {
-    class_alias(Schema::class, Form::class);
-}
 
 /**
  * AddressResource
@@ -100,7 +95,7 @@ final class AddressResource extends Resource
             Section::make(__('translations.address_information'))
                 ->schema([
                     Grid::make(2)->schema([
-                        SearchableInput::make('user_id')
+                        Select::make('user_id')
                             ->label(__('translations.user'))
                             ->placeholder('Name, email or phone')
                             ->required()
@@ -189,7 +184,7 @@ final class AddressResource extends Resource
                             ->maxLength(100),
                     ]),
                     Grid::make(3)->schema([
-                        SearchableInput::make('city')
+                        TextInput::make('city')
                             ->label(__('translations.city'))
                             ->placeholder(__('translations.city'))
                             ->required()
