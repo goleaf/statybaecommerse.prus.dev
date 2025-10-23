@@ -24,6 +24,7 @@ final class SliderComparisonTable extends BaseWidget
 
     public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         $startDate = $this->pageFilters['startDate'] ?? now()->subDays(30);
         $endDate = $this->pageFilters['endDate'] ?? now();
         $sliderId = $this->pageFilters['sliderId'] ?? null;

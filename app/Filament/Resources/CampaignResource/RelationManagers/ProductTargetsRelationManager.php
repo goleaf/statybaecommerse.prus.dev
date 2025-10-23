@@ -24,7 +24,8 @@ final class ProductTargetsRelationManager extends BaseRelationManager
 
     public function form(Form $form): Form
     {
-        return $schema->schema([
+        // Filament 4 expects returning the Form builder instance.
+        return $form->schema([
             Select::make('product_id')
                 ->label('Product')
                 ->relationship('product', 'name')
@@ -43,6 +44,7 @@ final class ProductTargetsRelationManager extends BaseRelationManager
 
     public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('product.name')

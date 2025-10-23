@@ -22,15 +22,22 @@ class FeatureFlagResource extends Resource
 
     protected static ?string $model = FeatureFlag::class;
 
-    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return FeatureFlagForm::configure($form);
     }
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return FeatureFlagsTable::configure($table);
     }
 

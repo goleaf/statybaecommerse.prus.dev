@@ -8,7 +8,6 @@ use App\Filament\Resources\InventoryResource\Pages;
 use App\Models\Inventory;
 use App\Models\Product;
 use App\Support\Search\ProductSearch;
-use BackedEnum;
 use Closure;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\Grid;
@@ -41,7 +40,12 @@ final class InventoryResource extends Resource
 {
     protected static ?string $model = Inventory::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-cube';
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-cube';
 
     protected static ?int $navigationSort = 2;
 
@@ -67,6 +71,7 @@ final class InventoryResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Section::make(__('Inventory Details'))
                 ->schema([
@@ -156,6 +161,7 @@ final class InventoryResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('product.name')

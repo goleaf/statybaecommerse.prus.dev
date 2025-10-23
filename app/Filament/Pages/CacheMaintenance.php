@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Services\Shared\ComponentPerformanceService;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
@@ -20,7 +19,12 @@ use Filament\Schemas\Schema;
 
 final class CacheMaintenance extends Page
 {
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-server-stack';
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-server-stack';
 
     public static function getNavigationGroup(): BackedEnum|string|null
     {
@@ -81,6 +85,7 @@ final class CacheMaintenance extends Page
 
     public function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 Section::make('Targeted Cache Operations')

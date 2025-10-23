@@ -42,15 +42,23 @@ final class ReviewResource extends Resource
 
     protected static ?string $model = Review::class;
 
-    /** @var string|\BackedEnum|null Provide a consistent star icon for review navigation. */
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
     protected static $navigationIcon = 'heroicon-o-star';
 
     protected static ?int $navigationSort = 4;
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    /** @var string|\BackedEnum|null Keep reviews grouped with broader content management tooling. */
-    protected static $navigationGroup = NavigationGroup::ContentManagement;
+    /**
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationGroup = 'Content Management';
 
     public static function getNavigationLabel(): string
     {
@@ -69,6 +77,7 @@ final class ReviewResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 Section::make(__('reviews.sections.basic_info'))
@@ -142,6 +151,7 @@ final class ReviewResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('title')

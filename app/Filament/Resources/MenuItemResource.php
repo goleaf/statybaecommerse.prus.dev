@@ -39,10 +39,18 @@ final class MenuItemResource extends Resource
 
     protected static ?string $model = MenuItem::class;
 
-    /** @var string|\UnitEnum|null Group content resources under the CMS navigation section. */
+    /**
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
     protected static $navigationGroup = 'Content';
 
-    /** @var string|\BackedEnum|null Keep the navigation icon compatible with Filament's string-based discovery. */
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
     protected static $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?int $navigationSort = 5;
@@ -66,6 +74,7 @@ final class MenuItemResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 FormSection::make(__('admin.menu_items.basic_information'))
@@ -139,6 +148,7 @@ final class MenuItemResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('menu.name')

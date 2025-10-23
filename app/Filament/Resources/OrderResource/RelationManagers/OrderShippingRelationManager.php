@@ -54,7 +54,8 @@ final class OrderShippingRelationManager extends BaseRelationManager
      */
     public function form(Form $form): Form
     {
-        return $schema
+        // Filament 4 expects returning the Form builder instance.
+        return $form
             ->schema([
                 Section::make(__('orders.shipping_information'))
                     ->description(__('orders.shipping_information_description'))
@@ -160,6 +161,7 @@ final class OrderShippingRelationManager extends BaseRelationManager
      */
     public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('shipping_method')

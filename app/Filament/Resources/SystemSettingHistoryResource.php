@@ -40,7 +40,10 @@ final class SystemSettingHistoryResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'change_reason';
 
-    
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-clock';
+    }
 
     
 
@@ -61,6 +64,7 @@ final class SystemSettingHistoryResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 Section::make(__('admin.system_setting_histories.basic_information'))
@@ -108,6 +112,7 @@ final class SystemSettingHistoryResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->deferFilters(false)
             ->searchable()

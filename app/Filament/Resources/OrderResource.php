@@ -158,7 +158,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
         return AuthorizationMatrix::check('orders', 'update');
     }
 
-    public static function getNavigationIcon(): string|\BackedEnum|null
+    public static function getNavigationIcon(): string|BackedEnum|\UnitEnum|null
     {
         return 'heroicon-o-shopping-bag';
     }
@@ -194,6 +194,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
      */
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Section::make(__('orders.sections.order_details'))
                 ->description(__('orders.sections.customer_information'))
@@ -559,18 +560,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
      */
     public static function table(Table $table): Table
     {
-        $formats = config('export.formats', []);
-
-        if ($formats === []) {
-            $formats = ['csv' => \App\Services\Export\Writers\CsvExportWriter::class];
-        }
-
-        $formatOptions = collect(array_keys($formats))
-            ->mapWithKeys(fn (string $format): array => [$format => strtoupper($format)])
-            ->all();
-
-        $defaultFormat = array_key_first($formats) ?? 'csv';
-
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 BadgeableColumn::make('number')

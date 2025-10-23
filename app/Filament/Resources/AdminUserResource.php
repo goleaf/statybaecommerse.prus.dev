@@ -41,7 +41,10 @@ final class AdminUserResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-document-text';
+    }
 
     
 
@@ -67,6 +70,7 @@ final class AdminUserResource extends Resource
      */
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Section::make(__('admin.admin_users.form.sections.basic_information'))
                 ->schema([
@@ -142,6 +146,7 @@ final class AdminUserResource extends Resource
      */
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('name')

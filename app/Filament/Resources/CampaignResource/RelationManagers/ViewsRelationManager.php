@@ -25,7 +25,8 @@ final class ViewsRelationManager extends BaseRelationManager
 
     public function form(Form $form): Form
     {
-        return $schema->schema([
+        // Filament 4 expects returning the Form builder instance.
+        return $form->schema([
             TextInput::make('session_id')
                 ->label('Session ID')
                 ->maxLength(255),
@@ -49,6 +50,7 @@ final class ViewsRelationManager extends BaseRelationManager
 
     public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('session_id')

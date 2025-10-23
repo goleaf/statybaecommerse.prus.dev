@@ -41,7 +41,12 @@ final class CollectionRuleResource extends Resource
 
     protected static ?string $model = CollectionRule::class;
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-cog-6-tooth';
+    }
+
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         return 'Products';
     }
@@ -69,7 +74,7 @@ final class CollectionRuleResource extends Resource
      */
     public static function form(Form $form): Form
     {
-        // Expose the schema via the Filament v4 `Form` instance to drop the deprecated array fallback.
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Tabs::make('collection_rule_tabs')
                 ->tabs([
@@ -152,7 +157,7 @@ final class CollectionRuleResource extends Resource
      */
     public static function table(Table $table): Table
     {
-        // Publish the full table definition through the Filament v4 `Table` signature for consistency.
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('collection.name')

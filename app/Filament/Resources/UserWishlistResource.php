@@ -27,8 +27,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
-use Filament\Schemas\Schema;
 
 /**
  * UserWishlistResource
@@ -41,12 +39,17 @@ final class UserWishlistResource extends Resource
 
     protected static ?string $model = UserWishlist::class;
 
-    public static function getNavigationIcon(): BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|\Illuminate\Contracts\Support\Htmlable|string|null
     {
         return 'heroicon-o-heart';
     }
 
-    protected static UnitEnum|string|null $navigationGroup = 'Users';
+    /**
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationGroup = 'Users';
 
     protected static ?int $navigationSort = 8;
 
@@ -67,7 +70,7 @@ final class UserWishlistResource extends Resource
 
     public static function form(Form $form): Form
     {
-        // Configure the wishlist creation and editing form components.
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->components([
                 Select::make('user_id')
@@ -95,7 +98,7 @@ final class UserWishlistResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Define table columns, filters, and actions for wishlist management.
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('user.name')

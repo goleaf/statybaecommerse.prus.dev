@@ -23,8 +23,6 @@ use Filament\Tables\Actions\ViewAction as TableViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use UnitEnum;
-use Filament\Schemas\Schema;
 
 /**
  * ReferralRewardLogResource
@@ -42,9 +40,11 @@ final class ReferralRewardLogResource extends Resource
     protected static ?string $recordTitleAttribute = 'action';
 
     /**
-     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static UnitEnum|string|null $navigationGroup = 'Analytics';
+    protected static $navigationGroup = 'Analytics';
 
     public static function getNavigationLabel(): string
     {
@@ -63,6 +63,7 @@ final class ReferralRewardLogResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 Section::make(__('admin.referral_reward_logs.basic_information'))
@@ -107,6 +108,7 @@ final class ReferralRewardLogResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('referralReward.id')

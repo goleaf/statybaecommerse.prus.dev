@@ -58,7 +58,8 @@ final class OrderItemsRelationManager extends BaseRelationManager
      */
     public function form(Form $form): Form
     {
-        return $schema
+        // Filament 4 expects returning the Form builder instance.
+        return $form
             ->schema([
                 Section::make(__('orders.item_information'))
                     ->description(__('orders.item_information_description'))
@@ -199,6 +200,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
      */
     public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('productVariant.name')

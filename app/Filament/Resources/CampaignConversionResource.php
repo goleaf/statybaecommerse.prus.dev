@@ -28,8 +28,6 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Number;
-use UnitEnum;
-use Filament\Schemas\Schema;
 
 /**
  * CampaignConversionResource
@@ -42,12 +40,19 @@ final class CampaignConversionResource extends Resource
 
     protected static ?string $model = CampaignConversion::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rocket-launch';
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-rocket-launch';
 
     /**
-     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Campaigns;
+    protected static $navigationGroup = NavigationGroup::Campaigns;
 
     public static function getNavigationLabel(): string
     {
@@ -76,6 +81,7 @@ final class CampaignConversionResource extends Resource
      */
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Section::make(__('campaign_conversions.form.basic_information'))
                 ->schema([
@@ -222,6 +228,7 @@ final class CampaignConversionResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('id')

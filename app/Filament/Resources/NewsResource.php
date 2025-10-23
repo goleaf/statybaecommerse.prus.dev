@@ -33,8 +33,13 @@ class NewsResource extends Resource
 
     protected static ?string $model = News::class;
 
-    /** @phpstan-var string|BackedEnum|null */
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-newspaper';
+    /** @phpstan-var string|BackedEnum|\UnitEnum|null */
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-newspaper';
 
     protected static ?int $navigationSort = 1;
 
@@ -44,6 +49,7 @@ class NewsResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->components([
             Forms\Components\Section::make('Article Information')
                 ->components([
@@ -160,6 +166,7 @@ class NewsResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 Tables\Columns\ImageColumn::make('featured_image')

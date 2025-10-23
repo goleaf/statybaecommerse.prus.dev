@@ -30,36 +30,32 @@ final class ReviewsRelationManager extends BaseRelationManager
 
     public function form(Form $form): Form
     {
-        return $form->schema([
-            Select::make('product_id')
-                ->relationship('product', 'name')
-                ->label(__('products.fields.name'))
-                ->required()
-                ->searchable()
-                ->preload(),
-            TextInput::make('rating')
-                ->label(__('reviews.fields.rating'))
-                ->numeric()
-                ->minValue(1)
-                ->maxValue(5)
-                ->required(),
-            Textarea::make('title')
-                ->label(__('reviews.fields.title'))
-                ->maxLength(255),
-            Textarea::make('content')
-                ->label(__('reviews.fields.content'))
-                ->maxLength(1000)
-                ->columnSpanFull(),
-            Toggle::make('is_approved')
-                ->label(__('reviews.fields.is_approved'))
-                ->default(false),
-            Toggle::make('is_featured')
-                ->label(__('reviews.fields.is_featured')),
-        ]);
+        // Filament 4 expects returning the Form builder instance.
+        return $form
+            ->components([
+                Forms\Components\Select::make('product_id')
+                    ->relationship('product', 'name')
+                    ->required()
+                    ->searchable()
+                    ->preload(),
+                Forms\Components\TextInput::make('rating')
+                    ->numeric()
+                    ->minValue(1)
+                    ->maxValue(5)
+                    ->required(),
+                Forms\Components\Textarea::make('title')
+                    ->maxLength(255),
+                Forms\Components\Textarea::make('content')
+                    ->maxLength(1000),
+                Forms\Components\Toggle::make('is_approved')
+                    ->default(false),
+                Forms\Components\Toggle::make('is_featured'),
+            ]);
     }
 
     public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->recordTitleAttribute('title')
             ->columns([

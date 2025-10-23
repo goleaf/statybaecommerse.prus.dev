@@ -20,7 +20,8 @@ class EditProfile extends BaseEditProfile
 {
     public function form(Form $form): Form
     {
-        return $schema
+        // Filament 4 expects returning the Form builder instance.
+        return $form
             ->components([
                 Section::make(__('admin.profile.personal_information'))
                     ->description(__('admin.profile.personal_information_description'))

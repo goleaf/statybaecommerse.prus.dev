@@ -38,7 +38,7 @@ final class RecommendationAnalyticsResource extends Resource
 
     protected static ?string $model = RecommendationAnalytics::class;
 
-    public static function getNavigationIcon(): BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|\Illuminate\Contracts\Support\Htmlable|string|null
     {
         return 'heroicon-o-chart-bar';
     }
@@ -69,6 +69,7 @@ final class RecommendationAnalyticsResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 SchemaSection::make(__('admin.recommendation_analytics.basic_information'))
@@ -144,6 +145,7 @@ final class RecommendationAnalyticsResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('block.name')

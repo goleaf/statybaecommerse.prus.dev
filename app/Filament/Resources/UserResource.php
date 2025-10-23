@@ -37,8 +37,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
-use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
-use UnitEnum;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
 
 /**
@@ -57,9 +55,11 @@ final class UserResource extends Resource implements DefinesExportColumns
     protected static ?string $recordTitleAttribute = 'name';
 
     /**
-     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static UnitEnum|string|null $navigationGroup = 'Users';
+    protected static $navigationGroup = 'Users';
 
     public static function shouldRegisterNavigation(): bool
     {
@@ -132,6 +132,7 @@ final class UserResource extends Resource implements DefinesExportColumns
      */
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 Section::make(__('users.sections.basic_info'))
@@ -218,18 +219,7 @@ final class UserResource extends Resource implements DefinesExportColumns
      */
     public static function table(Table $table): Table
     {
-        $formats = config('export.formats', []);
-
-        if ($formats === []) {
-            $formats = ['csv' => \App\Services\Export\Writers\CsvExportWriter::class];
-        }
-
-        $formatOptions = collect(array_keys($formats))
-            ->mapWithKeys(fn (string $format): array => [$format => strtoupper($format)])
-            ->all();
-
-        $defaultFormat = array_key_first($formats) ?? 'csv';
-
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 ImageColumn::make('avatar_url')

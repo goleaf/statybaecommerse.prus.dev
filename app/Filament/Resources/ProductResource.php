@@ -122,6 +122,11 @@ final class ProductResource extends Resource implements DefinesExportColumns
         return AuthorizationMatrix::check('products', 'update');
     }
 
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-cube';
+    }
+
     public static function getNavigationGroup(): UnitEnum|string|null
     {
         return 'Products';
@@ -173,6 +178,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->components([
                 Tabs::make('Product Information')
@@ -443,18 +449,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
 
     public static function table(Table $table): Table
     {
-        $formats = config('export.formats', []);
-
-        if ($formats === []) {
-            $formats = ['csv' => \App\Services\Export\Writers\CsvExportWriter::class];
-        }
-
-        $formatOptions = collect(array_keys($formats))
-            ->mapWithKeys(fn (string $format): array => [$format => strtoupper($format)])
-            ->all();
-
-        $defaultFormat = array_key_first($formats) ?? 'csv';
-
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->defaultPaginationPageOption(25)
             ->paginationPageOptions([25, 50, 100])

@@ -18,6 +18,7 @@ abstract class BaseRelationManager extends RelationManager
 
     public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         $table = parent::table($table);
 
         return $this->applyToggleableTableLayout($table);

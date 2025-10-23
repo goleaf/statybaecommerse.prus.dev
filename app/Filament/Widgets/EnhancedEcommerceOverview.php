@@ -14,12 +14,20 @@ use Illuminate\Support\Carbon;
 
 final class EnhancedEcommerceOverview extends StatsOverviewWidget
 {
-    /** @var string|\BackedEnum|null Keep the dashboard icon consistent with analytics visuals. */
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
     protected static $navigationIcon = 'heroicon-o-presentation-chart-line';
 
     protected static $navigationLabel = 'Enh. E-commerce Overview';
 
-    /** @var string|\BackedEnum|null Keep the widget under the dashboard navigation cluster. */
+    /**
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
     protected static $navigationGroup = 'Dashboard';
 
     protected string $maxHeight = '32rem';

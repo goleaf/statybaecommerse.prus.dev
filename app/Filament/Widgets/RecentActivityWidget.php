@@ -25,6 +25,7 @@ class RecentActivityWidget extends BaseWidget
 
     public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->query($this->getTableQuery())
             ->columns([

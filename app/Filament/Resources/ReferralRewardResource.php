@@ -41,17 +41,27 @@ final class ReferralRewardResource extends Resource
     use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
     protected static ?string $model = ReferralReward::class;
 
-    /** @var string|BackedEnum|null */
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
     protected static $navigationIcon = 'heroicon-o-gift';
 
     protected static ?int $navigationSort = 15;
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Referral;
+    /**
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationGroup = 'Referral';
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 Forms\Components\Section::make(__('referral_rewards.sections.reward_details'))
@@ -165,6 +175,7 @@ final class ReferralRewardResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('title')
@@ -309,7 +320,7 @@ final class ReferralRewardResource extends Resource
     {
         $icon = self::$navigationIcon;
 
-        return $icon instanceof BackedEnum ? $icon->value : $icon;
+        return $icon instanceof BackedEnum|\UnitEnum ? $icon->value : $icon;
     }
 
     public static function getNavigationGroup(): ?string

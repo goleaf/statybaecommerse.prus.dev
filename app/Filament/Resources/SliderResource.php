@@ -9,9 +9,6 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\SliderResource\Pages;
 use App\Models\Slider;
 use App\Support\Search\ContentLinkSearch;
-use App\Support\Search\SearchableComponentHelper;
-use BackedEnum;
-use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
@@ -31,8 +28,6 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use UnitEnum;
-use Filament\Schemas\Schema;
 
 /**
  * SliderResource
@@ -45,9 +40,19 @@ final class SliderResource extends Resource
 
     protected static ?string $model = Slider::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Content';
+    /**
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationGroup = 'Content';
 
     protected static ?int $navigationSort = 4;
 
@@ -79,6 +84,7 @@ final class SliderResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Section::make(__('sliders.basic_information'))
                 ->schema([
@@ -158,6 +164,7 @@ final class SliderResource extends Resource
      */
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 ImageColumn::make('image')

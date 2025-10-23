@@ -48,6 +48,11 @@ final class DiscountCodeResource extends Resource
         return 'Marketing';
     }
 
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-tag';
+    }
+
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
      */
@@ -69,6 +74,7 @@ final class DiscountCodeResource extends Resource
      */
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Section::make(__('discount_codes.basic_information'))
                 ->schema([
@@ -213,6 +219,7 @@ final class DiscountCodeResource extends Resource
      */
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('code')

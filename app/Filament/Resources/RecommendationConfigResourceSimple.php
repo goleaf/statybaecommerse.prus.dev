@@ -54,7 +54,8 @@ final class RecommendationConfigResourceSimple extends Resource
      */
     public static function form(Form $form): Form
     {
-        return $form->schema([
+        // Filament 4 expects returning the Form builder instance.
+        return $form->components([
             Section::make(__('recommendation_configs_simple.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -268,6 +269,7 @@ final class RecommendationConfigResourceSimple extends Resource
      */
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('name')

@@ -7,8 +7,7 @@ namespace App\Filament\Resources;
 use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\ActivityLogResource\Pages;
 use App\Models\ActivityLog;
-use BackedEnum;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use App\Support\Filament\Filters\DateRangeFilter;
@@ -26,9 +25,11 @@ final class ActivityLogResource extends Resource
     protected static ?string $model = ActivityLog::class;
 
     /**
-     * Icon used in the navigation menu. Type: string|BackedEnum|null.
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
+    protected static $navigationIcon = 'heroicon-o-document-text';
 
     protected static ?int $navigationSort = 9;
 
@@ -62,23 +63,15 @@ final class ActivityLogResource extends Resource
         return __('activity_logs.plural');
     }
 
-    /**
-     * Define the create/edit form schema using the new Filament Schema API. The schema is
-     * currently empty because the Activity Log resource is read-only, but the method keeps
-     * the hook ready for future form fields if editing becomes necessary.
-     */
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->schema([]);
+        // Filament 4 expects returning the Form builder instance.
+        return $form->schema([]);
     }
 
-    /**
-     * Configure the table that lists activity log records along with filters and actions.
-     */
     public static function table(Table $table): Table
     {
-        $modelClass = self::getModel();
-
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('id')

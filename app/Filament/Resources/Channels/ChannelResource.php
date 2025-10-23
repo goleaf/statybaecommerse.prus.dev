@@ -25,15 +25,20 @@ class ChannelResource extends Resource
 
     protected static ?string $model = Channel::class;
 
-    
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-rectangle-stack';
+    }
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return ChannelForm::configure($form);
     }
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return ChannelsTable::configure($table);
     }
 

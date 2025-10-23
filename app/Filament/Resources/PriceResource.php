@@ -32,10 +32,6 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Number;
-use UnitEnum;
-use Filament\Schemas\Schema;
 
 final class PriceResource extends Resource
 {
@@ -43,13 +39,18 @@ final class PriceResource extends Resource
 
     protected static ?string $model = Price::class;
 
-    /** @var string|UnitEnum|null Keep price management grouped with products in the navigation. */
+    /**
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
     protected static $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 12;
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 Section::make(__('admin.prices.priceable_association'))
@@ -202,6 +203,7 @@ final class PriceResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('priceable_display')

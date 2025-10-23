@@ -10,7 +10,13 @@ use App\Filament\Resources\VariantAttributeValueResource\Pages;
 use App\Models\Attribute;
 use App\Models\ProductVariant;
 use App\Models\VariantAttributeValue;
-use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -36,8 +42,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
-use UnitEnum;
-use Filament\Schemas\Schema;
 
 /**
  * VariantAttributeValueResource
@@ -51,14 +55,18 @@ final class VariantAttributeValueResource extends Resource
     protected static ?string $model = VariantAttributeValue::class;
 
     /**
-     * @var BackedEnum|string|null Navigation icon for the resource.
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
+    protected static $navigationIcon = 'heroicon-o-tag';
 
     /**
-     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static UnitEnum|string|null $navigationGroup = 'Inventory';
+    protected static $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 18;
 
@@ -79,6 +87,7 @@ final class VariantAttributeValueResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Section::make(__('admin.variant_attribute_values.basic_information'))
                 ->schema([
@@ -189,6 +198,7 @@ final class VariantAttributeValueResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('variant.name')

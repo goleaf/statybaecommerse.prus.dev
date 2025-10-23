@@ -7,9 +7,7 @@ namespace App\Filament\Resources;
 use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\StockMovementResource\Pages;
 use App\Models\StockMovement;
-use App\Support\Filament\Components\Flatpickr;
-use BackedEnum;
-use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -24,8 +22,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use LaraZeus\Quantity\Components\Quantity;
-use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Schemas\Schema;
 
@@ -36,9 +32,19 @@ use Filament\Schemas\Schema;
  */
 final class StockMovementResource extends Resource
 {
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-archive-box';
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-archive-box';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Inventory';
+    /**
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 3;
 
@@ -66,6 +72,7 @@ final class StockMovementResource extends Resource
      */
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Section::make(__('stock_movement.sections.basic_information'))
                 ->components([
@@ -130,6 +137,7 @@ final class StockMovementResource extends Resource
      */
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('variantInventory.variant.name')

@@ -43,9 +43,7 @@ class NewsImageResource extends Resource
 
     protected static ?string $model = NewsImage::class;
 
-    protected static ?int $navigationSort = 1;
-
-    public static function getNavigationIcon(): BackedEnum|string|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|string|null
     {
         return 'heroicon-o-photo';
     }
@@ -54,6 +52,7 @@ class NewsImageResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 Grid::make(2)
@@ -115,6 +114,7 @@ class NewsImageResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 ImageColumn::make('file_path')

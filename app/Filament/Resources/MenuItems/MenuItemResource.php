@@ -23,19 +23,21 @@ class MenuItemResource extends Resource
     protected static ?string $model = MenuItem::class;
 
     /**
-     * @var string|\BackedEnum|null Explicit icon string keeps Filament discovery compatible across PHP versions.
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Form $form): Form
     {
-        // Delegate to the dedicated schema helper so every consumer benefits from the tighter validation rules.
+        // Filament 4 expects returning the Form builder instance.
         return MenuItemForm::configure($form);
     }
 
     public static function table(Table $table): Table
     {
-        // The table helper centralises shared configuration for Menu Item listings.
+        // Filament 4 expects returning the Table builder instance.
         return MenuItemsTable::configure($table);
     }
 

@@ -10,7 +10,7 @@ use App\Filament\Resources\ProductHistoryResource\Pages;
 use App\Filament\Resources\ProductHistoryResource\Widgets\ProductHistoryStatsWidget;
 use App\Filament\Resources\ProductHistoryResource\Widgets\RecentProductChangesWidget;
 use App\Models\ProductHistory;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr; // Custom Flatpickr helper keeps date filters consistent with the admin UI
 use DateTimeInterface;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\Select as SelectInput;
@@ -32,14 +32,18 @@ final class ProductHistoryResource extends Resource
     protected static ?string $model = ProductHistory::class;
 
     /**
-     * @var string|\BackedEnum|null
+     * Navigation icon for Filament navigation.
      *
-     * @phpstan-var string|\BackedEnum|null
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
     protected static $navigationIcon = 'heroicon-o-clock';
 
-    // Keep the resource grouped via the shared navigation enum for consistency across the admin UI.
-    protected static NavigationGroup|string|null $navigationGroup = NavigationGroup::Products;
+    /**
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 11;
 
@@ -60,6 +64,7 @@ final class ProductHistoryResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Section::make(__('product_history.basic_information'))
                 ->columns(2)
@@ -105,6 +110,7 @@ final class ProductHistoryResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('product.name')

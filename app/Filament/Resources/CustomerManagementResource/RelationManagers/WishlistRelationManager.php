@@ -23,7 +23,8 @@ final class WishlistRelationManager extends BaseRelationManager
 
     public function form(Form $form): Form
     {
-        return $schema
+        // Filament 4 expects returning the Form builder instance.
+        return $form
             ->components([
                 Forms\Components\Select::make('wishlist_id')
                     ->label(__('customers.wishlist'))
@@ -53,6 +54,7 @@ final class WishlistRelationManager extends BaseRelationManager
 
     public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->recordTitleAttribute('wishlist.name')
             ->columns([

@@ -21,7 +21,6 @@ use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Schemas\Schema;
 
@@ -31,15 +30,17 @@ final class ProductRequestResource extends Resource
 
     protected static ?string $model = ProductRequest::class;
 
-    /**
-     * @var string|BackedEnum|null Navigation icon identifier for the resource.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-clipboard-document-list';
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|\Illuminate\Contracts\Support\Htmlable|string|null
+    {
+        return 'heroicon-o-clipboard-document-list';
+    }
 
     /**
-     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static UnitEnum|string|null $navigationGroup = 'Products';
+    protected static $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 16;
 
@@ -60,6 +61,7 @@ final class ProductRequestResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 SearchableInput::make('product_id')
@@ -149,6 +151,7 @@ final class ProductRequestResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('product.name')

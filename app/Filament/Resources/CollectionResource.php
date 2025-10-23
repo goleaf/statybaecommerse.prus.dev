@@ -37,7 +37,10 @@ final class CollectionResource extends Resource
 
     protected static ?string $model = Collection::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-folder';
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-folder';
+    }
 
     protected static UnitEnum|string|null $navigationGroup = 'Products';
 
@@ -64,6 +67,7 @@ final class CollectionResource extends Resource
      */
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->components([
             Section::make(__('collections.basic_information'))
                 ->schema([
@@ -225,6 +229,7 @@ final class CollectionResource extends Resource
      */
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 ImageColumn::make('image')

@@ -50,6 +50,7 @@ final class CompanyResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Forms\Components\Section::make(__('companies.basic_information'))
                 ->schema([
@@ -109,6 +110,7 @@ final class CompanyResource extends Resource
      */
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('name')

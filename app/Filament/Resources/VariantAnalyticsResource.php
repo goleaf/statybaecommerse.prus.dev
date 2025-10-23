@@ -51,11 +51,18 @@ final class VariantAnalyticsResource extends Resource
     protected static ?string $model = VariantAnalytics::class;
 
     /**
-     * @var string|BackedEnum|null Filament v4 expects an untyped navigation icon property.
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    /** @var string|BackedEnum|null Ensure inventory analytics stay grouped centrally. */
+    /** @var string|\BackedEnum|\UnitEnum|null Ensure inventory analytics stay grouped centrally. */
+    /**
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
     protected static $navigationGroup = NavigationGroup::Inventory;
 
     public static function getNavigationGroup(): BackedEnum|string|null
@@ -90,6 +97,7 @@ final class VariantAnalyticsResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 Forms\Components\Tabs::make(__('admin.variant_analytics.tabs'))
@@ -258,6 +266,7 @@ final class VariantAnalyticsResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('variant.name')

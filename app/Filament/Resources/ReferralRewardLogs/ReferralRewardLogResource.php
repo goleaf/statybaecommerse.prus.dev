@@ -11,7 +11,7 @@ use App\Filament\Resources\ReferralRewardLogs\Pages\ListReferralRewardLogs;
 use App\Filament\Resources\ReferralRewardLogs\Schemas\ReferralRewardLogForm;
 use App\Filament\Resources\ReferralRewardLogs\Tables\ReferralRewardLogsTable;
 use App\Models\ReferralRewardLog;
-use BackedEnum;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
@@ -23,15 +23,22 @@ class ReferralRewardLogResource extends Resource
 
     protected static ?string $model = ReferralRewardLog::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return ReferralRewardLogForm::configure($form);
     }
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return ReferralRewardLogsTable::configure($table);
     }
 

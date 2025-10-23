@@ -56,6 +56,7 @@ final class CouponUsageResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->components([
             Tabs::make('coupon_usage_tabs')
                 ->tabs([
@@ -196,6 +197,7 @@ final class CouponUsageResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('coupon.code')

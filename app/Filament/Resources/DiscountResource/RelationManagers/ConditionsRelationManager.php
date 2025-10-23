@@ -24,7 +24,8 @@ final class ConditionsRelationManager extends BaseRelationManager
 
     public function form(Form $form): Form
     {
-        return $schema
+        // Filament 4 expects returning the Form builder instance.
+        return $form
             ->schema([
                 Forms\Components\Select::make('type')
                     ->options([
@@ -66,6 +67,7 @@ final class ConditionsRelationManager extends BaseRelationManager
 
     public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->recordTitleAttribute('type')
             ->columns([

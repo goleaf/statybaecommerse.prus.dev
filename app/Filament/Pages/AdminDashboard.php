@@ -5,12 +5,16 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Filament\Widgets\AdminStatsWidget;
-use BackedEnum;
 use Filament\Pages\Dashboard as BaseDashboard;
 
 class AdminDashboard extends BaseDashboard
 {
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-home';
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-home';
 
     protected string $view = 'filament.pages.admin-dashboard';
 

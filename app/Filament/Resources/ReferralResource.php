@@ -7,9 +7,7 @@ namespace App\Filament\Resources;
 use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\ReferralResource\Pages;
 use App\Models\Referral;
-use App\Support\Filament\Components\Flatpickr;
-use BackedEnum;
-use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -22,8 +20,6 @@ use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
-use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
 
@@ -33,16 +29,18 @@ final class ReferralResource extends Resource
     protected static ?string $model = Referral::class;
 
     /**
-     * Icon displayed in the Filament navigation sidebar.
+     * Navigation icon for Filament navigation.
      *
-     * @var string|BackedEnum|null Navigation icon identifier.
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-share';
+    protected static $navigationIcon = 'heroicon-o-share';
 
     /**
-     * Navigation group for organizing the resource in the admin panel.
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static UnitEnum|string|null $navigationGroup = 'Marketing';
+    protected static $navigationGroup = 'Marketing';
 
     protected static ?int $navigationSort = 17;
 
@@ -50,7 +48,7 @@ final class ReferralResource extends Resource
 
     public static function form(Form $form): Form
     {
-        // Use the schema-based configuration to stay aligned with Filament v4 resource expectations.
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 Section::make('Referral Details')
@@ -140,7 +138,7 @@ final class ReferralResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Configure table columns using the fluent Table API for Filament v4 compliance.
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('referral_code')

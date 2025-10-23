@@ -33,13 +33,18 @@ final class NormalSettingTranslationResource extends Resource
 {
     protected static ?string $model = NormalSettingTranslation::class;
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
+    /**
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 16;
 
     protected static ?string $recordTitleAttribute = 'display_name';
 
-    public static function getNavigationIcon(): BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|\Illuminate\Contracts\Support\Htmlable|string|null
     {
         return 'heroicon-o-language';
     }
@@ -66,6 +71,7 @@ final class NormalSettingTranslationResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 Section::make(__('admin.normal_setting_translations.basic_information'))
@@ -112,6 +118,7 @@ final class NormalSettingTranslationResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('enhancedSetting.key')

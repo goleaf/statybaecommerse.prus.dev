@@ -20,36 +20,21 @@ class UserProductInteractionResource extends Resource
 
     protected static ?string $model = UserProductInteraction::class;
 
-    
-
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
     {
         return LegacyUserProductInteractionResource::getNavigationGroup();
     }
 
-    public static function form(Schema $form): Schema
-    {
-        return LegacyUserProductInteractionResource::getNavigationLabel();
-    }
-
-    public static function getPluralModelLabel(): string
-    {
-        return LegacyUserProductInteractionResource::getPluralModelLabel();
-    }
-
-    public static function getModelLabel(): string
-    {
-        return LegacyUserProductInteractionResource::getModelLabel();
-    }
-
     public static function form(Form $form): Form
     {
-        return LegacyUserProductInteractionResource::form($form);
+        // Filament 4 expects returning the Form builder instance.
+        return UserProductInteractionForm::configure($form);
     }
 
     public static function table(Table $table): Table
     {
-        return LegacyUserProductInteractionResource::table($table);
+        // Filament 4 expects returning the Table builder instance.
+        return UserProductInteractionsTable::configure($table);
     }
 
     public static function getRelations(): array

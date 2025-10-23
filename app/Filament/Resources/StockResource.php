@@ -30,9 +30,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use LaraZeus\Quantity\Components\Quantity;
-use UnitEnum;
-use Filament\Schemas\Schema;
 
 /**
  * StockResource
@@ -46,9 +43,11 @@ final class StockResource extends Resource
     protected static ?string $model = Inventory::class;
 
     /**
-     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static UnitEnum|string|null $navigationGroup = 'Inventory';
+    protected static $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 7;
 
@@ -71,6 +70,7 @@ final class StockResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Section::make(__('inventory.product_information'))
                 ->schema([
@@ -142,6 +142,7 @@ final class StockResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('product.name')

@@ -34,8 +34,10 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
-use UnitEnum;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Schemas\Schema;
 
@@ -43,9 +45,12 @@ final class UserProductInteractionResource extends Resource
 {
     protected static ?string $model = UserProductInteraction::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
-
-    protected static UnitEnum|string|null $navigationGroup = 'Users';
+    /**
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
+    protected static $navigationGroup = 'Users';
 
     public static function getNavigationLabel(): string
     {
@@ -64,7 +69,8 @@ final class UserProductInteractionResource extends Resource
 
     public static function form(Form $form): Form
     {
-        $basicInformationSection = SchemaSection::make(__('admin.user_product_interactions.basic_information'))
+        // Filament 4 expects returning the Form builder instance.
+        return $form
             ->schema([
                 SchemaGrid::make(2)
                     ->schema([
@@ -227,6 +233,7 @@ final class UserProductInteractionResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->deferLoading(false)
             ->columns([

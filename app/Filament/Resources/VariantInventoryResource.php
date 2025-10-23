@@ -37,8 +37,6 @@ use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
-use Filament\Schemas\Schema;
 
 /**
  * VariantInventoryResource
@@ -56,14 +54,18 @@ final class VariantInventoryResource extends Resource
     protected static ?string $recordTitleAttribute = 'variant_id';
 
     /**
-     * @var string|\BackedEnum|null Explicit navigation icon definition for inventory context.
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
     protected static $navigationIcon = 'heroicon-o-archive-box';
 
     /**
-     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static UnitEnum|string|null $navigationGroup = 'Inventory';
+    protected static $navigationGroup = 'Inventory';
 
     public static function getNavigationLabel(): string
     {
@@ -82,6 +84,7 @@ final class VariantInventoryResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form
             ->schema([
                 Section::make(__('admin.variant_inventory.basic_information'))
@@ -246,6 +249,7 @@ final class VariantInventoryResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('variant.name')

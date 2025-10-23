@@ -30,10 +30,10 @@ final class AddressesRelationManager extends BaseRelationManager
 
     public function form(Form $form): Form
     {
-        return $form->schema([
-            Grid::make(2)->schema([
-                TextInput::make('first_name')
-                    ->label(__('addresses.first_name'))
+        // Filament 4 expects returning the Form builder instance.
+        return $form
+            ->components([
+                Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('address_line_1'),
@@ -93,6 +93,7 @@ final class AddressesRelationManager extends BaseRelationManager
 
     public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->recordTitleAttribute('full_name')
             ->columns([

@@ -24,7 +24,8 @@ final class CustomerSegmentsRelationManager extends BaseRelationManager
 
     public function form(Form $form): Form
     {
-        return $schema->schema([
+        // Filament 4 expects returning the Form builder instance.
+        return $form->schema([
             Select::make('customer_group_id')
                 ->label('Customer Group')
                 ->relationship('customerGroup', 'name')
@@ -42,6 +43,7 @@ final class CustomerSegmentsRelationManager extends BaseRelationManager
 
     public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('customerGroup.name')

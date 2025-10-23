@@ -81,6 +81,7 @@ final class OrderItemResource extends Resource
      */
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Section::make(__('orders.sections.order_items'))
                 ->schema([
@@ -282,6 +283,7 @@ final class OrderItemResource extends Resource
      */
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 TextColumn::make('order.number')

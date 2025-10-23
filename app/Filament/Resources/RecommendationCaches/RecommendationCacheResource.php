@@ -13,7 +13,7 @@ use App\Filament\Resources\RecommendationCaches\Pages\ViewRecommendationCache;
 use App\Filament\Resources\RecommendationCaches\Schemas\RecommendationCacheForm;
 use App\Filament\Resources\RecommendationCaches\Tables\RecommendationCachesTable;
 use App\Models\RecommendationCache;
-use BackedEnum;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
@@ -25,14 +25,11 @@ final class RecommendationCacheResource extends Resource
     protected static ?string $model = RecommendationCache::class;
 
     /**
-     * @var string|BackedEnum|null Keep the caches under a consistent hero icon.
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
     protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
-
-    /**
-     * @var string|BackedEnum|null Ensure analytics tooling stays grouped together.
-     */
-    protected static $navigationGroup = NavigationGroup::Analytics;
 
     protected static ?int $navigationSort = 20;
 
@@ -63,11 +60,13 @@ final class RecommendationCacheResource extends Resource
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return RecommendationCacheForm::configure($form);
     }
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return RecommendationCachesTable::configure($table);
     }
 

@@ -9,7 +9,6 @@ use App\Support\Concerns\HasNav;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ProductFeatureResource\Pages;
 use App\Models\ProductFeature;
-use BackedEnum;
 use Filament\Tables\Actions\BulkActionGroup as TablesBulkActionGroup;
 use Filament\Tables\Actions\DeleteAction as TablesDeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction as TablesDeleteBulkAction;
@@ -22,8 +21,6 @@ use Filament\Tables\Actions\DeleteAction as TablesDeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction as TablesDeleteBulkAction;
 use Filament\Tables\Actions\EditAction as TablesEditAction;
 use Filament\Tables\Table;
-use UnitEnum;
-use Filament\Schemas\Schema;
 
 final class ProductFeatureResource extends Resource
 {
@@ -40,18 +37,25 @@ final class ProductFeatureResource extends Resource
 
     protected static ?string $model = ProductFeature::class;
 
-    /** @var string|BackedEnum|null */
+    /**
+     * Navigation icon for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     */
     protected static $navigationIcon = 'heroicon-o-star';
 
     /**
-     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     * Navigation group for Filament navigation.
+     *
+     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
+    protected static $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 17;
 
     public static function form(Form $form): Form
     {
+        // Filament 4 expects returning the Form builder instance.
         return $form->schema([
             Forms\Components\Select::make('product_id')
                 ->label('Product')
@@ -90,6 +94,7 @@ final class ProductFeatureResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('product.name')

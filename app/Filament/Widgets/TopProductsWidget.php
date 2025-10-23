@@ -37,6 +37,7 @@ final class TopProductsWidget extends BaseWidget
 
     public function table(Table $table): Table
     {
+        // Filament 4 expects returning the Table builder instance.
         $since = Carbon::now()->subDays(7);
 
         $query = Product::query()
