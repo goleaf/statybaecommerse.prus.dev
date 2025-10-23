@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CartItemResource\Pages;
 
-use App\Filament\Concerns\HasResizableColumns;
-use App\Filament\Resources\CartItemResource;
-use Filament\Actions;
 use App\Filament\Pages\Support\BaseListRecords;
+use App\Filament\Resources\CartItemResource;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListCartItems extends BaseListRecords
@@ -42,18 +39,18 @@ final class ListCartItems extends BaseListRecords
                 ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_saved_for_later', true)->count()),
 
             'low_stock' => WidgetTab::make(__('cart_items.tabs.low_stock'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('product.inventories', function ($q) {
+                ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('product.inventories', function ($q): void {
                     $q->where('quantity', '<=', 10);
                 }))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->whereHas('product.inventories', function ($q) {
+                ->value(fn () => $this->getResource()::getEloquentQuery()->whereHas('product.inventories', function ($q): void {
                     $q->where('quantity', '<=', 10);
                 })->count()),
 
             'out_of_stock' => WidgetTab::make(__('cart_items.tabs.out_of_stock'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('product.inventories', function ($q) {
+                ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('product.inventories', function ($q): void {
                     $q->where('quantity', '=', 0);
                 }))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->whereHas('product.inventories', function ($q) {
+                ->value(fn () => $this->getResource()::getEloquentQuery()->whereHas('product.inventories', function ($q): void {
                     $q->where('quantity', '=', 0);
                 })->count()),
 

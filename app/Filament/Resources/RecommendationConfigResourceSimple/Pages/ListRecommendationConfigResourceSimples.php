@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\RecommendationConfigResourceSimple\Pages;
 
-use App\Filament\Concerns\HasResizableColumns;
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\RecommendationConfigResourceSimple;
 use Filament\Actions;
-use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListRecommendationConfigResourceSimples extends BaseListRecords
 {

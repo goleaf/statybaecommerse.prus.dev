@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CampaignConversionResource\Pages;
 
-use App\Filament\Concerns\HasResizableColumns;
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\CampaignConversionResource;
 use App\Filament\Resources\CampaignConversionResource\Widgets\CampaignConversionDeviceBreakdownChart;
 use App\Filament\Resources\CampaignConversionResource\Widgets\CampaignConversionStatsOverview;
 use App\Filament\Resources\CampaignConversionResource\Widgets\CampaignConversionTrendsChart;
 use Filament\Actions;
-use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListCampaignConversions extends BaseListRecords
 {

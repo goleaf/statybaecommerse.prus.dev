@@ -510,32 +510,8 @@ final class DiscountResource extends Resource
      */
     private static function getTypeOptions(): array
     {
-        return self::formatOptions(['percentage', 'fixed', 'free_shipping']);
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private static function getStatusOptions(): array
-    {
-        return self::formatOptions(['draft', 'active', 'scheduled', 'expired']);
-    }
-
-    /**
-     * @param  array<int, string>  $values
-     * @return array<string, string>
-     */
-    private static function formatOptions(array $values): array
-    {
-        return collect($values)
-            ->mapWithKeys(fn (string $value): array => [$value => Str::headline($value)])
-            ->all();
-    }
-
-    private static function generateDuplicateSlug(Discount $discount): string
-    {
-        $baseSlug = $discount->slug ?: Str::slug($discount->name) ?: 'discount';
-        $candidate = $baseSlug.'-copy';
+        $baseSlug = Str::slug($name) ?: 'discount';
+        $candidate = $baseSlug . '-copy';
         $suffix = 2;
 
     private static function getTypeLabel(?string $type): string

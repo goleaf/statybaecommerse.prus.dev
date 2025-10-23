@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\UserProductInteractions\Schemas;
 
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
-use App\Support\Filament\Components\Flatpickr;
 
 class UserProductInteractionForm
 {

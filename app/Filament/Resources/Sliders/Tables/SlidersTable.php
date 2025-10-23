@@ -184,7 +184,7 @@ final class SlidersTable
                         $message = match (true) {
                             $imported === 0 => __('No sliders were imported.'),
                             $imported === 1 => __('One slider was imported.'),
-                            default => __(':count sliders were imported.', ['count' => $imported]),
+                            default         => __(':count sliders were imported.', ['count' => $imported]),
                         };
 
                         Notification::make()
@@ -303,17 +303,17 @@ final class SlidersTable
             ->all();
 
         return [
-            'slider' => $sliderData,
+            'slider'       => $sliderData,
             'translations' => $translations,
-            'media' => [
-                'slider_images' => $slider->getFirstMedia('slider_images')?->getUrl(),
+            'media'        => [
+                'slider_images'      => $slider->getFirstMedia('slider_images')?->getUrl(),
                 'slider_backgrounds' => $slider->getFirstMedia('slider_backgrounds')?->getUrl(),
             ],
         ];
     }
 
     /**
-     * @param array<string, mixed> $payload
+     * @param  array<string, mixed>             $payload
      * @return array<int, array<string, mixed>>
      */
     private static function normaliseImportedPayload(array $payload): array
@@ -321,7 +321,7 @@ final class SlidersTable
         if (isset($payload['slider']) || isset($payload['translations'])) {
             return [
                 [
-                    'slider' => Arr::except($payload['slider'] ?? $payload, ['translations', 'media']),
+                    'slider'       => Arr::except($payload['slider'] ?? $payload, ['translations', 'media']),
                     'translations' => $payload['translations'] ?? [],
                 ],
             ];
@@ -330,7 +330,7 @@ final class SlidersTable
         if (isset($payload['sliders']) && is_array($payload['sliders'])) {
             return array_map(
                 static fn ($item) => [
-                    'slider' => Arr::except(($item['slider'] ?? $item) ?? [], ['translations', 'media']),
+                    'slider'       => Arr::except(($item['slider'] ?? $item) ?? [], ['translations', 'media']),
                     'translations' => $item['translations'] ?? ($item['slider']['translations'] ?? []),
                 ],
                 array_filter($payload['sliders'], 'is_array'),
@@ -340,7 +340,7 @@ final class SlidersTable
         if (Arr::isList($payload)) {
             return array_map(
                 static fn ($item) => [
-                    'slider' => Arr::except(($item['slider'] ?? $item) ?? [], ['translations', 'media']),
+                    'slider'       => Arr::except(($item['slider'] ?? $item) ?? [], ['translations', 'media']),
                     'translations' => $item['translations'] ?? ($item['slider']['translations'] ?? []),
                 ],
                 array_filter($payload, 'is_array'),
@@ -349,7 +349,7 @@ final class SlidersTable
 
         return [
             [
-                'slider' => Arr::except($payload, ['translations', 'media']),
+                'slider'       => Arr::except($payload, ['translations', 'media']),
                 'translations' => $payload['translations'] ?? [],
             ],
         ];

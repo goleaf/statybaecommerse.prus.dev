@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\MenuItemResource\Pages;
 
-use App\Filament\Concerns\HasResizableColumns;
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\MenuItemResource;
 use Filament\Actions\CreateAction;
-use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListMenuItems extends BaseListRecords
 {

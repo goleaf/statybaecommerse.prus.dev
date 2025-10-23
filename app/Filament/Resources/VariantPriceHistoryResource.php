@@ -10,11 +10,14 @@ use UnitEnum;
 use App\Filament\Resources\VariantPriceHistoryResource\Pages;
 use App\Models\VariantPriceHistory;
 use App\Support\Filament\Components\Flatpickr;
+use BackedEnum;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use UnitEnum;
 
 final class VariantPriceHistoryResource extends Resource
 {
@@ -29,27 +32,24 @@ final class VariantPriceHistoryResource extends Resource
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-currency-euro';
 
-    /** @var string|\BackedEnum|\UnitEnum|null Navigation grouping centralized via enum. */
-    /**
-     * Navigation group for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static $navigationGroup = NavigationGroup::System;
+    /** @var string|BackedEnum|null Navigation grouping centralized via enum. */
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 20;
 
     public static function getNavigationGroup(): ?string
     {
         // Resolve enum-backed navigation label so the sidebar remains localized.
-        $group = static::$navigationGroup;
+        $group = self::$navigationGroup;
 
         return $group instanceof NavigationGroup ? $group->label() : $group;
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->schema([
                 Forms\Components\Select::make('variant_id')

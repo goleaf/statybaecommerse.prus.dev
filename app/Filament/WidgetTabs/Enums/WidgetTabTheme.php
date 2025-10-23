@@ -18,10 +18,10 @@ enum WidgetTabTheme: string implements HasLabel
     {
         return match ($this) {
             self::Secondary => 'Secondary',
-            self::Success => 'Success',
-            self::Warning => 'Warning',
-            self::Danger => 'Danger',
-            self::Info => 'Info',
+            self::Success   => 'Success',
+            self::Warning   => 'Warning',
+            self::Danger    => 'Danger',
+            self::Info      => 'Info',
         };
     }
 }

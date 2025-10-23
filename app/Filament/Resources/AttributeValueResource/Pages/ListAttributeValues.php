@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AttributeValueResource\Pages;
 
-use App\Filament\Concerns\HasResizableColumns;
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\AttributeValueResource;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
-use App\Filament\Pages\Support\BaseListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListAttributeValues extends BaseListRecords
@@ -37,34 +36,34 @@ final class ListAttributeValues extends BaseListRecords
                 ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_active', true)->count()),
 
             'color' => WidgetTab::make(__('attribute_values.tabs.color'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('attribute', function ($q) {
+                ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('attribute', function ($q): void {
                     $q->where('type', 'color');
                 }))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->whereHas('attribute', function ($q) {
+                ->value(fn () => $this->getResource()::getEloquentQuery()->whereHas('attribute', function ($q): void {
                     $q->where('type', 'color');
                 })->count()),
 
             'size' => WidgetTab::make(__('attribute_values.tabs.size'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('attribute', function ($q) {
+                ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('attribute', function ($q): void {
                     $q->where('type', 'size');
                 }))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->whereHas('attribute', function ($q) {
+                ->value(fn () => $this->getResource()::getEloquentQuery()->whereHas('attribute', function ($q): void {
                     $q->where('type', 'size');
                 })->count()),
 
             'material' => WidgetTab::make(__('attribute_values.tabs.material'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('attribute', function ($q) {
+                ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('attribute', function ($q): void {
                     $q->where('type', 'material');
                 }))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->whereHas('attribute', function ($q) {
+                ->value(fn () => $this->getResource()::getEloquentQuery()->whereHas('attribute', function ($q): void {
                     $q->where('type', 'material');
                 })->count()),
 
             'brand' => WidgetTab::make(__('attribute_values.tabs.brand'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('attribute', function ($q) {
+                ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('attribute', function ($q): void {
                     $q->where('type', 'brand');
                 }))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->whereHas('attribute', function ($q) {
+                ->value(fn () => $this->getResource()::getEloquentQuery()->whereHas('attribute', function ($q): void {
                     $q->where('type', 'brand');
                 })->count()),
 

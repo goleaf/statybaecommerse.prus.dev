@@ -26,13 +26,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -85,9 +79,11 @@ final class VariantImageResource extends Resource
         return __('admin.variant_images.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->components([
             Section::make(__('admin.variant_images.basic_information'))
                 ->schema([
@@ -100,9 +96,12 @@ final class VariantImageResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->afterStateUpdated(function (?int $state, Set $set): void {
-                                    if (! $state) {
-                                        return;
+                                ->afterStateUpdated(function ($state, $set): void {
+                                    if ($state) {
+                                        // Auto-generate sort order based on existing images
+                                        $nextSortOrder = VariantImage::where('variant_id', $state)
+                                            ->max('sort_order') + 1;
+                                        $set('sort_order', $nextSortOrder);
                                     }
 
                                     $nextSortOrder = VariantImage::where('variant_id', $state)
@@ -434,7 +433,7 @@ final class VariantImageResource extends Resource
                         ->color('info')
                         ->action(function (Collection $records): void {
                             // Auto-reorder based on current sort order
-                            $records->sortBy('sort_order')->values()->each(function (VariantImage $record, int $index): void {
+                            $records->sortBy('sort_order')->each(function ($record, $index): void {
                                 $record->update(['sort_order' => $index + 1]);
                             });
 
@@ -450,7 +449,7 @@ final class VariantImageResource extends Resource
                         ->color('warning')
                         ->action(function (Collection $records): void {
                             // Group by variant_id and set first image as primary for each variant
-                            $records->groupBy('variant_id')->each(function (Collection $variantImages): void {
+                            $records->groupBy('variant_id')->each(function ($variantImages): void {
                                 // Remove primary from all images in this variant
                                 VariantImage::where('variant_id', $variantImages->first()->variant_id)
                                     ->update(['is_primary' => false]);

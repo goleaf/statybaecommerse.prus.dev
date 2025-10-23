@@ -42,10 +42,22 @@ final class DiscountConditionTableWidget extends BaseWidget
                     ->label(__('discount_conditions.operator'))
                     ->formatStateUsing(fn (string $state): string => __('discount_conditions.operators.' . Str::slug($state, '_')))
                     ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'minimum_amount'   => 'blue',
+                        'minimum_quantity' => 'green',
+                        'customer_group'   => 'purple',
+                        'product_category' => 'orange',
+                        'date_range'       => 'red',
+                        default            => 'gray',
+                    })
                     ->sortable(),
                 Tables\Columns\TextColumn::make('value')
                     ->label(__('discount_conditions.value'))
-                    ->formatStateUsing(fn (mixed $state): string => $this->formatValue($state))
+                    ->formatStateUsing(fn (?string $state, DiscountCondition $record): string => match ($record->type) {
+                        'minimum_amount'   => '€' . number_format((float) $state, 2),
+                        'minimum_quantity' => (string) $state,
+                        default            => $state ?? '-',
+                    })
                     ->sortable(),
                 Tables\Columns\TextColumn::make('priority')
                     ->label(__('discount_conditions.priority'))

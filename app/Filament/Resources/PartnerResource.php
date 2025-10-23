@@ -10,8 +10,8 @@ use App\Filament\Resources\PartnerResource\Pages;
 use App\Models\Partner;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -37,9 +37,12 @@ final class PartnerResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Compose the partner form using the Section helper to keep layouts consistent.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
+        // Build the Partner form using the Section helper to keep layouts consistent.
         return $form
             ->schema([
                 Section::make(__('admin.partners.sections.basic_information'))

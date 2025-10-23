@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\UserPreferenceResource\Pages;
 
-use App\Filament\Concerns\HasResizableColumns;
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\UserPreferenceResource;
 use Filament\Actions;
-use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListUserPreferences extends BaseListRecords
 {

@@ -11,13 +11,14 @@ use App\Models\City;
 use App\Models\Country;
 use Filament\Forms;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
@@ -68,9 +69,11 @@ final class CityResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->schema([
             Section::make(__('cities.basic_information'))
                 ->schema([
@@ -345,10 +348,10 @@ final class CityResource extends Resource
                     ->label(__('cities.level'))
                     ->badge()
                     ->color(fn (?int $state): string => match ($state) {
-                        0 => 'blue',
-                        1 => 'green',
-                        2 => 'yellow',
-                        3 => 'orange',
+                        0       => 'blue',
+                        1       => 'green',
+                        2       => 'yellow',
+                        3       => 'orange',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (?int $state): string => $state !== null ? __("cities.levels.{$state}") : '-')

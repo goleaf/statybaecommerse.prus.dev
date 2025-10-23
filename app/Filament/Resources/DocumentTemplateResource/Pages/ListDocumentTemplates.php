@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DocumentTemplateResource\Pages;
 
-use App\Filament\Concerns\HasResizableColumns;
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\DocumentTemplateResource;
 use App\Models\DocumentTemplate;
 use Filament\Actions;
-use App\Filament\Pages\Support\BaseListRecords;
 
 class ListDocumentTemplates extends BaseListRecords
 {

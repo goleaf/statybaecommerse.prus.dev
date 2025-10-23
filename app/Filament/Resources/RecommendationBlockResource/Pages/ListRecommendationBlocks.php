@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\RecommendationBlockResource\Pages;
 
-use App\Filament\Concerns\HasResizableColumns;
-use App\Filament\Resources\RecommendationBlockResource;
-use Filament\Actions;
 use App\Filament\Pages\Support\BaseListRecords;
+use App\Filament\Resources\RecommendationBlockResource;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use App\Support\Recommendations\RecommendationBlockOptions;
+use Filament\Actions;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListRecommendationBlocks extends BaseListRecords

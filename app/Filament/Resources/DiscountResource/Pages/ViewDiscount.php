@@ -20,7 +20,7 @@ final class ViewDiscount extends ViewRecord
             Actions\Action::make('duplicate')
                 ->label('Duplicate')
                 ->icon('heroicon-o-document-duplicate')
-                ->action(function () {
+                ->action(function (): void {
                     $newDiscount = DiscountResource::duplicateDiscount($this->record);
 
                     $this->redirect($this->getResource()::getUrl('edit', ['record' => $newDiscount]));

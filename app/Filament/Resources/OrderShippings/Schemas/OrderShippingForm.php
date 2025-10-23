@@ -6,12 +6,12 @@ namespace App\Filament\Resources\OrderShippings\Schemas;
 
 use App\Forms\Components\Flatpickr;
 use App\Models\Order;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
-use App\Support\Filament\Components\Flatpickr;
 
 class OrderShippingForm
 {
