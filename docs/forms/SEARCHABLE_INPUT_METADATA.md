@@ -19,7 +19,7 @@ The Alpine helper embedded in `filament/components/autocomplete-select.blade.php
 
 On the PHP side, defer to `App\Support\Filament\SearchableComponentHelper` so hydration and clearing logic stays centralised. The helper resolves the record, normalises it into a `[value, label, payload]` tuple, and pushes that shape back into the component while exposing optional callbacks for clearing related form state. See the [Searchable input helper usage](../filament/searchable-inputs.md) note for full examples and the expected normaliser contract.
 
-Existing resources already expose the payload structures this helper needs. For example, the order form clears billing and shipping payloads when a user wipes the lookup, otherwise it resolves the cached `AddressSearch::payload()` structure into the associated `KeyValue` fields.【F:app/Filament/Resources/OrderResource.php†L312-L354】 Cart item forms follow the same pattern, using product metadata to fill name, SKU, unit price, and resetting related variant selections when the base product changes.【F:app/Filament/Resources/CartItemResource.php†L16-L56】
+The shared helper that now powers variant lookups lives at `App\Support\Filament\Forms\SearchableVariantFieldHelper`. Its `hydrate()` method restores the component state/options from a cached `SearchResult`, while `handleUpdated()` either maps the metadata into hidden fields or clears `product_id`, `name`, `sku`, pricing, and totals when the lookup is emptied.【F:app/Support/Filament/Forms/SearchableVariantFieldHelper.php†L15-L109】 Hook new searchable variant inputs into these helper methods so repeaters, relation managers, and regular forms all rely on the same sanitised flow.
 
 ## Integration examples
 
@@ -33,5 +33,5 @@ Replicate these patterns for any new searchable inputs so metadata remains autho
 
 ## Follow-up checklist
 
-- [ ] Replace bespoke hydration closures with `SearchableComponentHelper::hydrate()`/`clear()` so every resource stays aligned.
+- [x] Adopt the shared helper once it lands and replace bespoke hydration closures.
 - [ ] Request a team review of this document whenever the helper contract changes to keep the documentation accurate.

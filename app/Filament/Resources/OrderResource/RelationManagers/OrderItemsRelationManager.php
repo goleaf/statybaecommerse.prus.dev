@@ -6,6 +6,7 @@ namespace App\Filament\Resources\OrderResource\RelationManagers;
 
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\OrderItem;
+use App\Support\Filament\Forms\SearchableVariantFieldHelper;
 use App\Support\Search\ProductVariantSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
@@ -72,49 +73,13 @@ final class OrderItemsRelationManager extends BaseRelationManager
                                     ->placeholder(__('orders.placeholders.product_variant'))
                                     ->searchUsing(fn (string $term): array => ProductVariantSearch::results($term))
                                     ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                    ->afterStateHydrated(static function (SearchableInput $component, ?int $state): void {
-                                        if ($state === null) {
-                                            return;
-                                        }
-
-                                        $variant = ProductVariant::query()
-                                            ->select(['id', 'product_id', 'sku', 'name', 'price'])
-                                            ->with(['product:id,sku,name'])
-                                            ->find($state);
-
-                                        if (! $variant instanceof ProductVariant) {
-                                            return;
-                                        }
-
-                                        $component
-                                            ->state((string) $state)
-                                            ->options([
-                                                (string) $record->product_variant_id => ProductVariantSearch::label($record->productVariant),
-                                            ]);
-                                    })
-                                    ->afterStateUpdated(static function (?string $state, Set $set, Get $get): void {
-                                        if ($state === null || $state === '') {
-                                            return;
-                                        }
-
-                                        $payload = ProductVariantSearch::hydrate((int) $state);
-
-                                        if ($payload === null) {
-                                            return;
-                                        }
-
-                                        $set('product_variant_id', (int) $state);
-                                        $set('product_id', $payload['product_id']);
-                                        $set('unit_price', $payload['price']);
-                                        $set('name', $payload['name'] !== '' ? $payload['name'] : $payload['product_name']);
-                                        $set('sku', $payload['sku']);
-
-                                        $quantity = (int) ($get('quantity') ?? 1);
-                                        $discount = (float) ($get('discount_amount') ?? 0);
-                                        $set('total', ($payload['price'] * $quantity) - $discount);
-                                    })
-                                    ->reactive()
-                                    ->prefixIcon('heroicon-o-cube'),
+                                    // Helper workflow documented in docs/forms/SEARCHABLE_INPUT_METADATA.md.
+                                    ->afterStateHydrated(fn (SearchableInput $component, ?int $state, ?OrderItem $record): void => SearchableVariantFieldHelper::hydrate(
+                                        $component,
+                                        $state,
+                                        $record?->productVariant
+                                    ))
+                                    ->afterStateUpdated(fn (?string $state, Set $set, Get $get): void => SearchableVariantFieldHelper::handleUpdated($state, $set, $get)),
                                 TextInput::make('quantity')
                                     ->label(__('orders.quantity'))
                                     ->numeric()
