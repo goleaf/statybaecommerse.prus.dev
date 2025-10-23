@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Api;
 
-use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 abstract class ApiRequest extends FormRequest
 {
@@ -40,11 +41,24 @@ abstract class ApiRequest extends FormRequest
      */
     protected function failedAuthorization(): void
     {
-        $message = $this->requiredAbility
-            ? sprintf('This action requires the [%s] ability.', $this->requiredAbility)
-            : 'You are not authorized to perform this action.';
+        throw new HttpResponseException(response()->json([
+            'success' => false,
+            'message' => $this->requiredAbility
+                ? sprintf('This action requires the [%s] ability.', $this->requiredAbility)
+                : 'You are not authorized to perform this action.',
+        ], 403));
+    }
 
-        throw new AuthorizationException($message);
+    /**
+     * Handle a failed validation attempt.
+     */
+    protected function failedValidation(Validator $validator): void
+    {
+        throw new HttpResponseException(response()->json([
+            'success' => false,
+            'message' => 'The given data was invalid.',
+            'errors' => $validator->errors()->toArray(),
+        ], 422));
     }
 
     /**

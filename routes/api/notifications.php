@@ -5,7 +5,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('notifications')
     ->as('notifications.')
-    ->withoutMiddleware('throttle:api.default')
     ->middleware('throttle:api.notifications')
     ->group(function (): void {
         Route::middleware('abilities:notifications.read')->group(function (): void {
