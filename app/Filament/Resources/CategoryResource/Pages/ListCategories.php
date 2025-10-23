@@ -8,6 +8,7 @@ use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\CategoryResource;
 use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListCategories extends BaseListRecords
 {

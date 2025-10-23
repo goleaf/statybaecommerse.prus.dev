@@ -7,6 +7,7 @@ namespace App\Filament\Resources\AdminUserResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\AdminUserResource;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 class ListAdminUsers extends BaseListRecords
 {

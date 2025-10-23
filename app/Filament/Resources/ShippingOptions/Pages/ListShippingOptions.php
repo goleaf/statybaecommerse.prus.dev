@@ -7,6 +7,7 @@ namespace App\Filament\Resources\ShippingOptions\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\ShippingOptions\ShippingOptionResource;
 use Filament\Actions\CreateAction;
+use App\Filament\Pages\Support\BaseListRecords;
 
 class ListShippingOptions extends BaseListRecords
 {

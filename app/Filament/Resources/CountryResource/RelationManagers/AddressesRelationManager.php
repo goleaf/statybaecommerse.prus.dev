@@ -7,13 +7,13 @@ namespace App\Filament\Resources\CountryResource\RelationManagers;
 use App\Enums\AddressType;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
-final class AddressesRelationManager extends RelationManager
+final class AddressesRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'addresses';
 

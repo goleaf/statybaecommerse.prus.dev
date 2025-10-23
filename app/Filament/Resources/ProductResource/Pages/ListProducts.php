@@ -10,7 +10,7 @@ use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListProducts extends BaseListRecords

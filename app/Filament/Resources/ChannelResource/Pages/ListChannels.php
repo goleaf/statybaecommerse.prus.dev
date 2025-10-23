@@ -7,6 +7,7 @@ namespace App\Filament\Resources\ChannelResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\ChannelResource;
 use Filament\Actions\CreateAction;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListChannels extends BaseListRecords
 {

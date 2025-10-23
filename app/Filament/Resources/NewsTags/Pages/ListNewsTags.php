@@ -7,6 +7,7 @@ namespace App\Filament\Resources\NewsTags\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\NewsTags\NewsTagResource;
 use Filament\Actions\CreateAction;
+use App\Filament\Pages\Support\BaseListRecords;
 
 class ListNewsTags extends BaseListRecords
 {

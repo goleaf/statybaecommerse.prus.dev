@@ -8,9 +8,7 @@ use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\DocumentTemplateResource;
 use App\Models\DocumentTemplate;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
-use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use App\Filament\Pages\Support\BaseListRecords;
 
 class ListDocumentTemplates extends BaseListRecords
 {

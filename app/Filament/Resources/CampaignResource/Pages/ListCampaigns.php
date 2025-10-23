@@ -9,7 +9,7 @@ use App\Filament\Resources\CampaignResource;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListCampaigns extends BaseListRecords

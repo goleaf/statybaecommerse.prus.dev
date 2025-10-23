@@ -7,6 +7,7 @@ namespace App\Filament\Resources\ProductSimilarityResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\ProductSimilarityResource;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 class ListProductSimilarities extends BaseListRecords
 {

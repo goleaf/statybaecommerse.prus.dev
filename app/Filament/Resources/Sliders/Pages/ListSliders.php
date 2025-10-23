@@ -7,6 +7,7 @@ namespace App\Filament\Resources\Sliders\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\Sliders\SliderResource;
 use Filament\Actions\CreateAction;
+use App\Filament\Pages\Support\BaseListRecords;
 
 class ListSliders extends BaseListRecords
 {

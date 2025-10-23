@@ -10,6 +10,7 @@ use App\Filament\Resources\CampaignConversionResource\Widgets\CampaignConversion
 use App\Filament\Resources\CampaignConversionResource\Widgets\CampaignConversionStatsOverview;
 use App\Filament\Resources\CampaignConversionResource\Widgets\CampaignConversionTrendsChart;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListCampaignConversions extends BaseListRecords
 {

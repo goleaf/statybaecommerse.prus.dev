@@ -7,6 +7,7 @@ namespace App\Filament\Resources\CollectionResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\CollectionResource;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListCollections extends BaseListRecords
 {

@@ -7,6 +7,7 @@ namespace App\Filament\Resources\NormalSettingTranslationResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\NormalSettingTranslationResource;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListNormalSettingTranslations extends BaseListRecords
 {

@@ -9,7 +9,7 @@ use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;

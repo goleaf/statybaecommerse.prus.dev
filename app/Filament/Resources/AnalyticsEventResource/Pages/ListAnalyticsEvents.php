@@ -6,6 +6,8 @@ namespace App\Filament\Resources\AnalyticsEventResource\Pages;
 
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\AnalyticsEventResource;
+use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;

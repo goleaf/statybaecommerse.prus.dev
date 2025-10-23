@@ -7,6 +7,7 @@ namespace App\Filament\Resources\FeatureFlags\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\FeatureFlags\FeatureFlagResource;
 use Filament\Actions\CreateAction;
+use App\Filament\Pages\Support\BaseListRecords;
 
 class ListFeatureFlags extends BaseListRecords
 {

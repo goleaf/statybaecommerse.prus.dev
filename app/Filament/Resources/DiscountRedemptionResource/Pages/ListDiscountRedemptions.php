@@ -7,6 +7,7 @@ namespace App\Filament\Resources\DiscountRedemptionResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\DiscountRedemptionResource;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListDiscountRedemptions extends BaseListRecords
 {

@@ -7,6 +7,7 @@ namespace App\Filament\Resources\StockMovementResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\StockMovementResource;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListStockMovements extends BaseListRecords
 {

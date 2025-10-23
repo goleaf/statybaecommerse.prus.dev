@@ -7,6 +7,7 @@ namespace App\Filament\Resources\ProductRequestResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\ProductRequestResource;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListProductRequests extends BaseListRecords
 {

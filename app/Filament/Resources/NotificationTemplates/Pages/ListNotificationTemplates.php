@@ -7,6 +7,7 @@ namespace App\Filament\Resources\NotificationTemplates\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\NotificationTemplates\NotificationTemplateResource;
 use Filament\Actions\CreateAction;
+use App\Filament\Pages\Support\BaseListRecords;
 
 class ListNotificationTemplates extends BaseListRecords
 {

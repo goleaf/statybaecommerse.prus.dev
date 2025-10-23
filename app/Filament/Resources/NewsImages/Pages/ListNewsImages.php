@@ -7,6 +7,7 @@ namespace App\Filament\Resources\NewsImages\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\NewsImages\NewsImageResource;
 use Filament\Actions\CreateAction;
+use App\Filament\Pages\Support\BaseListRecords;
 
 class ListNewsImages extends BaseListRecords
 {

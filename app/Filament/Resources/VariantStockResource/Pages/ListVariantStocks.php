@@ -6,6 +6,7 @@ namespace App\Filament\Resources\VariantStockResource\Pages;
 
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\VariantStockResource;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListVariantStocks extends BaseListRecords
 {

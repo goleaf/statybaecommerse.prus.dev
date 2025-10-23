@@ -7,6 +7,7 @@ namespace App\Filament\Resources\VariantPricingRuleResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\VariantPricingRuleResource;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListVariantPricingRules extends BaseListRecords
 {

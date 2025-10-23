@@ -7,6 +7,7 @@ namespace App\Filament\Resources\EnumResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\EnumResource;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 class ListEnums extends BaseListRecords
 {

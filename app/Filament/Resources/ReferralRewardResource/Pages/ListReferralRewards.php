@@ -7,8 +7,7 @@ namespace App\Filament\Resources\ReferralRewardResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\ReferralRewardResource;
 use Filament\Actions;
-use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable as SpatieTranslatableListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListReferralRewards extends BaseListRecords
 {

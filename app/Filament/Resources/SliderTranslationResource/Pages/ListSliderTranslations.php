@@ -7,6 +7,7 @@ namespace App\Filament\Resources\SliderTranslationResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\SliderTranslationResource;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListSliderTranslations extends BaseListRecords
 {

@@ -7,6 +7,7 @@ namespace App\Filament\Resources\ProductFeatureResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\ProductFeatureResource;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListProductFeatures extends BaseListRecords
 {

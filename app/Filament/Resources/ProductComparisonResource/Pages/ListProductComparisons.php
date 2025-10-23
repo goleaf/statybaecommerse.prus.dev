@@ -7,6 +7,7 @@ namespace App\Filament\Resources\ProductComparisonResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\ProductComparisonResource;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListProductComparisons extends BaseListRecords
 {

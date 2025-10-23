@@ -6,6 +6,7 @@ namespace App\Filament\Resources\EnumManagementResource\Pages;
 
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\EnumManagementResource;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListEnums extends BaseListRecords
 {

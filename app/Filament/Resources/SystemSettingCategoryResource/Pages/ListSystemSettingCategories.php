@@ -7,6 +7,7 @@ namespace App\Filament\Resources\SystemSettingCategoryResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\SystemSettingCategoryResource;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 class ListSystemSettingCategories extends BaseListRecords
 {

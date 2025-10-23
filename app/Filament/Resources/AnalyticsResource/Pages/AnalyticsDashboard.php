@@ -8,7 +8,7 @@ use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\AnalyticsResource;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class AnalyticsDashboard extends BaseListRecords
 {

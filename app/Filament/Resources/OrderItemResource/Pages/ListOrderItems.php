@@ -7,6 +7,7 @@ namespace App\Filament\Resources\OrderItemResource\Pages;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\OrderItemResource;
 use Filament\Actions;
+use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListOrderItems extends BaseListRecords
 {
