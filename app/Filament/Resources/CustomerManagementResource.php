@@ -96,9 +96,10 @@ final class CustomerManagementResource extends Resource
                                 ->label(__('customers.is_verified'))
                                 ->default(false),
                         ]),
-                    Select::make('customer_group_id')
+                    Select::make('customerGroups')
                         ->label(__('customers.customer_group'))
-                        ->relationship('customerGroup', 'name')
+                        ->relationship('customerGroups', 'name')
+                        ->multiple()
                         ->searchable()
                         ->preload()
                         ->createOptionForm([
@@ -185,10 +186,11 @@ final class CustomerManagementResource extends Resource
                     ->label(__('customers.phone'))
                     ->copyable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('customerGroup.name')
+                TextColumn::make('customerGroups.name')
                     ->label(__('customers.customer_group'))
-                    ->sortable(),
-                TextColumn::make('email_verified_at')
+                    ->badge()
+                    ->separator(', '),
+                BadgeColumn::make('email_verified_at')
                     ->label(__('customers.email_status'))
                     ->badge()
                     ->formatStateUsing(fn (?string $state): string => filled($state) ? __('customers.verified') : __('customers.unverified'))
@@ -218,8 +220,8 @@ final class CustomerManagementResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                SelectFilter::make('customer_group_id')
-                    ->relationship('customerGroup', 'name')
+                SelectFilter::make('customerGroups')
+                    ->relationship('customerGroups', 'name')
                     ->preload(),
                 TernaryFilter::make('email_verified_at')
                     ->label(__('customers.email_verified'))
