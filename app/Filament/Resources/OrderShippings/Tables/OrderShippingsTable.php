@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderShippings\Tables;
 
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
+use App\Models\Order;
+use App\Models\OrderShipping;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -131,9 +136,9 @@ class OrderShippingsTable
                 Filter::make('shipped_at')
                     ->label(__('Shipped at'))
                     ->form([
-                        Flatpickr::makeDateTime('shipped_from')
+                        DateTimePicker::make('shipped_from')
                             ->label(__('Shipped from')),
-                        Flatpickr::makeDateTime('shipped_until')
+                        DateTimePicker::make('shipped_until')
                             ->label(__('Shipped until')),
                     ])
                     ->query(static function (Builder $query, array $data): Builder {

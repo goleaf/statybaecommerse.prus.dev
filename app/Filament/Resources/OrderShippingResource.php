@@ -74,11 +74,21 @@ final class OrderShippingResource extends Resource
                         ->relationship(
                             name: 'order',
                             titleAttribute: 'number',
-                            modifyQueryUsing: fn (Builder $query) => $query
-                                ->withoutGlobalScopes([ActiveScope::class, StatusScope::class])
-                                ->select('id', 'number'),
+                            modifyQueryUsing: static fn (Builder $query): Builder => $query->withoutGlobalScopes(),
                         )
-                        ->getOptionLabelFromRecordUsing(fn (Order $order): string => $order->number ?? sprintf('Order #%s', $order->getKey()))
+                        ->getOptionLabelFromRecordUsing(
+                            static fn (Order $record): string => $record->number ?? __('Order #:id', ['id' => $record->getKey()]),
+                        )
+                        ->getOptionLabelUsing(
+                            static fn (int|string|null $value): ?string => match (true) {
+                                $value === null => null,
+                                default         => optional(
+                                    Order::query()
+                                        ->withoutGlobalScopes()
+                                        ->find($value),
+                                )->number ?? __('Order #:id', ['id' => $value]),
+                            },
+                        )
                         ->required()
                         ->searchable()
                         ->preload()
@@ -206,17 +216,24 @@ final class OrderShippingResource extends Resource
             ->filters([
                 SelectFilter::make('order_id')
                     ->label(__('admin.order_shippings.order'))
-                    ->options(function () {
-                        return Order::query()
-                            ->withoutGlobalScopes([ActiveScope::class, StatusScope::class])
-                            ->select(['id', 'number'])
-                            ->orderBy('number')
-                            ->get()
-                            ->mapWithKeys(fn (Order $order): array => [
-                                $order->getKey() => $order->number ?? sprintf('Order #%s', $order->getKey()),
-                            ])
-                            ->all();
-                    })
+                    ->relationship(
+                        name: 'order',
+                        titleAttribute: 'number',
+                        modifyQueryUsing: static fn (Builder $query): Builder => $query->withoutGlobalScopes(),
+                    )
+                    ->getOptionLabelFromRecordUsing(
+                        static fn (Order $record): string => $record->number ?? __('Order #:id', ['id' => $record->getKey()]),
+                    )
+                    ->getOptionLabelUsing(
+                        static fn (int|string|null $value): ?string => match (true) {
+                            $value === null => null,
+                            default         => optional(
+                                Order::query()
+                                    ->withoutGlobalScopes()
+                                    ->find($value),
+                            )->number ?? __('Order #:id', ['id' => $value]),
+                        },
+                    )
                     ->searchable()
                     ->preload(),
                 SelectFilter::make('carrier_name')
