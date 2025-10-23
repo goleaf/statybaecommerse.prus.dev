@@ -15,20 +15,12 @@ env:
   COMPOSER_FLAGS: --no-interaction --prefer-dist --no-progress
 
 jobs:
-  php-tests:
-    name: PHP Tests (PHP ${{ matrix.php-version }})
+  phpunit:
+    name: "PHPUnit (PHP ${{ matrix.php-version }})"
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
-        php-version: ['8.2', '8.3']
-    env:
-      APP_ENV: testing
-      DB_CONNECTION: sqlite
-      DB_DATABASE: database/database.sqlite
-      CACHE_DRIVER: file
-      QUEUE_CONNECTION: sync
-      SESSION_DRIVER: file
+        php-version: ${{ fromJSON(github.event_name == 'pull_request' && startsWith(github.actor, 'renovate') ? '["8.2","8.3"]' : '["8.3"]') }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -90,9 +82,19 @@ jobs:
           name: coverage-php-${{ matrix.php-version }}
           path: coverage.xml
 
-  static-analysis:
-    name: Static Analysis
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phpunit-coverage
+          path: build/coverage.xml
+
+  php-compat:
+    name: "PHP Compatibility (PHP ${{ matrix.php-version }})"
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: ${{ fromJSON(github.event_name == 'pull_request' && startsWith(github.actor, 'renovate') ? '["8.2","8.3"]' : '["8.3"]') }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -183,7 +185,7 @@ PY
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: ${{ matrix.php-version }}
           extensions: mbstring, intl, pdo_sqlite
 
       - name: Install Composer dependencies
