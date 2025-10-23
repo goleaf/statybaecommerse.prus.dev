@@ -9,7 +9,7 @@ use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ReferralResource\Pages;
 use App\Models\Referral;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -73,9 +73,9 @@ final class ReferralResource extends Resource
                                 'cancelled' => 'Cancelled',
                             ])
                             ->required(),
-                        Flatpickr::makeDate('completed_at')
+                        SupportFlatpickr::makeDate('completed_at')
                             ->nullable(),
-                        Flatpickr::makeDate('expires_at')
+                        SupportFlatpickr::makeDate('expires_at')
                             ->nullable(),
                         TextInput::make('source')
                             ->maxLength(255)

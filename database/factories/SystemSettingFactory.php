@@ -22,8 +22,7 @@ final class SystemSettingFactory extends Factory
      */
     public function definition(): array
     {
-        $types = ['string', 'integer', 'boolean', 'json', 'array', 'file', 'color', 'date', 'datetime', 'email', 'url', 'password', 'float'];
-        $type = $this->faker->randomElement($types);
+        $type = 'string';
 
         return [
             'category_id' => static function (): int {

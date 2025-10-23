@@ -9,26 +9,26 @@ use App\Domain\Product\Entities\Product;
 /**
  * Represents a product as exposed through the public API contract.
  */
-final class ProductSummaryDto
+final readonly class ProductSummaryDto
 {
     public function __construct(
-        private readonly int $id,
-        private readonly string $name,
-        private readonly string $slug,
-        private readonly string $sku,
-        private readonly float $price,
-        private readonly ?float $salePrice,
-        private readonly ?array $brand,
-        private readonly ?array $category,
-        private readonly ?string $description,
-        private readonly ?string $shortDescription,
-        private readonly ProductImageCollectionDto $images,
-        private readonly ProductVariantCollectionDto $variants,
-        private readonly bool $manageStock,
-        private readonly int $stockQuantity,
-        private readonly bool $isInStock,
-        private readonly bool $isVisible,
-        private readonly bool $isFeatured,
+        private int $id,
+        private string $name,
+        private string $slug,
+        private string $sku,
+        private float $price,
+        private ?float $salePrice,
+        private ?array $brand,
+        private ?array $category,
+        private ?string $description,
+        private ?string $shortDescription,
+        private ProductImageCollectionDto $images,
+        private ProductVariantCollectionDto $variants,
+        private bool $manageStock,
+        private int $stockQuantity,
+        private bool $isInStock,
+        private bool $isVisible,
+        private bool $isFeatured,
     ) {
         // DTO stays immutable; everything is configured via promoted properties.
     }

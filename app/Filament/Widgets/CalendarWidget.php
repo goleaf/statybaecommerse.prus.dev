@@ -9,7 +9,7 @@ use App\Models\Campaign;
 use App\Models\Scopes\ActiveCampaignScope;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\StatusScope;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use DateTimeInterface;
@@ -162,10 +162,10 @@ final class CalendarWidget extends FullCalendarWidget
             Toggle::make('is_featured')
                 ->label($this->translate('campaigns.fields.is_featured', 'Featured'))
                 ->default(false),
-            Flatpickr::makeDateTime('starts_at')
+            SupportFlatpickr::makeDateTime('starts_at')
                 ->label($this->translate('campaigns.fields.start_date', 'Start date'))
                 ->seconds(false),
-            Flatpickr::makeDateTime('ends_at')
+            SupportFlatpickr::makeDateTime('ends_at')
                 ->label($this->translate('campaigns.fields.end_date', 'End date'))
                 ->seconds(false),
         ];

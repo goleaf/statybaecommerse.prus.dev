@@ -46,14 +46,19 @@
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_STORE" value="array"/>
         <env name="DB_CONNECTION" value="sqlite"/>
-        <env name="DB_DATABASE" value="database/testing.sqlite"/>
+        <!-- Use in-memory SQLite for stable, fast tests -->
+        <env name="DB_DATABASE" value=":memory:"/>
+        <!-- Use DELETE journal mode for broader FS compatibility during CI/CLI -->
+        <env name="DB_JOURNAL_MODE" value="delete"/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="ACTIVITY_LOGGER_ENABLED" value="false"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
+        <env name="SKIP_FILAMENT_BOOT" value="1"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
-        <env name="PARATEST_PROCESSES" value="4"/>
+        <!-- Avoid SQLite write-contention across processes -->
+        <env name="PARATEST_PROCESSES" value="1"/>
     </php>
 </phpunit>

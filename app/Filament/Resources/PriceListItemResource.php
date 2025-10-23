@@ -9,7 +9,7 @@ use Filament\Schemas\Schema;
 use App\Filament\Resources\PriceListItemResource\Pages;
 use App\Models\PriceListItem;
 use App\Models\Product;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
@@ -156,11 +156,11 @@ final class PriceListItemResource extends Resource
                     ->schema([
                         SchemaGrid::make(2)
                             ->schema([
-                                Flatpickr::makeDateTime('valid_from')
+                                SupportFlatpickr::makeDateTime('valid_from')
                                     ->label(__('price_list_items.valid_from'))
                                     ->default(now())
                                     ->helperText(__('price_list_items.valid_from_help')),
-                                Flatpickr::makeDateTime('valid_until')
+                                SupportFlatpickr::makeDateTime('valid_until')
                                     ->label(__('price_list_items.valid_until'))
                                     ->after('valid_from')
                                     ->helperText(__('price_list_items.valid_until_help')),

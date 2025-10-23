@@ -7,7 +7,7 @@ namespace App\Filament\Resources\CustomerManagementResource\RelationManagers;
 use App\Enums\OrderStatus;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\Order;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Filament\SearchableInputHelper;
 use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
@@ -200,9 +200,9 @@ class OrdersRelationManager extends BaseRelationManager
                         TextInput::make('tracking_number')
                             ->label(__('orders.tracking_number'))
                             ->maxLength(255),
-                        Flatpickr::makeDateTime('shipped_at')
+                        SupportFlatpickr::makeDateTime('shipped_at')
                             ->label(__('orders.shipped_at')),
-                        Flatpickr::makeDateTime('delivered_at')
+                        SupportFlatpickr::makeDateTime('delivered_at')
                             ->label(__('orders.delivered_at')),
                     ]),
                 SchemaSection::make(__('orders.additional_information'))
@@ -363,9 +363,9 @@ class OrdersRelationManager extends BaseRelationManager
                     ]),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::makeDate('created_from')
+                        SupportFlatpickr::makeDate('created_from')
                             ->label(__('orders.created_from')),
-                        Flatpickr::makeDate('created_until')
+                        SupportFlatpickr::makeDate('created_until')
                             ->label(__('orders.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

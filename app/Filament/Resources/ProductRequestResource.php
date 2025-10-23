@@ -10,7 +10,7 @@ use Filament\Schemas\Schema;
 use App\Filament\Resources\ProductRequestResource\Pages;
 use App\Models\Product;
 use App\Models\ProductRequest;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Search\ProductSearch;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
@@ -143,7 +143,7 @@ final class ProductRequestResource extends Resource
                 Forms\Components\Textarea::make('admin_notes')
                     ->label(__('product_requests.fields.admin_notes'))
                     ->columnSpanFull(),
-                Flatpickr::makeDateTime('responded_at')
+                SupportFlatpickr::makeDateTime('responded_at')
                     ->label(__('product_requests.fields.responded_at')),
                 Forms\Components\Select::make('responded_by')
                     ->relationship('respondedBy', 'name')

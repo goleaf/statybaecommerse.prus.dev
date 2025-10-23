@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\User;
 use App\Models\UserProductInteraction;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Arr;
 
 /**
  * CollaborativeFilteringRecommendation
@@ -86,7 +87,11 @@ final class CollaborativeFilteringRecommendation extends BaseRecommendation
         foreach ($candidateUsers as $userId => $interactions) {
             $similarity = $this->calculateUserSimilarity($userRatings, $interactions);
             if ($similarity >= $this->config['neighbor_threshold']) {
-                $neighbors->push(['user' => $interactions->first()->user, 'similarity' => $similarity, 'interactions' => $interactions->keyBy('product_id')]);
+                $neighbors->push([
+                    'user' => $interactions->first()?->user,
+                    'similarity' => $similarity,
+                    'interactions' => $interactions->keyBy('product_id'),
+                ]);
             }
         }
 
@@ -152,7 +157,7 @@ final class CollaborativeFilteringRecommendation extends BaseRecommendation
             $interactionCount = $group->count();
 
             return [
-                'product_id' => $group->first()['product_id'],
+                'product_id' => Arr::get($group->first(), 'product_id'),
                 'score' => $totalScore / $interactionCount,
                 // Average score
                 'similarity' => $maxSimilarity,

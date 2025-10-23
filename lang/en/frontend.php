@@ -378,5 +378,207 @@ return [
         'required' => 'Required',
         'last_updated' => 'Last updated',
         'document_unavailable' => 'This document is currently unavailable. Please contact us for assistance.',
+        'terms_of_service' => 'Terms & Conditions',
+        'privacy_policy' => 'Privacy Policy',
+        'cookie_policy' => 'Cookie Policy',
+        'return_policy' => 'Return & Refund Policy',
+        'register_agreement_intro' => 'By creating an account you agree to our',
+        'login_agreement_intro' => 'By signing in you agree to our',
+        'and' => 'and',
+        'descriptions' => [
+            'privacy' => 'Understand how we collect, use, and protect your personal data.',
+            'terms' => 'Review the terms and conditions that govern your use of our storefront.',
+            'cookies' => 'Learn how we use cookies and similar technologies to improve your experience.',
+            'shipping' => 'Review shipping methods, delivery times, and order tracking options for your orders.',
+            'returns' => 'Find out how returns, exchanges, and refunds are handled for your orders.',
+        ],
+        'defaults' => [
+            'privacy' => [
+                'sections' => [
+                    [
+                        'title' => '1. Data we collect',
+                        'paragraphs' => [
+                            'We collect account details such as your name, email address, phone number, shipping information, and a secure password when you create an account.',
+                            'We also store order history, support conversations, wish lists, and browsing preferences to fulfil your requests and improve the storefront experience.',
+                        ],
+                    ],
+                    [
+                        'title' => '2. How we use your information',
+                        'paragraphs' => [
+                            'Your data helps us process orders, arrange delivery, handle returns, and personalise recommendations that matter to your projects.',
+                            'We analyse aggregated usage patterns to maintain platform reliability, prevent fraud, and keep our services fast and secure.',
+                        ],
+                    ],
+                    [
+                        'title' => '3. When we share data',
+                        'paragraphs' => [
+                            'We share the minimum necessary information with trusted payment processors, logistics partners, and service providers so they can complete the tasks you request.',
+                            'We never sell your personal data. Any analytics reports that leave our systems are anonymised and cannot identify you directly.',
+                        ],
+                    ],
+                    [
+                        'title' => '4. Your choices and rights',
+                        'paragraphs' => [
+                            'You can review or update your profile details, communication preferences, and saved addresses at any time from your account dashboard.',
+                            'If you would like us to export or erase your personal data, contact our support team and we will respond within the timeframes required by applicable law.',
+                        ],
+                    ],
+                    [
+                        'title' => '5. Contact us',
+                        'paragraphs' => [
+                            'Questions about privacy? Email us at support@statybae.com and our data protection team will be happy to help.',
+                        ],
+                    ],
+                ],
+            ],
+            'terms' => [
+                'sections' => [
+                    [
+                        'title' => '1. Using StatyBae Commerce',
+                        'paragraphs' => [
+                            'These terms explain how you may use the StatyBae Commerce storefront, place orders, and access our services.',
+                            'By accessing the site you confirm that you are at least 18 years old (or have parental consent) and that you will follow all applicable laws.',
+                        ],
+                    ],
+                    [
+                        'title' => '2. Accounts and security',
+                        'paragraphs' => [
+                            'You are responsible for keeping your login credentials confidential and for all activity that occurs under your account.',
+                            'Please notify us immediately if you suspect unauthorised access so we can help secure your account.',
+                        ],
+                    ],
+                    [
+                        'title' => '3. Orders and pricing',
+                        'paragraphs' => [
+                            'Prices, availability, and promotions may change without notice until your order is confirmed at checkout.',
+                            'We reserve the right to refuse or cancel orders if there are errors in pricing, suspected fraud, or supply limitations. Any payments captured for cancelled orders will be refunded.',
+                        ],
+                    ],
+                    [
+                        'title' => '4. Deliveries and returns',
+                        'paragraphs' => [
+                            'Delivery estimates are provided at checkout. You agree to provide accurate address details and accept delivery within the communicated time window.',
+                            'Our return guidelines set out in the Return Policy explain how to request a return or exchange. Items must be unused and returned in original packaging unless otherwise stated.',
+                        ],
+                    ],
+                    [
+                        'title' => '5. Liability and contact',
+                        'paragraphs' => [
+                            'To the extent permitted by law we are not liable for indirect or consequential damages arising from use of the storefront.',
+                            'Need help? Email support@statybae.com and we will gladly assist.',
+                        ],
+                    ],
+                ],
+            ],
+            'cookies' => [
+                'sections' => [
+                    [
+                        'title' => '1. Essential cookies',
+                        'paragraphs' => [
+                            'Essential cookies keep critical storefront features working, including secure sign-in, shopping cart persistence, checkout steps, and payment workflows.',
+                            'These cookies are required to deliver the services you request and cannot be disabled without impacting basic functionality.',
+                        ],
+                    ],
+                    [
+                        'title' => '2. Performance and analytics',
+                        'paragraphs' => [
+                            'Analytics cookies help us understand how visitors browse our catalogue, discover products, and use navigation so we can improve the experience.',
+                            'Data collected is aggregated and does not personally identify you. You can opt out of analytics tracking in your browser settings or by contacting support.',
+                        ],
+                    ],
+                    [
+                        'title' => '3. Personalisation',
+                        'paragraphs' => [
+                            'Personalisation cookies remember your preferences such as language, recently viewed items, and saved filters to make returning visits faster.',
+                            'You can clear these cookies at any time in your browser. Doing so may reset saved preferences across the storefront.',
+                        ],
+                    ],
+                    [
+                        'title' => '4. Managing cookies',
+                        'paragraphs' => [
+                            'Most browsers let you block or delete cookies, but please note that key features like checkout or account access may stop working if essential cookies are disabled.',
+                            'For detailed instructions on managing cookies, consult your browser’s help centre or reach out to our support team at support@statybae.com.',
+                        ],
+                    ],
+                ],
+            ],
+            'shipping' => [
+                'sections' => [
+                    [
+                        'title' => '1. Delivery options',
+                        'paragraphs' => [
+                            'Choose from courier, pallet, or click-and-collect delivery depending on the weight and size of your order.',
+                            'Standard courier deliveries cover all of Lithuania with optional Saturday and express upgrades available at checkout.',
+                        ],
+                    ],
+                    [
+                        'title' => '2. Dispatch and lead times',
+                        'paragraphs' => [
+                            'Orders confirmed before 14:00 are usually dispatched the same day from our regional warehouse.',
+                            'Products marked as special-order display the estimated lead time before you add them to the cart.',
+                        ],
+                    ],
+                    [
+                        'title' => '3. Tracking and notifications',
+                        'paragraphs' => [
+                            'You receive an email with tracking details as soon as your shipment leaves our facility.',
+                            'Live tracking is available 24/7 in your account dashboard together with delivery status updates.',
+                        ],
+                    ],
+                    [
+                        'title' => '4. Freight and oversized items',
+                        'paragraphs' => [
+                            'Bulky or oversized items are delivered by dedicated freight partners. We will contact you to confirm unloading conditions and timing.',
+                            'If onsite equipment is required for unloading, please arrange this in advance or notify us so we can help.',
+                        ],
+                    ],
+                    [
+                        'title' => '5. Delivery support',
+                        'paragraphs' => [
+                            'If anything changes, contact logistics@statybae.com with your order number and new delivery instructions.',
+                            'Our team monitors shipments proactively and will reach out if a delay occurs so we can find the best alternative.',
+                        ],
+                    ],
+                ],
+            ],
+            'returns' => [
+                'sections' => [
+                    [
+                        'title' => '1. Return window',
+                        'paragraphs' => [
+                            'You can request a return within 30 days of delivery. The item must be unused and in its original packaging with all labels attached.',
+                            'Custom, cut-to-size, or clearance items may be excluded from standard returns. See your order confirmation for product-specific notes.',
+                        ],
+                    ],
+                    [
+                        'title' => '2. Starting a return',
+                        'paragraphs' => [
+                            'Submit your return request through the account dashboard or contact support with your order number, item details, and reason for return.',
+                            'Once approved we will provide instructions and, when applicable, a prepaid return label or pickup schedule.',
+                        ],
+                    ],
+                    [
+                        'title' => '3. Refunds and exchanges',
+                        'paragraphs' => [
+                            'Refunds are processed to your original payment method once the item passes inspection at our warehouse. Allow up to 10 business days after receipt.',
+                            'If you prefer an exchange, let us know during the return request and we will arrange a replacement or store credit.',
+                        ],
+                    ],
+                    [
+                        'title' => '4. Damaged or defective items',
+                        'paragraphs' => [
+                            'If your order arrives damaged or with missing components, report it within 5 days of delivery. Please include photos so we can resolve the issue quickly.',
+                            'We will organise a replacement or refund and handle the return shipping at no cost to you.',
+                        ],
+                    ],
+                    [
+                        'title' => '5. Support',
+                        'paragraphs' => [
+                            'Need help with a return? Email support@statybae.com and our logistics specialists will guide you through the process.',
+                        ],
+                    ],
+                ],
+            ],
+        ],
     ],
 ];

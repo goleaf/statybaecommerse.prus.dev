@@ -13,7 +13,7 @@ use App\Models\Partner;
 use App\Models\User;
 use App\Services\Pricing\PriceCalculator;
 use App\Support\Authorization\AuthorizationMatrix;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Filament\Filters\DateRangeFilter;
 use App\Support\Search\AddressSearch;
@@ -492,9 +492,9 @@ final class OrderResource extends Resource implements DefinesExportColumns
                 ->schema([
                     SchemaGrid::make(2)
                         ->schema([
-                            Flatpickr::makeDateTime('shipped_at')
+                            SupportFlatpickr::makeDateTime('shipped_at')
                                 ->label(__('orders.fields.shipped_at')),
-                            Flatpickr::makeDateTime('delivered_at')
+                            SupportFlatpickr::makeDateTime('delivered_at')
                                 ->label(__('orders.fields.delivered_at')),
                         ]),
                     TextInput::make('tracking_number')
@@ -683,13 +683,17 @@ final class OrderResource extends Resource implements DefinesExportColumns
                     ->sortable(),
                 BadgeableColumn::make('status')
                     ->label(__('orders.fields.status'))
-                    ->formatStateUsing(fn (string $state): string => __('orders.statuses.' . $state))
+                    ->formatStateUsing(function ($state): string {
+                        $key = $state instanceof BackedEnum ? $state->value : (string) $state;
+                        return __('orders.statuses.' . $key);
+                    })
                     ->sortable()
                     ->asPills()
                     ->searchable(['status', 'payment_status', 'channel.name', 'payment_method'])
                     ->prefixBadges(function (Order $record): array {
                         // Combine payment and channel metadata directly ahead of the main status label.
-                        $paymentStatus = $record->payment_status ?? 'pending';
+                        $rawPaymentStatus = $record->payment_status ?? 'pending';
+                        $paymentStatus = $rawPaymentStatus instanceof BackedEnum ? $rawPaymentStatus->value : (string) $rawPaymentStatus;
                         $paymentLabel = __('orders.payment_statuses.' . $paymentStatus);
                         $paymentColor = match ($paymentStatus) {
                             'paid', 'captured', 'settled', 'authorized' => 'success',
@@ -705,8 +709,9 @@ final class OrderResource extends Resource implements DefinesExportColumns
                         ];
 
                         if ($record->payment_method) {
+                            $method = $record->payment_method instanceof BackedEnum ? $record->payment_method->value : (string) $record->payment_method;
                             $badges[] = Badge::make('payment_method')
-                                ->label(__('orders.badges.payment_method', ['method' => __('orders.payment_methods.' . $record->payment_method)]))
+                                ->label(__('orders.badges.payment_method', ['method' => __('orders.payment_methods.' . $method)]))
                                 ->color('gray');
                         }
 
@@ -828,7 +833,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
                     ->label(__('orders.fields.items_count')),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::makeRange('range')
+                        SupportFlatpickr::makeRange('range')
                             ->label(__('orders.created_at'))
 
                             ->format('Y-m-d')
@@ -860,7 +865,10 @@ final class OrderResource extends Resource implements DefinesExportColumns
                     ->label(__('orders.mark_processing'))
                     ->icon('heroicon-o-cog')
                     ->color('primary')
-                    ->visible(fn (Order $record): bool => AuthorizationMatrix::check('orders', 'update') && $record->status === 'pending') // Keep the action hidden unless the operator can update and the order is pending.
+                    ->visible(function (Order $record): bool {
+                        $status = $record->status instanceof BackedEnum ? $record->status->value : (string) $record->status;
+                        return AuthorizationMatrix::check('orders', 'update') && $status === 'pending';
+                    }) // Keep the action hidden unless the operator can update and the order is pending.
                     ->action(function (Order $record): void {
                         $record->update(['status' => 'processing']);
                         Notification::make()
@@ -873,7 +881,10 @@ final class OrderResource extends Resource implements DefinesExportColumns
                     ->label(__('orders.mark_shipped'))
                     ->icon('heroicon-o-truck')
                     ->color('info')
-                    ->visible(fn (Order $record): bool => AuthorizationMatrix::check('orders', 'update') && $record->status === 'processing') // Ensure only authorized staff can advance processing orders.
+                    ->visible(function (Order $record): bool {
+                        $status = $record->status instanceof BackedEnum ? $record->status->value : (string) $record->status;
+                        return AuthorizationMatrix::check('orders', 'update') && $status === 'processing';
+                    }) // Ensure only authorized staff can advance processing orders.
                     ->action(function (Order $record): void {
                         $record->update([
                             'status'     => 'shipped',
@@ -889,7 +900,10 @@ final class OrderResource extends Resource implements DefinesExportColumns
                     ->label(__('orders.mark_delivered'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn (Order $record): bool => AuthorizationMatrix::check('orders', 'update') && $record->status === 'shipped') // Restrict delivery confirmation to authorized operators.
+                    ->visible(function (Order $record): bool {
+                        $status = $record->status instanceof BackedEnum ? $record->status->value : (string) $record->status;
+                        return AuthorizationMatrix::check('orders', 'update') && $status === 'shipped';
+                    }) // Restrict delivery confirmation to authorized operators.
                     ->action(function (Order $record): void {
                         $record->update([
                             'status'       => 'delivered',
@@ -905,7 +919,10 @@ final class OrderResource extends Resource implements DefinesExportColumns
                     ->label(__('orders.cancel_order'))
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->visible(fn (Order $record): bool => AuthorizationMatrix::check('orders', 'update') && in_array($record->status, ['pending', 'processing'], true)) // Combine status and permission gating for cancellation.
+                    ->visible(function (Order $record): bool {
+                        $status = $record->status instanceof BackedEnum ? $record->status->value : (string) $record->status;
+                        return AuthorizationMatrix::check('orders', 'update') && in_array($status, ['pending', 'processing'], true);
+                    }) // Combine status and permission gating for cancellation.
                     ->action(function (Order $record): void {
                         $record->update(['status' => 'cancelled']);
                         Notification::make()
@@ -918,7 +935,10 @@ final class OrderResource extends Resource implements DefinesExportColumns
                     ->label(__('orders.refund_order'))
                     ->icon('heroicon-o-arrow-uturn-left')
                     ->color('secondary')
-                    ->visible(fn (Order $record): bool => AuthorizationMatrix::check('orders', 'update') && in_array($record->status, ['delivered', 'completed'], true)) // Only show refunds for authorized users when fulfillment is complete.
+                    ->visible(function (Order $record): bool {
+                        $status = $record->status instanceof BackedEnum ? $record->status->value : (string) $record->status;
+                        return AuthorizationMatrix::check('orders', 'update') && in_array($status, ['delivered', 'completed'], true);
+                    }) // Only show refunds for authorized users when fulfillment is complete.
                     ->action(function (Order $record): void {
                         $record->update(['status' => 'refunded']);
                         Notification::make()
@@ -1048,8 +1068,8 @@ final class OrderResource extends Resource implements DefinesExportColumns
     {
         return [
             'number' => new ExportColumn('number', __('orders.number'), fn (Order $order): string => (string) $order->number),
-            'status' => new ExportColumn('status', __('orders.status'), fn (Order $order): string => (string) $order->status),
-            'payment_status' => new ExportColumn('payment_status', __('orders.payment_status'), fn (Order $order): string => (string) $order->payment_status),
+            'status' => new ExportColumn('status', __('orders.status'), fn (Order $order): string => $order->status instanceof BackedEnum ? $order->status->value : (string) $order->status),
+            'payment_status' => new ExportColumn('payment_status', __('orders.payment_status'), fn (Order $order): string => $order->payment_status instanceof BackedEnum ? $order->payment_status->value : (string) $order->payment_status),
             'total' => new ExportColumn('total', __('orders.total'), fn (Order $order): string => (string) $order->total),
             'customer' => new ExportColumn('customer', __('orders.customer'), fn (Order $order): string => (string) ($order->user?->name ?? '')),
             'created_at' => new ExportColumn('created_at', __('orders.created_at'), fn (Order $order): string => optional($order->created_at)->toDateTimeString() ?? ''),
@@ -1132,11 +1152,17 @@ final class OrderResource extends Resource implements DefinesExportColumns
                 ->getStateUsing(fn (Order $record): float => (float) $record->total),
             Column::make('status')
                 ->heading(__('orders.fields.status'))
-                ->getStateUsing(fn (Order $record): ?string => $record->status)
+                ->getStateUsing(function (Order $record): ?string {
+                    $state = $record->status;
+                    return $state instanceof BackedEnum ? $state->value : (is_string($state) ? $state : null);
+                })
                 ->formatStateUsing(fn (?string $state): string => $state ? __("orders.status.{$state}") : ''),
             Column::make('payment_status')
                 ->heading(__('orders.fields.payment_status'))
-                ->getStateUsing(fn (Order $record): ?string => $record->payment_status)
+                ->getStateUsing(function (Order $record): ?string {
+                    $state = $record->payment_status;
+                    return $state instanceof BackedEnum ? $state->value : (is_string($state) ? $state : null);
+                })
                 ->formatStateUsing(fn (?string $state): string => $state ? __("orders.payment_status.{$state}") : ''),
         ];
     }

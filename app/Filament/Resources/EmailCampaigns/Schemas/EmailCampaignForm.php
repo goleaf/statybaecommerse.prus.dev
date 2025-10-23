@@ -10,7 +10,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 
 class EmailCampaignForm
 {
@@ -68,12 +68,12 @@ class EmailCampaignForm
                             ]),
                         SchemaGrid::make(2)
                             ->schema([
-                                Flatpickr::makeDateTime('scheduled_at')
+                                SupportFlatpickr::makeDateTime('scheduled_at')
                                     ->label('Scheduled at'),
-                                Flatpickr::makeDateTime('sent_at')
+                                SupportFlatpickr::makeDateTime('sent_at')
                                     ->label('Sent at'),
                             ]),
-                        Flatpickr::makeDateTime('completed_at')
+                        SupportFlatpickr::makeDateTime('completed_at')
                             ->label('Completed at'),
                         Textarea::make('target_audience')
                             ->label('Target audience')

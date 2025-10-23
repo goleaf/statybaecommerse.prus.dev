@@ -447,7 +447,7 @@ final class VariantImage extends Model implements HasMedia
             return null;
         }
 
-        $parts = array_map('trim', explode('x', strtolower($dimensions)));
+        $parts = array_map('trim', explode('x', strtolower((string) $dimensions)));
         if (count($parts) !== 2) {
             return null;
         }

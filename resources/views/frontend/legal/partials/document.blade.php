@@ -4,6 +4,17 @@
     $emptyMessage = $emptyMessage ?? __('frontend.legal.document_unavailable');
     $updatedAt = optional($legal?->updated_at)->format('Y-m-d');
     $content = $legal?->getTranslatedContent();
+    $fallbackKey = $fallbackKey ?? null;
+    $fallbackSections = [];
+
+    if ((! $legal || blank($content)) && $fallbackKey) {
+        $sectionsKey = sprintf('frontend.legal.defaults.%s.sections', $fallbackKey);
+
+        if (\Illuminate\Support\Facades\Lang::has($sectionsKey)) {
+            $resolvedSections = trans($sectionsKey);
+            $fallbackSections = is_array($resolvedSections) ? $resolvedSections : [];
+        }
+    }
 @endphp
 
 <div class="bg-white dark:bg-gray-900 shadow-sm border border-gray-200 dark:border-gray-700 rounded-xl">
@@ -39,6 +50,32 @@
         @if ($legal && filled($content))
             <div class="prose prose-lg max-w-none dark:prose-invert">
                 {!! $content !!}
+            </div>
+        @elseif (filled($fallbackSections))
+            <div class="prose prose-lg max-w-none dark:prose-invert">
+                @foreach ($fallbackSections as $section)
+                    @php
+                        $title = $section['title'] ?? null;
+                        $paragraphs = $section['paragraphs'] ?? [];
+                        $listItems = $section['list'] ?? [];
+                    @endphp
+
+                    @if (filled($title))
+                        <h2>{{ $title }}</h2>
+                    @endif
+
+                    @foreach ($paragraphs as $paragraph)
+                        <p>{{ $paragraph }}</p>
+                    @endforeach
+
+                    @if (is_array($listItems) && filled($listItems))
+                        <ul>
+                            @foreach ($listItems as $item)
+                                <li>{{ $item }}</li>
+                            @endforeach
+                        </ul>
+                    @endif
+                @endforeach
             </div>
         @else
             <div class="text-center py-10">

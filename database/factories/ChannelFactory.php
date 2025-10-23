@@ -6,6 +6,7 @@ namespace Database\Factories;
 
 use App\Models\Channel;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 /**
@@ -18,15 +19,31 @@ class ChannelFactory extends Factory
     public function definition(): array
     {
         $name = $this->faker->unique()->company() . ' Channel';
-        $code = Str::of($name)
+        $baseCode = Str::of($name)
             ->snake()
+            ->replaceMatches('/[^a-z0-9_]/', '')
+            ->replaceMatches('/_{2,}/', '_')
+            ->trim('_')
             ->upper()
-            ->replaceMatches('/[^A-Z0-9_]/', '')
-            ->substr(0, 12)
+            ->limit(12, '')
             ->value();
 
         // Guarantee the code respects the alpha_dash rule even when company names contain punctuation.
-        $code = $code !== '' ? $code : Str::upper(Str::random(8));
+        $baseCode = $baseCode !== '' ? $baseCode : Str::upper(Str::random(8));
+
+        $generateCode = fn (): string => Str::limit(
+            $baseCode . '_' . Str::upper(Str::random(4)),
+            20,
+            ''
+        );
+
+        $code = $generateCode();
+
+        if (Schema::hasTable((new Channel())->getTable())) {
+            while (Channel::where('code', $code)->exists()) {
+                $code = $generateCode();
+            }
+        }
 
         return [
             // Identity and descriptive metadata.

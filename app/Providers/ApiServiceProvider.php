@@ -213,7 +213,7 @@ final class ApiServiceProvider extends ServiceProvider
         $window = 1;
 
         if (str_contains($scopeName, ':')) {
-            [$scopeName, $windowSegment] = explode(':', $scopeName, 2);
+            [$scopeName, $windowSegment] = explode(':', (string) $scopeName, 2);
             $windowCandidate = trim($windowSegment);
 
             if ($windowCandidate !== '' && is_numeric($windowCandidate)) {

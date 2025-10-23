@@ -7,13 +7,13 @@ namespace App\Application\Product\DTOs;
 /**
  * DTO representing a product search result set.
  */
-final class SearchProductsOutputDto
+final readonly class SearchProductsOutputDto
 {
     public function __construct(
-        private readonly ProductSummaryCollectionDto $products,
-        private readonly string $query,
-        private readonly int $total,
-        private readonly int $limit,
+        private ProductSummaryCollectionDto $products,
+        private string $query,
+        private int $total,
+        private int $limit,
     ) {
         // No additional work is needed in the constructor.
     }

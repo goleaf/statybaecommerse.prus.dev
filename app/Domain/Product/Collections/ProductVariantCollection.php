@@ -33,7 +33,7 @@ final class ProductVariantCollection implements IteratorAggregate, Countable
 
     public function count(): int
     {
-        return count($this->items);
+        return is_countable($this->items) ? count($this->items) : 0;
     }
 
     /**

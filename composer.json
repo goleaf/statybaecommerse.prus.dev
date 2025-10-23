@@ -132,7 +132,10 @@
         "lint:php": "vendor/bin/pint --test",
         "fix:php": "vendor/bin/pint -v",
         "format": "vendor/bin/pint",
-        "analyze": "vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G",
+        "analyze": [
+            "Composer\\Config::disableProcessTimeout",
+            "vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G --no-progress"
+        ],
         "rector": "vendor/bin/rector process --ansi",
         "blade:format": "php artisan view:clear && php artisan view:cache",
         "test": "@php vendor/bin/pest",
@@ -158,7 +161,7 @@
         "autofix:status": "ps aux | grep autofix-realtime.sh | grep -v grep",
         "qa": [
             "@php vendor/bin/pint --test",
-            "@php vendor/bin/phpstan analyse --memory-limit=1G"
+            "@analyze"
         ],
         "dusk:chrome": [
             "@php artisan dusk:chrome-driver --detect",

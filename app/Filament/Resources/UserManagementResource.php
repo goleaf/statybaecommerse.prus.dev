@@ -13,7 +13,7 @@ use App\Models\Scopes\ActiveScope;
 use App\Models\User;
 use App\Support\Authorization\AuthorizationMatrix;
 use BackedEnum;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -92,9 +92,9 @@ final class UserManagementResource extends Resource
         return __('users.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return UserResource::form($form);
+        return UserResource::form($schema);
     }
 
     public static function table(Table $table): Table

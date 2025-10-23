@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Enums\PaymentMethod;
 use App\Models\Channel;
 use App\Models\Currency;
 use App\Models\Order;
@@ -49,6 +50,8 @@ final class OrderSeeder extends Seeder
         ];
 
         foreach ($ordersToCreate as $config) {
+            $paymentMethods = PaymentMethod::cases();
+
             for ($i = 0; $i < $config['count']; $i++) {
                 // Create order using factory with relationships
                 /** @var Order $order */
@@ -59,7 +62,7 @@ final class OrderSeeder extends Seeder
                     ->state([
                         'number' => 'WEB-'.Str::upper(Str::random(8)),
                         'currency' => $currency->code,
-                        'payment_method' => 'card',
+                        'payment_method' => $paymentMethods[array_rand($paymentMethods)]->value,
                         'payment_status' => 'paid',
                         'status' => 'processing',
                         'created_at' => $config['date']->copy()->addDays(random_int(0, 3)),

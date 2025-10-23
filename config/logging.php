@@ -9,15 +9,18 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
 use Monolog\Processor\PsrLogMessageProcessor;
 
-$sentryDsn = (string) env('SENTRY_LARAVEL_DSN', env('SENTRY_DSN', ''));
+$dsnRaw = env('SENTRY_LARAVEL_DSN', env('SENTRY_DSN', ''));
+$sentryDsn = is_string($dsnRaw) ? $dsnRaw : '';
 $sentryAvailable = $sentryDsn !== '' && class_exists(\Sentry\Laravel\Integration::class);
 
+$rawStack = env('LOG_STACK', 'daily');
+$stackString = is_string($rawStack) ? $rawStack : 'daily';
 $configuredStackChannels = array_filter(array_map(
     static fn (string $channel): ?string => $channel !== '' ? $channel : null,
-    explode(',', (string) env('LOG_STACK', 'daily'))
+    explode(',', $stackString)
 ));
 
-$logRetentionDays = (int) config('privacy.retention.logs', (int) env('LOG_DAILY_DAYS', 14));
+// Retention is configured directly in channel definitions below.
 
 $stackChannels = $configuredStackChannels === []
     ? ['daily']

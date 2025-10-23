@@ -8,6 +8,20 @@
 @php
     $socialFacebook = $hasSettings ? app_setting('social_facebook') ?? '#' : '#';
     $socialInstagram = $hasSettings ? app_setting('social_instagram') ?? '#' : '#';
+    $locale = app()->getLocale();
+    $docsUrl = \Illuminate\Support\Facades\Route::has('docs.api') ? route('docs.api') : url('/docs/api');
+    $githubUrl = 'https://github.com/prus-dev/statybaecommerse.prus.dev';
+    $aboutUrl = \Illuminate\Support\Facades\Route::has('localized.about')
+        ? route('localized.about', ['locale' => $locale])
+        : (\Illuminate\Support\Facades\Route::has('frontend.about.index') ? route('frontend.about.index') : url('/about'));
+    $contactUrl = \Illuminate\Support\Facades\Route::has('frontend.contact.index') ? route('frontend.contact.index') : url('/contact');
+    $securePaymentUrl = \Illuminate\Support\Facades\Route::has('frontend.legal.terms') ? route('frontend.legal.terms') : url('/legal/terms');
+    $shippingUrl = \Illuminate\Support\Facades\Route::has('frontend.legal.shipping')
+        ? route('frontend.legal.shipping')
+        : (\Illuminate\Support\Facades\Route::has('legal.show') ? route('legal.show', 'shipping') : url('/legal/shipping'));
+    $returnsUrl = \Illuminate\Support\Facades\Route::has('frontend.legal.returns')
+        ? route('frontend.legal.returns')
+        : (\Illuminate\Support\Facades\Route::has('legal.show') ? route('legal.show', 'refund') : url('/legal/returns'));
 @endphp
 
 <footer aria-labelledby="footer-heading"
@@ -41,27 +55,27 @@
                         </h3>
                         <ul role="list" class="space-y-4">
                             <li>
-                                <x-footer-link :spa="false" href="https://filamentphp.com/docs"
+                                <x-footer-link href="{{ $docsUrl }}"
                                                class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
                                     {{ __('footer_documentation') }}
                                 </x-footer-link>
                             </li>
                             <li>
-                                <x-footer-link :spa="false" href="https://github.com/filamentphp/filament"
+                                <x-footer-link :spa="false" href="{{ $githubUrl }}" target="_blank" rel="noopener"
                                                class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">
                                     {{ __('footer_github') }}
                                 </x-footer-link>
                             </li>
                             <li>
-                                <x-footer-link href="#"
+                                <x-footer-link href="{{ $aboutUrl }}"
                                                class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">{{ __('footer_about') }}</x-footer-link>
                             </li>
                             <li>
-                                <x-footer-link href="#"
+                                <x-footer-link href="{{ $securePaymentUrl }}"
                                                class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">{{ __('footer_secure_payment') }}</x-footer-link>
                             </li>
                             <li>
-                                <x-footer-link href="/"
+                                <x-footer-link href="{{ $contactUrl }}"
                                                class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">{{ __('footer_contact') }}</x-footer-link>
                             </li>
                         </ul>
@@ -103,11 +117,11 @@
                                 </li>
                             @endif
                             <li>
-                                <x-footer-link href="#"
+                                <x-footer-link href="{{ $shippingUrl }}"
                                                class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">{{ __('legal_shipping') }}</x-footer-link>
                             </li>
                             <li>
-                                <x-footer-link href="#"
+                                <x-footer-link href="{{ $returnsUrl }}"
                                                class="text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium">{{ __('footer_returns_refunds') }}</x-footer-link>
                             </li>
                         </ul>

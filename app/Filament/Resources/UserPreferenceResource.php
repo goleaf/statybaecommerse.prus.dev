@@ -8,7 +8,7 @@ namespace App\Filament\Resources;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\UserPreferenceResource\Pages;
 use App\Models\UserPreference;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -85,7 +85,7 @@ final class UserPreferenceResource extends Resource
                     ->maxValue(1)
                     ->step(0.000001)
                     ->default(0),
-                Flatpickr::makeDateTime('last_updated')
+                SupportFlatpickr::makeDateTime('last_updated')
                     ->label(__('admin.user_preferences.last_updated'))
                     ->default(now()),
                 KeyValue::make('metadata')

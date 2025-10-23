@@ -8,7 +8,7 @@ namespace App\Filament\Resources;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantPricingRuleResource\Pages;
 use App\Models\VariantPricingRule;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
@@ -166,9 +166,9 @@ final class VariantPricingRuleResource extends Resource
                     ->schema([
                         SchemaGrid::make(2)
                             ->schema([
-                                Flatpickr::makeDateTime('valid_from')
+                                SupportFlatpickr::makeDateTime('valid_from')
                                     ->label(__('variant_pricing_rules.valid_from')),
-                                Flatpickr::makeDateTime('valid_until')
+                                SupportFlatpickr::makeDateTime('valid_until')
                                     ->label(__('variant_pricing_rules.valid_until')),
                             ]),
                     ]),

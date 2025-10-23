@@ -34,11 +34,9 @@ final class DiscountController extends Controller
         return view('frontend.discounts.coupons', compact('coupons'));
     }
 
-    public function applyCoupon(Request $request): RedirectResponse
+    public function applyCoupon(\App\Http\Requests\ApplyCouponRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'code' => ['required', 'string'],
-        ]);
+        $validated = $request->validated();
 
         $cart = Session::get('cart', []);
         if (empty($cart)) {

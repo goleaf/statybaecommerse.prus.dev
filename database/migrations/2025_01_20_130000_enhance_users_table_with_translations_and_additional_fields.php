@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('users')) {
+            return;
+        }
+
         Schema::table('users', function (Blueprint $table) {
             if (! Schema::hasColumn('users', 'website')) {
                 $table->string('website')->nullable()->after('email');
@@ -99,34 +103,44 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn([
-                'bio',
-                'company',
-                'position',
-                'website',
-                'social_links',
-                'notification_preferences',
-                'privacy_settings',
-                'marketing_preferences',
-                'login_count',
-                'last_activity_at',
-                'phone_verified_at',
-                'two_factor_secret',
-                'two_factor_recovery_codes',
-                'two_factor_confirmed_at',
-                'api_token',
-                'stripe_customer_id',
-                'stripe_account_id',
-                'subscription_status',
-                'subscription_plan',
-                'subscription_ends_at',
-                'trial_ends_at',
-                'status',
-                'verification_token',
-                'password_reset_token',
-                'password_reset_expires_at',
-            ]);
+        if (! Schema::hasTable('users')) {
+            return;
+        }
+
+        $columns = [
+            'bio',
+            'company',
+            'position',
+            'website',
+            'social_links',
+            'notification_preferences',
+            'privacy_settings',
+            'marketing_preferences',
+            'login_count',
+            'last_activity_at',
+            'phone_verified_at',
+            'two_factor_secret',
+            'two_factor_recovery_codes',
+            'two_factor_confirmed_at',
+            'api_token',
+            'stripe_customer_id',
+            'stripe_account_id',
+            'subscription_status',
+            'subscription_plan',
+            'subscription_ends_at',
+            'trial_ends_at',
+            'status',
+            'verification_token',
+            'password_reset_token',
+            'password_reset_expires_at',
+        ];
+
+        Schema::table('users', function (Blueprint $table) use ($columns) {
+            foreach ($columns as $column) {
+                if (Schema::hasColumn('users', $column)) {
+                    $table->dropColumn($column);
+                }
+            }
         });
     }
 };

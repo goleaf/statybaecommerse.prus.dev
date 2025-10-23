@@ -234,9 +234,7 @@ final class AttributeValue extends Model
                 }
 
                 if (is_string($value)) {
-                    $decoded = json_decode($value, true);
-
-                    return is_array($decoded) ? $decoded : [];
+                    return safe_json_decode_array($value);
                 }
 
                 if ($value instanceof \JsonSerializable) {
@@ -253,9 +251,9 @@ final class AttributeValue extends Model
                 }
 
                 if (is_string($value)) {
-                    $decoded = json_decode($value, true);
+                    $decoded = safe_json_decode_array($value);
 
-                    return is_array($decoded) ? $decoded : null;
+                    return $decoded !== [] ? $decoded : null;
                 }
 
                 if ($value instanceof \JsonSerializable) {

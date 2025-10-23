@@ -9,18 +9,13 @@ use App\Domain\Product\Collections\ProductImageCollection;
 /**
  * Lightweight collection DTO for serialising product images.
  */
-final class ProductImageCollectionDto
+final readonly class ProductImageCollectionDto
 {
-    /** @var list<ProductImageDto> */
-    private array $items;
-
     /**
      * @param list<ProductImageDto> $items
      */
-    public function __construct(array $items)
+    public function __construct(private array $items)
     {
-        // Store a normalised list of DTOs to keep rendering predictable.
-        $this->items = $items;
     }
 
     public static function fromDomainCollection(ProductImageCollection $images): self
@@ -38,6 +33,6 @@ final class ProductImageCollectionDto
      */
     public function toArray(): array
     {
-        return array_map(static fn (ProductImageDto $image) => $image->toArray(), $this->items);
+        return array_map(static fn (ProductImageDto $image): array => $image->toArray(), $this->items);
     }
 }

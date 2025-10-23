@@ -509,7 +509,7 @@ final class SeoDataResource extends Resource
                         TextEntry::make('keywords_count')
                             ->label(__('seo_data.fields.keywords_count'))
                             ->numeric()
-                            ->state(fn (SeoData $record): int => collect(explode(',', self::normalizeString($record->keywords)))
+                            ->state(fn (SeoData $record): int => collect(explode(',', (string) self::normalizeString($record->keywords)))
                                 ->map(fn (string $keyword): string => trim($keyword))
                                 ->filter()
                                 ->count()),

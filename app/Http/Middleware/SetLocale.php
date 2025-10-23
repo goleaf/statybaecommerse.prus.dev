@@ -25,7 +25,7 @@ final class SetLocale
             $configuredLocales = array_filter(
                 array_map(
                     static fn (string $locale): string => trim($locale),
-                    explode(',', $supportedConfig)
+                    explode(',', (string) $supportedConfig)
                 ),
                 static fn (string $locale): bool => $locale !== ''
             );
@@ -51,7 +51,7 @@ final class SetLocale
                 // Manually inspect the header to gracefully handle regional variants (e.g., en-GB).
                 foreach ($request->getLanguages() as $language) {
                     $primary = strtolower(str_replace('_', '-', $language));
-                    $segment = explode('-', $primary)[0] ?? '';
+                    $segment = explode('-', (string) $primary)[0] ?? '';
 
                     if ($segment !== '' && in_array($segment, $supportedLocales, true)) {
                         $headerLocale = $segment;

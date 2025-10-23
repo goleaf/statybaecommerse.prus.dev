@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'title' => 'Prenumeruokite naujienlaiškį',
+    'subtitle' => 'Gaukite pranešimus apie naujas prekes ir specialius pasiūlymus',
     'email_address' => 'El. pašto adresas',
     'email_placeholder' => 'Įveskite savo el. pašto adresą',
     'first_name' => 'Vardas',
@@ -18,7 +20,7 @@ return [
     'interests_technical' => 'Techniniai atnaujinimai',
     'interests_business' => 'Verslo naujienos',
     'interests_support' => 'Pagalba ir palaikymas',
-    'subscribe_button' => 'Prenumeruoti dabar',
+    'subscribe_button' => 'Prenumeruoti',
     'subscribing' => 'Prenumeruojama...',
     'privacy_notice' => 'Mes gerbiame jūsų privatumą. Galite atsisakyti prenumeratos bet kada.',
     'subscription_success_title' => 'Sėkmingai prenumeruota!',

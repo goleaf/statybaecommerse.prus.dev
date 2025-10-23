@@ -7,7 +7,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\AdminUserResource\Pages;
 use App\Models\AdminUser;
 use App\Support\Concerns\HasNav;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -193,9 +193,9 @@ final class AdminUserResource extends Resource
                 Filter::make('created_at')
                     ->label(__('admin.admin_users.filters.created_at'))
                     ->form([
-                        Flatpickr::makeDate('from')
+                        SupportFlatpickr::makeDate('from')
                             ->label(__('admin.admin_users.filters.created_from')),
-                        Flatpickr::makeDate('until')
+                        SupportFlatpickr::makeDate('until')
                             ->label(__('admin.admin_users.filters.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

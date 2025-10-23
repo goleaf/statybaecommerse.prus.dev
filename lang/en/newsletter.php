@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'title' => 'Subscribe to Newsletter',
+    'subtitle' => 'Get notified about new products and special offers',
     'email_address' => 'Email Address',
     'email_placeholder' => 'Enter your email address',
     'first_name' => 'First Name',
@@ -18,7 +20,7 @@ return [
     'interests_technical' => 'Technical Updates',
     'interests_business' => 'Business News',
     'interests_support' => 'Support & Help',
-    'subscribe_button' => 'Subscribe Now',
+    'subscribe_button' => 'Subscribe',
     'subscribing' => 'Subscribing...',
     'privacy_notice' => 'We respect your privacy. Unsubscribe at any time.',
     'subscription_success_title' => 'Successfully Subscribed!',

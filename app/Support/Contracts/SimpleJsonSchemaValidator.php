@@ -24,7 +24,7 @@ final class SimpleJsonSchemaValidator
         }
 
         $contents = $this->filesystem->get($schemaPath);
-        $schema = json_decode($contents, true);
+        $schema = safe_json_decode_array($contents);
 
         if (! is_array($schema)) {
             return [sprintf('Schema file [%s] does not contain a valid JSON object.', $schemaPath)];

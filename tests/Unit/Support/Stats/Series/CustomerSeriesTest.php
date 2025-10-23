@@ -20,6 +20,8 @@ final class CustomerSeriesTest extends TestCase
     {
         parent::setUp();
 
+        Schema::disableForeignKeyConstraints();
+
         Schema::dropIfExists('order_items');
         Schema::dropIfExists('orders');
         Schema::dropIfExists('customers');
@@ -81,6 +83,8 @@ final class CustomerSeriesTest extends TestCase
             $table->text('notes')->nullable();
             $table->timestamps();
         });
+
+        Schema::enableForeignKeyConstraints();
     }
 
     /**

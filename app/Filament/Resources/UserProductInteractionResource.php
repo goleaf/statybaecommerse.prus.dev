@@ -10,11 +10,11 @@ use App\Filament\Resources\UserProductInteractionResource\Pages;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\UserProductInteraction;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Actions\Action as TableAction;
 use Filament\Actions\BulkAction as TableBulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Hidden;
@@ -39,6 +39,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use UnitEnum;
+use App\Filament\Resources\UserProductInteractions\Schemas\UserProductInteractionForm as V4UserProductInteractionForm;
 
 final class UserProductInteractionResource extends Resource
 {
@@ -69,7 +70,7 @@ final class UserProductInteractionResource extends Resource
      */
     public static function form(Schema $schema): Schema   
     {
-        return $schema
+        /* legacy form replaced */ return V4UserProductInteractionForm::configure($schema); /* return $schema
             ->schema([
                 SchemaGrid::make(2)
                     ->schema([
@@ -140,12 +141,12 @@ final class UserProductInteractionResource extends Resource
                                     ->minValue(1)
                                     ->default(1)
                                     ->helperText(__('admin.user_product_interactions.count_help')),
-                                Flatpickr::makeDateTime('first_interaction')
+                                SupportFlatpickr::makeDateTime('first_interaction')
                                     ->label(__('admin.user_product_interactions.first_interaction'))
                                     ->default(now())
                                     ->displayFormat('d/m/Y H:i')
                                     ->seconds(false),
-                                Flatpickr::makeDateTime('last_interaction')
+                                SupportFlatpickr::makeDateTime('last_interaction')
                                     ->label(__('admin.user_product_interactions.last_interaction'))
                                     ->default(now())
                                     ->displayFormat('d/m/Y H:i')
@@ -230,6 +231,7 @@ final class UserProductInteractionResource extends Resource
             $basicInformationSection,
             $additionalInformationSection,
         ]);
+        */
     }
 
     /**
@@ -564,6 +566,8 @@ final class UserProductInteractionResource extends Resource
                         }),
                 ]),
             ])
+            ->recordAction(null)
+            ->recordUrl(fn () => '#')
             ->defaultSort('last_interaction', 'desc')
             ->poll('30s');
     }

@@ -14,7 +14,7 @@ use App\Filament\Resources\CountryResource\RelationManagers\CustomersRelationMan
 use App\Filament\Resources\CountryResource\RelationManagers\UsersRelationManager;
 use App\Models\Country;
 use App\Models\Scopes\ActiveScope;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction as TableBulkAction;
@@ -420,9 +420,9 @@ final class CountryResource extends Resource
                     ->searchable(),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::makeDate('created_from')
+                        SupportFlatpickr::makeDate('created_from')
                             ->label('Created from'),
-                        Flatpickr::makeDate('created_until')
+                        SupportFlatpickr::makeDate('created_until')
                             ->label('Created until'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

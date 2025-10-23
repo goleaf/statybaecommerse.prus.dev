@@ -39,7 +39,7 @@ return [
                 'customer' => [
                     'label' => 'Customer',
                     'type' => 'string',
-                    'resolver' => static fn (Order $order): mixed => optional($order->user)->name,
+                    'resolver' => static fn (Order $order): mixed => $order->user instanceof User ? $order->user->name : null,
                 ],
                 'items' => [
                     'label' => 'Items',

@@ -26,7 +26,7 @@ use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\DateFilter;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -228,8 +228,15 @@ final class CollectionRuleResource extends Resource
                         'greater_than_or_equal' => __('admin.collection_rules.operators.greater_than_or_equal'),
                         'less_than_or_equal'    => __('admin.collection_rules.operators.less_than_or_equal'),
                     ]),
-                DateFilter::make('created_at')
-                    ->label(__('admin.collection_rules.filters.created_at')),
+                Filter::make('created_at')
+                    ->label(__('admin.collection_rules.filters.created_at'))
+                    ->form([
+                        SupportFlatpickr::makeDate('value')->label(__('admin.collection_rules.filters.created_at')),
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => $query->when(
+                        $data['value'] ?? null,
+                        fn (Builder $q, $date): Builder => $q->whereDate('created_at', '=', $date),
+                    )),
                 Filter::make('recent')
                     ->label(__('admin.collection_rules.filters.recent'))
                     ->query(fn (Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(30))),

@@ -16,11 +16,22 @@ use Filament\Forms\Components\Select;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\Toggle;
 
+// Note: we avoid RefreshDatabase here to use the shared TestingDatabase harness.
+
+// Import Pest Livewire helper for component testing
+use function Pest\Livewire\livewire;
+
 beforeEach(function () {
-    $this->adminUser = User::factory()->create([
-        'email' => 'admin@example.com',
-        'is_admin' => true,
-    ]);
+    // Ensure a single reusable admin user to avoid unique email collisions
+    $this->adminUser = User::updateOrCreate(
+        ['email' => 'admin@example.com'],
+        [
+            'is_admin' => true,
+            'name'     => 'Admin User',
+            // Provide a default password to satisfy fillable constraints
+            'password' => bcrypt('password'),
+        ],
+    );
 
     $this->product = Product::factory()->create([
         'name' => 'Test Product',

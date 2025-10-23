@@ -9,17 +9,13 @@ use App\Domain\Product\Collections\ProductVariantCollection;
 /**
  * Helper DTO ensuring product variants are serialised consistently.
  */
-final class ProductVariantCollectionDto
+final readonly class ProductVariantCollectionDto
 {
-    /** @var list<ProductVariantDto> */
-    private array $items;
-
     /**
      * @param list<ProductVariantDto> $items
      */
-    public function __construct(array $items)
+    public function __construct(private array $items)
     {
-        $this->items = $items;
     }
 
     public static function fromDomainCollection(ProductVariantCollection $variants): self
@@ -37,6 +33,6 @@ final class ProductVariantCollectionDto
      */
     public function toArray(): array
     {
-        return array_map(static fn (ProductVariantDto $variant) => $variant->toArray(), $this->items);
+        return array_map(static fn (ProductVariantDto $variant): array => $variant->toArray(), $this->items);
     }
 }

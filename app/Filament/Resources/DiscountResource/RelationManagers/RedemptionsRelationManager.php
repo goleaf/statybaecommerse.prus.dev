@@ -19,7 +19,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 
 final class RedemptionsRelationManager extends BaseRelationManager
 {
@@ -74,7 +74,7 @@ final class RedemptionsRelationManager extends BaseRelationManager
                         ])
                         ->default('pending')
                         ->required(),
-                    Flatpickr::makeDateTime('redeemed_at')
+                    SupportFlatpickr::makeDateTime('redeemed_at')
                         ->label('Redeemed At')
                         ->seconds(false)
                         ->required(),

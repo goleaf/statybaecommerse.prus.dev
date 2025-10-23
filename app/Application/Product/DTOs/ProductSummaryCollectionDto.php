@@ -9,17 +9,13 @@ use App\Domain\Product\Collections\ProductCollection;
 /**
  * Thin wrapper ensuring we work with a consistent list of product summary DTOs.
  */
-final class ProductSummaryCollectionDto
+final readonly class ProductSummaryCollectionDto
 {
-    /** @var list<ProductSummaryDto> */
-    private array $items;
-
     /**
      * @param list<ProductSummaryDto> $items
      */
-    public function __construct(array $items)
+    public function __construct(private array $items)
     {
-        $this->items = $items;
     }
 
     public static function fromDomainCollection(ProductCollection $products): self
@@ -34,7 +30,7 @@ final class ProductSummaryCollectionDto
 
     public function count(): int
     {
-        return count($this->items);
+        return is_countable($this->items) ? count($this->items) : 0;
     }
 
     /**

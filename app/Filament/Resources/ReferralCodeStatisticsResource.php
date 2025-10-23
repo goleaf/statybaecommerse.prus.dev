@@ -10,7 +10,7 @@ use Filament\Schemas\Schema;
 use App\Filament\Resources\ReferralCodeStatisticsResource\Pages;
 use App\Models\ReferralCode;
 use App\Models\ReferralCodeStatistics;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -74,7 +74,7 @@ final class ReferralCodeStatisticsResource extends Resource
                                     ->relationship('referralCode', 'code')
                                     ->required()
                                     ->searchable(),
-                                Flatpickr::makeDate('date')
+                                SupportFlatpickr::makeDate('date')
                                     ->label(__('admin.referral_code_statistics.date'))
                                     ->required()
                                     ->default(now()),

@@ -14,7 +14,12 @@ trait InteractsWithFilamentPivotTables
 
     protected function ensureFilamentPivotTablesMigrated(): void
     {
-        if (! self::$pivotTestSchemaMigrated) {
+        if (
+            ! self::$pivotTestSchemaMigrated
+            || ! Schema::hasTable('news_categories')
+            || ! Schema::hasTable('news')
+            || ! Schema::hasTable('news_category_translations')
+        ) {
             $this->createFilamentPivotTestSchema();
             self::$pivotTestSchemaMigrated = true;
         }

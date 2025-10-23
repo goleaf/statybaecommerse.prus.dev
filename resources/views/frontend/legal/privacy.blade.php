@@ -1,9 +1,9 @@
 @extends('frontend.layouts.app')
 
 @php
-    $defaultTitle = __('Privacy Policy');
+    $defaultTitle = __('frontend.legal.privacy_policy');
     $pageTitle = $legal?->getTranslatedSeoTitle() ?? $legal?->getTranslatedTitle() ?? $defaultTitle;
-    $pageDescription = $legal?->getTranslatedSeoDescription() ?? __('Understand how we collect, use, and protect your personal data.');
+    $pageDescription = $legal?->getTranslatedSeoDescription() ?? __('frontend.legal.descriptions.privacy');
 @endphp
 
 @section('title', $pageTitle)
@@ -19,7 +19,8 @@
                 'legal' => $legal,
                 'heading' => $legal?->getTranslatedTitle() ?? $defaultTitle,
                 'description' => $pageDescription,
-                'emptyMessage' => __('Our privacy policy is currently unavailable. Please reach out to our support team for more details.'),
+                'emptyMessage' => __('frontend.legal.document_unavailable'),
+                'fallbackKey' => 'privacy',
             ])
         </div>
     </section>

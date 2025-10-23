@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'title' => 'Подпишитесь на рассылку',
+    'subtitle' => 'Получайте уведомления о новых товарах и специальных предложениях',
     'email_address' => 'Адрес электронной почты',
     'email_placeholder' => 'Введите ваш адрес электронной почты',
     'first_name' => 'Имя',
@@ -18,7 +20,7 @@ return [
     'interests_technical' => 'Технические обновления',
     'interests_business' => 'Бизнес-новости',
     'interests_support' => 'Поддержка и помощь',
-    'subscribe_button' => 'Подписаться сейчас',
+    'subscribe_button' => 'Подписаться',
     'subscribing' => 'Подписка...',
     'privacy_notice' => 'Мы уважаем вашу конфиденциальность. Вы можете отписаться в любое время.',
     'subscription_success_title' => 'Подписка оформлена!',

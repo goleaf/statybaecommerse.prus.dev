@@ -8,7 +8,7 @@ namespace App\Filament\Resources;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\ReferralRewardResource\Pages;
 use App\Models\ReferralReward;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use BackedEnum;
 use Filament\Forms\Components\KeyValue;
 use Filament\Schemas\Components\Section as SchemaSection;
@@ -119,10 +119,10 @@ final class ReferralRewardResource extends Resource
                                 'cancelled' => __('referral_rewards.status.cancelled'),
                             ])
                             ->required(),
-                        Flatpickr::makeDate('applied_at')
+                        SupportFlatpickr::makeDate('applied_at')
                             ->label(__('referral_rewards.fields.applied_at'))
                             ->nullable(),
-                        Flatpickr::makeDate('expires_at')
+                        SupportFlatpickr::makeDate('expires_at')
                             ->label(__('referral_rewards.fields.expires_at'))
                             ->nullable(),
                         Forms\Components\TextInput::make('title')

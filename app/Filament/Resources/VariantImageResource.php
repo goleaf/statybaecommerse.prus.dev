@@ -437,12 +437,17 @@ final class VariantImageResource extends Resource
                         ->action(function (Collection $records): void {
                             // Group by variant_id and set first image as primary for each variant
                             $records->groupBy('variant_id')->each(function ($variantImages): void {
-                                // Remove primary from all images in this variant
-                                VariantImage::where('variant_id', $variantImages->first()->variant_id)
-                                    ->update(['is_primary' => false]);
+                                $first = $variantImages->first();
 
-                                // Set first image as primary
-                                $variantImages->first()->update(['is_primary' => true]);
+                                // Remove primary from all images in this variant only if a valid variant id exists
+                                $firstVariantId = $first?->variant_id;
+                                if ($firstVariantId !== null) {
+                                    VariantImage::where('variant_id', $firstVariantId)
+                                        ->update(['is_primary' => false]);
+                                }
+
+                                // Set first image as primary (null-safe)
+                                $first?->update(['is_primary' => true]);
                             });
 
                             Notification::make()

@@ -28,14 +28,14 @@ use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\DateFilter;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use App\Support\Filament\Components\Flatpickr;
+
 
 final class CampaignScheduleResource extends Resource
 {
@@ -96,11 +96,11 @@ final class CampaignScheduleResource extends Resource
                                         ]),
                                     SchemaGrid::make(2)
                                         ->schema([
-                                            Flatpickr::makeDateTime('next_run_at')
+                                            SupportFlatpickr::makeDateTime('next_run_at')
                                                 ->label(__('admin.campaign_schedules.form.fields.next_run_at'))
                                                 ->required()
                                                 ->columnSpan(1),
-                                            Flatpickr::makeDateTime('last_run_at')
+                                            SupportFlatpickr::makeDateTime('last_run_at')
                                                 ->label(__('admin.campaign_schedules.form.fields.last_run_at'))
                                                 ->columnSpan(1),
                                         ]),
@@ -230,10 +230,24 @@ final class CampaignScheduleResource extends Resource
                     ]),
                 TernaryFilter::make('is_active')
                     ->label(__('admin.campaign_schedules.filters.is_active')),
-                DateFilter::make('next_run_at')
-                    ->label(__('admin.campaign_schedules.filters.next_run_at')),
-                DateFilter::make('last_run_at')
-                    ->label(__('admin.campaign_schedules.filters.last_run_at')),
+                Filter::make('next_run_at')
+                    ->label(__('admin.campaign_schedules.filters.next_run_at'))
+                    ->form([
+                        Flatpickr::makeDate('value')->label(__('admin.campaign_schedules.filters.next_run_at')),
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => $query->when(
+                        $data['value'] ?? null,
+                        fn (Builder $q, $date): Builder => $q->whereDate('next_run_at', '=', $date),
+                    )),
+                Filter::make('last_run_at')
+                    ->label(__('admin.campaign_schedules.filters.last_run_at'))
+                    ->form([
+                        Flatpickr::makeDate('value')->label(__('admin.campaign_schedules.filters.last_run_at')),
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => $query->when(
+                        $data['value'] ?? null,
+                        fn (Builder $q, $date): Builder => $q->whereDate('last_run_at', '=', $date),
+                    )),
                 Filter::make('overdue')
                     ->label(__('admin.campaign_schedules.filters.overdue'))
                     ->query(fn (Builder $query): Builder => $query->where('next_run_at', '<', now())->where('is_active', true)),

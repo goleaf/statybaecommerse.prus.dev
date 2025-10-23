@@ -39,6 +39,10 @@ final class AuthorizationMatrix
             return false;
         }
 
+        if (self::userBypassesAuthorization($user)) {
+            return true;
+        }
+
         $permission = self::ability($resource, $ability);
 
         try {
@@ -210,6 +214,23 @@ final class AuthorizationMatrix
         }
 
         return array_keys($normalized);
+    }
+
+    private static function userBypassesAuthorization(Authenticatable $user): bool
+    {
+        if (method_exists($user, 'getAttribute')) {
+            $flag = $user->getAttribute('is_admin');
+
+            if ($flag !== null && (bool) $flag) {
+                return true;
+            }
+        }
+
+        if (isset($user->is_admin) && (bool) $user->is_admin) {
+            return true;
+        }
+
+        return false;
     }
 
     private static function resolveGuardName(): ?string

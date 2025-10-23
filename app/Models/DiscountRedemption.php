@@ -36,7 +36,7 @@ final class DiscountRedemption extends Model
 
     protected $table = 'discount_redemptions';
 
-    protected $fillable = ['discount_id', 'code_id', 'order_id', 'user_id', 'amount_saved', 'currency_code', 'redeemed_at', 'metadata', 'status', 'notes', 'ip_address', 'user_agent', 'created_by', 'updated_by'];
+    protected $fillable = ['discount_id', 'code_id', 'order_id', 'user_id', 'amount_saved', 'currency_code', 'redeemed_at', 'metadata', 'status', 'notes', 'ip_address', 'user_agent', 'created_by', 'updated_by', 'created_by_name', 'updated_by_name'];
 
     /**
      * Handle casts functionality with proper error handling.

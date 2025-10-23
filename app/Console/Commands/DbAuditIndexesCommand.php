@@ -375,7 +375,7 @@ final class DbAuditIndexesCommand extends Command
                 $data = (array) $row;
                 $definition = isset($data['indexdef']) ? (string) $data['indexdef'] : '';
                 $indexName = isset($data['indexname']) ? (string) $data['indexname'] : '';
-                $start = strpos($definition, '(');
+                $start = strpos((string) $definition, '(');
                 $end = strrpos($definition, ')');
                 $columns = [];
 

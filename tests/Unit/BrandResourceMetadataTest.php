@@ -29,7 +29,7 @@ final class BrandResourceMetadataTest extends TestCase
      */
     public function testEloquentQueryIgnoresVisibilityScopes(): void
     {
-        $disabledBrand = Brand::factory()->create([
+        $disabledBrand = Brand::factory()->createQuietly([
             'is_enabled' => false,
             'is_active' => false,
         ]);

@@ -13,7 +13,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\DateFilter;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
@@ -107,8 +107,15 @@ final class RecommendationAnalyticsTable
                         'add_to_cart' => __('recommendation_analytics.actions.add_to_cart'),
                         'purchase'    => __('recommendation_analytics.actions.purchase'),
                     ]),
-                DateFilter::make('date')
-                    ->label(__('recommendation_analytics.date')),
+                Filter::make('date')
+                    ->label(__('recommendation_analytics.date'))
+                    ->form([
+                        SupportFlatpickr::makeDate('value')->label(__('recommendation_analytics.date')),
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => $query->when(
+                        $data['value'] ?? null,
+                        fn (Builder $q, $date): Builder => $q->whereDate('date', '=', $date),
+                    )),
             ])
             ->actions([
                 ViewAction::make(),

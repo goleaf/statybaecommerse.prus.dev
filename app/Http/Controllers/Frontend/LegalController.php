@@ -37,6 +37,15 @@ class LegalController extends Controller
         return view('frontend.legal.cookies', compact('legal'));
     }
 
+    public function shipping(): View
+    {
+        $legal = Legal::query()
+            ->with('translations')
+            ->firstWhere('key', 'shipping-policy');
+
+        return view('frontend.legal.shipping', compact('legal'));
+    }
+
     public function returns(): View
     {
         $legal = Legal::query()

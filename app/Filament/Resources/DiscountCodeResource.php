@@ -9,7 +9,7 @@ use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\DiscountCodeResource\Pages;
 use App\Models\DiscountCode;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -180,11 +180,11 @@ final class DiscountCodeResource extends Resource
                 ->schema([
                     SchemaGrid::make(2)
                         ->schema([
-                            Flatpickr::makeDateTime('valid_from')
+                            SupportFlatpickr::makeDateTime('valid_from')
                                 ->label(__('discount_codes.valid_from'))
                                 ->default(now())
                                 ->displayFormat('d/m/Y H:i'),
-                            Flatpickr::makeDateTime('valid_until')
+                            SupportFlatpickr::makeDateTime('valid_until')
                                 ->label(__('discount_codes.valid_until'))
                                 ->displayFormat('d/m/Y H:i'),
                         ]),

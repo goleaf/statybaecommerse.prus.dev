@@ -9,7 +9,7 @@ use App\Filament\Resources\DiscountRedemptionResource\RelationManagers\CodeRelat
 use App\Filament\Resources\DiscountRedemptionResource\RelationManagers\DiscountRelationManager;
 use App\Filament\Resources\DiscountRedemptionResource\RelationManagers\UserRelationManager;
 use App\Models\DiscountRedemption;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -119,7 +119,7 @@ final class DiscountRedemptionResource extends Resource
                                 ])
                                 ->default('pending')
                                 ->required(),
-                            Flatpickr::makeDateTime('redeemed_at')
+                            SupportFlatpickr::makeDateTime('redeemed_at')
                                 ->label(__('admin.discount_redemptions.form.fields.redeemed_at'))
                                 ->seconds(false)
                                 ->displayFormat('Y-m-d H:i')
@@ -212,9 +212,9 @@ final class DiscountRedemptionResource extends Resource
                 Filter::make('redeemed_at')
                     ->label(__('admin.discount_redemptions.filters.redeemed_at'))
                     ->form([
-                        Flatpickr::makeDateTime('from')
+                        SupportFlatpickr::makeDateTime('from')
                             ->label(__('discount_redemptions.filters.redeemed_from')),
-                        Flatpickr::makeDateTime('until')
+                        SupportFlatpickr::makeDateTime('until')
                             ->label(__('discount_redemptions.filters.redeemed_until')),
                     ])
                     ->query(static function (Builder $query, array $data): Builder {

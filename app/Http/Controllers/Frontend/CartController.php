@@ -21,12 +21,9 @@ final class CartController extends Controller
         return view('frontend.cart.index', $this->buildCartSummary());
     }
 
-    public function add(Request $request): RedirectResponse
+    public function add(\App\Http\Requests\Frontend\CartAddItemRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'product_id' => ['required', 'integer', 'exists:products,id'],
-            'quantity' => ['required', 'integer', 'min:1'],
-        ]);
+        $validated = $request->validated();
 
         $product = Product::query()->findOrFail($validated['product_id']);
 
@@ -107,9 +104,6 @@ final class CartController extends Controller
 
     private function saveCart(array $cart): void
     {
-        $subtotal = (float) $items->sum(fn (CartItem $item) => $item->calculateSubtotal());
-        $breakdown = app(PriceCalculator::class)->breakdown($subtotal);
-
-        return ['item_count' => (int) $items->sum('quantity')] + $breakdown->toSummary();
+        Session::put('cart', $cart);
     }
 }

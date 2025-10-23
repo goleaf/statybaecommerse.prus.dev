@@ -138,10 +138,22 @@ final class CampaignConversion extends Model
      */
     public function scopeByDateRange(Builder $query, string $startDate, string $endDate): Builder
     {
-        $start = Carbon::parse($startDate)->startOfDay();
-        $end = Carbon::parse($endDate)->endOfDay();
+        $start = \App\Support\DateParser::parse($startDate)?->startOfDay();
+        $end = \App\Support\DateParser::parse($endDate)?->endOfDay();
 
-        return $query->whereBetween('converted_at', [$start, $end]);
+        if ($start && $end) {
+            return $query->whereBetween('converted_at', [$start, $end]);
+        }
+
+        if ($start) {
+            return $query->where('converted_at', '>=', $start);
+        }
+
+        if ($end) {
+            return $query->where('converted_at', '<=', $end);
+        }
+
+        return $query;
     }
 
     /**

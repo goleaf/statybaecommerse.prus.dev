@@ -787,8 +787,8 @@ final class SearchRecommendationsService
                 return 1.0;
             }
 
-            $queryWords = explode(' ', $query);
-            $keywordWords = explode(' ', $keyword);
+            $queryWords = explode(' ', (string) $query);
+            $keywordWords = explode(' ', (string) $keyword);
 
             $commonWords = array_intersect($queryWords, $keywordWords);
 

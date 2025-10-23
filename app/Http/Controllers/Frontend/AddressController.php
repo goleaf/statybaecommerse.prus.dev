@@ -6,14 +6,16 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Enums\AddressType;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Frontend\GetCitiesRequest;
+use App\Http\Requests\Frontend\StoreAddressRequest;
+use App\Http\Requests\Frontend\UpdateAddressRequest;
 use App\Models\Address;
 use App\Models\City;
 use App\Models\Country;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
 /**
@@ -50,13 +52,9 @@ final class AddressController extends Controller
     /**
      * Store a newly created resource in storage with validation.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StoreAddressRequest $request): RedirectResponse
     {
-        $validator = Validator::make($request->all(), ['type' => 'required|in:'.implode(',', AddressType::values()), 'first_name' => 'required|string|max:255', 'last_name' => 'required|string|max:255', 'company_name' => 'nullable|string|max:255', 'company_vat' => 'nullable|string|max:50', 'address_line_1' => 'required|string|max:255', 'address_line_2' => 'nullable|string|max:255', 'apartment' => 'nullable|string|max:100', 'floor' => 'nullable|string|max:100', 'building' => 'nullable|string|max:100', 'city' => 'required|string|max:100', 'state' => 'nullable|string|max:100', 'postal_code' => 'required|string|max:20', 'country_code' => 'required|string|size:2', 'country_id' => 'nullable|exists:countries,id', 'city_id' => 'nullable|exists:cities,id', 'phone' => 'nullable|string|max:20', 'email' => 'nullable|email|max:255', 'is_default' => 'boolean', 'is_billing' => 'boolean', 'is_shipping' => 'boolean', 'notes' => 'nullable|string|max:1000', 'instructions' => 'nullable|string|max:1000', 'landmark' => 'nullable|string|max:255']);
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-        $data = $validator->validated();
+        $data = $request->validated();
         $data['user_id'] = Auth::id();
         $data['is_active'] = true;
         // Ensure only one default address per user
@@ -93,14 +91,10 @@ final class AddressController extends Controller
     /**
      * Update the specified resource in storage with validation.
      */
-    public function update(Request $request, Address $address): RedirectResponse
+    public function update(UpdateAddressRequest $request, Address $address): RedirectResponse
     {
         $this->authorize('update', $address);
-        $validator = Validator::make($request->all(), ['type' => 'required|in:'.implode(',', AddressType::values()), 'first_name' => 'required|string|max:255', 'last_name' => 'required|string|max:255', 'company_name' => 'nullable|string|max:255', 'company_vat' => 'nullable|string|max:50', 'address_line_1' => 'required|string|max:255', 'address_line_2' => 'nullable|string|max:255', 'apartment' => 'nullable|string|max:100', 'floor' => 'nullable|string|max:100', 'building' => 'nullable|string|max:100', 'city' => 'required|string|max:100', 'state' => 'nullable|string|max:100', 'postal_code' => 'required|string|max:20', 'country_code' => 'required|string|size:2', 'country_id' => 'nullable|exists:countries,id', 'city_id' => 'nullable|exists:cities,id', 'phone' => 'nullable|string|max:20', 'email' => 'nullable|email|max:255', 'is_default' => 'boolean', 'is_billing' => 'boolean', 'is_shipping' => 'boolean', 'notes' => 'nullable|string|max:1000', 'instructions' => 'nullable|string|max:1000', 'landmark' => 'nullable|string|max:255']);
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-        $data = $validator->validated();
+        $data = $request->validated();
         // Ensure only one default address per user
         if ($data['is_default'] ?? false) {
             Address::where('user_id', Auth::id())->where('id', '!=', $address->id)->update(['is_default' => false]);
@@ -148,7 +142,7 @@ final class AddressController extends Controller
      *
      * @return Illuminate\Http\JsonResponse
      */
-    public function getCountries(): \Illuminate\Http\JsonResponse
+    public function getCountries(): JsonResponse
     {
         $countries = Country::orderBy('name')->get(['id', 'name', 'cca2']);
 
@@ -160,9 +154,10 @@ final class AddressController extends Controller
      *
      * @return Illuminate\Http\JsonResponse
      */
-    public function getCities(Request $request): \Illuminate\Http\JsonResponse
+    public function getCities(GetCitiesRequest $request): JsonResponse
     {
-        $cities = City::where('country_id', $request->country_id)->orderBy('name')->get(['id', 'name']);
+        $validated = $request->validated();
+        $cities = City::where('country_id', $validated['country_id'])->orderBy('name')->get(['id', 'name']);
 
         return response()->json($cities);
     }

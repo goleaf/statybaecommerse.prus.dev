@@ -9,7 +9,7 @@ use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\CampaignViewResource\Pages;
 use App\Models\CampaignView;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
@@ -82,7 +82,7 @@ final class CampaignViewResource extends Resource
                                 TextInput::make('session_id')
                                     ->label(__('campaign_views.session_id'))
                                     ->maxLength(255),
-                                Flatpickr::makeDateTime('viewed_at')
+                                SupportFlatpickr::makeDateTime('viewed_at')
                                     ->label(__('campaign_views.viewed_at'))
                                     ->seconds(false)
                                     ->required(),

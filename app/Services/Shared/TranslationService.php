@@ -57,7 +57,7 @@ final class TranslationService
             // Load from JSON files
             $jsonFile = lang_path("{$locale}.json");
             if (File::exists($jsonFile)) {
-                $jsonTranslations = json_decode(File::get($jsonFile), true) ?? [];
+            $jsonTranslations = safe_json_decode_array(File::get($jsonFile));
                 $translations = array_merge($translations, $jsonTranslations);
             }
             // Load from PHP files
@@ -142,7 +142,7 @@ final class TranslationService
         // Try JSON file first
         $jsonFile = lang_path("{$locale}.json");
         if (File::exists($jsonFile)) {
-            $translations = json_decode(File::get($jsonFile), true) ?? [];
+            $translations = safe_json_decode_array(File::get($jsonFile));
             if (isset($translations[$key])) {
                 return $translations[$key];
             }

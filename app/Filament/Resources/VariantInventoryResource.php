@@ -12,7 +12,7 @@ use App\Models\Location;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\VariantInventory;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\LocationSearch;
 use App\Support\Search\PartnerSearch;
@@ -266,7 +266,7 @@ final class VariantInventoryResource extends Resource
                             ->default(0)
                             ->minValue(0),
                         // Row 2: supplier scheduling data follows the same alignment pattern.
-                        Flatpickr::makeDate('expiry_date')
+                        SupportFlatpickr::makeDate('expiry_date')
                             ->label(__('admin.variant_inventory.expiry_date')),
                         TextInput::make('supplier_id')
                             ->label(__('admin.variant_inventory.supplier_id'))
@@ -293,9 +293,9 @@ final class VariantInventoryResource extends Resource
                             ->rows(3)
                             ->columnSpanFull(),
                         // Row 3: restock timestamps stay paired in the shared column layout.
-                        Flatpickr::makeDate('last_restocked_at')
+                        SupportFlatpickr::makeDate('last_restocked_at')
                             ->label(__('admin.variant_inventory.last_restocked_at')),
-                        Flatpickr::makeDate('last_sold_at')
+                        SupportFlatpickr::makeDate('last_sold_at')
                             ->label(__('admin.variant_inventory.last_sold_at')),
                     ]),
                 SchemaSection::make(__('admin.variant_inventory.calculated_fields'))

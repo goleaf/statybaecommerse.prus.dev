@@ -81,14 +81,11 @@ final class DiscountRedemptionController extends Controller
         return view('frontend.discount-redemptions.create');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(\App\Http\Requests\Frontend\DiscountRedemptionStoreRequest $request): RedirectResponse
     {
-        $request->validate([
-            'discount_code' => 'required|string|exists:discount_codes,code',
-            'order_id' => 'nullable|exists:orders,id',
-        ]);
+        $validated = $request->validated();
 
-        $discountCode = \App\Models\DiscountCode::where('code', $request->discount_code)->first();
+        $discountCode = \App\Models\DiscountCode::where('code', $validated['discount_code'])->first();
 
         if (! $discountCode) {
             return back()->withErrors(['discount_code' => __('Invalid discount code.')]);
@@ -120,7 +117,7 @@ final class DiscountRedemptionController extends Controller
             'discount_id' => $discountCode->discount_id,
             'code_id' => $discountCode->id,
             'user_id' => auth()->id(),
-            'order_id' => $request->order_id,
+            'order_id' => $validated['order_id'] ?? null,
             'amount_saved' => $discountCode->discount->value,
             'currency_code' => 'EUR',
             'redeemed_at' => now(),

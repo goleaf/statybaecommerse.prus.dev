@@ -8,7 +8,7 @@ namespace App\Filament\Resources;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\AnalyticsResource\Pages;
 use App\Models\Order;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
 use Filament\Schemas\Schema;
 use BackedEnum;
@@ -187,7 +187,7 @@ final class AnalyticsResource extends Resource
                 Filter::make('created_at')
                     ->label(__('analytics.order_date_range'))
                     ->form([
-                        Flatpickr::makeRange('range')
+                        SupportFlatpickr::makeRange('range')
                             ->label(__('analytics.from_date'))
                             ->format('Y-m-d')
                             ->displayFormat('Y-m-d'),

@@ -10,7 +10,7 @@ use Filament\Schemas\Schema;
 use App\Filament\Resources\OrderShippingResource\Pages;
 use App\Models\Order;
 use App\Models\OrderShipping;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use BackedEnum;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Grid;
@@ -117,11 +117,11 @@ final class OrderShippingResource extends Resource
                         ]),
                     SchemaGrid::make(3)
                         ->schema([
-                            Flatpickr::makeDateTime('shipped_at')
+                            SupportFlatpickr::makeDateTime('shipped_at')
                                 ->label(__('admin.order_shippings.shipped_at')),
-                            Flatpickr::makeDateTime('estimated_delivery')
+                            SupportFlatpickr::makeDateTime('estimated_delivery')
                                 ->label(__('admin.order_shippings.estimated_delivery')),
-                            Flatpickr::makeDateTime('delivered_at')
+                            SupportFlatpickr::makeDateTime('delivered_at')
                                 ->label(__('admin.order_shippings.delivered_at')),
                         ]),
                     SchemaGrid::make(3)
@@ -254,9 +254,9 @@ final class OrderShippingResource extends Resource
                 Filter::make('shipped_at')
                     ->label(__('admin.order_shippings.shipped_at'))
                     ->form([
-                        Flatpickr::makeDateTime('shipped_from')
+                        SupportFlatpickr::makeDateTime('shipped_from')
                             ->label(__('admin.order_shippings.shipped_from')),
-                        Flatpickr::makeDateTime('shipped_until')
+                        SupportFlatpickr::makeDateTime('shipped_until')
                             ->label(__('admin.order_shippings.shipped_until')),
                     ])
                     ->query(function ($query, array $data) {

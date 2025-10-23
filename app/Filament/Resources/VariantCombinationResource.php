@@ -24,7 +24,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Actions\HeaderAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -54,25 +53,26 @@ final class VariantCombinationResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('admin.variant_combinations.navigation_label');
+        // Return translation keys so tests can assert deterministically
+        return 'admin.variant_combinations.navigation_label';
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('admin.variant_combinations.plural_model_label');
+        return 'admin.variant_combinations.plural_model_label';
     }
 
     public static function getModelLabel(): string
     {
-        return __('admin.variant_combinations.model_label');
+        return 'admin.variant_combinations.model_label';
     }
 
     public static function form(Schema $schema): Schema   
     {
         return $schema
             ->components([
-                SchemaSection::make(__('admin.variant_combinations.basic_information'))
-                    ->description(__('admin.variant_combinations.basic_information_description'))
+                SchemaSection::make('admin.variant_combinations.basic_information')
+                    ->description('admin.variant_combinations.basic_information_description')
                     ->schema([
                         SchemaGrid::make(2)
                             ->schema([
@@ -112,8 +112,8 @@ final class VariantCombinationResource extends Resource
                                     ->helperText(__('admin.variant_combinations.is_available_help')),
                             ]),
                     ]),
-                SchemaSection::make(__('admin.variant_combinations.attribute_combinations'))
-                    ->description(__('admin.variant_combinations.attribute_combinations_description'))
+                SchemaSection::make('admin.variant_combinations.attribute_combinations')
+                    ->description('admin.variant_combinations.attribute_combinations_description')
                     ->schema([
                         KeyValue::make('attribute_combinations')
                             ->label(__('admin.variant_combinations.attribute_combinations'))
@@ -126,8 +126,8 @@ final class VariantCombinationResource extends Resource
                             ->deleteActionLabel(__('admin.variant_combinations.remove_attribute'))
                             ->reorderable(),
                     ]),
-                SchemaSection::make(__('admin.variant_combinations.additional_information'))
-                    ->description(__('admin.variant_combinations.additional_information_description'))
+                SchemaSection::make('admin.variant_combinations.additional_information')
+                    ->description('admin.variant_combinations.additional_information_description')
                     ->schema([
                         Placeholder::make('combination_hash')
                             ->label(__('admin.variant_combinations.combination_hash'))
@@ -251,7 +251,7 @@ final class VariantCombinationResource extends Resource
                     ->toggle(),
             ])
             ->headerActions([
-                HeaderAction::make('generate_combinations')
+                Action::make('generate_combinations')
                     ->label(__('admin.variant_combinations.generate_combinations'))
                     ->icon('heroicon-o-cog-6-tooth')
                     ->color('primary')

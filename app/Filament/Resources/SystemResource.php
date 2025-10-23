@@ -9,7 +9,7 @@ use Filament\Schemas\Schema;
 use App\Filament\Resources\SystemResource\Pages;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use BackedEnum;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\ColorPicker;
@@ -266,9 +266,9 @@ final class SystemResource extends Resource
                                                 }
 
                                                 if (is_string($options)) {
-                                                    $decoded = json_decode($options, true);
+                                                    $decoded = safe_json_decode_array($options);
 
-                                                    if (is_array($decoded)) {
+                                                    if ($decoded !== []) {
                                                         return collect($decoded)
                                                             ->filter(fn ($label): bool => is_scalar($label))
                                                             ->map(fn ($label): string => (string) $label)
@@ -310,11 +310,11 @@ final class SystemResource extends Resource
                                             ->label(__('system.color_value'))
                                             ->visible(fn (callable $get) => $get('type') === 'color')
                                             ->helperText(__('system.color_value_help')),
-                                        Flatpickr::makeDateTime('value')
+                                        SupportFlatpickr::makeDateTime('value')
                                             ->label(__('system.date_time'))
                                             ->visible(fn (callable $get) => $get('type') === 'datetime')
                                             ->helperText(__('system.date_time_help')),
-                                        Flatpickr::makeDateTime('value')
+                                        SupportFlatpickr::makeDateTime('value')
                                             ->label(__('system.date'))
                                             ->displayFormat('Y-m-d')
                                             ->visible(fn (callable $get) => $get('type') === 'date')
@@ -326,7 +326,7 @@ final class SystemResource extends Resource
                                         Select::make('value')
                                             ->label(__('system.select_value'))
                                             ->visible(fn (callable $get) => $get('type') === 'select')
-                                            ->options(fn (callable $get) => json_decode($get('options') ?? '{}', true) ?? [])
+                                            ->options(fn (callable $get) => safe_json_decode_array($get('options') ?? '{}'))
                                             ->helperText(__('system.select_value_help')),
                                         KeyValue::make('value')
                                             ->label(__('system.key_value_pairs'))

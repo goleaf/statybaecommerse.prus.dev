@@ -37,7 +37,7 @@ trait ConfiguresToggleableTableLayout
         $visibleColumns = array_values($table->getVisibleColumns());
         $contentGrid = $table->getContentGrid();
 
-        $isCurrentlyGrid = (count($columnsLayout) === 1)
+        $isCurrentlyGrid = ((is_countable($columnsLayout) ? count($columnsLayout) : 0) === 1)
             && $columnsLayout[0] instanceof GridLayoutColumn;
 
         if (! $isCurrentlyGrid) {

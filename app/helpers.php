@@ -30,7 +30,7 @@ if (! function_exists('app_setting')) {
             'boolean' => (bool) $setting->value,
             'integer' => (int) $setting->value,
             'float'   => (float) $setting->value,
-            'array', 'json' => is_string($setting->value) ? json_decode($setting->value, true) : $setting->value,
+            'array', 'json' => safe_json_decode_array($setting->value),
             default => $setting->value,
         };
     }
@@ -93,6 +93,38 @@ if (! function_exists('current_currency')) {
 
         // Default project currency
         return $resolved = 'EUR';
+    }
+}
+
+if (! function_exists('safe_json_decode_array')) {
+    /**
+     * Decode a JSON value into an associative array safely.
+     * - Accepts mixed input; non-strings return [] or the array as-is
+     * - Returns [] on invalid JSON or non-array results
+     */
+    function safe_json_decode_array(mixed $value): array
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+
+        if (! is_string($value)) {
+            return [];
+        }
+
+        $trimmed = trim($value);
+
+        if ($trimmed === '') {
+            return [];
+        }
+
+        $decoded = json_decode($trimmed, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE || ! is_array($decoded)) {
+            return [];
+        }
+
+        return $decoded;
     }
 }
 

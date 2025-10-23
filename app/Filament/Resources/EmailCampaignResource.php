@@ -9,7 +9,7 @@ use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\EmailCampaignResource\Pages;
 use App\Models\EmailCampaign;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use BackedEnum;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
@@ -93,7 +93,7 @@ final class EmailCampaignResource extends Resource
                         ]),
                     SchemaGrid::make(2)
                         ->schema([
-                            Flatpickr::makeDateTime('scheduled_at')
+                            SupportFlatpickr::makeDateTime('scheduled_at')
                                 ->label(__('admin.email_campaigns.scheduled_at')),
                             Toggle::make('is_active')
                                 ->label(__('admin.email_campaigns.is_active'))

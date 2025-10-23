@@ -26,16 +26,6 @@ final class EditCustomer extends EditRecord
     }
 
     /**
-     * Pre-populate the virtual form fields before rendering the edit screen.
-     */
-    protected function mutateFormDataBeforeFill(array $data): array
-    {
-        $data['preferred_language'] = $data['preferred_locale'] ?? $data['preferred_language'] ?? null;
-
-        return $data;
-    }
-
-    /**
      * Normalise edited data before it is saved back to the database.
      */
     protected function mutateFormDataBeforeSave(array $data): array
@@ -48,16 +38,38 @@ final class EditCustomer extends EditRecord
      */
     private function mapFormFieldsToModelAttributes(array $data): array
     {
-        $data['preferred_locale'] = $data['preferred_language'] ?? $data['preferred_locale'] ?? null;
-        unset($data['preferred_language']);
+        $incomingPreferences = is_array($data['preferences'] ?? null) ? $data['preferences'] : [];
 
-        if (array_key_exists('newsletter_subscription', $data)) {
-            $data['newsletter_subscription'] = (bool) $data['newsletter_subscription'];
+        if (array_key_exists('preferences->preferred_currency', $data)) {
+            $incomingPreferences['preferred_currency'] = $data['preferences->preferred_currency'];
+            unset($data['preferences->preferred_currency']);
         }
 
-        if (array_key_exists('sms_notifications', $data)) {
-            $data['sms_notifications'] = (bool) $data['sms_notifications'];
+        if (array_key_exists('preferred_currency', $incomingPreferences)) {
+            $data['preferred_currency'] = $incomingPreferences['preferred_currency'];
         }
+
+        unset($data['preferences']);
+
+        $existingNotification = (array) ($this->record?->notification_preferences ?? []);
+        $incomingNotification = is_array($data['notification_preferences'] ?? null) ? $data['notification_preferences'] : [];
+
+        if (array_key_exists('notification_preferences->newsletter_subscription', $data)) {
+            $incomingNotification['newsletter_subscription'] = $data['notification_preferences->newsletter_subscription'];
+            unset($data['notification_preferences->newsletter_subscription']);
+        }
+
+        if (array_key_exists('notification_preferences->sms_notifications', $data)) {
+            $incomingNotification['sms_notifications'] = $data['notification_preferences->sms_notifications'];
+            unset($data['notification_preferences->sms_notifications']);
+        }
+
+        $notificationPreferences = [
+            'newsletter_subscription' => (bool) ($incomingNotification['newsletter_subscription'] ?? ($existingNotification['newsletter_subscription'] ?? false)),
+            'sms_notifications' => (bool) ($incomingNotification['sms_notifications'] ?? ($existingNotification['sms_notifications'] ?? false)),
+        ];
+
+        $data['notification_preferences'] = json_encode($notificationPreferences, JSON_THROW_ON_ERROR);
 
         return $data;
     }

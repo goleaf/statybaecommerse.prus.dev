@@ -335,13 +335,13 @@ final class Attribute extends Model
         }
         if (is_string($rules)) {
             // Try JSON decode first
-            $decoded = json_decode($rules, true);
-            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            $decoded = safe_json_decode_array($rules);
+            if ($decoded !== []) {
                 return $decoded;
             }
 
             // Fallback to pipe-delimited
-            return array_filter(array_map('trim', explode('|', $rules)));
+            return array_filter(array_map('trim', explode('|', (string) $rules)));
         }
 
         return [];

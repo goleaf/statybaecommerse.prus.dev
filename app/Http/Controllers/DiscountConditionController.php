@@ -107,11 +107,12 @@ final class DiscountConditionController extends Controller
             new OA\Response(response: 422, ref: '#/components/responses/ValidationError'),
         ]
     )]
-    public function test(Request $request, DiscountCondition $discountCondition): JsonResponse
+    public function test(\App\Http\Requests\DiscountConditionTestRequest $request, DiscountCondition $discountCondition): JsonResponse
     {
-        $request->validate(['test_value' => 'required']);
-        $matches = $discountCondition->matches($request->get('test_value'));
-        $isValid = $discountCondition->isValidForContext([$discountCondition->type => $request->get('test_value')]);
+        $validated = $request->validated();
+        $value = $validated['test_value'];
+        $matches = $discountCondition->matches($value);
+        $isValid = $discountCondition->isValidForContext([$discountCondition->type => $value]);
 
         return response()->json(['matches' => $matches, 'is_valid' => $isValid, 'condition_description' => $discountCondition->human_readable_condition, 'message' => $matches ? __('discount_conditions.messages.condition_matches') : __('discount_conditions.messages.condition_does_not_match')]);
     }

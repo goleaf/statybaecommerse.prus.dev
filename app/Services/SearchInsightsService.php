@@ -346,13 +346,13 @@ final class SearchInsightsService
         $negativeCount = 0;
 
         foreach ($positiveWords as $word) {
-            if (strpos($query, $word) !== false) {
+            if (strpos((string) $query, $word) !== false) {
                 $positiveCount++;
             }
         }
 
         foreach ($negativeWords as $word) {
-            if (strpos($query, $word) !== false) {
+            if (strpos((string) $query, $word) !== false) {
                 $negativeCount++;
             }
         }

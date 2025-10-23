@@ -15,7 +15,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\UserWishlist;
 use App\Models\WishlistItem;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
@@ -500,9 +500,9 @@ final class WishlistItemResource extends Resource
                     ),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::makeDateTime('created_from')
+                        SupportFlatpickr::makeDateTime('created_from')
                             ->label(__('admin.wishlist_items.filters.created_from')),
-                        Flatpickr::makeDateTime('created_until')
+                        SupportFlatpickr::makeDateTime('created_until')
                             ->label(__('admin.wishlist_items.filters.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

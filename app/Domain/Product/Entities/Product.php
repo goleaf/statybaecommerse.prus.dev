@@ -6,6 +6,7 @@ namespace App\Domain\Product\Entities;
 
 use App\Domain\Product\Collections\ProductImageCollection;
 use App\Domain\Product\Collections\ProductVariantCollection;
+use Illuminate\Support\Arr;
 
 /**
  * Rich domain representation of a product tailored for read models.
@@ -78,7 +79,7 @@ final class Product
 
     public function getBrandName(): ?string
     {
-        return $this->brand['name'] ?? null;
+        return Arr::get($this->brand, 'name');
     }
 
     /**
@@ -91,7 +92,7 @@ final class Product
 
     public function getCategoryName(): ?string
     {
-        return $this->category['name'] ?? null;
+        return Arr::get($this->category, 'name');
     }
 
     public function isVisible(): bool

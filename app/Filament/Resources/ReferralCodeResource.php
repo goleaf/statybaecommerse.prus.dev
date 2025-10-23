@@ -9,7 +9,7 @@ use Filament\Schemas\Schema;
 use App\Filament\Resources\ReferralCodeResource\Pages;
 use App\Models\ReferralCampaign;
 use App\Models\ReferralCode;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Forms\Components\KeyValue;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
@@ -75,7 +75,7 @@ final class ReferralCodeResource extends Resource
                             ->label(__('referral.form.is_active'))
                             ->inline(false)
                             ->default(true),
-                        Flatpickr::makeDate('expires_at')
+                        SupportFlatpickr::makeDate('expires_at')
                             ->label(__('referral.form.expires_at'))
                             ->nullable(),
                         TextInput::make('usage_limit')

@@ -38,7 +38,9 @@ if ($appEnvironment !== 'local' || $queueConnection !== 'sync') {
 }
 
 $providers[] = App\Providers\LocaleServiceProvider::class;
-$providers[] = App\Providers\Filament\AdminPanelProvider::class;
+if (! env('SKIP_FILAMENT_BOOT')) {
+    $providers[] = App\Providers\Filament\AdminPanelProvider::class;
+}
 $providers[] = SecurityServiceProvider::class;
 
 $app = Application::configure(basePath: dirname(__DIR__))
@@ -442,6 +444,31 @@ $app = Application::configure(basePath: dirname(__DIR__))
             }
 
             if (RequestContext::isApiRequest($request)) {
+                // Normalize PHP type errors (e.g. bad route param types) to a client error.
+                if ($throwable instanceof TypeError) {
+                    $reason = $throwable->getMessage();
+                    if (is_string($reason)) {
+                        $reason = preg_replace('/ in \/.*$/', '', $reason) ?? $reason;
+                    }
+
+                    Log::notice('Type error rendered as bad request.', [
+                        'reason' => $reason,
+                    ]);
+
+                    $detail = ErrorCodes::message(ErrorCodes::VALIDATION_FAILED, $locale)
+                        ?? 'Invalid request parameters.';
+
+                    return ApiErrorResponse::problem(
+                        request: $request,
+                        errorCode: ErrorCodes::VALIDATION_FAILED,
+                        detail: $detail,
+                        status: 400,
+                        title: ApiErrorResponse::titleFor(ErrorCodes::VALIDATION_FAILED, $locale),
+                        context: ['reason' => $reason],
+                        locale: $locale,
+                    );
+                }
+
                 if ($throwable instanceof HttpExceptionInterface) {
                     $status = $throwable->getStatusCode();
                     // Normalise common HTTP status codes to shared API error codes so

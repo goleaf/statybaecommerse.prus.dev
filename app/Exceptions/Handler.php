@@ -4,12 +4,19 @@ declare(strict_types=1);
 
 namespace App\Exceptions;
 
+use App\Support\ApiErrorResponse;
+use App\Support\ErrorCodes;
+use App\Support\RequestContext;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Validation\ValidationException;
 use Throwable;
+use TypeError;
 
 class Handler extends ExceptionHandler
 {
@@ -38,6 +45,31 @@ class Handler extends ExceptionHandler
         });
     }
 
+    /**
+     * Report or log an exception.
+     *
+     * For API requests, avoid treating validation issues as application errors
+     * and downgrade type errors arising from bad route parameters to warnings.
+     */
+    public function report(Throwable $e): void
+    {
+        if ($e instanceof ValidationException) {
+            // Don't spam logs for user input errors.
+            return;
+        }
+
+        if ($e instanceof TypeError) {
+            // Surface a concise warning to aid debugging without full stack traces.
+            Log::warning('Type error triggered by request parameters.', [
+                'message' => $e->getMessage(),
+            ]);
+
+            return;
+        }
+
+        parent::report($e);
+    }
+
     protected function unauthenticated($request, AuthenticationException $exception): JsonResponse|RedirectResponse
     {
         if ($request->expectsJson()) {
@@ -56,5 +88,72 @@ class Handler extends ExceptionHandler
 
         // Preserve Laravel's default redirect behaviour for any other web guard.
         return redirect()->guest($fallback);
+    }
+
+    /**
+     * Render an exception into an HTTP response.
+     *
+     * Keep API responses consistent with our RFC 7807 problem format.
+     */
+    public function render($request, Throwable $e)
+    {
+        // Only customize API responses; defer to the framework for web views.
+        if ($request instanceof Request && RequestContext::isApiRequest($request)) {
+            $locale = RequestContext::resolveLocale($request);
+
+            if ($e instanceof ValidationException) {
+                $violations = collect($e->errors())
+                    ->map(static function (array $messages, string $field): array {
+                        $localizedMessages = array_values($messages);
+
+                        return [
+                            'field'    => $field,
+                            'messages' => $localizedMessages,
+                            'reason'   => $localizedMessages[0] ?? 'Invalid value.',
+                        ];
+                    })
+                    ->values()
+                    ->all();
+
+                $detail = $e->getMessage() !== ''
+                    ? $e->getMessage()
+                    : (ErrorCodes::message(ErrorCodes::VALIDATION_FAILED, $locale) ?? 'The given data was invalid.');
+
+                return ApiErrorResponse::problem(
+                    request: $request,
+                    errorCode: ErrorCodes::VALIDATION_FAILED,
+                    detail: $detail,
+                    status: $e->status,
+                    title: ApiErrorResponse::titleFor(ErrorCodes::VALIDATION_FAILED, $locale),
+                    context: ['violations' => $violations],
+                    locale: $locale,
+                );
+            }
+
+            if ($e instanceof TypeError) {
+                // Treat parameter type mismatches as a bad request rather than a server error.
+                $reason = $e->getMessage();
+
+                // Trim noisy details to avoid leaking internals in responses.
+                if (is_string($reason)) {
+                    $reason = preg_replace('/ in \/.*$/', '', $reason) ?? $reason;
+                }
+
+                $detail = ErrorCodes::message(ErrorCodes::VALIDATION_FAILED, $locale)
+                    ?? 'Invalid request parameters.';
+
+                return ApiErrorResponse::problem(
+                    request: $request,
+                    errorCode: ErrorCodes::VALIDATION_FAILED,
+                    detail: $detail,
+                    status: 400,
+                    title: ApiErrorResponse::titleFor(ErrorCodes::VALIDATION_FAILED, $locale),
+                    context: ['reason' => $reason],
+                    locale: $locale,
+                );
+            }
+        }
+
+        return parent::render($request, $e);
     }
 }

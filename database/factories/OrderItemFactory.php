@@ -69,7 +69,7 @@ final class OrderItemFactory extends Factory
             'sku' => $product->sku,
             'unit_price' => $product->price,
             'price' => $product->price,
-            'total' => ($attributes['quantity'] ?? 1) * (float) $product->price,
+            'total' => null,
         ]);
     }
 

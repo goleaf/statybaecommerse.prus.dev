@@ -161,9 +161,9 @@ final class CampaignConversionController extends Controller
      *
      * @return Illuminate\Http\RedirectResponse
      */
-    public function store(Request $request): \Illuminate\Http\RedirectResponse
+    public function store(StoreCampaignConversionRequest $request): RedirectResponse
     {
-        $validated = $request->validate(['campaign_id' => 'required|exists:discount_campaigns,id', 'conversion_type' => 'required|string|max:255', 'conversion_value' => 'required|numeric|min:0', 'status' => 'required|string|max:255', 'converted_at' => 'required|date', 'source' => 'nullable|string|max:255', 'medium' => 'nullable|string|max:255', 'device_type' => 'nullable|string|max:255', 'country' => 'nullable|string|max:255', 'city' => 'nullable|string|max:255', 'notes' => 'nullable|string', 'tags' => 'nullable|array', 'custom_attributes' => 'nullable|array']);
+        $validated = $request->validated();
         $conversion = CampaignConversion::create($validated);
 
         return redirect()->route('frontend.campaign-conversions.show', $conversion)->with('success', __('campaign_conversions.messages.created_successfully'));
@@ -187,9 +187,9 @@ final class CampaignConversionController extends Controller
      *
      * @return Illuminate\Http\RedirectResponse
      */
-    public function update(Request $request, CampaignConversion $campaignConversion): \Illuminate\Http\RedirectResponse
+    public function update(UpdateCampaignConversionRequest $request, CampaignConversion $campaignConversion): RedirectResponse
     {
-        $validated = $request->validate(['campaign_id' => 'required|exists:discount_campaigns,id', 'conversion_type' => 'required|string|max:255', 'conversion_value' => 'required|numeric|min:0', 'status' => 'required|string|max:255', 'converted_at' => 'required|date', 'source' => 'nullable|string|max:255', 'medium' => 'nullable|string|max:255', 'device_type' => 'nullable|string|max:255', 'country' => 'nullable|string|max:255', 'city' => 'nullable|string|max:255', 'notes' => 'nullable|string', 'tags' => 'nullable|array', 'custom_attributes' => 'nullable|array']);
+        $validated = $request->validated();
         $campaignConversion->update($validated);
 
         return redirect()->route('frontend.campaign-conversions.show', $campaignConversion)->with('success', __('campaign_conversions.messages.updated_successfully'));
@@ -200,7 +200,7 @@ final class CampaignConversionController extends Controller
      *
      * @return Illuminate\Http\RedirectResponse
      */
-    public function destroy(CampaignConversion $campaignConversion): \Illuminate\Http\RedirectResponse
+    public function destroy(CampaignConversion $campaignConversion): RedirectResponse
     {
         $campaignConversion->delete();
 

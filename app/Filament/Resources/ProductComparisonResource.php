@@ -10,7 +10,7 @@ use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ProductComparisonResource\Pages;
 use App\Models\ProductComparison;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -149,7 +149,7 @@ final class ProductComparisonResource extends Resource
                     ->preload(),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::makeRange('range')
+                        SupportFlatpickr::makeRange('range')
                             ->label(__('product_comparisons.created_at'))
 
                             ->format('Y-m-d')

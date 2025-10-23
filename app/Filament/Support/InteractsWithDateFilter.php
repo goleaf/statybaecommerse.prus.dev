@@ -47,7 +47,16 @@ trait InteractsWithDateFilter
             return $filter;
         }
 
-        return array_key_first($filters) ?? 'month';
+        // Default to the first available filter for unknown inputs, but when a
+        // "custom" option is present prefer the explicit month range to avoid
+        // invoking arbitrary custom ranges in fallback scenarios.
+        $first = array_key_first($filters) ?? 'month';
+
+        if (array_key_exists('custom', $filters) && array_key_exists('month', $filters)) {
+            return 'month';
+        }
+
+        return $first;
     }
 
     /**

@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -29,7 +30,7 @@ final class ReferralController extends Controller
      *
      * @return Illuminate\Http\JsonResponse
      */
-    public function codeStatistics(): \Illuminate\Http\JsonResponse
+    public function codeStatistics(): JsonResponse
     {
         $stats = ['total_codes' => ReferralCode::count(), 'active_codes' => ReferralCode::where('is_active', true)->count(), 'total_usage' => ReferralCode::sum('usage_count'), 'total_rewards' => ReferralCode::sum('total_rewards')];
 
@@ -41,7 +42,7 @@ final class ReferralController extends Controller
      *
      * @return Illuminate\Http\JsonResponse
      */
-    public function getReferralUrl(): \Illuminate\Http\JsonResponse
+    public function getReferralUrl(): JsonResponse
     {
         $user = Auth::user();
         if (! $user) {

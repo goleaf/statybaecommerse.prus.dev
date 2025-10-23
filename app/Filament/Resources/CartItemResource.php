@@ -11,7 +11,7 @@ use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Filament\Forms\Components\Quantity;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;
 use BackedEnum;
@@ -404,9 +404,9 @@ final class CartItemResource extends Resource
                     }),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::makeDate('created_from')
+                        SupportFlatpickr::makeDate('created_from')
                             ->label(__('cart_items.created_from')),
-                        Flatpickr::makeDate('created_until')
+                        SupportFlatpickr::makeDate('created_until')
                             ->label(__('cart_items.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

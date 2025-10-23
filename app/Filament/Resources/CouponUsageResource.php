@@ -10,7 +10,7 @@ use Filament\Schemas\Schema;
 use App\Filament\Resources\CouponUsageResource\Pages;
 use App\Models\Coupon;
 use App\Models\CouponUsage;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Search\CouponSearch;
 use App\Support\Search\CustomerSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
@@ -159,7 +159,7 @@ final class CouponUsageResource extends Resource
                                                 ->prefix('€')
                                                 ->required(),
                                         ]),
-                                    Flatpickr::makeDateTime('used_at')
+                                    SupportFlatpickr::makeDateTime('used_at')
                                         ->label(__('admin.coupon_usages.form.fields.used_at'))
                                         ->required()
                                         ->default(now())
@@ -252,8 +252,8 @@ final class CouponUsageResource extends Resource
                 Filter::make('used_at')
                     ->label(__('admin.coupon_usages.filters.used_at'))
                     ->form([
-                        Flatpickr::makeDateTime('from')->label(__('admin.coupon_usages.filters.used_at_from')),
-                        Flatpickr::makeDateTime('until')->label(__('admin.coupon_usages.filters.used_at_until')),
+                        SupportFlatpickr::makeDateTime('from')->label(__('admin.coupon_usages.filters.used_at_from')),
+                        SupportFlatpickr::makeDateTime('until')->label(__('admin.coupon_usages.filters.used_at_until')),
                     ])
                     ->query(function (Builder $query, array|string|null $data): Builder {
                         // Allow both the range picker (array payload) and the single date test helper string.

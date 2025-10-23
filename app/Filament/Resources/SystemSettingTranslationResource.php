@@ -9,7 +9,7 @@ use Filament\Schemas\Schema;
 use App\Filament\Resources\SystemSettingTranslationResource\Pages;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingTranslation;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -344,8 +344,8 @@ final class SystemSettingTranslationResource extends Resource
                 Filter::make('created_at')
                     ->label(__('admin.common.created_at'))
                     ->form([
-                        Flatpickr::makeDate('from')->label(__('admin.common.from')),
-                        Flatpickr::makeDate('until')->label(__('admin.common.until')),
+                        SupportFlatpickr::makeDate('from')->label(__('admin.common.from')),
+                        SupportFlatpickr::makeDate('until')->label(__('admin.common.until')),
                     ])
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];

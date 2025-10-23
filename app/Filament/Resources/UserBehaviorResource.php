@@ -8,7 +8,7 @@ namespace App\Filament\Resources;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\UserBehaviorResource\Pages;
 use App\Models\UserBehavior;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -123,7 +123,7 @@ final class UserBehaviorResource extends Resource
                             ->options(self::behaviorTypeOptions())
                             ->required()
                             ->searchable(),
-                        Flatpickr::makeDateTime('created_at')
+                        SupportFlatpickr::makeDateTime('created_at')
                             ->label(__('admin.user_behaviors.created_at'))
                             ->default(now())
                             ->displayFormat('d/m/Y H:i:s'),
@@ -273,7 +273,7 @@ final class UserBehaviorResource extends Resource
                     ]),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::makeRange('range')
+                        SupportFlatpickr::makeRange('range')
                             ->label(__('admin.user_behaviors.created_at'))
 
                             ->format('Y-m-d')

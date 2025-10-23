@@ -25,7 +25,7 @@ final class TraceContext
         $traceparent = self::sanitizeHeader($headers->get('traceparent'));
 
         if ($traceparent !== null) {
-            $parts = explode('-', $traceparent);
+            $parts = explode('-', (string) $traceparent);
             if (\count($parts) >= 4) {
                 $traceId = self::validTraceId($parts[1] ?? '') ? strtolower($parts[1]) : null;
                 $parentSpanId = self::validSpanId($parts[2] ?? '') ? strtolower($parts[2]) : null;

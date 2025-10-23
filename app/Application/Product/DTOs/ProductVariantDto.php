@@ -9,14 +9,14 @@ use App\Domain\Product\Entities\ProductVariant;
 /**
  * DTO describing a single product variant.
  */
-final class ProductVariantDto
+final readonly class ProductVariantDto
 {
     public function __construct(
-        private readonly int $id,
-        private readonly string $name,
-        private readonly string $sku,
-        private readonly float $price,
-        private readonly ?int $stockQuantity,
+        private int $id,
+        private string $name,
+        private string $sku,
+        private float $price,
+        private ?int $stockQuantity,
     ) {
         // All state is captured via constructor promotion for clarity.
     }
