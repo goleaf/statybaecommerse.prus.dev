@@ -20,17 +20,27 @@ return new class extends Migration
 
         Schema::table('feature_flags', function (Blueprint $table): void {
             if (! Schema::hasColumn('feature_flags', 'created_by')) {
-                $table->foreignId('created_by')
-                    ->nullable()
-                    ->after('created_by_name')
+                $createdByColumn = $table->foreignId('created_by')->nullable();
+
+                if (Schema::hasColumn('feature_flags', 'created_by_name')) {
+                    $createdByColumn->after('created_by_name');
+                }
+
+                $createdByColumn
                     ->constrained('users')
                     ->nullOnDelete();
             }
 
             if (! Schema::hasColumn('feature_flags', 'updated_by')) {
-                $table->foreignId('updated_by')
-                    ->nullable()
-                    ->after('created_by')
+                $updatedByColumn = $table->foreignId('updated_by')->nullable();
+
+                if (Schema::hasColumn('feature_flags', 'created_by')) {
+                    $updatedByColumn->after('created_by');
+                } elseif (Schema::hasColumn('feature_flags', 'created_by_name')) {
+                    $updatedByColumn->after('created_by_name');
+                }
+
+                $updatedByColumn
                     ->constrained('users')
                     ->nullOnDelete();
             }
