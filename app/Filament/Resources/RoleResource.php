@@ -35,11 +35,16 @@ final class RoleResource extends Resource
     protected static ?int $navigationSort = 19;
 
     protected static ?string $recordTitleAttribute = 'name';
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-shield-check';
 
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = 'System';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-shield-check';
+
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
+    protected static UnitEnum|string|null $navigationGroup = 'System';
 
     public static function shouldRegisterNavigation(): bool
     {

@@ -39,11 +39,20 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 use UnitEnum;
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-tag';
 
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = 'Inventory';
+final class VariantAttributeValueResource extends Resource
+{
+    protected static ?string $model = \App\Models\VariantAttributeValue::class;
+
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
+
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
+    protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 18;
 

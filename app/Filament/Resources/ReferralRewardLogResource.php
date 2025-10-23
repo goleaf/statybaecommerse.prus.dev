@@ -44,8 +44,10 @@ final class ReferralRewardLogResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'action';
 
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = 'Analytics';
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
+    protected static UnitEnum|string|null $navigationGroup = 'Analytics';
 
     public static function getNavigationLabel(): string
     {

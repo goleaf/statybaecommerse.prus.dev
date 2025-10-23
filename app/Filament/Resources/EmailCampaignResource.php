@@ -37,8 +37,11 @@ final class EmailCampaignResource extends Resource
     protected static ?string $model = EmailCampaign::class;
 
     protected static ?int $navigationSort = 4;
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-envelope';
+
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-envelope';
 
     public static function getNavigationLabel(): string
     {

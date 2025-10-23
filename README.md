@@ -17,6 +17,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 ### Latest updates
+- Filament admin navigation now standardises every icon and group declaration on the BackedEnum/UnitEnum union types mandated by v4, eliminating the PHP 8.3 fatals that previously surfaced during `composer install`.
 - Logged the Oct 21–22, 2025 PR triage outcome directly in `docs/analysis/CURRENT_SYSTEM_STATUS.md`, highlighting which Husky and Filament fixes are ready to merge, which legacy branches to close as superseded, and which submissions still need action so maintainers can prioritise reviews without re-scraping GitHub.
 - Curated a high-level repository analysis that catalogues the 24 open pull requests, highlighting the repeated Filament Schema API migrations, Husky bootstrap shim restorations, and the layered rate-limiting proposal so maintainers can prioritise reviews without manually expanding each PR.
 - Documented the open proposal from PR #289 to introduce layered API rate limiting buckets for read, write, notification, and autocomplete endpoints alongside enhanced throttling logs with correlation identifiers, so reviewers can quickly trace the outstanding security hardening work.
@@ -89,7 +90,8 @@ composer run dev
 
 ## Latest maintenance
 
-- 2025-10-25: Introduced layered per-user and per-IP API throttles with structured 429 responses, refreshed rate limiting configuration, and updated security runbooks to document the new read/write buckets.
+- 2025-10-24: Normalised every Filament navigation icon and group declaration to the BackedEnum/UnitEnum union types expected by v4 so CLI installs and admin boots succeed on PHP 8.3.
+
 - 2025-10-24: Reinstated the Husky bootstrap shim file contents and permissions so Git hooks execute using the local toolchain again while continuing to surface the upstream v10 deprecation warning banner for contributor awareness.
 - 2025-10-24: Hardened content security policies with request-scoped nonces, refreshed inline Blade assets to inject the helper automatically, and expanded rate limiting configuration so API throttles can stack per-minute and per-hour limits.
 

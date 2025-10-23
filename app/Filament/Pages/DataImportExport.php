@@ -22,8 +22,11 @@ use Filament\Schemas\Schema;
 final class DataImportExport extends Page
 {
     protected string $view = 'filament.pages.data-import-export';
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-arrow-down-tray';
+
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-arrow-down-tray';
 
     public ?string $provider = 'xml';
 

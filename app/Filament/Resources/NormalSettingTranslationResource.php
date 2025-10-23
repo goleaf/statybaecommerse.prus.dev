@@ -36,8 +36,10 @@ final class NormalSettingTranslationResource extends Resource
 {
     protected static ?string $model = NormalSettingTranslation::class;
 
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::System;
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 16;
 

@@ -8,7 +8,7 @@ use App\Filament\Resources\NotificationResource\Pages;
 use App\Models\Notification;
 use App\Support\Concerns\HasNav;
 use App\Support\Filament\Filters\SingleDateFilter;
-use App\Support\Concerns\HasNav;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\DeleteBulkAction;
@@ -39,7 +39,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use Filament\Schemas\Schema;
+use UnitEnum;
 
 use Filament\Schemas\Schema;
 final class NotificationResource extends Resource
@@ -52,10 +52,15 @@ final class NotificationResource extends Resource
 
     protected static ?string $model = Notification::class;
 
-    /** @var string|BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-bell';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-bell';
 
-    protected static ?string $navigationGroup = 'System';
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
+    protected static UnitEnum|string|null $navigationGroup = 'System';
 
     protected static bool $shouldRegisterNavigation = false;
 

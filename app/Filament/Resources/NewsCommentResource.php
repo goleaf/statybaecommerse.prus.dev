@@ -43,9 +43,10 @@ final class NewsCommentResource extends Resource
 {
     use HasNav;
 
-    protected static ?string $model = NewsComment::class;
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-chat-bubble-left-ellipsis';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chat-bubble-left-ellipsis';
 
     public static function getNavigationGroup(): UnitEnum|string|null
     {

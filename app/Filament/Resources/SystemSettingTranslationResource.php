@@ -45,12 +45,20 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Throwable;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-document-text';
 
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = 'Settings';
+final class SystemSettingTranslationResource extends Resource
+{
+    protected static ?string $model = \App\Models\SystemSettingTranslation::class;
+
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
+
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
+    protected static UnitEnum|string|null $navigationGroup = 'Settings';
 
     public static function getNavigationLabel(): string
     {

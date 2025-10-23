@@ -38,8 +38,6 @@ use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Filament\Schemas\Schema;
-use BackedEnum;
 use UnitEnum;
 
 use Filament\Schemas\Schema;
@@ -49,12 +47,13 @@ final class EnumValueResource extends Resource
 {
     use HasNav;
 
-    protected static ?string $model = EnumValue::class;
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-squares-2x2';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
 
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::System;
+    /** @var string|BackedEnum|null Keep enum value tools inside the System cluster. */
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
 
     public static function getNavigationGroup(): ?string
     {

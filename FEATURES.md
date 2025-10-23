@@ -19,6 +19,7 @@ This snapshot complements the changelog by listing functional capabilities that 
 ## Latest Update
 - API rate limiting now layers per-user and per-IP budgets with structured logging and updated route/security documentation so integrators can separate read and write traffic when tuning clients.
 - Filament admin resources, relation managers, widgets, and standalone pages now follow the Schema-based API with normalized navigation icon docblocks, eliminating BackedEnum collisions while documenting how each builder composes the new schema pipeline.
+- Navigation icons and groups across every Filament page, resource, widget, and relation manager now rely on the BackedEnum/UnitEnum union types mandated by v4 so PHP 8.3 environments boot without property type fatals.
 - Product API contract delivery now runs through dedicated application-layer use cases, a presenter, and an Eloquent repository, ensuring storefront consumers receive filtered, displayable catalogue data without breaking schema guarantees.
 - Notification administration delegates navigation metadata to the Nav registry with recursion safeguards, and address management documents its Filament `Schema::components([...])` pipeline for reviewers aligning with v4 expectations.
 - Menu Item administration adopts the shared navigation icon docblock and documents the reusable schema/table configurators so Filament v4 resource reviews stay consistent.

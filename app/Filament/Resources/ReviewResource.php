@@ -28,6 +28,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Section as InfolistSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -37,7 +38,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use BackedEnum;
 use UnitEnum;
 
 use BackedEnum;
@@ -46,16 +46,19 @@ final class ReviewResource extends Resource
 {
     use HasNav;
 
-    protected static ?string $model = Review::class;
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-star';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
 
     protected static ?int $navigationSort = 4;
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::ContentManagement;
+    /**
+     * @var string|BackedEnum|null Allow enum-backed navigation grouping.
+     */
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::ContentManagement;
 
     public static function getNavigationGroup(): ?string
     {

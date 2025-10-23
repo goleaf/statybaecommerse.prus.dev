@@ -35,11 +35,20 @@ use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-squares-2x2';
 
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = 'Inventory';
+final class VariantCombinationResource extends Resource
+{
+    protected static ?string $model = \App\Models\VariantCombination::class;
+
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
+
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
+    protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 19;
 

@@ -31,8 +31,10 @@ use Filament\Schemas\Schema;
 use Filament\Schemas\Schema;
 final class DocumentResource extends Resource
 {
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-document';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document';
 
     protected static ?string $model = Document::class;
 

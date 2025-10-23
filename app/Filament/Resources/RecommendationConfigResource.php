@@ -35,8 +35,10 @@ final class RecommendationConfigResource extends Resource
 
     protected static ?string $model = RecommendationConfig::class;
 
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = 'Analytics';
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
+    protected static UnitEnum|string|null $navigationGroup = 'Analytics';
 
     protected static ?int $navigationSort = 11;
 

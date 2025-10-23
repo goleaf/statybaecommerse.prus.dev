@@ -24,11 +24,12 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
-use Filament\Actions\BulkActionGroup as TableBulkActionGroup;
-use Filament\Actions\DeleteAction as TableDeleteAction;
-use Filament\Actions\DeleteBulkAction as TableDeleteBulkAction;
-use Filament\Actions\EditAction as TableEditAction;
-use Filament\Actions\ViewAction as TableViewAction;
+use Filament\Schemas\Schema;
+use Filament\Tables\Actions\BulkActionGroup as TableBulkActionGroup;
+use Filament\Tables\Actions\DeleteAction as TableDeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction as TableDeleteBulkAction;
+use Filament\Tables\Actions\EditAction as TableEditAction;
+use Filament\Tables\Actions\ViewAction as TableViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -36,11 +37,20 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use UnitEnum;
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = 'Content';
+final class SliderResource extends Resource
+{
+    protected static ?string $model = Slider::class;
+
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
+    protected static UnitEnum|string|null $navigationGroup = 'Content';
 
     protected static ?int $navigationSort = 4;
 

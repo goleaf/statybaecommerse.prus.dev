@@ -27,19 +27,15 @@ final class SliderResource extends Resource
 {
     use HasNav;
 
-    protected static ?string $model = Slider::class;
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
-
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Content;
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     /**
-     * Navigation group for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static $navigationGroup = NavigationGroup::Content;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Content;
 
     /**
      * @var \UnitEnum|string|null

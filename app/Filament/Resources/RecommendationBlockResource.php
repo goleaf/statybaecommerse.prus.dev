@@ -30,7 +30,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Schemas\Schema;
+use Novadaemon\FilamentCombobox\Combobox;
 use UnitEnum;
 
 use Filament\Schemas\Schema;
@@ -46,8 +46,10 @@ final class RecommendationBlockResource extends Resource
 
     protected static ?string $model = RecommendationBlock::class;
 
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
+    /**
+     * @var string|BackedEnum|null Tracks the navigation group while remaining Filament compatible.
+     */
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 13;
 

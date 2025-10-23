@@ -30,7 +30,7 @@ class MenuItemResource extends Resource
     /**
      * @var string|\BackedEnum|null Menu item icon aligned with Filament v4 guidance.
      */
-    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     /**
      * Compose the shared form schema for creating and editing menu items.

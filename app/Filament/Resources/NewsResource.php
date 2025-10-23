@@ -16,6 +16,7 @@ use Filament\Forms;
 use Filament\Infolists;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -31,9 +32,10 @@ class NewsResource extends Resource
 {
     use HasNav;
 
-    protected static ?string $model = News::class;
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-newspaper';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-newspaper';
 
     protected static ?int $navigationSort = 1;
 

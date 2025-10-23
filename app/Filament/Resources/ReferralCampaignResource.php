@@ -37,8 +37,11 @@ final class ReferralCampaignResource extends Resource
     use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
 
     protected static ?string $model = ReferralCampaign::class;
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-megaphone';
+
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-megaphone';
 
     protected static ?int $navigationSort = 14;
 

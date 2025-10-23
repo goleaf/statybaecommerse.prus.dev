@@ -24,8 +24,11 @@ final class InventoryManagement extends Page implements HasTable
     use ConfiguresToggleableTableLayout;
     use HasToggleableTable;
     use InteractsWithTable;
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-archive-box';
+
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-archive-box';
 
