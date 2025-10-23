@@ -9,7 +9,11 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\ReferralCodeStatisticsResource\Pages;
 use App\Models\ReferralCode;
 use App\Models\ReferralCodeStatistics;
-use Filament\Forms\Components\DatePicker;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -22,6 +26,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 /**
  * ReferralCodeStatisticsResource
@@ -70,9 +75,10 @@ final class ReferralCodeStatisticsResource extends Resource
                                     ->label(__('admin.referral_code_statistics.referral_code'))
                                     ->relationship('referralCode', 'code')
                                     ->required()
-                                    ->searchable()
-                                    ->preload(),
-                                DatePicker::make('date')
+                                    ->searchable(),
+                                Flatpickr::make('date')
+                                    ->time(false)
+                                    ->format('Y-m-d')
                                     ->label(__('admin.referral_code_statistics.date'))
                                     ->required()
                                     ->default(now()),

@@ -13,6 +13,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -25,6 +26,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 /**
  * RecommendationAnalyticsResource
@@ -109,7 +111,9 @@ final class RecommendationAnalyticsResource extends Resource
                                     ])
                                     ->required()
                                     ->default('view'),
-                                Flatpickr::makeDate('date')
+                                Flatpickr::make('date')
+                                    ->time(false)
+                                    ->format('Y-m-d')
                                     ->label(__('admin.recommendation_analytics.date'))
                                     ->required()
                                     ->default(now()),

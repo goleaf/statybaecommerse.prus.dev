@@ -28,8 +28,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Forms\Components\CheckboxList;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Grid;
+
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -57,6 +56,7 @@ use Illuminate\Database\Eloquent\Model;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 /**
  * OrderResource
@@ -432,9 +432,17 @@ final class OrderResource extends Resource implements DefinesExportColumns
                 ->schema([
                     Grid::make(2)
                         ->schema([
-                            Flatpickr::makeDateTime('shipped_at')
+                            Flatpickr::make('shipped_at')
+                                ->time(true)
+                                ->time24hr(true)
+                                ->seconds(false)
+                                ->format('Y-m-d H:i')
                                 ->label(__('orders.fields.shipped_at')),
-                            Flatpickr::makeDateTime('delivered_at')
+                            Flatpickr::make('delivered_at')
+                                ->time(true)
+                                ->time24hr(true)
+                                ->seconds(false)
+                                ->format('Y-m-d H:i')
                                 ->label(__('orders.fields.delivered_at')),
                         ]),
                     TextInput::make('tracking_number')
@@ -667,11 +675,16 @@ final class OrderResource extends Resource implements DefinesExportColumns
                     ->label(__('orders.fields.items_count')),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::makeRange('range')
-                            ->label(__('orders.created_at'))
-
+                        Flatpickr::make('created_from')
+                            ->time(false)
                             ->format('Y-m-d')
-                            ->displayFormat('Y-m-d'),
+                            ->rangePicker()
+                            ->label(__('orders.created_from')),
+                        Flatpickr::make('created_until')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker()
+                            ->label(__('orders.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query

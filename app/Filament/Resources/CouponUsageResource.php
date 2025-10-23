@@ -13,6 +13,7 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -36,7 +37,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Number;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class CouponUsageResource extends Resource
 {
@@ -154,7 +155,11 @@ final class CouponUsageResource extends Resource
                                                 ->prefix('€')
                                                 ->required(),
                                         ]),
-                                    Flatpickr::makeDateTime('used_at')
+                                    Flatpickr::make('used_at')
+                                        ->time(true)
+                                        ->time24hr(true)
+                                        ->seconds(false)
+                                        ->format('Y-m-d H:i')
                                         ->label(__('admin.coupon_usages.form.fields.used_at'))
                                         ->required()
                                         ->default(now())
@@ -246,8 +251,20 @@ final class CouponUsageResource extends Resource
                 Filter::make('used_at_range')
                     ->label(__('admin.coupon_usages.filters.used_at'))
                     ->form([
-                        Flatpickr::makeDateTime('from')->label(__('admin.coupon_usages.filters.used_at_from')),
-                        Flatpickr::makeDateTime('until')->label(__('admin.coupon_usages.filters.used_at_until')),
+                        Flatpickr::make('from')
+                            ->time(true)
+                            ->time24hr(true)
+                            ->seconds(false)
+                            ->format('Y-m-d H:i')
+                            ->rangePicker()
+                            ->label(__('admin.coupon_usages.filters.used_at_from')),
+                        Flatpickr::make('until')
+                            ->time(true)
+                            ->time24hr(true)
+                            ->seconds(false)
+                            ->format('Y-m-d H:i')
+                            ->rangePicker()
+                            ->label(__('admin.coupon_usages.filters.used_at_until')),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => $query
                         ->when($data['from'] ?? null, fn (Builder $q, $date): Builder => $q->where('used_at', '>=', $date))

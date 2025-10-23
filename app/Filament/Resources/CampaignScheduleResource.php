@@ -8,7 +8,7 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\CampaignScheduleResource\Pages;
 use App\Models\CampaignSchedule;
-use Filament\Forms\Components\DateTimePicker;
+
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -36,6 +36,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class CampaignScheduleResource extends Resource
 {
@@ -96,11 +97,19 @@ final class CampaignScheduleResource extends Resource
                                         ]),
                                     Grid::make(2)
                                         ->schema([
-                                            Flatpickr::makeDateTime('next_run_at')
+                                            Flatpickr::make('next_run_at')
+                                                ->time(true)
+                                                ->time24hr(true)
+                                                ->seconds(false)
+                                                ->format('Y-m-d H:i')
                                                 ->label(__('admin.campaign_schedules.form.fields.next_run_at'))
                                                 ->required()
                                                 ->columnSpan(1),
-                                            Flatpickr::makeDateTime('last_run_at')
+                                            Flatpickr::make('last_run_at')
+                                                ->time(true)
+                                                ->time24hr(true)
+                                                ->seconds(false)
+                                                ->format('Y-m-d H:i')
                                                 ->label(__('admin.campaign_schedules.form.fields.last_run_at'))
                                                 ->columnSpan(1),
                                         ]),

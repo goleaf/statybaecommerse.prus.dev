@@ -11,6 +11,7 @@ use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\ColorPicker;
+
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
@@ -31,6 +32,7 @@ use UnitEnum;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 class SliderManagement extends Page implements HasActions, HasForms
 {
     use InteractsWithActions, InteractsWithForms;
@@ -249,10 +251,20 @@ class SliderManagement extends Page implements HasActions, HasForms
                 Section::make(__('translations.scheduling'))
                     ->components([
                         Grid::make(2)->components([
-                            Flatpickr::makeDateTime('start_date')
+                            Flatpickr::make('start_date')
+                                ->time(true)
+                                ->time24hr(true)
+                                ->seconds(false)
+                                ->format('Y-m-d H:i')
+                                ->rangePicker()
                                 ->label(__('translations.start_date'))
                                 ->default(now()),
-                            Flatpickr::makeDateTime('end_date')
+                            Flatpickr::make('end_date')
+                                ->time(true)
+                                ->time24hr(true)
+                                ->seconds(false)
+                                ->format('Y-m-d H:i')
+                                ->rangePicker()
                                 ->label(__('translations.end_date'))
                                 ->after('start_date'),
                         ]),

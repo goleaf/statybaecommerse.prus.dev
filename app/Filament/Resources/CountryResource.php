@@ -13,7 +13,7 @@ use App\Filament\Resources\CountryResource\RelationManagers\CustomersRelationMan
 use App\Filament\Resources\CountryResource\RelationManagers\UsersRelationManager;
 use App\Models\Country;
 use Filament\Actions\Action;
-use Filament\Forms\Components\DatePicker;
+
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
@@ -41,6 +41,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Throwable;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class CountryResource extends Resource
 {
@@ -347,9 +348,15 @@ final class CountryResource extends Resource
                     ->searchable(),
                 Filter::make('created_at')
                     ->form([
-                        DatePicker::make('created_from')
+                        Flatpickr::make('created_from')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker()
                             ->label('Created from'),
-                        DatePicker::make('created_until')
+                        Flatpickr::make('created_until')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker()
                             ->label('Created until'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

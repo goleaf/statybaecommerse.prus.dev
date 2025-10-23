@@ -8,9 +8,7 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\CouponResource\Pages;
 use App\Models\Coupon;
-use Awcodes\BadgeableColumn\Components\Badge;
-use Awcodes\BadgeableColumn\Components\BadgeableColumn;
-use Filament\Forms\Components\DateTimePicker;
+
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -37,6 +35,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class CouponResource extends Resource
 {
@@ -159,12 +158,22 @@ final class CouponResource extends Resource
                 ->schema([
                     Grid::make(2)
                         ->schema([
-                            DateTimePicker::make('starts_at')
-                                ->label(__('coupons.starts_at'))
+                            Flatpickr::make('valid_from')
+                                ->time(true)
+                                ->time24hr(true)
+                                ->seconds(false)
+                                ->format('Y-m-d H:i')
+                                ->rangePicker()
+                                ->label(__('coupons.valid_from'))
                                 ->default(now())
                                 ->displayFormat('d/m/Y H:i'),
-                            DateTimePicker::make('expires_at')
-                                ->label(__('coupons.expires_at'))
+                            Flatpickr::make('valid_until')
+                                ->time(true)
+                                ->time24hr(true)
+                                ->seconds(false)
+                                ->format('Y-m-d H:i')
+                                ->rangePicker()
+                                ->label(__('coupons.valid_until'))
                                 ->displayFormat('d/m/Y H:i'),
                         ]),
                 ]),

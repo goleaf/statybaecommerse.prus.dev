@@ -24,6 +24,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class ProductRequestResource extends Resource
 {
@@ -138,7 +139,11 @@ final class ProductRequestResource extends Resource
                 Forms\Components\Textarea::make('admin_notes')
                     ->label(__('product_requests.fields.admin_notes'))
                     ->columnSpanFull(),
-                Flatpickr::makeDateTime('responded_at')
+                Flatpickr::make('responded_at')
+                    ->time(true)
+                    ->time24hr(true)
+                    ->seconds(false)
+                    ->format('Y-m-d H:i')
                     ->label(__('product_requests.fields.responded_at')),
                 Forms\Components\Select::make('responded_by')
                     ->relationship('respondedBy', 'name')

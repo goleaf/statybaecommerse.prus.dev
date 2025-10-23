@@ -39,7 +39,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use LaraZeus\Quantity\Components\Quantity;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class CartItemResource extends Resource
 {
@@ -392,9 +392,15 @@ final class CartItemResource extends Resource
                     }),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::makeDate('created_from')
+                        Flatpickr::make('created_from')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker()
                             ->label(__('cart_items.created_from')),
-                        Flatpickr::makeDate('created_until')
+                        Flatpickr::make('created_until')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker()
                             ->label(__('cart_items.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

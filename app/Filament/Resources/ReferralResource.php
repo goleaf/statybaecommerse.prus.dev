@@ -14,6 +14,7 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -26,6 +27,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class ReferralResource extends Resource
 {
@@ -75,9 +77,13 @@ final class ReferralResource extends Resource
                                 'cancelled' => 'Cancelled',
                             ])
                             ->required(),
-                        Flatpickr::makeDate('completed_at')
+                        Flatpickr::make('completed_at')
+                            ->time(false)
+                            ->format('Y-m-d')
                             ->nullable(),
-                        Flatpickr::makeDate('expires_at')
+                        Flatpickr::make('expires_at')
+                            ->time(false)
+                            ->format('Y-m-d')
                             ->nullable(),
                         TextInput::make('source')
                             ->maxLength(255)

@@ -10,7 +10,7 @@ use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 class UserRelationManager extends BaseRelationManager
 {
@@ -38,7 +38,11 @@ class UserRelationManager extends BaseRelationManager
                         Forms\Components\TextInput::make('phone')
                             ->tel()
                             ->maxLength(255),
-                        Flatpickr::makeDateTime('email_verified_at')
+                        Flatpickr::make('email_verified_at')
+                            ->time(true)
+                            ->time24hr(true)
+                            ->seconds(false)
+                            ->format('Y-m-d H:i')
                             ->label('Email Verified At'),
                         Forms\Components\Select::make('status')
                             ->options([

@@ -13,7 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class NewsRelationManager extends BaseRelationManager
 {
@@ -49,7 +49,11 @@ final class NewsRelationManager extends BaseRelationManager
                             ->default(true),
                         Forms\Components\Toggle::make('is_featured')
                             ->default(false),
-                        Flatpickr::makeDateTime('published_at')
+                        Flatpickr::make('published_at')
+                            ->time(true)
+                            ->time24hr(true)
+                            ->seconds(false)
+                            ->format('Y-m-d H:i')
                             ->default(now()),
                     ])
                     ->columns(2),
@@ -103,8 +107,14 @@ final class NewsRelationManager extends BaseRelationManager
                 Tables\Filters\TernaryFilter::make('is_featured'),
                 Tables\Filters\Filter::make('published_at')
                     ->form([
-                        Flatpickr::makeDate('published_from'),
-                        Flatpickr::makeDate('published_until'),
+                        Flatpickr::make('published_from')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker(),
+                        Flatpickr::make('published_until')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker(),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query

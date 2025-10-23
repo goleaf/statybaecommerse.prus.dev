@@ -11,16 +11,11 @@ use App\Models\Notification;
 use App\Support\Concerns\HasNav;
 use App\Support\Filament\Filters\SingleDateFilter;
 use BackedEnum;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Tables\Actions\Action as TableAction;
-use Filament\Tables\Actions\BulkAction as TableBulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Grid;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -41,6 +36,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class NotificationResource extends Resource
 {
@@ -112,7 +108,11 @@ final class NotificationResource extends Resource
                                 ->dehydrated(false)
                                 ->default(false)
                                 ->columnSpan(1),
-                            DateTimePicker::make('read_at')
+                            Flatpickr::make('read_at')
+                                ->time(true)
+                                ->time24hr(true)
+                                ->seconds(false)
+                                ->format('Y-m-d H:i')
                                 ->label(__('admin.notifications.form.fields.read_at'))
                                 ->seconds(false)
                                 ->native(false)

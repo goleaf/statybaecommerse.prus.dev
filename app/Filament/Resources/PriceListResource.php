@@ -11,7 +11,7 @@ use App\Models\PriceList;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\DateTimePicker;
+
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -27,6 +27,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 /**
  * PriceListResource
@@ -105,10 +106,20 @@ final class PriceListResource extends Resource
                         ->label(__('price_lists.is_default')),
                     Toggle::make('auto_apply')
                         ->label(__('price_lists.auto_apply')),
-                    DateTimePicker::make('starts_at')
-                        ->label(__('price_lists.valid_from')),
-                    DateTimePicker::make('ends_at')
-                        ->label(__('price_lists.valid_until')),
+                    Flatpickr::make('starts_at')
+                        ->time(true)
+                        ->time24hr(true)
+                        ->seconds(false)
+                        ->format('Y-m-d H:i')
+                        ->rangePicker()
+                        ->label(__('price_lists.starts_at')),
+                    Flatpickr::make('ends_at')
+                        ->time(true)
+                        ->time24hr(true)
+                        ->seconds(false)
+                        ->format('Y-m-d H:i')
+                        ->rangePicker()
+                        ->label(__('price_lists.ends_at')),
                     TextInput::make('min_order_amount')
                         ->label(__('price_lists.min_order_amount'))
                         ->numeric()
@@ -226,10 +237,20 @@ final class PriceListResource extends Resource
                 Filter::make('starts_at')
                     ->label(__('price_lists.valid_from'))
                     ->form([
-                        DateTimePicker::make('starts_from')
-                            ->label(__('price_lists.valid_from_from')),
-                        DateTimePicker::make('starts_until')
-                            ->label(__('price_lists.valid_from_until')),
+                        Flatpickr::make('starts_from')
+                            ->time(true)
+                            ->time24hr(true)
+                            ->seconds(false)
+                            ->format('Y-m-d H:i')
+                            ->rangePicker()
+                            ->label(__('price_lists.starts_at_from')),
+                        Flatpickr::make('starts_until')
+                            ->time(true)
+                            ->time24hr(true)
+                            ->seconds(false)
+                            ->format('Y-m-d H:i')
+                            ->rangePicker()
+                            ->label(__('price_lists.starts_at_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -240,6 +261,35 @@ final class PriceListResource extends Resource
                             ->when(
                                 $data['starts_until'],
                                 fn (Builder $query, $date): Builder => $query->whereDate('starts_at', '<=', $date),
+                            );
+                    }),
+                Filter::make('ends_at')
+                    ->label(__('price_lists.ends_at'))
+                    ->form([
+                        Flatpickr::make('ends_from')
+                            ->time(true)
+                            ->time24hr(true)
+                            ->seconds(false)
+                            ->format('Y-m-d H:i')
+                            ->rangePicker()
+                            ->label(__('price_lists.ends_at_from')),
+                        Flatpickr::make('ends_until')
+                            ->time(true)
+                            ->time24hr(true)
+                            ->seconds(false)
+                            ->format('Y-m-d H:i')
+                            ->rangePicker()
+                            ->label(__('price_lists.ends_at_until')),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['ends_from'] ?? null,
+                                fn (Builder $query, $date): Builder => $query->whereDate('ends_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['ends_until'] ?? null,
+                                fn (Builder $query, $date): Builder => $query->whereDate('ends_at', '<=', $date),
                             );
                     }),
             ])

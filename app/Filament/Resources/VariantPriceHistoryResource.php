@@ -13,6 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class VariantPriceHistoryResource extends Resource
 {
@@ -74,10 +75,20 @@ final class VariantPriceHistoryResource extends Resource
                     ->relationship('changedBy', 'name')
                     ->searchable()
                     ->preload(),
-                Flatpickr::makeDateTime('effective_from')
+                Flatpickr::make('effective_from')
+                    ->time(true)
+                    ->time24hr(true)
+                    ->seconds(false)
+                    ->format('Y-m-d H:i')
+                    ->rangePicker()
                     ->label('Effective From')
                     ->required(),
-                Flatpickr::makeDateTime('effective_until')
+                Flatpickr::make('effective_until')
+                    ->time(true)
+                    ->time24hr(true)
+                    ->seconds(false)
+                    ->format('Y-m-d H:i')
+                    ->rangePicker()
                     ->label('Effective Until')
                     ->after('effective_from'),
             ]);
@@ -198,9 +209,15 @@ final class VariantPriceHistoryResource extends Resource
                     ->preload(),
                 Tables\Filters\Filter::make('effective_date_range')
                     ->form([
-                        Flatpickr::makeDate('effective_from')
+                        Flatpickr::make('effective_from')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker()
                             ->label('Effective From'),
-                        Flatpickr::makeDate('effective_until')
+                        Flatpickr::make('effective_until')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker()
                             ->label('Effective Until'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

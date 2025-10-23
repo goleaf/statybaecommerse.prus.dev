@@ -8,9 +8,11 @@ use App\Filament\Components\Combobox;
 use App\Filament\Resources\CampaignResource\Pages;
 use App\Filament\Resources\CampaignResource\RelationManagers\TranslationsRelationManager;
 use App\Models\Campaign;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms;
+
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -31,6 +33,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Novadaemon\FilamentCombobox\Combobox;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class CampaignResource extends Resource
 {
@@ -108,10 +111,20 @@ final class CampaignResource extends Resource
                 ->schema([
                     Grid::make(2)
                         ->schema([
-                            Flatpickr::makeDateTime('starts_at')
+                            Flatpickr::make('starts_at')
+                                ->time(true)
+                                ->time24hr(true)
+                                ->seconds(false)
+                                ->format('Y-m-d H:i')
+                                ->rangePicker()
                                 ->label(self::label('campaigns.fields.start_date', 'Start date'))
                                 ->seconds(false),
-                            Flatpickr::makeDateTime('ends_at')
+                            Flatpickr::make('ends_at')
+                                ->time(true)
+                                ->time24hr(true)
+                                ->seconds(false)
+                                ->format('Y-m-d H:i')
+                                ->rangePicker()
                                 ->label(self::label('campaigns.fields.end_date', 'End date'))
                                 ->seconds(false),
                             TextInput::make('max_uses')

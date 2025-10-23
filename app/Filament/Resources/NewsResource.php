@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\DB;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 use Novadaemon\FilamentCombobox\Combobox;
 use RuntimeException;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 class NewsResource extends Resource
 {
@@ -74,7 +75,11 @@ class NewsResource extends Resource
                 ->columns(1),
             Forms\Components\Section::make('Publishing')
                 ->components([
-                    Forms\Components\DateTimePicker::make('published_at')
+                    Flatpickr::make('published_at')
+                        ->time(true)
+                        ->time24hr(true)
+                        ->seconds(false)
+                        ->format('Y-m-d H:i')
                         ->label(__('news.fields.published_at'))
                         ->default(now()),
                     Forms\Components\TextInput::make('author_name')
@@ -230,9 +235,15 @@ class NewsResource extends Resource
                     ->label(__('news.fields.is_breaking')),
                 Tables\Filters\Filter::make('published_at')
                     ->form([
-                        Flatpickr::makeDate('published_from')
+                        Flatpickr::make('published_from')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker()
                             ->label(__('news.filters.published_from')),
-                        Flatpickr::makeDate('published_until')
+                        Flatpickr::make('published_until')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker()
                             ->label(__('news.filters.published_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

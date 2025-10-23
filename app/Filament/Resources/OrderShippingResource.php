@@ -12,8 +12,13 @@ use App\Models\OrderShipping;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\StatusScope;
 use BackedEnum;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Grid;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -35,6 +40,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class OrderShippingResource extends Resource
 {
@@ -116,11 +122,23 @@ final class OrderShippingResource extends Resource
                         ]),
                     Grid::make(3)
                         ->schema([
-                            Flatpickr::makeDateTime('shipped_at')
+                            Flatpickr::make('shipped_at')
+                                ->time(true)
+                                ->time24hr(true)
+                                ->seconds(false)
+                                ->format('Y-m-d H:i')
                                 ->label(__('admin.order_shippings.shipped_at')),
-                            Flatpickr::makeDateTime('estimated_delivery')
+                            Flatpickr::make('estimated_delivery')
+                                ->time(true)
+                                ->time24hr(true)
+                                ->seconds(false)
+                                ->format('Y-m-d H:i')
                                 ->label(__('admin.order_shippings.estimated_delivery')),
-                            Flatpickr::makeDateTime('delivered_at')
+                            Flatpickr::make('delivered_at')
+                                ->time(true)
+                                ->time24hr(true)
+                                ->seconds(false)
+                                ->format('Y-m-d H:i')
                                 ->label(__('admin.order_shippings.delivered_at')),
                         ]),
                     Grid::make(3)
@@ -249,9 +267,19 @@ final class OrderShippingResource extends Resource
                 Filter::make('shipped_at')
                     ->label(__('admin.order_shippings.shipped_at'))
                     ->form([
-                        Flatpickr::makeDateTime('shipped_from')
+                        Flatpickr::make('shipped_from')
+                            ->time(true)
+                            ->time24hr(true)
+                            ->seconds(false)
+                            ->format('Y-m-d H:i')
+                            ->rangePicker()
                             ->label(__('admin.order_shippings.shipped_from')),
-                        Flatpickr::makeDateTime('shipped_until')
+                        Flatpickr::make('shipped_until')
+                            ->time(true)
+                            ->time24hr(true)
+                            ->seconds(false)
+                            ->format('Y-m-d H:i')
+                            ->rangePicker()
                             ->label(__('admin.order_shippings.shipped_until')),
                     ])
                     ->query(function ($query, array $data) {

@@ -8,11 +8,9 @@ use App\Models\OrderShipping;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -30,7 +28,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 /**
  * OrderShippingRelationManager
@@ -121,15 +119,27 @@ final class OrderShippingRelationManager extends BaseRelationManager
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                                DateTimePicker::make('shipped_at')
-                                    ->label(__('orders.fields.shipped_at')),
-                                DateTimePicker::make('estimated_delivery')
-                                    ->label(__('orders.fields.estimated_delivery')),
+                                Flatpickr::make('shipped_at')
+                                    ->time(true)
+                                    ->time24hr(true)
+                                    ->seconds(false)
+                                    ->format('Y-m-d H:i')
+                                    ->label(__('orders.shipped_at')),
+                                Flatpickr::make('estimated_delivery')
+                                    ->time(true)
+                                    ->time24hr(true)
+                                    ->seconds(false)
+                                    ->format('Y-m-d H:i')
+                                    ->label(__('orders.estimated_delivery')),
                             ]),
                         Grid::make(2)
                             ->schema([
-                                DateTimePicker::make('delivered_at')
-                                    ->label(__('orders.fields.delivered_at')),
+                                Flatpickr::make('delivered_at')
+                                    ->time(true)
+                                    ->time24hr(true)
+                                    ->seconds(false)
+                                    ->format('Y-m-d H:i')
+                                    ->label(__('orders.delivered_at')),
                                 TextInput::make('delivery_notes')
                                     ->label(__('orders.fields.delivery_notes'))
                                     ->maxLength(500),
