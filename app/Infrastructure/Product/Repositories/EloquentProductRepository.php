@@ -16,6 +16,7 @@ use App\Domain\Product\ValueObjects\ProductSearchCriteria;
 use App\Domain\Product\ValueObjects\ProductSlug;
 use App\Models\Product;
 use App\Models\Scopes\PublishedScope;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Eloquent-backed repository for domain product read models.
@@ -36,7 +37,13 @@ final class EloquentProductRepository implements ProductRepositoryInterface
                     ->orWhere('description', 'like', "%{$term}%")
                     ->orWhere('sku', 'like', "%{$term}%");
             })
-            ->with(['brand', 'categories', 'variants', 'media']);
+            ->with(['brand', 'categories', 'variants', 'media'])
+            ->withSum([
+                // Eager-load active reservation totals so stock checks avoid N+1 aggregate queries.
+                'stockReservations as reserved_stock_quantity' => static function (Builder $relation): void {
+                    $relation->active();
+                },
+            ], 'quantity');
 
         $timeout = now()->addSeconds($criteria->getTimeoutSeconds());
 
@@ -55,7 +62,13 @@ final class EloquentProductRepository implements ProductRepositoryInterface
     {
         $builder = Product::query()
             ->where('is_visible', true)
-            ->with(['brand', 'categories', 'variants', 'media']);
+            ->with(['brand', 'categories', 'variants', 'media'])
+            ->withSum([
+                // Keep reservation totals consistent in catalog listings as well for parity with search results.
+                'stockReservations as reserved_stock_quantity' => static function (Builder $relation): void {
+                    $relation->active();
+                },
+            ], 'quantity');
 
         if ($query->getCategorySlug()) {
             $builder->whereHas('categories', static function ($relation) use ($query): void {
@@ -89,6 +102,12 @@ final class EloquentProductRepository implements ProductRepositoryInterface
         $product = Product::query()
             ->where('slug', $slug->getValue())
             ->with(['brand', 'categories', 'variants', 'media'])
+            ->withSum([
+                // Ensure detail views reuse the same eager-loaded reservation aggregates.
+                'stockReservations as reserved_stock_quantity' => static function (Builder $relation): void {
+                    $relation->active();
+                },
+            ], 'quantity')
             ->first();
 
         return $product ? $this->mapToDomainProduct($product) : null;
@@ -138,6 +157,13 @@ final class EloquentProductRepository implements ProductRepositoryInterface
             'slug' => (string) $primaryCategory->slug,
         ] : null;
 
+        // Derive inventory booleans from preloaded aggregates to avoid calling helper methods that trigger extra queries.
+        $manageStock = (bool) $product->manage_stock;
+        $stockQuantity = (int) ($product->stock_quantity ?? 0);
+        $reservedQuantity = (int) ($product->reserved_stock_quantity ?? 0);
+        $availableQuantity = $manageStock ? max($stockQuantity - $reservedQuantity, 0) : $stockQuantity;
+        $isInStock = $manageStock ? $availableQuantity > 0 : true;
+
         return new DomainProduct(
             $product->id,
             $name,
@@ -149,9 +175,9 @@ final class EloquentProductRepository implements ProductRepositoryInterface
             $category,
             (bool) $product->is_visible,
             (bool) $product->is_featured,
-            (bool) $product->manage_stock,
-            (bool) $product->isInStock(),
-            (int) ($product->stock_quantity ?? 0),
+            $manageStock,
+            $isInStock,
+            $availableQuantity,
             $images,
             $variants,
             $description,
