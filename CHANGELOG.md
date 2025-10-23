@@ -10,6 +10,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Introduced operator-aware system setting dependencies with explicit condition values, refreshed Filament forms, and resilient evaluation helpers for richer admin automation.
 
 ### Maintenance
+* Clarified the Wishlist Item Filament resource navigation metadata by switching to the documented static icon property and explaining the sidebar sort order for reviewers.
 * Replaced the artisan diagnostics commands with PHPUnit coverage suites, added Paratest support, and wired a minimum coverage extension that fails the build when thresholds are not met.
 * Added granular rate limiting configuration scopes and partner-friendly throttling helpers while wiring CSP nonces into helper utilities and admin providers.
 * Normalized HTTP 429 API responses to the new shared `error.rate_limited` problem code and refreshed the contract docs so client throttling logic stays consistent.
