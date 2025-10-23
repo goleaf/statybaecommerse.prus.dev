@@ -6,7 +6,7 @@ namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Concerns\InteractsWithTranslationTabs;
 use App\Filament\Resources\ProductResource;
-use App\Support\Html\HtmlSanitizer;
+use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;

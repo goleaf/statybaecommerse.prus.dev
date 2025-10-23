@@ -4,43 +4,49 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Models\AdminUser;
 use App\Models\Brand;
 use App\Models\User;
-use App\Policies\Concerns\HandlesRolePermissions;
-use Illuminate\Auth\Access\HandlesAuthorization;
+use App\Support\Authorization\AuthorizationMatrix;
 
 final class BrandPolicy
 {
-    use HandlesAuthorization;
-    use HandlesRolePermissions;
-
-    public function viewAny(User $user): bool
+    public function viewAny(AdminUser|User $user): bool
     {
-        return $this->allows($user, 'brand', 'viewAny');
+        return $user instanceof AdminUser
+            ? AuthorizationMatrix::check('brands', 'viewAny', $user)
+            : (bool) ($user->is_admin ?? false);
     }
 
-    public function view(User $user, Brand $brand): bool
+    public function view(AdminUser|User $user, Brand $brand): bool
     {
-        return $this->allows($user, 'brand', 'view');
+        return $user instanceof AdminUser
+            ? AuthorizationMatrix::check('brands', 'view', $user)
+            : (bool) ($user->is_admin ?? false);
     }
 
-    public function create(User $user): bool
+    public function create(AdminUser $user): bool
     {
-        return $this->allows($user, 'brand', 'create');
+        return AuthorizationMatrix::check('brands', 'create', $user);
     }
 
-    public function update(User $user, Brand $brand): bool
+    public function update(AdminUser $user, Brand $brand): bool
     {
-        return $this->allows($user, 'brand', 'update');
+        return AuthorizationMatrix::check('brands', 'update', $user);
     }
 
-    public function delete(User $user, Brand $brand): bool
+    public function delete(AdminUser $user, Brand $brand): bool
     {
-        return $this->allows($user, 'brand', 'delete');
+        return AuthorizationMatrix::check('brands', 'delete', $user);
     }
 
-    public function restore(User $user, Brand $brand): bool
+    public function restore(AdminUser $user, Brand $brand): bool
     {
-        return $this->allows($user, 'brand', 'restore');
+        return AuthorizationMatrix::check('brands', 'update', $user);
+    }
+
+    public function forceDelete(AdminUser $user, Brand $brand): bool
+    {
+        return AuthorizationMatrix::check('brands', 'delete', $user);
     }
 }

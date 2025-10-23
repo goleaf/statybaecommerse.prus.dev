@@ -22,13 +22,13 @@ Policies for each model call the same helper, guaranteeing the UI and server res
 The matrix seeds explicit role presets that can be assigned to either `App\Models\AdminUser` or the customer-facing
 `App\Models\User` model:
 
-- **`AuthorizationRole::SUPER_ADMIN`** – wildcard access to every permission.
-- **`AuthorizationRole::ADMIN` / `AuthorizationRole::ADMINISTRATOR`** – full CRUD across products, categories, brands, orders, users, plus panel access.
-- **`AuthorizationRole::MANAGER`** – can manage catalog content and update orders but cannot delete users or brands.
-- **`AuthorizationRole::EDITOR`** – limited to catalog creation and updates.
-- **`AuthorizationRole::SUPPORT`** – maintain orders and update user profiles without modifying catalog data.
-- **`AuthorizationRole::VIEWER`** – read-only access across the main dashboards.
-- **`AuthorizationRole::USER`** – no administrative permissions seeded.
+- **super_admin** – wildcard access to every permission.
+- **admin / administrator** – full CRUD across products, categories, brands, orders, users, plus panel access.
+- **manager** – can manage catalog content and update orders but cannot delete users or brands.
+- **editor** – limited to catalog creation and updates.
+- **support** – maintain orders and update user profiles without modifying catalog data.
+- **viewer** – read-only access across the main dashboards.
+- **user** – no administrative permissions seeded.
 
 Assigning one of these roles ensures the associated permissions are synchronized automatically for both guards.
 Use the `AdminAuthorizationSeeder` when preparing local or CI environments to populate the baseline roles and permissions.
@@ -38,5 +38,5 @@ Use the `AdminAuthorizationSeeder` when preparing local or CI environments to po
 1. Add the ability mapping to `config/authorization.php` under the appropriate resource.
 2. Reference the new ability from policies and Filament resources via `AuthorizationMatrix::ability()` or
    `AuthorizationMatrix::check()`.
-3. Re-run the `AdminAuthorizationSeeder` (or call `AuthorizationMatrix::permissionsForRole(AuthorizationRole::ADMIN)` in bespoke seeders) so the
+3. Re-run the `AdminAuthorizationSeeder` (or call `AuthorizationMatrix::permissionsForRole()` in bespoke seeders) so the
    new permission is created for each guard and linked to the relevant roles.

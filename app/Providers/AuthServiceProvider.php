@@ -63,12 +63,24 @@ final class AuthServiceProvider extends ServiceProvider
     ];
 
     /**
+     * The policy mappings for the application.
+     */
+    protected $policies = [
+        Product::class => ProductPolicy::class,
+        Category::class => CategoryPolicy::class,
+        Brand::class => BrandPolicy::class,
+        Order::class => OrderPolicy::class,
+        User::class => UserPolicy::class,
+    ];
+
+    /**
      * Register any authentication / authorization services.
      */
     public function boot(): void
     {
         $this->registerPolicies();
 
+        // Allow administrators to bypass all authorization checks
         Gate::before(function ($user, ?string $ability = null) {
             if (! method_exists($user, 'hasRole')) {
                 return null;

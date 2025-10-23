@@ -10,14 +10,16 @@ use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Address;
 use App\Models\Channel;
 use App\Models\Order;
-use Filament\Actions\Action as PageAction;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use App\Support\Authorization\AuthorizationMatrix;
+use App\Services\Export\ExportColumn;
+use App\Services\Export\ExportService;
+use App\Services\Export\Exporters\OrderExport;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DateTimePicker;
@@ -99,7 +101,15 @@ final class OrderResource extends Resource implements DefinesExportColumns
 
     protected static ?string $pluralModelLabel = 'orders.models.orders';
 
-    
+    public static function shouldRegisterNavigation(): bool
+    {
+        return AuthorizationMatrix::check('orders', 'viewAny');
+    }
+
+    public static function getNavigationIcon(): string|\BackedEnum|null
+    {
+        return 'heroicon-o-shopping-bag';
+    }
 
     
 
@@ -703,12 +713,12 @@ final class OrderResource extends Resource implements DefinesExportColumns
             ->actions([
                 ViewAction::make()
                     ->color('info')
-                    ->visible(fn (Order $record): bool => static::authorizeOrder($record, 'view')),
+                    ->visible(fn () => AuthorizationMatrix::check('orders', 'view')),
                 EditAction::make()
                     ->color('warning')
-                    ->visible(fn (Order $record): bool => static::authorizeOrder($record, 'update')),
-                DeleteAction::make()
-                    ->visible(fn (Order $record): bool => static::authorizeOrder($record, 'delete')),
+                    ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
+                \Filament\Tables\Actions\DeleteAction::make()
+                    ->visible(fn () => AuthorizationMatrix::check('orders', 'delete')),
                 Action::make('mark_processing')
                     ->label(__('orders.mark_processing'))
                     ->icon('heroicon-o-cog')
@@ -788,8 +798,52 @@ final class OrderResource extends Resource implements DefinesExportColumns
             ])
             ->bulkActions([
                 BulkActionGroup::make([
+                    BulkAction::make('export_selected')
+                        ->label(__('Export selected'))
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('success')
+                        ->form([
+                            Select::make('format')
+                                ->label(__('Format'))
+                                ->options([
+                                    'csv' => 'CSV',
+                                    'xlsx' => 'XLSX',
+                                    'pdf' => 'PDF',
+                                ])
+                                ->default('csv')
+                                ->required(),
+                            CheckboxList::make('columns')
+                                ->label(__('Columns'))
+                                ->options(fn () => collect(app(OrderExport::class)->columns())->mapWithKeys(fn (ExportColumn $column) => [$column->key => $column->label])->all())
+                                ->default(fn () => app(OrderExport::class)->defaultColumns())
+                                ->columns(2)
+                                ->required(),
+                        ])
+                        ->action(function (Collection $records, array $data): void {
+                            /** @var ExportService $service */
+                            $service = app(ExportService::class);
+                            $columns = $data['columns'] ?? app(OrderExport::class)->defaultColumns();
+                            $request = new ExportRequestData(
+                                name: __('Orders Export'),
+                                exportable: OrderExport::class,
+                                format: $data['format'],
+                                columns: $columns,
+                                recordIds: $records->pluck('id')->all(),
+                                userId: auth()->id(),
+                            );
+
+                            $service->queue($request);
+
+                            Notification::make()
+                                ->title(__('Export queued'))
+                                ->body(__('You will receive a notification once the export has finished.'))
+                                ->success()
+                                ->send();
+                        })
+                        ->deselectRecordsAfterCompletion()
+                        ->visible(fn () => AuthorizationMatrix::check('orders', 'viewAny')),
                     DeleteBulkAction::make()
-                        ->visible(fn (): bool => static::authorizeOrder(null, 'delete')),
+                        ->visible(fn () => AuthorizationMatrix::check('orders', 'delete')),
                     BulkAction::make('mark_processing')
                         ->label(__('orders.bulk_mark_processing'))
                         ->icon('heroicon-o-cog')
@@ -802,7 +856,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                 ->send();
                         })
                         ->requiresConfirmation()
-                        ->visible(fn (): bool => static::authorizeOrder(null, 'update')),
+                        ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
                     BulkAction::make('mark_shipped')
                         ->label(__('orders.bulk_mark_shipped'))
                         ->icon('heroicon-o-truck')
@@ -818,7 +872,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                 ->send();
                         })
                         ->requiresConfirmation()
-                        ->visible(fn (): bool => static::authorizeOrder(null, 'update')),
+                        ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
                     BulkAction::make('mark_delivered')
                         ->label(__('orders.bulk_mark_delivered'))
                         ->icon('heroicon-o-check-circle')
@@ -834,7 +888,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                 ->send();
                         })
                         ->requiresConfirmation()
-                        ->visible(fn (): bool => static::authorizeOrder(null, 'update')),
+                        ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
                     BulkAction::make('cancel_orders')
                         ->label(__('orders.bulk_cancel'))
                         ->icon('heroicon-o-x-circle')
@@ -847,7 +901,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                 ->send();
                         })
                         ->requiresConfirmation()
-                        ->visible(fn (): bool => static::authorizeOrder(null, 'update')),
+                        ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
                     BulkAction::make('export_orders')
                         ->label(__('exports.actions.export_orders'))
                         ->icon('heroicon-o-arrow-down-tray')
@@ -884,8 +938,8 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                 ->send();
                         })
                         ->requiresConfirmation()
-                        ->visible(fn (): bool => static::authorizeOrder(null, 'viewAny')),
-                ])->visible(fn (): bool => static::authorizeOrder(null, 'update') || static::authorizeOrder(null, 'delete') || static::authorizeOrder(null, 'viewAny')),
+                        ->visible(fn () => AuthorizationMatrix::check('orders', 'viewAny')),
+                ]),
             ])
             ->defaultSort('created_at', 'desc')
             ->poll('30s')

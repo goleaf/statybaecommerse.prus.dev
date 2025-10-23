@@ -24,7 +24,6 @@ class ListUsers extends BaseListRecords
         }
 
         return [
-            LocaleSwitcher::make(), // Provide a quick language toggle for the grid view.
             CreateAction::make()
                 ->visible(fn () => AuthorizationMatrix::check('users', 'create')),
         ];

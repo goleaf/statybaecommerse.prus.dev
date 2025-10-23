@@ -4,43 +4,63 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Models\AdminUser;
 use App\Models\Order;
 use App\Models\User;
-use App\Policies\Concerns\HandlesRolePermissions;
-use Illuminate\Auth\Access\HandlesAuthorization;
+use App\Support\Authorization\AuthorizationMatrix;
 
 final class OrderPolicy
 {
-    use HandlesAuthorization;
-    use HandlesRolePermissions;
-
-    public function viewAny(User $user): bool
+    public function viewAny(AdminUser|User $user): bool
     {
-        return $this->allows($user, 'order', 'viewAny');
+        return $user instanceof AdminUser
+            ? AuthorizationMatrix::check('orders', 'viewAny', $user)
+            : (bool) ($user->is_admin ?? false);
     }
 
-    public function view(User $user, Order $order): bool
+    public function view(AdminUser|User $user, Order $order): bool
     {
-        return $this->allows($user, 'order', 'view');
+        if ($user instanceof AdminUser) {
+            return AuthorizationMatrix::check('orders', 'view', $user);
+        }
+
+        if ($user->is_admin ?? false) {
+            return true;
+        }
+
+        return $order->user_id === $user->getKey();
     }
 
-    public function create(User $user): bool
+    public function create(AdminUser $user): bool
     {
-        return $this->allows($user, 'order', 'create');
+        return AuthorizationMatrix::check('orders', 'create', $user);
     }
 
-    public function update(User $user, Order $order): bool
+    public function update(AdminUser|User $user, Order $order): bool
     {
-        return $this->allows($user, 'order', 'update');
+        if ($user instanceof AdminUser) {
+            return AuthorizationMatrix::check('orders', 'update', $user);
+        }
+
+        if ($user->is_admin ?? false) {
+            return true;
+        }
+
+        return $order->user_id === $user->getKey();
     }
 
-    public function delete(User $user, Order $order): bool
+    public function delete(AdminUser $user, Order $order): bool
     {
-        return $this->allows($user, 'order', 'delete');
+        return AuthorizationMatrix::check('orders', 'delete', $user);
     }
 
-    public function restore(User $user, Order $order): bool
+    public function restore(AdminUser $user, Order $order): bool
     {
-        return $this->allows($user, 'order', 'restore');
+        return AuthorizationMatrix::check('orders', 'update', $user);
+    }
+
+    public function forceDelete(AdminUser $user, Order $order): bool
+    {
+        return AuthorizationMatrix::check('orders', 'delete', $user);
     }
 }

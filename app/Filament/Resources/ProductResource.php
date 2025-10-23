@@ -15,6 +15,7 @@ use App\Filament\Resources\ProductResource\RelationManagers\ReviewsRelationManag
 use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
 use App\Filament\Widgets\InlineCharts\ProductSalesSparkline;
 use App\Models\Product;
+use App\Support\Authorization\AuthorizationMatrix;
 use App\Services\Export\ExportColumn;
 use App\Services\Export\ExportService;
 use App\Services\Export\Exporters\ProductExport;
@@ -70,7 +71,15 @@ final class ProductResource extends Resource implements DefinesExportColumns
 
     protected static ?string $model = Product::class;
 
-    
+    public static function shouldRegisterNavigation(): bool
+    {
+        return AuthorizationMatrix::check('products', 'viewAny');
+    }
+
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-cube';
+    }
 
     
 
@@ -569,12 +578,12 @@ final class ProductResource extends Resource implements DefinesExportColumns
             ->actions([
                 ActionGroup::make([
                     ViewAction::make()
-                        ->visible(fn (Product $record): bool => static::authorizeProduct($record, 'view')),
+                        ->visible(fn () => AuthorizationMatrix::check('products', 'view')),
                     EditAction::make()
-                        ->visible(fn (Product $record): bool => static::authorizeProduct($record, 'update')),
+                        ->visible(fn () => AuthorizationMatrix::check('products', 'update')),
                     DeleteAction::make()
-                        ->visible(fn (Product $record): bool => static::authorizeProduct($record, 'delete')),
-                ])->visible(fn (Product $record): bool => static::authorizeProduct($record, 'view') || static::authorizeProduct($record, 'update') || static::authorizeProduct($record, 'delete')),
+                        ->visible(fn () => AuthorizationMatrix::check('products', 'delete')),
+                ]),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -620,7 +629,8 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                 ->success()
                                 ->send();
                         })
-                        ->deselectRecordsAfterCompletion(),
+                        ->deselectRecordsAfterCompletion()
+                        ->visible(fn () => AuthorizationMatrix::check('products', 'viewAny')),
                     BulkAction::make('publish')
                         ->label(__('products.actions.publish'))
                         ->icon('heroicon-o-eye')
@@ -631,7 +641,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn (): bool => static::authorizeProduct(null, 'update')),
+                        ->visible(fn () => AuthorizationMatrix::check('products', 'update')),
                     BulkAction::make('unpublish')
                         ->label(__('products.actions.unpublish'))
                         ->icon('heroicon-o-eye-slash')
@@ -642,7 +652,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn (): bool => static::authorizeProduct(null, 'update')),
+                        ->visible(fn () => AuthorizationMatrix::check('products', 'update')),
                     BulkAction::make('feature')
                         ->label(__('products.actions.feature'))
                         ->icon('heroicon-o-star')
@@ -653,7 +663,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn (): bool => static::authorizeProduct(null, 'update')),
+                        ->visible(fn () => AuthorizationMatrix::check('products', 'update')),
                     BulkAction::make('unfeature')
                         ->label(__('products.actions.unfeature'))
                         ->icon('heroicon-o-star')
@@ -664,7 +674,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn (): bool => static::authorizeProduct(null, 'update')),
+                        ->visible(fn () => AuthorizationMatrix::check('products', 'update')),
                     BulkAction::make('update_stock')
                         ->label(__('products.actions.update_stock'))
                         ->icon('heroicon-o-cube')
@@ -688,7 +698,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn (): bool => static::authorizeProduct(null, 'update')),
+                        ->visible(fn () => AuthorizationMatrix::check('products', 'update')),
                     BulkAction::make('update_prices')
                         ->label(__('products.actions.update_prices'))
                         ->icon('heroicon-o-currency-euro')
@@ -716,10 +726,10 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn (): bool => static::authorizeProduct(null, 'update')),
+                        ->visible(fn () => AuthorizationMatrix::check('products', 'update')),
                     DeleteBulkAction::make()
-                        ->visible(fn (): bool => static::authorizeProduct(null, 'delete')),
-                ])->visible(fn (): bool => static::authorizeProduct(null, 'update') || static::authorizeProduct(null, 'delete')),
+                        ->visible(fn () => AuthorizationMatrix::check('products', 'delete')),
+                ]),
             ])
             ->defaultSort('created_at', 'desc');
     }
