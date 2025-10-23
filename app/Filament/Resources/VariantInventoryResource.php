@@ -28,7 +28,7 @@ use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Resources\Resource;
-use Filament\Support\Facades\Number;
+use Filament\Support\Facades\FilamentNumber;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -337,9 +337,9 @@ final class VariantInventoryResource extends Resource
                     ->toggleable(),
                 TextColumn::make('utilization_percentage')
                     ->label(__('admin.variant_inventory.utilization_percentage'))
-                    ->formatStateUsing(static function (float|int|null $state): string {
-                        // Format percentages consistently with Filament's Number facade.
-                        return Number::percentage(((float) $state) / 100, 2);
+                    ->formatStateUsing(static function ($state): string {
+                        // Use FilamentNumber so percentage formatting respects panel-wide locale overrides.
+                        return FilamentNumber::format((float) ($state ?? 0), 2) . '%';
                     })
                     ->color(fn ($state) => $state > 80 ? 'warning' : 'success')
                     ->toggleable(),
