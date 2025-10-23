@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\NewsCategoryResource\Pages;
 use App\Models\NewsCategory;
 use BackedEnum;
@@ -33,8 +32,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Str;
-use UnitEnum;
 
 final class NewsCategoryResource extends Resource
 {
@@ -42,9 +39,19 @@ final class NewsCategoryResource extends Resource
 
     protected static ?string $model = NewsCategory::class;
 
-    
+    /**
+     * @return string|Htmlable|BackedEnum|null ensure icon compatibility with enum-aware navigation.
+     */
+    public static function getNavigationIcon(): string|Htmlable|null
+    {
+        return 'heroicon-o-tag';
+    }
 
-    
+    public static function getNavigationGroup(): ?string
+    {
+        // Leverage the enum label to keep the group consistent across locales.
+        return NavigationGroup::Content->label();
+    }
 
     protected static ?int $navigationSort = 2;
 

@@ -6,6 +6,9 @@ return [
     'title'  => 'Product Similarities',
     'plural' => 'Product Similarities',
     'single' => 'Product Similarity',
+    'navigation_label'    => 'Product Similarities',
+    'model_label'         => 'Product Similarity',
+    'plural_model_label'  => 'Product Similarities',
 
     'basic_information' => 'Similarity Details',
 

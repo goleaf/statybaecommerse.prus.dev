@@ -6,6 +6,9 @@ return [
     'title'  => 'Produktų panašumai',
     'plural' => 'Produktų panašumai',
     'single' => 'Produktų panašumas',
+    'navigation_label'    => 'Produktų panašumai',
+    'model_label'         => 'Produktų panašumas',
+    'plural_model_label'  => 'Produktų panašumai',
 
     'sections' => [
         'products'            => 'Produktai',
