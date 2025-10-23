@@ -10,7 +10,9 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Introduced operator-aware system setting dependencies with explicit condition values, refreshed Filament forms, and resilient evaluation helpers for richer admin automation.
 
 ### Maintenance
-* Introduced layered per-user and per-IP API throttles with structured 429 responses, refreshed security configuration defaults, and updated route documentation for dedicated read/write buckets.
+* Captured the Oct 21–22, 2025 pull request triage results in `docs/analysis/CURRENT_SYSTEM_STATUS.md`, outlining merge-ready Husky and feature flag fixes, superseded Filament cleanups to close, and outstanding follow-up work so maintainers can act without revisiting GitHub filters.
+* Captured a repository-wide analysis summary that enumerates the 24 open pull requests, clustering the Filament Schema migrations, Husky shim fixes, and layered rate-limiting work so reviewers can triage without scraping the GitHub UI.
+* Documented the open security hardening proposal from PR #289 covering layered API rate limits, per-identity throttling buckets, and correlation-aware logging so stakeholders can track the pending review scope from within the repository knowledge base.
 * Migrated Filament resources, relation managers, custom pages, and widgets to the v4 Schema API while normalizing navigation icon docblocks so BackedEnum-powered metadata stays compatible with upstream traits (#1070).
 * Refactored the product API flow to run through dedicated application use cases, a presenter, and an Eloquent-backed repository so contract responses stay stable while filtering non-displayable catalogue entries.
 * Centralized Filament navigation metadata by adopting the `HasNav` trait on notifications, hardening the Nav helper against recursion, and documenting the `Schema::components([...])` pipeline for the Address resource.

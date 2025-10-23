@@ -17,7 +17,9 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 ### Latest updates
-- Continuous Integration now runs a PHP 8.2/8.3 matrix with shared Composer caching, coverage uploads, and a flat ESLint config so every pull request validates backend and frontend tooling in one pass.
+- Logged the Oct 21–22, 2025 PR triage outcome directly in `docs/analysis/CURRENT_SYSTEM_STATUS.md`, highlighting which Husky and Filament fixes are ready to merge, which legacy branches to close as superseded, and which submissions still need action so maintainers can prioritise reviews without re-scraping GitHub.
+- Curated a high-level repository analysis that catalogues the 24 open pull requests, highlighting the repeated Filament Schema API migrations, Husky bootstrap shim restorations, and the layered rate-limiting proposal so maintainers can prioritise reviews without manually expanding each PR.
+- Documented the open proposal from PR #289 to introduce layered API rate limiting buckets for read, write, notification, and autocomplete endpoints alongside enhanced throttling logs with correlation identifiers, so reviewers can quickly trace the outstanding security hardening work.
 - Filament admin resources, relation managers, and bespoke pages now return `Filament\\Schemas\\Schema` instances with documented icon docblocks, aligning every form/table/infolist signature to the v4 API so upstream navigation traits continue to resolve enum-aware metadata without collisions.
 - Product API endpoints now resolve via dedicated application use cases, an Eloquent-backed repository, and a presenter that preserves the public contract while filtering non-displayable catalogue entries.
 - Activity Log admin navigation now declares its icon using the BackedEnum-aware union type expected by Filament v4, eliminating the fatal error encountered during resource bootstrapping.
