@@ -1,52 +1,119 @@
 <?php
 
-if (! class_exists(Awcodes\Curator\Curations\ThumbnailPreset::class)) {
-    class_alias(\stdClass::class, Awcodes\Curator\Curations\ThumbnailPreset::class);
+declare(strict_types=1);
+
+namespace Awcodes\Curator\Curations {
+    if (! class_exists(ThumbnailPreset::class)) {
+        class ThumbnailPreset {}
+    }
 }
 
-if (! class_exists(Awcodes\Curator\Glide\DefaultServerFactory::class)) {
-    class_alias(\stdClass::class, Awcodes\Curator\Glide\DefaultServerFactory::class);
+namespace Awcodes\Curator\Glide {
+    if (! class_exists(DefaultServerFactory::class)) {
+        class DefaultServerFactory {}
+    }
 }
 
-if (! class_exists(Awcodes\Curator\Models\Media::class)) {
-    class_alias(\stdClass::class, Awcodes\Curator\Models\Media::class);
+namespace Awcodes\Curator\Models {
+    if (! class_exists(Media::class)) {
+        class Media {}
+    }
 }
 
-if (! class_exists(Awcodes\Curator\Resources\MediaResource::class)) {
-    class_alias(\stdClass::class, Awcodes\Curator\Resources\MediaResource::class);
+namespace Awcodes\Curator\Resources {
+    if (! class_exists(MediaResource::class)) {
+        class MediaResource {}
+    }
 }
 
-if (! class_exists(Spatie\MediaLibraryPro\Models\TemporaryUpload::class)) {
-    class_alias(\stdClass::class, Spatie\MediaLibraryPro\Models\TemporaryUpload::class);
+namespace Spatie\MediaLibraryPro\Models {
+    if (! class_exists(TemporaryUpload::class)) {
+        class TemporaryUpload {}
+    }
 }
 
-if (! class_exists(Laravel\Telescope\Http\Middleware\Authorize::class)) {
-    class_alias(\stdClass::class, Laravel\Telescope\Http\Middleware\Authorize::class);
+namespace Laravel\Telescope\Http\Middleware {
+    if (! class_exists(Authorize::class)) {
+        class Authorize
+        {
+            public function handle(mixed $request, \Closure $next): mixed
+            {
+                return $next($request);
+            }
+        }
+    }
 }
 
-foreach ([
-    'BatchWatcher',
-    'CacheWatcher',
-    'ClientRequestWatcher',
-    'CommandWatcher',
-    'DumpWatcher',
-    'EventWatcher',
-    'ExceptionWatcher',
-    'GateWatcher',
-    'JobWatcher',
-    'LogWatcher',
-    'MailWatcher',
-    'ModelWatcher',
-    'NotificationWatcher',
-    'QueryWatcher',
-    'RedisWatcher',
-    'RequestWatcher',
-    'ScheduleWatcher',
-    'ViewWatcher',
-] as $watcher) {
-    $class = "Laravel\\Telescope\\Watchers\\{$watcher}";
+namespace Laravel\Telescope\Watchers {
+    if (! class_exists(BatchWatcher::class)) {
+        class BatchWatcher {}
+    }
 
-    if (! class_exists($class)) {
-        class_alias(\stdClass::class, $class);
+    if (! class_exists(CacheWatcher::class)) {
+        class CacheWatcher {}
+    }
+
+    if (! class_exists(ClientRequestWatcher::class)) {
+        class ClientRequestWatcher {}
+    }
+
+    if (! class_exists(CommandWatcher::class)) {
+        class CommandWatcher {}
+    }
+
+    if (! class_exists(DumpWatcher::class)) {
+        class DumpWatcher {}
+    }
+
+    if (! class_exists(EventWatcher::class)) {
+        class EventWatcher {}
+    }
+
+    if (! class_exists(ExceptionWatcher::class)) {
+        class ExceptionWatcher {}
+    }
+
+    if (! class_exists(GateWatcher::class)) {
+        class GateWatcher {}
+    }
+
+    if (! class_exists(JobWatcher::class)) {
+        class JobWatcher {}
+    }
+
+    if (! class_exists(LogWatcher::class)) {
+        class LogWatcher {}
+    }
+
+    if (! class_exists(MailWatcher::class)) {
+        class MailWatcher {}
+    }
+
+    if (! class_exists(ModelWatcher::class)) {
+        class ModelWatcher {}
+    }
+
+    if (! class_exists(NotificationWatcher::class)) {
+        class NotificationWatcher {}
+    }
+
+    if (! class_exists(QueryWatcher::class)) {
+        class QueryWatcher {}
+    }
+
+    if (! class_exists(RedisWatcher::class)) {
+        class RedisWatcher {}
+    }
+
+    if (! class_exists(RequestWatcher::class)) {
+        class RequestWatcher {}
+    }
+
+    if (! class_exists(ScheduleWatcher::class)) {
+        class ScheduleWatcher {}
+    }
+
+    if (! class_exists(ViewWatcher::class)) {
+        class ViewWatcher {}
     }
 }

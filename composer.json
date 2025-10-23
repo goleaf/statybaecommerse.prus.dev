@@ -63,8 +63,8 @@
         "pestphp/pest-plugin-laravel": "^4.0",
         "pestphp/pest-plugin-livewire": "^4.0",
         "phpstan/phpstan": "^2.1",
-        "phpunit/phpunit": "^12.3",
-        "zircote/swagger-php": "^5.5"
+        "phpstan/phpstan-deprecation-rules": "^2.0",
+        "phpunit/phpunit": "^12.3"
     },
     "autoload": {
         "psr-4": {
