@@ -22,6 +22,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Filament\Schemas\Schema;
 
@@ -85,13 +86,17 @@ final class CompanyResource extends Resource
                     Forms\Components\TextInput::make('industry')
                         ->label(__('companies.industry'))
                         ->maxLength(255),
+                    // Allow administrators to explicitly leave the size unset while still offering helpful context.
                     Forms\Components\Select::make('size')
                         ->label(__('companies.size'))
+                        ->placeholder(__('companies.size_placeholder'))
                         ->options([
                             'small'  => __('companies.sizes.small'),
                             'medium' => __('companies.sizes.medium'),
                             'large'  => __('companies.sizes.large'),
-                        ]),
+                        ])
+                        ->nullable()
+                        ->default(null),
                 ]),
             Forms\Components\Section::make(__('companies.settings'))
                 ->schema([
@@ -133,6 +138,7 @@ final class CompanyResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('size')
                     ->label(__('companies.size'))
+                    // Keep displaying an explicit "None" badge when the size is not provided.
                     ->formatStateUsing(static function (?string $state): string {
                         if ($state === null || $state === '') {
                             return __('filament::common.none');
@@ -166,10 +172,17 @@ final class CompanyResource extends Resource
             ])
             ->filters([
                 SelectFilter::make('size')
+                    ->label(__('companies.size'))
+                    // Provide explicit filters for unset sizes while keeping "all" as the default placeholder state.
+                    ->placeholder(__('companies.size_filter_placeholder'))
                     ->options([
                         'small'  => __('companies.sizes.small'),
                         'medium' => __('companies.sizes.medium'),
                         'large'  => __('companies.sizes.large'),
+                        '__null' => __('filament::common.none'),
+                    ])
+                    ->queries([
+                        '__null' => static fn (Builder $query): Builder => $query->whereNull('size'),
                     ]),
                 TernaryFilter::make('is_active')
                     ->trueLabel(__('companies.active_only'))
