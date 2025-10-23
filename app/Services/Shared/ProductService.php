@@ -37,9 +37,14 @@ final class ProductService
         $locale = app()->getLocale();
         $currency = current_currency();
 
-        return $this->cacheService->rememberDefault("featured_products.{$locale}.{$currency}", function () use ($limit) {
-            return Product::query()->with($this->getProductRelations())->where('is_visible', true)->where('is_featured', true)->whereNotNull('published_at')->latest('published_at')->limit($limit)->get();
-        }, null, CacheTagHelper::products());
+        return $this->cacheService->rememberDefault(
+            "featured_products.{$locale}.{$currency}",
+            function () use ($limit) {
+                return Product::query()->with($this->getProductRelations())->where('is_visible', true)->where('is_featured', true)->whereNotNull('published_at')->latest('published_at')->limit($limit)->get();
+            },
+            null,
+            CacheTagHelper::merge(CacheTagHelper::products(), CacheTagHelper::locale($locale))
+        );
     }
 
     /**
@@ -55,9 +60,14 @@ final class ProductService
         $locale = app()->getLocale();
         $currency = current_currency();
 
-        return $this->cacheService->rememberShort("new_arrivals.{$locale}.{$currency}", function () use ($limit, $days) {
-            return Product::query()->with($this->getProductRelations())->where('is_visible', true)->whereNotNull('published_at')->where('published_at', '>=', now()->subDays($days))->latest('published_at')->limit($limit)->get();
-        }, null, CacheTagHelper::products());
+        return $this->cacheService->rememberShort(
+            "new_arrivals.{$locale}.{$currency}",
+            function () use ($limit, $days) {
+                return Product::query()->with($this->getProductRelations())->where('is_visible', true)->whereNotNull('published_at')->where('published_at', '>=', now()->subDays($days))->latest('published_at')->limit($limit)->get();
+            },
+            null,
+            CacheTagHelper::merge(CacheTagHelper::products(), CacheTagHelper::locale($locale))
+        );
     }
 
     /**
@@ -153,14 +163,19 @@ final class ProductService
         $locale = app()->getLocale();
         $currency = current_currency();
 
-        return $this->cacheService->rememberDefault("related_products.{$product->id}.{$locale}.{$currency}", function () use ($product, $limit) {
-            return Product::query()->with($this->getProductRelations())->where('id', '!=', $product->id)->where('is_visible', true)->where(function ($query) use ($product): void {
-                // Same category or brand
-                $query->whereHas('categories', function ($q) use ($product): void {
-                    $q->whereIn('categories.id', $product->categories->pluck('id'));
-                })->orWhere('brand_id', $product->brand_id);
-            })->inRandomOrder()->limit($limit)->get();
-        }, null, CacheTagHelper::products());
+        return $this->cacheService->rememberDefault(
+            "related_products.{$product->id}.{$locale}.{$currency}",
+            function () use ($product, $limit) {
+                return Product::query()->with($this->getProductRelations())->where('id', '!=', $product->id)->where('is_visible', true)->where(function ($query) use ($product) {
+                    // Same category or brand
+                    $query->whereHas('categories', function ($q) use ($product) {
+                        $q->whereIn('categories.id', $product->categories->pluck('id'));
+                    })->orWhere('brand_id', $product->brand_id);
+                })->inRandomOrder()->limit($limit)->get();
+            },
+            null,
+            CacheTagHelper::merge(CacheTagHelper::products(), CacheTagHelper::locale($locale))
+        );
     }
 
     /**

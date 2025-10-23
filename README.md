@@ -17,6 +17,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 ### Latest updates
+- Cache tag conflicts from PR #120 are resolved: dashboard widgets, storefront navigation, and product shelves now share locale-aware tags with automatic invalidation hooks so cached payloads refresh the moment catalogue records change, and new feature tests guard the behaviour.
 - A new cache invalidation service now coordinates dashboard and storefront tag flushing, and the cart/checkout flows gained JSON regression tests to keep the customer journey stable across releases.
 - The Filament schema upgrade tooling now normalizes navigation icon docblocks and reruns cleanly across every resource, keeping the v4 Schema migration safe to execute repeatedly without manual cleanup.
 - Reusable HTML sanitization now protects product and legal descriptions end-to-end, complete with a maintenance command and storefront Blade helper for rendering cleaned markup.
@@ -74,6 +75,8 @@ composer run dev
 ```
 
 ## Latest maintenance
+
+- 2025-10-23: Wired the cache invalidation service into global model events, updated navigation caches to use shared tag helpers, and expanded regression coverage so dashboard stats and storefront widgets refresh automatically after catalogue edits.
 
 - 2025-10-22: Extended the Filament schema upgrade script to normalize navigation icon docblocks automatically and refreshed every resource/page/widget to the standardized format.
 - 2025-10-21: Tightened the User Product Interaction Filament resource to return concrete `Form` and `Table` instances so Filament v4 boots cleanly when analytics interactions are seeded.

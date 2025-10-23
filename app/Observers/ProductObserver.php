@@ -7,7 +7,6 @@ namespace App\Observers;
 use App\Models\Product;
 use App\Services\CacheInvalidationService;
 use App\Services\Images\GradientImageService;
-use App\Support\Cache\CacheInvalidator;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -18,6 +17,10 @@ use Throwable;
  */
 final class ProductObserver
 {
+    public function __construct(
+        private readonly CacheInvalidationService $cacheInvalidationService,
+    ) {}
+
     /**
      * Handle created functionality with proper error handling.
      */
@@ -75,7 +78,8 @@ final class ProductObserver
      */
     private function flushProductCaches(Product $product): void
     {
-        app(CacheInvalidationService::class)->flushForModel($product);
-        ($this->invalidateProductCache)();
+        // Delegate to the central cache invalidation orchestrator so both taggable
+        // stores and array/file fallbacks are refreshed consistently.
+        $this->cacheInvalidationService->flushProducts();
     }
 }

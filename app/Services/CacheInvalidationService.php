@@ -63,7 +63,15 @@ final class CacheInvalidationService
      */
     public function flushProducts(): void
     {
-        if ($this->flushTags(CacheTagHelper::products())) {
+        // Include shared home/navigation tags so both storefront widgets and
+        // menu payloads flush together when product data changes.
+        $productTags = CacheTagHelper::merge(
+            CacheTagHelper::products(),
+            [CacheKeys::homeTag()],
+            [CacheKeys::navigationTag()]
+        );
+
+        if ($this->flushTags($productTags)) {
             return;
         }
 
@@ -75,7 +83,14 @@ final class CacheInvalidationService
      */
     public function flushCategories(): void
     {
-        if ($this->flushTags(CacheTagHelper::categories())) {
+        // Categories influence both storefront widgets and navigation menus.
+        $categoryTags = CacheTagHelper::merge(
+            CacheTagHelper::categories(),
+            [CacheKeys::homeTag()],
+            [CacheKeys::navigationTag()]
+        );
+
+        if ($this->flushTags($categoryTags)) {
             return;
         }
 
@@ -87,7 +102,13 @@ final class CacheInvalidationService
      */
     public function flushBrands(): void
     {
-        if ($this->flushTags(CacheTagHelper::brands())) {
+        // Featured brand carousels live in storefront sections, so share the home tag.
+        $brandTags = CacheTagHelper::merge(
+            CacheTagHelper::brands(),
+            [CacheKeys::homeTag()]
+        );
+
+        if ($this->flushTags($brandTags)) {
             return;
         }
 
@@ -101,7 +122,13 @@ final class CacheInvalidationService
      */
     public function flushCollections(): void
     {
-        if ($this->flushTags(CacheTagHelper::collections())) {
+        // Collections feed the home page carousels; merge with the shared home tag.
+        $collectionTags = CacheTagHelper::merge(
+            CacheTagHelper::collections(),
+            [CacheKeys::homeTag()]
+        );
+
+        if ($this->flushTags($collectionTags)) {
             return;
         }
 
