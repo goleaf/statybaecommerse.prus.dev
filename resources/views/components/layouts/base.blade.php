@@ -59,7 +59,21 @@
 
     <!-- Scripts -->
     @php
-        $shouldLoadViteAssets = ! app()->runningUnitTests() || file_exists(public_path('build/manifest.json'));
+        // Inspect the Vite manifest so unit/feature tests can fall back to the precompiled assets when the
+        // build step has not been executed; this keeps Blade rendering deterministic during CI.
+        $manifestPath = public_path('build/manifest.json');
+        $manifestHasEntries = false;
+
+        if (is_string($manifestPath) && $manifestPath !== '' && file_exists($manifestPath)) {
+            $manifestContents = @file_get_contents($manifestPath);
+
+            if ($manifestContents !== false) {
+                $decodedManifest = json_decode($manifestContents, true);
+                $manifestHasEntries = is_array($decodedManifest) && $decodedManifest !== [];
+            }
+        }
+
+        $shouldLoadViteAssets = ! app()->runningUnitTests() && $manifestHasEntries;
     @endphp
 
     @if ($shouldLoadViteAssets)

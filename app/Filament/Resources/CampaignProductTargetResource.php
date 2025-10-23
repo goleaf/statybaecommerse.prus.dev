@@ -61,7 +61,15 @@ final class CampaignProductTargetResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('campaign_product_targets.navigation');
+        // Prefer the nested translation label when available, while gracefully falling back to
+        // the legacy flat string so feature tests keep exercising the Filament sidebar in CI.
+        $label = __('campaign_product_targets.navigation.label');
+
+        if (is_array($label)) {
+            $label = __('campaign_product_targets.navigation');
+        }
+
+        return is_string($label) && $label !== '' ? $label : 'Campaign Targets';
     }
 
     public static function getPluralModelLabel(): string

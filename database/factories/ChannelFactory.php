@@ -18,15 +18,21 @@ class ChannelFactory extends Factory
     public function definition(): array
     {
         $name = $this->faker->unique()->company() . ' Channel';
-        $code = Str::of($name)
+        $baseCode = Str::of($name)
             ->snake()
             ->upper()
             ->replaceMatches('/[^A-Z0-9_]/', '')
-            ->substr(0, 12)
+            ->trim('_')
+            ->substr(0, 8)
             ->value();
 
-        // Guarantee the code respects the alpha_dash rule even when company names contain punctuation.
-        $code = $code !== '' ? $code : Str::upper(Str::random(8));
+        // Append a random suffix so truncated company names cannot collide with the channel unique constraint.
+        $suffix = Str::upper(Str::random(4));
+        $code = Str::of(($baseCode !== '' ? $baseCode : 'CHANNEL') . '_' . $suffix)
+            ->replaceMatches('/_{2,}/', '_')
+            ->trim('_')
+            ->substr(0, 12)
+            ->value();
 
         return [
             // Identity and descriptive metadata.
