@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Support\Repositories\ProductRepository;
-use App\Support\Repositories\UserRepository;
+use App\Support\Backup\RepositoryRegistry;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Facades\DB;
@@ -76,25 +75,39 @@ final class BackupVerifyCommand extends Command
 
             $this->components->info('Running sanity checks...');
 
-            $repositories = $this->instantiateRepositories($metadata['repositories'] ?? []);
+            $metadataRepositories = $metadata['repositories'] ?? [];
+            $repositoryRegistry = $metadataRepositories !== []
+                ? RepositoryRegistry::fromDefinitions($this->container(), $metadataRepositories)
+                : RepositoryRegistry::fromConfig($this->container());
             $expectedCounts = $metadata['counts'] ?? [];
-            $results = [];
 
-            foreach ($repositories as $label => $repository) {
-                $actualCount = $this->repositoryCount($repository, $connectionName);
-                $expected = $expectedCounts[$label] ?? null;
-
-                $this->compareCounts($label, $expected, $actualCount);
-
-                $results[$label] = [
-                    'expected' => $expected,
-                    'actual'   => $actualCount,
-                ];
-            }
-
-            if ($results === []) {
+            if ($repositoryRegistry->isEmpty()) {
                 $this->components->warn('No repository counts were recorded in the backup metadata.');
             } else {
+                $actualCounts = $repositoryRegistry->counts($connectionName);
+                $results = [];
+
+                $labels = array_unique(array_merge(
+                    array_keys($repositoryRegistry->definitions()),
+                    array_keys($expectedCounts),
+                ));
+
+                foreach ($labels as $label) {
+                    $expected = $expectedCounts[$label] ?? null;
+                    $actualCount = $actualCounts[$label] ?? null;
+
+                    if ($actualCount === null) {
+                        throw new RuntimeException(sprintf('Backup repository [%s] is not available for verification.', $label));
+                    }
+
+                    $this->compareCounts($label, $expected, $actualCount);
+
+                    $results[$label] = [
+                        'expected' => $expected,
+                        'actual'   => $actualCount,
+                    ];
+                }
+
                 foreach ($results as $label => $comparison) {
                     $this->components->twoColumnDetail(
                         sprintf('%s (expected/actual)', Str::headline($label)),
@@ -359,100 +372,6 @@ final class BackupVerifyCommand extends Command
         $process = Process::fromShellCommandline($command);
         $process->setTimeout(null);
         $process->mustRun();
-    }
-
-    /**
-     * @param  array<string, string> $metadataRepositories
-     * @return array<string, object>
-     */
-    private function instantiateRepositories(array $metadataRepositories): array
-    {
-        $definitions = $metadataRepositories !== [] ? $metadataRepositories : $this->repositoryConfiguration();
-
-        if ($definitions === []) {
-            return [];
-        }
-
-        $repositories = [];
-        $container = $this->container();
-
-        foreach ($definitions as $label => $class) {
-            if (! class_exists($class)) {
-                throw new RuntimeException(sprintf('Backup repository class [%s] does not exist.', $class));
-            }
-
-            $instance = $container->make($class);
-
-            if (! method_exists($instance, 'count')) {
-                throw new RuntimeException(sprintf('Backup repository [%s] must define a count method.', $class));
-            }
-
-            $repositories[$label] = $instance;
-        }
-
-        return $repositories;
-    }
-
-    /**
-     * @return array<string, class-string>
-     */
-    private function repositoryConfiguration(): array
-    {
-        $configured = config('backup.repositories');
-
-        if ($configured === null) {
-            return $this->defaultRepositoryConfiguration();
-        }
-
-        if ($configured === []) {
-            return [];
-        }
-
-        if (! is_array($configured) || array_is_list($configured)) {
-            throw new RuntimeException('Backup repositories configuration must be an associative array.');
-        }
-
-        $normalized = [];
-
-        foreach ($configured as $label => $class) {
-            if (! is_string($label) || $label === '') {
-                throw new RuntimeException('Backup repository keys must be non-empty strings.');
-            }
-
-            if (! is_string($class) || $class === '') {
-                throw new RuntimeException(sprintf('Backup repository [%s] must reference a class name.', $label));
-            }
-
-            $normalized[$label] = $class;
-        }
-
-        return $normalized;
-    }
-
-    /**
-     * @return array<string, class-string>
-     */
-    private function defaultRepositoryConfiguration(): array
-    {
-        return [
-            'users'    => UserRepository::class,
-            'products' => ProductRepository::class,
-        ];
-    }
-
-    private function repositoryCount(object $repository, string $connection): int
-    {
-        $count = $repository->count($connection);
-
-        if (is_int($count)) {
-            return $count;
-        }
-
-        if (is_numeric($count)) {
-            return (int) $count;
-        }
-
-        throw new RuntimeException(sprintf('Backup repository [%s]::count() must return an integer.', $repository::class));
     }
 
     private function container(): Container
