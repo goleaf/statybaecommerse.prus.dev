@@ -28,6 +28,9 @@
 - OpenAPI documentation now mirrors the lean product meta payload and nullable media thumbnails emitted by the presenter, keeping schema validators and client SDKs in sync with production responses.
 
 ## Admin panel resilience
+- Filament dashboard access checks now fall back to open access when no
+  permissions are configured and inline sparkline widgets respect the base
+  nullable model contract, eliminating the latest regression tests failures.
 - Campaign customer segment listings now use local scopes for segment type,
   campaign, customer group, and activity filters so admins can intentionally
   include inactive rows in reviews without disabling visibility controls for
