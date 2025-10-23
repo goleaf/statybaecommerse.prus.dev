@@ -10,31 +10,31 @@ it('supports translations and publishes correctly for News model', function (): 
     // Arrange
     /** @var \App\Models\News $news */
     $news = \App\Models\News::create([
-        'is_visible' => true,
+        'is_visible'   => true,
         'published_at' => now()->subDay(),
-        'author_name' => 'Editor',
+        'author_name'  => 'Editor',
     ]);
 
     // Create translations (lt/en)
     \App\Models\Translations\NewsTranslation::create([
-        'news_id' => $news->id,
-        'locale' => 'lt',
-        'title' => 'Naujiena LT',
-        'slug' => 'naujiena-lt',
-        'summary' => 'Trumpas aprašymas LT',
-        'content' => '<p>Turinys LT</p>',
-        'seo_title' => 'SEO pavadinimas LT',
+        'news_id'         => $news->id,
+        'locale'          => 'lt',
+        'title'           => 'Naujiena LT',
+        'slug'            => 'naujiena-lt',
+        'summary'         => 'Trumpas aprašymas LT',
+        'content'         => '<p>Turinys LT</p>',
+        'seo_title'       => 'SEO pavadinimas LT',
         'seo_description' => 'SEO aprašymas LT',
     ]);
 
     \App\Models\Translations\NewsTranslation::create([
-        'news_id' => $news->id,
-        'locale' => 'en',
-        'title' => 'News EN',
-        'slug' => 'news-en',
-        'summary' => 'Short summary EN',
-        'content' => '<p>Content EN</p>',
-        'seo_title' => 'SEO title EN',
+        'news_id'         => $news->id,
+        'locale'          => 'en',
+        'title'           => 'News EN',
+        'slug'            => 'news-en',
+        'summary'         => 'Short summary EN',
+        'content'         => '<p>Content EN</p>',
+        'seo_title'       => 'SEO title EN',
         'seo_description' => 'SEO description EN',
     ]);
 
@@ -55,24 +55,41 @@ it('supports translations and publishes correctly for News model', function (): 
 it('enforces unique slug per locale for News', function (): void {
     /** @var \App\Models\News $news */
     $news = \App\Models\News::create([
-        'is_visible' => true,
+        'is_visible'   => true,
         'published_at' => now()->subHour(),
-        'author_name' => 'Editor',
+        'author_name'  => 'Editor',
     ]);
 
     \App\Models\Translations\NewsTranslation::create([
         'news_id' => $news->id,
-        'locale' => 'lt',
-        'title' => 'Naujiena A',
-        'slug' => 'naujiena-a',
+        'locale'  => 'lt',
+        'title'   => 'Naujiena A',
+        'slug'    => 'naujiena-a',
     ]);
 
     expect(function () use ($news): void {
         \App\Models\Translations\NewsTranslation::create([
             'news_id' => $news->id,
-            'locale' => 'lt',
-            'title' => 'Naujiena A (dup)',
-            'slug' => 'naujiena-a',
+            'locale'  => 'lt',
+            'title'   => 'Naujiena A (dup)',
+            'slug'    => 'naujiena-a',
         ]);
     })->toThrow(\Illuminate\Database\QueryException::class);
+});
+
+it('soft deletes and restores news records', function (): void {
+    /** @var \App\Models\News $news */
+    $news = \App\Models\News::factory()->create();
+
+    $news->delete();
+
+    expect(\App\Models\News::find($news->id))->toBeNull();
+
+    $trashed = \App\Models\News::withTrashed()->findOrFail($news->id);
+
+    expect($trashed->trashed())->toBeTrue();
+
+    $trashed->restore();
+
+    expect(\App\Models\News::find($news->id))->not()->toBeNull();
 });

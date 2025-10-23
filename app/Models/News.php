@@ -14,12 +14,11 @@ use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\NewsApproval;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -45,6 +44,7 @@ final class News extends Model implements TranslatableRecord
     use HasFactory;
     use HasTranslations;
     use LogsActivity;
+    use SoftDeletes;
 
     protected $table = 'news';
 
@@ -68,15 +68,16 @@ final class News extends Model implements TranslatableRecord
     protected function casts(): array
     {
         return [
-            'is_visible' => 'boolean',
-            'is_featured' => 'boolean',
-            'moderation_state' => ModerationState::class,
+            'is_visible'              => 'boolean',
+            'is_featured'             => 'boolean',
+            'moderation_state'        => ModerationState::class,
             'submitted_for_review_at' => 'datetime',
-            'approved_at' => 'datetime',
-            'approved_by_id' => 'integer',
-            'published_at' => 'datetime',
-            'view_count' => 'integer',
-            'meta_data' => 'array',
+            'approved_at'             => 'datetime',
+            'approved_by_id'          => 'integer',
+            'published_at'            => 'datetime',
+            'view_count'              => 'integer',
+            'meta_data'               => 'array',
+            'deleted_at'              => 'datetime',
         ];
     }
 
