@@ -86,9 +86,9 @@ return [
         ],
         'editor' => [
             'panel.access.admin',
-            'products.viewAny', 'products.view', 'products.create', 'products.update',
-            'categories.viewAny', 'categories.view', 'categories.create', 'categories.update',
-            'brands.viewAny', 'brands.view', 'brands.create', 'brands.update',
+            'products.viewAny', 'products.view', 'products.update',
+            'categories.viewAny', 'categories.view', 'categories.update',
+            'brands.viewAny', 'brands.view', 'brands.update',
         ],
         'support' => [
             'panel.access.admin',
@@ -101,7 +101,6 @@ return [
             'categories.viewAny', 'categories.view',
             'brands.viewAny', 'brands.view',
             'orders.viewAny', 'orders.view',
-            'users.viewAny', 'users.view',
         ],
         'user' => [],
     ],

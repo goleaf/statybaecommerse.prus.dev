@@ -26,12 +26,12 @@
                     <div class="flex items-start space-x-4">
                         @if($productRequest->product->getMainImage())
                             <img src="{{ $productRequest->product->getMainImage() }}" 
-                                 alt="{{ $productRequest->product->name }}" 
+                                 alt="{{ $productRequest->product->trans('name') ?? $productRequest->product->name }}" 
                                  class="w-20 h-20 object-cover rounded-lg">
                         @endif
                         <div class="flex-1">
                             <h3 class="text-lg font-medium text-gray-900">
-                                {{ $productRequest->product->name }}
+                                {{ $productRequest->product->trans('name') ?? $productRequest->product->name }}
                             </h3>
                             <p class="text-sm text-gray-600 mb-2">
                                 {{ __('translations.sku') }}: {{ $productRequest->product->sku }}
@@ -199,4 +199,3 @@
     </div>
 </div>
 @endsection
-

@@ -12,7 +12,7 @@ beforeEach(function (): void {
 });
 
 it('disables the topbar and moves the user menu to the sidebar', function (): void {
-    $provider = new AdminPanelProvider;
+    $provider = new AdminPanelProvider(app());
 
     $panel = $provider->panel(Panel::make());
 

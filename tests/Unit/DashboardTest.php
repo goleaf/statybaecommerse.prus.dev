@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use App\Filament\Pages\Dashboard;
-use Tests\TestCase;
 
-final class DashboardTest extends TestCase
+final class DashboardTest extends UnitTestCase
 {
     public function test_dashboard_can_access_returns_true(): void
     {

@@ -4,13 +4,21 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductVariantResource\Pages;
 
+use App\Filament\Concerns\InteractsWithTranslationTabs;
 use App\Filament\Resources\ProductVariantResource;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 
 final class CreateProductVariant extends CreateRecord
 {
+    use InteractsWithTranslationTabs;
+
     protected static string $resource = ProductVariantResource::class;
+
+    protected function getTranslatableFields(): array
+    {
+        return ['name', 'description', 'seo_title', 'seo_description'];
+    }
 
     protected function getRedirectUrl(): string
     {
@@ -27,6 +35,8 @@ final class CreateProductVariant extends CreateRecord
 
     protected function afterCreate(): void
     {
+        $this->syncTranslationRecords($this->record, $this->languageTabsPayload);
+
         parent::afterCreate();
 
         $state = $this->form->getState();
@@ -40,6 +50,16 @@ final class CreateProductVariant extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
+        [$data, $translations] = $this->extractTranslationsFromForm($data);
+        $this->languageTabsPayload = $this->filterEmptyTranslations($translations);
+        $data = $this->mutateMainDataWithDefaultLocale($data, $this->languageTabsPayload);
+        unset($data['description'], $data['seo_title'], $data['seo_description']);
+
+        $defaultLocale = $this->getDefaultLocale();
+        if (filled($this->languageTabsPayload[$defaultLocale]['name'] ?? null)) {
+            $data['name'] = $this->languageTabsPayload[$defaultLocale]['name'];
+        }
+
         // Generate SKU if not provided
         if (empty($data['sku'])) {
             $data['sku'] = $this->generateSku($data);
@@ -47,7 +67,7 @@ final class CreateProductVariant extends CreateRecord
 
         // Set position if not provided
         if (! isset($data['position'])) {
-            $data['position'] = $this->getNextPosition($data['product_id']);
+            $data['position'] = $this->getNextPosition((int) $data['product_id']);
         }
 
         return $data;

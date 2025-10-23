@@ -167,6 +167,7 @@ final class AdminPanelProvider extends PanelProvider
             ->breadcrumbs()
             ->unsavedChangesAlerts()
             ->databaseTransactions()
+            ->topbar(false)
             ->readOnlyRelationManagersOnResourceViewPagesByDefault()
             // Feed navigation groups generated from the shared helper so the sidebar uses
             // consistent icons, order, and collapse behaviour across the application.

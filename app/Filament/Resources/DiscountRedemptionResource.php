@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\DiscountRedemptionResource\Pages;
 use App\Filament\Resources\DiscountRedemptionResource\RelationManagers\CodeRelationManager;
 use App\Filament\Resources\DiscountRedemptionResource\RelationManagers\DiscountRelationManager;
@@ -13,27 +11,27 @@ use App\Filament\Resources\DiscountRedemptionResource\RelationManagers\UserRelat
 use App\Models\DiscountRedemption;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
-use Filament\Actions\Action as TableAction;
-use Filament\Actions\BulkAction as TableBulkAction;
-use Filament\Actions\BulkActionGroup;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
 use UnitEnum;
 
@@ -41,21 +39,15 @@ final class DiscountRedemptionResource extends Resource
 {
     protected static ?string $model = DiscountRedemption::class;
 
-    /**
-     * Explicitly declare the marketing navigation group for this resource.
-     */
-    protected static string|\UnitEnum|null $navigationGroup = 'Marketing';
+    protected static string|UnitEnum|null $navigationGroup = 'Discounts';
 
-    // Retain the ticket icon so administrators can spot the redemption resource quickly.
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-ticket';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-receipt-percent';
 
-    // Position the resource prominently within the marketing navigation cluster.
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = null;
 
-    public static function getNavigationBadgeColor(): string
+    public static function getNavigationBadgeColor(): string|array|null
     {
-        // Highlight the badge with a warning tone to draw attention to pending discount redemptions.
-        return 'warning';
+        return null;
     }
 
     public static function getPluralModelLabel(): string
@@ -68,7 +60,7 @@ final class DiscountRedemptionResource extends Resource
         return __('admin.discount_redemptions.single');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             SchemaSection::make(__('discount_redemptions.sections.associations'))
@@ -119,43 +111,36 @@ final class DiscountRedemptionResource extends Resource
                             Select::make('status')
                                 ->label(__('admin.discount_redemptions.form.fields.status'))
                                 ->options([
-                                    'pending' => __('frontend.discount_redemptions.status.pending'),
-                                    'redeemed' => __('frontend.discount_redemptions.status.redeemed'),
-                                    'expired' => __('frontend.discount_redemptions.status.expired'),
+                                    'pending'   => __('frontend.discount_redemptions.status.pending'),
+                                    'redeemed'  => __('frontend.discount_redemptions.status.redeemed'),
+                                    'expired'   => __('frontend.discount_redemptions.status.expired'),
                                     'cancelled' => __('frontend.discount_redemptions.status.cancelled'),
-                                    'refunded' => __('frontend.discount_redemptions.status.refunded'),
+                                    'refunded'  => __('frontend.discount_redemptions.status.refunded'),
                                 ])
                                 ->default('pending')
                                 ->required(),
-                            DateTimePicker::make('redeemed_at')
+                            Flatpickr::makeDateTime('redeemed_at')
                                 ->label(__('admin.discount_redemptions.form.fields.redeemed_at'))
+                                ->seconds(false)
+                                ->displayFormat('Y-m-d H:i')
                                 ->default(now())
                                 ->required(),
                         ]),
-                    Flatpickr::makeDateTime('redeemed_at')
-                        ->label(__('discount_redemptions.fields.redeemed_at'))
-                        ->seconds(false)
-                        ->displayFormat('Y-m-d H:i')
-                        ->default(now())
-                        ->required(),
                     SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('ip_address')
                                 ->label(__('admin.discount_redemptions.form.fields.ip_address'))
-                                ->maxLength(45)
-                                ->columnSpan(1),
+                                ->maxLength(45),
                             TextInput::make('user_agent')
-                                ->label(__('admin.discount_redemptions.form.fields.user_agent'))
-                                ->columnSpan(1),
+                                ->label(__('admin.discount_redemptions.form.fields.user_agent')),
                         ]),
                 ])
                 ->columns(2),
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
-        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->defaultSort('redeemed_at', 'desc')
             ->columns([
@@ -173,15 +158,16 @@ final class DiscountRedemptionResource extends Resource
                     ->sortable(),
                 TextColumn::make('order.id')
                     ->label(__('admin.discount_redemptions.table.order'))
-                    ->formatStateUsing(fn (?int $state): string => $state ? '#'.$state : '-')
+                    ->formatStateUsing(fn (?int $state): string => $state !== null ? '#'.$state : '-')
                     ->sortable(),
                 TextColumn::make('amount_saved')
                     ->label(__('admin.discount_redemptions.table.discount_amount'))
-                    ->formatStateUsing(fn (DiscountRedemption $record): string => number_format((float) $record->amount_saved, 2).' '.($record->currency_code ?? 'EUR'))
+                    ->formatStateUsing(
+                        fn (DiscountRedemption $record): string => number_format((float) $record->amount_saved, 2).' '.($record->currency_code ?? 'EUR')
+                    )
                     ->sortable(),
                 TextColumn::make('status')
                     ->label(__('discount_redemptions.fields.status'))
-                    // Use the badge helper to stay compatible with Filament v4 while keeping the visual treatment.
                     ->badge()
                     ->color(fn (?string $state): string => match ($state) {
                         'redeemed'  => 'success',
@@ -233,8 +219,14 @@ final class DiscountRedemptionResource extends Resource
                     ])
                     ->query(static function (Builder $query, array $data): Builder {
                         return $query
-                            ->when($data['from'] ?? null, static fn (Builder $builder, string $date): Builder => $builder->where('redeemed_at', '>=', $date))
-                            ->when($data['until'] ?? null, static fn (Builder $builder, string $date): Builder => $builder->where('redeemed_at', '<=', $date));
+                            ->when(
+                                $data['from'] ?? null,
+                                static fn (Builder $builder, string $date): Builder => $builder->where('redeemed_at', '>=', $date)
+                            )
+                            ->when(
+                                $data['until'] ?? null,
+                                static fn (Builder $builder, string $date): Builder => $builder->where('redeemed_at', '<=', $date)
+                            );
                     }),
                 TernaryFilter::make('recent')
                     ->label(__('admin.discount_redemptions.filters.recent'))
@@ -245,10 +237,10 @@ final class DiscountRedemptionResource extends Resource
                     ),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-                TableAction::make('refund')
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
+                Action::make('refund')
                     ->label(__('admin.discount_redemptions.actions.refund'))
                     ->icon('heroicon-o-arrow-uturn-left')
                     ->requiresConfirmation()
@@ -261,11 +253,11 @@ final class DiscountRedemptionResource extends Resource
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                    TableBulkAction::make('bulk_refund')
+                    BulkAction::make('bulk_refund')
                         ->label(__('admin.discount_redemptions.actions.bulk_refund'))
                         ->icon('heroicon-o-arrow-uturn-left')
                         ->requiresConfirmation()
-                        ->action(function (EloquentCollection $records): void {
+                        ->action(function (Collection $records): void {
                             $records->each->update(['status' => 'refunded']);
                         })
                         ->deselectRecordsAfterCompletion()

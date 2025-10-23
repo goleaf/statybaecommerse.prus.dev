@@ -197,6 +197,8 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                     'is_enabled' => true,
                 ])
             );
+
+            $this->syncBrandTranslations($brandModels[$slug]);
         }
 
         // Get or create categories
@@ -217,6 +219,8 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                     'is_visible' => true,
                 ])
             );
+
+            $this->syncCategoryTranslations($categoryModels[$slug]);
         }
 
         // Product data with variants
@@ -310,6 +314,8 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                 'type' => 'variable',
             ]);
 
+            $this->syncProductTranslations($product, $productData);
+
             // Attach category
             $product->categories()->attach($category->id);
 
@@ -354,8 +360,153 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                     'clicks_count' => rand(5, 100),
                     'conversion_rate' => rand(1, 15) / 100,
                 ]);
+
+                $this->syncVariantTranslations($variant, $variantData, $productData);
             }
         }
+    }
+
+    private function syncBrandTranslations(Brand $brand): void
+    {
+        if (! method_exists($brand, 'translations')) {
+            return;
+        }
+
+        foreach ($this->supportedLocales() as $locale) {
+            $name = $brand->name;
+
+            $brand->translations()->updateOrCreate(
+                ['locale' => $locale],
+                [
+                    'name'        => $name,
+                    'slug'        => Str::slug($name.'-'.$locale),
+                    'description' => $brand->description,
+                    'seo_title'   => $brand->seo_title ?? $name,
+                    'seo_description' => $brand->seo_description ?? $brand->description,
+                ],
+            );
+        }
+    }
+
+    private function syncCategoryTranslations(Category $category): void
+    {
+        if (! method_exists($category, 'translations')) {
+            return;
+        }
+
+        foreach ($this->supportedLocales() as $locale) {
+            $name = $category->name;
+
+            $category->translations()->updateOrCreate(
+                ['locale' => $locale],
+                [
+                    'name'        => $name,
+                    'slug'        => Str::slug($name.'-'.$locale),
+                    'description' => $category->description,
+                    'seo_title'   => $category->seo_title ?? $name,
+                    'seo_description' => $category->seo_description ?? $category->description,
+                ],
+            );
+        }
+    }
+
+    private function syncProductTranslations(Product $product, array $data): void
+    {
+        if (! method_exists($product, 'translations')) {
+            return;
+        }
+
+        foreach ($this->supportedLocales() as $locale) {
+            $name = $this->resolveLocalizedValue($data, 'name', $locale, $data['name']);
+            $description = $this->resolveLocalizedValue($data, 'description', $locale, $data['description']);
+            $shortDescription = $this->resolveLocalizedValue(
+                $data,
+                'short_description',
+                $locale,
+                substr($description ?? '', 0, 120)
+            );
+            $seoTitle = $this->resolveLocalizedValue($data, 'seo_title', $locale, $name);
+            $seoDescription = $this->resolveLocalizedValue($data, 'seo_description', $locale, $description);
+
+            if (! filled($name)) {
+                $name = $product->name;
+            }
+
+            $product->translations()->updateOrCreate(
+                ['locale' => $locale],
+                [
+                    'name'              => $name,
+                    'slug'              => Str::slug($name.'-'.$locale),
+                    'summary'           => $shortDescription,
+                    'description'       => $description,
+                    'short_description' => $shortDescription,
+                    'seo_title'         => $seoTitle ?? $name,
+                    'seo_description'   => $seoDescription ?? $description,
+                ],
+            );
+        }
+    }
+
+    private function syncVariantTranslations(ProductVariant $variant, array $variantData, array $productData): void
+    {
+        if (! method_exists($variant, 'translations')) {
+            return;
+        }
+
+        foreach ($this->supportedLocales() as $locale) {
+            $name = $this->resolveVariantValue($variantData, 'variant_name', $locale, $variant->name);
+            $description = $this->resolveVariantValue(
+                $variantData,
+                'description',
+                $locale,
+                $this->resolveLocalizedValue($productData, 'description', $locale, $productData['description'] ?? null)
+            );
+            $seoTitle = $this->resolveVariantValue($variantData, 'seo_title', $locale, $name);
+            $seoDescription = $this->resolveVariantValue($variantData, 'seo_description', $locale, $description);
+
+            $variant->translations()->updateOrCreate(
+                ['locale' => $locale],
+                [
+                    'name'            => $name,
+                    'description'     => $description,
+                    'seo_title'       => $seoTitle ?? $name,
+                    'seo_description' => $seoDescription ?? $description,
+                ],
+            );
+        }
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function supportedLocales(): array
+    {
+        $locales = config('app.supported_locales', ['lt', 'en']);
+
+        if (is_string($locales)) {
+            $locales = explode(',', $locales);
+        }
+
+        return collect($locales)
+            ->map(static fn ($locale): string => trim((string) $locale))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    private function resolveLocalizedValue(array $data, string $key, string $locale, ?string $fallback = null): ?string
+    {
+        $localeKey = "{$key}_{$locale}";
+
+        return $data[$localeKey] ?? $fallback;
+    }
+
+    private function resolveVariantValue(array $data, string $key, string $locale, ?string $fallback = null): ?string
+    {
+        $localeKey = "{$key}_{$locale}";
+
+        return $data[$localeKey] ?? $fallback;
     }
 
     private function createVariantAttributeValues(): void

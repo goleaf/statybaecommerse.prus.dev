@@ -2,15 +2,19 @@
     <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ __('Product Analytics') }}</h3>
     
     @if($product)
+        @php
+            $productName = $product->trans('name') ?? $product->name;
+            $brandName = optional($product->brand)?->trans('name') ?? optional($product->brand)->name;
+        @endphp
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- Product Info -->
             <div class="bg-gray-50 rounded-lg p-4">
                 <h4 class="font-medium text-gray-900 mb-2">{{ __('Product Information') }}</h4>
                 <div class="space-y-2 text-sm">
-                    <p><span class="font-medium">{{ __('Name') }}:</span> {{ $product->name }}</p>
+                    <p><span class="font-medium">{{ __('Name') }}:</span> {{ $productName }}</p>
                     <p><span class="font-medium">{{ __('SKU') }}:</span> {{ $product->sku }}</p>
                     <p><span class="font-medium">{{ __('Price') }}:</span> €{{ number_format($product->price, 2) }}</p>
-                    <p><span class="font-medium">{{ __('Brand') }}:</span> {{ $product->brand?->name ?? __('N/A') }}</p>
+                    <p><span class="font-medium">{{ __('Brand') }}:</span> {{ $brandName ?? __('N/A') }}</p>
                 </div>
             </div>
 

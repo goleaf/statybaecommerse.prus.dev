@@ -6,6 +6,7 @@ namespace App\UseCases\Cache;
 
 use App\Observers\Concerns\ResolvesSupportedLocales;
 use App\Support\Cache\CacheKeys;
+use App\Support\Cache\CacheTagHelper;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -15,7 +16,7 @@ final class InvalidateMenuCache
 
     public function __invoke(?int $menuId = null): void
     {
-        if (Cache::supportsTags()) {
+        if (CacheTagHelper::supportsTags()) {
             $tags = [CacheKeys::navigationTag()];
 
             if ($menuId !== null) {

@@ -14,13 +14,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('shipping_options', function (Blueprint $table): void {
-            $table->json('shipping_matrix')->nullable()->after('metadata');
-        });
+        if (! Schema::hasColumn('shipping_options', 'shipping_matrix')) {
+            Schema::table('shipping_options', function (Blueprint $table): void {
+                $table->json('shipping_matrix')->nullable()->after('metadata');
+            });
+        }
 
-        DB::table('shipping_options')
-            ->whereNull('shipping_matrix')
-            ->update(['shipping_matrix' => json_encode([])]);
+        if (Schema::hasColumn('shipping_options', 'shipping_matrix')) {
+            DB::table('shipping_options')
+                ->whereNull('shipping_matrix')
+                ->update(['shipping_matrix' => json_encode([])]);
+        }
     }
 
     /**
@@ -28,8 +32,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('shipping_options', function (Blueprint $table): void {
-            $table->dropColumn('shipping_matrix');
-        });
+        if (Schema::hasColumn('shipping_options', 'shipping_matrix')) {
+            Schema::table('shipping_options', function (Blueprint $table): void {
+                $table->dropColumn('shipping_matrix');
+            });
+        }
     }
 };

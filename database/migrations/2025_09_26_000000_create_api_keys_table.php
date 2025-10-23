@@ -16,13 +16,23 @@ return new class extends Migration
 
         Schema::create('api_keys', function (Blueprint $table): void {
             $table->id();
-            $table->string('key', 64)->unique();
-            $table->string('name')->index();
-            $table->json('scopes');
-            $table->unsignedInteger('rate_limit')->nullable()->index();
-            $table->boolean('active')->default(true)->index();
-            $table->timestamp('last_used_at')->nullable()->index();
+            $table->string('key', 128)->unique();
+            $table->string('name');
+            $table->string('secret', 128)->nullable();
+            $table->json('scopes')->nullable();
+            $table->json('permissions')->nullable();
+            $table->unsignedInteger('rate_limit')->nullable();
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('partner_id')->nullable()->constrained('partners')->nullOnDelete();
+            $table->timestamp('last_used_at')->nullable();
+            $table->timestamp('expires_at')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
+
+            $table->index('name');
+            $table->index('rate_limit');
+            $table->index('is_active');
+            $table->index('last_used_at');
         });
     }
 

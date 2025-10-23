@@ -6,6 +6,8 @@
         ? $product->getMainImage('image-lg') ?? $product->getMainImage()
         : ($product->getFirstMediaUrl('images', 'image-lg') ?:
         $product->getFirstMediaUrl('images'));
+    $productName = $product->trans('name') ?? $product->name;
+    $brandName = optional($product->brand)?->trans('name') ?? optional($product->brand)->name;
     $currentPrice =
         $product->sale_price && $product->sale_price < $product->price ? $product->sale_price : $product->price;
     $hasDiscount =
@@ -22,17 +24,26 @@
         'class' =>
             'group relative flex h-full flex-col overflow-hidden rounded-3xl border border-gray-200 bg-white shadow',
     ]);
+
+    foreach ($attributes->getAttributes() as $attributeKey => $attributeValue) {
+        if ($attributeValue instanceof \Closure) {
+            \Log::error('Closure attribute detected on product card.', [
+                'attribute' => $attributeKey,
+                'product_id' => $product->id ?? null,
+            ]);
+        }
+    }
 @endphp
 
 <article {{ $attributes }} aria-labelledby="product-title-{{ $product->id }}">
     <div class="relative aspect-[4/3] overflow-hidden">
         @if ($image)
-            <img src="{{ $image }}" alt="{{ $product->name }}"
+            <img src="{{ $image }}" alt="{{ $productName }}"
                  class="h-full w-full object-cover" loading="lazy">
         @else
             <div
                  class="flex h-full w-full items-center justify-center bg-gradient-to-br from-indigo-500/40 to-purple-500/40 text-3xl font-semibold text-white">
-                {{ mb_substr($product->name, 0, 2) }}
+                {{ mb_substr($productName, 0, 2) }}
             </div>
         @endif
 
@@ -63,7 +74,7 @@
         @if ($product->brand)
             <span
                   class="absolute top-4 right-4 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-gray-800 backdrop-blur">
-                {{ $product->brand->name }}
+                {{ $brandName }}
             </span>
         @endif
     </div>
@@ -74,7 +85,7 @@
                 class="text-lg font-semibold leading-tight text-gray-900 line-clamp-2">
                 <a href="{{ route('localized.products.show', ['locale' => app()->getLocale(), 'product' => $product->slug ?? $product]) }}"
                    class="transition hover:text-indigo-600">
-                    {{ $product->name }}
+                    {{ $productName }}
                 </a>
             </h3>
             <div class="flex flex-wrap items-center gap-3 text-sm text-gray-600">
@@ -84,7 +95,7 @@
                              viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 7h18M3 12h18M3 17h18" />
                         </svg>
-                        {{ $category->name }}
+                        {{ $category->trans('name') ?? $category->name }}
                     </span>
                 @endforeach
             </div>

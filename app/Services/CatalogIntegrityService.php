@@ -244,12 +244,26 @@ final class CatalogIntegrityService
                 $frequency[$key] = ($frequency[$key] ?? 0) + 1;
             }
 
-            arsort($frequency);
-            $expectedKey = array_key_first($frequency);
+            if ($variantKeys === [] || $frequency === []) {
+                continue;
+            }
 
-            $baselineVariantId = array_search($expectedKey, $variantKeys, true);
-            $expected = $baselineVariantId !== false
-                ? $normalized[(int) $baselineVariantId]
+            $maxFrequency = max($frequency);
+            $candidateVariantIds = [];
+
+            foreach ($variantKeys as $variantId => $key) {
+                if (($frequency[$key] ?? 0) === $maxFrequency) {
+                    $candidateVariantIds[] = (int) $variantId;
+                }
+            }
+
+            sort($candidateVariantIds);
+            $baselineVariantId = $candidateVariantIds[0] ?? null;
+            $expectedKey = $baselineVariantId !== null
+                ? ($variantKeys[$baselineVariantId] ?? null)
+                : null;
+            $expected = ($baselineVariantId !== null && $expectedKey !== null)
+                ? ($normalized[$baselineVariantId] ?? [])
                 : [];
 
             $variantDiffs = [];
@@ -266,7 +280,7 @@ final class CatalogIntegrityService
                     continue;
                 }
 
-                $variantDiffs[$variantId] = $set;
+                $variantDiffs[(int) $variantId] = $set;
             }
 
             if ($variantDiffs !== []) {
@@ -275,7 +289,7 @@ final class CatalogIntegrityService
                     'product_id' => (int) $productId,
                     'product_slug' => $normalizedSlug,
                     'expected' => $expected,
-                    'baseline_variant_id' => $baselineVariantId !== false ? (int) $baselineVariantId : null,
+                    'baseline_variant_id' => $baselineVariantId,
                     'variants' => $variantDiffs,
                 ];
             }

@@ -99,8 +99,16 @@ return new class extends Migration
             return;
         }
 
-        Schema::table('addresses', function (Blueprint $table): void {
-            $table->foreignId('region_id')->nullable()->after('zone_id')->constrained('regions')->onDelete('set null');
+        $hasZoneColumn = Schema::hasColumn('addresses', 'zone_id');
+
+        Schema::table('addresses', function (Blueprint $table) use ($hasZoneColumn): void {
+            $column = $table->foreignId('region_id')->nullable();
+
+            if ($hasZoneColumn) {
+                $column->after('zone_id');
+            }
+
+            $column->constrained('regions')->onDelete('set null');
         });
     }
 

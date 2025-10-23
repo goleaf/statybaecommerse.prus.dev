@@ -13,6 +13,7 @@ use App\Models\Review;
 use App\Repositories\ProductRepository;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTags;
+use App\Support\Cache\TagAwareCache;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
@@ -37,22 +38,28 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return Cache::tags([
-            CacheTags::home(),
-            CacheTags::locale($locale),
-            CacheTags::products(),
-            CacheTags::categories(),
-            CacheTags::brands(),
-            CacheTags::reviews(),
-        ])->remember(CacheKeys::homeStats($locale), now()->addSeconds(60), function (): array {
-            return [
-                'products_count' => Product::query()->where('is_visible', true)->count(),
-                'categories_count' => Category::query()->where('is_visible', true)->count(),
-                'brands_count' => Brand::query()->where('is_enabled', true)->count(),
-                'reviews_count' => Review::query()->where('is_approved', true)->count(),
-                'avg_rating' => (float) (Review::query()->where('is_approved', true)->avg('rating') ?? 0),
-            ];
-        }, [CacheKeys::homeTag(), CacheKeys::productAggregateTag()]);
+        return TagAwareCache::remember(
+            CacheKeys::homeStats($locale),
+            now()->addSeconds(60),
+            function (): array {
+                return [
+                    'products_count' => Product::query()->where('is_visible', true)->count(),
+                    'categories_count' => Category::query()->where('is_visible', true)->count(),
+                    'brands_count' => Brand::query()->where('is_enabled', true)->count(),
+                    'reviews_count' => Review::query()->where('is_approved', true)->count(),
+                    'avg_rating' => (float) (Review::query()->where('is_approved', true)->avg('rating') ?? 0),
+                ];
+            },
+            [
+                CacheTags::home(),
+                CacheTags::locale($locale),
+                CacheTags::products(),
+                CacheTags::categories(),
+                CacheTags::brands(),
+                CacheTags::reviews(),
+                CacheKeys::productAggregateTag(),
+            ]
+        );
     }
 
     /**
@@ -63,21 +70,27 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return Cache::tags([
-            CacheTags::home(),
-            CacheTags::locale($locale),
-            CacheTags::products(),
-            CacheTags::brands(),
-            CacheTags::categories(),
-        ])->remember(CacheKeys::homeFeaturedProducts($locale), now()->addSeconds(60), static function (): Collection {
-            return Product::query()
-                ->withoutGlobalScopes()
-                ->where('is_visible', true)
-                ->where('is_featured', true)
-                ->latest('published_at')
-                ->limit(8)
-                ->get();
-        });
+        return TagAwareCache::remember(
+            CacheKeys::homeFeaturedProducts($locale),
+            now()->addSeconds(60),
+            static function (): Collection {
+                return Product::query()
+                    ->withoutGlobalScopes()
+                    ->where('is_visible', true)
+                    ->where('is_featured', true)
+                    ->latest('published_at')
+                    ->limit(8)
+                    ->get();
+            },
+            [
+                CacheTags::home(),
+                CacheTags::locale($locale),
+                CacheTags::products(),
+                CacheTags::brands(),
+                CacheTags::categories(),
+                CacheKeys::homeTag(),
+            ]
+        );
     }
 
     /**
@@ -88,20 +101,26 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return Cache::tags([
-            CacheTags::home(),
-            CacheTags::locale($locale),
-            CacheTags::products(),
-            CacheTags::brands(),
-            CacheTags::categories(),
-        ])->remember(CacheKeys::homeLatestProducts($locale), now()->addSeconds(60), static function (): Collection {
-            return Product::query()
-                ->withoutGlobalScopes()
-                ->where('is_visible', true)
-                ->latest('published_at')
-                ->limit(8)
-                ->get();
-        });
+        return TagAwareCache::remember(
+            CacheKeys::homeLatestProducts($locale),
+            now()->addSeconds(60),
+            static function (): Collection {
+                return Product::query()
+                    ->withoutGlobalScopes()
+                    ->where('is_visible', true)
+                    ->latest('published_at')
+                    ->limit(8)
+                    ->get();
+            },
+            [
+                CacheTags::home(),
+                CacheTags::locale($locale),
+                CacheTags::products(),
+                CacheTags::brands(),
+                CacheTags::categories(),
+                CacheKeys::homeTag(),
+            ]
+        );
     }
 
     /**
@@ -112,36 +131,25 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return Cache::tags([
-            CacheTags::home(),
-            CacheTags::locale($locale),
-            CacheTags::reviews(),
-            CacheTags::products(),
-        ])->remember(CacheKeys::homeLatestReviews($locale), now()->addSeconds(60), static function (): Collection {
-            return Review::query()
-                ->where('is_approved', true)
-                ->with(['product' => static fn ($query) => $query->select('id', 'name', 'slug')])
-                ->latest('created_at')
-                ->limit(6)
-                ->get();
-        }, [CacheKeys::homeTag()]);
-    }
-
-    private function rememberWithTagsFallback(array $tags, string $key, \DateTimeInterface|\DateInterval|int $ttl, callable $callback): mixed
-    {
-        if (app()->environment('testing')) {
-            return $callback();
-        }
-
-        $store = Cache::getStore();
-
-        if ($store instanceof \Illuminate\Cache\TaggableStore) {
-            return Cache::tags($tags)->remember($key, $ttl, $callback);
-        }
-
-        $namespacedKey = implode('|', $tags) . ':' . $key;
-
-        return Cache::remember($namespacedKey, $ttl, $callback);
+        return TagAwareCache::remember(
+            CacheKeys::homeLatestReviews($locale),
+            now()->addSeconds(60),
+            static function (): Collection {
+                return Review::query()
+                    ->where('is_approved', true)
+                    ->with(['product' => static fn ($query) => $query->select('id', 'name', 'slug')])
+                    ->latest('created_at')
+                    ->limit(6)
+                    ->get();
+            },
+            [
+                CacheTags::home(),
+                CacheTags::locale($locale),
+                CacheTags::reviews(),
+                CacheTags::products(),
+                CacheKeys::homeTag(),
+            ]
+        );
     }
 
     public function addToCart(int $productId): void

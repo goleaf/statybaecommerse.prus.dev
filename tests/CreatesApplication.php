@@ -73,7 +73,7 @@ trait CreatesApplication
             return $this->sqliteDatabasePath;
         }
 
-        $databasePath = dirname(__DIR__) . '/database/testing.sqlite';
+        $databasePath = dirname(__DIR__) . '/storage/framework/testing/testing.sqlite';
         $this->sqliteDatabasePreExisted = file_exists($databasePath);
 
         if (! $this->sqliteDatabasePreExisted) {

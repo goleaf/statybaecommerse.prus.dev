@@ -13,10 +13,6 @@ final class OrderPolicy
 {
     public function viewAny(AdminUser|User $user): bool
     {
-        if (! $user instanceof AdminUser) {
-            return false;
-        }
-
         return AuthorizationMatrix::check('orders', 'viewAny', $user);
     }
 
@@ -33,7 +29,7 @@ final class OrderPolicy
         return $order->user_id === $user->getKey();
     }
 
-    public function create(AdminUser $user): bool
+    public function create(AdminUser|User $user): bool
     {
         return AuthorizationMatrix::check('orders', 'create', $user);
     }
@@ -51,17 +47,17 @@ final class OrderPolicy
         return $order->user_id === $user->getKey();
     }
 
-    public function delete(AdminUser $user, Order $order): bool
+    public function delete(AdminUser|User $user, Order $order): bool
     {
         return AuthorizationMatrix::check('orders', 'delete', $user);
     }
 
-    public function restore(AdminUser $user, Order $order): bool
+    public function restore(AdminUser|User $user, Order $order): bool
     {
         return AuthorizationMatrix::check('orders', 'update', $user);
     }
 
-    public function forceDelete(AdminUser $user, Order $order): bool
+    public function forceDelete(AdminUser|User $user, Order $order): bool
     {
         return AuthorizationMatrix::check('orders', 'delete', $user);
     }

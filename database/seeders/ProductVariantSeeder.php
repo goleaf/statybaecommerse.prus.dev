@@ -248,6 +248,7 @@ final class ProductVariantSeeder extends Seeder
                 ->hasAttached($category)
                 ->state([
                     'name' => $productData['name'],
+                    'slug' => Str::slug($productData['name']),
                     'description' => $productData['description'],
                     'short_description' => substr($productData['description'], 0, 100),
                     'price' => $productData['base_price'],
@@ -261,6 +262,8 @@ final class ProductVariantSeeder extends Seeder
                     'published_at' => now(),
                 ])
                 ->create();
+
+            $this->syncProductTranslations($product, $productData);
 
             foreach ($productData['variants'] as $index => $variantData) {
                 $variant = ProductVariant::factory()
@@ -278,6 +281,8 @@ final class ProductVariantSeeder extends Seeder
                         'attributes' => ['size' => $variantData['size']],
                     ])
                     ->create();
+
+                $this->syncVariantTranslations($variant, $variantData, $productData);
 
                 $matrix = [];
 
@@ -413,5 +418,80 @@ final class ProductVariantSeeder extends Seeder
                 ])
                 ->create();
         }
+    }
+
+    private function syncProductTranslations(Product $product, array $productData): void
+    {
+        if (! method_exists($product, 'translations')) {
+            return;
+        }
+
+        $locales = $this->supportedLocales();
+
+        foreach ($locales as $locale) {
+            $name = data_get($productData, "translations.{$locale}.name", $productData['name']);
+            $description = data_get($productData, "translations.{$locale}.description", $productData['description']);
+            $shortDescription = data_get($productData, "translations.{$locale}.short_description", substr($description, 0, 120));
+            $seoTitle = data_get($productData, "translations.{$locale}.seo_title", $name);
+            $seoDescription = data_get($productData, "translations.{$locale}.seo_description", $description);
+
+            $product->translations()->updateOrCreate(
+                ['locale' => $locale],
+                [
+                    'name'              => $name,
+                    'slug'              => Str::slug($name.'-'.$locale),
+                    'summary'           => $shortDescription,
+                    'description'       => $description,
+                    'short_description' => $shortDescription,
+                    'seo_title'         => $seoTitle,
+                    'seo_description'   => $seoDescription,
+                ],
+            );
+        }
+    }
+
+    private function syncVariantTranslations(ProductVariant $variant, array $variantData, array $productData): void
+    {
+        if (! method_exists($variant, 'translations')) {
+            return;
+        }
+
+        $locales = $this->supportedLocales();
+
+        foreach ($locales as $locale) {
+            $name = data_get($variantData, "translations.{$locale}.name", $variant->name);
+            $description = data_get($variantData, "translations.{$locale}.description", $productData['description']);
+            $seoTitle = data_get($variantData, "translations.{$locale}.seo_title", $name);
+            $seoDescription = data_get($variantData, "translations.{$locale}.seo_description", $description);
+
+            $variant->translations()->updateOrCreate(
+                ['locale' => $locale],
+                [
+                    'name'            => $name,
+                    'description'     => $description,
+                    'seo_title'       => $seoTitle,
+                    'seo_description' => $seoDescription,
+                ],
+            );
+        }
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function supportedLocales(): array
+    {
+        $locales = config('app.supported_locales', ['lt', 'en']);
+
+        if (is_string($locales)) {
+            $locales = explode(',', $locales);
+        }
+
+        return collect($locales)
+            ->map(static fn ($locale): string => trim((string) $locale))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
     }
 }

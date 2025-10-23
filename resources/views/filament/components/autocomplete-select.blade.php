@@ -12,7 +12,7 @@
          valueField: @js($viewData['valueField']),
          labelField: @js($viewData['labelField']),
          modelClass: @js($viewData['modelClass']),
-         searchResults: @js($viewData['searchResults']),
+         searchResults: @js($viewData['searchResultItems']),
          searchQuery: @js($viewData['searchQuery']),
          state: $wire.{{ $getStatePath() }},
      })"
@@ -177,4 +177,3 @@
         }
     </script>
 @endpush
-

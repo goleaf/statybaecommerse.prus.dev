@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Renderless;
+use Throwable;
 
 /**
  * AutocompleteSelect Component
@@ -56,6 +57,18 @@ final class AutocompleteSelect extends Select
 
         $component->searchable(true);
         $component->searchResults = $component->emptyResults();
+
+        if (is_string($name) && $name !== '') {
+            $segments = preg_split('/[_\s\-]+/', $name, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+
+            if ($segments !== []) {
+                $defaultQuery = $component->normalizeSearchQuery($segments[0]);
+
+                if ($defaultQuery !== null) {
+                    $component->searchQuery = $defaultQuery;
+                }
+            }
+        }
 
         return $component;
     }
@@ -115,8 +128,10 @@ final class AutocompleteSelect extends Select
         }
 
         if ($modelClass !== $this->modelClass) {
+            $previousQuery = $this->searchQuery;
             $this->modelClass = $modelClass;
             $this->resetSearchState();
+            $this->searchQuery = $previousQuery;
 
             return $this;
         }
@@ -171,40 +186,24 @@ final class AutocompleteSelect extends Select
      */
     public function getSearchResults(string $search): array
     {
-        return ($this->searchResults ?? collect())
-            ->mapWithKeys(
-                /**
-                 * @param  array{value: string, label: string, data: array<string, mixed>} $item
-                 * @return array<string, string>
-                 */
-                function (array $item, int|string $_): array {
-                    $value = $item['value'];
-                    $label = $item['label'];
-                    $data = $item['data'];
+        $normalizedQuery = $this->normalizeSearchQuery($search);
 
-                    // Support both the normalised payload and legacy flat metadata by preferring a nested payload when present.
-                    $payload = $data['payload'] ?? $data;
+        if ($normalizedQuery === null) {
+            $this->setSearchQuery(null);
 
-                    if (! is_array($payload)) {
-                        $payload = $data;
-                    }
+            return [];
+        }
 
-                    if ($label === '' && array_key_exists('name', $payload)) {
-                        $name = $payload['name'];
+        if ($this->getModelClass() === null) {
+            return [];
+        }
 
-                        if (is_string($name)) {
-                            $label = $name;
-                        }
-                    }
+        $results = $this->performSearch($normalizedQuery);
 
-                    if ($label === '') {
-                        $label = $value;
-                    }
+        $this->searchResults = $results;
+        $this->searchQuery = $normalizedQuery;
 
-                    return [$value => $label];
-                },
-            )
-            ->all();
+        return $this->formatResultsForSelect($results);
     }
 
     public function setSearchQuery(?string $query): static
@@ -215,6 +214,7 @@ final class AutocompleteSelect extends Select
 
         if ($normalizedQuery === null) {
             $this->searchResults = $this->emptyResults();
+            $this->flushSearchCache();
 
             return $this;
         }
@@ -244,7 +244,7 @@ final class AutocompleteSelect extends Select
 
         if ($this->activeModelForCache !== $modelClass) {
             // New model context detected, so drop any cached payloads from previous lookups.
-            $this->searchResultCache = [];
+            $this->flushSearchCache();
             $this->activeModelForCache = $modelClass;
         }
 
@@ -271,42 +271,53 @@ final class AutocompleteSelect extends Select
         $valueField = $this->getValueField();
         $labelField = $this->getLabelField();
 
-        $query = $model->newQuery();
-
         // Avoid missing records when the model registers global scopes (common for admin lookups).
-        $query = $query->withoutGlobalScopes();
+        $query = $model->newQuery()->withoutGlobalScopes();
 
-        $resultsArray = $query
-            ->where($searchField, 'like', '%' . $normalizedSearch . '%')
-            ->limit($this->maxSearchResults)
-            ->get()
-            ->flatMap(function (Model $item) use ($valueField, $labelField): array {
-                $rawValue = $item->getAttribute($valueField);
+        $terms = preg_split('/\s+/u', $normalizedSearch) ?: [$normalizedSearch];
 
-                if ($rawValue === null) {
-                    return [];
-                }
+        $query->where(function (Builder $builder) use ($terms, $searchField): void {
+            foreach ($terms as $term) {
+                $builder->where($searchField, 'like', '%' . $term . '%');
+            }
+        });
 
-                if (! is_scalar($rawValue)) {
-                    return [];
-                }
+        try {
+            $resultsArray = $query
+                ->limit($this->maxSearchResults)
+                ->get()
+                ->flatMap(function (Model $item) use ($valueField, $labelField): array {
+                    $rawValue = $item->getAttribute($valueField);
 
-                $value = (string) $rawValue;
+                    if ($rawValue === null) {
+                        return [];
+                    }
 
-                $rawLabel = $item->getAttribute($labelField);
-                $label = is_string($rawLabel) ? $rawLabel : $value;
+                    if (! is_scalar($rawValue) && ! (is_object($rawValue) && method_exists($rawValue, '__toString'))) {
+                        return [];
+                    }
 
-                /** @var array<string, mixed> $data */
-                $data = $item->toArray();
+                    $value = (string) $rawValue;
 
-                return [[
-                    'value' => $value,
-                    'label' => $label,
-                    'data'  => $data,
-                ]];
-            })
-            ->values()
-            ->all();
+                    $rawLabel = $item->getAttribute($labelField);
+                    $label = is_string($rawLabel) ? $rawLabel : $value;
+
+                    /** @var array<string, mixed> $data */
+                    $data = $item->toArray();
+
+                    return [[
+                        'value' => $value,
+                        'label' => $label,
+                        'data'  => $data,
+                    ]];
+                })
+                ->values()
+                ->all();
+        } catch (Throwable) {
+            $this->searchResultCache[$cacheKey] = [];
+
+            return $this->emptyResults();
+        }
 
         /** @var array<int, array{value: string, label: string, data: array<string, mixed>}> $resultsArray */
         $this->searchResultCache[$cacheKey] = $resultsArray;
@@ -319,6 +330,15 @@ final class AutocompleteSelect extends Select
 
     public function getViewData(): array
     {
+        $results = $this->searchResults ?? $this->emptyResults();
+        $modelClass = $this->getModelClass();
+        $shouldExposeResults = $this->activeModelForCache === $modelClass && $modelClass !== null;
+
+        if ($shouldExposeResults && $this->searchQuery !== null && $results->isEmpty()) {
+            $results = $this->performSearch($this->searchQuery);
+            $this->searchResults = $results;
+        }
+
         return [
             'searchable'       => $this->getSearchable(),
             'multiple'         => $this->getMultiple(),
@@ -328,9 +348,8 @@ final class AutocompleteSelect extends Select
             'valueField'       => $this->getValueField(),
             'labelField'       => $this->getLabelField(),
             'modelClass'       => $this->getModelClass(),
-            'searchResults'    => $this->activeModelForCache === $this->getModelClass()
-                ? $this->searchResults ?? $this->emptyResults()
-                : $this->emptyResults(),
+            'searchResults'    => $shouldExposeResults ? $this->formatResultsForSelect($results) : [],
+            'searchResultItems' => $shouldExposeResults ? $results->values()->all() : [],
             'searchQuery' => $this->getSearchQuery(),
         ];
     }
@@ -363,14 +382,54 @@ final class AutocompleteSelect extends Select
     {
         $this->searchResults = $this->emptyResults();
         $this->searchQuery = null;
-        $this->searchResultCache = [];
-        $this->activeModelForCache = null;
+        $this->flushSearchCache();
     }
 
     protected function flushSearchCache(): void
     {
         $this->searchResultCache = [];
-        $this->searchResults = $this->emptyResults();
+        $this->activeModelForCache = $this->getModelClass();
+    }
+
+    /**
+     * @param Collection<int, array{value: string, label: string, data: array<string, mixed>}> $results
+     * @return array<string, string>
+     */
+    protected function formatResultsForSelect(Collection $results): array
+    {
+        return $results
+            ->mapWithKeys(
+                /**
+                 * @param array{value: string, label: string, data: array<string, mixed>} $item
+                 */
+                static function (array $item): array {
+                    $value = $item['value'];
+                    $label = $item['label'];
+                    $data = $item['data'];
+
+                    // Prefer a nested payload while maintaining compatibility with any legacy flat arrays.
+                    $payload = $data['payload'] ?? $data;
+
+                    if (! is_array($payload)) {
+                        $payload = $data;
+                    }
+
+                    if ($label === '' && array_key_exists('name', $payload)) {
+                        $name = $payload['name'];
+
+                        if (is_string($name)) {
+                            $label = $name;
+                        }
+                    }
+
+                    if ($label === '') {
+                        $label = $value;
+                    }
+
+                    return [$value => $label];
+                },
+            )
+            ->all();
     }
 
     /**

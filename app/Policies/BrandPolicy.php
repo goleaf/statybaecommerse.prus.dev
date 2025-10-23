@@ -13,43 +13,35 @@ final class BrandPolicy
 {
     public function viewAny(AdminUser|User $user): bool
     {
-        if (! $user instanceof AdminUser) {
-            return false;
-        }
-
         return AuthorizationMatrix::check('brands', 'viewAny', $user);
     }
 
     public function view(AdminUser|User $user, Brand $brand): bool
     {
-        if (! $user instanceof AdminUser) {
-            return false;
-        }
-
         return AuthorizationMatrix::check('brands', 'view', $user);
     }
 
-    public function create(AdminUser $user): bool
+    public function create(AdminUser|User $user): bool
     {
         return AuthorizationMatrix::check('brands', 'create', $user);
     }
 
-    public function update(AdminUser $user, Brand $brand): bool
+    public function update(AdminUser|User $user, Brand $brand): bool
     {
         return AuthorizationMatrix::check('brands', 'update', $user);
     }
 
-    public function delete(AdminUser $user, Brand $brand): bool
+    public function delete(AdminUser|User $user, Brand $brand): bool
     {
         return AuthorizationMatrix::check('brands', 'delete', $user);
     }
 
-    public function restore(AdminUser $user, Brand $brand): bool
+    public function restore(AdminUser|User $user, Brand $brand): bool
     {
         return AuthorizationMatrix::check('brands', 'update', $user);
     }
 
-    public function forceDelete(AdminUser $user, Brand $brand): bool
+    public function forceDelete(AdminUser|User $user, Brand $brand): bool
     {
         return AuthorizationMatrix::check('brands', 'delete', $user);
     }

@@ -7,20 +7,23 @@ namespace App\Filament\Actions;
 use App\Models\ProductVariant;
 use App\Models\VariantPriceHistory;
 use Carbon\Carbon;
+use Closure;
 use DateTimeInterface;
-
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\Select as SelectInput;
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Text\TextInput as TextInputInput;
 use Filament\Actions\Action;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Component;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class VariantBulkPriceUpdate extends Action
 {
+    private const FLATPICKR_COMPONENT = 'Coolsam\\FilamentFlatpickr\\Forms\\Components\\Flatpickr';
+
     public static function make(?string $name = null): static
     {
         return parent::make('bulk_price_update')
@@ -73,24 +76,18 @@ final class VariantBulkPriceUpdate extends Action
                 Toggle::make('set_sale_period')
                     ->label(__('product_variants.fields.set_sale_period'))
                     ->default(false),
-                Flatpickr::make('sale_start_date')
-                    ->time(true)
-                    ->time24hr(true)
-                    ->seconds(false)
-                    ->format('Y-m-d H:i')
-                    ->rangePicker()
-                    ->label(__('product_variants.fields.sale_start_date'))
-                    ->visible(fn (callable $get) => $get('set_sale_period'))
-                    ->default(now()),
-                Flatpickr::make('sale_end_date')
-                    ->time(true)
-                    ->time24hr(true)
-                    ->seconds(false)
-                    ->format('Y-m-d H:i')
-                    ->rangePicker()
-                    ->label(__('product_variants.fields.sale_end_date'))
-                    ->visible(fn (callable $get) => $get('set_sale_period'))
-                    ->default(now()->addDays(30)),
+                self::makeSalePeriodPicker(
+                    name: 'sale_start_date',
+                    label: __('product_variants.fields.sale_start_date'),
+                    visibility: fn (callable $get): bool => (bool) $get('set_sale_period'),
+                    default: fn (): Carbon => now(),
+                ),
+                self::makeSalePeriodPicker(
+                    name: 'sale_end_date',
+                    label: __('product_variants.fields.sale_end_date'),
+                    visibility: fn (callable $get): bool => (bool) $get('set_sale_period'),
+                    default: fn (): Carbon => now()->addDays(30),
+                ),
                 Textarea::make('change_reason')
                     ->label(__('product_variants.fields.change_reason'))
                     ->maxLength(500)
@@ -222,5 +219,45 @@ final class VariantBulkPriceUpdate extends Action
                         ->send();
                 });
             });
+    }
+
+    /**
+     * Build a sale period date picker using Flatpickr when available, falling back to Filament's DateTimePicker otherwise.
+     *
+     * @param  Closure(callable): bool  $visibility
+     * @param  Closure(): Carbon  $default
+     */
+    private static function makeSalePeriodPicker(string $name, string $label, Closure $visibility, Closure $default): Component
+    {
+        $componentClass = class_exists(self::FLATPICKR_COMPONENT)
+            ? self::FLATPICKR_COMPONENT
+            : DateTimePicker::class;
+
+        /** @var Component $component */
+        $component = $componentClass::make($name)
+            ->label($label)
+            ->visible($visibility)
+            ->default($default);
+
+        if ($componentClass === self::FLATPICKR_COMPONENT) {
+            /** @var Component $component */
+            $component = $component
+                ->time(true)
+                ->time24hr(true)
+                ->seconds(false)
+                ->format('Y-m-d H:i')
+                ->rangePicker();
+
+            return $component;
+        }
+
+        /** @var DateTimePicker $component */
+        $component = $component
+            ->time()
+            ->seconds(false)
+            ->format('Y-m-d H:i')
+            ->displayFormat('Y-m-d H:i');
+
+        return $component;
     }
 }

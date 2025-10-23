@@ -31,6 +31,7 @@ use App\Models\Zone;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 /**
  * AdminSeeder
@@ -356,10 +357,13 @@ final class AdminSeeder extends Seeder
 
         $createdCategories = [];
         foreach ($categories as $category) {
-            $createdCategories[] = Category::firstOrCreate(
+            $createdCategory = Category::firstOrCreate(
                 ['slug' => $category['slug']],
                 $category
             );
+
+            $this->ensureCategoryTranslations($createdCategory);
+            $createdCategories[] = $createdCategory;
         }
 
         return $createdCategories;
@@ -433,6 +437,8 @@ final class AdminSeeder extends Seeder
                 $product
             );
 
+            $this->ensureProductTranslations($createdProduct);
+
             // Attach category to product if not already attached
             if (isset($categories[$index]) && ! $createdProduct->categories()->where('category_id', $categories[$index]->id)->exists()) {
                 $createdProduct->categories()->attach($categories[$index]->id);
@@ -461,7 +467,7 @@ final class AdminSeeder extends Seeder
 
         foreach ($products as $product) {
             foreach ($variantDefinitions as $definition) {
-                $variants[] = ProductVariant::firstOrCreate(
+                $variant = ProductVariant::firstOrCreate(
                     ['product_id' => $product->id, 'sku' => $product->sku . '-' . $definition['suffix']],
                     [
                         'product_id' => $product->id,
@@ -475,6 +481,9 @@ final class AdminSeeder extends Seeder
                         ],
                     ]
                 );
+
+                $this->ensureVariantTranslations($variant);
+                $variants[] = $variant;
             }
         }
 
@@ -954,6 +963,94 @@ final class AdminSeeder extends Seeder
         }
 
         return $createdLocations;
+    }
+
+    private function ensureProductTranslations(Product $product): void
+    {
+        if (! method_exists($product, 'translations')) {
+            return;
+        }
+
+        foreach ($this->supportedLocales() as $locale) {
+            $name = $product->name;
+            $description = $product->description;
+            $shortDescription = $product->short_description ?? Str::limit((string) $description, 120);
+            $seoTitle = $product->seo_title ?? $name;
+            $seoDescription = $product->seo_description ?? $description;
+
+            $product->translations()->updateOrCreate(
+                ['locale' => $locale],
+                [
+                    'name'              => $name,
+                    'slug'              => Str::slug($name.'-'.$locale),
+                    'summary'           => $shortDescription,
+                    'description'       => $description,
+                    'short_description' => $shortDescription,
+                    'seo_title'         => $seoTitle,
+                    'seo_description'   => $seoDescription,
+                ],
+            );
+        }
+    }
+
+    private function ensureCategoryTranslations(Category $category): void
+    {
+        if (! method_exists($category, 'translations')) {
+            return;
+        }
+
+        foreach ($this->supportedLocales() as $locale) {
+            $name = $category->name;
+            $description = $category->description;
+
+            $category->translations()->updateOrCreate(
+                ['locale' => $locale],
+                [
+                    'name'        => $name,
+                    'slug'        => Str::slug($name.'-'.$locale),
+                    'description' => $description,
+                ],
+            );
+        }
+    }
+
+    private function ensureVariantTranslations(ProductVariant $variant): void
+    {
+        if (! method_exists($variant, 'translations')) {
+            return;
+        }
+
+        foreach ($this->supportedLocales() as $locale) {
+            $name = $variant->name;
+            $variant->translations()->updateOrCreate(
+                ['locale' => $locale],
+                [
+                    'name'            => $name,
+                    'description'     => null,
+                    'seo_title'       => $name,
+                    'seo_description' => null,
+                ],
+            );
+        }
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function supportedLocales(): array
+    {
+        $locales = config('app.supported_locales', ['lt', 'en']);
+
+        if (is_string($locales)) {
+            $locales = explode(',', $locales);
+        }
+
+        return collect($locales)
+            ->map(static fn ($locale): string => trim((string) $locale))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
     }
 
     /**

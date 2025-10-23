@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Filament\Resources\DiscountRedemptionResource;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Support\Contracts\TranslatableContentDriver;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;

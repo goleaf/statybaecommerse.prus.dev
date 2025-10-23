@@ -8,6 +8,7 @@ namespace App\Filament\Resources;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\SliderResource\Pages;
 use App\Models\Slider;
+use App\Support\Concerns\HasNav;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ContentLinkSearch;
 use App\Support\Search\SearchResultPayload;
@@ -38,6 +39,8 @@ use UnitEnum;
 
 final class SliderResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Slider::class;
 
     /**

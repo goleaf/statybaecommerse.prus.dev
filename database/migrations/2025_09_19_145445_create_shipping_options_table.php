@@ -31,6 +31,7 @@ return new class extends Migration
             $table->integer('estimated_days_min')->nullable();
             $table->integer('estimated_days_max')->nullable();
             $table->json('metadata')->nullable();
+            $table->json('shipping_matrix')->nullable();
             $table->timestamps();
 
             $table->foreign('zone_id')->references('id')->on('zones')->onDelete('cascade');

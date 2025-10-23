@@ -65,6 +65,10 @@ return new class extends Migration
         string $referencedColumn,
         string $onDelete,
     ): void {
+        if ($this->isSqliteConnection()) {
+            return;
+        }
+
         if ($this->foreignKeyExists($table, $column, $referencedTable, $referencedColumn)) {
             return;
         }

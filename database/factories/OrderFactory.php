@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\User;
 use App\Models\Zone;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Order>
@@ -32,9 +33,9 @@ class OrderFactory extends Factory
 
         return [
             'number' => 'ORD-'.strtoupper($this->faker->unique()->bothify('######')),
-            'user_id' => User::factory(),
-            'channel_id' => Channel::factory(),
-            'zone_id' => Zone::factory(),
+            'user_id' => null,
+            'channel_id' => null,
+            'zone_id' => null,
             'partner_id' => null,
             'status' => $this->faker->randomElement(['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'completed']),
             'payment_status' => $this->faker->randomElement(['pending', 'paid', 'failed', 'refunded', 'partially_refunded']),
@@ -190,6 +191,49 @@ class OrderFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'payment_status' => 'refunded',
         ]);
+    }
+
+    public function configure(): static
+    {
+        return $this
+            ->afterMaking(function (Order $order): void {
+                if ($order->user_id === null && ! $order->relationLoaded('user')) {
+                    $order->setRelation('user', User::factory()->make());
+                }
+
+                if ($order->channel_id === null && ! $order->relationLoaded('channel')) {
+                    $order->setRelation('channel', Channel::factory()->make());
+                }
+
+                if ($order->zone_id === null && ! $order->relationLoaded('zone')) {
+                    $order->setRelation('zone', Zone::factory()->make());
+                }
+            })
+            ->afterCreating(function (Order $order): void {
+                $dirty = false;
+                $userTable = (new User())->getTable();
+                $channelTable = (new Channel())->getTable();
+                $zoneTable = (new Zone())->getTable();
+
+                if ($order->user_id === null && Schema::hasTable($userTable)) {
+                    $order->user()->associate(User::factory()->create());
+                    $dirty = true;
+                }
+
+                if ($order->channel_id === null && Schema::hasTable($channelTable)) {
+                    $order->channel()->associate(Channel::factory()->create());
+                    $dirty = true;
+                }
+
+                if ($order->zone_id === null && Schema::hasTable($zoneTable)) {
+                    $order->zone()->associate(Zone::factory()->create());
+                    $dirty = true;
+                }
+
+                if ($dirty) {
+                    $order->save();
+                }
+            });
     }
 
     /**

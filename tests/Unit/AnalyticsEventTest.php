@@ -4,9 +4,94 @@ declare(strict_types=1);
 
 use App\Models\AnalyticsEvent;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
-uses(RefreshDatabase::class);
+beforeEach(function (): void {
+    $this->sqlitePath = sys_get_temp_dir() . '/analytics_events_' . Str::random(16) . '.sqlite';
+    touch($this->sqlitePath);
+
+    DB::purge('sqlite');
+    DB::disconnect('sqlite');
+
+    config()->set('database.default', 'sqlite');
+    config()->set('database.connections.sqlite.database', $this->sqlitePath);
+    config()->set('database.connections.sqlite.foreign_key_constraints', true);
+    config()->set('database.connections.sqlite.prefix', '');
+    config()->set('activitylog.enabled', false);
+
+    Schema::connection('sqlite')->dropAllTables();
+
+    Schema::create('users', function (Blueprint $table): void {
+        $table->id();
+        $table->string('name')->nullable();
+        $table->string('email')->unique();
+        $table->timestamp('email_verified_at')->nullable();
+        $table->string('password');
+        $table->string('preferred_locale', 10)->nullable();
+        $table->boolean('is_admin')->default(false);
+        $table->rememberToken();
+        $table->timestamps();
+        $table->softDeletes();
+    });
+
+    Schema::create('analytics_events', function (Blueprint $table): void {
+        $table->id();
+        $table->string('event_name')->nullable();
+        $table->string('event_type');
+        $table->text('description')->nullable();
+        $table->string('session_id')->nullable()->index();
+        $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
+        $table->string('url')->nullable();
+        $table->string('referrer')->nullable();
+        $table->string('ip_address', 45)->nullable();
+        $table->string('country_code', 2)->nullable();
+        $table->string('device_type')->nullable()->index();
+        $table->string('browser')->nullable()->index();
+        $table->string('os')->nullable();
+        $table->string('screen_resolution')->nullable();
+        $table->string('trackable_type')->nullable();
+        $table->unsignedBigInteger('trackable_id')->nullable();
+        $table->decimal('value', 10, 2)->nullable();
+        $table->string('currency', 3)->nullable();
+        $table->json('properties')->nullable();
+        $table->text('user_agent')->nullable();
+        $table->boolean('is_important')->default(false);
+        $table->boolean('is_conversion')->default(false);
+        $table->decimal('conversion_value', 10, 2)->nullable();
+        $table->string('conversion_currency', 3)->nullable();
+        $table->text('notes')->nullable();
+        $table->string('user_name')->nullable();
+        $table->string('user_email')->nullable();
+        $table->json('event_data')->nullable();
+        $table->string('utm_source')->nullable();
+        $table->string('utm_medium')->nullable();
+        $table->string('utm_campaign')->nullable();
+        $table->string('utm_term')->nullable();
+        $table->string('utm_content')->nullable();
+        $table->string('referrer_url')->nullable();
+        $table->string('country')->nullable();
+        $table->string('city')->nullable();
+        $table->timestamps();
+
+        $table->index(['event_type', 'created_at']);
+        $table->index(['user_id', 'created_at']);
+    });
+
+    User::unsetEventDispatcher();
+    AnalyticsEvent::unsetEventDispatcher();
+});
+
+afterEach(function (): void {
+    User::setEventDispatcher(app('events'));
+    AnalyticsEvent::setEventDispatcher(app('events'));
+    DB::disconnect('sqlite');
+    if (isset($this->sqlitePath) && is_string($this->sqlitePath) && file_exists($this->sqlitePath)) {
+        @unlink($this->sqlitePath);
+    }
+});
 
 it('can create analytics event', function () {
     $user = User::factory()->create();

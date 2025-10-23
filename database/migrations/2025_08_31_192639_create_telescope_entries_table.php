@@ -4,42 +4,18 @@ declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Get the migration connection name.
-     */
-    public function getConnection(): ?string
-    {
-        if (app()->runningUnitTests()) {
-            // Always use SQLite when PHPUnit is orchestrating the migrations to avoid external services.
-            return 'sqlite';
-        }
-
-        $configured = config('telescope.storage.database.connection');
-
-        if (is_string($configured) && config()->has("database.connections.{$configured}")) {
-            // Honour the explicitly configured connection when it exists in the database configuration list.
-            return $configured;
-        }
-
-        if (config()->has('database.connections.sqlite')) {
-            // Fall back to the SQLite connection so automated tests can run without a MySQL service.
-            return 'sqlite';
-        }
-
-        // Defer to the framework default connection when no better option is available.
-        return config('database.default');
-    }
 
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        $schema = Schema::connection($this->getConnection());
+        $schema = Schema::connection($this->schemaConnection());
 
         $schema->create('telescope_entries', function (Blueprint $table): void {
             $table->bigIncrements('sequence');
@@ -81,10 +57,38 @@ return new class extends Migration
      */
     public function down(): void
     {
-        $schema = Schema::connection($this->getConnection());
+        $schema = Schema::connection($this->schemaConnection());
 
         $schema->dropIfExists('telescope_entries_tags');
         $schema->dropIfExists('telescope_entries');
         $schema->dropIfExists('telescope_monitoring');
+    }
+
+    /**
+     * Resolve the connection name that should back Telescope's schema.
+     */
+    private function schemaConnection(): string
+    {
+        if (app()->runningUnitTests() || app()->environment('testing')) {
+            return 'sqlite';
+        }
+
+        $current = DB::getDefaultConnection();
+
+        if (is_string($current) && $current !== '') {
+            return $current;
+        }
+
+        $configured = config('telescope.storage.database.connection');
+
+        if (is_string($configured) && config()->has("database.connections.{$configured}")) {
+            return $configured;
+        }
+
+        if (config()->has('database.connections.sqlite')) {
+            return 'sqlite';
+        }
+
+        return config('database.default');
     }
 };

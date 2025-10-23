@@ -1,6 +1,6 @@
 @extends('components.layouts.base')
 
-@section('title', __('translations.request_product') . ' - ' . $product->name)
+@section('title', __('translations.request_product') . ' - ' . ($product->trans('name') ?? $product->name))
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
@@ -20,11 +20,11 @@
                 <div class="flex items-center space-x-4">
                     @if($product->getMainImage())
                         <img src="{{ $product->getMainImage() }}" 
-                             alt="{{ $product->name }}" 
+                             alt="{{ $product->trans('name') ?? $product->name }}" 
                              class="w-16 h-16 object-cover rounded-lg">
                     @endif
                     <div>
-                        <h3 class="font-semibold text-gray-900">{{ $product->name }}</h3>
+                        <h3 class="font-semibold text-gray-900">{{ $product->trans('name') ?? $product->name }}</h3>
                         <p class="text-sm text-gray-600">{{ $product->sku }}</p>
                         @if($product->price)
                             <p class="text-sm font-medium text-green-600">
@@ -135,4 +135,3 @@
     </div>
 </div>
 @endsection
-

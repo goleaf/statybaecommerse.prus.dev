@@ -18,6 +18,10 @@ return new class extends Migration
             return;
         }
 
+        if (Schema::getConnection()->getDriverName() !== 'mysql') {
+            return;
+        }
+
         DB::statement(<<<'SQL'
             ALTER TABLE `orders`
             MODIFY COLUMN `status` ENUM(
@@ -41,6 +45,10 @@ return new class extends Migration
     {
         if (! Schema::hasTable('orders')) {
             // Consistent with the up() guard, skip when the orders table is missing.
+            return;
+        }
+
+        if (Schema::getConnection()->getDriverName() !== 'mysql') {
             return;
         }
 

@@ -12,11 +12,7 @@ use App\Policies\CategoryPolicy;
 use App\Policies\OrderPolicy;
 use App\Policies\ProductPolicy;
 use App\Policies\UserPolicy;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
     app(PermissionRegistrar::class)->forgetCachedPermissions();
@@ -24,9 +20,16 @@ beforeEach(function (): void {
 
 function policyUser(string $role): User
 {
-    $user = User::factory()->create();
-    Role::findOrCreate($role, 'web');
-    $user->assignRole($role);
+    $user = User::factory()->make([
+        'id' => random_int(1, PHP_INT_MAX),
+    ]);
+
+    $roleModel = \Spatie\Permission\Models\Role::make([
+        'name' => $role,
+        'guard_name' => 'web',
+    ]);
+
+    $user->setRelation('roles', collect([$roleModel]));
 
     return $user;
 }

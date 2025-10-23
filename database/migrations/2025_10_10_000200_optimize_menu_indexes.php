@@ -88,8 +88,12 @@ return new class extends Migration
             return false;
         }
 
-        $schemaManager = $connection->getDoctrineSchemaManager();
+        if ($driver === 'mysql') {
+            $result = DB::select("SHOW INDEX FROM `{$table}` WHERE Key_name = ?", [$index]);
 
-        return array_key_exists($index, $schemaManager->listTableIndexes($table));
+            return ! empty($result);
+        }
+
+        return false;
     }
 };

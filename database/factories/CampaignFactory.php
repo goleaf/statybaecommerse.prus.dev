@@ -10,6 +10,7 @@ use App\Models\CampaignProductTarget;
 use App\Models\CampaignSchedule;
 use App\Models\CustomerGroup;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -30,7 +31,7 @@ final class CampaignFactory extends Factory
             ? $this->generateUniqueSlug($baseSlug)
             : $baseSlug.'-'.Str::random(6);
 
-        return [
+        $attributes = [
             'name'       => $name,
             'slug'       => $slug,
             'starts_at'  => $this->faker->dateTimeBetween('-1 week', 'now'),
@@ -50,22 +51,22 @@ final class CampaignFactory extends Factory
             },
             'zone_id'   => null,
             'status'    => 'active',
-            'is_active' => true,
             'metadata'  => [
                 'source' => $this->faker->randomElement(['manual', 'automated', 'imported']),
                 'tags'   => $this->faker->words(3),
             ],
-            'is_featured'        => $this->faker->boolean(20),
-            'send_notifications' => $this->faker->boolean(80),
-            'track_conversions'  => $this->faker->boolean(90),
-            'max_uses'           => $this->faker->numberBetween(100, 10000),
-            'budget_limit'       => $this->faker->randomFloat(2, 500, 50000),
         ];
+
+        return array_merge($attributes, $this->optionalCampaignFlags());
     }
 
     public function configure(): static
     {
         return $this->afterCreating(function (Campaign $campaign): void {
+            if (! config('factory.seed_campaign_relations', true)) {
+                return;
+            }
+
             // Create related records only when the necessary tables exist in the temporary test database.
             if ($this->tableExists('campaign_product_targets')) {
                 CampaignProductTarget::factory()
@@ -104,12 +105,55 @@ final class CampaignFactory extends Factory
         $slug = $baseSlug;
         $counter = 1;
 
-        while (Campaign::where('slug', $slug)->exists()) {
+        while ($this->slugExists($slug)) {
             $slug = $baseSlug.'-'.$counter;
             $counter++;
         }
 
         return $slug;
+    }
+
+    /**
+     * Determine if a slug is already persisted without relying on model scopes.
+     */
+    private function slugExists(string $slug): bool
+    {
+        if (! Schema::hasTable('discount_campaigns')) {
+            return false;
+        }
+
+        return DB::table('discount_campaigns')->where('slug', $slug)->exists();
+    }
+
+    /**
+     * Provide optional campaign attributes only when the schema includes matching columns.
+     *
+     * @return array<string, mixed>
+     */
+    private function optionalCampaignFlags(): array
+    {
+        if (! Schema::hasTable('discount_campaigns')) {
+            return [];
+        }
+
+        $optional = [
+            'is_active' => true,
+            'is_featured' => $this->faker->boolean(20),
+            'send_notifications' => $this->faker->boolean(80),
+            'track_conversions' => $this->faker->boolean(90),
+            'max_uses' => $this->faker->numberBetween(100, 10000),
+            'budget_limit' => $this->faker->randomFloat(2, 500, 50000),
+        ];
+
+        $attributes = [];
+
+        foreach ($optional as $column => $value) {
+            if (Schema::hasColumn('discount_campaigns', $column)) {
+                $attributes[$column] = $value;
+            }
+        }
+
+        return $attributes;
     }
 
     /**

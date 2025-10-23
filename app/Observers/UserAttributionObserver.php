@@ -11,12 +11,11 @@ use Illuminate\Support\Facades\Schema;
 
 final class UserAttributionObserver
 {
-    private static ?int $cachedSystemUserId = null;
-
-    private static bool $systemUserResolved = false;
-
     /** @var array<int, string|null> */
     private static array $userNameCache = [];
+
+    /** @var array<string, int|null> */
+    private static array $systemUserEmailCache = [];
 
     public function creating(Model $model): void
     {
@@ -76,33 +75,25 @@ final class UserAttributionObserver
             return (int) $authenticatedId;
         }
 
-        if (self::$systemUserResolved) {
-            return self::$cachedSystemUserId;
-        }
-
         $configuredId = config('attribution.system_user_id');
 
-        if ($configuredId !== null) {
-            self::$cachedSystemUserId = (int) $configuredId;
-            self::$systemUserResolved = true;
-
-            return self::$cachedSystemUserId;
+        if ($configuredId !== null && $configuredId !== '') {
+            return (int) $configuredId;
         }
 
         $systemUserEmail = config('attribution.system_user_email');
 
         if (! is_string($systemUserEmail) || $systemUserEmail === '') {
-            self::$systemUserResolved = true;
-
             return null;
         }
 
-        self::$cachedSystemUserId = User::query()
-            ->where('email', $systemUserEmail)
-            ->value('id');
-        self::$systemUserResolved = true;
+        if (! array_key_exists($systemUserEmail, self::$systemUserEmailCache)) {
+            self::$systemUserEmailCache[$systemUserEmail] = User::query()
+                ->where('email', $systemUserEmail)
+                ->value('id');
+        }
 
-        return self::$cachedSystemUserId;
+        return self::$systemUserEmailCache[$systemUserEmail];
     }
 
     private function resolveUserName(?int $userId): ?string

@@ -1,6 +1,6 @@
 @extends('frontend.layouts.app')
 
-@section('title', $product->name)
+@section('title', $product->trans('name') ?? $product->name)
 
 @section('content')
     <div class="container mx-auto px-4">
@@ -11,10 +11,10 @@
                 <li><a href="{{ route('frontend.products.index') }}" class="hover:text-blue-600 dark:hover:text-blue-300">{{ __('Products') }}</a></li>
                 @foreach ($product->categories as $category)
                     <li aria-hidden="true" class="px-1">/</li>
-                    <li><a href="{{ route('frontend.categories.show', $category) }}" class="hover:text-blue-600 dark:hover:text-blue-300">{{ $category->name }}</a></li>
+                <li><a href="{{ route('frontend.categories.show', $category) }}" class="hover:text-blue-600 dark:hover:text-blue-300">{{ $category->trans('name') ?? $category->name }}</a></li>
                 @endforeach
                 <li aria-hidden="true" class="px-1">/</li>
-                <li class="font-semibold text-gray-900 dark:text-white">{{ $product->name }}</li>
+                <li class="font-semibold text-gray-900 dark:text-white">{{ $product->trans('name') ?? $product->name }}</li>
             </ol>
         </nav>
 

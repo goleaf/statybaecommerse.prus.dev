@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Enums\ExportFormat;
 use App\Enums\ExportStatus;
-use App\Enums\ExportType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,12 +11,16 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('exports')) {
+            return;
+        }
+
         Schema::create('exports', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('requested_by')->constrained('users');
             $table->string('type');
             $table->string('format');
-            $table->string('status')->default(ExportStatus::PENDING->value);
+            $table->string('status')->default(ExportStatus::Queued->value);
             $table->json('filters')->nullable();
             $table->json('columns')->nullable();
             $table->string('file_name')->nullable();
@@ -35,6 +37,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('exports');
+        // No-op to avoid dropping the exports table defined by earlier migrations.
     }
 };

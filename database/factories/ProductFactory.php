@@ -7,6 +7,7 @@ namespace Database\Factories;
 use App\Models\Brand;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 /**
@@ -111,7 +112,7 @@ class ProductFactory extends Factory
             'short_description'   => $this->generateShortDescription($name),
             'price'               => $basePrice,
             'sale_price'          => $salePrice,
-            'brand_id'            => Brand::factory(),
+            'brand_id'            => null,
             'stock_quantity'      => $this->faker->numberBetween(0, 200),
             'low_stock_threshold' => $this->faker->numberBetween(5, 20),
             'weight'              => $this->faker->randomFloat(2, 0.1, 25.0),
@@ -160,9 +161,24 @@ class ProductFactory extends Factory
 
     public function configure(): static
     {
-        return $this->afterCreating(function (Product $product): void {
-            // Skip media for now - will be added manually or via admin
-        });
+        return $this
+            ->afterMaking(function (Product $product): void {
+                if ($product->brand_id === null && ! $product->relationLoaded('brand')) {
+                    $product->setRelation('brand', Brand::factory()->make());
+                }
+            })
+            ->afterCreating(function (Product $product): void {
+                $brandTable = (new Brand())->getTable();
+
+                if ($product->brand_id === null && Schema::hasTable($brandTable)) {
+                    $brand = Brand::factory()->create();
+                    $product->brand()->associate($brand);
+                    $product->save();
+                }
+
+                $this->createTranslations($product);
+                // Skip media for now - will be added manually or via admin
+            });
     }
 
     public function published(): static
@@ -210,5 +226,61 @@ class ProductFactory extends Factory
             'stock_quantity'      => 25,
             'low_stock_threshold' => 5,
         ], $preset);
+    }
+
+    private function createTranslations(Product $product): void
+    {
+        if (! method_exists($product, 'translations') || $product->translations()->exists()) {
+            return;
+        }
+
+        $defaultLocale = config('app.locale', 'en');
+        $locales = $this->supportedLocales();
+
+        $translations = collect($locales)->map(function (string $locale) use ($product, $defaultLocale): array {
+            $name = $locale === $defaultLocale
+                ? (string) $product->name
+                : Str::title($this->faker->words(3, true));
+
+            $slugSource = $locale === $defaultLocale
+                ? (string) ($product->slug ?? $name)
+                : $name.'-'.$locale;
+
+            return [
+                'locale'            => $locale,
+                'name'              => $name,
+                'slug'              => Str::slug($slugSource),
+                'summary'           => $this->faker->sentence(8),
+                'description'       => $locale === $defaultLocale ? (string) ($product->description ?? $this->generateLithuanianDescription($name)) : $this->faker->paragraphs(3, true),
+                'short_description' => $locale === $defaultLocale ? (string) ($product->short_description ?? $this->generateShortDescription($name)) : $this->faker->sentence(6),
+                'seo_title'         => $this->faker->sentence(6),
+                'seo_description'   => $this->faker->sentence(12),
+                'meta_keywords'     => $this->faker->words(5),
+                'alt_text'          => $this->faker->sentence(3),
+            ];
+        })->values()->all();
+
+        if ($translations !== []) {
+            $product->translations()->createMany($translations);
+        }
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function supportedLocales(): array
+    {
+        $locales = config('app.supported_locales', ['lt', 'en']);
+
+        if (is_string($locales)) {
+            $locales = explode(',', $locales);
+        }
+
+        return collect($locales)
+            ->map(static fn ($locale): string => trim((string) $locale))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
     }
 }

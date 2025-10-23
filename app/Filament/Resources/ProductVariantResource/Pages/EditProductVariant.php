@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductVariantResource\Pages;
 
+use App\Filament\Concerns\InteractsWithTranslationTabs;
 use App\Filament\Resources\ProductVariantResource;
 use Filament\Actions;
 use Filament\Notifications\Notification;
@@ -11,7 +12,14 @@ use Filament\Resources\Pages\EditRecord;
 
 final class EditProductVariant extends EditRecord
 {
+    use InteractsWithTranslationTabs;
+
     protected static string $resource = ProductVariantResource::class;
+
+    protected function getTranslatableFields(): array
+    {
+        return ['name', 'description', 'seo_title', 'seo_description'];
+    }
 
     protected function getHeaderActions(): array
     {
@@ -44,8 +52,17 @@ final class EditProductVariant extends EditRecord
             ->body(__('product_variants.messages.updated_successfully_description'));
     }
 
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $this->record->loadMissing('translations');
+
+        return $this->hydrateFormWithTranslations($this->record, $data);
+    }
+
     protected function afterSave(): void
     {
+        $this->syncTranslationRecords($this->record, $this->languageTabsPayload);
+
         parent::afterSave();
 
         $state = $this->form->getState();
@@ -59,6 +76,16 @@ final class EditProductVariant extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
+        [$data, $translations] = $this->extractTranslationsFromForm($data);
+        $this->languageTabsPayload = $this->filterEmptyTranslations($translations);
+        $data = $this->mutateMainDataWithDefaultLocale($data, $this->languageTabsPayload);
+        unset($data['description'], $data['seo_title'], $data['seo_description']);
+
+        $defaultLocale = $this->getDefaultLocale();
+        if (filled($this->languageTabsPayload[$defaultLocale]['name'] ?? null)) {
+            $data['name'] = $this->languageTabsPayload[$defaultLocale]['name'];
+        }
+
         // Update SKU if size or suffix changed
         if (isset($data['size']) || isset($data['variant_sku_suffix'])) {
             $data['sku'] = $this->generateSku($data);
