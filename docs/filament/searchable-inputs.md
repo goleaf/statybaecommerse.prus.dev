@@ -7,11 +7,9 @@ same conventions.
 ## Hydrating from existing records
 
 ```php
-use App\\Models\\User;
-use App\\Support\\Filament\\SearchableComponentHelper;
-use App\\Support\\Search\\SearchResultPayload;
-use DefStudio\\SearchableInput\\DTO\\SearchResult;
-use DefStudio\\SearchableInput\\Forms\\Components\\SearchableInput;
+use App\Support\Filament\SearchableComponentHelper;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Filament\Forms\Components\Hidden;
 
 SearchableInput::make('product_id')
     ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
@@ -38,6 +36,10 @@ SearchableInput::make('product_id')
             },
         );
     });
+
+Hidden::make('user_lookup_payload')
+    ->default([])
+    ->dehydrated(false); // Cache the lookup metadata for sibling components without persisting it.
 ```
 
 1. **Resolver closure** – receives the persisted state and must return a `SearchResult` DTO (or `null` when nothing should hydrate).
@@ -89,7 +91,9 @@ SearchableInput::make('user_lookup')
 - **Type normalisation** – numeric identifiers are converted to integers automatically so Eloquent relationships receive the expected type.
 - **Clearing dependants** – when the state is empty you can reset related fields immediately after `sync()` runs, as shown with the `profile_payload` field above.
 
-## Clearing a component manually
+Hidden payload fields (paired with `->dehydrated(false)`) keep the normalised metadata available to downstream components while ensuring `clear()` can wipe both the identifier and its cached payload in tandem.
+
+## Normalisation tips
 
 Call `SearchableComponentHelper::clear($component);` whenever you need to wipe a lookup outside of the standard lifecycle hooks. The helper strips state and options so the user sees a blank input and no residual metadata.
 
