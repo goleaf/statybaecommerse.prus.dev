@@ -22,9 +22,10 @@
         "eightynine/filament-advanced-widgets": "^4.0",
         "encoredigitalgroup/filament-helpers": "^4.0@rc",
         "filament/filament": "^4.1",
+        "filament/forms": "^4.1",
+        "filament/infolists": "^4.1",
         "filament/spatie-laravel-media-library-plugin": "^4.0",
-        "hydrat/filament-table-layout-toggle": "^3.0",
-        "icetalker/filament-table-repeatable-entry": "^2.0",
+        "filament/tables": "^4.1",
         "kenepa/resource-lock": "^4.0",
         "lara-zeus/bolt": "^4.0.5",
         "lara-zeus/inline-chart": "^2.0",
@@ -49,8 +50,7 @@
         "spatie/laravel-permission": "^6.21",
         "spatie/laravel-sluggable": "^3.7",
         "spatie/laravel-translatable": "^6.11",
-        "tapp/filament-value-range-filter": "^2.0",
-        "zvizvi/relation-manager-repeater": "^2.0"
+        "zircote/swagger-php": "^4.9"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.16",
