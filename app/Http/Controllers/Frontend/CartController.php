@@ -5,15 +5,17 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
-use Illuminate\Http\RedirectResponse;
+use App\Services\Cart\CartService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 final class CartController extends Controller
 {
-    public function index(Request $request): View
+    public function __construct(private readonly CartService $cartService) {}
+
+    public function index(Request $request): JsonResponse
     {
         $cartItems = collect($request->session()->get('cart', []));
         $summary = $this->calculateSummary($cartItems);
@@ -24,7 +26,7 @@ final class CartController extends Controller
         ]);
     }
 
-    public function add(Request $request): RedirectResponse
+    public function add(Request $request): JsonResponse
     {
         $data = $request->validate([
             'product_id' => ['required', 'integer', 'exists:products,id'],
@@ -63,7 +65,7 @@ final class CartController extends Controller
         return redirect()->route('frontend.cart.index')->with('status', __('Product added to cart.'));
     }
 
-    public function update(Request $request): RedirectResponse
+    public function update(Request $request, string $id): JsonResponse
     {
         $data = $request->validate([
             'items' => ['required', 'array'],
@@ -90,7 +92,7 @@ final class CartController extends Controller
         return redirect()->route('frontend.cart.index')->with('status', __('Cart updated successfully.'));
     }
 
-    public function remove(Request $request): RedirectResponse
+    public function remove(string $id): JsonResponse
     {
         $data = $request->validate([
             'id' => ['required', 'integer'],
@@ -128,5 +130,24 @@ final class CartController extends Controller
             'discount' => round($discount, 2),
             'total' => round(max($total, 0), 2),
         ];
+    }
+
+    public function clear(Request $request): JsonResponse
+    {
+        $sessionId = $request->session()->getId();
+        $userIdentifier = $request->user()?->getAuthIdentifier();
+        $userId = is_numeric($userIdentifier) ? (int) $userIdentifier : null;
+
+        $fallbackSessionId = $request->session()->get('cart_session_id');
+        $fallbackSessionId = is_string($fallbackSessionId) ? $fallbackSessionId : null;
+
+        $this->cartService->clear($userId, $sessionId, $fallbackSessionId);
+        $summary = $this->cartService->getSummary($userId, $sessionId);
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Cart cleared successfully.'),
+            'cart' => $summary,
+        ]);
     }
 }
