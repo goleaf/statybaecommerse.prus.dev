@@ -21,6 +21,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -83,12 +84,24 @@ final class MenuItemResource extends Resource
                                     ->searchable(),
                                 Select::make('parent_id')
                                     ->label(__('admin.menu_items.parent'))
-                                    ->options(
-                                        static fn (): array => MenuItem::withoutGlobalScopes()
+                                    ->options(function (Get $get, ?MenuItem $record): array {
+                                        $menuId = $get('menu_id') ?? $record?->menu_id;
+
+                                        if (! $menuId) {
+                                            return [];
+                                        }
+
+                                        return MenuItem::query()
+                                            ->withoutGlobalScopes()
+                                            ->where('menu_id', $menuId)
                                             ->whereNull('parent_id')
+                                            ->when(
+                                                $record,
+                                                fn (Builder $query): Builder => $query->whereKeyNot($record->getKey()),
+                                            )
                                             ->pluck('label', 'id')
-                                            ->all()
-                                    )
+                                            ->all();
+                                    })
                                     ->searchable()
                                     ->preload(),
                                 TextInput::make('label')
@@ -190,12 +203,19 @@ final class MenuItemResource extends Resource
                     ->searchable(),
                 SelectFilter::make('parent_id')
                     ->label(__('admin.menu_items.parent'))
-                    ->options(
-                        static fn (): array => MenuItem::withoutGlobalScopes()
-                            ->whereNull('parent_id')
-                            ->pluck('label', 'id')
-                            ->all()
-                    )
+                    ->options(function (SelectFilter $filter): array {
+                        $menuId = data_get($filter->getLivewire()->tableFilters ?? [], 'menu_id.value');
+
+                        $query = MenuItem::query()
+                            ->withoutGlobalScopes()
+                            ->whereNull('parent_id');
+
+                        if ($menuId) {
+                            $query->where('menu_id', $menuId);
+                        }
+
+                        return $query->pluck('label', 'id')->all();
+                    })
                     ->searchable(),
                 TernaryFilter::make('is_visible')
                     ->label(__('admin.menu_items.is_visible')),
