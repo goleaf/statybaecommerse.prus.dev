@@ -41,16 +41,21 @@ final class ProductContractPresenter
             $output->getProducts()->all(),
         );
 
-        $pagination = $output->getPagination()->toArray();
+        $paginationDto = $output->getPagination();
+        $paginationData = $paginationDto->toContractData();
+        $paginationMeta = $paginationDto->toContractMeta();
 
         return self::envelope(
             [
                 'items' => $items,
-                'pagination' => Arr::only($pagination, ['current_page', 'last_page', 'per_page', 'total']),
+                // Limit the pagination payload to the documented surface area.
+                'pagination' => $paginationData,
             ],
             [
-                'total' => $pagination['total'],
-                'limit' => $pagination['per_page'],
+                // Bubble up key pagination hints for analytics and clients that rely on the meta snapshot.
+                'total'      => $paginationData['total'],
+                'limit'      => $paginationData['per_page'],
+                'pagination' => $paginationMeta,
             ],
         );
     }
@@ -74,9 +79,9 @@ final class ProductContractPresenter
     {
         return [
             'contract' => 'product',
-            'version' => 'v1',
-            'data' => $data,
-            'meta' => array_merge([
+            'version'  => 'v1',
+            'data'     => $data,
+            'meta'     => array_merge([
                 'generated_at' => now()->toISOString(),
             ], Arr::whereNotNull($meta)),
         ];
