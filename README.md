@@ -17,6 +17,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 -### Latest updates
+- Campaign click administration now exposes a timestamp picker, defaults conversion values to zero, and backfills missing data during creation so marketing teams can record clicks without tripping database constraints.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
 - Region-aware address tables and the dedicated `customers` dataset are back online for the SQLite harness, letting factories and
