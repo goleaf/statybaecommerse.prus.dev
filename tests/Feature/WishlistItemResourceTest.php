@@ -200,7 +200,9 @@ class WishlistItemResourceTest extends TestCase
             );
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function move_to_cart_action_creates_cart_item_with_correct_pricing(): void
     {
         $this->actingAs($this->adminUser);
@@ -222,22 +224,24 @@ class WishlistItemResourceTest extends TestCase
         $this->assertEquals(129.99, (float) ($cartItem->product_snapshot['price'] ?? 0));
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function bulk_move_to_cart_uses_product_pricing_when_variant_missing(): void
     {
         $this->actingAs($this->adminUser);
 
         $productWithoutVariant = Product::factory()->create([
-            'name'       => 'Simple Product',
-            'price'      => 200.00,
+            'name' => 'Simple Product',
+            'price' => 200.00,
             'sale_price' => 150.00,
         ]);
 
         $wishlistItemWithoutVariant = WishlistItem::factory()->create([
             'wishlist_id' => $this->wishlist->id,
-            'product_id'  => $productWithoutVariant->id,
-            'variant_id'  => null,
-            'quantity'    => 4,
+            'product_id' => $productWithoutVariant->id,
+            'variant_id' => null,
+            'quantity' => 4,
         ]);
 
         Livewire::test(\App\Filament\Resources\WishlistItemResource\Pages\ListWishlistItems::class)
@@ -257,7 +261,9 @@ class WishlistItemResourceTest extends TestCase
         $this->assertEquals(150.00, (float) ($cartItem->product_snapshot['price'] ?? 0));
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function admin_can_filter_wishlist_items_by_product(): void
     {
         $this->actingAs($this->adminUser);

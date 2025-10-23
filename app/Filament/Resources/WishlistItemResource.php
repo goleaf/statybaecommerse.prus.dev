@@ -43,7 +43,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Str;
+use RuntimeException;
 use UnitEnum;
 
 /**
@@ -501,13 +501,7 @@ final class WishlistItemResource extends Resource
                         ->color('success')
                         ->action(function (WishlistItem $record): void {
                             try {
-                                // Create cart item logic here
-                                CartItem::create([
-                                    'user_id'    => $record->wishlist->user_id,
-                                    'product_id' => $record->product_id,
-                                    'variant_id' => $record->variant_id,
-                                    'quantity'   => $record->quantity,
-                                ]);
+                                CartItem::create(self::buildCartItemPayload($record));
 
                                 FilamentNotification::make()
                                     ->title(__('admin.wishlist_items.moved_to_cart_successfully'))
@@ -546,12 +540,7 @@ final class WishlistItemResource extends Resource
                             try {
                                 $moved = 0;
                                 foreach ($records as $record) {
-                                    CartItem::create([
-                                        'user_id'    => $record->wishlist->user_id,
-                                        'product_id' => $record->product_id,
-                                        'variant_id' => $record->variant_id,
-                                        'quantity'   => $record->quantity,
-                                    ]);
+                                    CartItem::create(self::buildCartItemPayload($record));
                                     $moved++;
                                 }
 
@@ -640,30 +629,30 @@ final class WishlistItemResource extends Resource
         $snapshotName = $variant?->name ?? $product->name;
 
         if (! empty($variantAttributes)) {
-            $snapshotName .= ' (' . collect($variantAttributes)
+            $snapshotName .= ' ('.collect($variantAttributes)
                 ->map(fn ($value, $key) => sprintf('%s: %s', $key, $value))
-                ->implode(', ') . ')';
+                ->implode(', ').')';
         }
 
         $productSnapshot = array_filter([
-            'name'               => $snapshotName,
-            'sku'                => $variant?->sku ?? $product->sku,
-            'price'              => $unitPrice,
-            'variant_id'         => $variant?->getKey(),
+            'name' => $snapshotName,
+            'sku' => $variant?->sku ?? $product->sku,
+            'price' => $unitPrice,
+            'variant_id' => $variant?->getKey(),
             'variant_attributes' => ! empty($variantAttributes) ? $variantAttributes : null,
         ], static fn ($value) => $value !== null);
 
         return [
-            'user_id'            => $record->wishlist->user_id,
-            'product_id'         => $product->getKey(),
-            'variant_id'         => $variant?->getKey(),
+            'user_id' => $record->wishlist->user_id,
+            'product_id' => $product->getKey(),
+            'variant_id' => $variant?->getKey(),
             'product_variant_id' => $variant?->getKey(),
-            'quantity'           => $quantity,
-            'minimum_quantity'   => $product->getMinimumQuantity(),
-            'unit_price'         => $unitPrice,
-            'total_price'        => $totalPrice,
-            'price'              => $unitPrice,
-            'product_snapshot'   => $productSnapshot,
+            'quantity' => $quantity,
+            'minimum_quantity' => $product->getMinimumQuantity(),
+            'unit_price' => $unitPrice,
+            'total_price' => $totalPrice,
+            'price' => $unitPrice,
+            'product_snapshot' => $productSnapshot,
         ];
     }
 
