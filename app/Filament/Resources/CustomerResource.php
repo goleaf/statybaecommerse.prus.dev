@@ -30,7 +30,6 @@ use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -38,6 +37,8 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Number;
+use LaraZeus\InlineChart\Tables\Columns\InlineChart;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
@@ -45,7 +46,6 @@ use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
-use LaraZeus\InlineChart\Tables\Columns\InlineChart;
 
 final class CustomerResource extends Resource
 {
@@ -202,9 +202,54 @@ final class CustomerResource extends Resource
             ->columns([
                 BadgeableColumn::make('name')
                     ->label(__('customers.name'))
-                    ->searchable()
+                    ->searchable(['name', 'email', 'phone', 'country.name', 'city.name', 'company.name'])
                     ->sortable()
-                    ->weight('bold'),
+                    ->weight('bold')
+                    ->asPills()
+                    ->tooltip(fn (Customer $record): ?string => mb_strlen((string) $record->name) > 40 ? $record->name : null)
+                    ->prefixBadges(function (Customer $record): array {
+                        // Display geographic and organizational context up front.
+                        return collect([
+                            $record->country?->name
+                                ? Badge::make('country')
+                                    ->label(__('customers.badges.country', ['country' => $record->country->name]))
+                                    ->color('info')
+                                : null,
+                            $record->city?->name
+                                ? Badge::make('city')
+                                    ->label(__('customers.badges.city', ['city' => $record->city->name]))
+                                    ->color('info')
+                                : null,
+                            $record->company?->name
+                                ? Badge::make('company')
+                                    ->label(__('customers.badges.company', ['company' => $record->company->name]))
+                                    ->color('gray')
+                                : null,
+                        ])->filter()->values()->all();
+                    })
+                    ->suffixBadges(function (Customer $record): array {
+                        // Surface activation, verification, and revenue health alongside the customer name.
+                        $isVerified = (bool) data_get($record->metadata, 'is_verified', false);
+                        $ordersCount = (int) ($record->orders_count ?? 0);
+                        $ordersTotal = $record->orders_sum_total ?? $record->orders_total_sum ?? null;
+
+                        return collect([
+                            Badge::make('active')
+                                ->label($record->is_active ? __('customers.badges.active') : __('customers.badges.inactive'))
+                                ->color($record->is_active ? 'success' : 'danger'),
+                            Badge::make('verified')
+                                ->label($isVerified ? __('customers.badges.verified') : __('customers.badges.unverified'))
+                                ->color($isVerified ? 'success' : 'warning'),
+                            Badge::make('orders')
+                                ->label(__('customers.badges.orders', ['count' => number_format($ordersCount)]))
+                                ->color($ordersCount > 0 ? 'primary' : 'gray'),
+                            $ordersTotal !== null
+                                ? Badge::make('ltv')
+                                    ->label(__('customers.badges.ltv', ['total' => Number::currency((float) $ordersTotal, 'EUR', app()->getLocale())]))
+                                    ->color('gray')
+                                : null,
+                        ])->filter()->values()->all();
+                    }),
                 ViewColumn::make('quick_links')
                     ->label(__('Quick links'))
                     ->view('filament.tables.columns.list-group')
@@ -212,14 +257,14 @@ final class CustomerResource extends Resource
                         return collect([
                             filled($record->email) ? [
                                 'label' => __('Email :email', ['email' => $record->email]),
-                                'url' => 'mailto:'.$record->email,
-                                'icon' => 'heroicon-o-envelope',
+                                'url'   => 'mailto:' . $record->email,
+                                'icon'  => 'heroicon-o-envelope',
                                 'color' => 'info',
                             ] : null,
                             filled($record->phone) ? [
                                 'label' => __('Call :phone', ['phone' => $record->phone]),
-                                'url' => 'tel:'.preg_replace('/[^0-9+]/', '', (string) $record->phone),
-                                'icon' => 'heroicon-o-phone',
+                                'url'   => 'tel:' . preg_replace('/[^0-9+]/', '', (string) $record->phone),
+                                'icon'  => 'heroicon-o-phone',
                                 'color' => 'success',
                             ] : null,
                         ])
@@ -257,42 +302,9 @@ final class CustomerResource extends Resource
                     ->label(__('customers.address'))
                     ->limit(50)
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('country.name')
-                    ->label(__('customers.country'))
-                    ->sortable()
-                    ->searchable(),
-                TextColumn::make('city.name')
-                    ->label(__('customers.city'))
-                    ->sortable()
-                    ->searchable(),
-                TextColumn::make('company.name')
-                    ->label(__('customers.company'))
-                    ->sortable()
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('postal_code')
                     ->label(__('customers.postal_code'))
                     ->toggleable(isToggledHiddenByDefault: true),
-                // Badge that surfaces the active or inactive status for quick scanning.
-                BadgeColumn::make('is_active')
-                    ->label(__('customers.is_active'))
-                    ->getStateUsing(static fn (Customer $record): string => $record->is_active ? 'active' : 'inactive')
-                    ->formatStateUsing(static fn (string $state): string => __('customers.badges.' . $state))
-                    ->color(static fn (string $state): string => match ($state) {
-                        'active'   => 'success',
-                        'inactive' => 'gray',
-                        default    => 'gray',
-                    })
-                    ->icon(static fn (string $state): ?string => match ($state) {
-                        'active'   => 'heroicon-o-check',
-                        'inactive' => 'heroicon-o-x-mark',
-                        default    => null,
-                    })
-                    ->sortable(),
-                TextColumn::make('orders_count')
-                    ->label(__('customers.orders_count'))
-                    ->counts('orders')
-                    ->sortable(),
                 // Inline orders sparkline to visualize recent activity without leaving the table.
                 InlineChart::make('orders_sparkline')
                     ->label(__('customers.orders_trend'))
@@ -448,6 +460,8 @@ final class CustomerResource extends Resource
                 'country:id,name',
                 'city:id,name',
                 'company:id,name',
-            ]);
+            ])
+            ->withCount(['orders'])
+            ->withSum('orders', 'total');
     }
 }

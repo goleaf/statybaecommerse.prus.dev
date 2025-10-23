@@ -22,6 +22,8 @@ use App\Support\Search\CustomerSearch;
 use App\Support\Search\PartnerSearch;
 use App\Support\Search\SearchableComponentHelper;
 use App\Support\Seo\LocaleUrlGenerator;
+use Awcodes\BadgeableColumn\Components\Badge;
+use Awcodes\BadgeableColumn\Components\BadgeableColumn;
 use BackedEnum;
 use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
@@ -48,7 +50,6 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Support\Enums\MaxWidth;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Filters\Filter;
@@ -60,6 +61,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Number;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
@@ -609,23 +611,76 @@ final class OrderResource extends Resource implements DefinesExportColumns
                     })
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('total')
-                    ->label(__('orders.fields.total'))
-                    ->money('EUR')
-                    ->sortable(),
-                TextColumn::make('items_count')
-                    ->label(__('orders.fields.items_count'))
-                    ->counts('items')
-                    ->sortable(),
-                TextColumn::make('payment_method')
-                    ->label(__('orders.fields.payment_method'))
-                    ->formatStateUsing(fn (?string $state): string => $state ? __("orders.payment_methods.{$state}") : '-')
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->sortable(),
-                TextColumn::make('channel.name')
-                    ->label(__('orders.fields.channel'))
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->sortable(),
+                BadgeableColumn::make('status')
+                    ->label(__('orders.fields.status'))
+                    ->formatStateUsing(fn (string $state): string => __('orders.statuses.' . $state))
+                    ->sortable()
+                    ->asPills()
+                    ->searchable(['status', 'payment_status', 'channel.name', 'payment_method'])
+                    ->prefixBadges(function (Order $record): array {
+                        // Combine payment and channel metadata directly ahead of the main status label.
+                        $paymentStatus = $record->payment_status ?? 'pending';
+                        $paymentLabel = __('orders.payment_statuses.' . $paymentStatus);
+                        $paymentColor = match ($paymentStatus) {
+                            'paid', 'captured', 'settled', 'authorized' => 'success',
+                            'failed' => 'danger',
+                            'refunded', 'partially_refunded' => 'secondary',
+                            default => 'warning',
+                        };
+
+                        $badges = [
+                            Badge::make('payment_status')
+                                ->label(__('orders.badges.payment', ['status' => $paymentLabel]))
+                                ->color($paymentColor),
+                        ];
+
+                        if ($record->payment_method) {
+                            $badges[] = Badge::make('payment_method')
+                                ->label(__('orders.badges.payment_method', ['method' => __('orders.payment_methods.' . $record->payment_method)]))
+                                ->color('gray');
+                        }
+
+                        if ($record->channel?->name) {
+                            $badges[] = Badge::make('channel')
+                                ->label(__('orders.badges.channel', ['channel' => $record->channel->name]))
+                                ->color('info');
+                        }
+
+                        return collect($badges)->filter()->values()->all();
+                    })
+                    ->suffixBadges(function (Order $record): array {
+                        // Surface fulfillment progress, totals, and line counts adjacent to the status for at-a-glance triage.
+                        $shippingState = match (true) {
+                            filled($record->delivered_at) => 'delivered',
+                            filled($record->shipped_at)   => 'shipped',
+                            default                       => 'pending',
+                        };
+
+                        $shippingColor = match ($shippingState) {
+                            'delivered' => 'success',
+                            'shipped'   => 'info',
+                            default     => 'warning',
+                        };
+
+                        $shippingDate = $shippingState === 'delivered'
+                            ? optional($record->delivered_at)?->format('Y-m-d')
+                            : ($shippingState === 'shipped' ? optional($record->shipped_at)?->format('Y-m-d') : null);
+
+                        $itemsCount = (int) ($record->items_count ?? 0);
+
+                        return collect([
+                            Badge::make('shipping')
+                                ->label(__('orders.badges.shipping.' . $shippingState, ['date' => $shippingDate]))
+                                ->color($shippingColor),
+                            Badge::make('total')
+                                ->label(__('orders.badges.total', ['total' => Number::currency((float) $record->total, 'EUR', app()->getLocale())]))
+                                ->color('gray'),
+                            Badge::make('items')
+                                ->label(trans_choice('orders.badges.items', $itemsCount, ['count' => $itemsCount]))
+                                ->color($itemsCount > 0 ? 'primary' : 'gray'),
+                        ])->filter()->values()->all();
+                    })
+                    ->tooltip(fn (Order $record): string => __('orders.badges.status_tooltip', ['number' => $record->number])),
                 TextColumn::make('created_at')
                     ->label(__('orders.fields.created_at'))
                     ->dateTime()
@@ -973,6 +1028,19 @@ final class OrderResource extends Resource implements DefinesExportColumns
     private static function exportColumnOptions(): array
     {
         return array_map(static fn (ExportColumn $column): string => $column->label, self::availableExportColumns());
+    }
+
+    /**
+     * @return Builder<Order>
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with([
+                'user:id,name,email',
+                'channel:id,name',
+            ])
+            ->withCount(['items']);
     }
 
     /**
