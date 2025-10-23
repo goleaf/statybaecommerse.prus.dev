@@ -50,8 +50,7 @@
 - OpenAPI documentation now mirrors the lean product meta payload and nullable media thumbnails emitted by the presenter, keeping schema validators and client SDKs in sync with production responses.
 
 ## Admin panel resilience
-
-- Filament address workflows now register the Spatie translatable plugin during tests, bypass Vite assets in testing, and inline their widget tab markup, keeping Livewire feature tests and real admin sessions aligned without plugin or manifest errors.
+- Admin login flows now route unauthenticated users to the Filament login even in test runs without compiled assets, thanks to the hardened exception handler, Vite manifest guard, and seeded authorization roles exercised by the updated regression tests.
 - Attribute administration keeps validation rule strings verbatim, surfaces array-based rules as comma-separated chips, and pairs with regression tests that prove both paths round-trip correctly through Filament.
 - Attribute group filters, columns, and form selectors now share a translation fallback so legacy group slugs render as readable labels instead of raw keys throughout the Filament admin.
 - Filament dashboard access checks now fall back to open access when no

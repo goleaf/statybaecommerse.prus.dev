@@ -1,8 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Exceptions;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -30,5 +36,35 @@ class Handler extends ExceptionHandler
             // Intentionally left blank for now so default exception reporting remains intact.
             // Future enhancements can log domain specific context here without touching bootstrap.
         });
+    }
+
+    /**
+     * Normalize authentication failures so guard-specific redirects work during browser and test flows.
+     */
+    protected function unauthenticated($request, AuthenticationException $exception): JsonResponse|Response
+    {
+        /** @var Request $request */
+        if ($request->expectsJson()) {
+            // Preserve the original behaviour for API consumers.
+            return response()->json(['message' => $exception->getMessage()], 401);
+        }
+
+        try {
+            $loginRoute = route('filament.admin.auth.login');
+        } catch (Throwable) {
+            $loginRoute = null;
+        }
+
+        if ($loginRoute === null) {
+            try {
+                $loginRoute = route('login');
+            } catch (Throwable) {
+                // Last resort: send the user to the root URL to avoid bubbling the exception.
+                $loginRoute = '/';
+            }
+        }
+
+        // Gracefully redirect guests back to the intended login route without surfacing framework exceptions.
+        return redirect()->guest($loginRoute);
     }
 }

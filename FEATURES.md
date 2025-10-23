@@ -20,8 +20,8 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
-
-- Filament address workflows now include translation-aware plugins, offline-safe asset loading, and streamlined widget tabs so admin operators and regression tests share the same reliable editing experience.
+- Admin guard flows now short-circuit to the Filament login when guests hit `/admin`, skip Vite asset inclusion during automated tests, and rely on seeded permissions so the dashboard URL remains verifiable without compiling assets.
+- Brands page now features a light-themed layout, shared card components, and refreshed translations so the partner directory feels consistent across locales.
 - Region-to-city lookups and the dedicated customers table are restored for the SQLite harness, ensuring analytics sparklines, customer factories, and Filament resources can attach geographic metadata without migration errors.
 - Localized product/category routing plus collection seeding were hardened, ensuring homepage product links, category landing pages, and collection showcases load without 404s or empty states.
 - PHPUnit harness now boots a shared `database/testing.sqlite` schema (including Spatie permission tables and variant attribute pivots) and registers Filament SearchableInput payload macros so admin feature suites stay v4-compatible while reusing deterministic migrations.
