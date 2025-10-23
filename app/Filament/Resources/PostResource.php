@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Enums\ModerationState;
 use App\Filament\Resources\PostResource\Pages;
 use App\Filament\Resources\PostResource\RelationManagers;
 use App\Models\Post;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Seo\LocaleUrlGenerator;
 use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\RichEditor;
@@ -41,16 +44,9 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
-use Maatwebsite\Excel\Excel;
-use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
-use pxlrbt\FilamentExcel\Actions\ExportBulkAction as ExcelExportBulkAction;
-use pxlrbt\FilamentExcel\Columns\Column as ExcelColumn;
-use pxlrbt\FilamentExcel\Exports\ExcelExport;
-use RuntimeException;
 use UnitEnum;
 
 /**
@@ -105,31 +101,21 @@ final class PostResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->components([
+            ->schema([
                 Section::make(__('posts.sections.basic_information'))
-                    ->components([
-                        LanguageTabs::make([
-                            TextInput::make('title')
-                                ->label(__('posts.fields.title'))
-                                ->required()
-                                ->maxLength(255)
-                                ->live()
-                                ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set, ?string $state): void {
-                                    if (! $get('slug') && filled($state)) {
-                                        $set('slug', Str::slug($state));
-                                    }
-                                }),
-                            Textarea::make('excerpt')
-                                ->label(__('posts.fields.excerpt'))
-                                ->maxLength(500)
-                                ->rows(3),
-                            RichEditor::make('content')
-                                ->label(__('posts.fields.content'))
-                                ->required()
-                                ->columnSpanFull(),
-                        ]),
+                    ->schema([
                         Grid::make(2)
-                            ->components([
+                            ->schema([
+                                TextInput::make('title')
+                                    ->label(__('posts.fields.title'))
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->live()
+                                    ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set, ?string $state): void {
+                                        if (! $get('slug') && filled($state)) {
+                                            $set('slug', \Str::slug($state));
+                                        }
+                                    }),
                                 TextInput::make('slug')
                                     ->label(__('posts.fields.slug'))
                                     ->required()
@@ -137,51 +123,53 @@ final class PostResource extends Resource
                                     ->unique(Post::class, 'slug', ignoreRecord: true),
                             ]),
                         Textarea::make('excerpt')
-                            ->label(__('posts.excerpt'))
+                            ->label(__('posts.fields.excerpt'))
                             ->maxLength(500)
                             ->rows(3),
                         RichEditor::make('content')
-                            ->label(__('posts.content'))
+                            ->label(__('posts.fields.content'))
                             ->required()
                             ->columnSpanFull(),
                     ]),
-                Section::make(__('posts.media'))
+                Section::make(__('posts.sections.media'))
                     ->schema([
                         FileUpload::make('featured_image')
-                            ->label(__('posts.featured_image'))
+                            ->label(__('posts.fields.images'))
                             ->image()
                             ->directory('posts')
                             ->visibility('private'),
                         FileUpload::make('gallery')
-                            ->label(__('posts.gallery'))
+                            ->label(__('posts.fields.gallery'))
                             ->image()
                             ->multiple()
                             ->directory('posts/gallery')
                             ->visibility('private'),
                     ]),
-                Section::make(__('posts.seo'))
+                Section::make(__('posts.sections.seo'))
                     ->schema([
                         TextInput::make('meta_title')
-                            ->label(__('posts.meta_title'))
+                            ->label(__('posts.fields.meta_title'))
                             ->maxLength(255),
                         Textarea::make('meta_description')
-                            ->label(__('posts.meta_description'))
+                            ->label(__('posts.fields.meta_description'))
                             ->maxLength(160)
                             ->rows(3),
                     ]),
-                Section::make(__('posts.settings'))
+                Section::make(__('posts.sections.settings'))
                     ->schema([
                         Grid::make(2)
                             ->schema([
                                 Select::make('status')
-                                    ->label(__('posts.status'))
+                                    ->label(__('posts.fields.status'))
                                     ->options([
                                         'draft' => __('posts.status.draft'),
                                         'published' => __('posts.status.published'),
                                         'archived' => __('posts.status.archived'),
                                     ])
                                     ->default('draft')
-                                    ->required(),
+                                    ->required()
+                                    ->disableOptionWhen('published', fn (): bool => true)
+                                    ->helperText(__('posts.status_managed_by_workflow')),
                                 Select::make('user_id')
                                     ->label(__('posts.fields.user_id'))
                                     ->relationship('user', 'name')
@@ -189,34 +177,9 @@ final class PostResource extends Resource
                                     ->preload()
                                     ->required(),
                             ]),
-                    ]),
-                Section::make(__('posts.sections.media'))
-                    ->components([
-                        SpatieMediaLibraryFileUpload::make('images')
-                            ->label(__('posts.fields.images'))
-                            ->collection('images')
-                            ->image()
-                            ->singleFile(),
-                        SpatieMediaLibraryFileUpload::make('gallery')
-                            ->label(__('posts.fields.gallery'))
-                            ->collection('gallery')
-                            ->image()
-                            ->multiple(),
-                    ]),
-                Section::make(__('posts.sections.seo'))
-                    ->components([
-                        LanguageTabs::make([
-                            TextInput::make('meta_title')
-                                ->label(__('posts.fields.meta_title'))
-                                ->maxLength(255),
-                            Textarea::make('meta_description')
-                                ->label(__('posts.fields.meta_description'))
-                                ->maxLength(160)
-                                ->rows(3),
-                        ]),
-                    ]),
-                Section::make(__('posts.sections.settings'))
-                    ->components([
+                        DateTimePicker::make('published_at')
+                            ->label(__('posts.fields.published_at'))
+                            ->default(now()),
                         Grid::make(2)
                             ->components([
                                 Select::make('status')
@@ -300,10 +263,8 @@ final class PostResource extends Resource
     {
         return $table
             ->columns([
-                SpatieMediaLibraryImageColumn::make('images')
+                ImageColumn::make('featured_image')
                     ->label(__('posts.fields.images'))
-                    ->collection('images')
-                    ->conversion('thumb')
                     ->circular()
                     ->size(50),
                 TextColumn::make('title')
@@ -365,7 +326,7 @@ final class PostResource extends Resource
                     ->formatStateUsing(fn (?ModerationState $state): ?string => $state?->label())
                     ->colors([
                         'warning' => fn (?ModerationState $state): bool => $state === ModerationState::Draft,
-                        'info'    => fn (?ModerationState $state): bool => $state === ModerationState::Review,
+                        'info' => fn (?ModerationState $state): bool => $state === ModerationState::Review,
                         'success' => fn (?ModerationState $state): bool => $state === ModerationState::Published,
                     ])
                     ->sortable(),
@@ -428,9 +389,9 @@ final class PostResource extends Resource
                     ->falseLabel(__('posts.filters.not_pinned')),
                 Filter::make('published_at')
                     ->form([
-                        Flatpickr::makeDateTime('published_from')
+                        DateTimePicker::make('published_from')
                             ->label(__('posts.filters.published_from')),
-                        Flatpickr::makeDateTime('published_until')
+                        DateTimePicker::make('published_until')
                             ->label(__('posts.filters.published_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
@@ -456,9 +417,9 @@ final class PostResource extends Resource
                     ->visible(fn (Post $record): bool => $record->moderation_state === ModerationState::Draft)
                     ->action(function (Post $record): void {
                         $record->update([
-                            'moderation_state'        => ModerationState::Review,
+                            'moderation_state' => ModerationState::Review,
                             'submitted_for_review_at' => now(),
-                            'status'                  => 'draft',
+                            'status' => 'draft',
                         ]);
 
                         activity()
@@ -489,23 +450,23 @@ final class PostResource extends Resource
                         $userId = Auth::id();
 
                         if (! $userId) {
-                            throw new RuntimeException('Approvals require an authenticated user.');
+                            throw new \RuntimeException('Approvals require an authenticated user.');
                         }
 
                         DB::transaction(function () use ($record, $data, $userId): void {
                             $record->approvals()->create([
-                                'user_id'    => $userId,
-                                'decision'   => 'approved',
-                                'notes'      => $data['notes'] ?? null,
+                                'user_id' => $userId,
+                                'decision' => 'approved',
+                                'notes' => $data['notes'] ?? null,
                                 'decided_at' => now(),
                             ]);
 
                             $record->update([
                                 'moderation_state' => ModerationState::Published,
-                                'approved_at'      => now(),
-                                'approved_by_id'   => $userId,
-                                'status'           => 'published',
-                                'published_at'     => $record->published_at ?? now(),
+                                'approved_at' => now(),
+                                'approved_by_id' => $userId,
+                                'status' => 'published',
+                                'published_at' => $record->published_at ?? now(),
                             ]);
                         });
 
@@ -537,23 +498,23 @@ final class PostResource extends Resource
                         $userId = Auth::id();
 
                         if (! $userId) {
-                            throw new RuntimeException('Return to draft requires an authenticated user.');
+                            throw new \RuntimeException('Return to draft requires an authenticated user.');
                         }
 
                         DB::transaction(function () use ($record, $data, $userId): void {
                             $record->approvals()->create([
-                                'user_id'    => $userId,
-                                'decision'   => 'returned',
-                                'notes'      => $data['notes'] ?? null,
+                                'user_id' => $userId,
+                                'decision' => 'returned',
+                                'notes' => $data['notes'] ?? null,
                                 'decided_at' => now(),
                             ]);
 
                             $record->update([
-                                'moderation_state'        => ModerationState::Draft,
+                                'moderation_state' => ModerationState::Draft,
                                 'submitted_for_review_at' => null,
-                                'approved_at'             => null,
-                                'approved_by_id'          => null,
-                                'status'                  => 'draft',
+                                'approved_at' => null,
+                                'approved_by_id' => null,
+                                'status' => 'draft',
                             ]);
                         });
 

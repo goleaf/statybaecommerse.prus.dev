@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Contracts\TranslatableRecord;
 use App\Enums\ModerationState;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\PublishedScope;
@@ -15,6 +14,8 @@ use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\NewsApproval;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -50,7 +51,6 @@ final class News extends Model implements TranslatableRecord
     protected $fillable = [
         'is_visible',
         'is_featured',
-        'is_breaking',
         'moderation_state',
         'submitted_for_review_at',
         'approved_at',
@@ -68,16 +68,15 @@ final class News extends Model implements TranslatableRecord
     protected function casts(): array
     {
         return [
-            'is_visible'              => 'boolean',
-            'is_featured'             => 'boolean',
-            'is_breaking'             => 'boolean',
-            'moderation_state'        => ModerationState::class,
+            'is_visible' => 'boolean',
+            'is_featured' => 'boolean',
+            'moderation_state' => ModerationState::class,
             'submitted_for_review_at' => 'datetime',
-            'approved_at'             => 'datetime',
-            'approved_by_id'          => 'integer',
-            'published_at'            => 'datetime',
-            'view_count'              => 'integer',
-            'meta_data'               => 'array',
+            'approved_at' => 'datetime',
+            'approved_by_id' => 'integer',
+            'published_at' => 'datetime',
+            'view_count' => 'integer',
+            'meta_data' => 'array',
         ];
     }
 
@@ -108,7 +107,6 @@ final class News extends Model implements TranslatableRecord
                 'approved_by_id',
                 'is_visible',
                 'is_featured',
-                'is_breaking',
                 'published_at',
                 'author_name',
                 'author_email',

@@ -4,9 +4,6 @@ return [
     'title' => 'Posts',
     'single' => 'Post',
     'plural' => 'Posts',
-    'view_author_profile' => 'View author profile',
-    'browse_by_author' => 'Browse articles by :author',
-    'search_tagged' => 'Search for posts tagged :tag',
     'sections' => [
         'basic_information' => 'Basic Information',
         'media' => 'Media',
