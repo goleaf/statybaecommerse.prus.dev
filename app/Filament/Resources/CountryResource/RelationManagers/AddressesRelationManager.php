@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Filament\Resources\CountryResource\RelationManagers;
 
 use App\Enums\AddressType;
-use Filament\Forms;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Forms;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Form;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Schemas\Schema;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class AddressesRelationManager extends BaseRelationManager
 {
@@ -182,7 +184,15 @@ final class AddressesRelationManager extends BaseRelationManager
                     ->label(__('addresses.is_active')),
             ])
             ->headerActions([
-                RelationManagerRepeaterAction::make(),
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit ' . $this->getPluralModelLabel())
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        // Provide a quick-edit modal for managing records inline.
+                        return $repeater->schema($this->getQuickEditSchema());
+                    }),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

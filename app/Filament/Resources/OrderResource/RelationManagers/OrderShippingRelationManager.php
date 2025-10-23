@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
-use App\Forms\Components\Flatpickr;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\OrderShipping;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\BadgeColumn;
@@ -27,8 +27,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 /**
  * OrderShippingRelationManager
@@ -245,7 +244,15 @@ final class OrderShippingRelationManager extends BaseRelationManager
                     ),
             ])
             ->headerActions([
-                RelationManagerRepeaterAction::make(),
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit ' . $this->getPluralModelLabel())
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        // Provide a quick-edit modal for managing records inline.
+                        return $repeater->schema($this->getQuickEditSchema());
+                    }),
                 \Filament\Actions\CreateAction::make()
                     ->label(__('orders.add_shipping'))
                     ->icon('heroicon-o-plus')
