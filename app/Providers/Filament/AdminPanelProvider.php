@@ -7,6 +7,9 @@ namespace App\Providers\Filament;
 use Andreia\FilamentNordTheme\FilamentNordThemePlugin;
 use Asmit\ResizedColumn\ResizedColumnPlugin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+
+use function class_exists;
+
 use Filament\Enums\UserMenuPosition;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -29,7 +32,6 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use LaraZeus\SpatieTranslatable\SpatieTranslatablePlugin;
 use pxlrbt\FilamentExcel\FilamentExport;
-use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
 
 final class AdminPanelProvider extends PanelProvider
 {
@@ -216,9 +218,6 @@ final class AdminPanelProvider extends PanelProvider
             ->all();
     }
 
-    /**
-     * @return \Filament\Contracts\Plugin|null
-     */
     private function makeFullCalendarPlugin(): ?\Filament\Contracts\Plugin
     {
         $pluginClass = 'Saade\\FilamentFullCalendar\\FilamentFullCalendarPlugin';
