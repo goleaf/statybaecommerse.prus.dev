@@ -54,6 +54,8 @@ abstract class TestCase extends BaseTestCase
             \Spatie\Permission\Middleware\RoleMiddleware::class,
             \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
+
+        $this->resolveAdminPanel();
     }
 
     protected function tearDown(): void
