@@ -154,11 +154,20 @@ final class ProductComparisonResource extends Resource
                             ->format('Y-m-d')
                             ->displayFormat('Y-m-d'),
                     ])
-                    ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
-                        $query,
-                        $data['range'] ?? null,
-                        'created_at',
-                    )),
+                    ->query(function (Builder $query, array $data): Builder {
+                        $createdFrom = data_get($data, 'created_from');
+                        $createdUntil = data_get($data, 'created_until');
+
+                        return $query
+                            ->when(
+                                $createdFrom,
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $createdUntil,
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    }),
             ])
             ->actions([
                 ViewAction::make(),
