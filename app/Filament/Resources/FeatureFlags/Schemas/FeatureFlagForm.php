@@ -57,12 +57,12 @@ class FeatureFlagForm
                     ->columnSpanFull(),
                 Placeholder::make('created_by_display')
                     ->label(__('system.created_by'))
-                    ->content(fn (?FeatureFlag $record): string => $record?->created_by_display ?? '—')
+                    ->content(fn (?FeatureFlag $record): string => $record === null ? '—' : ($record->created_by_display ?? '—'))
                     ->visible(fn (?FeatureFlag $record): bool => $record !== null)
                     ->columnSpanFull(),
                 Placeholder::make('updated_by_display')
                     ->label(__('system.updated_by'))
-                    ->content(fn (?FeatureFlag $record): string => $record?->updated_by_display ?? '—')
+                    ->content(fn (?FeatureFlag $record): string => $record === null ? '—' : ($record->updated_by_display ?? '—'))
                     ->visible(fn (?FeatureFlag $record): bool => $record !== null)
                     ->columnSpanFull(),
                 DateTimePicker::make('last_activated'),
