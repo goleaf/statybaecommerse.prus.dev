@@ -40,7 +40,7 @@
         "pixelpeter/filament-language-tabs": "^3.0",
         "predis/predis": "^3.2",
         "pxlrbt/filament-excel": "^3.1",
-        "sentry/sentry-laravel": "^4.17",
+        "saade/filament-fullcalendar": "^4.0@beta",
         "solution-forest/tab-layout-plugin": "^3.2",
         "spatie/laravel-activitylog": "^4.10",
         "spatie/laravel-data": "^4.17",
