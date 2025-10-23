@@ -36,6 +36,12 @@ use App\View\Creators\UserDataCreator;
 use DateInterval;
 use DateTimeInterface;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Filament\Tables\Testing\TestsActions;
+use Filament\Tables\Testing\TestsBulkActions;
+use Filament\Tables\Testing\TestsColumns;
+use Filament\Tables\Testing\TestsFilters;
+use Filament\Tables\Testing\TestsRecords;
+use Filament\Tables\Testing\TestsSummaries;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Console\Scheduling\Schedule;
@@ -125,6 +131,17 @@ class AppServiceProvider extends ServiceProvider
 
         $this->registerSearchableInputMacros();
 
+        // Expose the bespoke Filament widget tab views as anonymous Blade components for reuse across resources.
+        Blade::anonymousComponentPath(resource_path('views/filament/components'), 'filament.components');
+
+        // Manually register Filament table testing helpers to keep compatibility with the upgraded packages.
+        Testable::mixin(new TestsFilters);
+        Testable::mixin(new TestsActions);
+        Testable::mixin(new TestsBulkActions);
+        Testable::mixin(new TestsColumns);
+        Testable::mixin(new TestsRecords);
+        Testable::mixin(new TestsSummaries);
+
         // Register Livewire components
         Livewire::component('live-notification-feed', LiveNotificationFeed::class);
 
@@ -151,7 +168,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         if (! Testable::hasMacro('assertCanSeeText')) {
-            // Maintain backwards-compatible Livewire assertions used across legacy Filament tests.
+            // Provide a convenience assertion that respects unescaped content, matching Filament v3's testing API.
             Testable::macro('assertCanSeeText', function (string $text): Testable {
                 $this->assertSee($text, escape: false);
 

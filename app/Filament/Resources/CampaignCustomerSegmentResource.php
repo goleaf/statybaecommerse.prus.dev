@@ -8,7 +8,16 @@ use App\Filament\Resources\CampaignCustomerSegmentResource\Pages;
 use App\Models\CampaignCustomerSegment;
 use App\Models\Scopes\ActiveScope;
 use BackedEnum;
-use Filament\Schemas\Components\Grid;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
@@ -18,19 +27,10 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\KeyValueEntry;
-use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section as InfolistSection;
 use Filament\Schemas\Schema;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ForceDeleteAction;
-use Filament\Tables\Actions\ForceDeleteBulkAction;
-use Filament\Tables\Actions\RestoreAction;
-use Filament\Tables\Actions\RestoreBulkAction;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -44,7 +44,7 @@ final class CampaignCustomerSegmentResource extends Resource
     protected static ?string $model = CampaignCustomerSegment::class;
 
     /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     * Keep the navigation icon compatible with Filament v4 expectations while supporting BackedEnum fallbacks.
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-users';
 
@@ -229,6 +229,7 @@ final class CampaignCustomerSegmentResource extends Resource
                 TrashedFilter::make(),
             ])
             ->actions([
+                // Use shared action classes so table actions stay in sync with Filament's centralized behaviours.
                 ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
@@ -236,6 +237,7 @@ final class CampaignCustomerSegmentResource extends Resource
                 ForceDeleteAction::make(),
             ])
             ->bulkActions([
+                // Group destructive bulk actions together to provide a predictable dropdown in the toolbar.
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     RestoreBulkAction::make(),
@@ -264,7 +266,13 @@ final class CampaignCustomerSegmentResource extends Resource
                         ->label(__('campaign_customer_segments.segment_criteria')),
                     TextEntry::make('targeting_tags')
                         ->label(__('campaign_customer_segments.targeting_tags'))
-                        ->formatStateUsing(fn (?array $state): string => empty($state) ? __('campaign_customer_segments.no_targeting_tags') : implode(', ', $state ?? []))
+                        ->formatStateUsing(
+                            fn ($state): string => match (true) {
+                                is_array($state) && $state !== []  => implode(', ', $state),
+                                is_string($state) && $state !== '' => $state,
+                                default                            => __('campaign_customer_segments.no_targeting_tags'),
+                            }
+                        )
                         ->columnSpanFull(),
                     TextEntry::make('custom_conditions')
                         ->label(__('campaign_customer_segments.custom_conditions'))
