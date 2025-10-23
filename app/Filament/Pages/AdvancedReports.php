@@ -11,9 +11,15 @@ use UnitEnum;
 
 final class AdvancedReports extends Page
 {
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
+    public static function getNavigationIcon(): BackedEnum|string|null
+    {
+        return 'heroicon-o-chart-bar-square';
+    }
 
-    protected static UnitEnum|string|null $navigationGroup = 'Analytics';
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Analytics';
+    }
 
     protected static ?string $title = 'Advanced Reports';
 
