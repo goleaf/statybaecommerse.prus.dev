@@ -20,6 +20,9 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - Before contributing new guides, skim the [Documentation Style Guide](docs/CONTRIBUTING_DOCS.md) to keep tone and structure consistent.
 - When adding large diagrams or appendices, double-check that each file stays under 2MB so the documentation size guard in CI continues to pass.
 
+## Latest updates
+- Feature flag administration now surfaces inactive and disabled flags so operators can audit and re-enable them without reaching for database tooling.
+
 ## Requirements
 - PHP 8.2+ with `ext-sqlite3`, `ext-fileinfo`, and `ext-gd`
 - Composer 2.6+

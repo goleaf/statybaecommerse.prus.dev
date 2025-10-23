@@ -1,7 +1,5 @@
-# Features & Recent Enhancements
+# Feature highlights
 
-## Developer Experience
-- Restored the Husky bootstrap shim so local Git hooks once again run with the repository-provided Node toolchain while still displaying the upstream deprecation notice for future Husky releases.
+## Feature flag administration
+- Administrators can review inactive and disabled feature toggles directly in Filament because the resource now ignores the Active and Enabled global scopes during listing.
 
-## Reference
-- Review `.husky/_/husky.sh` for the shim implementation and hook execution comments that explain how the toolchain hand-off works.

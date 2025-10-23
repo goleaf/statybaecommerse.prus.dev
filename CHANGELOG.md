@@ -10,7 +10,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Aligned Filament variant pricing and analytics resources with stricter action namespaces, clarified currency formatting, and refreshed navigation icon annotations to streamline BackedEnum usage across admin pages.
 * Synced Collection Rule resource signatures, modal reorder UX, and cache maintenance tooling with Filament v4 to retire legacy array fallbacks.
 * Delivered the Campaign Product Target management resource with localized strings, reinforced widget navigation metadata, and hardened media path migrations for safer marketing workflows.
-* Restored the Husky bootstrap shim so Git hooks once again execute via the repository-local toolchain while retaining actionable deprecation messaging for future upgrades.
+* Restored the Feature Flag admin resource to bypass Active and Enabled global scopes, ensuring disabled toggles remain visible during audits.
 
 ## [0.1.0] - 2025-10-20
 

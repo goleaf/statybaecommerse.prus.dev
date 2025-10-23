@@ -66,6 +66,18 @@ final class FeatureFlagResource extends Resource
     }
 
     /**
+     * Ensure administrators can query every feature flag regardless of default scopes.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        // Removing the Active and Enabled scopes keeps disabled flags visible for auditing and reactivation.
+        return parent::getEloquentQuery()->withoutGlobalScopes([
+            ActiveScope::class,
+            EnabledScope::class,
+        ]);
+    }
+
+    /**
      * Handle getNavigationLabel functionality with proper error handling.
      */
     public static function getNavigationLabel(): string
