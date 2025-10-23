@@ -5,193 +5,118 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Data\SearchQueryData;
-use App\Models\Brand;
-use App\Models\Category;
 use App\Services\SearchService;
 use BackedEnum;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Pages\Page;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use UnitEnum;
 
 final class SearchExplorer extends Page
 {
-    protected static ?string $title = 'Search Explorer';
-
-    protected static ?string $navigationLabel = 'Search Explorer';
-
-    protected static UnitEnum|string|null $navigationGroup = 'Insights';
-
     /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-magnifying-glass';
+    protected static $navigationIcon = 'heroicon-o-magnifying-glass-circle';
+
+    protected static UnitEnum|string|null $navigationGroup = 'Search';
+
+    protected static ?string $title = 'Search Explorer';
 
     protected static ?string $slug = 'search-explorer';
 
-    protected static string $view = 'filament.pages.search-explorer';
+    protected string $view = 'filament.pages.search-explorer';
 
-    public array $formData = [];
+    public string $query = '';
 
-    /** @var array<string, array{items: array<int, array<string, mixed>>, total: int}> */
+    public int $perPage = SearchQueryData::DEFAULT_PER_PAGE;
+
+    /**
+     * @var array<int, array<string, mixed>>
+     */
     public array $results = [];
 
-    private SearchService $searchService;
+    /**
+     * @var array<string, mixed>
+     */
+    public array $meta = [];
+
+    /**
+     * @var array<string, int>
+     */
+    public array $buckets = [
+        'product' => 0,
+        'category' => 0,
+        'brand' => 0,
+    ];
 
     public function mount(): void
     {
-        $this->searchService = app(SearchService::class);
-        $this->formData = [
-            'q' => '',
-            'sort' => 'relevance',
-            'per_page' => 10,
-            'filters' => [
-                'price_min' => null,
-                'price_max' => null,
-                'brand' => [],
-                'category' => [],
-            ],
-        ];
-
-        $this->form->fill($this->formData);
-        $this->results = [
-            'products' => ['items' => [], 'total' => 0],
-            'categories' => ['items' => [], 'total' => 0],
-            'brands' => ['items' => [], 'total' => 0],
+        $this->meta = [
+            'query' => '',
+            'page' => 1,
+            'per_page' => $this->perPage,
+            'total_results' => 0,
+            'returned' => 0,
+            'cached' => false,
+            'types' => ['product', 'category', 'brand'],
         ];
     }
 
-    public function form(Form $form): Form
+    public static function shouldRegisterNavigation(): bool
     {
-        return $form
-            ->schema([
-                Grid::make(3)
-                    ->schema([
-                        TextInput::make('q')
-                            ->label('Query')
-                            ->required()
-                            ->minLength(1)
-                            ->maxLength(255),
-                        Select::make('sort')
-                            ->label('Sort by')
-                            ->options([
-                                'relevance' => 'Relevance',
-                                'price' => 'Price',
-                                'date' => 'Newest',
-                            ])
-                            ->default('relevance'),
-                        TextInput::make('per_page')
-                            ->label('Per type limit')
-                            ->numeric()
-                            ->minValue(1)
-                            ->maxValue(SearchQueryData::MAX_PER_PAGE)
-                            ->default(10),
-                    ]),
-                Grid::make(2)
-                    ->schema([
-                        TextInput::make('filters.price_min')
-                            ->label('Price min')
-                            ->numeric()
-                            ->minValue(0)
-                            ->nullable(),
-                        TextInput::make('filters.price_max')
-                            ->label('Price max')
-                            ->numeric()
-                            ->minValue(0)
-                            ->nullable(),
-                    ]),
-                Grid::make(2)
-                    ->schema([
-                        Select::make('filters.brand')
-                            ->label('Brands')
-                            ->multiple()
-                            ->options($this->brandOptions())
-                            ->searchable(),
-                        Select::make('filters.category')
-                            ->label('Categories')
-                            ->multiple()
-                            ->options($this->categoryOptions())
-                            ->searchable(),
-                    ]),
-            ])
-            ->statePath('formData');
+        $user = auth()->user();
+
+        if ($user === null) {
+            return false;
+        }
+
+        if (method_exists($user, 'hasAnyRole')) {
+            return $user->hasAnyRole(['super_admin', 'admin', 'administrator']);
+        }
+
+        return (bool) ($user->is_admin ?? false);
     }
 
-    public function submit(): void
+    public function performSearch(): void
     {
-        $data = $this->form->getState();
-        $queryString = trim((string) Arr::get($data, 'q', ''));
-        if ($queryString === '') {
-            $this->results = [
-                'products' => ['items' => [], 'total' => 0],
-                'categories' => ['items' => [], 'total' => 0],
-                'brands' => ['items' => [], 'total' => 0],
+        $query = trim($this->query);
+        $perPage = max(1, min(SearchQueryData::MAX_PER_PAGE, $this->perPage));
+
+        $this->perPage = $perPage;
+
+        if ($query === '') {
+            $this->results = [];
+            $this->meta = [
+                'query' => '',
+                'page' => 1,
+                'per_page' => $perPage,
+                'total_results' => 0,
+                'returned' => 0,
+                'cached' => false,
+                'types' => ['product', 'category', 'brand'],
+            ];
+            $this->buckets = [
+                'product' => 0,
+                'category' => 0,
+                'brand' => 0,
             ];
 
             return;
         }
 
-        $filters = Arr::get($data, 'filters', []);
-        $query = new SearchQueryData(
-            q: $queryString,
-            price_min: $filters['price_min'] !== null && $filters['price_min'] !== '' ? (float) $filters['price_min'] : null,
-            price_max: $filters['price_max'] !== null && $filters['price_max'] !== '' ? (float) $filters['price_max'] : null,
-            brand_ids: $this->toIntArray(Arr::get($filters, 'brand', [])),
-            category_ids: $this->toIntArray(Arr::get($filters, 'category', [])),
-            sort: (string) Arr::get($data, 'sort', 'relevance'),
-            page: 1,
-            per_page: (int) min(max((int) Arr::get($data, 'per_page', 10), 1), SearchQueryData::MAX_PER_PAGE),
-        );
+        $queryData = SearchQueryData::fromArray([
+            'query' => $query,
+            'page' => 1,
+            'per_page' => $perPage,
+        ], [
+            'source' => 'filament.search-explorer',
+            'user_id' => auth()->id(),
+            'locale' => app()->getLocale(),
+        ]);
 
-        $results = $this->searchService->aggregate($query);
+        /** @var SearchService $service */
+        $service = app(SearchService::class);
+        $response = $service->search($queryData);
 
-        $this->results = [
-            'products' => [
-                'items' => $results['products']['items']->values()->all(),
-                'total' => $results['products']['total'],
-            ],
-            'categories' => [
-                'items' => $results['categories']['items']->values()->all(),
-                'total' => $results['categories']['total'],
-            ],
-            'brands' => [
-                'items' => $results['brands']['items']->values()->all(),
-                'total' => $results['brands']['total'],
-            ],
-        ];
-    }
-
-    private function brandOptions(): array
-    {
-        return Brand::query()
-            ->orderBy('name')
-            ->limit(100)
-            ->pluck('name', 'id')
-            ->toArray();
-    }
-
-    private function categoryOptions(): array
-    {
-        return Category::query()
-            ->orderBy('name')
-            ->limit(100)
-            ->pluck('name', 'id')
-            ->toArray();
-    }
-
-    /**
-     * @param array<int, mixed> $values
-     * @return array<int, int>
-     */
-    private function toIntArray(array $values): array
-    {
-        return Collection::make($values)
-            ->filter(static fn ($value): bool => is_numeric($value))
-            ->map(static fn ($value): int => (int) $value)
-            ->unique()
-            ->values()
-            ->all();
+        $this->results = $response['data'] ?? [];
+        $this->meta = $response['meta'] ?? $this->meta;
+        $this->buckets = $response['buckets'] ?? $this->buckets;
     }
 }

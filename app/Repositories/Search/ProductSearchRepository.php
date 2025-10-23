@@ -5,116 +5,139 @@ declare(strict_types=1);
 namespace App\Repositories\Search;
 
 use App\Data\SearchQueryData;
-use App\Models\Product;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use Illuminate\Database\Query\Builder;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 
 final class ProductSearchRepository extends AbstractSearchRepository
 {
-    /**
-     * @return array{items: Collection<int, array<string, mixed>>, total: int}
-     */
-    public function search(SearchQueryData $query, int $limit): array
+    protected function type(): string
     {
-        $base = Product::query()
-            ->select(['products.*'])
-            ->where('is_visible', true)
-            ->whereNotNull('published_at')
-            ->where('published_at', '<=', now())
-            ->when($query->brandIds() !== [], function (EloquentBuilder $builder) use ($query) {
-                $builder->whereIn('brand_id', $query->brandIds());
-            })
-            ->when($query->categoryIds() !== [], function (EloquentBuilder $builder) use ($query) {
-                $builder->whereExists(function (Builder $sub) use ($query) {
-                    $sub->select(DB::raw('1'))
-                        ->from('product_categories')
-                        ->whereColumn('product_categories.product_id', 'products.id')
-                        ->whereIn('product_categories.category_id', $query->categoryIds());
-                });
-            })
-            ->when($query->price_min !== null, function (EloquentBuilder $builder) use ($query) {
-                $builder->where('price', '>=', $query->price_min);
-            })
-            ->when($query->price_max !== null, function (EloquentBuilder $builder) use ($query) {
-                $builder->where('price', '<=', $query->price_max);
-            });
-
-        $total = (clone $base)->count('products.id');
-
-        $scored = $this->applyScoring(clone $base, $query);
-        $scored = $this->applySort($scored, $query);
-        $scored = $this->applyPagination($scored, $query, $limit);
-
-        $items = $scored
-            ->with(['brand:id,name,slug', 'media'])
-            ->get()
-            ->map(function (Product $product) {
-                return [
-                    'id' => $product->id,
-                    'type' => 'product',
-                    'title' => $product->name,
-                    'subtitle' => $product->brand?->name,
-                    'description' => $product->short_description ?: Str::limit((string) $product->description, 160),
-                    'price' => $product->price,
-                    'formatted_price' => number_format((float) $product->price, 2).' €',
-                    'url' => route('products.show', $product->slug),
-                    'score' => (float) $product->getAttribute('total_score'),
-                    'image' => $product->getFirstMediaUrl('images', 'thumb'),
-                ];
-            });
-
-        return ['items' => $items, 'total' => $total];
+        return 'product';
     }
 
-    private function applyScoring(EloquentBuilder $builder, SearchQueryData $query): EloquentBuilder
+    protected function searchStatement(int $limit): string
     {
-        $builder->addSelect(DB::raw("products.id as entity_id"));
+        $limit = max(1, $limit);
 
-        $likeOperator = $this->likeOperator();
-        $lowered = Str::lower($query->q);
-        $wildcard = $this->wildcardLower($query->q);
+        return <<<SQL
+SELECT
+    p.id,
+    p.name,
+    p.slug,
+    p.short_description,
+    p.description,
+    p.price,
+    p.is_featured,
+    p.sales_count,
+    p.reviews_count,
+    p.average_rating,
+    p.sku,
+    b.name AS brand_name,
+    COALESCE(pt.name, '') AS translated_name,
+    COALESCE(pt.description, '') AS translated_description
+FROM products AS p
+LEFT JOIN brands AS b ON b.id = p.brand_id
+LEFT JOIN product_translations AS pt ON pt.product_id = p.id AND pt.locale = ?
+WHERE p.is_visible = 1
+  AND p.published_at IS NOT NULL
+  AND p.published_at <= ?
+  AND p.slug IS NOT NULL
+  AND p.price IS NOT NULL
+  AND p.price > 0
+  AND (
+        LOWER(p.name) LIKE ?
+        OR LOWER(p.description) LIKE ?
+        OR LOWER(p.sku) LIKE ?
+        OR LOWER(pt.name) LIKE ?
+        OR LOWER(pt.description) LIKE ?
+    )
+ORDER BY
+    CASE
+        WHEN LOWER(p.name) = ? THEN 0
+        WHEN LOWER(p.sku) = ? THEN 1
+        WHEN LOWER(p.name) LIKE ? THEN 2
+        ELSE 3
+    END,
+    p.updated_at DESC
+LIMIT {$limit}
+SQL;
+    }
 
-        $titleExact = 'CASE WHEN LOWER(products.name) = ? THEN 120 ELSE 0 END';
-        $titlePartial = "CASE WHEN LOWER(products.name) {$likeOperator} ? THEN 80 ELSE 0 END";
-        $titleScoreExpr = "({$titleExact} + {$titlePartial})";
-        $builder->selectRaw("{$titleScoreExpr} AS title_score", [$lowered, $wildcard]);
+    protected function bindings(SearchQueryData $queryData, int $limit): array
+    {
+        $locale = app()->getLocale();
+        $query = Str::lower($queryData->query());
+        $wildcard = $this->wildcard($query);
 
-        $descriptionExpr = "CASE WHEN LOWER(COALESCE(products.description, '')) {$likeOperator} ? THEN 40 ELSE 0 END";
-        $shortDescriptionExpr = "CASE WHEN LOWER(COALESCE(products.short_description, '')) {$likeOperator} ? THEN 30 ELSE 0 END";
-        $descriptionScoreExpr = "({$descriptionExpr} + {$shortDescriptionExpr})";
-        $builder->selectRaw("{$descriptionScoreExpr} AS description_score", [$wildcard, $wildcard]);
+        return [
+            $locale,
+            now()->toDateTimeString(),
+            $wildcard,
+            $wildcard,
+            $wildcard,
+            $wildcard,
+            $wildcard,
+            $query,
+            $query,
+            $wildcard,
+        ];
+    }
 
-        $popularityExpr = '(SELECT COALESCE(SUM(quantity),0) FROM order_items WHERE order_items.product_id = products.id) * 0.5';
-        $builder->selectRaw("{$popularityExpr} AS popularity_score");
+    protected function mapRow(object $row, SearchQueryData $queryData): array
+    {
+        $price = (float) ($row->price ?? 0);
+        $subtitle = $row->brand_name ?? null;
+        $description = $row->short_description ?: ($row->description ?: $row->translated_description ?: null);
 
-        $freshnessExpr = 'CASE WHEN products.published_at >= ? THEN 60 WHEN products.published_at >= ? THEN 30 WHEN products.published_at >= ? THEN 10 ELSE 0 END';
-        $builder->selectRaw(
-            "{$freshnessExpr} AS freshness_score",
-            [now()->subDays(7), now()->subDays(30), now()->subDays(90)]
-        );
+        return [
+            'id' => (int) $row->id,
+            'type' => 'product',
+            'title' => (string) $row->name,
+            'subtitle' => $subtitle,
+            'description' => $description,
+            'price' => $price,
+            'formatted_price' => Number::currency($price, 'EUR', app()->getLocale()),
+            'image' => null,
+            'url' => route('products.show', $row->slug),
+            'relevance_score' => $this->calculateRelevanceScore($row, $queryData->query()),
+            'sales_count' => (int) ($row->sales_count ?? 0),
+            'reviews_count' => (int) ($row->reviews_count ?? 0),
+            'average_rating' => (float) ($row->average_rating ?? 0),
+            'is_featured' => (bool) $row->is_featured,
+        ];
+    }
 
-        if ($this->supportsFullText()) {
-            $booleanTerm = $this->booleanFullTextTerm($query->q);
-            $fullTextExpr = 'MATCH(products.name, products.description, products.short_description) AGAINST (? IN BOOLEAN MODE)';
-            $builder->selectRaw("({$fullTextExpr}) * 120 AS text_score", [$booleanTerm]);
-            $totalExpr = "{$titleScoreExpr} + {$descriptionScoreExpr} + {$popularityExpr} + {$freshnessExpr} + (({$fullTextExpr}) * 120)";
-            $builder->selectRaw(
-                "{$totalExpr} AS total_score",
-                [$lowered, $wildcard, $wildcard, $wildcard, now()->subDays(7), now()->subDays(30), now()->subDays(90), $booleanTerm]
-            );
-        } else {
-            $similarityExpr = '1.0 * CASE WHEN LOWER(products.name) LIKE ? THEN 100 ELSE 0 END';
-            $builder->selectRaw("{$similarityExpr} AS text_score", [$wildcard]);
-            $totalExpr = "{$titleScoreExpr} + {$descriptionScoreExpr} + {$popularityExpr} + {$freshnessExpr} + {$similarityExpr}";
-            $builder->selectRaw(
-                "{$totalExpr} AS total_score",
-                [$lowered, $wildcard, $wildcard, $wildcard, now()->subDays(7), now()->subDays(30), now()->subDays(90), $wildcard]
-            );
+    private function calculateRelevanceScore(object $row, string $query): int
+    {
+        $score = 0;
+        $normalizedQuery = Str::lower($query);
+        $name = Str::lower((string) $row->name);
+        $sku = Str::lower((string) ($row->sku ?? ''));
+        $description = Str::lower((string) ($row->description ?? ''));
+        $translatedDescription = Str::lower((string) ($row->translated_description ?? ''));
+
+        if ($name === $normalizedQuery) {
+            $score += 100;
+        } elseif (str_contains($name, $normalizedQuery)) {
+            $score += 50;
         }
 
-        return $builder;
+        if ($sku !== '' && str_contains($sku, $normalizedQuery)) {
+            $score += 40;
+        }
+
+        if ($description !== '' && str_contains($description, $normalizedQuery)) {
+            $score += 20;
+        }
+
+        if ($translatedDescription !== '' && str_contains($translatedDescription, $normalizedQuery)) {
+            $score += 10;
+        }
+
+        if ((bool) $row->is_featured) {
+            $score += 10;
+        }
+
+        return $score;
     }
 }

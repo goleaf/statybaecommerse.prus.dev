@@ -5,60 +5,79 @@ declare(strict_types=1);
 namespace App\Repositories\Search;
 
 use App\Data\SearchQueryData;
+use App\Services\SearchCacheService;
 use Illuminate\Database\ConnectionInterface;
-use Illuminate\Database\Query\Builder;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 abstract class AbstractSearchRepository
 {
-    protected function connection(): ConnectionInterface
-    {
-        return DB::connection();
+    public function __construct(
+        protected ConnectionInterface $connection,
+        protected SearchCacheService $cache
+    ) {
     }
 
-    protected function driver(): string
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    final public function search(SearchQueryData $queryData, int $limit): array
     {
-        return $this->connection()->getDriverName();
+        return $this->remember($this->type(), $queryData, $limit, function () use ($queryData, $limit) {
+            $rows = $this->connection->select($this->searchStatement($limit), $this->bindings($queryData, $limit));
+
+            return array_map(fn ($row): array => $this->mapRow($row, $queryData), $rows);
+        });
     }
 
-    protected function supportsFullText(): bool
+    /**
+     * @return array<int, mixed>
+     */
+    final public function explain(SearchQueryData $queryData, int $limit): array
     {
-        return in_array($this->driver(), ['mysql', 'mariadb'], true);
+        return $this->connection->select(
+            'EXPLAIN '.$this->searchStatement($limit),
+            $this->bindings($queryData, $limit)
+        );
     }
 
-    protected function likeOperator(): string
+    abstract protected function type(): string;
+
+    protected function wildcard(string $value): string
     {
-        return $this->driver() === 'pgsql' ? 'ILIKE' : 'LIKE';
+        $escaped = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $value);
+
+        return '%'.$escaped.'%';
     }
 
-    protected function wildcardLower(string $term): string
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function remember(string $type, SearchQueryData $queryData, int $limit, callable $resolver): array
     {
-        return '%'.str_replace(['%', '_'], ['\\%', '\\_'], Str::lower($term)).'%';
+        $context = array_merge($queryData->context(), [
+            'type' => $type,
+            'limit' => $limit,
+        ]);
+
+        $cacheKey = $this->cache->generateCacheKey($queryData->query(), $context);
+
+        $cached = $this->cache->getCachedResults($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        $results = $resolver();
+
+        $this->cache->cacheSearchResults($cacheKey, $results, $queryData->query(), $context);
+
+        return $results;
     }
 
-    protected function booleanFullTextTerm(string $term): string
-    {
-        $tokens = collect(preg_split('/\s+/u', trim($term)))
-            ->filter()
-            ->map(static fn (string $token): string => '+'.Str::lower($token).'*');
+    abstract protected function searchStatement(int $limit): string;
 
-        return $tokens->isEmpty() ? Str::lower($term) : $tokens->implode(' ');
-    }
+    /**
+     * @return array<int, mixed>
+     */
+    abstract protected function bindings(SearchQueryData $queryData, int $limit): array;
 
-    protected function applyPagination(Builder $builder, SearchQueryData $query, int $limit): Builder
-    {
-        $offset = ($query->page() - 1) * $limit;
-
-        return $builder->offset($offset)->limit($limit);
-    }
-
-    protected function applySort(Builder $builder, SearchQueryData $query): Builder
-    {
-        return match ($query->sort()) {
-            'price' => $builder->orderBy('price', 'asc'),
-            'date' => $builder->orderByDesc('published_at'),
-            default => $builder->orderByDesc('total_score'),
-        };
-    }
+    abstract protected function mapRow(object $row, SearchQueryData $queryData): array;
 }
