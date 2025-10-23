@@ -33,6 +33,12 @@ final class DiscountCodeSeeder extends Seeder
             DiscountCode::factory()
                 ->count($missing)
                 ->withDiscount($discount)
+                ->state([
+                    'is_active'   => true,
+                    'status'      => 'active',
+                    'valid_from'  => now()->subDay(),
+                    'valid_until' => now()->addMonth(),
+                ])
                 ->make()
         );
     }

@@ -74,22 +74,22 @@ final class DiscountCode extends Model
     protected function casts(): array
     {
         return [
-            'starts_at' => 'datetime',
-            'expires_at' => 'datetime',
-            'valid_from' => 'datetime',
-            'valid_until' => 'datetime',
-            'usage_limit' => 'integer',
+            'starts_at'            => 'datetime',
+            'expires_at'           => 'datetime',
+            'valid_from'           => 'datetime',
+            'valid_until'          => 'datetime',
+            'usage_limit'          => 'integer',
             'usage_limit_per_user' => 'integer',
-            'usage_count' => 'integer',
-            'is_active' => 'boolean',
-            'is_public' => 'boolean',
-            'is_auto_apply' => 'boolean',
-            'is_stackable' => 'boolean',
-            'is_first_time_only' => 'boolean',
-            'value' => 'decimal:2',
-            'minimum_amount' => 'decimal:2',
-            'maximum_discount' => 'decimal:2',
-            'metadata' => 'array',
+            'usage_count'          => 'integer',
+            'is_active'            => 'boolean',
+            'is_public'            => 'boolean',
+            'is_auto_apply'        => 'boolean',
+            'is_stackable'         => 'boolean',
+            'is_first_time_only'   => 'boolean',
+            'value'                => 'decimal:2',
+            'minimum_amount'       => 'decimal:2',
+            'maximum_discount'     => 'decimal:2',
+            'metadata'             => 'array',
         ];
     }
 
@@ -146,7 +146,9 @@ final class DiscountCode extends Model
      */
     public function orders(): BelongsToMany
     {
-        return $this->belongsToMany(Order::class, 'discount_redemptions', 'code_id', 'order_id');
+        return $this->belongsToMany(Order::class, 'discount_redemptions', 'code_id', 'order_id')
+            // Ensure admin-side lookups ignore storefront-specific order scopes.
+            ->withoutGlobalScopes();
     }
 
     /**
@@ -162,9 +164,9 @@ final class DiscountCode extends Model
      */
     public function scopeActive(Builder $query): Builder
     {
-        return $query->where('is_active', true)->where(function ($q) {
+        return $query->where('is_active', true)->where(function ($q): void {
             $q->whereNull('starts_at')->orWhere('starts_at', '<=', now());
-        })->where(function ($q) {
+        })->where(function ($q): void {
             $q->whereNull('expires_at')->orWhere('expires_at', '>=', now());
         });
     }
@@ -279,11 +281,11 @@ final class DiscountCode extends Model
     public function getStatusColorAttribute(): string
     {
         return match ($this->status) {
-            'active' => 'success',
-            'inactive' => 'gray',
-            'expired' => 'danger',
+            'active'    => 'success',
+            'inactive'  => 'gray',
+            'expired'   => 'danger',
             'scheduled' => 'warning',
-            default => 'gray',
+            default     => 'gray',
         };
     }
 
