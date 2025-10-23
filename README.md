@@ -17,6 +17,10 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 -### Latest updates
+- Campaign customer segment queries now expose dedicated scopes for type,
+  campaign, customer group, and activity state, letting unit tests fetch
+  inactive records while admin tooling keeps expressive filters without
+  fighting a blanket global scope.
 - Campaign conversion analytics now bypass the generic ActiveScope filter, keeping
   completed conversion records visible so the type/status/device scopes used in
   the unit suite and marketing dashboards return accurate datasets again.

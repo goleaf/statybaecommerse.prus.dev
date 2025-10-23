@@ -28,6 +28,10 @@
 - OpenAPI documentation now mirrors the lean product meta payload and nullable media thumbnails emitted by the presenter, keeping schema validators and client SDKs in sync with production responses.
 
 ## Admin panel resilience
+- Campaign customer segment listings now use local scopes for segment type,
+  campaign, customer group, and activity filters so admins can intentionally
+  include inactive rows in reviews without disabling visibility controls for
+  every query.
 - Campaign conversion analytics drop the inherited ActiveScope so the model's
   own status-aware scopes (campaign, type, device, etc.) surface completed
   conversions for marketing dashboards and unit coverage without extra query
