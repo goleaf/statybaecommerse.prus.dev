@@ -21,12 +21,13 @@ final class ApiController extends Controller
     {
         $query = $request->get('q', '');
 
-        $limit = (int) $request->integer('limit', 10);
-        $limit = max(1, min($limit, 25));
+        // Clamp the requested limit to avoid excessive payloads or expensive queries.
+        $limit = max(1, min((int) $request->integer('limit', 10), 25));
 
         $products = Product::query()
-            ->when($query !== '', function ($productQuery) use ($query) {
-                $productQuery->where(function ($nestedQuery) use ($query) {
+            ->when($query !== '', static function ($productQuery) use ($query): void {
+                // Apply a LIKE search on both the name and description only when a query is present.
+                $productQuery->where(static function ($nestedQuery) use ($query): void {
                     $likeQuery = "%{$query}%";
 
                     $nestedQuery
@@ -37,13 +38,14 @@ final class ApiController extends Controller
             ->limit($limit)
             ->get(['id', 'name', 'slug', 'price'])
             ->map(static function (Product $product): array {
+                // Provide structured media information while avoiding the deprecated image column.
                 return [
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'slug' => $product->slug,
-                    'price' => $product->price,
+                    'id'         => $product->id,
+                    'name'       => $product->name,
+                    'slug'       => $product->slug,
+                    'price'      => $product->price,
                     'main_image' => $product->main_image,
-                    'thumbnail' => $product->thumbnail,
+                    'thumbnail'  => $product->thumbnail,
                 ];
             })
             ->values();
@@ -119,7 +121,7 @@ final class ApiController extends Controller
             $wishlist->items()->create([
                 'product_id' => $productId,
                 'variant_id' => $variantId,
-                'quantity' => 1,
+                'quantity'   => 1,
             ]);
             $added = true;
         }
@@ -146,19 +148,21 @@ final class ApiController extends Controller
             ->whereIn('id', $orderedIds)
             ->get(['id', 'name', 'slug', 'price'])
             ->sortBy(static function (Product $product) use ($orderedIds): int {
+                // Preserve the original order from the session store to keep UX expectations intact.
                 $position = array_search($product->id, $orderedIds, true);
 
                 return $position === false ? PHP_INT_MAX : $position;
             })
             ->values()
             ->map(static function (Product $product): array {
+                // Mirror the normalized media payload returned from the search endpoint.
                 return [
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'slug' => $product->slug,
-                    'price' => $product->price,
+                    'id'         => $product->id,
+                    'name'       => $product->name,
+                    'slug'       => $product->slug,
+                    'price'      => $product->price,
                     'main_image' => $product->main_image,
-                    'thumbnail' => $product->thumbnail,
+                    'thumbnail'  => $product->thumbnail,
                 ];
             });
 

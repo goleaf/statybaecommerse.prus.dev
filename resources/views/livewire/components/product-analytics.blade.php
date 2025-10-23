@@ -56,10 +56,11 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     @foreach($relatedProducts as $relatedProduct)
                         <div class="bg-white border rounded-lg p-3 hover:shadow-md transition-shadow">
+                            {{-- Resolve the related product thumbnail to keep analytics cards visually rich. --}}
                             @php($relatedImage = $relatedProduct['main_image'] ?? $relatedProduct['thumbnail'] ?? ($relatedProduct['image'] ?? null))
                             @if($relatedImage)
                                 <img src="{{ $relatedImage }}" alt="{{ $relatedProduct['name'] }}"
-                                     class="w-full h-24 object-cover rounded mb-2">
+                                      class="w-full h-24 object-cover rounded mb-2">
                             @endif
                             <h5 class="font-medium text-sm text-gray-900 mb-1">{{ $relatedProduct['name'] }}</h5>
                             <p class="text-sm text-gray-600">€{{ number_format($relatedProduct['price'], 2) }}</p>
@@ -76,10 +77,11 @@
                 <div class="space-y-2">
                     @foreach($topSellingProducts as $topProduct)
                         <div class="flex items-center space-x-3 bg-gray-50 rounded-lg p-3">
+                            {{-- Resolve the top selling product thumbnail for consistency with the API response. --}}
                             @php($topImage = $topProduct['main_image'] ?? $topProduct['thumbnail'] ?? ($topProduct['image'] ?? null))
                             @if($topImage)
                                 <img src="{{ $topImage }}" alt="{{ $topProduct['name'] }}"
-                                     class="w-12 h-12 object-cover rounded">
+                                      class="w-12 h-12 object-cover rounded">
                             @endif
                             <div class="flex-1">
                                 <h5 class="font-medium text-sm text-gray-900">{{ $topProduct['name'] }}</h5>

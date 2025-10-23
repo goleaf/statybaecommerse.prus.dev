@@ -259,6 +259,7 @@ class AutocompleteComponent {
         item.setAttribute('data-index', index);
         item.setAttribute('role', 'option');
 
+        // Prefer normalized media attributes returned from the API, and gracefully degrade to the legacy image key.
         const imageUrl = result.main_image ?? result.thumbnail ?? result.image;
 
         item.innerHTML = `
