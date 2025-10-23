@@ -17,8 +17,8 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -74,9 +74,9 @@ final class ChannelResource extends Resource
     {
         return $schema
             ->schema([
-                Section::make(__('admin.channels.basic_information'))
+                SchemaSection::make(__('admin.channels.basic_information'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('name')
                                     ->label(__('admin.channels.name'))
@@ -115,9 +115,9 @@ final class ChannelResource extends Resource
                             ->maxLength(1000)
                             ->rows(3),
                     ]),
-                Section::make(__('admin.channels.configuration'))
+                SchemaSection::make(__('admin.channels.configuration'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('url')
                                     ->label(__('admin.channels.url'))
@@ -147,7 +147,7 @@ final class ChannelResource extends Resource
                                     ->default('after'),
                             ]),
                     ]),
-                Section::make(__('admin.channels.payment_matrix_section'))
+                SchemaSection::make(__('admin.channels.payment_matrix_section'))
                     ->schema([
                         MatrixFactory::checkboxGrid(
                             'payment_matrix',
@@ -170,9 +170,9 @@ final class ChannelResource extends Resource
                             ->live(),
                     ])
                     ->columns(1),
-                Section::make(__('admin.channels.status'))
+                SchemaSection::make(__('admin.channels.status'))
                     ->schema([
-                        Grid::make(3)
+                        SchemaGrid::make(3)
                             ->schema([
                                 Toggle::make('is_enabled')
                                     ->label(__('admin.channels.is_enabled'))

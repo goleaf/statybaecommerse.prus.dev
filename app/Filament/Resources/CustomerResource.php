@@ -21,8 +21,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Components\Utilities\Get as SchemaGet;
 use Filament\Schemas\Components\Utilities\Set as SchemaSet;
 use Filament\Actions\Action;
@@ -99,9 +99,9 @@ final class CustomerResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('customers.basic_information'))
+            SchemaSection::make(__('customers.basic_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('name')
                                 ->label(__('customers.name'))
@@ -114,7 +114,7 @@ final class CustomerResource extends Resource
                                 ->maxLength(255)
                                 ->unique(ignoreRecord: true),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('phone')
                                 ->label(__('customers.phone'))
@@ -130,9 +130,9 @@ final class CustomerResource extends Resource
                         ->maxLength(1000)
                         ->columnSpanFull(),
                 ]),
-            Section::make(__('customers.location'))
+            SchemaSection::make(__('customers.location'))
                 ->schema([
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             Select::make('country_id')
                                 ->label(__('customers.country'))
@@ -174,7 +174,7 @@ final class CustomerResource extends Resource
                                 ->maxLength(20),
                         ]),
                 ]),
-            Section::make(__('customers.company'))
+            SchemaSection::make(__('customers.company'))
                 ->schema([
                     Select::make('company_id')
                         ->label(__('customers.company'))
@@ -183,7 +183,7 @@ final class CustomerResource extends Resource
                         ->preload()
                         ->nullable(),
                 ]),
-            Section::make(__('customers.settings'))
+            SchemaSection::make(__('customers.settings'))
                 ->schema([
                     Toggle::make('is_active')
                         ->label(__('customers.is_active'))

@@ -11,7 +11,7 @@ use App\Models\ReferralCampaign;
 use App\Models\ReferralCode;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -47,7 +47,7 @@ final class ReferralCodeResource extends Resource
     {
         return $schema
             ->components([
-                Section::make(__('referral.resource.referral_code.section.code_details'))
+                SchemaSection::make(__('referral.resource.referral_code.section.code_details'))
                     ->columns(2)
                     ->schema([
                         Select::make('user_id')

@@ -12,19 +12,12 @@ use App\Models\Order;
 use App\Models\OrderShipping;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -74,7 +67,7 @@ final class OrderShippingResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('admin.order_shippings.basic_information'))
+            SchemaSection::make(__('admin.order_shippings.basic_information'))
                 ->description(__('admin.order_shippings.basic_information_description'))
                 ->schema([
                     Select::make('order_id')
@@ -101,7 +94,7 @@ final class OrderShippingResource extends Resource
                         ->searchable()
                         ->preload()
                         ->placeholder(__('shared.select_option')),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('carrier_name')
                                 ->label(__('admin.order_shippings.carrier_name'))
@@ -112,7 +105,7 @@ final class OrderShippingResource extends Resource
                                 ->required()
                                 ->maxLength(255),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('tracking_number')
                                 ->label(__('admin.order_shippings.tracking_number'))
@@ -122,7 +115,7 @@ final class OrderShippingResource extends Resource
                                 ->url()
                                 ->maxLength(500),
                         ]),
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             Flatpickr::makeDateTime('shipped_at')
                                 ->label(__('admin.order_shippings.shipped_at')),
@@ -131,7 +124,7 @@ final class OrderShippingResource extends Resource
                             Flatpickr::makeDateTime('delivered_at')
                                 ->label(__('admin.order_shippings.delivered_at')),
                         ]),
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             TextInput::make('weight')
                                 ->label(__('admin.order_shippings.weight'))

@@ -16,9 +16,9 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\Placeholder;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -77,9 +77,9 @@ final class NotificationResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->schema([
-            Section::make(__('admin.notifications.form.sections.basic_information'))
+            SchemaSection::make(__('admin.notifications.form.sections.basic_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('user_id')
                                 ->label(__('admin.notifications.form.fields.user'))
@@ -102,7 +102,7 @@ final class NotificationResource extends Resource
                         ->label(__('admin.notifications.form.fields.body'))
                         ->required()
                         ->rows(4),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             ToggleButtons::make('read_state')
                                 ->label(__('admin.notifications.form.fields.read_state'))
@@ -146,7 +146,7 @@ final class NotificationResource extends Resource
                         ]),
                 ])
                 ->columns(1),
-            Section::make(__('admin.notifications.form.sections.metadata'))
+            SchemaSection::make(__('admin.notifications.form.sections.metadata'))
                 ->schema([
                     Placeholder::make('created_at')
                         ->label(__('admin.notifications.form.fields.created_at'))

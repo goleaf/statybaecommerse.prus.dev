@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Filament\Resources\DiscountResource\RelationManagers;
 
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -33,7 +34,7 @@ final class RedemptionsRelationManager extends BaseRelationManager
     public function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make('Redemption Details')
+            SchemaSection::make('Redemption Details')
                 ->schema([
                     Select::make('code_id')
                         ->relationship('code', 'code')

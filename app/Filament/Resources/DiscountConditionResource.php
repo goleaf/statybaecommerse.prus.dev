@@ -31,8 +31,8 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as InfolistGrid;
 use Filament\Schemas\Components\Section as InfolistSection;
-use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Tabs as SchemaTabs;
+use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -76,11 +76,11 @@ final class DiscountConditionResource extends Resource
     {
         return $schema
             ->schema([
-                Tabs::make('discount_condition')
+                SchemaTabs::make('discount_condition')
                     ->tabs([
-                        Tab::make(__('discount_conditions.basic_information'))
+                        SchemaTab::make(__('discount_conditions.basic_information'))
                             ->schema([
-                                Section::make()
+                                SchemaSection::make()
                                     ->columns(2)
                                     ->schema([
                                         Select::make('discount_id')
@@ -105,9 +105,9 @@ final class DiscountConditionResource extends Resource
                                             ->default(true),
                                     ]),
                             ]),
-                        Tab::make(__('discount_conditions.condition_settings'))
+                        SchemaTab::make(__('discount_conditions.condition_settings'))
                             ->schema([
-                                Section::make()
+                                SchemaSection::make()
                                     ->columns(2)
                                     ->schema([
                                         Select::make('type')
@@ -141,9 +141,9 @@ final class DiscountConditionResource extends Resource
                                             ->dehydrateStateUsing(static fn (?string $state): mixed => self::decodeValueFromTextarea($state)),
                                     ]),
                             ]),
-                        Tab::make(__('discount_conditions.targeting'))
+                        SchemaTab::make(__('discount_conditions.targeting'))
                             ->schema([
-                                Section::make()
+                                SchemaSection::make()
                                     ->columns(2)
                                     ->schema([
                                         Combobox::make('products')

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use BackedEnum;
 use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\CategoryResource\Pages;
@@ -18,8 +19,8 @@ use App\Models\Scopes\VisibleScope;
 use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -115,7 +116,7 @@ final class CategoryResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('categories.basic_information'))
+            SchemaSection::make(__('categories.basic_information'))
                 ->components([
                     LanguageTabs::make([
                         TextInput::make('name')
@@ -161,7 +162,7 @@ final class CategoryResource extends Resource
                                 ->maxLength(255),
                         ]),
                 ]),
-            Section::make(__('categories.media'))
+            SchemaSection::make(__('categories.media'))
                 ->components([
                     FileUpload::make('image')
                         ->label(__('categories.image'))
@@ -184,9 +185,9 @@ final class CategoryResource extends Resource
                         ->directory('categories/banners')
                         ->visibility('private'),
                 ]),
-            Section::make(__('categories.appearance'))
+            SchemaSection::make(__('categories.appearance'))
                 ->components([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->components([
                             ColorPicker::make('color')
                                 ->label(__('categories.color'))
@@ -198,7 +199,7 @@ final class CategoryResource extends Resource
                                 ->minValue(0),
                         ]),
                 ]),
-            Section::make(__('categories.seo'))
+            SchemaSection::make(__('categories.seo'))
                 ->components([
                     LanguageTabs::make([
                         TextInput::make('seo_title')
@@ -210,9 +211,9 @@ final class CategoryResource extends Resource
                             ->maxLength(500),
                     ]),
                 ]),
-            Section::make(__('categories.settings'))
+            SchemaSection::make(__('categories.settings'))
                 ->components([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->components([
                             Toggle::make('is_active')
                                 ->label(__('categories.is_active'))
@@ -390,41 +391,6 @@ final class CategoryResource extends Resource
                 ]),
             ])
             ->defaultSort('sort_order');
-    }
-
-    public static function shouldRegisterNavigation(): bool
-    {
-        return static::canViewAny();
-    }
-
-    public static function canViewAny(): bool
-    {
-        return static::authorizeCategory(null, 'viewAny');
-    }
-
-    public static function canCreate(): bool
-    {
-        return static::authorizeCategory(null, 'create');
-    }
-
-    public static function canView(Category $record): bool
-    {
-        return static::authorizeCategory($record, 'view');
-    }
-
-    public static function canEdit(Category $record): bool
-    {
-        return static::authorizeCategory($record, 'update');
-    }
-
-    public static function canDelete(Category $record): bool
-    {
-        return static::authorizeCategory($record, 'delete');
-    }
-
-    public static function canRestore(Category $record): bool
-    {
-        return static::authorizeCategory($record, 'restore');
     }
 
     public static function getRelations(): array

@@ -23,7 +23,7 @@ final class AddressesRelationManager extends BaseRelationManager
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make(__('addresses.address_information'))
+                Forms\Components\SchemaSection::make(__('addresses.address_information'))
                     ->columns(2)
                     ->schema([
                         Forms\Components\Select::make('user_id')
@@ -51,7 +51,7 @@ final class AddressesRelationManager extends BaseRelationManager
                             ->label(__('addresses.company_vat'))
                             ->maxLength(50),
                     ]),
-                Forms\Components\Section::make(__('addresses.address_details'))
+                Forms\Components\SchemaSection::make(__('addresses.address_details'))
                     ->columns(2)
                     ->schema([
                         Forms\Components\TextInput::make('address_line_1')
@@ -82,7 +82,7 @@ final class AddressesRelationManager extends BaseRelationManager
                             ->required()
                             ->maxLength(20),
                     ]),
-                Forms\Components\Section::make(__('addresses.contact_information'))
+                Forms\Components\SchemaSection::make(__('addresses.contact_information'))
                     ->columns(2)
                     ->schema([
                         Forms\Components\TextInput::make('phone')
@@ -97,7 +97,7 @@ final class AddressesRelationManager extends BaseRelationManager
                             ->label(__('addresses.landmark'))
                             ->maxLength(255),
                     ]),
-                Forms\Components\Section::make(__('addresses.additional_information'))
+                Forms\Components\SchemaSection::make(__('addresses.additional_information'))
                     ->schema([
                         Forms\Components\Textarea::make('notes')
                             ->label(__('addresses.notes'))
@@ -108,7 +108,7 @@ final class AddressesRelationManager extends BaseRelationManager
                             ->rows(3)
                             ->maxLength(1000),
                     ]),
-                Forms\Components\Section::make(__('addresses.settings'))
+                Forms\Components\SchemaSection::make(__('addresses.settings'))
                     ->columns(2)
                     ->schema([
                         Forms\Components\Toggle::make('is_default')

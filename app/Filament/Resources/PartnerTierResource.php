@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use BackedEnum;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\PartnerTierResource\Pages;
 use App\Models\PartnerTier;
@@ -40,7 +41,7 @@ final class PartnerTierResource extends Resource
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make(__('admin.partner_tiers.sections.basic_information'))
+                Forms\Components\SchemaSection::make(__('admin.partner_tiers.sections.basic_information'))
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label(__('admin.partner_tiers.name'))
@@ -55,7 +56,7 @@ final class PartnerTierResource extends Resource
                             ->default(true),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make(__('admin.partner_tiers.sections.financial_settings'))
+                Forms\Components\SchemaSection::make(__('admin.partner_tiers.sections.financial_settings'))
                     ->schema([
                         Forms\Components\TextInput::make('discount_rate')
                             ->label(__('admin.partner_tiers.discount_rate'))
@@ -77,7 +78,7 @@ final class PartnerTierResource extends Resource
                             ->step(0.01),
                     ])
                     ->columns(3),
-                Forms\Components\Section::make(__('admin.partner_tiers.sections.benefits'))
+                Forms\Components\SchemaSection::make(__('admin.partner_tiers.sections.benefits'))
                     ->schema([
                         Forms\Components\Repeater::make('benefits')
                             ->label(__('admin.partner_tiers.benefits'))

@@ -15,8 +15,8 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -65,9 +65,9 @@ final class ReferralRewardLogResource extends Resource
     {
         return $schema
             ->schema([
-                Section::make(__('admin.referral_reward_logs.basic_information'))
+                SchemaSection::make(__('admin.referral_reward_logs.basic_information'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 Select::make('referral_reward_id')
                                     ->label(__('admin.referral_reward_logs.referral_reward'))

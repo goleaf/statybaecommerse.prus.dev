@@ -11,7 +11,7 @@ use App\Models\ReferralReward;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -58,7 +58,7 @@ final class ReferralRewardResource extends Resource
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make(__('referral_rewards.sections.reward_details'))
+                Forms\Components\SchemaSection::make(__('referral_rewards.sections.reward_details'))
                     ->columns(2)
                     ->schema([
                         Forms\Components\Select::make('referral_id')
@@ -291,7 +291,7 @@ final class ReferralRewardResource extends Resource
     {
         return $schema
             ->schema([
-                Infolists\Components\Section::make(__('referral_rewards.sections.reward_details'))
+                Infolists\Components\SchemaSection::make(__('referral_rewards.sections.reward_details'))
                     ->schema([
                         TextEntry::make('title')
                             ->label(__('referral_rewards.fields.title')),

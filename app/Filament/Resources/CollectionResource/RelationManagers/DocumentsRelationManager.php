@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\CollectionResource\RelationManagers;
 
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Schema;
 use App\Models\Document;
 use Filament\Actions\DeleteAction;

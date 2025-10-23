@@ -9,6 +9,7 @@ use Filament\Schemas\Schema;
 use App\Data\ExportRequestData;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
+use App\Services\Export\Contracts\DefinesExportColumns;
 use App\Services\Export\ExportColumn;
 use App\Services\Export\Exporters\UserExport;
 use App\Services\Export\ExportService;
@@ -21,8 +22,8 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\FileUpload;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -134,9 +135,9 @@ final class UserResource extends Resource implements DefinesExportColumns
     {
         return $schema
             ->schema([
-                Section::make(__('users.sections.basic_info'))
+                SchemaSection::make(__('users.sections.basic_info'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('name')
                                     ->label(__('users.fields.name'))
@@ -173,7 +174,7 @@ final class UserResource extends Resource implements DefinesExportColumns
                             ->default(true),
                     ])
                     ->columns(1),
-                Section::make(__('users.sections.permissions'))
+                SchemaSection::make(__('users.sections.permissions'))
                     ->schema([
                         MatrixFactory::permissions(
                             [
@@ -197,7 +198,7 @@ final class UserResource extends Resource implements DefinesExportColumns
                             ->live(),
                     ])
                     ->columns(1),
-                Section::make(__('users.sections.profile'))
+                SchemaSection::make(__('users.sections.profile'))
                     ->schema([
                         FileUpload::make('avatar_url')
                             ->label(__('users.fields.avatar'))
@@ -349,42 +350,6 @@ final class UserResource extends Resource implements DefinesExportColumns
             ])
             ->defaultSort('created_at', 'desc');
     }
-
-    public static function shouldRegisterNavigation(): bool
-    {
-        return static::canViewAny();
-    }
-
-    public static function canViewAny(): bool
-    {
-        return static::authorizeUser(null, 'viewAny');
-    }
-
-    public static function canCreate(): bool
-    {
-        return static::authorizeUser(null, 'create');
-    }
-
-    public static function canView(User $record): bool
-    {
-        return static::authorizeUser($record, 'view');
-    }
-
-    public static function canEdit(User $record): bool
-    {
-        return static::authorizeUser($record, 'update');
-    }
-
-    public static function canDelete(User $record): bool
-    {
-        return static::authorizeUser($record, 'delete');
-    }
-
-    public static function canRestore(User $record): bool
-    {
-        return static::authorizeUser($record, 'restore');
-    }
-
     /**
      * @return array<string, ExportColumn>
      */

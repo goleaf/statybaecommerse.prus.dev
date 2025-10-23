@@ -12,8 +12,8 @@ use function collect;
 
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\FileUpload;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -25,10 +25,10 @@ final class SliderForm
     {
         return $schema
             ->schema([
-                Section::make(__('admin.sliders.basic_information'))
+                SchemaSection::make(__('admin.sliders.basic_information'))
                     ->description(__('admin.sliders.basic_information_description'))
                     ->components([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->components([
                                 TextInput::make('title')
                                     ->label(__('admin.sliders.title'))
@@ -49,7 +49,7 @@ final class SliderForm
                             ->columnSpanFull(),
                     ])
                     ->columns(2),
-                Section::make(__('admin.sliders.media'))
+                SchemaSection::make(__('admin.sliders.media'))
                     ->description(__('admin.sliders.media_description'))
                     ->components([
                         SpatieMediaLibraryFileUpload::make('slider_images')
@@ -81,10 +81,10 @@ final class SliderForm
                             ->columnSpanFull(),
                     ])
                     ->collapsible(),
-                Section::make(__('admin.sliders.call_to_action'))
+                SchemaSection::make(__('admin.sliders.call_to_action'))
                     ->description(__('admin.sliders.call_to_action_description'))
                     ->components([
-                        Grid::make(3)
+                        SchemaGrid::make(3)
                             ->components([
                                 TextInput::make('button_text')
                                     ->label(__('admin.sliders.button_text'))
@@ -118,10 +118,10 @@ final class SliderForm
                             ]),
                     ])
                     ->collapsible(),
-                Section::make(__('admin.sliders.design'))
+                SchemaSection::make(__('admin.sliders.design'))
                     ->description(__('admin.sliders.design_description'))
                     ->components([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->components([
                                 TextInput::make('background_color')
                                     ->label(__('admin.sliders.background_color'))
@@ -136,10 +136,10 @@ final class SliderForm
                             ]),
                     ])
                     ->collapsible(),
-                Section::make(__('admin.sliders.settings'))
+                SchemaSection::make(__('admin.sliders.settings'))
                     ->description(__('admin.sliders.settings_description'))
                     ->components([
-                        Grid::make(3)
+                        SchemaGrid::make(3)
                             ->components([
                                 Toggle::make('settings.autoplay')
                                     ->label(__('admin.sliders.settings_autoplay'))
@@ -160,7 +160,7 @@ final class SliderForm
                             ]),
                     ])
                     ->collapsible(),
-                Section::make(__('admin.sliders.status'))
+                SchemaSection::make(__('admin.sliders.status'))
                     ->description(__('admin.sliders.status_description'))
                     ->components([
                         Toggle::make('is_active')

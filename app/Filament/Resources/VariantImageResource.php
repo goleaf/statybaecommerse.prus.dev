@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use BackedEnum;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantImageResource\Pages;
 use App\Models\ProductVariant;
@@ -17,10 +18,10 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
-use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -71,9 +72,9 @@ final class VariantImageResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->components([
-            Section::make(__('admin.variant_images.basic_information'))
+            SchemaSection::make(__('admin.variant_images.basic_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('variant_id')
                                 ->label(__('admin.variant_images.variant'))
@@ -110,9 +111,9 @@ final class VariantImageResource extends Resource
                                 ->visible(fn ($get) => ! empty($get('variant_id'))),
                         ]),
                 ]),
-            Section::make(__('admin.variant_images.image_details'))
+            SchemaSection::make(__('admin.variant_images.image_details'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             FileUpload::make('image_path')
                                 ->label(__('admin.variant_images.image'))
@@ -159,9 +160,9 @@ final class VariantImageResource extends Resource
                         ->columnSpanFull()
                         ->helperText(__('admin.variant_images.description_help')),
                 ]),
-            Section::make(__('admin.variant_images.display_settings'))
+            SchemaSection::make(__('admin.variant_images.display_settings'))
                 ->schema([
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             TextInput::make('sort_order')
                                 ->label(__('admin.variant_images.sort_order'))
@@ -179,9 +180,9 @@ final class VariantImageResource extends Resource
                                 ->helperText(__('admin.variant_images.is_active_help')),
                         ]),
                 ]),
-            Section::make(__('admin.variant_images.metadata'))
+            SchemaSection::make(__('admin.variant_images.metadata'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('file_size')
                                 ->label(__('admin.variant_images.file_size'))

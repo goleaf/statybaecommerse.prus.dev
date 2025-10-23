@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use BackedEnum;
 use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\CampaignConversionResource\Pages;
@@ -13,8 +14,8 @@ use App\Models\CampaignConversion;
 use App\Models\Order;
 use App\Models\User;
 use Filament\Forms;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -72,9 +73,9 @@ final class CampaignConversionResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('campaign_conversions.basic_information'))
+            SchemaSection::make(__('campaign_conversions.basic_information'))
                 ->schema([
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             Select::make('campaign_id')
                                 ->label(__('campaign_conversions.form.campaign_id'))
@@ -97,7 +98,7 @@ final class CampaignConversionResource extends Resource
                                 ->maxLength(255)
                                 ->disabled(),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('customer_id')
                                 ->label(__('campaign_conversions.form.customer_id'))
@@ -119,7 +120,7 @@ final class CampaignConversionResource extends Resource
                                 ->maxLength(255)
                                 ->disabled(),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('conversion_value')
                                 ->label(__('campaign_conversions.form.conversion_value'))
@@ -132,7 +133,7 @@ final class CampaignConversionResource extends Resource
                                 ->required()
                                 ->seconds(false),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('session_id')
                                 ->label(__('campaign_conversions.form.session_id'))
@@ -145,9 +146,9 @@ final class CampaignConversionResource extends Resource
                                 ->step(0.0001),
                         ]),
                 ]),
-            Section::make(__('campaign_conversions.form.tracking_information'))
+            SchemaSection::make(__('campaign_conversions.form.tracking_information'))
                 ->schema([
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             TextInput::make('source')
                                 ->label(__('campaign_conversions.form.source'))
@@ -169,9 +170,9 @@ final class CampaignConversionResource extends Resource
                                 ->maxLength(500),
                         ]),
                 ]),
-            Section::make(__('campaign_conversions.form.device_information'))
+            SchemaSection::make(__('campaign_conversions.form.device_information'))
                 ->schema([
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             Select::make('device_type')
                                 ->label(__('campaign_conversions.form.device_type'))
@@ -195,7 +196,7 @@ final class CampaignConversionResource extends Resource
                                 ->label(__('campaign_conversions.form.city'))
                                 ->maxLength(255),
                         ]),
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             Toggle::make('is_mobile')
                                 ->label(__('campaign_conversions.form.is_mobile')),
@@ -205,7 +206,7 @@ final class CampaignConversionResource extends Resource
                                 ->label(__('campaign_conversions.form.is_desktop')),
                         ]),
                 ]),
-            Section::make(__('campaign_conversions.form.additional_information'))
+            SchemaSection::make(__('campaign_conversions.form.additional_information'))
                 ->schema([
                     Textarea::make('notes')
                         ->label(__('campaign_conversions.form.notes'))

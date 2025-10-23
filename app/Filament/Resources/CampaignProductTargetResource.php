@@ -18,7 +18,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -80,10 +80,10 @@ final class CampaignProductTargetResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('campaign_product_targets.basic_information'))
+            SchemaSection::make(__('campaign_product_targets.basic_information'))
                 ->description(__('campaign_product_targets.campaign_selection_description'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('campaign_id')
                                 ->label(__('campaign_product_targets.campaign'))
@@ -102,7 +102,7 @@ final class CampaignProductTargetResource extends Resource
                                 ->required()
                                 ->live(),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('product_id')
                                 ->label(__('campaign_product_targets.product'))
@@ -134,10 +134,10 @@ final class CampaignProductTargetResource extends Resource
                                 ->required(fn (Get $get): bool => $get('target_type') === 'collection'),
                         ])->columns(2),
                 ]),
-            Section::make(__('campaign_product_targets.targeting_rules'))
+            SchemaSection::make(__('campaign_product_targets.targeting_rules'))
                 ->description(__('campaign_product_targets.targeting_rules_description'))
                 ->schema([
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             TextInput::make('priority')
                                 ->label(__('campaign_product_targets.priority'))
@@ -158,7 +158,7 @@ final class CampaignProductTargetResource extends Resource
                                 ->minValue(0)
                                 ->helperText(__('campaign_product_targets.sort_order_help')),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Toggle::make('is_active')
                                 ->label(__('campaign_product_targets.is_active'))

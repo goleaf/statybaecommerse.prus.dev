@@ -21,6 +21,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Support\Htmlable;
 
 final class VariantAnalyticsResource extends Resource
 {
@@ -70,14 +71,14 @@ final class VariantAnalyticsResource extends Resource
     {
         return $schema
             ->schema([
-                Forms\Components\Tabs::make(__('admin.variant_analytics.tabs'))
+                Forms\Components\SchemaTabs::make(__('admin.variant_analytics.tabs'))
                     ->tabs([
-                        Forms\Components\Tabs\Tab::make(__('admin.variant_analytics.basic_info'))
+                        Forms\Components\Tabs\SchemaTab::make(__('admin.variant_analytics.basic_info'))
                             ->icon('heroicon-o-information-circle')
                             ->schema([
-                                Forms\Components\Section::make(__('admin.variant_analytics.basic_info'))
+                                Forms\Components\SchemaSection::make(__('admin.variant_analytics.basic_info'))
                                     ->schema([
-                                        Forms\Components\Grid::make(2)
+                                        Forms\Components\SchemaGrid::make(2)
                                             ->schema([
                                                 Forms\Components\Select::make('variant_id')
                                                     ->label(__('admin.variant_analytics.variant'))
@@ -93,7 +94,7 @@ final class VariantAnalyticsResource extends Resource
                                                     ->maxDate(now())
                                                     ->live(),
                                             ]),
-                                        Forms\Components\Grid::make(2)
+                                        Forms\Components\SchemaGrid::make(2)
                                             ->schema([
                                                 Forms\Components\Placeholder::make('variant_name')
                                                     ->label(__('admin.variant_analytics.variant_name'))
@@ -132,12 +133,12 @@ final class VariantAnalyticsResource extends Resource
                                             ]),
                                     ]),
                             ]),
-                        Forms\Components\Tabs\Tab::make(__('admin.variant_analytics.metrics'))
+                        Forms\Components\Tabs\SchemaTab::make(__('admin.variant_analytics.metrics'))
                             ->icon('heroicon-o-chart-bar')
                             ->schema([
-                                Forms\Components\Section::make(__('admin.variant_analytics.traffic_metrics'))
+                                Forms\Components\SchemaSection::make(__('admin.variant_analytics.traffic_metrics'))
                                     ->schema([
-                                        Forms\Components\Grid::make(3)
+                                        Forms\Components\SchemaGrid::make(3)
                                             ->schema([
                                                 Forms\Components\TextInput::make('views')
                                                     ->label(__('admin.variant_analytics.views'))
@@ -169,9 +170,9 @@ final class VariantAnalyticsResource extends Resource
                                                     }),
                                             ]),
                                     ]),
-                                Forms\Components\Section::make(__('admin.variant_analytics.conversion_metrics'))
+                                Forms\Components\SchemaSection::make(__('admin.variant_analytics.conversion_metrics'))
                                     ->schema([
-                                        Forms\Components\Grid::make(3)
+                                        Forms\Components\SchemaGrid::make(3)
                                             ->schema([
                                                 Forms\Components\TextInput::make('add_to_cart')
                                                     ->label(__('admin.variant_analytics.add_to_cart'))
@@ -197,9 +198,9 @@ final class VariantAnalyticsResource extends Resource
                                                     ->prefix('€'),
                                             ]),
                                     ]),
-                                Forms\Components\Section::make(__('admin.variant_analytics.calculated_metrics'))
+                                Forms\Components\SchemaSection::make(__('admin.variant_analytics.calculated_metrics'))
                                     ->schema([
-                                        Forms\Components\Grid::make(3)
+                                        Forms\Components\SchemaGrid::make(3)
                                             ->schema([
                                                 Forms\Components\Placeholder::make('add_to_cart_rate')
                                                     ->label(__('admin.variant_analytics.atc_rate'))
@@ -241,10 +242,10 @@ final class VariantAnalyticsResource extends Resource
                                             ]),
                                     ]),
                             ]),
-                        Forms\Components\Tabs\Tab::make(__('admin.variant_analytics.additional_data'))
+                        Forms\Components\Tabs\SchemaTab::make(__('admin.variant_analytics.additional_data'))
                             ->icon('heroicon-o-document-text')
                             ->schema([
-                                Forms\Components\Section::make(__('admin.variant_analytics.additional_info'))
+                                Forms\Components\SchemaSection::make(__('admin.variant_analytics.additional_info'))
                                     ->schema([
                                         Forms\Components\KeyValue::make('additional_metrics')
                                             ->label(__('admin.variant_analytics.additional_metrics'))

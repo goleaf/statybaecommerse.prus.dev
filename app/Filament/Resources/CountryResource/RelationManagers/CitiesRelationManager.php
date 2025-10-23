@@ -22,7 +22,7 @@ final class CitiesRelationManager extends BaseRelationManager
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make(__('cities.basic_information'))
+                Forms\Components\SchemaSection::make(__('cities.basic_information'))
                     ->columns(2)
                     ->schema([
                         Forms\Components\TextInput::make('name')
@@ -43,7 +43,7 @@ final class CitiesRelationManager extends BaseRelationManager
                             ->label(__('cities.postal_code'))
                             ->maxLength(20),
                     ]),
-                Forms\Components\Section::make(__('cities.hierarchy'))
+                Forms\Components\SchemaSection::make(__('cities.hierarchy'))
                     ->columns(2)
                     ->schema([
                         Forms\Components\Select::make('parent_id')
@@ -67,7 +67,7 @@ final class CitiesRelationManager extends BaseRelationManager
                             })
                             ->nullable(),
                     ]),
-                Forms\Components\Section::make(__('cities.coordinates'))
+                Forms\Components\SchemaSection::make(__('cities.coordinates'))
                     ->columns(2)
                     ->schema([
                         Forms\Components\TextInput::make('latitude')
@@ -90,7 +90,7 @@ final class CitiesRelationManager extends BaseRelationManager
                             ->minValue(0)
                             ->nullable(),
                     ]),
-                Forms\Components\Section::make(__('cities.settings'))
+                Forms\Components\SchemaSection::make(__('cities.settings'))
                     ->columns(2)
                     ->schema([
                         Forms\Components\Toggle::make('is_enabled')

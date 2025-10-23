@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use BackedEnum;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantAttributeValueResource\Pages;
 use App\Models\Attribute;
@@ -21,8 +22,8 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -76,9 +77,9 @@ final class VariantAttributeValueResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('admin.variant_attribute_values.basic_information'))
+            SchemaSection::make(__('admin.variant_attribute_values.basic_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('variant_id')
                                 ->label(__('admin.variant_attribute_values.variant'))
@@ -110,7 +111,7 @@ final class VariantAttributeValueResource extends Resource
                                 ->disabled()
                                 ->dehydrated(false),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('attribute_id')
                                 ->label(__('admin.variant_attribute_values.attribute'))
@@ -142,9 +143,9 @@ final class VariantAttributeValueResource extends Resource
                                 ->dehydrated(false),
                         ]),
                 ]),
-            Section::make(__('admin.variant_attribute_values.attribute_values'))
+            SchemaSection::make(__('admin.variant_attribute_values.attribute_values'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('attribute_value')
                                 ->label(__('admin.variant_attribute_values.attribute_value'))
@@ -163,7 +164,7 @@ final class VariantAttributeValueResource extends Resource
                                 ->maxLength(255)
                                 ->helperText(__('admin.variant_attribute_values.attribute_value_display_help')),
                         ]),
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             TextInput::make('attribute_value_lt')
                                 ->label(__('admin.variant_attribute_values.attribute_value_lt'))
@@ -179,9 +180,9 @@ final class VariantAttributeValueResource extends Resource
                                 ->helperText(__('admin.variant_attribute_values.slug_help')),
                         ]),
                 ]),
-            Section::make(__('admin.variant_attribute_values.settings'))
+            SchemaSection::make(__('admin.variant_attribute_values.settings'))
                 ->schema([
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             TextInput::make('sort_order')
                                 ->label(__('admin.variant_attribute_values.sort_order'))

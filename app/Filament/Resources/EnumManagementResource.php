@@ -18,13 +18,13 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
-use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Tabs as SchemaTabs;
+use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -79,13 +79,13 @@ final class EnumManagementResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Tabs::make('enum_management_tabs')
+            SchemaTabs::make('enum_management_tabs')
                 ->tabs([
-                    Tab::make(trans('admin.enums.form.tabs.basic_information'))
+                    SchemaTab::make(trans('admin.enums.form.tabs.basic_information'))
                         ->schema([
-                            Section::make(trans('admin.enums.form.sections.basic_information'))
+                            SchemaSection::make(trans('admin.enums.form.sections.basic_information'))
                                 ->schema([
-                                    Grid::make(2)
+                                    SchemaGrid::make(2)
                                         ->schema([
                                             Select::make('type')
                                                 ->label(trans('admin.enums.form.fields.type'))
@@ -100,7 +100,7 @@ final class EnumManagementResource extends Resource
                                                 ->unique(ignoreRecord: true),
                                         ])
                                         ->columnSpanFull(),
-                                    Grid::make(2)
+                                    SchemaGrid::make(2)
                                         ->schema([
                                             TextInput::make('value')
                                                 ->label(trans('admin.enums.form.fields.value'))
@@ -118,11 +118,11 @@ final class EnumManagementResource extends Resource
                                         ->columnSpanFull(),
                                 ]),
                         ]),
-                    Tab::make(trans('admin.enums.form.tabs.additional_settings'))
+                    SchemaTab::make(trans('admin.enums.form.tabs.additional_settings'))
                         ->schema([
-                            Section::make(trans('admin.enums.form.sections.additional_settings'))
+                            SchemaSection::make(trans('admin.enums.form.sections.additional_settings'))
                                 ->schema([
-                                    Grid::make(3)
+                                    SchemaGrid::make(3)
                                         ->schema([
                                             TextInput::make('sort_order')
                                                 ->label(trans('admin.enums.form.fields.sort_order'))
@@ -142,9 +142,9 @@ final class EnumManagementResource extends Resource
                                         ->columnSpanFull(),
                                 ]),
                         ]),
-                    Tab::make(trans('admin.enums.form.tabs.preview'))
+                    SchemaTab::make(trans('admin.enums.form.tabs.preview'))
                         ->schema([
-                            Section::make(trans('admin.enums.form.sections.preview'))
+                            SchemaSection::make(trans('admin.enums.form.sections.preview'))
                                 ->schema([
                                     Placeholder::make('usage_count')
                                         ->label(trans('admin.enums.form.fields.usage_count'))

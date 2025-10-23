@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace App\Filament\Resources\CategoryResource\RelationManagers;
 
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -35,9 +36,9 @@ final class TranslationsRelationManager extends BaseRelationManager
     public function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('translations.basic_information'))
+            SchemaSection::make(__('translations.basic_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('locale')
                                 ->label(__('translations.locale'))
@@ -62,7 +63,7 @@ final class TranslationsRelationManager extends BaseRelationManager
                         ->maxLength(500)
                         ->columnSpanFull(),
                 ]),
-            Section::make(__('translations.seo'))
+            SchemaSection::make(__('translations.seo'))
                 ->schema([
                     TextInput::make('seo_title')
                         ->label(__('translations.seo_title'))

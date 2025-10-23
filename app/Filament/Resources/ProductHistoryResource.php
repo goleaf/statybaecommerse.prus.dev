@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use BackedEnum;
 use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
@@ -17,7 +18,7 @@ use DateTimeInterface;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\Select as SelectInput;
 use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
@@ -62,7 +63,7 @@ final class ProductHistoryResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('product_history.basic_information'))
+            SchemaSection::make(__('product_history.basic_information'))
                 ->columns(2)
                 ->schema([
                     SelectInput::make('product_id', __('product_history.product'))
@@ -82,7 +83,7 @@ final class ProductHistoryResource extends Resource
                         ->searchUsing(fn (string $search): array => self::searchFieldNames($search))
                         ->options(fn (): array => self::fieldNameOptions()),
                 ]),
-            Section::make(__('product_history.details'))
+            SchemaSection::make(__('product_history.details'))
                 ->columns(2)
                 ->schema([
                     Textarea::make('old_value')

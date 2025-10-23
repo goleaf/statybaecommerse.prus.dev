@@ -17,7 +17,7 @@ class NewsCommentForm
     {
         return $form
             ->schema([
-                Grid::make()
+                SchemaGrid::make()
                     ->schema([
                         Select::make('news_id')
                             ->relationship('news', 'title')
@@ -33,7 +33,7 @@ class NewsCommentForm
                             ->nullable(),
                     ])
                     ->columns(2),
-                Grid::make()
+                SchemaGrid::make()
                     ->schema([
                         TextInput::make('author_name')
                             ->label(__('admin.news_comments.author_name'))
@@ -51,7 +51,7 @@ class NewsCommentForm
                     ->required()
                     ->rows(4)
                     ->columnSpanFull(),
-                Grid::make()
+                SchemaGrid::make()
                     ->schema([
                         Toggle::make('is_approved')
                             ->label(__('admin.news_comments.is_approved'))

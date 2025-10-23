@@ -8,8 +8,8 @@ use Filament\Schemas\Schema;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 
 /**
  * CountryForm
@@ -23,9 +23,9 @@ final class CountryForm
         return $form
             ->schema([
                 // Basic Information Section
-                Section::make(__('countries.basic_information'))
+                SchemaSection::make(__('countries.basic_information'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('name')
                                     ->label(__('countries.name'))
@@ -38,7 +38,7 @@ final class CountryForm
                                     ->maxLength(255),
                             ]),
 
-                        Grid::make(3)
+                        SchemaGrid::make(3)
                             ->schema([
                                 TextInput::make('cca2')
                                     ->label(__('countries.cca2'))
@@ -67,9 +67,9 @@ final class CountryForm
                     ]),
 
                 // Geographic Information Section
-                Section::make(__('countries.geographic_information'))
+                SchemaSection::make(__('countries.geographic_information'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('region')
                                     ->label(__('countries.region'))
@@ -80,7 +80,7 @@ final class CountryForm
                                     ->maxLength(255),
                             ]),
 
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('latitude')
                                     ->label(__('countries.latitude'))
@@ -95,9 +95,9 @@ final class CountryForm
                     ]),
 
                 // Currency and Economic Information Section
-                Section::make(__('countries.currency_economic'))
+                SchemaSection::make(__('countries.currency_economic'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('currency_code')
                                     ->label(__('countries.currency_code'))
@@ -109,7 +109,7 @@ final class CountryForm
                                     ->maxLength(10),
                             ]),
 
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('vat_rate')
                                     ->label(__('countries.vat_rate'))
@@ -131,9 +131,9 @@ final class CountryForm
                     ]),
 
                 // Contact Information Section
-                Section::make(__('countries.contact_information'))
+                SchemaSection::make(__('countries.contact_information'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('phone_code')
                                     ->label(__('countries.phone_code'))
@@ -146,7 +146,7 @@ final class CountryForm
                                     ->maxLength(10),
                             ]),
 
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('flag')
                                     ->label(__('countries.flag'))
@@ -161,7 +161,7 @@ final class CountryForm
                     ]),
 
                 // Additional Information Section
-                Section::make(__('countries.additional_information'))
+                SchemaSection::make(__('countries.additional_information'))
                     ->schema([
                         Textarea::make('languages')
                             ->label(__('countries.languages'))
@@ -180,9 +180,9 @@ final class CountryForm
                     ]),
 
                 // Status and Settings Section
-                Section::make(__('countries.status_settings'))
+                SchemaSection::make(__('countries.status_settings'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 Toggle::make('is_active')
                                     ->label(__('countries.is_active'))
@@ -193,7 +193,7 @@ final class CountryForm
                                     ->default(true),
                             ]),
 
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 Toggle::make('is_eu_member')
                                     ->label(__('countries.is_eu_member'))

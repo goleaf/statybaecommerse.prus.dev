@@ -23,7 +23,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
-use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -56,7 +56,7 @@ class NewsImageResource extends Resource
     {
         return $schema
             ->schema([
-                Grid::make(2)
+                SchemaGrid::make(2)
                     ->schema([
                         Select::make('news_id')
                             ->label('News Item')

@@ -26,8 +26,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -79,9 +77,9 @@ final class CampaignClickResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('campaign_clicks.basic_information'))
+            SchemaSection::make(__('campaign_clicks.basic_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('campaign_id')
                                 ->label(__('campaign_clicks.campaign'))
@@ -144,7 +142,7 @@ final class CampaignClickResource extends Resource
                         ->disabled()
                         ->dehydrated(false),
                 ]),
-            Section::make(__('campaign_clicks.click_information'))
+            SchemaSection::make(__('campaign_clicks.click_information'))
                 ->schema([
                     TextInput::make('clicked_url')
                         ->label(__('campaign_clicks.clicked_url'))
@@ -182,7 +180,7 @@ final class CampaignClickResource extends Resource
                         ->label(__('campaign_clicks.country'))
                         ->helperText(__('campaign_clicks.country_help')),
                 ]),
-            Section::make(__('campaign_clicks.tracking_information'))
+            SchemaSection::make(__('campaign_clicks.tracking_information'))
                 ->schema([
                     TextInput::make('session_id')
                         ->label(__('campaign_clicks.session_id'))
@@ -203,7 +201,7 @@ final class CampaignClickResource extends Resource
                         ->label(__('campaign_clicks.utm_content'))
                         ->helperText(__('campaign_clicks.utm_content_help')),
                 ]),
-            Section::make(__('campaign_clicks.settings'))
+            SchemaSection::make(__('campaign_clicks.settings'))
                 ->schema([
                     Toggle::make('is_converted')
                         ->label(__('campaign_clicks.is_converted'))

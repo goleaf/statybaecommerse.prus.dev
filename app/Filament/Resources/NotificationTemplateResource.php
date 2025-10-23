@@ -15,7 +15,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -68,7 +68,7 @@ final class NotificationTemplateResource extends Resource
     {
         return $schema
             ->schema([
-                Section::make(__('admin.notification_templates.basic_information'))
+                SchemaSection::make(__('admin.notification_templates.basic_information'))
                     ->columns(2)
                     ->schema([
                         TextInput::make('name')
@@ -126,7 +126,7 @@ final class NotificationTemplateResource extends Resource
                             ->helperText(__('admin.notification_templates.event_help')),
                     ])
                     ->columns(2),
-                Section::make(__('admin.notification_templates.content'))
+                SchemaSection::make(__('admin.notification_templates.content'))
                     ->schema([
                         TextInput::make('subject')
                             ->label(__('admin.notification_templates.subject'))
@@ -143,7 +143,7 @@ final class NotificationTemplateResource extends Resource
                             ->rows(5)
                             ->helperText(__('admin.notification_templates.variables_help')),
                     ]),
-                Section::make(__('admin.notification_templates.status'))
+                SchemaSection::make(__('admin.notification_templates.status'))
                     ->schema([
                         Toggle::make('is_active')
                             ->label(__('admin.notification_templates.is_active'))

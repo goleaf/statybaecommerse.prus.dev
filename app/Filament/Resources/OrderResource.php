@@ -25,6 +25,7 @@ use App\Support\Seo\LocaleUrlGenerator;
 use Awcodes\BadgeableColumn\Components\Badge;
 use Awcodes\BadgeableColumn\Components\BadgeableColumn;
 use BackedEnum;
+use App\Services\Export\Contracts\DefinesExportColumns;
 use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Exception;
@@ -45,8 +46,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
@@ -58,6 +57,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Number;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
@@ -98,9 +98,9 @@ final class OrderResource extends Resource implements DefinesExportColumns
         return Gate::allows('viewAny', Order::class);
     }
 
-    public static function canView(Order $record): bool
+    public static function canView(Model $record): bool
     {
-        return Gate::allows('view', $record);
+        return $record instanceof Order && Gate::allows('view', $record);
     }
 
     public static function canCreate(): bool
@@ -108,14 +108,14 @@ final class OrderResource extends Resource implements DefinesExportColumns
         return Gate::allows('create', Order::class);
     }
 
-    public static function canEdit(Order $record): bool
+    public static function canEdit(Model $record): bool
     {
-        return Gate::allows('update', $record);
+        return $record instanceof Order && Gate::allows('update', $record);
     }
 
-    public static function canDelete(Order $record): bool
+    public static function canDelete(Model $record): bool
     {
-        return Gate::allows('delete', $record);
+        return $record instanceof Order && Gate::allows('delete', $record);
     }
 
     protected static ?string $modelLabel = 'orders.models.order';
@@ -126,32 +126,6 @@ final class OrderResource extends Resource implements DefinesExportColumns
     {
         return AuthorizationMatrix::check('orders', 'viewAny');
     }
-
-    public static function canViewAny(): bool
-    {
-        return AuthorizationMatrix::check('orders', 'viewAny');
-    }
-
-    public static function canView(Model $record): bool
-    {
-        return AuthorizationMatrix::check('orders', 'view');
-    }
-
-    public static function canCreate(): bool
-    {
-        return AuthorizationMatrix::check('orders', 'create');
-    }
-
-    public static function canEdit(Model $record): bool
-    {
-        return AuthorizationMatrix::check('orders', 'update');
-    }
-
-    public static function canDelete(Model $record): bool
-    {
-        return AuthorizationMatrix::check('orders', 'delete');
-    }
-
     public static function canForceDelete(Model $record): bool
     {
         return AuthorizationMatrix::check('orders', 'delete');
@@ -199,11 +173,11 @@ final class OrderResource extends Resource implements DefinesExportColumns
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('orders.sections.order_details'))
+            SchemaSection::make(__('orders.sections.order_details'))
                 ->description(__('orders.sections.customer_information'))
                 ->icon('heroicon-o-information-circle')
                 ->schema([
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             TextInput::make('number')
                                 ->label(__('orders.fields.order_number'))
@@ -267,7 +241,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                 ])
                                 ->default('pending'),
                         ]),
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             Select::make('payment_status')
                                 ->label(__('orders.fields.payment_status'))
@@ -294,11 +268,11 @@ final class OrderResource extends Resource implements DefinesExportColumns
                         ]),
                 ])
                 ->collapsible(),
-            Section::make(__('orders.sections.order_details'))
+            SchemaSection::make(__('orders.sections.order_details'))
                 ->description(__('orders.fields.total'))
                 ->icon('heroicon-o-currency-euro')
                 ->schema([
-                    Grid::make(4)
+                    SchemaGrid::make(4)
                         ->schema([
                             TextInput::make('subtotal')
                                 ->label(__('orders.fields.subtotal'))
@@ -391,11 +365,11 @@ final class OrderResource extends Resource implements DefinesExportColumns
                         }),
                 ])
                 ->collapsible(),
-            Section::make(__('orders.sections.billing_information'))
+            SchemaSection::make(__('orders.sections.billing_information'))
                 ->description(__('orders.sections.shipping_information'))
                 ->icon('heroicon-o-map-pin')
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             SearchableInput::make('billing_address_lookup')
                                 ->label(__('orders.lookups.billing_address'))
@@ -495,7 +469,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                 })
                                 ->dehydrated(false),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             KeyValue::make('billing_address')
                                 ->label(__('orders.fields.billing_address'))
@@ -512,11 +486,11 @@ final class OrderResource extends Resource implements DefinesExportColumns
                         ]),
                 ])
                 ->collapsible(),
-            Section::make(__('orders.sections.order_shipping'))
+            SchemaSection::make(__('orders.sections.order_shipping'))
                 ->description(__('orders.sections.shipping_information'))
                 ->icon('heroicon-o-truck')
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Flatpickr::makeDateTime('shipped_at')
                                 ->label(__('orders.fields.shipped_at')),
@@ -528,7 +502,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
                         ->maxLength(255),
                 ])
                 ->collapsible(),
-            Section::make(__('orders.sections.order_details'))
+            SchemaSection::make(__('orders.sections.order_details'))
                 ->description(__('orders.fields.notes'))
                 ->icon('heroicon-o-document-text')
                 ->schema([
@@ -537,7 +511,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
                         ->rows(3)
                         ->columnSpanFull()
                         ->helperText(__('orders.fields.internal_notes')),
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             SearchableInput::make('channel_id')
                                 ->label(__('orders.fields.channel'))
@@ -1067,42 +1041,6 @@ final class OrderResource extends Resource implements DefinesExportColumns
             ->striped()
             ->paginated([10, 25, 50, 100]);
     }
-
-    public static function shouldRegisterNavigation(): bool
-    {
-        return static::canViewAny();
-    }
-
-    public static function canViewAny(): bool
-    {
-        return static::authorizeOrder(null, 'viewAny');
-    }
-
-    public static function canCreate(): bool
-    {
-        return static::authorizeOrder(null, 'create');
-    }
-
-    public static function canView(Order $record): bool
-    {
-        return static::authorizeOrder($record, 'view');
-    }
-
-    public static function canEdit(Order $record): bool
-    {
-        return static::authorizeOrder($record, 'update');
-    }
-
-    public static function canDelete(Order $record): bool
-    {
-        return static::authorizeOrder($record, 'delete');
-    }
-
-    public static function canRestore(Order $record): bool
-    {
-        return static::authorizeOrder($record, 'restore');
-    }
-
     /**
      * @return array<string, ExportColumn>
      */
@@ -1307,16 +1245,6 @@ final class OrderResource extends Resource implements DefinesExportColumns
             'edit'   => Pages\EditOrder::route('/{record}/edit'),
         ];
     }
-
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()->with([
-            'user:id,name,email',
-            'shipping:id,order_id,status',
-            'channel:id,name',
-        ]);
-    }
-
     /**
      * Get the global search result details.
      */

@@ -11,8 +11,7 @@ use Filament\Actions;
 
 class ListDocumentTemplates extends BaseListRecords
 {
-    use HasResizableColumns;
-
+    
     protected static string $resource = DocumentTemplateResource::class;
 
     protected function getHeaderActions(): array

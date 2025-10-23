@@ -12,6 +12,7 @@ use App\Filament\Resources\CustomerManagementResource\RelationManagers\OrdersRel
 use App\Filament\Resources\CustomerManagementResource\RelationManagers\ReviewsRelationManager;
 use App\Models\User;
 use App\Support\Filament\Components\Flatpickr;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\EditAction;
@@ -22,7 +23,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -50,19 +51,19 @@ final class CustomerManagementResource extends Resource
     use SpatieTranslatableResource; // Keep parity with other translated resources.
 
     /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-user-group';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user-group';
 
     protected static ?string $model = User::class;
 
     /**
      * Build the Filament form used on the create and edit pages.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
-            Section::make(__('customers.basic_information'))
+        return $schema->schema([
+            SchemaSection::make(__('customers.basic_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('name')
                                 ->label(__('customers.name'))
@@ -74,7 +75,7 @@ final class CustomerManagementResource extends Resource
                                 ->required()
                                 ->unique(ignoreRecord: true),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('phone')
                                 ->label(__('customers.phone'))
@@ -85,9 +86,9 @@ final class CustomerManagementResource extends Resource
                                 ->displayFormat('Y-m-d H:i'),
                         ]),
                 ]),
-            Section::make(__('customers.account_settings'))
+            SchemaSection::make(__('customers.account_settings'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Toggle::make('is_active')
                                 ->label(__('customers.is_active'))
@@ -112,16 +113,16 @@ final class CustomerManagementResource extends Resource
                                 ->maxLength(500),
                         ]),
                 ]),
-            Section::make(__('customers.personal_information'))
+            SchemaSection::make(__('customers.personal_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('first_name')
                                 ->label(__('customers.first_name')),
                             TextInput::make('last_name')
                                 ->label(__('customers.last_name')),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Flatpickr::makeDateTime('date_of_birth')
                                 ->label(__('customers.date_of_birth'))
@@ -136,9 +137,9 @@ final class CustomerManagementResource extends Resource
                                 ->nullable(),
                         ]),
                 ]),
-            Section::make(__('customers.preferences'))
+            SchemaSection::make(__('customers.preferences'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('preferred_language')
                                 ->label(__('customers.preferred_language'))
@@ -159,7 +160,7 @@ final class CustomerManagementResource extends Resource
                                 ])
                                 ->default('EUR'),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Toggle::make('newsletter_subscription')
                                 ->label(__('customers.newsletter_subscription'))

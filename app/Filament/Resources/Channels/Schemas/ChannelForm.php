@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Channels\Schemas;
 
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -18,9 +18,9 @@ class ChannelForm
     {
         return $schema
             ->schema([
-                Section::make(__('admin.channels.basic_information'))
+                SchemaSection::make(__('admin.channels.basic_information'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('name')
                                     ->label(__('admin.channels.name'))
@@ -56,9 +56,9 @@ class ChannelForm
                             ->maxLength(1000)
                             ->rows(3),
                     ]),
-                Section::make(__('admin.channels.configuration'))
+                SchemaSection::make(__('admin.channels.configuration'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('url')
                                     ->label(__('admin.channels.url'))
@@ -88,9 +88,9 @@ class ChannelForm
                                     ->default('after'),
                             ]),
                     ]),
-                Section::make(__('admin.channels.status'))
+                SchemaSection::make(__('admin.channels.status'))
                     ->schema([
-                        Grid::make(3)
+                        SchemaGrid::make(3)
                             ->schema([
                                 Toggle::make('is_enabled')
                                     ->label(__('admin.channels.is_enabled'))

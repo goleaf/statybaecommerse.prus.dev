@@ -27,7 +27,7 @@ class CodeRelationManager extends BaseRelationManager
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make('Code Information')
+                Forms\Components\SchemaSection::make('Code Information')
                     ->schema([
                         Forms\Components\TextInput::make('code')
                             ->required()

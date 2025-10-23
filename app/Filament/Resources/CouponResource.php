@@ -42,7 +42,6 @@ use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
-use App\Support\Filament\Components\Flatpickr;
 
 final class CouponResource extends Resource
 {
@@ -88,9 +87,9 @@ final class CouponResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('coupons.basic_information'))
+            SchemaSection::make(__('coupons.basic_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('code')
                                 ->label(__('coupons.code'))
@@ -109,9 +108,9 @@ final class CouponResource extends Resource
                         ->maxLength(500)
                         ->columnSpanFull(),
                 ]),
-            Section::make(__('coupons.discount_settings'))
+            SchemaSection::make(__('coupons.discount_settings'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('type')
                                 ->label(__('coupons.type'))
@@ -147,9 +146,9 @@ final class CouponResource extends Resource
                                 ->nullable(),
                         ]),
                 ]),
-            Section::make(__('coupons.usage_limits'))
+            SchemaSection::make(__('coupons.usage_limits'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Quantity::make('usage_limit')
                                 ->label(__('coupons.usage_limit'))
@@ -177,9 +176,9 @@ final class CouponResource extends Resource
                                 ->dehydrated(false),
                         ]),
                 ]),
-            Section::make(__('coupons.validity'))
+            SchemaSection::make(__('coupons.validity'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             // Bind to starts_at so form submissions map directly to the persisted columns that power scopes.
                             Flatpickr::makeDateTime('starts_at')
@@ -191,9 +190,9 @@ final class CouponResource extends Resource
                                 ->displayFormat('d/m/Y H:i'),
                         ]),
                 ]),
-            Section::make(__('coupons.settings'))
+            SchemaSection::make(__('coupons.settings'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Toggle::make('is_active')
                                 ->label(__('coupons.is_active'))
@@ -508,7 +507,9 @@ final class CouponResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->with(['customerGroup:id,name']);
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([ActiveScope::class])
+            ->with(['customerGroup:id,name']);
     }
 
     /**
@@ -567,11 +568,4 @@ final class CouponResource extends Resource
         ];
     }
 
-    /**
-     * Ensure the admin listing can manage both active and inactive coupons.
-     */
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()->withoutGlobalScopes([ActiveScope::class]);
-    }
 }

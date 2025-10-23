@@ -19,8 +19,8 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -52,9 +52,9 @@ final class VariantStockResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make('Stock Details')
+            SchemaSection::make('Stock Details')
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('variant_id')
                                 ->label('Variant')
@@ -70,22 +70,22 @@ final class VariantStockResource extends Resource
                                 ->searchable()
                                 ->preload(),
                         ]),
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             TextInput::make('stock')->numeric()->required(),
                             TextInput::make('reserved')->numeric()->default(0),
                             TextInput::make('incoming')->numeric()->default(0),
                         ]),
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             TextInput::make('threshold')->numeric()->default(0),
                             TextInput::make('reorder_point')->numeric()->default(0),
                             TextInput::make('max_stock_level')->numeric()->default(0),
                         ]),
                 ]),
-            Section::make('Procurement')
+            SchemaSection::make('Procurement')
                 ->schema([
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             TextInput::make('cost_per_unit')->numeric()->step(0.01),
                             Select::make('supplier_id')
@@ -95,7 +95,7 @@ final class VariantStockResource extends Resource
                                 ->preload(),
                             TextInput::make('batch_number'),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Flatpickr::makeDate('expiry_date'),
                             Select::make('status')
@@ -107,7 +107,7 @@ final class VariantStockResource extends Resource
                                 ])
                                 ->default('active'),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Toggle::make('is_tracked')->default(true),
                         ]),

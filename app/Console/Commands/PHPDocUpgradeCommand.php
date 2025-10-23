@@ -249,12 +249,6 @@ class PHPDocUpgradeVisitor extends NodeVisitorAbstract
     private string $directory;
 
     private array $classInfo = [];
-
-    public function __construct(string $directory)
-    {
-        $this->directory = $directory;
-    }
-
     public function enterNode(Node $node)
     {
         if ($node instanceof Node\Stmt\Class_) {

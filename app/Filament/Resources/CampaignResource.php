@@ -13,8 +13,8 @@ use App\Models\Campaign;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
 use Filament\Forms;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -69,10 +69,10 @@ final class CampaignResource extends Resource
     {
         return $schema->schema([
             // Section component keeps the basic information grouped for clarity in Filament v4.
-            Section::make(__('campaigns.sections.basic_information'))
+            SchemaSection::make(__('campaigns.sections.basic_information'))
                 ->schema([
                     // Grid enforces a two-column layout for name and slug pairing.
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('name')
                                 ->label(self::label('campaigns.fields.name', 'Name'))
@@ -113,9 +113,9 @@ final class CampaignResource extends Resource
                         ->default(false),
                 ]),
             // Dedicated section to encapsulate scheduling and budgeting controls.
-            Section::make(__('campaigns.sections.campaign_settings'))
+            SchemaSection::make(__('campaigns.sections.campaign_settings'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Flatpickr::makeDateTime('starts_at')
                                 ->label(self::label('campaigns.fields.start_date', 'Start date'))
@@ -133,7 +133,7 @@ final class CampaignResource extends Resource
                                 ->step(0.01)
                                 ->prefix('€'),
                         ]),
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             Toggle::make('send_notifications')
                                 ->label(self::label('campaigns.fields.send_notifications', 'Send notifications'))
@@ -147,7 +147,7 @@ final class CampaignResource extends Resource
                         ]),
                 ]),
             // Campaign targeting resources are grouped for better discoverability.
-            Section::make(__('campaigns.sections.targeting'))
+            SchemaSection::make(__('campaigns.sections.targeting'))
                 ->schema([
                     Combobox::make('targetCategories')
                         ->label(self::label('campaigns.fields.target_categories', 'Target categories'))
@@ -195,13 +195,13 @@ final class CampaignResource extends Resource
                         ->columnSpanFull(),
                 ]),
             // Content settings are segmented to keep copy updates approachable.
-            Section::make(__('campaigns.sections.content'))
+            SchemaSection::make(__('campaigns.sections.content'))
                 ->schema([
                     Textarea::make('description')
                         ->label(self::label('campaigns.fields.description', 'Description'))
                         ->rows(4)
                         ->columnSpanFull(),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('cta_text')
                                 ->label(self::label('campaigns.fields.cta_text', 'CTA text'))
@@ -221,7 +221,7 @@ final class CampaignResource extends Resource
                                 ->numeric()
                                 ->default(0),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Toggle::make('auto_start')
                                 ->label(self::label('campaigns.fields.auto_start', 'Auto start'))
@@ -231,7 +231,7 @@ final class CampaignResource extends Resource
                                 ->default(false),
                         ]),
                 ]),
-            Section::make(__('campaigns.sections.seo'))
+            SchemaSection::make(__('campaigns.sections.seo'))
                 ->schema([
                     TextInput::make('meta_title')
                         ->label(self::label('campaigns.fields.meta_title', 'Meta title'))

@@ -13,8 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 final class ListCartItems extends BaseListRecords
 {
-    use HasResizableColumns;
-    use HasWidgetTabs;
+        use HasWidgetTabs;
 
     protected static string $resource = CartItemResource::class;
 

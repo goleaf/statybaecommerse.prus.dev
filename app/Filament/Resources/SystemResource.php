@@ -14,13 +14,13 @@ use BackedEnum;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
-use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Tabs as SchemaTabs;
+use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -100,15 +100,15 @@ final class SystemResource extends Resource
     {
         return $schema
             ->schema([
-                Tabs::make('System Configuration')
+                SchemaTabs::make('System Configuration')
                     ->tabs([
-                        Tab::make('Basic Settings')
+                        SchemaTab::make('Basic Settings')
                             ->icon('heroicon-o-cog-6-tooth')
                             ->schema([
-                                Section::make('System Information')
+                                SchemaSection::make('System Information')
                                     ->description(__('system.core_configuration'))
                                     ->schema([
-                                        Grid::make(2)
+                                        SchemaGrid::make(2)
                                             ->schema([
                                                 TextInput::make('key')
                                                     ->label(__('system.setting_key'))
@@ -184,7 +184,7 @@ final class SystemResource extends Resource
                                             ->maxLength(1000)
                                             ->rows(2)
                                             ->helperText(__('system.help_text_help')),
-                                        Grid::make(2)
+                                        SchemaGrid::make(2)
                                             ->schema([
                                                 TextInput::make('group')
                                                     ->label(__('system.group'))
@@ -219,7 +219,7 @@ final class SystemResource extends Resource
                                             ->required()
                                             ->helperText(__('system.setting_type_help')),
                                     ]),
-                                Section::make('Value Configuration')
+                                SchemaSection::make('Value Configuration')
                                     ->schema([
                                         TextInput::make('value')
                                             ->label(__('system.setting_value'))
@@ -339,10 +339,10 @@ final class SystemResource extends Resource
                                             ->rows(3),
                                     ]),
                             ]),
-                        Tab::make('Advanced Settings')
+                        SchemaTab::make('Advanced Settings')
                             ->icon('heroicon-o-adjustments-horizontal')
                             ->schema([
-                                Section::make('Validation & Constraints')
+                                SchemaSection::make('Validation & Constraints')
                                     ->schema([
                                         Textarea::make('validation_rules')
                                             ->label(__('system.validation_rules'))
@@ -363,7 +363,7 @@ final class SystemResource extends Resource
                                             ->label(__('system.environment'))
                                             ->default('production')
                                             ->helperText(__('system.environment_help')),
-                                        Grid::make(2)
+                                        SchemaGrid::make(2)
                                             ->schema([
                                                 Checkbox::make('is_required')
                                                     ->label(__('system.required_setting'))
@@ -386,7 +386,7 @@ final class SystemResource extends Resource
                                                     ->helperText(__('system.is_cacheable_help')),
                                             ]),
                                     ]),
-                                Section::make('Access Control')
+                                SchemaSection::make('Access Control')
                                     ->schema([
                                         Select::make('permission_required')
                                             ->label(__('system.required_permission'))
@@ -404,7 +404,7 @@ final class SystemResource extends Resource
                                             ->disabled()
                                             ->helperText(__('system.updated_by_help')),
                                     ]),
-                                Section::make('System Integration')
+                                SchemaSection::make('System Integration')
                                     ->schema([
                                         TextInput::make('cache_key')
                                             ->label(__('system.cache_key'))
@@ -423,10 +423,10 @@ final class SystemResource extends Resource
                                             ->helperText(__('system.cache_ttl_help')),
                                     ]),
                             ]),
-                        Tab::make('Translations')
+                        SchemaTab::make('Translations')
                             ->icon('heroicon-o-language')
                             ->schema([
-                                Section::make('Multi-language Support')
+                                SchemaSection::make('Multi-language Support')
                                     ->schema([
                                         Repeater::make('translations')
                                             ->label(__('system.translations'))
@@ -456,10 +456,10 @@ final class SystemResource extends Resource
                                             ->itemLabel(fn (array $state): ?string => $state['locale'] ?? null),
                                     ]),
                             ]),
-                        Tab::make('Dependencies & Relations')
+                        SchemaTab::make('Dependencies & Relations')
                             ->icon('heroicon-o-link')
                             ->schema([
-                                Section::make('Dependencies')
+                                SchemaSection::make('Dependencies')
                                     ->schema([
                                         Repeater::make('dependencies')
                                             ->label(__('system.dependencies'))

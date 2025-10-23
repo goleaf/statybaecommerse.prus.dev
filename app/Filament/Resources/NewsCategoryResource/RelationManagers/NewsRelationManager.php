@@ -29,7 +29,7 @@ final class NewsRelationManager extends BaseRelationManager
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make('News Information')
+                Forms\Components\SchemaSection::make('News Information')
                     ->schema([
                         Forms\Components\TextInput::make('title')
                             ->required()

@@ -9,8 +9,8 @@ use App\Models\VariantAnalytics;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Components\TextEntry;
 use Filament\Schemas\Schema;
 
@@ -31,9 +31,9 @@ final class ViewVariantAnalytics extends ViewRecord
         // Provide the infolist schema using the Filament v4 return type.
         return $schema
             ->components([
-                Section::make(__('admin.variant_analytics.basic_info'))
+                SchemaSection::make(__('admin.variant_analytics.basic_info'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextEntry::make('variant.name')
                                     ->label(__('admin.variant_analytics.variant'))
@@ -46,9 +46,9 @@ final class ViewVariantAnalytics extends ViewRecord
                             ]),
                     ]),
 
-                Section::make(__('admin.variant_analytics.metrics'))
+                SchemaSection::make(__('admin.variant_analytics.metrics'))
                     ->schema([
-                        Grid::make(4)
+                        SchemaGrid::make(4)
                             ->schema([
                                 TextEntry::make('views')
                                     ->label(__('admin.variant_analytics.views'))
@@ -71,7 +71,7 @@ final class ViewVariantAnalytics extends ViewRecord
                                     ->columnSpan(1),
                             ]),
 
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextEntry::make('revenue')
                                     ->label(__('admin.variant_analytics.revenue'))
@@ -85,9 +85,9 @@ final class ViewVariantAnalytics extends ViewRecord
                             ]),
                     ]),
 
-                Section::make(__('admin.variant_analytics.calculated_metrics'))
+                SchemaSection::make(__('admin.variant_analytics.calculated_metrics'))
                     ->schema([
-                        Grid::make(4)
+                        SchemaGrid::make(4)
                             ->schema([
                                 TextEntry::make('click_through_rate')
                                     ->label(__('admin.variant_analytics.ctr'))

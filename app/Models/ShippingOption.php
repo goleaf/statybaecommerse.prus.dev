@@ -108,12 +108,6 @@ final class ShippingOption extends Model
      *
      * @phpstan-return BelongsTo<Zone, ShippingOption>
      */
-    public function zone(): BelongsTo
-    {
-        // Link each shipping option to the geographical zone it belongs to for filtering and reporting.
-        return $this->belongsTo(Zone::class);
-    }
-
     /**
      * Handle scopeEnabled functionality with proper error handling.
      *
@@ -161,27 +155,12 @@ final class ShippingOption extends Model
     /**
      * Scope shipping options by zone while tolerating null filters.
      */
-    public function scopeByZone(Builder $query, null|int|string $zoneId): Builder
-    {
-        if ($zoneId === null || $zoneId === '') {
-            return $query;
-        }
-
-        return $query->where('zone_id', $zoneId);
-    }
-
     /**
      * Handle scopeByZone functionality with proper error handling.
      *
      * @param  Builder<self> $query
      * @return Builder<self>
      */
-    public function scopeByZone(Builder $query, int $zoneId): Builder
-    {
-        // Allow filtering by the owning zone so queries remain expressive.
-        return $query->where('zone_id', $zoneId);
-    }
-
     /**
      * Handle scopeOrdered functionality with proper error handling.
      *

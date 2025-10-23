@@ -31,12 +31,6 @@ final class EnhancedEcommerceOverview extends StatsOverviewWidget
     {
         return __('analytics.enhanced_overview.navigation_label');
     }
-
-    public static function getNavigationLabel(): string
-    {
-        return __('analytics.enhanced_overview.navigation_label');
-    }
-
     protected string $maxHeight = '32rem';
 
     protected ?string $pollingInterval = '15s';

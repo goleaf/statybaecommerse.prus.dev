@@ -70,16 +70,6 @@ final class CampaignConversion extends Model
     {
         return ['conversion_value' => 'decimal:2', 'conversion_data' => 'array', 'converted_at' => 'datetime', 'is_mobile' => 'boolean', 'is_tablet' => 'boolean', 'is_desktop' => 'boolean', 'is_verified' => 'boolean', 'is_attributed' => 'boolean', 'conversion_duration' => 'integer', 'page_views' => 'integer', 'time_on_site' => 'integer', 'bounce_rate' => 'decimal:2', 'assisted_conversion_value' => 'decimal:2', 'total_conversion_value' => 'decimal:2', 'conversion_rate' => 'decimal:4', 'cost_per_conversion' => 'decimal:2', 'roi' => 'decimal:4', 'roas' => 'decimal:4', 'lifetime_value' => 'decimal:2', 'customer_acquisition_cost' => 'decimal:2', 'payback_period' => 'integer', 'tags' => 'array', 'custom_attributes' => 'array', 'touchpoints' => 'array', 'conversion_path' => 'array'];
     }
-
-    protected static function booted(): void
-    {
-        static::creating(function (self $conversion): void {
-            if (empty($conversion->converted_at)) {
-                $conversion->converted_at = now();
-            }
-        });
-    }
-
     public function getTranslationModelAttribute(): string
     {
         return $this->translationModelClass();

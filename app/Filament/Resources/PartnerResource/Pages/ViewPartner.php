@@ -28,7 +28,7 @@ final class ViewPartner extends ViewRecord
     {
         // Present the partner details in themed sections so admins see critical data at a glance.
         return $infolist->schema([
-            Section::make(__('admin.partners.sections.basic_information'))
+            SchemaSection::make(__('admin.partners.sections.basic_information'))
                 ->schema([
                     TextEntry::make('name')
                         ->label(__('admin.partners.name'))
@@ -46,7 +46,7 @@ final class ViewPartner extends ViewRecord
                         ->boolean(),
                 ])
                 ->columns(2),
-            Section::make(__('admin.partners.sections.contact_information'))
+            SchemaSection::make(__('admin.partners.sections.contact_information'))
                 ->schema([
                     TextEntry::make('contact_email')
                         ->label(__('admin.partners.contact_email'))
@@ -58,7 +58,7 @@ final class ViewPartner extends ViewRecord
                         ->copyable(),
                 ])
                 ->columns(2),
-            Section::make(__('admin.partners.sections.financial_settings'))
+            SchemaSection::make(__('admin.partners.sections.financial_settings'))
                 ->schema([
                     TextEntry::make('discount_rate')
                         ->label(__('admin.partners.discount_rate'))
@@ -70,7 +70,7 @@ final class ViewPartner extends ViewRecord
                         ->suffix('%'),
                 ])
                 ->columns(2),
-            Section::make(__('admin.common.timestamps'))
+            SchemaSection::make(__('admin.common.timestamps'))
                 ->schema([
                     TextEntry::make('created_at')
                         ->label(__('admin.common.created_at'))

@@ -144,12 +144,6 @@ final class ApiKey extends Model
             }
         });
     }
-
-    public static function generatePlainTextKey(): string
-    {
-        return Str::random(40);
-    }
-
     public static function generatePlainTextSecret(): string
     {
         return Str::random(64);
@@ -244,11 +238,6 @@ final class ApiKey extends Model
      *
      * @return Collection<int, string>
      */
-    public function scopesAsCollection(): Collection
-    {
-        return Collection::make(Arr::wrap($this->scopes))->filter()->values();
-    }
-
     /**
      * Build a unique cache key for partner API rate limiting.
      */

@@ -23,8 +23,8 @@ use Filament\Schemas\Components\Grid as FormGrid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
-use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Tabs as SchemaTabs;
+use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -77,12 +77,12 @@ final class SystemSettingTranslationResource extends Resource
     {
         return $schema
             ->schema([
-                Tabs::make('Translation Details')
+                SchemaTabs::make('Translation Details')
                     ->tabs([
-                        Tab::make(__('admin.system_setting_translations.basic_information'))
+                        SchemaTab::make(__('admin.system_setting_translations.basic_information'))
                             ->icon('heroicon-o-information-circle')
                             ->schema([
-                                Grid::make(2)
+                                SchemaGrid::make(2)
                                     ->schema([
                                         Select::make('system_setting_id')
                                             ->label(__('admin.system_setting_translations.system_setting'))
@@ -127,10 +127,10 @@ final class SystemSettingTranslationResource extends Resource
                                     ->helperText(__('admin.system_setting_translations.help_text_help'))
                                     ->columnSpanFull(),
                             ]),
-                        Tab::make(__('admin.system_setting_translations.advanced_settings'))
+                        SchemaTab::make(__('admin.system_setting_translations.advanced_settings'))
                             ->icon('heroicon-o-cog-6-tooth')
                             ->schema([
-                                Grid::make(2)
+                                SchemaGrid::make(2)
                                     ->schema([
                                         Toggle::make('is_active')
                                             ->label(__('admin.system_setting_translations.is_active'))
@@ -152,7 +152,7 @@ final class SystemSettingTranslationResource extends Resource
                                     ->helperText(__('admin.system_setting_translations.tags_help'))
                                     ->columnSpanFull(),
                             ]),
-                        Tab::make(__('admin.system_setting_translations.rich_content'))
+                        SchemaTab::make(__('admin.system_setting_translations.rich_content'))
                             ->icon('heroicon-o-document-text')
                             ->schema([
                                 RichEditor::make('rich_description')

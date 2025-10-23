@@ -5,15 +5,16 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
-use Filament\Schemas\Schema;
 use App\Enums\ApiKeyScope;
 use App\Filament\Resources\ApiKeyResource\Concerns\HandlesApiKeyCredentials;
 use App\Filament\Resources\ApiKeyResource\Pages;
 use App\Models\ApiKey;
+use BackedEnum;
 use Filament\Forms\Components\Actions\Action as FormAction;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Placeholder;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
@@ -80,7 +81,7 @@ final class ApiKeyResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('api_keys.sections.details'))
+            SchemaSection::make(__('api_keys.sections.details'))
                 ->columns(2)
                 ->schema([
                     TextInput::make('name')
@@ -105,7 +106,7 @@ final class ApiKeyResource extends Resource
                         ->hint(__('api_keys.hints.rate_limit'))
                         ->placeholder(__('api_keys.placeholders.rate_limit')),
                 ]),
-            Section::make(__('api_keys.sections.credentials'))
+            SchemaSection::make(__('api_keys.sections.credentials'))
                 ->schema([
                     TextInput::make('plain_text_key')
                         ->label(__('api_keys.fields.plain_text_key'))
@@ -135,7 +136,7 @@ final class ApiKeyResource extends Resource
                                 ->action('generateFreshPlainTextKey')
                         ),
                 ]),
-            Section::make(__('api_keys.sections.activity'))
+            SchemaSection::make(__('api_keys.sections.activity'))
                 ->columns(3)
                 ->visible(fn (?ApiKey $record): bool => $record !== null)
                 ->schema([

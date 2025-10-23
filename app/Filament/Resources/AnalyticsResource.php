@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
-use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\AnalyticsResource\Pages;
 use App\Models\Order;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
+use Filament\Schemas\Schema;
 use BackedEnum;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -24,11 +24,12 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
 use UnitEnum;
 
 final class AnalyticsResource extends Resource
 {
-    use TranslatableResource;
+    use SpatieTranslatableResource; // Align translation support with other resources.
 
     /**
      * Mirror the Filament base class union so icon definitions support both enum-backed and string identifiers.

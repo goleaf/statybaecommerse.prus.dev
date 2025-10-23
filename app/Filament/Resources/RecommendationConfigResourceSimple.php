@@ -15,8 +15,8 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Novadaemon\FilamentCombobox\Combobox;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -56,9 +56,9 @@ final class RecommendationConfigResourceSimple extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->components([
-            Section::make(__('recommendation_configs_simple.basic_information'))
+            SchemaSection::make(__('recommendation_configs_simple.basic_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('name')
                                 ->label(__('recommendation_configs_simple.name'))
@@ -77,9 +77,9 @@ final class RecommendationConfigResourceSimple extends Resource
                         ->maxLength(500)
                         ->columnSpanFull(),
                 ]),
-            Section::make(__('recommendation_configs_simple.algorithm_settings'))
+            SchemaSection::make(__('recommendation_configs_simple.algorithm_settings'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('algorithm_type')
                                 ->label(__('recommendation_configs_simple.algorithm_type'))
@@ -103,7 +103,7 @@ final class RecommendationConfigResourceSimple extends Resource
                                 ->default(0.1)
                                 ->helperText(__('recommendation_configs_simple.min_score_help')),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('max_results')
                                 ->label(__('recommendation_configs_simple.max_results'))
@@ -122,9 +122,9 @@ final class RecommendationConfigResourceSimple extends Resource
                                 ->helperText(__('recommendation_configs_simple.decay_factor_help')),
                         ]),
                 ]),
-            Section::make(__('recommendation_configs_simple.filtering'))
+            SchemaSection::make(__('recommendation_configs_simple.filtering'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->components([
                             Combobox::make('products')
                                 ->label(__('recommendation_configs_simple.products'))
@@ -159,7 +159,7 @@ final class RecommendationConfigResourceSimple extends Resource
                                         ->maxLength(500),
                                 ]),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Toggle::make('exclude_out_of_stock')
                                 ->label(__('recommendation_configs_simple.exclude_out_of_stock'))
@@ -169,9 +169,9 @@ final class RecommendationConfigResourceSimple extends Resource
                                 ->default(true),
                         ]),
                 ]),
-            Section::make(__('recommendation_configs_simple.weighting'))
+            SchemaSection::make(__('recommendation_configs_simple.weighting'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('price_weight')
                                 ->label(__('recommendation_configs_simple.price_weight'))
@@ -190,7 +190,7 @@ final class RecommendationConfigResourceSimple extends Resource
                                 ->default(0.3)
                                 ->helperText(__('recommendation_configs_simple.rating_weight_help')),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('popularity_weight')
                                 ->label(__('recommendation_configs_simple.popularity_weight'))
@@ -209,7 +209,7 @@ final class RecommendationConfigResourceSimple extends Resource
                                 ->default(0.1)
                                 ->helperText(__('recommendation_configs_simple.recency_weight_help')),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('category_weight')
                                 ->label(__('recommendation_configs_simple.category_weight'))
@@ -229,9 +229,9 @@ final class RecommendationConfigResourceSimple extends Resource
                                 ->helperText(__('recommendation_configs_simple.custom_weight_help')),
                         ]),
                 ]),
-            Section::make(__('recommendation_configs_simple.settings'))
+            SchemaSection::make(__('recommendation_configs_simple.settings'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Toggle::make('is_active')
                                 ->label(__('recommendation_configs_simple.is_active'))
@@ -239,7 +239,7 @@ final class RecommendationConfigResourceSimple extends Resource
                             Toggle::make('is_default')
                                 ->label(__('recommendation_configs_simple.is_default')),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('cache_duration')
                                 ->label(__('recommendation_configs_simple.cache_duration'))

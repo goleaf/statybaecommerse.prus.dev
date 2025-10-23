@@ -10,7 +10,7 @@ use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Support\Html\HtmlSanitizer;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\RichEditor;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -47,9 +47,9 @@ class TranslationsRelationManager extends BaseRelationManager
     {
         return $schema
             ->schema([
-                Section::make('Translation Details')
+                SchemaSection::make('Translation Details')
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 Select::make('locale')
                                     ->label('Language')
@@ -108,7 +108,7 @@ class TranslationsRelationManager extends BaseRelationManager
                             ])
                             ->helperText('The main content of this legal document'),
 
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('seo_title')
                                     ->label('SEO Title')

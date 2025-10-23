@@ -68,9 +68,9 @@ final class CustomerGroupResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('customer_groups.basic_information'))
+            SchemaSection::make(__('customer_groups.basic_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('name')
                                 ->label(__('customer_groups.name'))
@@ -82,7 +82,7 @@ final class CustomerGroupResource extends Resource
                                 ->unique(ignoreRecord: true)
                                 ->rules(['alpha_dash']),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             ColorPicker::make('color')
                                 ->label(__('customer_groups.color'))
@@ -104,9 +104,9 @@ final class CustomerGroupResource extends Resource
                         ->maxLength(500)
                         ->columnSpanFull(),
                 ]),
-            Section::make(__('customer_groups.pricing_settings'))
+            SchemaSection::make(__('customer_groups.pricing_settings'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('discount_percentage')
                                 ->label(__('customer_groups.discount_percentage'))
@@ -125,7 +125,7 @@ final class CustomerGroupResource extends Resource
                                 ->default(0)
                                 ->helperText(__('customer_groups.discount_fixed_help')),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('minimum_order_amount')
                                 ->label(__('customer_groups.minimum_order_amount'))
@@ -140,7 +140,7 @@ final class CustomerGroupResource extends Resource
                                 ->minValue(0)
                                 ->prefix('€'),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Toggle::make('has_special_pricing')
                                 ->label(__('customer_groups.has_special_pricing'))
@@ -161,9 +161,9 @@ final class CustomerGroupResource extends Resource
                         ->default('net_30')
                         ->rules([Rule::in(['due_on_receipt', 'net_15', 'net_30', 'net_45', 'net_60'])]),
                 ]),
-            Section::make(__('customer_groups.permissions'))
+            SchemaSection::make(__('customer_groups.permissions'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Toggle::make('can_view_prices')
                                 ->label(__('customer_groups.can_view_prices'))
@@ -179,9 +179,9 @@ final class CustomerGroupResource extends Resource
                                 ->default(true),
                         ]),
                 ]),
-            Section::make(__('customer_groups.settings'))
+            SchemaSection::make(__('customer_groups.settings'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Toggle::make('is_active')
                                 ->label(__('customer_groups.is_active'))
@@ -190,7 +190,7 @@ final class CustomerGroupResource extends Resource
                                 ->label(__('customer_groups.is_default'))
                                 ->default(false),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('sort_order')
                                 ->label(__('customer_groups.sort_order'))

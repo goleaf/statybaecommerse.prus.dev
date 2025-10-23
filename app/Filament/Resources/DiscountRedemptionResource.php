@@ -22,7 +22,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -71,9 +71,9 @@ final class DiscountRedemptionResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('discount_redemptions.sections.associations'))
+            SchemaSection::make(__('discount_redemptions.sections.associations'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('discount_id')
                                 ->label(__('admin.discount_redemptions.form.fields.discount'))
@@ -100,7 +100,7 @@ final class DiscountRedemptionResource extends Resource
                                 ->preload()
                                 ->nullable(),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('amount_saved')
                                 ->label(__('admin.discount_redemptions.form.fields.discount_amount'))
@@ -114,7 +114,7 @@ final class DiscountRedemptionResource extends Resource
                                 ->default('EUR')
                                 ->required(),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('status')
                                 ->label(__('admin.discount_redemptions.form.fields.status'))
@@ -138,7 +138,7 @@ final class DiscountRedemptionResource extends Resource
                         ->displayFormat('Y-m-d H:i')
                         ->default(now())
                         ->required(),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('ip_address')
                                 ->label(__('admin.discount_redemptions.form.fields.ip_address'))

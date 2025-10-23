@@ -11,8 +11,8 @@ use App\Filament\Resources\EmailCampaignResource\Pages;
 use App\Models\EmailCampaign;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -58,7 +58,7 @@ final class EmailCampaignResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('admin.email_campaigns.basic_information'))
+            SchemaSection::make(__('admin.email_campaigns.basic_information'))
                 ->description(__('admin.email_campaigns.basic_information_description'))
                 ->schema([
                     TextInput::make('name')
@@ -69,7 +69,7 @@ final class EmailCampaignResource extends Resource
                         ->label(__('admin.email_campaigns.description'))
                         ->rows(3)
                         ->columnSpanFull(),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('subject')
                                 ->label(__('admin.email_campaigns.subject'))
@@ -81,7 +81,7 @@ final class EmailCampaignResource extends Resource
                                 ->required()
                                 ->maxLength(255),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('from_name')
                                 ->label(__('admin.email_campaigns.from_name'))
@@ -91,7 +91,7 @@ final class EmailCampaignResource extends Resource
                                 ->email()
                                 ->maxLength(255),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Flatpickr::makeDateTime('scheduled_at')
                                 ->label(__('admin.email_campaigns.scheduled_at')),

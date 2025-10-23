@@ -16,8 +16,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -38,9 +38,9 @@ use UnitEnum;
 final class CollectionResource extends Resource
 {
     /**
-     * @var string|null Navigation group displayed in the Filament sidebar.
+     * @var \UnitEnum|string|null Navigation group displayed in the Filament sidebar.
      */
-    protected static ?string $navigationGroup = 'Products';
+    protected static UnitEnum|string|null $navigationGroup = 'Products';
 
     /**
      * @var string|null Explicit navigation label to avoid relying on defaults.
@@ -91,9 +91,9 @@ final class CollectionResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->components([
-            Section::make(__('collections.basic_information'))
+            SchemaSection::make(__('collections.basic_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('name')
                                 ->label(__('collections.name'))
@@ -113,9 +113,9 @@ final class CollectionResource extends Resource
                         ->columnSpanFull(),
                 ])
                 ->columns(1),
-            Section::make(__('collections.display_type'))
+            SchemaSection::make(__('collections.display_type'))
                 ->components([
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->components([
                             Select::make('display_type')
                                 ->label(__('collections.display_type'))
@@ -136,9 +136,9 @@ final class CollectionResource extends Resource
                                 ->default(true),
                         ]),
                 ]),
-            Section::make(__('collections.business_info'))
+            SchemaSection::make(__('collections.business_info'))
                 ->schema([
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             Toggle::make('is_visible')
                                 ->label(__('collections.is_visible'))
@@ -150,7 +150,7 @@ final class CollectionResource extends Resource
                                 ->label(__('collections.is_automatic'))
                                 ->default(false),
                         ]),
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             TextInput::make('sort_order')
                                 ->label(__('collections.sort_order'))
@@ -171,9 +171,9 @@ final class CollectionResource extends Resource
                         ->columnSpanFull(),
                 ])
                 ->columns(1),
-            Section::make(__('collections.display_type'))
+            SchemaSection::make(__('collections.display_type'))
                 ->schema([
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             Select::make('display_type')
                                 ->label(__('collections.display_type'))
@@ -194,7 +194,7 @@ final class CollectionResource extends Resource
                                 ->default(true),
                         ]),
                 ]),
-            Section::make(__('collections.media'))
+            SchemaSection::make(__('collections.media'))
                 ->schema([
                     SpatieMediaLibraryFileUpload::make('images')
                         ->collection('images')
@@ -210,7 +210,7 @@ final class CollectionResource extends Resource
                         ->maxFiles(1),
                 ])
                 ->columns(2),
-            Section::make(__('collections.collection_info'))
+            SchemaSection::make(__('collections.collection_info'))
                 ->components([
                     Combobox::make('products')
                         ->label(__('translations.products'))
@@ -220,9 +220,9 @@ final class CollectionResource extends Resource
                         ->height('350px')
                         ->preload(),
                 ]),
-            Section::make(__('collections.seo_info'))
+            SchemaSection::make(__('collections.seo_info'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('seo_title')
                                 ->label(__('collections.seo_title'))

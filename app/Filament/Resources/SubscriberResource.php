@@ -23,8 +23,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -91,9 +91,9 @@ final class SubscriberResource extends Resource
     {
         return $schema
             ->schema([
-                Section::make(__('subscribers.personal_information'))
+                SchemaSection::make(__('subscribers.personal_information'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('email')
                                     ->label(__('subscribers.email'))
@@ -106,7 +106,7 @@ final class SubscriberResource extends Resource
                                     ->tel()
                                     ->maxLength(20),
                             ]),
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('first_name')
                                     ->label(__('subscribers.first_name'))
@@ -115,7 +115,7 @@ final class SubscriberResource extends Resource
                                     ->label(__('subscribers.last_name'))
                                     ->maxLength(255),
                             ]),
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('company')
                                     ->label(__('subscribers.company'))
@@ -125,9 +125,9 @@ final class SubscriberResource extends Resource
                                     ->maxLength(255),
                             ]),
                     ]),
-                Section::make(__('subscribers.subscription_information'))
+                SchemaSection::make(__('subscribers.subscription_information'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 Select::make('status')
                                     ->label(__('subscribers.status'))
@@ -152,7 +152,7 @@ final class SubscriberResource extends Resource
                                     ->required()
                                     ->default('website'),
                             ]),
-                        Grid::make(3)
+                        SchemaGrid::make(3)
                             ->schema([
                                 Toggle::make('is_verified')
                                     ->label(__('subscribers.is_verified'))
@@ -168,7 +168,7 @@ final class SubscriberResource extends Resource
                             ->label(__('subscribers.subscribed_at'))
                             ->default(fn () => now()),
                     ]),
-                Section::make(__('subscribers.additional_information'))
+                SchemaSection::make(__('subscribers.additional_information'))
                     ->schema([
                         TagsInput::make('interests')
                             ->label(__('subscribers.interests'))

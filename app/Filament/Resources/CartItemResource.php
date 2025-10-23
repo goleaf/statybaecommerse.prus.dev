@@ -21,8 +21,8 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
@@ -68,9 +68,9 @@ final class CartItemResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('cart_items.basic_information'))
+            SchemaSection::make(__('cart_items.basic_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('user_id')
                                 ->label(__('cart_items.user'))
@@ -168,7 +168,7 @@ final class CartItemResource extends Resource
                         ->readOnly()
                         ->dehydrated(false)
                         ->maxLength(255),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('quantity')
                                 ->label(__('cart_items.quantity'))
@@ -197,9 +197,9 @@ final class CartItemResource extends Resource
                         ->rows(3)
                         ->maxLength(1000),
                 ]),
-            Section::make(__('cart_items.pricing'))
+            SchemaSection::make(__('cart_items.pricing'))
                 ->schema([
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             TextInput::make('unit_price')
                                 ->label(__('cart_items.unit_price'))
@@ -234,7 +234,7 @@ final class CartItemResource extends Resource
                                 ->dehydrated(),
                         ]),
                 ]),
-            Section::make(__('cart_items.additional_info'))
+            SchemaSection::make(__('cart_items.additional_info'))
                 ->schema([
                     Forms\Components\KeyValue::make('attributes')
                         ->label(__('cart_items.attributes'))

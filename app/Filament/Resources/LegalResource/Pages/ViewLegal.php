@@ -32,7 +32,7 @@ class ViewLegal extends ViewRecord
         // Provide the infolist schema using the Filament v4 return type.
         return $schema
             ->components([
-                Section::make(__('legal.basic_information'))
+                SchemaSection::make(__('legal.basic_information'))
                     ->schema([
                         TextEntry::make('key')
                             ->label(__('legal.key'))
@@ -69,7 +69,7 @@ class ViewLegal extends ViewRecord
                             ->placeholder(__('legal.draft')),
                     ])
                     ->columns(2),
-                Section::make(__('legal.translations'))
+                SchemaSection::make(__('legal.translations'))
                     ->schema([
                         RepeatableEntry::make('translations')
                             ->schema([
@@ -107,7 +107,7 @@ class ViewLegal extends ViewRecord
                             ])
                             ->columns(2),
                     ]),
-                Section::make(__('legal.meta_data'))
+                SchemaSection::make(__('legal.meta_data'))
                     ->schema([
                         KeyValueEntry::make('meta_data')
                             ->label('')

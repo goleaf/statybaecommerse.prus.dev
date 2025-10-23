@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use BackedEnum;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\MenuItemResource\Pages;
 use App\Models\Menu;
@@ -91,8 +92,8 @@ final class MenuItemResource extends Resource
                                             )
                                             ->orderBy('label')
                                             ->pluck('label', 'id')
-                                            ->toArray()
-                                    )
+                                            ->toArray();
+                                    })
                                     ->searchable()
                                     ->preload(),
                                 TextInput::make('label')
@@ -207,8 +208,8 @@ final class MenuItemResource extends Resource
                         return $query
                             ->orderBy('label')
                             ->pluck('label', 'id')
-                            ->toArray()
-                    )
+                            ->toArray();
+                    })
                     ->searchable(),
                 TernaryFilter::make('is_visible')
                     ->label(__('admin.menu_items.is_visible')),

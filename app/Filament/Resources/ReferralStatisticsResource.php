@@ -22,7 +22,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -70,7 +70,7 @@ final class ReferralStatisticsResource extends Resource
         return $schema
             ->columns(3)
             ->schema([
-                Section::make(__('referral_statistics.sections.basic_info'))
+                SchemaSection::make(__('referral_statistics.sections.basic_info'))
                     ->description(__('referral_statistics.sections.basic_info_description'))
                     ->columns(2)
                     ->schema([
@@ -85,7 +85,7 @@ final class ReferralStatisticsResource extends Resource
                             ->required()
                             ->default(now()),
                     ]),
-                Section::make(__('referral_statistics.sections.referral_stats'))
+                SchemaSection::make(__('referral_statistics.sections.referral_stats'))
                     ->description(__('referral_statistics.sections.referral_stats_description'))
                     ->columns(3)
                     ->schema([
@@ -111,7 +111,7 @@ final class ReferralStatisticsResource extends Resource
                             ->minValue(0)
                             ->step(1),
                     ]),
-                Section::make(__('referral_statistics.sections.financial_stats'))
+                SchemaSection::make(__('referral_statistics.sections.financial_stats'))
                     ->description(__('referral_statistics.sections.financial_stats_description'))
                     ->columns(2)
                     ->schema([
@@ -130,7 +130,7 @@ final class ReferralStatisticsResource extends Resource
                             ->step(0.01)
                             ->prefix('€'),
                     ]),
-                Section::make(__('referral_statistics.sections.advanced'))
+                SchemaSection::make(__('referral_statistics.sections.advanced'))
                     ->description(__('referral_statistics.sections.advanced_description'))
                     ->collapsible()
                     ->schema([
@@ -280,7 +280,7 @@ final class ReferralStatisticsResource extends Resource
         // Provide the infolist schema using the Filament v4 return type.
         return $schema
             ->schema([
-                Section::make(__('referral_statistics.sections.basic_info'))
+                SchemaSection::make(__('referral_statistics.sections.basic_info'))
                     ->schema([
                         TextEntry::make('user.name')
                             ->label(__('referral_statistics.fields.user_name'))
@@ -292,7 +292,7 @@ final class ReferralStatisticsResource extends Resource
                             ->color('info'),
                     ])
                     ->columns(2),
-                Section::make(__('referral_statistics.sections.referral_stats'))
+                SchemaSection::make(__('referral_statistics.sections.referral_stats'))
                     ->schema([
                         TextEntry::make('total_referrals')
                             ->label(__('referral_statistics.fields.total_referrals'))
@@ -311,7 +311,7 @@ final class ReferralStatisticsResource extends Resource
                             ->color('warning'),
                     ])
                     ->columns(3),
-                Section::make(__('referral_statistics.sections.financial_stats'))
+                SchemaSection::make(__('referral_statistics.sections.financial_stats'))
                     ->schema([
                         TextEntry::make('total_rewards_earned')
                             ->label(__('referral_statistics.fields.total_rewards_earned'))
@@ -323,7 +323,7 @@ final class ReferralStatisticsResource extends Resource
                             ->weight('medium'),
                     ])
                     ->columns(2),
-                Section::make(__('referral_statistics.sections.advanced'))
+                SchemaSection::make(__('referral_statistics.sections.advanced'))
                     ->collapsible()
                     ->schema([
                         TextEntry::make('metadata')
@@ -337,7 +337,7 @@ final class ReferralStatisticsResource extends Resource
                             })
                             ->placeholder(__('referral_statistics.placeholders.no_metadata')),
                     ]),
-                Section::make(__('referral_statistics.sections.timestamps'))
+                SchemaSection::make(__('referral_statistics.sections.timestamps'))
                     ->schema([
                         TextEntry::make('created_at')
                             ->label(__('referral_statistics.fields.created_at'))

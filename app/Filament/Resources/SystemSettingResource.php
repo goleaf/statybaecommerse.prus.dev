@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use BackedEnum;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\SystemSettingResource\Pages;
 use App\Models\SystemSetting;
@@ -14,9 +15,9 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -71,9 +72,9 @@ final class SystemSettingResource extends Resource
     {
         return $schema
             ->schema([
-                Section::make(__('system_settings.basic_information'))
+                SchemaSection::make(__('system_settings.basic_information'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('key')
                                     ->label(__('system_settings.key'))
@@ -97,9 +98,9 @@ final class SystemSettingResource extends Resource
                             ->helperText(__('system_settings.help_text_help'))
                             ->columnSpanFull(),
                     ]),
-                Section::make(__('system_settings.configuration'))
+                SchemaSection::make(__('system_settings.configuration'))
                     ->schema([
-                        Grid::make(3)
+                        SchemaGrid::make(3)
                             ->schema([
                                 Select::make('type')
                                     ->label(__('system_settings.type'))
@@ -131,7 +132,7 @@ final class SystemSettingResource extends Resource
                                     ->maxLength(255)
                                     ->helperText(__('system_settings.group_help')),
                             ]),
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('value')
                                     ->label(__('system_settings.value'))
@@ -141,9 +142,9 @@ final class SystemSettingResource extends Resource
                                     ->helperText(__('system_settings.default_value_help')),
                             ]),
                     ]),
-                Section::make(__('system_settings.options'))
+                SchemaSection::make(__('system_settings.options'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 KeyValue::make('options')
                                     ->label(__('system_settings.options'))
@@ -152,7 +153,7 @@ final class SystemSettingResource extends Resource
                                     ->label(__('system_settings.validation_rules'))
                                     ->helperText(__('system_settings.validation_rules_help')),
                             ]),
-                        Grid::make(4)
+                        SchemaGrid::make(4)
                             ->schema([
                                 Toggle::make('is_public')
                                     ->label(__('system_settings.is_public'))
@@ -167,7 +168,7 @@ final class SystemSettingResource extends Resource
                                     ->label(__('system_settings.is_readonly'))
                                     ->helperText(__('system_settings.is_readonly_help')),
                             ]),
-                        Grid::make(3)
+                        SchemaGrid::make(3)
                             ->schema([
                                 Toggle::make('is_active')
                                     ->label(__('system_settings.is_active'))
@@ -184,9 +185,9 @@ final class SystemSettingResource extends Resource
                                     ->helperText(__('system_settings.placeholder_help')),
                             ]),
                     ]),
-                Section::make(__('system_settings.advanced'))
+                SchemaSection::make(__('system_settings.advanced'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('tooltip')
                                     ->label(__('system_settings.tooltip'))
@@ -197,7 +198,7 @@ final class SystemSettingResource extends Resource
                                     ->maxLength(255)
                                     ->helperText(__('system_settings.validation_message_help')),
                             ]),
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 Toggle::make('is_cacheable')
                                     ->label(__('system_settings.is_cacheable'))
@@ -207,7 +208,7 @@ final class SystemSettingResource extends Resource
                                     ->numeric()
                                     ->helperText(__('system_settings.cache_ttl_help')),
                             ]),
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('environment')
                                     ->label(__('system_settings.environment'))

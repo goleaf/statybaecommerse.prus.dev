@@ -111,23 +111,6 @@ final class LegalTranslation extends Model
     {
         return $query->whereNotNull('slug')->where('slug', '!=', '');
     }
-
-    protected static function booted(): void
-    {
-        static::saving(static function (LegalTranslation $translation): void {
-            /** @var HtmlSanitizer $sanitizer */
-            $sanitizer = app(HtmlSanitizer::class);
-
-            $content = $translation->content;
-            if (! is_string($content) || trim($content) === '') {
-                return;
-            }
-
-            // Keep legal copy consistent with the sanitizer allow-list as well.
-            $translation->content = $sanitizer->sanitize($content);
-        });
-    }
-
     // Accessors
     /**
      * Handle getFormattedTitleAttribute functionality with proper error handling.

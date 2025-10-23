@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Resources\RecommendationCaches\Schemas;
 
 use App\Models\RecommendationCache;
-use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -19,9 +19,9 @@ final class RecommendationCacheForm
     {
         return $schema
             ->schema([
-                Section::make(__('admin.recommendation_caches.basic_information'))
+                SchemaSection::make(__('admin.recommendation_caches.basic_information'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('cache_key')
                                     ->label(__('admin.recommendation_caches.cache_key'))

@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\Filament\Resources\MenuResource\RelationManagers;
 
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Schema;
 use App\Models\MenuItem;
 use App\Models\Scopes\VisibleScope;
-use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -27,7 +28,7 @@ final class MenuItemsRelationManager extends BaseRelationManager
     public function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Grid::make(2)
+            SchemaGrid::make(2)
                 ->schema([
                     TextInput::make('label')
                         ->label(__('menus.item_label'))

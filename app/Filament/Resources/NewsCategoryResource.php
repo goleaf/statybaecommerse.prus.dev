@@ -18,7 +18,7 @@ use Filament\Infolists;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
@@ -60,7 +60,7 @@ final class NewsCategoryResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('news_categories.sections.category_information'))
+            SchemaSection::make(__('news_categories.sections.category_information'))
                 ->schema([
                     TextInput::make('name')
                         ->label(__('news_categories.fields.name'))
@@ -85,7 +85,7 @@ final class NewsCategoryResource extends Resource
                         ->helperText(__('Brief description of the category')),
                 ])
                 ->columns(2),
-            Section::make(__('news_categories.sections.hierarchy_display'))
+            SchemaSection::make(__('news_categories.sections.hierarchy_display'))
                 ->schema([
                     Select::make('parent_id')
                         ->label(__('news_categories.fields.parent_id'))
@@ -131,7 +131,7 @@ final class NewsCategoryResource extends Resource
                         ->helperText(__('Icon to display with category')),
                 ])
                 ->columns(2),
-            Section::make(__('news_categories.sections.visibility'))
+            SchemaSection::make(__('news_categories.sections.visibility'))
                 ->schema([
                     Toggle::make('is_visible')
                         ->label(__('news_categories.fields.is_visible'))
@@ -277,7 +277,7 @@ final class NewsCategoryResource extends Resource
         // Provide the infolist schema using the Filament v4 return type.
         return $schema
             ->schema([
-                Section::make(__('news_categories.sections.category_details'))
+                SchemaSection::make(__('news_categories.sections.category_details'))
                     ->schema([
                         TextEntry::make('name')
                             ->label(__('news_categories.fields.name'))
@@ -301,7 +301,7 @@ final class NewsCategoryResource extends Resource
                             ->color('primary'),
                     ])
                     ->columns(2),
-                Section::make(__('news_categories.sections.display_settings'))
+                SchemaSection::make(__('news_categories.sections.display_settings'))
                     ->schema([
                         TextEntry::make('sort_order')
                             ->label(__('news_categories.fields.sort_order'))
@@ -327,7 +327,7 @@ final class NewsCategoryResource extends Resource
                             ->falseColor('danger'),
                     ])
                     ->columns(2),
-                Section::make(__('news_categories.sections.statistics'))
+                SchemaSection::make(__('news_categories.sections.statistics'))
                     ->schema([
                         TextEntry::make('news_count')
                             ->label(__('news_categories.fields.news_count'))

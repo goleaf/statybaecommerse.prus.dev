@@ -12,8 +12,8 @@ use App\Models\RecommendationConfig;
 use Filament\Actions\BulkAction;
 use Filament\Actions\DeleteBulkAction;
 use Novadaemon\FilamentCombobox\Combobox;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -59,9 +59,9 @@ final class RecommendationConfigResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('recommendation_config.sections.basic_info'))
+            SchemaSection::make(__('recommendation_config.sections.basic_info'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('name')
                                 ->label(__('recommendation_config.fields.name'))
@@ -84,9 +84,9 @@ final class RecommendationConfigResource extends Resource
                     Textarea::make('description')
                         ->label(__('recommendation_config.fields.description')),
                 ]),
-            Section::make(__('recommendation_config.sections.parameters'))
+            SchemaSection::make(__('recommendation_config.sections.parameters'))
                 ->schema([
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             TextInput::make('min_score')
                                 ->label(__('recommendation_config.fields.min_score'))
@@ -108,9 +108,9 @@ final class RecommendationConfigResource extends Resource
                                 ->numeric(),
                         ]),
                 ]),
-            Section::make(__('recommendation_config.sections.flags'))
+            SchemaSection::make(__('recommendation_config.sections.flags'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Toggle::make('is_active')
                                 ->label(__('recommendation_config.fields.is_active')),
@@ -118,9 +118,9 @@ final class RecommendationConfigResource extends Resource
                                 ->label(__('recommendation_config.fields.is_default')),
                         ]),
                 ]),
-            Section::make(__('recommendation_config.sections.relationships'))
+            SchemaSection::make(__('recommendation_config.sections.relationships'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Combobox::make('products')
                                 ->label(__('recommendation_config.fields.products'))

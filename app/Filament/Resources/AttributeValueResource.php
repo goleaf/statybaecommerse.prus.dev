@@ -21,9 +21,9 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -95,12 +95,12 @@ final class AttributeValueResource extends Resource
             ]);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
-            Section::make(__('attribute_values.basic_information'))
+            SchemaSection::make(__('attribute_values.basic_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('attribute_id')
                                 ->label(__('attribute_values.attribute'))
@@ -132,9 +132,9 @@ final class AttributeValueResource extends Resource
                         ->maxLength(500)
                         ->columnSpanFull(),
                 ]),
-            Section::make(__('attribute_values.settings'))
+            SchemaSection::make(__('attribute_values.settings'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Toggle::make('is_active')
                                 ->label(__('attribute_values.is_active'))
@@ -144,7 +144,7 @@ final class AttributeValueResource extends Resource
                                 ->label(__('attribute_values.is_default'))
                                 ->helperText(__('attribute_values.is_default_help')),
                         ]),
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             TextInput::make('sort_order')
                                 ->label(__('attribute_values.sort_order'))
@@ -165,7 +165,7 @@ final class AttributeValueResource extends Resource
                         ->maxLength(255)
                         ->columnSpanFull(),
                 ]),
-            Section::make(__('attributes.meta_data'))
+            SchemaSection::make(__('attributes.meta_data'))
                 ->schema([
                     KeyValue::make('metadata')
                         ->label(__('attributes.meta_data'))

@@ -26,7 +26,7 @@ class DiscountRelationManager extends BaseRelationManager
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make('Discount Information')
+                Forms\Components\SchemaSection::make('Discount Information')
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->required()

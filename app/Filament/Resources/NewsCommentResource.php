@@ -13,8 +13,8 @@ use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\ApprovedScope;
 use App\Models\Scopes\VisibleScope;
 use BackedEnum;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -71,10 +71,10 @@ final class NewsCommentResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('admin.news_comments.basic_information'))
+            SchemaSection::make(__('admin.news_comments.basic_information'))
                 ->description(__('admin.news_comments.basic_information_description'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('news_id')
                                 ->label(__('admin.news_comments.news'))
@@ -119,7 +119,7 @@ final class NewsCommentResource extends Resource
                                 ->preload()
                                 ->live(),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('author_name')
                                 ->label(__('admin.news_comments.author_name'))
@@ -136,7 +136,7 @@ final class NewsCommentResource extends Resource
                         ->required()
                         ->rows(4)
                         ->columnSpanFull(),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Toggle::make('is_approved')
                                 ->label(__('admin.news_comments.is_approved'))

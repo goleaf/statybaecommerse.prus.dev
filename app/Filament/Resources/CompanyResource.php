@@ -53,9 +53,9 @@ final class CompanyResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Forms\Components\Section::make(__('companies.basic_information'))
+            Forms\Components\SchemaSection::make(__('companies.basic_information'))
                 ->schema([
-                    Forms\Components\Grid::make(2)
+                    Forms\Components\SchemaGrid::make(2)
                         ->schema([
                             Forms\Components\TextInput::make('name')
                                 ->label(__('companies.name'))
@@ -80,7 +80,7 @@ final class CompanyResource extends Resource
                         ->maxLength(500)
                         ->columnSpanFull(),
                 ]),
-            Forms\Components\Section::make(__('companies.business_information'))
+            Forms\Components\SchemaSection::make(__('companies.business_information'))
                 ->schema([
                     Forms\Components\TextInput::make('industry')
                         ->label(__('companies.industry'))
@@ -97,7 +97,7 @@ final class CompanyResource extends Resource
                         ->nullable()
                         ->default(null),
                 ]),
-            Forms\Components\Section::make(__('companies.settings'))
+            Forms\Components\SchemaSection::make(__('companies.settings'))
                 ->schema([
                     Forms\Components\Toggle::make('is_active')
                         ->label(__('companies.is_active'))

@@ -13,8 +13,8 @@ use Filament\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -57,9 +57,9 @@ final class CurrencyResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->components([
-            Section::make(__('currencies.basic_information'))
+            SchemaSection::make(__('currencies.basic_information'))
                 ->components([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->components([
                             TextInput::make('name')
                                 ->label(__('currencies.name'))
@@ -72,7 +72,7 @@ final class CurrencyResource extends Resource
                                 ->rules(['alpha'])
                                 ->helperText(__('currencies.code_help')),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->components([
                             TextInput::make('symbol')
                                 ->label(__('currencies.symbol'))
@@ -88,9 +88,9 @@ final class CurrencyResource extends Resource
                         ->maxLength(500)
                         ->columnSpanFull(),
                 ]),
-            Section::make(__('currencies.exchange_rates'))
+            SchemaSection::make(__('currencies.exchange_rates'))
                 ->components([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->components([
                             TextInput::make('exchange_rate')
                                 ->label(__('currencies.exchange_rate'))
@@ -105,9 +105,9 @@ final class CurrencyResource extends Resource
                                 ->helperText(__('currencies.base_currency_help')),
                         ]),
                 ]),
-            Section::make(__('currencies.formatting'))
+            SchemaSection::make(__('currencies.formatting'))
                 ->components([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->components([
                             TextInput::make('decimal_places')
                                 ->label(__('currencies.decimal_places'))
@@ -122,7 +122,7 @@ final class CurrencyResource extends Resource
                                 ])
                                 ->default('after'),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->components([
                             TextInput::make('thousands_separator')
                                 ->label(__('currencies.thousands_separator'))
@@ -136,9 +136,9 @@ final class CurrencyResource extends Resource
                                 ->helperText(__('currencies.decimal_separator_help')),
                         ]),
                 ]),
-            Section::make(__('currencies.settings'))
+            SchemaSection::make(__('currencies.settings'))
                 ->components([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->components([
                             Toggle::make('is_active')
                                 ->label(__('currencies.is_active'))
@@ -146,7 +146,7 @@ final class CurrencyResource extends Resource
                             Toggle::make('is_default')
                                 ->label(__('currencies.is_default')),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->components([
                             TextInput::make('sort_order')
                                 ->label(__('currencies.sort_order'))

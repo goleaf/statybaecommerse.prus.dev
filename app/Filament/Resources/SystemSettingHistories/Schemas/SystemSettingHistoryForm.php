@@ -9,8 +9,8 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
 
 final class SystemSettingHistoryForm
@@ -19,9 +19,9 @@ final class SystemSettingHistoryForm
     {
         return $form
             ->schema([
-                Section::make(__('admin.system_setting_histories.basic_information'))
+                SchemaSection::make(__('admin.system_setting_histories.basic_information'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 Select::make('system_setting_id')
                                     ->label(__('admin.system_setting_histories.system_setting'))

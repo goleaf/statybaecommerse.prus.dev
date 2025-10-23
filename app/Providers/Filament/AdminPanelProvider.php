@@ -174,11 +174,11 @@ final class AdminPanelProvider extends PanelProvider
             ->userMenu(position: UserMenuPosition::Sidebar)
             ->userMenuItems([
                 'profile' => \Filament\Navigation\MenuItem::make()
-                    ->label($this->translate('admin.navigation.profile'))
+                    ->label(__('admin.navigation.profile'))
                     ->url(fn (): string => \App\Filament\Pages\Auth\EditProfile::getUrl())
                     ->icon('heroicon-o-user-circle'),
                 'language' => \Filament\Navigation\MenuItem::make()
-                    ->label($this->translate('admin.navigation.language'))
+                    ->label(__('admin.navigation.language'))
                     ->url(fn (): string => $this->routeUrl('language.switch', [
                         'locale' => $this->currentLocale() === 'lt' ? 'en' : 'lt',
                     ]))

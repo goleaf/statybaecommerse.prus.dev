@@ -117,7 +117,7 @@ final class ViewProduct extends ViewRecord
                         })
                         ->all();
                 }),
-            Section::make(__('ecommerce.variants'))
+            SchemaSection::make(__('ecommerce.variants'))
                 ->schema([
                     TableRepeatableEntry::make('variants')
                         ->label(__('ecommerce.variants'))

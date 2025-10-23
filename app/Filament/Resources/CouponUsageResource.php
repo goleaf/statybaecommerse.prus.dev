@@ -17,10 +17,10 @@ use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
-use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Tabs as SchemaTabs;
+use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Set;
@@ -62,13 +62,13 @@ final class CouponUsageResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->components([
-            Tabs::make('coupon_usage_tabs')
+            SchemaTabs::make('coupon_usage_tabs')
                 ->tabs([
-                    Tab::make(__('admin.coupon_usages.form.tabs.basic_information'))
+                    SchemaTab::make(__('admin.coupon_usages.form.tabs.basic_information'))
                         ->schema([
-                            Section::make(__('admin.coupon_usages.form.sections.basic_information'))
+                            SchemaSection::make(__('admin.coupon_usages.form.sections.basic_information'))
                                 ->schema([
-                                    Grid::make(2)
+                                    SchemaGrid::make(2)
                                         ->schema([
                                             SearchableInput::make('coupon_id')
                                                 ->label(__('admin.coupon_usages.form.fields.coupon'))
@@ -171,9 +171,9 @@ final class CouponUsageResource extends Resource
                                         ->columnSpanFull(),
                                 ]),
                         ]),
-                    Tab::make(__('admin.coupon_usages.form.tabs.usage_details'))
+                    SchemaTab::make(__('admin.coupon_usages.form.tabs.usage_details'))
                         ->schema([
-                            Section::make(__('admin.coupon_usages.form.sections.usage_details'))
+                            SchemaSection::make(__('admin.coupon_usages.form.sections.usage_details'))
                                 ->schema([
                                     Placeholder::make('coupon_name')
                                         ->label(__('admin.coupon_usages.form.fields.coupon_name'))

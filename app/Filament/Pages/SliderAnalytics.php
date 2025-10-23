@@ -14,6 +14,8 @@ use Filament\Pages\Dashboard\Actions\FilterAction;
 use Filament\Pages\Dashboard\Concerns\HasFiltersAction;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
+use BackedEnum;
 
 class SliderAnalytics extends BaseDashboard
 {

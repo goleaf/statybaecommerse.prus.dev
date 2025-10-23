@@ -12,8 +12,8 @@ use App\Filament\Resources\MenuResource\RelationManagers\MenuItemsRelationManage
 use App\Models\Menu;
 use App\Models\Scopes\ActiveScope;
 use BackedEnum;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -79,9 +79,9 @@ final class MenuResource extends Resource
         ];
 
         return $schema->schema([
-            Section::make(__('menus.basic_information'))
+            SchemaSection::make(__('menus.basic_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('name')
                                 ->label(__('menus.name'))
@@ -105,7 +105,7 @@ final class MenuResource extends Resource
                         ->maxLength(65535)
                         ->columnSpanFull(),
                 ]),
-            Section::make(__('menus.settings'))
+            SchemaSection::make(__('menus.settings'))
                 ->schema([
                     Toggle::make('is_active')
                         ->label(__('menus.is_active'))

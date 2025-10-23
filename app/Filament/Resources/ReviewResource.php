@@ -26,7 +26,7 @@ use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Components\Section as InfolistSection;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
@@ -84,7 +84,7 @@ final class ReviewResource extends Resource
     {
         return $schema
             ->schema([
-                Section::make(__('reviews.sections.basic_info'))
+                SchemaSection::make(__('reviews.sections.basic_info'))
                     ->description(__('reviews.sections.basic_info_description'))
                     ->columns(2)
                     ->schema([
@@ -110,7 +110,7 @@ final class ReviewResource extends Resource
                         NumericScale::make('rating', __('reviews.fields.rating'))
                             ->required(),
                     ]),
-                Section::make(__('reviews.sections.content'))
+                SchemaSection::make(__('reviews.sections.content'))
                     ->description(__('reviews.sections.content_description'))
                     ->columns(1)
                     ->schema([
@@ -124,7 +124,7 @@ final class ReviewResource extends Resource
                             ->rows(5)
                             ->columnSpanFull(),
                     ]),
-                Section::make(__('reviews.sections.status'))
+                SchemaSection::make(__('reviews.sections.status'))
                     ->description(__('reviews.sections.status_description'))
                     ->columns(2)
                     ->schema([
@@ -141,7 +141,7 @@ final class ReviewResource extends Resource
                             ->default('lt')
                             ->maxLength(10),
                     ]),
-                Section::make(__('reviews.sections.advanced'))
+                SchemaSection::make(__('reviews.sections.advanced'))
                     ->description(__('reviews.sections.advanced_description'))
                     ->collapsible()
                     ->schema([

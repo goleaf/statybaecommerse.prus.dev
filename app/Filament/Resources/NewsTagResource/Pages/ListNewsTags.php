@@ -10,8 +10,7 @@ use Filament\Actions;
 
 final class ListNewsTags extends BaseListRecords
 {
-    use HasResizableColumns;
-
+    
     protected static string $resource = NewsTagResource::class;
 
     protected function getHeaderActions(): array

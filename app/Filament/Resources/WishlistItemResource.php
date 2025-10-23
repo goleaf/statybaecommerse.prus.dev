@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use BackedEnum;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\WishlistItemResource\Pages;
 use App\Models\Brand;
@@ -46,7 +47,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 use RuntimeException;
-use Str;
 use UnitEnum;
 
 /**

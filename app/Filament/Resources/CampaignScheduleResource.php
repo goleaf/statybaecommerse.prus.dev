@@ -9,13 +9,13 @@ use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\CampaignScheduleResource\Pages;
 use App\Models\CampaignSchedule;
-use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
-use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Tabs as SchemaTabs;
+use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
@@ -65,14 +65,14 @@ final class CampaignScheduleResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Tabs::make('campaign_schedule_tabs')
+            SchemaTabs::make('campaign_schedule_tabs')
                 ->tabs([
-                    Tab::make(__('admin.campaign_schedules.form.tabs.basic_information'))
+                    SchemaTab::make(__('admin.campaign_schedules.form.tabs.basic_information'))
                         ->icon('heroicon-o-information-circle')
                         ->schema([
-                            Section::make(__('admin.campaign_schedules.form.sections.basic_information'))
+                            SchemaSection::make(__('admin.campaign_schedules.form.sections.basic_information'))
                                 ->schema([
-                                    Grid::make(2)
+                                    SchemaGrid::make(2)
                                         ->schema([
                                             Select::make('campaign_id')
                                                 ->label(__('admin.campaign_schedules.form.fields.campaign'))
@@ -94,7 +94,7 @@ final class CampaignScheduleResource extends Resource
                                                 ->required()
                                                 ->columnSpan(1),
                                         ]),
-                                    Grid::make(2)
+                                    SchemaGrid::make(2)
                                         ->schema([
                                             Flatpickr::makeDateTime('next_run_at')
                                                 ->label(__('admin.campaign_schedules.form.fields.next_run_at'))
@@ -111,10 +111,10 @@ final class CampaignScheduleResource extends Resource
                                 ])
                                 ->columns(1),
                         ]),
-                    Tab::make(__('admin.campaign_schedules.form.tabs.schedule_config'))
+                    SchemaTab::make(__('admin.campaign_schedules.form.tabs.schedule_config'))
                         ->icon('heroicon-o-cog-6-tooth')
                         ->schema([
-                            Section::make(__('admin.campaign_schedules.form.sections.schedule_config'))
+                            SchemaSection::make(__('admin.campaign_schedules.form.sections.schedule_config'))
                                 ->schema([
                                     KeyValue::make('schedule_config')
                                         ->label(__('admin.campaign_schedules.form.fields.schedule_config'))
@@ -124,10 +124,10 @@ final class CampaignScheduleResource extends Resource
                                 ])
                                 ->columns(1),
                         ]),
-                    Tab::make(__('admin.campaign_schedules.form.tabs.campaign_details'))
+                    SchemaTab::make(__('admin.campaign_schedules.form.tabs.campaign_details'))
                         ->icon('heroicon-o-megaphone')
                         ->schema([
-                            Section::make(__('admin.campaign_schedules.form.sections.campaign_details'))
+                            SchemaSection::make(__('admin.campaign_schedules.form.sections.campaign_details'))
                                 ->schema([
                                     Placeholder::make('campaign_name')
                                         ->label(__('admin.campaign_schedules.form.fields.campaign_name'))

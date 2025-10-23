@@ -19,7 +19,7 @@ use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -73,9 +73,9 @@ final class CampaignCustomerSegmentResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('campaign_customer_segments.tabs.basic_information'))
+            SchemaSection::make(__('campaign_customer_segments.tabs.basic_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('campaign_id')
                                 ->label(__('campaign_customer_segments.campaign'))
@@ -126,9 +126,9 @@ final class CampaignCustomerSegmentResource extends Resource
                         ->rows(4)
                         ->columnSpanFull(),
                 ]),
-            Section::make(__('campaign_customer_segments.tabs.advanced_settings'))
+            SchemaSection::make(__('campaign_customer_segments.tabs.advanced_settings'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Toggle::make('track_performance')
                                 ->label(__('campaign_customer_segments.track_performance'))

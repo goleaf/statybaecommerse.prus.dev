@@ -9,8 +9,8 @@ use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantPricingRuleResource\Pages;
 use App\Models\VariantPricingRule;
 use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -90,9 +90,9 @@ final class VariantPricingRuleResource extends Resource
     {
         return $schema
             ->schema([
-                Section::make(__('variant_pricing_rules.basic_information'))
+                SchemaSection::make(__('variant_pricing_rules.basic_information'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('name')
                                     ->label(__('variant_pricing_rules.name'))
@@ -119,9 +119,9 @@ final class VariantPricingRuleResource extends Resource
                                     ->default(0),
                             ]),
                     ]),
-                Section::make(__('variant_pricing_rules.relationships'))
+                SchemaSection::make(__('variant_pricing_rules.relationships'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 Select::make('product_variant_id')
                                     ->label(__('variant_pricing_rules.product_variant'))
@@ -136,9 +136,9 @@ final class VariantPricingRuleResource extends Resource
                                     ->preload(),
                             ]),
                     ]),
-                Section::make(__('variant_pricing_rules.quantity_settings'))
+                SchemaSection::make(__('variant_pricing_rules.quantity_settings'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('min_quantity')
                                     ->label(__('variant_pricing_rules.min_quantity'))
@@ -150,9 +150,9 @@ final class VariantPricingRuleResource extends Resource
                                     ->minValue(0),
                             ]),
                     ]),
-                Section::make(__('variant_pricing_rules.status_settings'))
+                SchemaSection::make(__('variant_pricing_rules.status_settings'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 Toggle::make('is_active')
                                     ->label(__('variant_pricing_rules.is_active'))
@@ -162,9 +162,9 @@ final class VariantPricingRuleResource extends Resource
                                     ->default(false),
                             ]),
                     ]),
-                Section::make(__('variant_pricing_rules.validity_period'))
+                SchemaSection::make(__('variant_pricing_rules.validity_period'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 Flatpickr::makeDateTime('valid_from')
                                     ->label(__('variant_pricing_rules.valid_from')),
@@ -172,7 +172,7 @@ final class VariantPricingRuleResource extends Resource
                                     ->label(__('variant_pricing_rules.valid_until')),
                             ]),
                     ]),
-                Section::make(__('variant_pricing_rules.description'))
+                SchemaSection::make(__('variant_pricing_rules.description'))
                     ->schema([
                         Textarea::make('description')
                             ->label(__('variant_pricing_rules.description'))

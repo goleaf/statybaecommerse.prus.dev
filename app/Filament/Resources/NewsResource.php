@@ -24,7 +24,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Novadaemon\FilamentCombobox\Combobox;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 use RuntimeException;
 
@@ -46,7 +45,7 @@ class NewsResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->components([
-            Forms\Components\Section::make('Article Information')
+            Forms\Components\SchemaSection::make('Article Information')
                 ->components([
                     LanguageTabs::make([
                         Forms\Components\TextInput::make('title')
@@ -72,7 +71,7 @@ class NewsResource extends Resource
                     ])->columnSpanFull(),
                 ])
                 ->columns(1),
-            Forms\Components\Section::make('Publishing')
+            Forms\Components\SchemaSection::make('Publishing')
                 ->components([
                     Flatpickr::makeDateTime('published_at')
                         ->label(__('news.fields.published_at'))
@@ -107,7 +106,7 @@ class NewsResource extends Resource
                         ->content(fn (?News $record): string => $record?->approvedBy?->name ?? '—'),
                 ])
                 ->columns(2),
-            Forms\Components\Section::make('SEO & Metadata')
+            Forms\Components\SchemaSection::make('SEO & Metadata')
                 ->components([
                     LanguageTabs::make([
                         Forms\Components\TextInput::make('meta_title')
@@ -122,7 +121,7 @@ class NewsResource extends Resource
                         ->label(__('news.fields.meta_keywords'))
                         ->maxLength(255),
                 ]),
-            Forms\Components\Section::make(__('news.podcast.section_title'))
+            Forms\Components\SchemaSection::make(__('news.podcast.section_title'))
                 ->description(__('news.podcast.section_description'))
                 ->collapsible()
                 ->collapsed()
@@ -136,7 +135,7 @@ class NewsResource extends Resource
                         ->dehydrateStateUsing(static fn (?string $state): ?string => filled($state) ? trim($state) : null)
                         ->helperText(__('news.podcast.field_help')),
                 ]),
-            Forms\Components\Section::make('Categories & Tags')
+            Forms\Components\SchemaSection::make('Categories & Tags')
                 ->components([
                     Combobox::make('categories')
                         ->label(__('news.fields.categories'))
@@ -392,7 +391,7 @@ class NewsResource extends Resource
         // Provide the infolist schema using the Filament v4 return type.
         return $schema
             ->components([
-                Infolists\Components\Section::make('Article Details')
+                Infolists\Components\SchemaSection::make('Article Details')
                     ->schema([
                         Infolists\Components\TextEntry::make('title')
                             ->label(__('news.fields.title')),
@@ -408,7 +407,7 @@ class NewsResource extends Resource
                             ->columnSpanFull(),
                     ])
                     ->columns(2),
-                Infolists\Components\Section::make('Publishing Information')
+                Infolists\Components\SchemaSection::make('Publishing Information')
                     ->schema([
                         Infolists\Components\TextEntry::make('author_name')
                             ->label(__('news.fields.author_name')),
@@ -442,7 +441,7 @@ class NewsResource extends Resource
                             ->numeric(),
                     ])
                     ->columns(3),
-                Infolists\Components\Section::make('Categories & Tags')
+                Infolists\Components\SchemaSection::make('Categories & Tags')
                     ->schema([
                         Infolists\Components\TextEntry::make('categories.name')
                             ->label(__('news.fields.categories'))

@@ -24,12 +24,12 @@ use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
-use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Tabs as SchemaTabs;
+use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -96,13 +96,13 @@ final class ProductVariantResource extends Resource
     {
         return $schema
             ->schema([
-                Tabs::make('Variant Information')
+                SchemaTabs::make('Variant Information')
                     ->tabs([
-                        Tab::make('Basic Information')
+                        SchemaTab::make('Basic Information')
                             ->schema([
-                                Section::make('Variant Details')
+                                SchemaSection::make('Variant Details')
                                     ->schema([
-                                        Grid::make(2)
+                                        SchemaGrid::make(2)
                                             ->schema([
                                                 Select::make('product_id')
                                                     ->label(__('product_variants.fields.product'))
@@ -116,7 +116,7 @@ final class ProductVariantResource extends Resource
                                                     ->unique(ignoreRecord: true)
                                                     ->maxLength(255),
                                             ]),
-                                        Grid::make(2)
+                                        SchemaGrid::make(2)
                                             ->schema([
                                                 TextInput::make('name')
                                                     ->label(__('product_variants.fields.name'))
@@ -133,9 +133,9 @@ final class ProductVariantResource extends Resource
                                             ->label(__('product_variants.fields.description_en'))
                                             ->rows(3),
                                     ]),
-                                Section::make('Pricing')
+                                SchemaSection::make('Pricing')
                                     ->schema([
-                                        Grid::make(3)
+                                        SchemaGrid::make(3)
                                             ->schema([
                                                 TextInput::make('price')
                                                     ->label(__('product_variants.fields.price'))
@@ -154,7 +154,7 @@ final class ProductVariantResource extends Resource
                                                     ->prefix('€')
                                                     ->step(0.01),
                                             ]),
-                                        Grid::make(3)
+                                        SchemaGrid::make(3)
                                             ->schema([
                                                 TextInput::make('wholesale_price')
                                                     ->label(__('product_variants.fields.wholesale_price'))
@@ -174,11 +174,11 @@ final class ProductVariantResource extends Resource
                                             ]),
                                     ]),
                             ]),
-                        Tab::make('Inventory & Stock')
+                        SchemaTab::make('Inventory & Stock')
                             ->schema([
-                                Section::make('Stock Management')
+                                SchemaSection::make('Stock Management')
                                     ->schema([
-                                        Grid::make(2)
+                                        SchemaGrid::make(2)
                                             ->schema([
                                                 Toggle::make('track_inventory')
                                                     ->label(__('product_variants.fields.track_inventory'))
@@ -187,7 +187,7 @@ final class ProductVariantResource extends Resource
                                                     ->label(__('product_variants.fields.is_enabled'))
                                                     ->default(true),
                                             ]),
-                                        Grid::make(3)
+                                        SchemaGrid::make(3)
                                             ->schema([
                                                 TextInput::make('stock_quantity')
                                                     ->label(__('product_variants.fields.stock_quantity'))
@@ -203,9 +203,9 @@ final class ProductVariantResource extends Resource
                                                     ->default(5),
                                             ]),
                                     ]),
-                                Section::make('Physical Properties')
+                                SchemaSection::make('Physical Properties')
                                     ->schema([
-                                        Grid::make(2)
+                                        SchemaGrid::make(2)
                                             ->schema([
                                                 TextInput::make('weight')
                                                     ->label(__('product_variants.fields.weight'))
@@ -218,25 +218,25 @@ final class ProductVariantResource extends Resource
                                             ]),
                                     ]),
                             ]),
-                        Tab::make('Marketing & Features')
+                        SchemaTab::make('Marketing & Features')
                             ->schema([
-                                Section::make('Marketing Settings')
+                                SchemaSection::make('Marketing Settings')
                                     ->schema([
-                                        Grid::make(2)
+                                        SchemaGrid::make(2)
                                             ->schema([
                                                 Toggle::make('is_featured')
                                                     ->label(__('product_variants.fields.is_featured')),
                                                 Toggle::make('is_new')
                                                     ->label(__('product_variants.fields.is_new')),
                                             ]),
-                                        Grid::make(2)
+                                        SchemaGrid::make(2)
                                             ->schema([
                                                 Toggle::make('is_bestseller')
                                                     ->label(__('product_variants.fields.is_bestseller')),
                                                 Toggle::make('is_on_sale')
                                                     ->label(__('product_variants.fields.is_on_sale')),
                                             ]),
-                                        Grid::make(2)
+                                        SchemaGrid::make(2)
                                             ->schema([
                                                 Flatpickr::makeDateTime('sale_start_date')
                                                     ->label(__('product_variants.fields.sale_start_date')),
@@ -244,7 +244,7 @@ final class ProductVariantResource extends Resource
                                                     ->label(__('product_variants.fields.sale_end_date')),
                                             ]),
                                     ]),
-                                Section::make('SEO Settings')
+                                SchemaSection::make('SEO Settings')
                                     ->schema([
                                         TextInput::make('seo_title_lt')
                                             ->label(__('product_variants.fields.seo_title_lt'))
@@ -260,9 +260,9 @@ final class ProductVariantResource extends Resource
                                             ->rows(3),
                                     ]),
                             ]),
-                        Tab::make('Attributes & Variants')
+                        SchemaTab::make('Attributes & Variants')
                             ->schema([
-                                Section::make('Variant Attribute Matrix')
+                                SchemaSection::make('Variant Attribute Matrix')
                                     ->schema([
                                         MatrixFactory::radioGrid(
                                             'variant_attribute_matrix',
@@ -271,7 +271,7 @@ final class ProductVariantResource extends Resource
                                             ),
                                         ),
                                     ]),
-                                Section::make('Additional Data')
+                                SchemaSection::make('Additional Data')
                                     ->schema([
                                         KeyValue::make('variant_metadata')
                                             ->label(__('product_variants.fields.variant_metadata'))

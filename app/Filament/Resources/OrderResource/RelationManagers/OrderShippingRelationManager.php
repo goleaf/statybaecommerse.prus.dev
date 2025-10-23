@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Schema;
 use App\Models\OrderShipping;
 use App\Support\Filament\Components\Flatpickr;
@@ -18,8 +19,8 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -56,11 +57,11 @@ final class OrderShippingRelationManager extends BaseRelationManager
     {
         return $schema
             ->schema([
-                Section::make(__('orders.shipping_information'))
+                SchemaSection::make(__('orders.shipping_information'))
                     ->description(__('orders.shipping_information_description'))
                     ->icon('heroicon-o-truck')
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 Select::make('shipping_method')
                                     ->label(__('orders.fields.shipping_method'))
@@ -76,7 +77,7 @@ final class OrderShippingRelationManager extends BaseRelationManager
                                     ->label(__('orders.fields.tracking_number'))
                                     ->maxLength(255),
                             ]),
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('carrier')
                                     ->label(__('orders.fields.carrier'))
@@ -87,11 +88,11 @@ final class OrderShippingRelationManager extends BaseRelationManager
                             ]),
                     ])
                     ->collapsible(),
-                Section::make(__('orders.shipping_costs'))
+                SchemaSection::make(__('orders.shipping_costs'))
                     ->description(__('orders.shipping_costs_description'))
                     ->icon('heroicon-o-currency-euro')
                     ->schema([
-                        Grid::make(3)
+                        SchemaGrid::make(3)
                             ->schema([
                                 TextInput::make('base_cost')
                                     ->label(__('orders.fields.base_cost'))
@@ -112,18 +113,18 @@ final class OrderShippingRelationManager extends BaseRelationManager
                             ]),
                     ])
                     ->collapsible(),
-                Section::make(__('orders.delivery_information'))
+                SchemaSection::make(__('orders.delivery_information'))
                     ->description(__('orders.delivery_information_description'))
                     ->icon('heroicon-o-map-pin')
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 Flatpickr::makeDateTime('shipped_at')
                                     ->label(__('orders.shipped_at')),
                                 Flatpickr::makeDateTime('estimated_delivery')
                                     ->label(__('orders.estimated_delivery')),
                             ]),
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 Flatpickr::makeDateTime('delivered_at')
                                     ->label(__('orders.delivered_at')),
@@ -141,7 +142,7 @@ final class OrderShippingRelationManager extends BaseRelationManager
                             }),
                     ])
                     ->collapsible(),
-                Section::make(__('orders.additional_details'))
+                SchemaSection::make(__('orders.additional_details'))
                     ->description(__('orders.additional_details_description'))
                     ->icon('heroicon-o-document-text')
                     ->schema([

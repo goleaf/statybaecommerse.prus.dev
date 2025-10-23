@@ -10,8 +10,7 @@ use Filament\Actions;
 
 final class ListPosts extends BaseListRecords
 {
-    use HasResizableColumns;
-
+    
     protected static string $resource = PostResource::class;
 
     protected function getHeaderActions(): array

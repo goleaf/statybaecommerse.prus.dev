@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use BackedEnum;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\ReferralCampaignResource\Pages;
 use App\Models\ReferralCampaign;
@@ -13,9 +14,9 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -26,6 +27,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
 
 final class ReferralCampaignResource extends Resource
@@ -67,9 +69,9 @@ final class ReferralCampaignResource extends Resource
     {
         return $schema
             ->schema([
-                Section::make(__('admin.referral_campaigns.basic_information'))
+                SchemaSection::make(__('admin.referral_campaigns.basic_information'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 LanguageTabs::make([
                                     TextInput::make('name')
@@ -95,9 +97,9 @@ final class ReferralCampaignResource extends Resource
                                     ->nullable(),
                             ]),
                     ]),
-                Section::make(__('admin.referral_campaigns.reward_settings'))
+                SchemaSection::make(__('admin.referral_campaigns.reward_settings'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('reward_amount')
                                     ->label(__('admin.referral_campaigns.reward_amount'))
@@ -127,7 +129,7 @@ final class ReferralCampaignResource extends Resource
                                     ->helperText(__('admin.referral_campaigns.max_total_referrals_help')),
                             ]),
                     ]),
-                Section::make(__('admin.referral_campaigns.advanced_settings'))
+                SchemaSection::make(__('admin.referral_campaigns.advanced_settings'))
                     ->schema([
                         KeyValue::make('conditions')
                             ->label(__('admin.referral_campaigns.conditions'))

@@ -10,8 +10,7 @@ use Filament\Actions\CreateAction;
 
 class ListProductSimilarities extends BaseListRecords
 {
-    use HasResizableColumns;
-
+    
     protected static string $resource = ProductSimilarityResource::class;
 
     protected function getHeaderActions(): array
