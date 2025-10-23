@@ -9,10 +9,7 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\CampaignResource\Pages;
 use App\Filament\Resources\CampaignResource\RelationManagers\TranslationsRelationManager;
 use App\Models\Campaign;
-use Filament\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Forms;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -20,12 +17,12 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -65,10 +62,8 @@ final class CampaignResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            // Section component keeps the basic information grouped for clarity in Filament v4.
             Section::make(__('campaigns.sections.basic_information'))
                 ->schema([
-                    // Grid enforces a two-column layout for name and slug pairing.
                     Grid::make(2)
                         ->schema([
                             TextInput::make('name')
@@ -76,7 +71,7 @@ final class CampaignResource extends Resource
                                 ->required()
                                 ->maxLength(255)
                                 ->live(onBlur: true)
-                                ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', Str::slug((string) $state)) : null),
+                                ->afterStateUpdated(fn (string $operation, $state, Set $set) => $operation === 'create' ? $set('slug', Str::slug((string) $state)) : null),
                             TextInput::make('slug')
                                 ->label(self::label('campaigns.fields.slug', 'Slug'))
                                 ->unique(ignoreRecord: true),
@@ -109,7 +104,6 @@ final class CampaignResource extends Resource
                         ->label(self::label('campaigns.fields.social_media_ready', 'Social media ready'))
                         ->default(false),
                 ]),
-            // Dedicated section to encapsulate scheduling and budgeting controls.
             Section::make(__('campaigns.sections.campaign_settings'))
                 ->schema([
                     Grid::make(2)
@@ -143,7 +137,6 @@ final class CampaignResource extends Resource
                                 ->default(false),
                         ]),
                 ]),
-            // Campaign targeting resources are grouped for better discoverability.
             Section::make(__('campaigns.sections.targeting'))
                 ->schema([
                     Combobox::make('targetCategories')
@@ -183,7 +176,6 @@ final class CampaignResource extends Resource
                         ->preload()
                         ->columnSpanFull(),
                 ]),
-            // Content settings are segmented to keep copy updates approachable.
             Section::make(__('campaigns.sections.content'))
                 ->schema([
                     Textarea::make('description')
