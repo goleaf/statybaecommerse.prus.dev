@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingHistories\Schemas;
 
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 
 final class SystemSettingHistoryForm
 {
     public static function configure(Form $form): Form
     {
-        return $schema
-            ->components([
+        return $form
+            ->schema([
                 Section::make(__('admin.system_setting_histories.basic_information'))
                     ->schema([
                         Grid::make(2)

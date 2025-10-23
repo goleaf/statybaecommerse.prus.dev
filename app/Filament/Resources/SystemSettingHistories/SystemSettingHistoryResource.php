@@ -16,6 +16,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
+use UnitEnum;
 
 class SystemSettingHistoryResource extends Resource
 {
@@ -24,6 +26,35 @@ class SystemSettingHistoryResource extends Resource
     protected static ?string $model = SystemSettingHistory::class;
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static ?int $navigationSort = 13;
+
+    protected static ?string $recordTitleAttribute = 'change_reason';
+
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-clock';
+    }
+
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Settings';
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.system_setting_histories.navigation_label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.system_setting_histories.plural_model_label');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.system_setting_histories.model_label');
+    }
 
     public static function form(Form $form): Form
     {
