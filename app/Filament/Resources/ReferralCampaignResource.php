@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\ReferralCampaignResource\Pages;
 use App\Models\ReferralCampaign;
 use App\Support\Filament\Components\Flatpickr;
@@ -14,8 +13,6 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -86,16 +83,10 @@ final class ReferralCampaignResource extends Resource
                                     ->label(__('admin.referral_campaigns.is_active'))
                                     ->inline(false)
                                     ->default(true),
-                                Flatpickr::make('start_date')
-                                    ->time(false)
-                                    ->format('Y-m-d')
-                                    ->rangePicker()
+                                Flatpickr::make('start_date')->datePicker()
                                     ->label(__('admin.referral_campaigns.start_date'))
                                     ->nullable(),
-                                Flatpickr::make('end_date')
-                                    ->time(false)
-                                    ->format('Y-m-d')
-                                    ->rangePicker()
+                                Flatpickr::make('end_date')->datePicker()
                                     ->label(__('admin.referral_campaigns.end_date'))
                                     ->nullable(),
                             ]),

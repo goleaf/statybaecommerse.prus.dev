@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\CampaignScheduleResource\Pages;
 use App\Models\CampaignSchedule;
-
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -97,19 +95,11 @@ final class CampaignScheduleResource extends Resource
                                         ]),
                                     Grid::make(2)
                                         ->schema([
-                                            Flatpickr::make('next_run_at')
-                                                ->time(true)
-                                                ->time24hr(true)
-                                                ->seconds(false)
-                                                ->format('Y-m-d H:i')
+                                            Flatpickr::make('next_run_at')->dateTimePicker()
                                                 ->label(__('admin.campaign_schedules.form.fields.next_run_at'))
                                                 ->required()
                                                 ->columnSpan(1),
-                                            Flatpickr::make('last_run_at')
-                                                ->time(true)
-                                                ->time24hr(true)
-                                                ->seconds(false)
-                                                ->format('Y-m-d H:i')
+                                            Flatpickr::make('last_run_at')->dateTimePicker()
                                                 ->label(__('admin.campaign_schedules.form.fields.last_run_at'))
                                                 ->columnSpan(1),
                                         ]),

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\VariantStockResource\RelationManagers;
 
+use App\Forms\Components\Flatpickr;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
-
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -64,11 +64,7 @@ class StockMovementsRelationManager extends BaseRelationManager
                 Textarea::make('notes')
                     ->label(__('inventory.notes'))
                     ->rows(3),
-                Flatpickr::make('moved_at')
-                    ->time(true)
-                    ->time24hr(true)
-                    ->seconds(false)
-                    ->format('Y-m-d H:i')
+                Flatpickr::make('moved_at')->dateTimePicker()
                     ->label(__('inventory.moved_at'))
                     ->default(now()),
             ]);

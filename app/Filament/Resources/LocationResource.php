@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\LocationResource\Pages;
 use App\Models\Location;
 use Filament\Actions\Action;
@@ -19,7 +18,6 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Forms\Set;
@@ -214,20 +212,10 @@ final class LocationResource extends Resource
                             Toggle::make('is_closed')
                                 ->label(__('locations.fields.is_closed'))
                                 ->live(),
-                            Flatpickr::make('open_time')
-                                ->time(true)
-                                ->time24hr(true)
-                                ->seconds(false)
-                                ->noCalendar(true)
-                                ->format('H:i')
+                            Flatpickr::make('open_time')->timeOnly()
                                 ->label(__('locations.fields.open_time'))
                                 ->visible(fn ($get) => ! $get('is_closed')),
-                            Flatpickr::make('close_time')
-                                ->time(true)
-                                ->time24hr(true)
-                                ->seconds(false)
-                                ->noCalendar(true)
-                                ->format('H:i')
+                            Flatpickr::make('close_time')->timeOnly()
                                 ->label(__('locations.fields.close_time'))
                                 ->visible(fn ($get) => ! $get('is_closed')),
                         ])

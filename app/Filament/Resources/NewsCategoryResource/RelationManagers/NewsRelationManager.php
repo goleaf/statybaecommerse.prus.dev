@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsCategoryResource\RelationManagers;
 
+use App\Forms\Components\Flatpickr;
 use App\Models\News;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms;
@@ -49,11 +50,7 @@ final class NewsRelationManager extends BaseRelationManager
                             ->default(true),
                         Forms\Components\Toggle::make('is_featured')
                             ->default(false),
-                        Flatpickr::make('published_at')
-                            ->time(true)
-                            ->time24hr(true)
-                            ->seconds(false)
-                            ->format('Y-m-d H:i')
+                        Flatpickr::make('published_at')->dateTimePicker()
                             ->default(now()),
                     ])
                     ->columns(2),
@@ -107,14 +104,8 @@ final class NewsRelationManager extends BaseRelationManager
                 Tables\Filters\TernaryFilter::make('is_featured'),
                 Tables\Filters\Filter::make('published_at')
                     ->form([
-                        Flatpickr::make('published_from')
-                            ->time(false)
-                            ->format('Y-m-d')
-                            ->rangePicker(),
-                        Flatpickr::make('published_until')
-                            ->time(false)
-                            ->format('Y-m-d')
-                            ->rangePicker(),
+                        Flatpickr::make('published_from')->datePicker(),
+                        Flatpickr::make('published_until')->datePicker(),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query

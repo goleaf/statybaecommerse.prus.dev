@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\CustomerManagementResource\Pages;
 use App\Models\User;
 use App\Support\Filament\Components\Flatpickr;
@@ -15,7 +14,6 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -84,11 +82,7 @@ final class CustomerManagementResource extends Resource
                                 ->label(__('customers.phone'))
                                 ->tel()
                                 ->maxLength(20),
-                            Flatpickr::make('email_verified_at')
-                                ->time(true)
-                                ->time24hr(true)
-                                ->seconds(false)
-                                ->format('Y-m-d H:i')
+                            Flatpickr::make('email_verified_at')->dateTimePicker()
                                 ->label(__('customers.email_verified_at'))
                                 ->displayFormat('d/m/Y H:i'),
                         ]),
@@ -131,11 +125,7 @@ final class CustomerManagementResource extends Resource
                         ]),
                     Grid::make(2)
                         ->schema([
-                            Flatpickr::make('date_of_birth')
-                                ->time(true)
-                                ->time24hr(true)
-                                ->seconds(false)
-                                ->format('Y-m-d H:i')
+                            Flatpickr::make('date_of_birth')->dateTimePicker()
                                 ->label(__('customers.date_of_birth'))
                                 ->displayFormat('Y-m-d'),
                             Select::make('gender')
@@ -247,15 +237,9 @@ final class CustomerManagementResource extends Resource
                     ->label(__('customers.orders_count')),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::make('created_from')
-                            ->time(false)
-                            ->format('Y-m-d')
-                            ->rangePicker()
+                        Flatpickr::make('created_from')->datePicker()
                             ->label(__('customers.created_from')),
-                        Flatpickr::make('created_until')
-                            ->time(false)
-                            ->format('Y-m-d')
-                            ->rangePicker()
+                        Flatpickr::make('created_until')->datePicker()
                             ->label(__('customers.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

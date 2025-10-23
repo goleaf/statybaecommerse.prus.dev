@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\DiscountCodeResource\Pages;
 use App\Models\DiscountCode;
 use App\Support\Filament\Components\Flatpickr;
@@ -15,7 +14,6 @@ use Filament\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -159,21 +157,11 @@ final class DiscountCodeResource extends Resource
                 ->schema([
                     Grid::make(2)
                         ->schema([
-                            Flatpickr::make('valid_from')
-                                ->time(true)
-                                ->time24hr(true)
-                                ->seconds(false)
-                                ->format('Y-m-d H:i')
-                                ->rangePicker()
+                            Flatpickr::make('valid_from')->dateTimePicker()
                                 ->label(__('discount_codes.valid_from'))
                                 ->default(now())
                                 ->displayFormat('d/m/Y H:i'),
-                            Flatpickr::make('valid_until')
-                                ->time(true)
-                                ->time24hr(true)
-                                ->seconds(false)
-                                ->format('Y-m-d H:i')
-                                ->rangePicker()
+                            Flatpickr::make('valid_until')->dateTimePicker()
                                 ->label(__('discount_codes.valid_until'))
                                 ->displayFormat('d/m/Y H:i'),
                         ]),

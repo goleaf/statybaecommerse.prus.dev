@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\FeatureFlagResource\Pages;
 use App\Models\FeatureFlag;
-
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -153,20 +151,10 @@ final class FeatureFlagResource extends Resource
                 ->components([
                     Grid::make(2)
                         ->components([
-                            Flatpickr::make('starts_at')
-                                ->time(true)
-                                ->time24hr(true)
-                                ->seconds(false)
-                                ->format('Y-m-d H:i')
-                                ->rangePicker()
+                            Flatpickr::make('starts_at')->dateTimePicker()
                                 ->label(__('feature_flags.starts_at'))
                                 ->nullable(),
-                            Flatpickr::make('ends_at')
-                                ->time(true)
-                                ->time24hr(true)
-                                ->seconds(false)
-                                ->format('Y-m-d H:i')
-                                ->rangePicker()
+                            Flatpickr::make('ends_at')->dateTimePicker()
                                 ->label(__('feature_flags.ends_at'))
                                 ->nullable(),
                         ]),

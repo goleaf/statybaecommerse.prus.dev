@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Enums\ModerationState;
 use App\Filament\Resources\PostResource\Pages;
 use App\Filament\Resources\PostResource\RelationManagers;
@@ -11,7 +12,6 @@ use App\Models\Post;
 use App\Support\Seo\LocaleUrlGenerator;
 use BackedEnum;
 use Filament\Forms;
-
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
@@ -193,11 +193,7 @@ final class PostResource extends Resource
                                     ->required()
                                     ->disableOptionWhen(fn (string $value): bool => $value === 'published')
                                     ->helperText(__('posts.status_managed_by_workflow')),
-                                Flatpickr::make('published_at')
-                                    ->time(true)
-                                    ->time24hr(true)
-                                    ->seconds(false)
-                                    ->format('Y-m-d H:i')
+                                Flatpickr::make('published_at')->dateTimePicker()
                                     ->label(__('posts.fields.published_at'))
                                     ->default(now()),
                             ]),
@@ -379,19 +375,9 @@ final class PostResource extends Resource
                     ->falseLabel(__('posts.filters.not_pinned')),
                 Filter::make('published_at')
                     ->form([
-                        Flatpickr::make('published_from')
-                            ->time(true)
-                            ->time24hr(true)
-                            ->seconds(false)
-                            ->format('Y-m-d H:i')
-                            ->rangePicker()
+                        Flatpickr::make('published_from')->dateTimePicker()
                             ->label(__('posts.filters.published_from')),
-                        Flatpickr::make('published_until')
-                            ->time(true)
-                            ->time24hr(true)
-                            ->seconds(false)
-                            ->format('Y-m-d H:i')
-                            ->rangePicker()
+                        Flatpickr::make('published_until')->dateTimePicker()
                             ->label(__('posts.filters.published_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

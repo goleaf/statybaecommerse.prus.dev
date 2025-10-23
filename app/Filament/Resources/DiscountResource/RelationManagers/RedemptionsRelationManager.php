@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountResource\RelationManagers;
 
+use App\Forms\Components\Flatpickr;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -73,11 +74,7 @@ final class RedemptionsRelationManager extends BaseRelationManager
                         ])
                         ->default('pending')
                         ->required(),
-                    Flatpickr::make('redeemed_at')
-                        ->time(true)
-                        ->time24hr(true)
-                        ->seconds(false)
-                        ->format('Y-m-d H:i')
+                    Flatpickr::make('redeemed_at')->dateTimePicker()
                         ->label('Redeemed At')
                         ->seconds(false)
                         ->required(),

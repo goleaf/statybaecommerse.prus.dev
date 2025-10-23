@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\ProductRequestResource\Pages;
 use App\Models\Product;
 use App\Models\ProductRequest;
@@ -139,11 +138,7 @@ final class ProductRequestResource extends Resource
                 Forms\Components\Textarea::make('admin_notes')
                     ->label(__('product_requests.fields.admin_notes'))
                     ->columnSpanFull(),
-                Flatpickr::make('responded_at')
-                    ->time(true)
-                    ->time24hr(true)
-                    ->seconds(false)
-                    ->format('Y-m-d H:i')
+                Flatpickr::make('responded_at')->dateTimePicker()
                     ->label(__('product_requests.fields.responded_at')),
                 Forms\Components\Select::make('responded_by')
                     ->relationship('respondedBy', 'name')

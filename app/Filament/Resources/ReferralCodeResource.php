@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\ReferralCodeResource\Pages;
 use App\Models\ReferralCampaign;
 use App\Models\ReferralCode;
-
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -78,9 +76,7 @@ final class ReferralCodeResource extends Resource
                             ->label(__('referral.form.is_active'))
                             ->inline(false)
                             ->default(true),
-                        Flatpickr::make('expires_at')
-                            ->time(false)
-                            ->format('Y-m-d')
+                        Flatpickr::make('expires_at')->datePicker()
                             ->label(__('referral.form.expires_at'))
                             ->nullable(),
                         TextInput::make('usage_limit')

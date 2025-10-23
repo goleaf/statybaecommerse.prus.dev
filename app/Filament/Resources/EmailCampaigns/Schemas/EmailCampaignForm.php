@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\EmailCampaigns\Schemas;
 
+use App\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
@@ -68,24 +69,12 @@ class EmailCampaignForm
                             ]),
                         Grid::make(2)
                             ->schema([
-                                Flatpickr::make('scheduled_at')
-                                    ->time(true)
-                                    ->time24hr(true)
-                                    ->seconds(false)
-                                    ->format('Y-m-d H:i')
+                                Flatpickr::make('scheduled_at')->dateTimePicker()
                                     ->label('Scheduled at'),
-                                Flatpickr::make('sent_at')
-                                    ->time(true)
-                                    ->time24hr(true)
-                                    ->seconds(false)
-                                    ->format('Y-m-d H:i')
+                                Flatpickr::make('sent_at')->dateTimePicker()
                                     ->label('Sent at'),
                             ]),
-                        Flatpickr::make('completed_at')
-                            ->time(true)
-                            ->time24hr(true)
-                            ->seconds(false)
-                            ->format('Y-m-d H:i')
+                        Flatpickr::make('completed_at')->dateTimePicker()
                             ->label('Completed at'),
                         Textarea::make('target_audience')
                             ->label('Target audience')

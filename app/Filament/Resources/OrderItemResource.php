@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\OrderItemResource\Pages;
 use App\Models\OrderItem;
 use App\Models\Product;
@@ -338,11 +338,10 @@ final class OrderItemResource extends Resource
                     ->preload(),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::make('range')
-                            ->label(__('order_items.created_at'))
-                            ->rangePicker()
-                            ->format('Y-m-d')
-                            ->displayFormat('Y-m-d'),
+                        Flatpickr::make('created_from')->datePicker()
+                            ->label(__('order_items.created_from')),
+                        Flatpickr::make('created_until')->datePicker()
+                            ->label(__('order_items.created_until')),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,

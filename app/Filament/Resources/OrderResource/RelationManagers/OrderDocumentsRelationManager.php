@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
+use App\Forms\Components\Flatpickr;
 use App\Models\Document;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\Action;
@@ -13,7 +14,6 @@ use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -156,11 +156,7 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
                                     ->label(__('orders.access_password'))
                                     ->password()
                                     ->maxLength(255),
-                                Flatpickr::make('expires_at')
-                                    ->time(true)
-                                    ->time24hr(true)
-                                    ->seconds(false)
-                                    ->format('Y-m-d H:i')
+                                Flatpickr::make('expires_at')->dateTimePicker()
                                     ->label(__('orders.expires_at')),
                             ]),
                     ])

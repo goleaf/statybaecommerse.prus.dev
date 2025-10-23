@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Enums\ModerationState;
 use App\Filament\Components\Combobox;
 use App\Filament\Resources\NewsResource\Pages;
@@ -75,11 +76,7 @@ class NewsResource extends Resource
                 ->columns(1),
             Forms\Components\Section::make('Publishing')
                 ->components([
-                    Flatpickr::make('published_at')
-                        ->time(true)
-                        ->time24hr(true)
-                        ->seconds(false)
-                        ->format('Y-m-d H:i')
+                    Flatpickr::make('published_at')->dateTimePicker()
                         ->label(__('news.fields.published_at'))
                         ->default(now()),
                     Forms\Components\TextInput::make('author_name')
@@ -235,15 +232,9 @@ class NewsResource extends Resource
                     ->label(__('news.fields.is_breaking')),
                 Tables\Filters\Filter::make('published_at')
                     ->form([
-                        Flatpickr::make('published_from')
-                            ->time(false)
-                            ->format('Y-m-d')
-                            ->rangePicker()
+                        Flatpickr::make('published_from')->datePicker()
                             ->label(__('news.filters.published_from')),
-                        Flatpickr::make('published_until')
-                            ->time(false)
-                            ->format('Y-m-d')
-                            ->rangePicker()
+                        Flatpickr::make('published_until')->datePicker()
                             ->label(__('news.filters.published_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

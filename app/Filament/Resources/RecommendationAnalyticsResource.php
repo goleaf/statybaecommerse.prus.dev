@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\RecommendationAnalyticsResource\Pages;
 use App\Models\RecommendationAnalytics;
 use BackedEnum;
@@ -13,7 +12,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -111,9 +109,7 @@ final class RecommendationAnalyticsResource extends Resource
                                     ])
                                     ->required()
                                     ->default('view'),
-                                Flatpickr::make('date')
-                                    ->time(false)
-                                    ->format('Y-m-d')
+                                Flatpickr::make('date')->datePicker()
                                     ->label(__('admin.recommendation_analytics.date'))
                                     ->required()
                                     ->default(now()),

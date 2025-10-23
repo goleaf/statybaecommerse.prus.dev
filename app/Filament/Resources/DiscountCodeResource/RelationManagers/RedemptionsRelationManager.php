@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountCodeResource\RelationManagers;
 
+use App\Forms\Components\Flatpickr;
 use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -40,11 +41,7 @@ final class RedemptionsRelationManager extends BaseRelationManager
                     ->numeric()
                     ->prefix('€')
                     ->required(),
-                Flatpickr::make('redeemed_at')
-                    ->time(true)
-                    ->time24hr(true)
-                    ->seconds(false)
-                    ->format('Y-m-d H:i')
+                Flatpickr::make('redeemed_at')->dateTimePicker()
                     ->label(__('Redeemed At'))
                     ->default(now())
                     ->required(),

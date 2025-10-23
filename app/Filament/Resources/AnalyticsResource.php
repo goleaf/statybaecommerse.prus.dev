@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Forms\Components\Flatpickr;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\AnalyticsResource\Pages;
 use App\Models\Order;
@@ -155,11 +154,12 @@ final class AnalyticsResource extends Resource
                 Filter::make('created_at')
                     ->label(__('analytics.order_date_range'))
                     ->form([
-                        Flatpickr::make('range')
+                        Flatpickr::make('created_from')->datePicker()
                             ->label(__('analytics.from_date'))
-                            ->rangePicker()
-                            ->format('Y-m-d')
-                            ->displayFormat('Y-m-d'),
+                            ->placeholder(__('analytics.from_date')),
+                        Flatpickr::make('created_until')->datePicker()
+                            ->label(__('analytics.until_date'))
+                            ->placeholder(__('analytics.until_date')),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,

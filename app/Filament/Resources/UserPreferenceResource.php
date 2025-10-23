@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\UserPreferenceResource\Pages;
 use App\Models\UserPreference;
 use App\Support\Filament\Components\Flatpickr;
@@ -16,7 +15,6 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -93,11 +91,7 @@ final class UserPreferenceResource extends Resource
                     ->maxValue(1)
                     ->step(0.000001)
                     ->default(0),
-                Flatpickr::make('last_updated')
-                    ->time(true)
-                    ->time24hr(true)
-                    ->seconds(false)
-                    ->format('Y-m-d H:i')
+                Flatpickr::make('last_updated')->dateTimePicker()
                     ->label(__('admin.user_preferences.last_updated'))
                     ->default(now()),
                 KeyValue::make('metadata')

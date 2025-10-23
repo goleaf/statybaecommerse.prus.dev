@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\ProductResource;
 use App\Filament\Resources\UserProductInteractionResource\Pages;
 use App\Models\Product;
@@ -16,7 +17,6 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -136,20 +136,12 @@ final class UserProductInteractionResource extends Resource
                                     ->minValue(1)
                                     ->default(1)
                                     ->helperText(__('admin.user_product_interactions.count_help')),
-                                Flatpickr::make('first_interaction')
-                                    ->time(true)
-                                    ->time24hr(true)
-                                    ->seconds(false)
-                                    ->format('Y-m-d H:i')
+                                Flatpickr::make('first_interaction')->dateTimePicker()
                                     ->label(__('admin.user_product_interactions.first_interaction'))
                                     ->default(now())
                                     ->displayFormat('d/m/Y H:i')
                                     ->seconds(false),
-                                Flatpickr::make('last_interaction')
-                                    ->time(true)
-                                    ->time24hr(true)
-                                    ->seconds(false)
-                                    ->format('Y-m-d H:i')
+                                Flatpickr::make('last_interaction')->dateTimePicker()
                                     ->label(__('admin.user_product_interactions.last_interaction'))
                                     ->default(now())
                                     ->displayFormat('d/m/Y H:i')

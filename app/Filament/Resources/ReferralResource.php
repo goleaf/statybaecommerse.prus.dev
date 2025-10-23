@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\ReferralResource\Pages;
 use App\Models\Referral;
 use App\Support\Filament\Components\Flatpickr;
@@ -14,7 +13,6 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -77,13 +75,9 @@ final class ReferralResource extends Resource
                                 'cancelled' => 'Cancelled',
                             ])
                             ->required(),
-                        Flatpickr::make('completed_at')
-                            ->time(false)
-                            ->format('Y-m-d')
+                        Flatpickr::make('completed_at')->datePicker()
                             ->nullable(),
-                        Flatpickr::make('expires_at')
-                            ->time(false)
-                            ->format('Y-m-d')
+                        Flatpickr::make('expires_at')->datePicker()
                             ->nullable(),
                         TextInput::make('source')
                             ->maxLength(255)

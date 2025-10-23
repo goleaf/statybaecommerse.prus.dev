@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\PriceListItemResource\Pages;
 use App\Models\PriceListItem;
 use App\Models\Product;
@@ -16,7 +15,6 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -155,21 +153,11 @@ final class PriceListItemResource extends Resource
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                                Flatpickr::make('valid_from')
-                                    ->time(true)
-                                    ->time24hr(true)
-                                    ->seconds(false)
-                                    ->format('Y-m-d H:i')
-                                    ->rangePicker()
+                                Flatpickr::make('valid_from')->dateTimePicker()
                                     ->label(__('price_list_items.valid_from'))
                                     ->default(now())
                                     ->helperText(__('price_list_items.valid_from_help')),
-                                Flatpickr::make('valid_until')
-                                    ->time(true)
-                                    ->time24hr(true)
-                                    ->seconds(false)
-                                    ->format('Y-m-d H:i')
-                                    ->rangePicker()
+                                Flatpickr::make('valid_until')->dateTimePicker()
                                     ->label(__('price_list_items.valid_until'))
                                     ->after('valid_from')
                                     ->helperText(__('price_list_items.valid_until_help')),

@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\StockMovementResource\Pages;
 use App\Models\StockMovement;
 use App\Support\Filament\Components\Flatpickr;
@@ -15,7 +14,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -119,11 +117,7 @@ final class StockMovementResource extends Resource
                         ->label(__('stock_movement.fields.notes'))
                         ->maxLength(1000)
                         ->rows(3),
-                    Flatpickr::make('moved_at')
-                        ->time(true)
-                        ->time24hr(true)
-                        ->seconds(false)
-                        ->format('Y-m-d H:i')
+                    Flatpickr::make('moved_at')->dateTimePicker()
                         ->label(__('stock_movement.fields.moved_at'))
                         ->required()
                         ->default(now()),
@@ -184,16 +178,10 @@ final class StockMovementResource extends Resource
                     ->preload(),
                 Filter::make('moved_at')
                     ->form([
-                        Flatpickr::make('moved_from')
-                            ->time(false)
-                            ->format('Y-m-d')
-                            ->rangePicker()
+                        Flatpickr::make('moved_from')->datePicker()
                             ->label(__('stock_movement.fields.moved_at'))
                             ->placeholder(__('stock_movement.filters.from')),
-                        Flatpickr::make('moved_to')
-                            ->time(false)
-                            ->format('Y-m-d')
-                            ->rangePicker()
+                        Flatpickr::make('moved_to')->datePicker()
                             ->label(__('stock_movement.fields.moved_at'))
                             ->placeholder(__('stock_movement.filters.to')),
                     ])
