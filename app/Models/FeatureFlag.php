@@ -6,7 +6,7 @@ namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
-use App\Observers\UserAttributionObserver;
+use App\Observers\AttributionObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -28,17 +28,57 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @mixin \Eloquent
  */
+#[ObservedBy([AttributionObserver::class])]
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
 #[ObservedBy([UserAttributionObserver::class])]
 final class FeatureFlag extends Model
 {
     use HasFactory;
 
-    protected $with = ['creator', 'updater'];
+    protected $fillable = [
+        'name',
+        'key',
+        'description',
+        'is_active',
+        'is_enabled',
+        'is_global',
+        'conditions',
+        'rollout_percentage',
+        'environment',
+        'starts_at',
+        'ends_at',
+        'start_date',
+        'end_date',
+        'metadata',
+        'priority',
+        'category',
+        'impact_level',
+        'rollout_strategy',
+        'rollback_plan',
+        'success_metrics',
+        'approval_status',
+        'approval_notes',
+        'last_activated',
+        'last_deactivated',
+    ];
 
-    protected $fillable = ['name', 'key', 'description', 'is_active', 'is_enabled', 'is_global', 'conditions', 'rollout_percentage', 'environment', 'starts_at', 'ends_at', 'start_date', 'end_date', 'metadata', 'priority', 'category', 'impact_level', 'rollout_strategy', 'rollback_plan', 'success_metrics', 'approval_status', 'approval_notes', 'created_by', 'created_by_name', 'updated_by', 'updated_by_name', 'last_activated', 'last_deactivated'];
-
-    protected $casts = ['is_active' => 'boolean', 'is_enabled' => 'boolean', 'is_global' => 'boolean', 'conditions' => 'json', 'rollout_percentage' => 'json', 'metadata' => 'json', 'success_metrics' => 'json', 'starts_at' => 'datetime', 'ends_at' => 'datetime', 'start_date' => 'datetime', 'end_date' => 'datetime', 'last_activated' => 'datetime', 'last_deactivated' => 'datetime', 'created_by' => 'integer', 'updated_by' => 'integer'];
+    protected $casts = [
+        'is_active' => 'boolean',
+        'is_enabled' => 'boolean',
+        'is_global' => 'boolean',
+        'conditions' => 'json',
+        'rollout_percentage' => 'json',
+        'metadata' => 'json',
+        'success_metrics' => 'json',
+        'starts_at' => 'datetime',
+        'ends_at' => 'datetime',
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
+        'last_activated' => 'datetime',
+        'last_deactivated' => 'datetime',
+        'created_by' => 'integer',
+        'updated_by' => 'integer',
+    ];
 
     /**
      * Handle isEnabled functionality with proper error handling.
@@ -195,23 +235,19 @@ final class FeatureFlag extends Model
         return $this->belongsToMany(User::class, 'feature_flag_users');
     }
 
+    /**
+     * Handle creator functionality with proper error handling.
+     */
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    /**
+     * Handle updater functionality with proper error handling.
+     */
     public function updater(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by');
-    }
-
-    protected function createdByDisplay(): Attribute
-    {
-        return Attribute::get(fn (): ?string => $this->creator?->name ?? $this->created_by_name);
-    }
-
-    protected function updatedByDisplay(): Attribute
-    {
-        return Attribute::get(fn (): ?string => $this->updater?->name ?? $this->updated_by_name);
     }
 }

@@ -65,26 +65,16 @@ class FeatureFlagsTable
                     ->searchable(),
                 TextColumn::make('approval_status')
                     ->searchable(),
-                TextColumn::make('created_by_display')
+                TextColumn::make('creator.name')
                     ->label(__('system.created_by'))
-                    ->formatStateUsing(fn (FeatureFlag $record): string => $record->created_by_display ?? '—')
-                    ->searchable(query: function (Builder $query, string $search): Builder {
-                        return $query->where(function (Builder $scopedQuery) use ($search): void {
-                            $scopedQuery
-                                ->whereHas('creator', fn (Builder $creatorQuery): Builder => $creatorQuery->where('name', 'like', "%{$search}%"))
-                                ->orWhere('created_by_name', 'like', "%{$search}%");
-                        });
-                    }),
-                TextColumn::make('updated_by_display')
+                    ->formatStateUsing(fn (?string $state): string => $state ?? '—')
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->searchable(),
+                TextColumn::make('updater.name')
                     ->label(__('system.updated_by'))
-                    ->formatStateUsing(fn (FeatureFlag $record): string => $record->updated_by_display ?? '—')
-                    ->searchable(query: function (Builder $query, string $search): Builder {
-                        return $query->where(function (Builder $scopedQuery) use ($search): void {
-                            $scopedQuery
-                                ->whereHas('updater', fn (Builder $updaterQuery): Builder => $updaterQuery->where('name', 'like', "%{$search}%"))
-                                ->orWhere('updated_by_name', 'like', "%{$search}%");
-                        });
-                    }),
+                    ->formatStateUsing(fn (?string $state): string => $state ?? '—')
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->searchable(),
                 TextColumn::make('last_activated')
                     ->dateTime()
                     ->sortable(),

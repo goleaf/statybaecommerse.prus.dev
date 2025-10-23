@@ -6,54 +6,75 @@ namespace App\Observers;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
+/**
+ * AttributionObserver
+ *
+ * Shared observer that automatically manages created_by and updated_by columns
+ * for authenticated users.
+ */
 final class AttributionObserver
 {
     public function creating(Model $model): void
     {
-        $userId = Auth::id();
-
-        if ($userId === null) {
+        if (! Auth::check()) {
             return;
         }
 
-        if ($this->supportsAttribute($model, 'created_by') && ! $model->isDirty('created_by') && $model->getAttribute('created_by') === null) {
-            $model->setAttribute('created_by', $userId);
-        }
-
-        if ($this->supportsAttribute($model, 'updated_by') && ! $model->isDirty('updated_by') && $model->getAttribute('updated_by') === null) {
-            $model->setAttribute('updated_by', $userId);
-        }
+        $this->setCreatedBy($model);
+        $this->setUpdatedBy($model, force: false);
     }
 
     public function updating(Model $model): void
     {
-        $userId = Auth::id();
-
-        if ($userId === null) {
+        if (! Auth::check()) {
             return;
         }
 
-        if ($this->supportsAttribute($model, 'updated_by') && ! $model->isDirty('updated_by')) {
-            $model->setAttribute('updated_by', $userId);
-        }
+        $this->setUpdatedBy($model);
     }
 
-    public function saving(Model $model): void
+    private function setCreatedBy(Model $model): void
     {
-        $userId = Auth::id();
-
-        if ($userId === null) {
+        if (! $this->columnExists($model, 'created_by')) {
             return;
         }
 
-        if (! $model->exists && $this->supportsAttribute($model, 'updated_by') && $model->getAttribute('updated_by') === null) {
-            $model->setAttribute('updated_by', $userId);
+        if ($model->getAttribute('created_by')) {
+            return;
         }
+
+        $model->forceFill(['created_by' => Auth::id()]);
     }
 
-    private function supportsAttribute(Model $model, string $attribute): bool
+    private function setUpdatedBy(Model $model, bool $force = true): void
     {
-        return in_array($attribute, $model->getFillable(), true);
+        if (! $this->columnExists($model, 'updated_by')) {
+            return;
+        }
+
+        if (! $force && $model->getAttribute('updated_by')) {
+            return;
+        }
+
+        $model->forceFill(['updated_by' => Auth::id()]);
+    }
+
+    private function columnExists(Model $model, string $column): bool
+    {
+        static $cache = [];
+
+        $table = $model->getTable();
+
+        if (! array_key_exists($table, $cache)) {
+            $cache[$table] = [];
+        }
+
+        if (! array_key_exists($column, $cache[$table])) {
+            $cache[$table][$column] = Schema::hasColumn($table, $column);
+        }
+
+        return $cache[$table][$column];
     }
 }
