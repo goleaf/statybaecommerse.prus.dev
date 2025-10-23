@@ -28,7 +28,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
+use Str;
 use UnitEnum;
 
 /**
@@ -239,8 +239,8 @@ final class ShippingOptionResource extends Resource
                     ->sortable(),
                 TextColumn::make('estimated_days_min')
                     ->label(__('admin.shipping_options.estimated_days'))
-                    ->formatStateUsing(fn ($record) => $record->estimated_days_min && $record->estimated_days_max
-                        ? "{$record->estimated_days_min}-{$record->estimated_days_max} " . __('admin.shipping_options.days')
+                    ->formatStateUsing(fn ($state, ShippingOption $record): string => $state !== null && $record->estimated_days_max !== null
+                        ? "{$state}-{$record->estimated_days_max} " . __('admin.shipping_options.days')
                         : '-'),
                 IconColumn::make('is_enabled')
                     ->label(__('admin.shipping_options.is_enabled'))
