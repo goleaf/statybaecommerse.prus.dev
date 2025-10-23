@@ -19,7 +19,10 @@
 - Created_at index migrations now detect pre-existing keys case-insensitively (with driver-specific fallbacks) and the demo currency/country seeds align with multilingual schemas, so `php artisan migrate:fresh --seed` completes reliably across supported databases.
 - Discount rebuild migrations now temporarily relax foreign key checks only while replaying legacy rows, preventing the `discount_codes_created_by_foreign` MySQL error during full refreshes without sacrificing referential integrity.
 - User and author foreign keys on rebuilt discount tables now attach after verifying the `users` table compatibility, ensuring MySQL restores with mixed storage engines keep migrating without tripping the `discount_codes_created_by_foreign` system-table check.
-- Focused PHPUnit runs now auto-run pending migrations when the in-memory SQLite database is empty, keeping factories from hitting missing-table errors while generating deterministic email addresses.
+- User-product interaction factories now default to alternate interaction types
+  and constrained timestamp windows, while the model enforces lean fillable
+  data and scope-free product relations so duplicate analytics records no
+  longer collide with unique keys during regression tests.
 
 ## Discounts & promotions
 - Coupon migrations now provision maximum discount caps, per-user usage limits, and product/category scoping columns so factories, admin forms, and API tests share the same schema snapshot during refreshes.
