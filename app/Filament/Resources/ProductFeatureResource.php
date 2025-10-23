@@ -31,7 +31,8 @@ final class ProductFeatureResource extends Resource
 
     protected static ?string $model = ProductFeature::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-star';
+    /** @var string|BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-star';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
@@ -50,7 +51,13 @@ final class ProductFeatureResource extends Resource
                 ->searchable()
                 ->preload(),
             Forms\Components\Select::make('feature_type')
-                ->options(self::getFeatureTypeOptions())
+                ->options([
+                    'specification' => 'Specification',
+                    'benefit'       => 'Benefit',
+                    'feature'       => 'Feature',
+                    'technical'     => 'Technical',
+                    'performance'   => 'Performance',
+                ])
                 ->searchable(),
             Forms\Components\TextInput::make('feature_key')
                 ->label('Feature Key')
@@ -150,34 +157,6 @@ final class ProductFeatureResource extends Resource
             'index'  => Pages\ListProductFeatures::route('/'),
             'create' => Pages\CreateProductFeature::route('/create'),
             'edit'   => Pages\EditProductFeature::route('/{record}/edit'),
-        ];
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private static function getFeatureTypeOptions(): array
-    {
-        return [
-            'specification' => 'Specification',
-            'benefit'       => 'Benefit',
-            'feature'       => 'Feature',
-            'technical'     => 'Technical',
-            'performance'   => 'Performance',
-        ];
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private static function getFeatureTypeOptions(): array
-    {
-        return [
-            'specification' => 'Specification',
-            'benefit' => 'Benefit',
-            'feature' => 'Feature',
-            'technical' => 'Technical',
-            'performance' => 'Performance',
         ];
     }
 }
