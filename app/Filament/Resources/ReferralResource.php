@@ -33,12 +33,15 @@ final class ReferralResource extends Resource
 
     protected static ?string $model = Referral::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-share';
+    /**
+     * Navigation icon for the resource.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-share';
 
     /**
      * Navigation group for organizing the resource in the admin panel.
      */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Marketing; // Keep referrals with other marketing touchpoints.
+    protected static UnitEnum|string|null $navigationGroup = 'Marketing';
 
     protected static ?int $navigationSort = 17;
 
