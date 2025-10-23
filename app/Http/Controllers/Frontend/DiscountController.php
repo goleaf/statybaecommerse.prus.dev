@@ -5,119 +5,125 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Coupon;
 use App\Models\Discount;
-use App\Models\DiscountCode;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
 
 final class DiscountController extends Controller
 {
-    public function index(Request $request): View
+    public function index(): View
     {
-        return view('frontend.discounts.index', [
-            'activeDiscounts' => Discount::query()->active()->orderByDesc('created_at')->get(),
-            'upcomingDiscounts' => Discount::query()->scheduled()->orderBy('starts_at')->get(),
-            'expiredDiscounts' => Discount::query()->expired()->orderByDesc('ends_at')->limit(10)->get(),
-        ]);
-    }
+        $discounts = Discount::query()
+            ->active()
+            ->orderByDesc('priority')
+            ->paginate(12);
 
-    public function show(Discount $discount): View
-    {
-        $discount->load(['codes', 'conditions']);
-
-        return view('frontend.discounts.show', [
-            'discount' => $discount,
-            'codes' => $discount->codes()->latest()->get(),
-        ]);
+        return view('frontend.discounts.index', compact('discounts'));
     }
 
     public function coupons(): View
     {
-        $codes = DiscountCode::query()->orderByDesc('created_at')->paginate(15);
+        $coupons = Coupon::query()
+            ->valid()
+            ->orderByDesc('created_at')
+            ->paginate(12);
 
-        return view('frontend.discounts.coupons', [
-            'codes' => $codes,
-        ]);
+        return view('frontend.discounts.coupons', compact('coupons'));
     }
 
     public function applyCoupon(Request $request): RedirectResponse
     {
-        $data = $request->validate([
+        $validated = $request->validate([
             'code' => ['required', 'string'],
         ]);
 
-        $code = DiscountCode::query()
-            ->whereRaw('LOWER(code) = ?', [Str::lower($data['code'])])
-            ->first();
-
-        if (! $code) {
-            return back()->withErrors(['code' => __('Coupon not found.')]);
+        $cart = Session::get('cart', []);
+        if (empty($cart)) {
+            return redirect()->route('frontend.cart.index')->withErrors([
+                'cart' => __('Add items to your cart before applying a coupon.'),
+            ]);
         }
 
-        $cartItems = collect($request->session()->get('cart', []));
-        $discountAmount = $this->calculateDiscountAmount($code, $cartItems);
+        $coupon = Coupon::query()->valid()->byCode($validated['code'])->first();
 
-        if ($discountAmount <= 0) {
-            return back()->withErrors(['code' => __('This coupon cannot be applied to your cart.')]);
+        if (! $coupon) {
+            return redirect()->back()->withErrors([
+                'code' => __('The provided coupon code is not valid.'),
+            ]);
         }
 
-        $request->session()->put('cart_discount', $discountAmount);
-        $request->session()->put('applied_coupon', $code->code);
+        $summary = $this->buildCartSummary();
 
-        return redirect()->route('frontend.cart.index')->with('status', __('Coupon applied successfully.'));
-    }
-
-    public function removeCoupon(Request $request): RedirectResponse
-    {
-        $request->session()->forget(['cart_discount', 'applied_coupon']);
-
-        return back()->with('status', __('Coupon removed.'));
-    }
-
-    public function validate(Request $request): JsonResponse
-    {
-        $code = DiscountCode::query()
-            ->whereRaw('LOWER(code) = ?', [Str::lower($request->input('code'))])
-            ->first();
-
-        if (! $code) {
-            return response()->json(['valid' => false, 'message' => __('Coupon not found.')]);
+        if ($coupon->minimum_amount && $summary['subtotal'] < $coupon->minimum_amount) {
+            return redirect()->back()->withErrors([
+                'code' => __('This coupon requires a minimum order amount of :amount.', ['amount' => app_money_format($coupon->minimum_amount ?? 0)]),
+            ]);
         }
 
-        return response()->json([
-            'valid' => true,
-            'discount' => $code->value,
-            'type' => $code->type,
-            'expires_at' => optional($code->expires_at)?->toDateTimeString(),
+        $discountAmount = $this->calculateDiscount($coupon, $summary['subtotal']);
+
+        Session::put('cart_discount', $discountAmount);
+        Session::put('applied_coupon', [
+            'id' => $coupon->getKey(),
+            'code' => $coupon->code,
         ]);
+
+        return redirect()->route('frontend.cart.index')->with('status', 'coupon-applied');
     }
 
-    private function calculateDiscountAmount(DiscountCode $code, Collection $cartItems): float
+    public function removeCoupon(): RedirectResponse
     {
-        $subtotal = $cartItems->sum(fn ($item) => ($item['price'] ?? 0) * ($item['quantity'] ?? 0));
+        Session::forget('cart_discount');
+        Session::forget('applied_coupon');
 
-        if ($subtotal <= 0) {
-            return 0.0;
-        }
+        return redirect()->route('frontend.cart.index')->with('status', 'coupon-removed');
+    }
 
-        $value = (float) $code->value;
+    private function calculateDiscount(Coupon $coupon, float $subtotal): float
+    {
+        $discount = 0.0;
 
-        if ($code->type === 'percentage') {
-            $amount = $subtotal * ($value / 100);
+        if ($coupon->type === 'percentage') {
+            $discount = $subtotal * ((float) $coupon->value / 100);
         } else {
-            $amount = $value;
+            $discount = (float) $coupon->value;
         }
 
-        if ($code->maximum_discount) {
-            $amount = min($amount, (float) $code->maximum_discount);
+        if ($coupon->maximum_discount) {
+            $discount = min($discount, (float) $coupon->maximum_discount);
         }
 
-        $amount = min($amount, $subtotal);
+        if ($coupon->type === 'fixed') {
+            $discount = min($discount, $subtotal);
+        }
 
-        return round($amount, 2);
+        return round(max($discount, 0), 2);
+    }
+
+    private function buildCartSummary(): array
+    {
+        $cart = Session::get('cart', []);
+        $subtotal = 0.0;
+
+        foreach ($cart as $item) {
+            $subtotal += (float) ($item['price'] ?? 0) * (int) ($item['quantity'] ?? 0);
+        }
+
+        $taxRate = config('shared.tax.default_rate', 0.21);
+        $tax = $subtotal * $taxRate;
+        $shipping = $subtotal > 50 ? 0 : 5.99;
+        $discount = (float) Session::get('cart_discount', 0);
+        $total = $subtotal + $tax + $shipping - $discount;
+
+        return [
+            'subtotal' => round($subtotal, 2),
+            'tax' => round($tax, 2),
+            'shipping' => round($shipping, 2),
+            'discount' => round($discount, 2),
+            'total' => round(max($total, 0), 2),
+        ];
     }
 }
