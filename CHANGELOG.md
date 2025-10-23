@@ -24,7 +24,8 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Introduced a reusable HTML sanitization pipeline with a maintenance command, model hooks, and storefront renderer updates to harden product and legal content.
 
 ### Bug Fixes
-* Ensured the price list discount filter only surfaces items where the compare price actually exceeds the net price and added coverage to guard the behaviour going forward.
+* Corrected shipping option delivery window formatting so zero-day estimates and partially filled ranges no longer collapse to a placeholder dash in admin tables.
+* Ensured the test bootstrap reloads JSON translation directories so Filament commerce navigation labels resolve to localized values instead of falling back to raw keys during regression runs.
 
 ## [0.1.0] - 2025-10-20
 
