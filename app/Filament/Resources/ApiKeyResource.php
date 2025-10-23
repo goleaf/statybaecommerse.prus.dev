@@ -5,54 +5,66 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Enums\ApiKeyScope;
+use App\Filament\Resources\ApiKeyResource\Concerns\HandlesApiKeyCredentials;
 use App\Filament\Resources\ApiKeyResource\Pages;
 use App\Models\ApiKey;
+use BackedEnum;
+use Filament\Forms\Components\Actions\Action as FormAction;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\View as ViewComponent;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Actions\Action as TableAction;
-use Filament\Actions\ActionGroup;
-use Filament\Actions\DeleteAction as TableDeleteAction;
-use Filament\Actions\EditAction as TableEditAction;
+use Filament\Tables\Actions\Action as TableAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TagsColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use UnitEnum;
 
-/**
- * @codeCoverageIgnore
- */
 final class ApiKeyResource extends Resource
 {
+    use HandlesApiKeyCredentials;
+
     protected static ?string $model = ApiKey::class;
 
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-key';
+    protected static ?string $navigationLabel = 'api_keys.navigation.label';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    /** @var string|BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-key';
+
+    protected static UnitEnum|string|null $navigationGroup = null;
+
+    protected static ?int $navigationSort = 4;
+
+    public static function getNavigationLabel(): string
+    {
+        return __('api_keys.navigation.label');
+    }
+
+    public static function getNavigationGroup(): ?string
     {
         return __('navigation.groups.system');
     }
 
-    public static function getNavigationLabel(): string
-    {
-        return __('api_keys.navigation');
-    }
-
     public static function getModelLabel(): string
     {
-        return __('api_keys.single');
+        return __('api_keys.navigation.singular');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('api_keys.plural');
+        return __('api_keys.navigation.plural');
     }
 
     public static function form(Form $form): Form
@@ -64,30 +76,68 @@ final class ApiKeyResource extends Resource
                     TextInput::make('name')
                         ->label(__('api_keys.fields.name'))
                         ->required()
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->placeholder(__('api_keys.placeholders.name')),
+                    Toggle::make('active')
+                        ->label(__('api_keys.fields.active'))
+                        ->default(true),
+                    CheckboxList::make('scopes')
+                        ->label(__('api_keys.fields.scopes'))
+                        ->required()
+                        ->options(ApiKeyScope::options())
+                        ->helperText(__('api_keys.hints.scopes'))
+                        ->columns(2)
+                        ->bulkToggleable(),
                     TextInput::make('rate_limit')
                         ->label(__('api_keys.fields.rate_limit'))
                         ->numeric()
-                        ->minValue(1)
-                        ->nullable()
-                        ->helperText(__('api_keys.helpers.rate_limit')),
-                    CheckboxList::make('permissions')
-                        ->label(__('api_keys.fields.scopes'))
-                        ->options(ApiKeyScope::options())
-                        ->columns(2)
-                        ->helperText(__('api_keys.helpers.scopes'))
-                        ->columnSpanFull(),
-                    Toggle::make('is_active')
-                        ->label(__('api_keys.fields.is_active'))
-                        ->default(true),
+                        ->minValue(0)
+                        ->hint(__('api_keys.hints.rate_limit'))
+                        ->placeholder(__('api_keys.placeholders.rate_limit')),
                 ]),
             Section::make(__('api_keys.sections.credentials'))
                 ->schema([
-                    Placeholder::make('masked_key')
-                        ->label(__('api_keys.fields.masked_key'))
-                        ->content(static fn (?ApiKey $record): string => $record?->maskKey() ?? __('api_keys.messages.no_key')),
-                    ViewComponent::make('filament.forms.components.api-key-credentials')
-                        ->columnSpanFull(),
+                    TextInput::make('plain_text_key')
+                        ->label(__('api_keys.fields.plain_text_key'))
+                        ->password()
+                        ->revealable()
+                        ->copyable()
+                        ->readOnly()
+                        ->dehydrated(false)
+                        ->helperText(__('api_keys.hints.generated_once'))
+                        ->afterStateHydrated(static function (TextInput $component, ?string $state, ?ApiKey $record): void {
+                            if (filled($state)) {
+                                return;
+                            }
+
+                            $plainText = session()->get(static::getCredentialSessionKey($record));
+
+                            if (filled($plainText)) {
+                                $component->state($plainText);
+                            }
+                        })
+                        ->suffixAction(
+                            FormAction::make('refresh')
+                                ->label(__('api_keys.actions.regenerate'))
+                                ->icon('heroicon-o-arrow-path')
+                                ->color('warning')
+                                ->requiresConfirmation()
+                                ->action('generateFreshPlainTextKey')
+                        ),
+                ]),
+            Section::make(__('api_keys.sections.activity'))
+                ->columns(3)
+                ->visible(fn (?ApiKey $record): bool => $record !== null)
+                ->schema([
+                    Placeholder::make('last_used_at')
+                        ->label(__('api_keys.fields.last_used_at'))
+                        ->content(fn (?ApiKey $record): string => $record?->last_used_at?->diffForHumans() ?? '—'),
+                    Placeholder::make('created_at')
+                        ->label(__('api_keys.fields.created_at'))
+                        ->content(fn (?ApiKey $record): string => $record?->created_at?->toDateTimeString() ?? '—'),
+                    Placeholder::make('updated_at')
+                        ->label(__('api_keys.fields.updated_at'))
+                        ->content(fn (?ApiKey $record): string => $record?->updated_at?->toDateTimeString() ?? '—'),
                 ]),
         ]);
     }
@@ -100,76 +150,93 @@ final class ApiKeyResource extends Resource
                     ->label(__('api_keys.fields.name'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('permissions')
+                TagsColumn::make('scopes')
                     ->label(__('api_keys.fields.scopes'))
-                    ->formatStateUsing(static fn (?array $state): string => Collection::make($state)
-                        ->map(static fn (string $scope): ?string => ApiKeyScope::tryFrom($scope)?->label())
-                        ->filter()
-                        ->join(', ')
-                    )
-                    ->badge()
-                    ->wrap()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->separator(', ')
+                    ->formatStateUsing(static fn (?array $state): array => Collection::make($state)
+                        ->map(fn (string $scope) => ApiKeyScope::tryFrom($scope)?->label() ?? $scope)
+                        ->all())
+                    ->limit(3)
+                    ->toggleable(),
                 TextColumn::make('rate_limit')
                     ->label(__('api_keys.fields.rate_limit'))
-                    ->sortable()
-                    ->formatStateUsing(static fn (?int $state): string => $state === null
-                        ? __('api_keys.messages.unlimited')
-                        : __('api_keys.messages.requests_per_minute', ['value' => $state])
-                    ),
-                IconColumn::make('is_active')
-                    ->label(__('api_keys.fields.is_active'))
-                    ->boolean()
-                    ->toggleable(),
+                    ->formatStateUsing(fn (ApiKey $record): string => $record->formattedRateLimit())
+                    ->sortable(),
+                IconColumn::make('active')
+                    ->label(__('api_keys.fields.active'))
+                    ->boolean(),
                 TextColumn::make('last_used_at')
                     ->label(__('api_keys.fields.last_used_at'))
                     ->dateTime()
-                    ->since()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('created_at')
+                    ->label(__('api_keys.fields.created_at'))
+                    ->dateTime()
                     ->sortable(),
             ])
-            ->actions([
-                ActionGroup::make([
-                    TableAction::make('reveal')
-                        ->label(__('api_keys.actions.reveal_key'))
-                        ->icon('heroicon-m-eye')
-                        ->modalHeading(__('api_keys.modals.reveal_key.heading'))
-                        ->modalContent(static fn (ApiKey $record): View => view('filament.api-keys.reveal-key', [
-                            'key' => $record->key,
-                            'secret' => $record->secret,
-                        ]))
-                        ->modalSubmitAction(false),
-                    TableAction::make('revoke')
-                        ->label(__('api_keys.actions.revoke'))
-                        ->icon('heroicon-m-no-symbol')
-                        ->color('danger')
-                        ->requiresConfirmation()
-                        ->visible(static fn (ApiKey $record): bool => $record->is_active)
-                        ->action(static fn (ApiKey $record): bool => $record->update(['is_active' => false])),
-                    TableAction::make('activate')
-                        ->label(__('api_keys.actions.reactivate'))
-                        ->icon('heroicon-m-bolt')
-                        ->color('success')
-                        ->requiresConfirmation()
-                        ->visible(static fn (ApiKey $record): bool => ! $record->is_active)
-                        ->action(static fn (ApiKey $record): bool => $record->update(['is_active' => true])),
-                    TableAction::make('regenerate')
-                        ->label(__('api_keys.actions.regenerate_key'))
-                        ->icon('heroicon-m-arrow-path')
-                        ->color('warning')
-                        ->requiresConfirmation()
-                        ->action(static function (ApiKey $record): void {
-                            $credentials = $record->regenerateCredentials();
+            ->filters([
+                TernaryFilter::make('active')
+                    ->label(__('api_keys.filters.active')),
+                SelectFilter::make('scopes')
+                    ->label(__('api_keys.filters.scope'))
+                    ->multiple()
+                    ->options(ApiKeyScope::options())
+                    ->query(function (Builder $query, array $values): Builder {
+                        $scopes = Collection::make($values)->filter()->values();
 
-                            \Filament\Notifications\Notification::make()
-                                ->title(__('api_keys.notifications.regenerated.title'))
-                                ->body(__('api_keys.notifications.regenerated.body', ['key' => $credentials['key']]))
-                                ->success()
-                                ->send();
-                        }),
-                    TableEditAction::make(),
-                    TableDeleteAction::make(),
+                        if ($scopes->isEmpty()) {
+                            return $query;
+                        }
+
+                        return $scopes->reduce(
+                            fn (Builder $builder, string $scope): Builder => $builder->whereJsonContains('scopes', $scope),
+                            $query,
+                        );
+                    }),
+            ])
+            ->actions([
+                TableAction::make('reveal')
+                    ->label(__('api_keys.actions.reveal'))
+                    ->icon('heroicon-o-eye')
+                    ->visible(fn (ApiKey $record): bool => session()->has(static::getCredentialSessionKey($record)))
+                    ->modalHeading(fn (ApiKey $record): string => __('api_keys.modals.reveal_title', ['name' => $record->name]))
+                    ->modalSubmitAction(false)
+                    ->modalIcon('heroicon-o-eye')
+                    ->modalCancelActionLabel(__('api_keys.actions.close'))
+                    ->modalContent(fn (ApiKey $record) => view('filament.resources.api-key.actions.reveal', [
+                        'plainTextKey' => session()->get(static::getCredentialSessionKey($record)),
+                    ])),
+                TableAction::make('regenerate')
+                    ->label(__('api_keys.actions.regenerate'))
+                    ->icon('heroicon-o-arrow-path')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->modalContent(fn (ApiKey $record) => view('filament.resources.api-key.actions.regenerate', [
+                        'record' => $record,
+                    ]))
+                    ->modalSubmitActionLabel(__('api_keys.actions.confirm_regenerate'))
+                    ->action(static function (ApiKey $record): void {
+                        $credentials = ApiKey::generateCredentials();
+
+                        $record->forceFill([
+                            'key' => $credentials['hashed'],
+                            'last_used_at' => null,
+                        ])->save();
+
+                        session()->flash(static::getCredentialSessionKey($record), $credentials['plain_text']);
+                    })
+                    ->successRedirectUrl(fn (ApiKey $record): string => Pages\EditApiKey::getUrl(['record' => $record]))
+                    ->successNotificationTitle(__('api_keys.notifications.regenerated')),
+                EditAction::make(),
+                DeleteAction::make(),
+            ])
+            ->bulkActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getPages(): array

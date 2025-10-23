@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ApiKeyResource\Pages;
 
 use App\Filament\Resources\ApiKeyResource;
-use Filament\Actions\CreateAction;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 final class ListApiKeys extends ListRecords
@@ -15,7 +15,8 @@ final class ListApiKeys extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            Actions\CreateAction::make()
+                ->label(__('api_keys.actions.create')),
         ];
     }
 }

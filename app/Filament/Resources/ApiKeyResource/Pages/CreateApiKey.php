@@ -15,30 +15,45 @@ final class CreateApiKey extends CreateRecord
 
     protected static string $resource = ApiKeyResource::class;
 
-    /**
-     * @param  array<string, mixed>  $data
-     * @return array<string, mixed>
-     */
+    public function mount(): void
+    {
+        parent::mount();
+
+        $this->generateFreshPlainTextKey();
+    }
+
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $permissions = $data['permissions'] ?? [];
+        $plainText = $data['plain_text_key'] ?? null;
 
-        if (! is_array($permissions)) {
-            $permissions = [];
-        }
+        $credentials = filled($plainText)
+            ? ApiKey::credentialsFromPlainText($plainText)
+            : ApiKey::generateCredentials();
 
-        $data['permissions'] = array_values(array_filter($permissions));
+        $this->plainTextApiKey = $credentials['plain_text'];
+
+        $data['key'] = $credentials['hashed'];
+        $data['rate_limit'] = ApiKey::normalizeRateLimit($data['rate_limit'] ?? null);
+
+        unset($data['plain_text_key']);
 
         return $data;
     }
 
     protected function afterCreate(): void
     {
-        if ($this->record instanceof ApiKey) {
-            $this->dispatchCredentialModal([
-                'key' => $this->record->key,
-                'secret' => $this->record->secret,
-            ]);
+        if ($this->plainTextApiKey !== null) {
+            $this->rememberPlainTextKey($this->record, $this->plainTextApiKey);
         }
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return static::getResource()::getUrl('edit', ['record' => $this->record]);
+    }
+
+    protected function getCreatedNotificationTitle(): ?string
+    {
+        return __('api_keys.notifications.created');
     }
 }
