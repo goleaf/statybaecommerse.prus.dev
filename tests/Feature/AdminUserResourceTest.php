@@ -9,7 +9,6 @@ use App\Filament\Resources\AdminUserResource\Pages\EditAdminUser;
 use App\Filament\Resources\AdminUserResource\Pages\ListAdminUsers;
 use App\Filament\Resources\AdminUserResource\Pages\ViewAdminUser;
 use App\Models\AdminUser;
-use Filament\Facades\Filament;
 use Hash;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -25,8 +24,8 @@ final class AdminUserResourceTest extends TestCase
     {
         parent::setUp();
 
-        // Ensure we use the admin panel and guard for Filament
-        Filament::setCurrentPanel('admin');
+        // Resolve the full Filament admin panel so resource schemas are booted during tests.
+        $this->resolveAdminPanel();
         Config::set('auth.defaults.guard', 'admin');
 
         // Create a test admin user for authentication
