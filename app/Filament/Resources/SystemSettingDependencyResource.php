@@ -92,42 +92,34 @@ final class SystemSettingDependencyResource extends Resource
                                 ->preload()
                                 ->helperText(__('admin.system_setting_dependencies.depends_on_setting_help')),
                         ]),
-                    Grid::make(2)
-                        ->schema([
-                            Select::make('condition')
-                                ->label(__('admin.system_setting_dependencies.condition'))
-                                ->options([
-                                    'equals'       => __('admin.system_settings.equals'),
-                                    'not_equals'   => __('admin.system_settings.not_equals'),
-                                    'greater_than' => __('admin.system_settings.greater_than'),
-                                    'less_than'    => __('admin.system_settings.less_than'),
-                                    'contains'     => __('admin.system_settings.contains'),
-                                    'not_contains' => __('admin.system_settings.not_contains'),
-                                    'is_empty'     => __('admin.system_settings.is_empty'),
-                                    'is_not_empty' => __('admin.system_settings.is_not_empty'),
-                                    'is_true'      => __('admin.system_settings.is_true'),
-                                    'is_false'     => __('admin.system_settings.is_false'),
-                                ])
-                                ->required()
-                                ->native(false)
-                                ->helperText(__('admin.system_setting_dependencies.condition_help')),
-                            TextInput::make('condition_value')
-                                ->label(__('admin.system_settings.condition_value'))
-                                ->maxLength(255)
-                                ->nullable()
-                                ->required(fn (Get $get): bool => $get('condition') !== null && ! in_array($get('condition'), [
-                                    'is_empty',
-                                    'is_not_empty',
-                                    'is_true',
-                                    'is_false',
-                                ], true))
-                                ->hidden(fn (Get $get): bool => in_array($get('condition'), [
-                                    'is_empty',
-                                    'is_not_empty',
-                                    'is_true',
-                                    'is_false',
-                                ], true)),
+                    Select::make('condition')
+                        ->label(__('admin.system_setting_dependencies.condition'))
+                        ->options([
+                            'equals' => __('admin.system_setting_dependencies.conditions.equals'),
+                            'not_equals' => __('admin.system_setting_dependencies.conditions.not_equals'),
+                            'greater_than' => __('admin.system_setting_dependencies.conditions.greater_than'),
+                            'greater_than_or_equals' => __('admin.system_setting_dependencies.conditions.greater_than_or_equals'),
+                            'less_than' => __('admin.system_setting_dependencies.conditions.less_than'),
+                            'less_than_or_equals' => __('admin.system_setting_dependencies.conditions.less_than_or_equals'),
+                            'contains' => __('admin.system_setting_dependencies.conditions.contains'),
+                            'not_contains' => __('admin.system_setting_dependencies.conditions.not_contains'),
+                            'in' => __('admin.system_setting_dependencies.conditions.in'),
+                            'not_in' => __('admin.system_setting_dependencies.conditions.not_in'),
+                            'starts_with' => __('admin.system_setting_dependencies.conditions.starts_with'),
+                            'ends_with' => __('admin.system_setting_dependencies.conditions.ends_with'),
+                            'is_empty' => __('admin.system_setting_dependencies.conditions.is_empty'),
+                            'is_not_empty' => __('admin.system_setting_dependencies.conditions.is_not_empty'),
+                            'is_true' => __('admin.system_setting_dependencies.conditions.is_true'),
+                            'is_false' => __('admin.system_setting_dependencies.conditions.is_false'),
                         ])
+                        ->searchable()
+                        ->required()
+                        ->helperText(__('admin.system_setting_dependencies.condition_help')),
+                    TextInput::make('condition_value')
+                        ->label(__('admin.system_setting_dependencies.condition_value'))
+                        ->helperText(__('admin.system_setting_dependencies.condition_value_help'))
+                        ->visible(fn (callable $get): bool => ! in_array($get('condition'), ['is_empty', 'is_not_empty', 'is_true', 'is_false'], true))
+                        ->required(fn (callable $get): bool => ! in_array($get('condition'), ['is_empty', 'is_not_empty', 'is_true', 'is_false'], true))
                         ->columnSpanFull(),
                     Grid::make(2)
                         ->schema([
@@ -189,18 +181,9 @@ final class SystemSettingDependencyResource extends Resource
                 TextColumn::make('condition')
                     ->label(__('admin.system_setting_dependencies.condition'))
                     ->badge()
-                    ->formatStateUsing(function (?string $state): string {
-                        if ($state === null) {
-                            return __('admin.common.not_set');
-                        }
-
-                        $translationKey = "admin.system_settings.{$state}";
-
-                        return __($translationKey) !== $translationKey ? __($translationKey) : ucfirst(str_replace('_', ' ', $state));
-                    })
                     ->sortable(),
                 TextColumn::make('condition_value')
-                    ->label(__('admin.system_settings.condition_value'))
+                    ->label(__('admin.system_setting_dependencies.condition_value'))
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = (string) ($column->getState() ?? '');
@@ -221,7 +204,7 @@ final class SystemSettingDependencyResource extends Resource
                             return null;
                         }
 
-                        return strlen($state) > 50 ? $state : null;
+                        return is_string($state) && strlen($state) > 50 ? $state : null;
                     })
                     ->searchable()
                     ->sortable(),
@@ -329,6 +312,9 @@ final class SystemSettingDependencyResource extends Resource
                     ->color('info')
                     ->action(function (SystemSettingDependency $record): void {
                         $newRecord = $record->replicate();
+                        if ($newRecord->condition_value) {
+                            $newRecord->condition_value .= ' (Copy)';
+                        }
                         $newRecord->is_active = false;
                         $newRecord->save();
 
@@ -385,6 +371,9 @@ final class SystemSettingDependencyResource extends Resource
                         ->action(function (Collection $records): void {
                             $records->each(function (SystemSettingDependency $record): void {
                                 $newRecord = $record->replicate();
+                                if ($newRecord->condition_value) {
+                                    $newRecord->condition_value .= ' (Copy)';
+                                }
                                 $newRecord->is_active = false;
                                 $newRecord->save();
                             });
