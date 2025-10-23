@@ -13,7 +13,6 @@ use App\Models\Translations\NewsTranslation;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Forms\Get;
 use Filament\Infolists;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -25,7 +24,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
+use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 use RuntimeException;
 
 class NewsResource extends Resource
@@ -45,45 +44,36 @@ class NewsResource extends Resource
 
     public static function form(Form $form): Form
     {
-        $activeLocale = app()->getLocale();
-
-        return $form->schema([
+        return $form->components([
             Forms\Components\Section::make('Article Information')
-                ->schema([
-                    Forms\Components\Group::make()
-                        ->statePath("translations.{$activeLocale}")
-                        ->schema([
-                            Forms\Components\TextInput::make('title')
-                                ->label(__('news.fields.title'))
-                                ->required()
-                                ->maxLength(255)
-                                ->live()
-                                ->afterStateUpdated(fn (?string $state, callable $set) => $set('slug', Str::slug($state ?? ''))),
-                            Forms\Components\TextInput::make('slug')
-                                ->label(__('news.fields.slug'))
-                                ->required()
-                                ->maxLength(255)
-                                ->unique(
-                                    NewsTranslation::class,
-                                    'slug',
-                                    ignoreRecord: true,
-                                    ignorable: fn (?News $record): ?NewsTranslation => $record?->translations()->firstWhere('locale', $activeLocale)
-                                ),
-                            Forms\Components\Textarea::make('summary')
-                                ->label(__('news.fields.excerpt'))
-                                ->maxLength(500)
-                                ->rows(3)
-                                ->columnSpanFull(),
-                            Forms\Components\RichEditor::make('content')
-                                ->label(__('news.fields.content'))
-                                ->required()
-                                ->columnSpanFull(),
-                        ])
-                        ->columns(2),
-                ]),
+                ->components([
+                    LanguageTabs::make([
+                        Forms\Components\TextInput::make('title')
+                            ->label(__('news.fields.title'))
+                            ->required()
+                            ->maxLength(255)
+                            ->live()
+                            ->afterStateUpdated(function (?string $state, callable $set): void {
+                                $set('slug', \Illuminate\Support\Str::slug((string) $state));
+                            }),
+                        Forms\Components\TextInput::make('slug')
+                            ->label(__('news.fields.slug'))
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\Textarea::make('summary')
+                            ->label(__('news.fields.excerpt'))
+                            ->maxLength(500)
+                            ->rows(3),
+                        Forms\Components\RichEditor::make('content')
+                            ->label(__('news.fields.content'))
+                            ->required()
+                            ->columnSpanFull(),
+                    ])->columnSpanFull(),
+                ])
+                ->columns(1),
             Forms\Components\Section::make('Publishing')
                 ->components([
-                    Flatpickr::makeDateTime('published_at')
+                    Forms\Components\DateTimePicker::make('published_at')
                         ->label(__('news.fields.published_at'))
                         ->default(now()),
                     Forms\Components\TextInput::make('author_name')
@@ -117,19 +107,17 @@ class NewsResource extends Resource
                 ])
                 ->columns(2),
             Forms\Components\Section::make('SEO & Metadata')
-                ->schema([
-                    Forms\Components\Group::make()
-                        ->statePath("translations.{$activeLocale}")
-                        ->schema([
-                            Forms\Components\TextInput::make('seo_title')
-                                ->label(__('news.fields.meta_title'))
-                                ->maxLength(255),
-                            Forms\Components\Textarea::make('seo_description')
-                                ->label(__('news.fields.meta_description'))
-                                ->maxLength(500)
-                                ->rows(3),
-                        ]),
-                    Forms\Components\TextInput::make('meta_data.meta_keywords')
+                ->components([
+                    LanguageTabs::make([
+                        Forms\Components\TextInput::make('meta_title')
+                            ->label(__('news.fields.meta_title'))
+                            ->maxLength(255),
+                        Forms\Components\Textarea::make('meta_description')
+                            ->label(__('news.fields.meta_description'))
+                            ->maxLength(500)
+                            ->rows(3),
+                    ]),
+                    Forms\Components\TextInput::make('meta_keywords')
                         ->label(__('news.fields.meta_keywords'))
                         ->maxLength(255),
                 ]),
@@ -148,8 +136,8 @@ class NewsResource extends Resource
                         ->helperText(__('news.podcast.field_help')),
                 ]),
             Forms\Components\Section::make('Categories & Tags')
-                ->schema([
-                    Combobox::make('categories')
+                ->components([
+                    Forms\Components\Select::make('categories')
                         ->label(__('news.fields.categories'))
                         ->relationship('categories', 'name')
                         ->preload(),

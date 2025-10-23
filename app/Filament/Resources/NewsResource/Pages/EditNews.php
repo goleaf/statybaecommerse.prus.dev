@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources\NewsResource\Pages;
 
 use App\Enums\ModerationState;
+use App\Filament\Concerns\InteractsWithTranslationTabs;
+use App\Filament\Concerns\ManagesNewsTranslationTabs;
 use App\Filament\Resources\NewsResource;
 use Filament\Actions;
 use Filament\Forms;
@@ -163,9 +165,26 @@ final class EditNews extends EditRecord
         return $this->getResource()::getUrl('index');
     }
 
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $this->record->loadMissing('translations');
+
+        return $this->hydrateFormWithTranslations($this->record, $data);
+    }
+
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        $this->translationPayload = $this->extractTranslationPayload($data);
+        [$data, $translations] = $this->extractTranslationsFromForm($data);
+        $fallbackSlug = $this->record->translations()
+            ->where('locale', $this->getDefaultLocale())
+            ->value('slug');
+
+        $this->languageTabsPayload = $this->ensureDefaultLocaleSlug(
+            $this->filterEmptyTranslations($translations),
+            $fallbackSlug
+        );
+
+        $this->assertUniqueSlugs($this->languageTabsPayload, $this->record->getKey());
 
         if ($this->record->moderation_state !== ModerationState::Published) {
             $data['is_visible'] = false;
@@ -174,69 +193,10 @@ final class EditNews extends EditRecord
         return $data;
     }
 
-    protected function mutateFormDataBeforeFill(array $data): array
+    protected function afterSave(): void
     {
-        $locale = $this->getActiveLocale();
-        $translation = $this->record->translations()->firstWhere('locale', $locale);
+        $this->syncTranslationRecords($this->record, $this->languageTabsPayload);
 
-        $data['translations'][$locale] = [
-            'title'           => $translation?->title,
-            'slug'            => $translation?->slug,
-            'summary'         => $translation?->summary,
-            'content'         => $translation?->content,
-            'seo_title'       => $translation?->seo_title,
-            'seo_description' => $translation?->seo_description,
-        ];
-
-        return $data;
-    }
-
-    protected function handleRecordUpdate(Model $record, array $data): Model
-    {
-        $record = parent::handleRecordUpdate($record, $data);
-
-        $this->persistTranslation($record);
-
-        return $record;
-    }
-
-    private function extractTranslationPayload(array &$data): array
-    {
-        $locale = $this->getActiveLocale();
-        $translationData = data_get($data, "translations.{$locale}", []);
-
-        unset($data['translations']);
-
-        if ($translationData === []) {
-            return [];
-        }
-
-        return [
-            'title'           => $translationData['title'] ?? null,
-            'slug'            => $translationData['slug'] ?? null,
-            'summary'         => $translationData['summary'] ?? null,
-            'content'         => $translationData['content'] ?? null,
-            'seo_title'       => $translationData['seo_title'] ?? null,
-            'seo_description' => $translationData['seo_description'] ?? null,
-        ];
-    }
-
-    private function persistTranslation(Model $record): void
-    {
-        if ($this->translationPayload === []) {
-            return;
-        }
-
-        $locale = $this->getActiveLocale();
-
-        $record->translations()->updateOrCreate(
-            ['locale' => $locale],
-            array_merge($this->translationPayload, ['locale' => $locale])
-        );
-    }
-
-    private function getActiveLocale(): string
-    {
-        return app()->getLocale();
+        parent::afterSave();
     }
 }

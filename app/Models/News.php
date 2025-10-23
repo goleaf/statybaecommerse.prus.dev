@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Contracts\TranslatableRecord;
 use App\Enums\ModerationState;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\PublishedScope;
@@ -71,6 +72,7 @@ final class News extends Model implements TranslatableRecord
         return [
             'is_visible'              => 'boolean',
             'is_featured'             => 'boolean',
+            'is_breaking'             => 'boolean',
             'moderation_state'        => ModerationState::class,
             'submitted_for_review_at' => 'datetime',
             'approved_at'             => 'datetime',
