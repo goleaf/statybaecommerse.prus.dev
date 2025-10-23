@@ -8,7 +8,7 @@ use App\Filament\Resources\NewsImages\NewsImageResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
-final class ViewNewsImage extends ViewRecord
+class ViewNewsImage extends ViewRecord
 {
     protected static string $resource = NewsImageResource::class;
 
