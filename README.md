@@ -39,6 +39,12 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
    composer seed:fresh
    ```
    Runs `php artisan migrate:fresh --seed` so you get the admin user (`admin@statybaecommerse.prus.dev` / `admin123`) and sample content in one shot.
+
+   Seeder profiles are centralized in `config/seeds.php` so you can control how much demo data is loaded:
+   - `php artisan db:seed --profile=minimal` seeds only the essentials for admin access and catalog metadata.
+   - `php artisan db:seed --profile=full` (default) includes all demo storefront content on top of the minimal set.
+
+   Set `DB_SEED_PROFILE=minimal` in `.env` to change the default profile used by seeding commands.
 3. **Serve the application**
    ```bash
    composer serve
