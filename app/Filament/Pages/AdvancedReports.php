@@ -7,7 +7,6 @@ namespace App\Filament\Pages;
 use BackedEnum;
 use Filament\Pages\Page;
 use UnitEnum;
-
 final class AdvancedReports extends Page
 {
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
