@@ -16,6 +16,8 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
@@ -133,17 +135,16 @@ final class PostResource extends Resource
                     ]),
                 Section::make(__('posts.sections.media'))
                     ->schema([
-                        FileUpload::make('featured_image')
+                        SpatieMediaLibraryFileUpload::make('images')
                             ->label(__('posts.fields.images'))
+                            ->collection('images')
                             ->image()
-                            ->directory('posts')
-                            ->visibility('private'),
-                        FileUpload::make('gallery')
+                            ->singleFile(),
+                        SpatieMediaLibraryFileUpload::make('gallery')
                             ->label(__('posts.fields.gallery'))
+                            ->collection('gallery')
                             ->image()
-                            ->multiple()
-                            ->directory('posts/gallery')
-                            ->visibility('private'),
+                            ->multiple(),
                     ]),
                 Section::make(__('posts.sections.seo'))
                     ->schema([
@@ -263,8 +264,10 @@ final class PostResource extends Resource
     {
         return $table
             ->columns([
-                ImageColumn::make('featured_image')
+                SpatieMediaLibraryImageColumn::make('images')
                     ->label(__('posts.fields.images'))
+                    ->collection('images')
+                    ->conversion('thumb')
                     ->circular()
                     ->size(50),
                 TextColumn::make('title')

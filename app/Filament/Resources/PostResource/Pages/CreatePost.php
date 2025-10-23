@@ -23,6 +23,8 @@ final class CreatePost extends CreateRecord
         $data['approved_at'] = null;
         $data['approved_by_id'] = null;
 
+        unset($data['images'], $data['gallery']);
+
         return $data;
     }
 }
