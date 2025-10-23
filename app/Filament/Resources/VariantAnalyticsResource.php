@@ -13,7 +13,7 @@ use App\Filament\Resources\VariantAnalyticsResource\Pages;
 use App\Models\ProductVariant;
 use App\Models\VariantAnalytics;
 use App\Support\Filament\Components\Flatpickr;
-use BackedEnum;
+use UnitEnum;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -27,8 +27,8 @@ use Illuminate\Database\Eloquent\Collection;
     /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Inventory;
+    /** @var UnitEnum|string|null Anchor inventory analytics beneath the shared navigation enum. */
+    protected static $navigationGroup = NavigationGroup::Inventory;
 
     public static function getNavigationGroup(): ?string
     {
@@ -79,20 +79,7 @@ use Illuminate\Database\Eloquent\Collection;
                                                     ->required()
                                                     ->searchable()
                                                     ->preload()
-                                                    ->live()
-                                                    ->afterStateUpdated(static function (int|string|null $state, callable $set): void {
-                                                        if ($state === null || $state === '') {
-                                                            return;
-                                                        }
-
-                                                $variant = \App\Models\ProductVariant::find($state);
-                                                if ($variant === null) {
-                                                    return;
-                                                }
-
-                                                        $set('variant_name', $variant->name);
-                                                        $set('product_name', $variant->product->name ?? '');
-                                                    }),
+                                                    ->live(),
                                                 Flatpickr::makeDate('date')
                                                     ->label(__('admin.variant_analytics.date'))
                                                     ->required()
@@ -104,12 +91,38 @@ use Illuminate\Database\Eloquent\Collection;
                                             ->schema([
                                                 Forms\Components\Placeholder::make('variant_name')
                                                     ->label(__('admin.variant_analytics.variant_name'))
-                                                    ->content(static fn (?VariantAnalytics $record): string => $record?->variant?->name ?? '')
-                                                    ->visible(static fn (?VariantAnalytics $record): bool => $record !== null),
+                                                    ->content(static function (callable $get, ?VariantAnalytics $record): string {
+                                                        if ($record !== null) {
+                                                            return $record->variant?->name ?? '';
+                                                        }
+                                                        $variantId = $get('variant_id');
+                                                        if (! $variantId) {
+                                                            return '';
+                                                        }
+                                                        $variant = \App\Models\ProductVariant::query()->with('product:id,name')->find($variantId);
+                                                        return $variant?->name ?? '';
+                                                    })
+                                                    ->visible(static function (callable $get, ?VariantAnalytics $record): bool {
+                                                        return ($record !== null) || (bool) $get('variant_id');
+                                                    })
+                                                    ->reactive(),
                                                 Forms\Components\Placeholder::make('product_name')
                                                     ->label(__('admin.variant_analytics.product_name'))
-                                                    ->content(static fn (?VariantAnalytics $record): string => $record?->variant?->product?->name ?? '')
-                                                    ->visible(static fn (?VariantAnalytics $record): bool => $record !== null),
+                                                    ->content(static function (callable $get, ?VariantAnalytics $record): string {
+                                                        if ($record !== null) {
+                                                            return $record->product?->name ?? ($record->variant?->product?->name ?? '');
+                                                        }
+                                                        $variantId = $get('variant_id');
+                                                        if (! $variantId) {
+                                                            return '';
+                                                        }
+                                                        $variant = \App\Models\ProductVariant::query()->with('product:id,name')->find($variantId);
+                                                        return $variant?->product?->name ?? '';
+                                                    })
+                                                    ->visible(static function (callable $get, ?VariantAnalytics $record): bool {
+                                                        return ($record !== null) || (bool) $get('variant_id');
+                                                    })
+                                                    ->reactive(),
                                             ]),
                                     ]),
                             ]),
@@ -254,7 +267,7 @@ use Illuminate\Database\Eloquent\Collection;
                     ->sortable()
                     ->toggleable()
                     ->copyable()
-                    ->description(static fn (?VariantAnalytics $record): ?string => $record?->variant?->product?->name),
+                    ->description(static fn (?VariantAnalytics $record): ?string => $record?->product?->name ?? $record?->variant?->product?->name),
                 Tables\Columns\TextColumn::make('variant.sku')
                     ->label(__('admin.variant_analytics.sku'))
                     ->searchable()
