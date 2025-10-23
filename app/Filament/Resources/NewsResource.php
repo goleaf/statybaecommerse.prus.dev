@@ -8,7 +8,7 @@ use App\Enums\ModerationState;
 use App\Filament\Resources\NewsResource\Pages;
 use App\Filament\Resources\NewsResource\RelationManagers;
 use App\Models\News;
-use App\Support\Filament\Components\Flatpickr;
+use App\Models\Translations\NewsTranslation;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Get;
@@ -23,8 +23,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
-use Filament\Notifications\Notification;
+use Illuminate\Support\Str;
+use RuntimeException;
 
 class NewsResource extends Resource
 {
@@ -42,50 +42,42 @@ class NewsResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form->components([
+        $activeLocale = app()->getLocale();
+
+        return $form->schema([
             Forms\Components\Section::make('Article Information')
                 ->schema([
-                    Forms\Components\TextInput::make('title')
-                        ->label(__('news.fields.title'))
-                        ->required()
-                        ->maxLength(255)
-                        ->live()
-                        ->afterStateUpdated(fn ($state, callable $set) => $set('slug', \Illuminate\Support\Str::slug($state))),
-                    Forms\Components\Hidden::make('current_locale')
-                        ->default(fn (): string => app()->getLocale())
-                        ->dehydrated(false),
-                    Forms\Components\TextInput::make('slug')
-                        ->label(__('news.fields.slug'))
-                        ->required()
-                        ->maxLength(255)
-                        ->rules(function (Get $get, ?News $record): array {
-                            $locale = $get('current_locale') ?? app()->getLocale();
-
-                            $rule = Rule::unique('news_translations', 'slug')
-                                ->where(fn ($query) => $query->where('locale', $locale));
-
-                            if ($record) {
-                                $translationId = $record->translations()
-                                    ->where('locale', $locale)
-                                    ->value('id');
-
-                                if ($translationId) {
-                                    $rule->ignore($translationId);
-                                }
-                            }
-
-                            return [$rule];
-                        }),
-                    Forms\Components\Textarea::make('excerpt')
-                        ->label(__('news.fields.excerpt'))
-                        ->maxLength(500)
-                        ->rows(3),
-                    Forms\Components\RichEditor::make('content')
-                        ->label(__('news.fields.content'))
-                        ->required()
-                        ->columnSpanFull(),
-                ])
-                ->columns(1),
+                    Forms\Components\Group::make()
+                        ->statePath("translations.{$activeLocale}")
+                        ->schema([
+                            Forms\Components\TextInput::make('title')
+                                ->label(__('news.fields.title'))
+                                ->required()
+                                ->maxLength(255)
+                                ->live()
+                                ->afterStateUpdated(fn (?string $state, callable $set) => $set('slug', Str::slug($state ?? ''))),
+                            Forms\Components\TextInput::make('slug')
+                                ->label(__('news.fields.slug'))
+                                ->required()
+                                ->maxLength(255)
+                                ->unique(
+                                    NewsTranslation::class,
+                                    'slug',
+                                    ignoreRecord: true,
+                                    ignorable: fn (?News $record): ?NewsTranslation => $record?->translations()->firstWhere('locale', $activeLocale)
+                                ),
+                            Forms\Components\Textarea::make('summary')
+                                ->label(__('news.fields.excerpt'))
+                                ->maxLength(500)
+                                ->rows(3)
+                                ->columnSpanFull(),
+                            Forms\Components\RichEditor::make('content')
+                                ->label(__('news.fields.content'))
+                                ->required()
+                                ->columnSpanFull(),
+                        ])
+                        ->columns(2),
+                ]),
             Forms\Components\Section::make('Publishing')
                 ->components([
                     Flatpickr::makeDateTime('published_at')
@@ -120,17 +112,19 @@ class NewsResource extends Resource
                 ])
                 ->columns(2),
             Forms\Components\Section::make('SEO & Metadata')
-                ->components([
-                    LanguageTabs::make([
-                        Forms\Components\TextInput::make('meta_title')
-                            ->label(__('news.fields.meta_title'))
-                            ->maxLength(255),
-                        Forms\Components\Textarea::make('meta_description')
-                            ->label(__('news.fields.meta_description'))
-                            ->maxLength(500)
-                            ->rows(3),
-                    ]),
-                    Forms\Components\TextInput::make('meta_keywords')
+                ->schema([
+                    Forms\Components\Group::make()
+                        ->statePath("translations.{$activeLocale}")
+                        ->schema([
+                            Forms\Components\TextInput::make('seo_title')
+                                ->label(__('news.fields.meta_title'))
+                                ->maxLength(255),
+                            Forms\Components\Textarea::make('seo_description')
+                                ->label(__('news.fields.meta_description'))
+                                ->maxLength(500)
+                                ->rows(3),
+                        ]),
+                    Forms\Components\TextInput::make('meta_data.meta_keywords')
                         ->label(__('news.fields.meta_keywords'))
                         ->maxLength(255),
                 ]),
@@ -196,7 +190,7 @@ class NewsResource extends Resource
                     ->formatStateUsing(fn (?ModerationState $state): ?string => $state?->label())
                     ->colors([
                         'warning' => fn (?ModerationState $state): bool => $state === ModerationState::Draft,
-                        'info' => fn (?ModerationState $state): bool => $state === ModerationState::Review,
+                        'info'    => fn (?ModerationState $state): bool => $state === ModerationState::Review,
                         'success' => fn (?ModerationState $state): bool => $state === ModerationState::Published,
                     ])
                     ->sortable(),
@@ -270,9 +264,9 @@ class NewsResource extends Resource
                     ->visible(fn (News $record): bool => $record->moderation_state === ModerationState::Draft)
                     ->action(function (News $record): void {
                         $record->update([
-                            'moderation_state' => ModerationState::Review,
+                            'moderation_state'        => ModerationState::Review,
                             'submitted_for_review_at' => now(),
-                            'is_visible' => false,
+                            'is_visible'              => false,
                         ]);
 
                         activity()
@@ -303,23 +297,23 @@ class NewsResource extends Resource
                         $userId = Auth::id();
 
                         if (! $userId) {
-                            throw new \RuntimeException('Approvals require an authenticated user.');
+                            throw new RuntimeException('Approvals require an authenticated user.');
                         }
 
                         DB::transaction(function () use ($record, $userId, $data): void {
                             $record->approvals()->create([
-                                'user_id' => $userId,
-                                'decision' => 'approved',
-                                'notes' => $data['notes'] ?? null,
+                                'user_id'    => $userId,
+                                'decision'   => 'approved',
+                                'notes'      => $data['notes'] ?? null,
                                 'decided_at' => now(),
                             ]);
 
                             $record->update([
                                 'moderation_state' => ModerationState::Published,
-                                'approved_at' => now(),
-                                'approved_by_id' => $userId,
-                                'is_visible' => true,
-                                'published_at' => $record->published_at ?? now(),
+                                'approved_at'      => now(),
+                                'approved_by_id'   => $userId,
+                                'is_visible'       => true,
+                                'published_at'     => $record->published_at ?? now(),
                             ]);
                         });
 
@@ -351,23 +345,23 @@ class NewsResource extends Resource
                         $userId = Auth::id();
 
                         if (! $userId) {
-                            throw new \RuntimeException('Return to draft requires an authenticated user.');
+                            throw new RuntimeException('Return to draft requires an authenticated user.');
                         }
 
                         DB::transaction(function () use ($record, $userId, $data): void {
                             $record->approvals()->create([
-                                'user_id' => $userId,
-                                'decision' => 'returned',
-                                'notes' => $data['notes'] ?? null,
+                                'user_id'    => $userId,
+                                'decision'   => 'returned',
+                                'notes'      => $data['notes'] ?? null,
                                 'decided_at' => now(),
                             ]);
 
                             $record->update([
-                                'moderation_state' => ModerationState::Draft,
+                                'moderation_state'        => ModerationState::Draft,
                                 'submitted_for_review_at' => null,
-                                'approved_at' => null,
-                                'approved_by_id' => null,
-                                'is_visible' => false,
+                                'approved_at'             => null,
+                                'approved_by_id'          => null,
+                                'is_visible'              => false,
                             ]);
                         });
 

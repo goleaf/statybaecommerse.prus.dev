@@ -10,8 +10,10 @@ use Filament\Actions;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use RuntimeException;
 
 final class EditNews extends EditRecord
 {
@@ -22,6 +24,11 @@ final class EditNews extends EditRecord
     }
 
     protected static string $resource = NewsResource::class;
+
+    /**
+     * @var array<string, mixed>
+     */
+    private array $translationPayload = [];
 
     protected function getHeaderActions(): array
     {
@@ -35,9 +42,9 @@ final class EditNews extends EditRecord
                 ->visible(fn (): bool => $this->record->moderation_state === ModerationState::Draft)
                 ->action(function (): void {
                     $this->record->update([
-                        'moderation_state' => ModerationState::Review,
+                        'moderation_state'        => ModerationState::Review,
                         'submitted_for_review_at' => now(),
-                        'is_visible' => false,
+                        'is_visible'              => false,
                     ]);
 
                     activity()
@@ -68,23 +75,23 @@ final class EditNews extends EditRecord
                     $userId = Auth::id();
 
                     if (! $userId) {
-                        throw new \RuntimeException('Approvals require an authenticated user.');
+                        throw new RuntimeException('Approvals require an authenticated user.');
                     }
 
                     DB::transaction(function () use ($data, $userId): void {
                         $this->record->approvals()->create([
-                            'user_id' => $userId,
-                            'decision' => 'approved',
-                            'notes' => $data['notes'] ?? null,
+                            'user_id'    => $userId,
+                            'decision'   => 'approved',
+                            'notes'      => $data['notes'] ?? null,
                             'decided_at' => now(),
                         ]);
 
                         $this->record->update([
                             'moderation_state' => ModerationState::Published,
-                            'approved_at' => now(),
-                            'approved_by_id' => $userId,
-                            'is_visible' => true,
-                            'published_at' => $this->record->published_at ?? now(),
+                            'approved_at'      => now(),
+                            'approved_by_id'   => $userId,
+                            'is_visible'       => true,
+                            'published_at'     => $this->record->published_at ?? now(),
                         ]);
                     });
 
@@ -116,23 +123,23 @@ final class EditNews extends EditRecord
                     $userId = Auth::id();
 
                     if (! $userId) {
-                        throw new \RuntimeException('Return to draft requires an authenticated user.');
+                        throw new RuntimeException('Return to draft requires an authenticated user.');
                     }
 
                     DB::transaction(function () use ($data, $userId): void {
                         $this->record->approvals()->create([
-                            'user_id' => $userId,
-                            'decision' => 'returned',
-                            'notes' => $data['notes'] ?? null,
+                            'user_id'    => $userId,
+                            'decision'   => 'returned',
+                            'notes'      => $data['notes'] ?? null,
                             'decided_at' => now(),
                         ]);
 
                         $this->record->update([
-                            'moderation_state' => ModerationState::Draft,
+                            'moderation_state'        => ModerationState::Draft,
                             'submitted_for_review_at' => null,
-                            'approved_at' => null,
-                            'approved_by_id' => null,
-                            'is_visible' => false,
+                            'approved_at'             => null,
+                            'approved_by_id'          => null,
+                            'is_visible'              => false,
                         ]);
                     });
 
@@ -158,10 +165,78 @@ final class EditNews extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
+        $this->translationPayload = $this->extractTranslationPayload($data);
+
         if ($this->record->moderation_state !== ModerationState::Published) {
             $data['is_visible'] = false;
         }
 
         return $data;
+    }
+
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $locale = $this->getActiveLocale();
+        $translation = $this->record->translations()->firstWhere('locale', $locale);
+
+        $data['translations'][$locale] = [
+            'title'           => $translation?->title,
+            'slug'            => $translation?->slug,
+            'summary'         => $translation?->summary,
+            'content'         => $translation?->content,
+            'seo_title'       => $translation?->seo_title,
+            'seo_description' => $translation?->seo_description,
+        ];
+
+        return $data;
+    }
+
+    protected function handleRecordUpdate(Model $record, array $data): Model
+    {
+        $record = parent::handleRecordUpdate($record, $data);
+
+        $this->persistTranslation($record);
+
+        return $record;
+    }
+
+    private function extractTranslationPayload(array &$data): array
+    {
+        $locale = $this->getActiveLocale();
+        $translationData = data_get($data, "translations.{$locale}", []);
+
+        unset($data['translations']);
+
+        if ($translationData === []) {
+            return [];
+        }
+
+        return [
+            'title'           => $translationData['title'] ?? null,
+            'slug'            => $translationData['slug'] ?? null,
+            'summary'         => $translationData['summary'] ?? null,
+            'content'         => $translationData['content'] ?? null,
+            'seo_title'       => $translationData['seo_title'] ?? null,
+            'seo_description' => $translationData['seo_description'] ?? null,
+        ];
+    }
+
+    private function persistTranslation(Model $record): void
+    {
+        if ($this->translationPayload === []) {
+            return;
+        }
+
+        $locale = $this->getActiveLocale();
+
+        $record->translations()->updateOrCreate(
+            ['locale' => $locale],
+            array_merge($this->translationPayload, ['locale' => $locale])
+        );
+    }
+
+    private function getActiveLocale(): string
+    {
+        return app()->getLocale();
     }
 }
