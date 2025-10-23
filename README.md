@@ -17,6 +17,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 ### Latest updates
+- Documented the open proposal from PR #289 to introduce layered API rate limiting buckets for read, write, notification, and autocomplete endpoints alongside enhanced throttling logs with correlation identifiers, so reviewers can quickly trace the outstanding security hardening work.
 - Filament admin resources, relation managers, and bespoke pages now return `Filament\\Schemas\\Schema` instances with documented icon docblocks, aligning every form/table/infolist signature to the v4 API so upstream navigation traits continue to resolve enum-aware metadata without collisions.
 - Product API endpoints now resolve via dedicated application use cases, an Eloquent-backed repository, and a presenter that preserves the public contract while filtering non-displayable catalogue entries.
 - Activity Log admin navigation now declares its icon using the BackedEnum-aware union type expected by Filament v4, eliminating the fatal error encountered during resource bootstrapping.
