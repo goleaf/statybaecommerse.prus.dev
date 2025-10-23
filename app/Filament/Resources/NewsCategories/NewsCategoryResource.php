@@ -11,10 +11,11 @@ use App\Filament\Resources\NewsCategories\Pages\ListNewsCategories;
 use App\Filament\Resources\NewsCategories\Schemas\NewsCategoryForm;
 use App\Filament\Resources\NewsCategories\Tables\NewsCategoriesTable;
 use App\Models\NewsCategory;
-use Filament\Forms\Form;
+use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 final class NewsCategoryResource extends Resource
 {
@@ -26,7 +27,7 @@ final class NewsCategoryResource extends Resource
 
     
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return NewsCategoryForm::configure($form);
     }

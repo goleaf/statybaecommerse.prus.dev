@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace App\Filament\Resources\CustomerGroupResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
+use Filament\Schemas\Schema;
 
 final class UsersRelationManager extends BaseRelationManager
 {
@@ -17,7 +16,7 @@ final class UsersRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'customer_groups.relation_users';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $schema
             ->schema([

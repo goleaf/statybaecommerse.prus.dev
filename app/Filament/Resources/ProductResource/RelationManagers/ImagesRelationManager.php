@@ -9,11 +9,11 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
+use Filament\Schemas\Schema;
 
 final class ImagesRelationManager extends BaseRelationManager
 {
@@ -21,7 +21,7 @@ final class ImagesRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Product Images';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $schema
             ->components([

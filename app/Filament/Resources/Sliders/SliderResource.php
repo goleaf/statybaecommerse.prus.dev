@@ -13,11 +13,12 @@ use App\Filament\Resources\Sliders\Schemas\SliderForm;
 use App\Filament\Resources\Sliders\Tables\SlidersTable;
 use App\Enums\NavigationGroup;
 use App\Models\Slider;
-use Filament\Forms\Form;
+use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 final class SliderResource extends Resource
 {
@@ -36,7 +37,7 @@ final class SliderResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return SliderForm::configure($form);
     }

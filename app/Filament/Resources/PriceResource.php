@@ -17,8 +17,6 @@ use Filament\Forms\Components\MorphToSelect;
 use Filament\Forms\Components\MorphToSelect\Type as MorphToSelectType;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -31,6 +29,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Number;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 final class PriceResource extends Resource
 {
@@ -45,7 +44,7 @@ final class PriceResource extends Resource
 
     protected static ?int $navigationSort = 12;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema([

@@ -12,11 +12,11 @@ use App\Filament\Resources\OrderShippings\Schemas\OrderShippingForm;
 use App\Filament\Resources\OrderShippings\Tables\OrderShippingsTable;
 use App\Models\OrderShipping;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
+use Filament\Schemas\Schema;
 
 class OrderShippingResource extends Resource
 {
@@ -26,7 +26,7 @@ class OrderShippingResource extends Resource
 
     
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return OrderShippingForm::configure($form);
     }

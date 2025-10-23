@@ -41,7 +41,7 @@ final class ApiServiceProvider extends ServiceProvider
 
         RateLimiter::for('api.exports', function (Request $request): Limit|array {
             return $this->resolveLimit(
-                config('security.rate_limiting.api.exports', 30),
+                config('security.rate_limiting.api.exports', 10),
                 $this->rateLimitKey($request, 'exports')
             );
         });

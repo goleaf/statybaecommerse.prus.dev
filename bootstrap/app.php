@@ -77,6 +77,8 @@ $app = Application::configure(basePath: dirname(__DIR__))
             'partner.api.auth'       => App\Http\Middleware\EnsurePartnerApiKey::class,
             'partner.api.scope'      => App\Http\Middleware\EnsurePartnerApiScope::class,
             'partner.api.rate_limit' => App\Http\Middleware\EnsurePartnerApiRateLimit::class,
+            'abilities'          => Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
+            'ability'            => Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -336,10 +338,51 @@ $app = Application::configure(basePath: dirname(__DIR__))
                         default => ErrorCodes::SERVER_ERROR,
                     };
 
+                    $rawHeaders = $throwable->getHeaders();
+                    $sanitizedHeaders = [];
+
+                    foreach ($rawHeaders as $headerName => $headerValue) {
+                        if (! is_string($headerName)) {
+                            continue;
+                        }
+
+                        $normalizedName = trim($headerName);
+
+                        if ($normalizedName === '' || str_contains($normalizedName, "\r") || str_contains($normalizedName, "\n")) {
+                            continue;
+                        }
+
+                        $values = is_array($headerValue) ? $headerValue : [$headerValue];
+                        $normalizedValues = [];
+
+                        foreach ($values as $value) {
+                            if (! is_scalar($value) && ! (is_object($value) && method_exists($value, '__toString'))) {
+                                continue;
+                            }
+
+                            $stringValue = (string) $value;
+                            $stringValue = preg_replace('/[\x00-\x1F\x7F]+/', '', $stringValue) ?? '';
+
+                            if ($stringValue === '') {
+                                continue;
+                            }
+
+                            $normalizedValues[] = $stringValue;
+                        }
+
+                        if ($normalizedValues === []) {
+                            continue;
+                        }
+
+                        $sanitizedHeaders[$normalizedName] = count($normalizedValues) === 1
+                            ? $normalizedValues[0]
+                            : $normalizedValues;
+                    }
+
                     Log::notice('HTTP exception rendered.', [
                         'exception' => $throwable::class,
                         'status'    => $status,
-                        'headers'   => $throwable->getHeaders(),
+                        'headers'   => $sanitizedHeaders,
                     ]);
 
                     $detail = $throwable->getMessage() !== ''
@@ -352,16 +395,20 @@ $app = Application::configure(basePath: dirname(__DIR__))
                         detail: $detail,
                         status: $status,
                         title: ApiErrorResponse::titleFor($code),
-                        context: $throwable->getHeaders() !== [] ? ['headers' => $throwable->getHeaders()] : [],
+                        context: $sanitizedHeaders !== [] ? ['headers' => $sanitizedHeaders] : [],
                         locale: $locale,
                     );
 
-                    foreach ($throwable->getHeaders() as $name => $value) {
-                        $normalized = is_array($value)
-                            ? array_map(static fn ($item) => (string) $item, $value)
-                            : (string) $value;
+                    foreach ($sanitizedHeaders as $name => $value) {
+                        if (is_array($value)) {
+                            foreach ($value as $headerValue) {
+                                $response->headers->set($name, $headerValue, false);
+                            }
 
-                        $response->headers->set($name, $normalized);
+                            continue;
+                        }
+
+                        $response->headers->set($name, $value);
                     }
 
                     return $response;

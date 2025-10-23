@@ -8,12 +8,12 @@ use App\Forms\Components\Flatpickr;
 use App\Models\DiscountCode;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms;
-use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 final class CodesRelationManager extends BaseRelationManager
 {
@@ -25,7 +25,7 @@ final class CodesRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Codes';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $schema
             ->schema([

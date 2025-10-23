@@ -19,7 +19,6 @@ use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
@@ -32,6 +31,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 final class AdminUserResource extends Resource
 {
@@ -65,7 +65,7 @@ final class AdminUserResource extends Resource
      * Configure the Filament form schema using the v4 Schema contract so the
      * resource signature remains compatible with the upstream Resource base class.
      */
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return $form->schema([
             Section::make(__('admin.admin_users.form.sections.basic_information'))

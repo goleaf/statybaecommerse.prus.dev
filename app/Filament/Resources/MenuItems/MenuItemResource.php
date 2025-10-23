@@ -11,9 +11,10 @@ use App\Filament\Resources\MenuItems\Pages\ListMenuItems;
 use App\Filament\Resources\MenuItems\Schemas\MenuItemForm;
 use App\Filament\Resources\MenuItems\Tables\MenuItemsTable;
 use App\Models\MenuItem;
-use Filament\Forms\Form;
+use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 class MenuItemResource extends Resource
 {
@@ -23,7 +24,7 @@ class MenuItemResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         // Delegate field layout to the dedicated schema configurator for reuse.
         return MenuItemForm::configure($form);

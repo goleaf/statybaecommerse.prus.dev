@@ -15,11 +15,10 @@ use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\ApprovedScope;
 use App\Models\Scopes\VisibleScope;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Schemas\Schema;
 
 class NewsCommentResource extends Resource
 {
@@ -29,7 +28,7 @@ class NewsCommentResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return NewsCommentForm::configure($form);
     }

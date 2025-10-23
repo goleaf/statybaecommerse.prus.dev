@@ -9,11 +9,11 @@ use App\Models\Product;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 final class ProductsRelationManager extends BaseRelationManager
 {
@@ -21,7 +21,7 @@ final class ProductsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Collection Products';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $schema
             ->schema([
