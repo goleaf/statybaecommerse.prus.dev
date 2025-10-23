@@ -265,9 +265,6 @@ final class ReferralCodeResource extends Resource
                     })
                     ->query(function (Builder $query, array $data): Builder {
                         $value = $data['source'] ?? $data['value'] ?? null;
-                        if (is_array($value)) {
-                            $value = $value['value'] ?? reset($value);
-                        }
 
                         return $value ? $query->where('source', $value) : $query;
                     }),
