@@ -354,10 +354,13 @@ $app = Application::configure(basePath: dirname(__DIR__))
             if (RequestContext::isApiRequest($request)) {
                 if ($throwable instanceof HttpExceptionInterface) {
                     $status = $throwable->getStatusCode();
+                    // Normalise common HTTP status codes to shared API error codes so
+                    // integrators can implement consistent handling logic.
                     $code = match ($status) {
                         401     => ErrorCodes::UNAUTHORIZED,
                         403     => ErrorCodes::FORBIDDEN,
                         404     => ErrorCodes::NOT_FOUND,
+                        429     => ErrorCodes::RATE_LIMITED,
                         default => ErrorCodes::SERVER_ERROR,
                     };
 

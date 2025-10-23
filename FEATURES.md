@@ -17,6 +17,6 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
-- Automated dependency maintenance now includes weekly Dependabot runs with labeling and guarded auto-merge workflows so security and ecosystem patches land promptly without manual triage.
+- API error responses now surface an explicit `error.rate_limited` code for HTTP 429 cases so partner integrations can detect throttling conditions without parsing status text.
 - Test infrastructure now reloads JSON translation directories so Filament commerce navigation continues to present localized labels during automated checks.
 - Resolved the open cache invalidation conflicts by tagging navigation, product, and dashboard caches with the shared helper, wiring the invalidation service into global model events, and adding regression tests that prove storefront widgets and stats refresh immediately after catalogue edits.

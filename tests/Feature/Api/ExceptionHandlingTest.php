@@ -20,20 +20,25 @@ final class ExceptionHandlingTest extends TestCase
         parent::setUp();
 
         Route::middleware('api')->group(function (): void {
-            Route::get('/testing/exceptions/server', function () {
+            Route::get('/testing/exceptions/server', function (): void {
                 throw new RuntimeException('Unexpected failure');
             });
 
-            Route::get('/testing/exceptions/not-found', function () {
+            Route::get('/testing/exceptions/not-found', function (): void {
                 abort(404, 'Record not found');
             });
 
-            Route::get('/testing/exceptions/authentication', function () {
+            Route::get('/testing/exceptions/authentication', function (): void {
                 throw new AuthenticationException('Authentication required.');
             });
 
-            Route::get('/testing/exceptions/authorization', function () {
+            Route::get('/testing/exceptions/authorization', function (): void {
                 throw new AuthorizationException('Missing [system.autocomplete] ability.');
+            });
+
+            Route::get('/testing/exceptions/rate-limited', function (): void {
+                // Simulate the framework's throttle middleware raising an HTTP 429.
+                abort(429, 'Too many requests, please try again later.');
             });
 
             Route::post('/testing/exceptions/validation', function (Request $request) {
@@ -57,7 +62,7 @@ final class ExceptionHandlingTest extends TestCase
             ->assertJsonPath('error.code', ErrorCodes::SERVER_ERROR)
             ->assertJsonStructure([
                 'correlation' => ['trace_id', 'correlation_id'],
-                'meta' => ['locale', 'timestamp'],
+                'meta'        => ['locale', 'timestamp'],
             ]);
     }
 
@@ -104,5 +109,16 @@ final class ExceptionHandlingTest extends TestCase
             ->assertJsonPath('type', ApiErrorResponse::typeFor(ErrorCodes::NOT_FOUND))
             ->assertJsonPath('error.code', ErrorCodes::NOT_FOUND)
             ->assertJsonPath('detail', 'Record not found');
+    }
+
+    public function test_too_many_requests_exception_maps_to_rate_limited_code(): void
+    {
+        $response = $this->getJson('/testing/exceptions/rate-limited');
+
+        $response
+            ->assertStatus(429)
+            ->assertJsonPath('type', ApiErrorResponse::typeFor(ErrorCodes::RATE_LIMITED))
+            ->assertJsonPath('error.code', ErrorCodes::RATE_LIMITED)
+            ->assertJsonPath('detail', 'Too many requests, please try again later.');
     }
 }
