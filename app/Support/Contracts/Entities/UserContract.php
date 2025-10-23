@@ -6,6 +6,7 @@ namespace App\Support\Contracts\Entities;
 
 use App\Models\User;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Schema;
 
 final class UserContract
 {
@@ -32,9 +33,28 @@ final class UserContract
 
     private static function mapUser(User $user): array
     {
-        // Preload relations that back the envelope so downstream JSON encoding
-        // doesn't trigger N+1 queries for large dashboard payloads.
-        $user->loadMissing(['addresses', 'orders', 'wishlists.items.product']);
+        $relationsToLoad = [];
+
+        // Guard optional relationships so migrations that omit commerce tables during tests do not trigger query exceptions.
+        if (Schema::hasTable('addresses')) {
+            $relationsToLoad[] = 'addresses';
+        }
+
+        if (Schema::hasTable('orders')) {
+            $relationsToLoad[] = 'orders';
+        }
+
+        if (
+            Schema::hasTable('user_wishlists')
+            && Schema::hasColumn('user_wishlists', 'product_id')
+            && Schema::hasTable('products')
+        ) {
+            $relationsToLoad[] = 'wishlist';
+        }
+
+        if ($relationsToLoad !== []) {
+            $user->loadMissing($relationsToLoad);
+        }
         $safeAttributes = $user->toApiSafeArray();
 
         $wishlistItems = $user->wishlists
@@ -89,14 +109,22 @@ final class UserContract
                 'locale_text'      => $user->locale_text,
                 'roles_label'      => $user->roles_label,
             ],
-            'addresses' => $user->addresses->map(static function ($address) {
-                return Arr::except($address->toArray(), ['user_id', 'created_at', 'updated_at']);
-            })->all(),
-            'orders' => $user->orders->map(static function ($order) {
-                return Arr::except($order->toArray(), ['user_id']);
-            })->all(),
-            'wishlist' => $wishlistItems,
-            'links'    => [
+            'addresses' => $user->relationLoaded('addresses')
+                ? $user->addresses->map(static function ($address) {
+                    return Arr::except($address->toArray(), ['user_id', 'created_at', 'updated_at']);
+                })->all()
+                : [],
+            'orders' => $user->relationLoaded('orders')
+                ? $user->orders->map(static function ($order) {
+                    return Arr::except($order->toArray(), ['user_id']);
+                })->all()
+                : [],
+            'wishlist' => $user->relationLoaded('wishlist')
+                ? $user->wishlist->map(static function ($product) {
+                    return Arr::except($product->toArray(), ['pivot']);
+                })->all()
+                : [],
+            'links' => [
                 'self' => route('account'),
             ],
         ];

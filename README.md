@@ -47,7 +47,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
   analytics widgets build customer journeys without missing foreign keys during PHPUnit runs.
 - SearchableInput payload macros are registered lazily with safer fallbacks, and the SQLite testing harness now spins up one
   database per parallel worker so hydrate/clear flows avoid TypeErrors and filesystem locks during `php artisan test --parallel`.
-- Category administration once again exposes the children, product linkage, and translation relation managers, keeping the Filament resource navigation consistent with the rest of the catalog tooling and satisfying the new resource smoke tests.
+- Campaign click analytics, profile lookup, and category factory flows now have deterministic timestamps, consistent ability error payloads, and collision-free slugs so the API and factories behave the same under SQLite-driven test runs.
 - System setting translation records can once again be soft deleted, restored, and replicated thanks to the relaxed locale index and leaner fillable list that align with the documented API expectations.
 - Product review aggregates in the API now reuse eager-loaded counts and averages, eliminating redundant queries and
   keeping cached storefront metrics intact for the Product API regression suite.

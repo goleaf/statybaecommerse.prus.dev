@@ -25,13 +25,7 @@
 - Order analytics scopes now hint the standalone created-at index, the orders table seeds that index on fresh installs, and the refined ActiveScope lets diagnostics seeders retain processing orders for regression coverage.
 - Discount rebuild migrations now temporarily relax foreign key checks only while replaying legacy rows, preventing the `discount_codes_created_by_foreign` MySQL error during full refreshes without sacrificing referential integrity.
 - User and author foreign keys on rebuilt discount tables now attach after verifying the `users` table compatibility, ensuring MySQL restores with mixed storage engines keep migrating without tripping the `discount_codes_created_by_foreign` system-table check.
-- User-product interaction factories now default to alternate interaction types
-  and constrained timestamp windows, while the model enforces lean fillable
-  data and scope-free product relations so duplicate analytics records no
-  longer collide with unique keys during regression tests.
-
-## Admin UI & Search
-- Filament autocomplete select components now discard model global scopes during lookups so catalog managers immediately see freshly created records in suggestion lists while still benefiting from cached, trimmed queries.
+- Campaign click fixtures now exercise the same routes and timestamps across environments thanks to deterministic UTC formatting, ability-aware profile responses, and factory slugs that remain unique under SQLite.
 
 ## Discounts & promotions
 
