@@ -158,7 +158,7 @@ final class UserResource extends Resource implements DefinesExportColumns
                                     ? Hash::make($state)
                                     : null,
                             ),
-                        Select::make('locale')
+                        Select::make('preferred_locale')
                             ->label(__('users.fields.locale'))
                             ->options([
                                 'lt' => 'Lietuvių',
@@ -222,9 +222,9 @@ final class UserResource extends Resource implements DefinesExportColumns
                 TextColumn::make('preferred_locale')
                     ->label(__('users.fields.locale'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'lt' => 'success',
-                        'en' => 'info',
+                    ->color(fn (?string $state): string => match ($state) {
+                        'lt'    => 'success',
+                        'en'    => 'info',
                         default => 'gray',
                     }),
                 IconColumn::make('is_active')
@@ -267,9 +267,13 @@ final class UserResource extends Resource implements DefinesExportColumns
                         ->color('success')
                         ->form([
                             Select::make('format')
-                                ->label(__('exports.filament.bulk_action.format_label'))
-                                ->options($formatOptions)
-                                ->default($defaultFormat)
+                                ->label(__('Format'))
+                                ->options([
+                                    'csv'  => 'CSV',
+                                    'xlsx' => 'XLSX',
+                                    'pdf'  => 'PDF',
+                                ])
+                                ->default('csv')
                                 ->required(),
                             CheckboxList::make('columns')
                                 ->label(__('exports.filament.bulk_action.columns_label'))
@@ -397,8 +401,8 @@ final class UserResource extends Resource implements DefinesExportColumns
         return [
             'index'  => Pages\ListUsers::route('/'),
             'create' => Pages\CreateUser::route('/create'),
-            'view' => Pages\ViewUser::route('/{record}'),
-            'edit' => Pages\EditUser::route('/{record}/edit'),
+            'view'   => Pages\ViewUser::route('/{record}'),
+            'edit'   => Pages\EditUser::route('/{record}/edit'),
         ];
     }
 
