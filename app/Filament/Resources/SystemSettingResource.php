@@ -8,12 +8,7 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\SystemSettingResource\Pages;
 use App\Models\SystemSetting;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use BackedEnum;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
@@ -24,13 +19,20 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
+use UnitEnum;
 
 /**
  * SystemSettingResource
@@ -288,7 +290,7 @@ class SystemSettingResource extends Resource
                     }),
                 TextColumn::make('category')
                     ->label(__('system_settings.category'))
-                    ->formatStateUsing(fn (?string $state): string => $state !== null ? __("system_settings.categories.{$state}") : __('system_settings.category'))
+                    ->formatStateUsing(fn (?string $state): string => $state ? __("system_settings.categories.{$state}") : '-')
                     ->badge()
                     ->color(fn (?string $state): string => match ($state) {
                         'general'     => 'gray',
@@ -404,7 +406,7 @@ class SystemSettingResource extends Resource
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
-                \Filament\Actions\DeleteAction::make()
+                DeleteAction::make()
                     ->action(function (SystemSetting $record): void {
                         $record->forceDelete();
                     }),
