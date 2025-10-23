@@ -17,7 +17,8 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 -### Latest updates
-- Discount condition administration now bypasses storefront scopes, refreshes Filament v4 imports, and bridges custom widget tab components so list filters, bulk actions, and pivot syncing work across active and inactive records during test runs and live moderation.
+- Customer group administration now syncs the model fillable list, boolean casts, and metadata helpers, enabling Filament CRUD
+  flows to manage inactive, default, and discounted groups while keeping validation for discount fields and toggles consistent.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
 - Region-aware address tables and the dedicated `customers` dataset are back online for the SQLite harness, letting factories and
