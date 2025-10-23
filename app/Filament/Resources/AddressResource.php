@@ -99,12 +99,11 @@ final class AddressResource extends Resource
     }
 
     /**
-     * Configure the Filament form schema using the injected Form instance so Filament v4 stays type-safe.
+     * Configure the Filament form schema using the v4 Schema container pipeline.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
-            // Returning the schema on the provided Form keeps resource composition consistent with Filament expectations.
+        return $schema->components([
             Section::make(__('translations.address_information'))
                 ->schema([
                     Grid::make(2)->schema([
@@ -331,9 +330,6 @@ final class AddressResource extends Resource
 
     /**
      * Configure the Filament table definition so it matches the stricter return type enforced in v4.
-     */
-    /**
-     * Configure the Filament table definition on the provided Table instance to satisfy Filament v4 signatures.
      */
     public static function table(Table $table): Table
     {
