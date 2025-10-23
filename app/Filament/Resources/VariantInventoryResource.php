@@ -54,9 +54,7 @@ final class VariantInventoryResource extends Resource
     protected static ?string $recordTitleAttribute = 'variant_id';
 
     /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     * @var string|BackedEnum|null Navigation icon configured for the inventory module.
      */
     protected static $navigationIcon = 'heroicon-o-archive-box';
 
@@ -82,6 +80,9 @@ final class VariantInventoryResource extends Resource
         return __('admin.variant_inventory.model_label');
     }
 
+    /**
+     * Configure the Variant Inventory form schema for Filament administrators.
+     */
     public static function form(Form $form): Form
     {
         // Filament 4 expects returning the Form builder instance.
