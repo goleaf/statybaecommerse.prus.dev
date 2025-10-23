@@ -9,9 +9,11 @@ use App\Filament\Resources\SystemSettingResource;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
+use Filament\Resources\Components\Tab;
+use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
-class ListSystemSettings extends BaseListRecords
+class ListSystemSettings extends ListRecords
 {
     use HasWidgetTabs;
 
@@ -34,9 +36,8 @@ class ListSystemSettings extends BaseListRecords
     public function getWidgetTabs(): array
     {
         return [
-            'all' => WidgetTab::make(__('system_settings.tabs.all'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
-            'general' => WidgetTab::make(__('system_settings.tabs.general'))
+            'all'     => Tab::make(__('system_settings.tabs.all')),
+            'general' => Tab::make(__('system_settings.tabs.general'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('category', 'general'))
                 ->value(fn () => $this->getResource()::getEloquentQuery()->where('category', 'general')->count()),
             'appearance' => WidgetTab::make(__('system_settings.tabs.appearance'))

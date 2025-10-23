@@ -37,7 +37,7 @@ use Illuminate\Support\Str;
  *
  * Filament v4 resource for SystemSetting management in the admin panel with comprehensive CRUD operations, filters, and actions.
  */
-final class SystemSettingResource extends Resource
+class SystemSettingResource extends Resource
 {
     use HasNav;
 
@@ -288,23 +288,7 @@ final class SystemSettingResource extends Resource
                     }),
                 TextColumn::make('category')
                     ->label(__('system_settings.category'))
-                    ->formatStateUsing(function (?string $state): string {
-                        if (blank($state)) {
-                            return __('system_settings.category_unassigned');
-                        }
-
-                        $translationKey = "system_settings.categories.{$state}";
-                        $translation = __($translationKey);
-
-                        if ($translation !== $translationKey) {
-                            return $translation;
-                        }
-
-                        return Str::of($state)
-                            ->replace('_', ' ')
-                            ->title()
-                            ->toString();
-                    })
+                    ->formatStateUsing(fn (?string $state): string => $state !== null ? __("system_settings.categories.{$state}") : __('system_settings.category'))
                     ->badge()
                     ->color(fn (?string $state): string => match ($state) {
                         'general'     => 'gray',
