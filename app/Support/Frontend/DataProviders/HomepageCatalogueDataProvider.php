@@ -9,10 +9,10 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Review;
 use App\Support\Cache\CacheKeys;
+use App\Support\Cache\TagAwareCache;
 use App\Support\Frontend\DataProviders\Concerns\BuildsProductCatalogueQuery;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
 
 final class HomepageCatalogueDataProvider
 {
@@ -22,7 +22,7 @@ final class HomepageCatalogueDataProvider
     {
         $locale = app()->getLocale();
 
-        $stats = Cache::remember(
+        $stats = TagAwareCache::remember(
             CacheKeys::homeStats($locale),
             CacheKeys::TTL_ONE_HOUR,
             static function (): array {
@@ -33,10 +33,11 @@ final class HomepageCatalogueDataProvider
                     'reviews_count' => Review::query()->where('is_approved', true)->count(),
                     'avg_rating' => (float) (Review::query()->where('is_approved', true)->avg('rating') ?? 0.0),
                 ];
-            }
+            },
+            [CacheKeys::homeTag(), CacheKeys::productAggregateTag()]
         );
 
-        $featuredProducts = Cache::remember(
+        $featuredProducts = TagAwareCache::remember(
             CacheKeys::homeFeaturedProducts($locale),
             CacheKeys::TTL_FIVE_MINUTES,
             function (): Collection {
@@ -44,10 +45,11 @@ final class HomepageCatalogueDataProvider
                     ->where('is_featured', true)
                     ->limit(8)
                     ->get();
-            }
+            },
+            [CacheKeys::homeTag()]
         );
 
-        $latestProducts = Cache::remember(
+        $latestProducts = TagAwareCache::remember(
             CacheKeys::homeLatestProducts($locale),
             CacheKeys::TTL_FIVE_MINUTES,
             function (): Collection {
@@ -55,10 +57,11 @@ final class HomepageCatalogueDataProvider
                     ->orderByDesc('published_at')
                     ->limit(8)
                     ->get();
-            }
+            },
+            [CacheKeys::homeTag()]
         );
 
-        $popularCategories = Cache::remember(
+        $popularCategories = TagAwareCache::remember(
             CacheKeys::categoryPopularList(6),
             CacheKeys::TTL_ONE_HOUR,
             static function (): Collection {
@@ -73,10 +76,11 @@ final class HomepageCatalogueDataProvider
                     ->orderByDesc('visible_products_count')
                     ->limit(6)
                     ->get();
-            }
+            },
+            [CacheKeys::homeTag()]
         );
 
-        $topBrands = Cache::remember(
+        $topBrands = TagAwareCache::remember(
             CacheKeys::brandTopList(6),
             CacheKeys::TTL_ONE_HOUR,
             static function (): Collection {
@@ -91,7 +95,8 @@ final class HomepageCatalogueDataProvider
                     ->orderByDesc('visible_products_count')
                     ->limit(6)
                     ->get();
-            }
+            },
+            [CacheKeys::homeTag()]
         );
 
         return [

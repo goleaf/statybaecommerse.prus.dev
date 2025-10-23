@@ -6,8 +6,7 @@ namespace App\Repositories;
 
 use App\Models\Product;
 use App\Support\Cache\CacheKeys;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
+use App\Support\Cache\TagAwareCache;
 
 final class ProductRepository
 {
@@ -22,20 +21,12 @@ final class ProductRepository
             return Product::on($connection)->newQuery()->count();
         }
 
-        if (! Cache::supportsTags()) {
-            return Cache::remember(
-                CacheKeys::productTotalCount(),
-                now()->addSeconds(CacheKeys::TTL_MINUTE),
-                static fn (): int => Product::query()->count(),
-            );
-        }
-
-        return Cache::tags([CacheKeys::productAggregateTag(), CacheKeys::dashboardTag()])
-            ->remember(
-                CacheKeys::productTotalCount(),
-                now()->addSeconds(CacheKeys::TTL_MINUTE),
-                static fn (): int => Product::query()->count(),
-            );
+        return TagAwareCache::remember(
+            CacheKeys::productTotalCount(),
+            now()->addSeconds(CacheKeys::TTL_MINUTE),
+            static fn (): int => Product::query()->count(),
+            [CacheKeys::productAggregateTag(), CacheKeys::dashboardTag()]
+        );
     }
 
     public function visibleCount(): int

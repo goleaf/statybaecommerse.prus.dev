@@ -6,8 +6,9 @@ namespace App\Livewire\Components;
 
 use App\Models\Brand;
 use App\Models\Collection;
-use App\Repositories\CategoryRepository;
-use App\Repositories\MenuRepository;
+use App\Models\Menu;
+use App\Support\Cache\CacheKeys;
+use App\Support\Cache\TagAwareCache;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Route;
 use Livewire\Attributes\Computed;
@@ -36,10 +37,15 @@ final class NavigationMenu extends Component
     #[Computed]
     public function headerMenu()
     {
-        $repository = app(MenuRepository::class);
-        $menu = $repository->byKey('main_header', app()->getLocale());
+        return TagAwareCache::remember('nav:header_menu:'.app()->getLocale(), now()->addMinutes(30), function () {
+            /** @var Menu|null $menu */
+            $menu = Menu::query()->where('key', 'main_header')->where('is_active', true)->first();
+            if (! $menu) {
+                return collect();
+            }
 
-        return collect($menu['items'] ?? []);
+            return $menu->items()->with('children')->where('is_visible', true)->get();
+        }, [CacheKeys::homeTag()]);
     }
 
     /**
@@ -48,7 +54,13 @@ final class NavigationMenu extends Component
     #[Computed]
     public function mainCategories()
     {
-        return app(CategoryRepository::class)->navigation(8);
+        return TagAwareCache::remember('nav:main_categories:'.app()->getLocale(), now()->addHour(), function () {
+            return Category::query()->with(['translations' => function ($q) {
+                $q->where('locale', app()->getLocale());
+            }, 'children.translations' => function ($q) {
+                $q->where('locale', app()->getLocale());
+            }])->where('is_visible', true)->whereNull('parent_id')->orderBy('sort_order')->limit(8)->get();
+        }, [CacheKeys::homeTag()]);
     }
 
     /**
@@ -57,11 +69,11 @@ final class NavigationMenu extends Component
     #[Computed]
     public function featuredBrands()
     {
-        return cache()->remember('navigation.featured_brands.'.app()->getLocale(), now()->addMinutes(30), function () {
+        return TagAwareCache::remember('nav:featured_brands:'.app()->getLocale(), now()->addHour(), function () {
             return Brand::query()->with(['translations' => function ($q) {
                 $q->where('locale', app()->getLocale());
             }])->where('is_enabled', true)->where('is_featured', true)->orderBy('sort_order')->limit(6)->get();
-        });
+        }, [CacheKeys::homeTag()]);
     }
 
     /**
@@ -70,11 +82,11 @@ final class NavigationMenu extends Component
     #[Computed]
     public function featuredCollections()
     {
-        return \Cache::remember('nav:featured_collections:'.app()->getLocale(), now()->addHour(), function () {
+        return TagAwareCache::remember('nav:featured_collections:'.app()->getLocale(), now()->addHour(), function () {
             return Collection::query()->with(['translations' => function ($q) {
                 $q->where('locale', app()->getLocale());
             }])->where('is_enabled', true)->where('is_featured', true)->orderBy('sort_order')->limit(4)->get();
-        });
+        }, [CacheKeys::homeTag()]);
     }
 
     /**

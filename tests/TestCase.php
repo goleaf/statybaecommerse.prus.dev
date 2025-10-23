@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests;
 
+use App\Support\Cache\TagAwareCache;
 use Filament\Facades\Filament;
 use Filament\Panel;
 use Illuminate\Contracts\Translation\Loader as TranslationLoader;
@@ -69,6 +70,8 @@ abstract class TestCase extends BaseTestCase
         if ($this->createdEnvFile && file_exists(base_path('.env'))) {
             unlink(base_path('.env'));
         }
+
+        TagAwareCache::restore();
 
         parent::tearDown();
 
