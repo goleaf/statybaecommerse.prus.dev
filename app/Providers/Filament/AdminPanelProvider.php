@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use Andreia\FilamentNordTheme\FilamentNordThemePlugin;
 use Asmit\ResizedColumn\ResizedColumnPlugin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Enums\UserMenuPosition;
@@ -178,6 +179,7 @@ final class AdminPanelProvider extends PanelProvider
                         ->listLayoutButtonIcon('heroicon-o-list-bullet')
                         ->gridLayoutButtonIcon('heroicon-o-squares-2x2'),
                     FilamentNordThemePlugin::make(),
+                    ResizedColumnPlugin::make()->preserveOnDB(),
                 ]))
             // Enable the custom Filament theme so third-party plugin views (like the searchable input)
             // are compiled with Tailwind during the build step.
