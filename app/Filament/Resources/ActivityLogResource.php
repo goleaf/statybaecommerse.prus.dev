@@ -10,9 +10,9 @@ use App\Models\ActivityLog;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
 use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -113,12 +113,9 @@ final class ActivityLogResource extends Resource
                     ->label(__('Subject Type'))
                     ->options(fn (): array => self::getDistinctFilterOptions('subject_type')),
                 Filter::make('created_at')
+                    ->label(__('Created At')) // Make the filter caption explicit for the table header chips.
                     ->form([
-                        Flatpickr::makeRange('range')
-                            ->label(__('Created At'))
-
-                            ->format('Y-m-d')
-                            ->displayFormat('Y-m-d'),
+                        Flatpickr::makeRange('range', withTime: false, displayFormat: 'Y-m-d', format: 'Y-m-d'),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,
