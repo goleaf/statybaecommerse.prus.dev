@@ -41,6 +41,9 @@
 ## Documentation consolidation
 - Documentation now lives in dedicated `docs/analysis/`, `docs/runbooks/`, and `docs/contracts/` directories, with a new [style guide](docs/STYLE_GUIDE.md) and CI guard ensuring Markdown stays reviewable.
 
+## Project governance
+- Maintainer playbooks now capture the Oct 21–22, 2025 PR triage in `docs/analysis/CURRENT_SYSTEM_STATUS.md`, calling out immediate merges, superseded branches, and fix-required submissions so review queues stay actionable without reprocessing GitHub filters.
+
 ## Reference
 - Review `app/Filament/Resources/ShippingOptionResource.php` for the table presentation logic and `app/Models/ShippingOption.php` for the accessor reused across storefront components.
 - Developer tooling now documents the restored Husky bootstrap shim, keeping cross-platform Git hooks consistent for contributors.
