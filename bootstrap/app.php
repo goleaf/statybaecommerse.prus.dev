@@ -9,7 +9,9 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Throwable;
+use Illuminate\Support\Str;
+use Laravel\Sanctum\Http\Middleware\CheckAbilities;
+use Laravel\Sanctum\Http\Middleware\CheckForAnyAbility;
 
 require_once __DIR__.'/../app/Support/filament_compat.php';
 
@@ -44,8 +46,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'permissions' => Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'localize' => App\Http\Middleware\SetLocale::class,
-            'abilities' => Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
-            'ability' => Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,
+            'abilities' => CheckAbilities::class,
+            'ability' => CheckForAnyAbility::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
