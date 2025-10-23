@@ -1,6 +1,9 @@
 <?php
 
-use App\Support\ApiErrorResponse;
+use App\Exceptions\Domain\DomainException;
+use App\Http\Middleware\AttachCorrelationId;
+use App\Http\Middleware\SecurityHeaders;
+use App\Services\TranslationService;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -35,7 +38,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(App\Http\Middleware\SetFilamentLocale::class);
         // Handle user impersonation for admin support
         $middleware->append(App\Http\Middleware\HandleImpersonation::class);
-        $middleware->append(AddSecurityHeaders::class);
+        $middleware->append(SecurityHeaders::class);
         // Register Spatie permission middlewares (Laravel 11+/12 style)
         $middleware->alias([
             'role' => Spatie\Permission\Middleware\RoleMiddleware::class,
