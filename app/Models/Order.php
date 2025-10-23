@@ -262,6 +262,10 @@ final class Order extends Model
         return $query->whereIn('status', ['delivered', 'completed']);
     }
 
+    /**
+     * Constrain the query to orders created within the provided window so the
+     * standalone orders_created_at_index can accelerate analytics workloads.
+     */
     public function scopeCreatedBetween(Builder $query, CarbonInterface|DateTimeInterface|string $start, CarbonInterface|DateTimeInterface|string $end): Builder
     {
         [$startAt, $endAt] = self::normalizeRange($start, $end);
@@ -269,16 +273,28 @@ final class Order extends Model
         return $query->whereBetween($query->qualifyColumn('created_at'), [$startAt, $endAt]);
     }
 
+    /**
+     * Constrain the query to orders created at or after the provided boundary while
+     * still leaning on the created_at covering index for efficient scans.
+     */
     public function scopeCreatedSince(Builder $query, CarbonInterface|DateTimeInterface|string $start): Builder
     {
         return $query->where($query->qualifyColumn('created_at'), '>=', self::toImmutableCarbon($start));
     }
 
+    /**
+     * Constrain the query to orders created up to the provided timestamp, relying on
+     * the created_at index to keep descending windows fast.
+     */
     public function scopeCreatedUntil(Builder $query, CarbonInterface|DateTimeInterface|string $end): Builder
     {
         return $query->where($query->qualifyColumn('created_at'), '<=', self::toImmutableCarbon($end));
     }
 
+    /**
+     * Restrict the query to orders created on a specific day, which maps neatly to the
+     * standalone created_at index when used across dashboard widgets.
+     */
     public function scopeCreatedOn(Builder $query, CarbonInterface|DateTimeInterface|string $date): Builder
     {
         $day = self::toImmutableCarbon($date);
