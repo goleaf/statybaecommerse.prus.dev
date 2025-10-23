@@ -1,7 +1,4 @@
 ## Summary
-- [ ] Linked issue or context is documented (include doc links where helpful)
-- [ ] Behavioural changes have accompanying tests or QA notes
-- [ ] Relevant knowledge base pages updated (e.g., `docs/INDEX.md`, `docs/CHANGELOG.md`, or feature-specific summaries)
 
 <!-- Provide a short description of the changes along with links to issues, docs, or conversations that give context. -->
 - Related Issue(s): <!-- e.g. Closes #123 -->
