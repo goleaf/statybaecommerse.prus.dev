@@ -21,14 +21,15 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -39,8 +40,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 final class BrandResource extends Resource
 {
@@ -93,6 +94,9 @@ final class BrandResource extends Resource
         return AuthorizationMatrix::check('brands', 'update');
     }
 
+    /**
+     * @return Builder<Brand>
+     */
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery();
@@ -129,20 +133,27 @@ final class BrandResource extends Resource
     {
         return $form->components([
             Section::make(__('brands.basic_information'))
-                ->components([
-                    LanguageTabs::make([
-                        TextInput::make('name')
-                            ->label(__('brands.name'))
-                            ->required()
-                            ->maxLength(255),
-                        TextInput::make('slug')
-                            ->label(__('brands.slug'))
-                            ->required()
-                            ->maxLength(255),
-                        Textarea::make('description')
-                            ->label(__('brands.description'))
-                            ->rows(3),
-                    ]),
+                ->schema([
+                    Grid::make(2)
+                        ->schema([
+                            TextInput::make('name')
+                                ->label(__('brands.name'))
+                                ->required()
+                                ->maxLength(255)
+                                ->live(onBlur: true)
+                                ->afterStateUpdated(function (string $operation, $state, Set $set): void {
+                                    if ($operation !== 'create' || ! is_string($state)) {
+                                        return;
+                                    }
+
+                                    $set('slug', Str::slug($state));
+                                }),
+                            TextInput::make('slug')
+                                ->label(__('brands.slug'))
+                                ->required()
+                                ->unique(ignoreRecord: true)
+                                ->rules(['alpha_dash']),
+                        ]),
                     TextInput::make('website')
                         ->label(__('brands.website'))
                         ->url()
@@ -250,9 +261,8 @@ final class BrandResource extends Resource
                 TernaryFilter::make('enabled')
                     ->label(__('brands.enabled_only'))
                     ->queries(
-                        true: fn (Builder $query) => $query->where('is_enabled', true),
-                        false: fn (Builder $query) => $query->where('is_enabled', false),
-                        blank: fn (Builder $query) => $query
+                        fn (Builder $query) => $query->where('is_enabled', true),
+                        fn (Builder $query) => $query->where('is_enabled', false),
                     )
                     ->native(false),
                 TernaryFilter::make('is_featured')
@@ -327,7 +337,7 @@ final class BrandResource extends Resource
                         ->color('success')
                         ->action(function (Collection $records): void {
                             $ids = $records->pluck('id');
-                            if ($ids instanceof BaseCollection && $ids->isNotEmpty()) {
+                            if ($ids->isNotEmpty()) {
                                 DB::table('brands')->whereIn('id', $ids->all())->update(['is_enabled' => true]);
                             }
                             Notification::make()
@@ -342,7 +352,7 @@ final class BrandResource extends Resource
                         ->color('warning')
                         ->action(function (Collection $records): void {
                             $ids = $records->pluck('id');
-                            if ($ids instanceof BaseCollection && $ids->isNotEmpty()) {
+                            if ($ids->isNotEmpty()) {
                                 DB::table('brands')->whereIn('id', $ids->all())->update(['is_enabled' => false]);
                             }
                             Notification::make()
