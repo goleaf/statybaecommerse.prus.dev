@@ -44,7 +44,8 @@ final class VariantAnalyticsResource extends Resource
 
     protected static ?string $model = VariantAnalytics::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar-square';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
