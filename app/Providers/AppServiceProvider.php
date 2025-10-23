@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Console\Commands\ProfiledSeedCommand;
 use App\Contracts\DocumentServiceContract;
 use App\Contracts\HealthReporter as HealthReporterContract;
 use App\Contracts\SystemNotificationSender;
@@ -32,6 +33,7 @@ use App\View\Creators\UserDataCreator;
 use Artisan;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
@@ -74,8 +76,11 @@ class AppServiceProvider extends ServiceProvider
                 ProfiledSeedCommand::class,
             ]);
 
-            $this->app->extend('command.seed', static function ($command, $app) {
-                return \tap(new ProfiledSeedCommand($app['db']), static fn ($seedCommand) => $seedCommand->setLaravel($app));
+            $this->app->extend('command.db.seed', function ($command, $app) {
+                /** @var Dispatcher|null $dispatcher */
+                $dispatcher = $app->bound('events') ? $app->make('events') : null;
+
+                return new ProfiledSeedCommand($app->make('db'), $dispatcher, $app->make('config'));
             });
         }
 
