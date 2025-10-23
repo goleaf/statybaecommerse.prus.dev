@@ -2,40 +2,54 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature\Api;
-
+use App\Enums\ExportStatus;
 use App\Models\Export;
-use App\Services\Export\ExportFormat;
-use App\Services\Export\ExportService;
-use App\Services\Export\ExportStatus;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
-use Tests\TestCase;
+use Illuminate\Support\Facades\URL;
 
-final class ExportDownloadTest extends TestCase
-{
-    use RefreshDatabase;
+beforeEach(function (): void {
+    Storage::fake('public');
+    config()->set('export.disk', 'public');
+});
 
-    public function test_signed_download_returns_file(): void
-    {
-        Storage::fake(config('export.disk'));
+test('it downloads completed export artifacts via signed url', function (): void {
+    $artifactPath = 'exports/orders.csv';
+    Storage::disk('public')->put($artifactPath, "number,status\n1001,paid");
 
-        $export = Export::factory()
-            ->completed('exports/example.csv')
-            ->create([
-                'format' => ExportFormat::Csv,
-                'status' => ExportStatus::Completed,
-            ]);
+    $export = Export::factory()->create([
+        'status' => ExportStatus::Completed,
+        'format' => 'csv',
+        'artifact_disk' => 'public',
+        'artifact_path' => $artifactPath,
+        'artifact_filename' => 'orders.csv',
+    ]);
 
-        Storage::disk(config('export.disk'))->put('exports/example.csv', 'header,rows');
+    $url = URL::temporarySignedRoute('api.exports.download', now()->addMinutes(5), ['export' => $export]);
 
-        /** @var ExportService $service */
-        $service = app(ExportService::class);
-        $url = $service->makeSignedDownloadUrl($export, now()->addMinutes(5));
+    $response = $this->get($url);
 
-        $response = $this->get($url);
+    $response->assertOk();
+    $response->assertHeader('content-disposition', 'attachment; filename="orders.csv"');
+    $response->assertHeader('content-type', 'text/csv; charset=UTF-8');
+    $response->assertSee('number');
+});
 
-        $response->assertOk();
-        $response->assertHeader('content-disposition', 'attachment; filename="'.$export->name.'.'.$export->format->extension().'"');
-    }
-}
+test('it returns not found for missing or incomplete exports', function (): void {
+    $queuedExport = Export::factory()->create([
+        'status' => ExportStatus::Queued,
+        'format' => 'csv',
+    ]);
+
+    $queuedUrl = URL::temporarySignedRoute('api.exports.download', now()->addMinutes(5), ['export' => $queuedExport]);
+    $this->get($queuedUrl)->assertNotFound();
+
+    $missingExport = Export::factory()->create([
+        'status' => ExportStatus::Completed,
+        'artifact_disk' => 'public',
+        'artifact_path' => 'exports/missing.csv',
+        'artifact_filename' => 'missing.csv',
+    ]);
+
+    $missingUrl = URL::temporarySignedRoute('api.exports.download', now()->addMinutes(5), ['export' => $missingExport]);
+    $this->get($missingUrl)->assertNotFound();
+});

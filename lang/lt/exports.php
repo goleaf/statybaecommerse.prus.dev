@@ -1,25 +1,33 @@
 <?php
 
+declare(strict_types=1);
+
 return [
-    'actions' => [
-        'export_orders' => 'Eksportuoti užsakymus',
-        'export_products' => 'Eksportuoti produktus',
-        'export_users' => 'Eksportuoti vartotojus',
-    ],
-    'form' => [
-        'format' => 'Failo formatas',
-        'columns' => 'Stulpeliai',
-    ],
     'notifications' => [
-        'queued' => 'Eksportas pateiktas',
-        'queued_body' => 'Pranešime, kai eksportas bus paruoštas atsisiuntimui.',
-        'subject' => 'Jūsų eksportas „:name“ paruoštas',
-        'ready' => 'Eksportas „:name“ sėkmingai užbaigtas.',
-        'download_action' => 'Atsisiųsti eksportą',
-        'expiration' => 'Nuoroda galios iki :date.',
+        'completed' => [
+            'subject' => 'Jūsų eksportas „:name“ paruoštas',
+            'intro' => 'Jūsų prašytas eksportas sėkmingai sugeneruotas.',
+            'format' => 'Formatas: :format',
+            'action' => 'Atsisiųsti eksportą',
+            'expires' => 'Nuoroda nustos galioti po :minutes min.',
+        ],
+        'failed' => [
+            'subject' => 'Eksportas „:name“ nepavyko',
+            'intro' => 'Nepavyko sugeneruoti jūsų prašyto eksporto.',
+            'reason' => 'Priežastis: :reason',
+            'support' => 'Bandykite dar kartą arba susisiekite su pagalba, jei problema kartojasi.',
+        ],
     ],
-    'boolean' => [
-        'yes' => 'Taip',
-        'no' => 'Ne',
+    'filament' => [
+        'bulk_action' => [
+            'label' => 'Eksportuoti pasirinktus',
+            'modal_heading' => 'Eksportuoti pasirinktus :label',
+            'modal_description' => 'Pasirinkite formatą ir stulpelius, kuriuos norite eksportuoti.',
+            'success' => 'Eksportas įtrauktas į eilę. Apie parengtį informuosime el. paštu.',
+            'success_body' => 'Kai tik eksportas bus sugeneruotas, gausite atsisiuntimo nuorodą.',
+            'format_label' => 'Formatas',
+            'columns_label' => 'Stulpeliai',
+            'columns_help' => 'Pasirinkite, kurie stulpeliai bus įtraukti į failą.',
+        ],
     ],
 ];

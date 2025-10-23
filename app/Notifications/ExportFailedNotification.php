@@ -23,10 +23,10 @@ final class ExportFailedNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject(__('Export ":name" failed', ['name' => $this->export->name]))
-            ->line(__('We were unable to generate the export you requested.'))
-            ->line(__('Reason: :reason', ['reason' => $this->export->failure_reason ?? __('Unknown error')]))
-            ->line(__('Please try again or contact support if the problem persists.'));
+            ->subject(__('exports.notifications.failed.subject', ['name' => $this->export->name]))
+            ->line(__('exports.notifications.failed.intro'))
+            ->line(__('exports.notifications.failed.reason', ['reason' => $this->export->failure_reason ?? __('Unknown error')]))
+            ->line(__('exports.notifications.failed.support'));
     }
 
     public function toArray(object $notifiable): array

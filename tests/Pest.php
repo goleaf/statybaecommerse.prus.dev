@@ -3,14 +3,12 @@
 declare(strict_types=1);
 
 use Filament\Facades\Filament;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 
 uses(Tests\TestCase::class)->in('Feature', 'Unit', 'admin', 'frontend', 'Performance');
 
-uses(RefreshDatabase::class)->in('Feature', 'Unit', 'admin', 'frontend', 'Performance');
 
 beforeAll(function () {
     $envPath = base_path('.env');

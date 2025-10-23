@@ -1,25 +1,33 @@
 <?php
 
+declare(strict_types=1);
+
 return [
-    'actions' => [
-        'export_orders' => 'Export Orders',
-        'export_products' => 'Export Products',
-        'export_users' => 'Export Users',
-    ],
-    'form' => [
-        'format' => 'File format',
-        'columns' => 'Columns',
-    ],
     'notifications' => [
-        'queued' => 'Export queued',
-        'queued_body' => 'You will receive a notification when the file is ready for download.',
-        'subject' => 'Your export ":name" is ready',
-        'ready' => 'The export ":name" has finished processing.',
-        'download_action' => 'Download export',
-        'expiration' => 'This link expires on :date.',
+        'completed' => [
+            'subject' => 'Your export ":name" is ready',
+            'intro' => 'The export you requested has finished processing.',
+            'format' => 'Format: :format',
+            'action' => 'Download export',
+            'expires' => 'The link will expire in :minutes minutes.',
+        ],
+        'failed' => [
+            'subject' => 'Export ":name" failed',
+            'intro' => 'We were unable to generate the export you requested.',
+            'reason' => 'Reason: :reason',
+            'support' => 'Please try again or contact support if the problem persists.',
+        ],
     ],
-    'boolean' => [
-        'yes' => 'Yes',
-        'no' => 'No',
+    'filament' => [
+        'bulk_action' => [
+            'label' => 'Export selected',
+            'modal_heading' => 'Export selected :label',
+            'modal_description' => 'Choose the format and columns you want to export.',
+            'success' => 'Export queued successfully. You will be notified once it is ready.',
+            'success_body' => 'We will email you a download link as soon as the export finishes processing.',
+            'format_label' => 'Format',
+            'columns_label' => 'Columns',
+            'columns_help' => 'Select the columns to include in the export file.',
+        ],
     ],
 ];

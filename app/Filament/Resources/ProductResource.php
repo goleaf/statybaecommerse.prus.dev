@@ -369,6 +369,18 @@ final class ProductResource extends Resource implements DefinesExportColumns
 
     public static function table(Table $table): Table
     {
+        $formats = config('export.formats', []);
+
+        if ($formats === []) {
+            $formats = ['csv' => \App\Services\Export\Writers\CsvExportWriter::class];
+        }
+
+        $formatOptions = collect(array_keys($formats))
+            ->mapWithKeys(fn (string $format): array => [$format => strtoupper($format)])
+            ->all();
+
+        $defaultFormat = array_key_first($formats) ?? 'csv';
+
         return $table
             ->defaultPaginationPageOption(25)
             ->paginationPageOptions([25, 50, 100])
@@ -616,24 +628,23 @@ final class ProductResource extends Resource implements DefinesExportColumns
             ->bulkActions([
                 BulkActionGroup::make([
                     BulkAction::make('export_selected')
-                        ->label(__('Export selected'))
+                        ->label(__('exports.filament.bulk_action.label'))
+                        ->modalHeading(__('exports.filament.bulk_action.modal_heading', ['label' => self::getPluralModelLabel()]))
+                        ->modalDescription(__('exports.filament.bulk_action.modal_description'))
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('success')
                         ->form([
                             Select::make('format')
-                                ->label(__('Format'))
-                                ->options([
-                                    'csv' => 'CSV',
-                                    'xlsx' => 'XLSX',
-                                    'pdf' => 'PDF',
-                                ])
-                                ->default('csv')
+                                ->label(__('exports.filament.bulk_action.format_label'))
+                                ->options($formatOptions)
+                                ->default($defaultFormat)
                                 ->required(),
                             CheckboxList::make('columns')
-                                ->label(__('Columns'))
+                                ->label(__('exports.filament.bulk_action.columns_label'))
                                 ->options(fn () => collect(app(ProductExport::class)->columns())->mapWithKeys(fn (ExportColumn $column) => [$column->key => $column->label])->all())
                                 ->default(fn () => app(ProductExport::class)->defaultColumns())
                                 ->columns(2)
+                                ->helperText(__('exports.filament.bulk_action.columns_help'))
                                 ->required(),
                         ])
                         ->action(function (Collection $records, array $data): void {
@@ -652,8 +663,8 @@ final class ProductResource extends Resource implements DefinesExportColumns
                             $service->queue($request);
 
                             Notification::make()
-                                ->title(__('Export queued'))
-                                ->body(__('You will receive a notification once the export has finished.'))
+                                ->title(__('exports.filament.bulk_action.success'))
+                                ->body(__('exports.filament.bulk_action.success_body'))
                                 ->success()
                                 ->send();
                         })

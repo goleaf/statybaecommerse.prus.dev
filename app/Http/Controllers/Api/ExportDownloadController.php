@@ -4,32 +4,46 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\ExportStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Export;
-use App\Services\Export\ExportStatus;
-use Illuminate\Http\Request;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Http\Response as HttpResponse;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 final class ExportDownloadController extends Controller
 {
-    public function __invoke(Request $request, Export $export): BinaryFileResponse
+    public function __invoke(Export $export): HttpResponse
     {
-        if (! $request->hasValidSignature()) {
-            abort(403, 'Invalid or expired export URL.');
-        }
+        abort_if($export->status !== ExportStatus::Completed, 404);
 
-        if ($export->status !== ExportStatus::Completed || ! $export->isDownloadable()) {
+        $disk = $export->artifact_disk ?? (string) config('export.disk', config('filesystems.default', 'public'));
+        $path = $export->artifact_path;
+
+        abort_if(! $path || ! Storage::disk($disk)->exists($path), 404);
+
+        try {
+            $content = Storage::disk($disk)->get($path);
+        } catch (FileNotFoundException) {
             abort(404);
         }
 
-        $disk = Storage::disk(config('export.disk'));
-        if (! $disk->exists($export->path)) {
-            abort(404);
-        }
+        $filename = $export->artifact_filename ?? basename($path);
 
-        $filename = sprintf('%s.%s', $export->name, $export->format->extension());
+        return Response::make($content, 200, [
+            'Content-Type' => $this->contentType($export->format),
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+        ]);
+    }
 
-        return response()->download($disk->path($export->path), $filename);
+    private function contentType(string $format): string
+    {
+        return match ($format) {
+            'csv' => 'text/csv; charset=UTF-8',
+            'xlsx' => 'application/vnd.ms-excel',
+            'pdf' => 'application/pdf',
+            default => 'application/octet-stream',
+        };
     }
 }
