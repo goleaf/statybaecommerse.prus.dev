@@ -50,7 +50,7 @@ final class SystemSettingCategoryResource extends Resource
 
     protected static ?string $model = SystemSettingCategory::class;
 
-    public static function getNavigationGroup(): BackedEnum|string|null
+    public static function getNavigationGroup(): ?string
     {
         return NavigationGroup::System->label();
     }
