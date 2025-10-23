@@ -11,15 +11,9 @@ use App\Models\SystemSetting;
 use App\Models\SystemSettingTranslation;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid as FormGrid;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -32,6 +26,13 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\BooleanColumn;
 use Filament\Tables\Columns\TagsColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -41,6 +42,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Throwable;
 use UnitEnum;
 
@@ -90,7 +92,7 @@ final class SystemSettingTranslationResource extends Resource
                         Tab::make(__('admin.system_setting_translations.basic_information'))
                             ->icon('heroicon-o-information-circle')
                             ->schema([
-                                FormGrid::make(2)
+                                Grid::make(2)
                                     ->schema([
                                         Select::make('system_setting_id')
                                             ->label(__('admin.system_setting_translations.system_setting'))
@@ -138,7 +140,7 @@ final class SystemSettingTranslationResource extends Resource
                         Tab::make(__('admin.system_setting_translations.advanced_settings'))
                             ->icon('heroicon-o-cog-6-tooth')
                             ->schema([
-                                FormGrid::make(2)
+                                Grid::make(2)
                                     ->schema([
                                         Toggle::make('is_active')
                                             ->label(__('admin.system_setting_translations.is_active'))
@@ -213,7 +215,7 @@ final class SystemSettingTranslationResource extends Resource
                     ->copyable()
                     ->badge()
                     ->color('primary')
-                    ->url(fn ($record) => route('filament.admin.resources.system-settings.view', $record->system_setting_id))
+                    ->url(fn (SystemSettingTranslation $record): string => route('filament.admin.resources.system-settings.view', $record->system_setting_id))
                     ->openUrlInNewTab(),
                 TextColumn::make('locale')
                     ->label(__('admin.system_setting_translations.locale'))
@@ -506,20 +508,31 @@ final class SystemSettingTranslationResource extends Resource
         return 'primary';
     }
 
-    public static function getGlobalSearchResultTitle($record): string
+    public static function getGlobalSearchResultTitle(Model $record): string
     {
-        return $record->name;
+        if ($record instanceof SystemSettingTranslation) {
+            return $record->name;
+        }
+
+        return (string) $record->getAttribute('name');
     }
 
-    public static function getGlobalSearchResultDetails($record): array
+    public static function getGlobalSearchResultDetails(Model $record): array
     {
+        if ($record instanceof SystemSettingTranslation) {
+            return [
+                __('admin.system_setting_translations.system_setting') => $record->systemSetting?->key ?? '-',
+                __('admin.system_setting_translations.locale')         => $record->locale,
+            ];
+        }
+
         return [
-            __('admin.system_setting_translations.system_setting') => $record->systemSetting->key,
-            __('admin.system_setting_translations.locale')         => $record->locale,
+            __('admin.system_setting_translations.system_setting') => (string) $record->getAttribute('system_setting_key'),
+            __('admin.system_setting_translations.locale')         => (string) $record->getAttribute('locale'),
         ];
     }
 
-    public static function getGlobalSearchResultUrl($record): string
+    public static function getGlobalSearchResultUrl(Model $record): string
     {
         return self::getUrl('view', ['record' => $record]);
     }
