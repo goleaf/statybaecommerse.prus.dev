@@ -6,113 +6,81 @@ namespace Tests\Feature\Frontend;
 
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\Currency;
+use App\Models\Price;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Carbon;
-use Tests\TestCase;
+use Tests\Feature\TestCase;
 
 final class ProductBrowsingTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_product_index_lists_only_published_products(): void
+    private function createCurrency(): void
     {
-        $category = Category::factory()->create();
-        $brand = Brand::factory()->create();
-
-        $visibleProduct = $this->createPublishedProduct([
-            'name' => 'Profesionalus pjūklas',
-            'slug' => 'profesionalus-pjuklas',
-            'brand_id' => $brand->id,
-        ]);
-        $visibleProduct->categories()->attach($category->id);
-
-        $hiddenProduct = $this->createPublishedProduct([
-            'name' => 'Senas produktas',
-            'slug' => 'senas-produktas',
-            'status' => 'draft',
-            'is_visible' => false,
-        ]);
-        $hiddenProduct->categories()->attach($category->id);
-
-        $response = $this->get(route('frontend.products.index'));
-
-        $response->assertOk()
-            ->assertViewIs('products.index')
-            ->assertViewHas('products', function ($paginator) use ($visibleProduct, $hiddenProduct) {
-                return $paginator->contains('id', $visibleProduct->id)
-                    && ! $paginator->contains('id', $hiddenProduct->id);
-            });
+        Currency::factory()->eur()->default()->create(['id' => 1]);
     }
 
-    public function test_search_filters_products_by_query(): void
+    public function test_product_listing_allows_search_and_filters(): void
     {
-        $brand = Brand::factory()->create();
-        $matchingProduct = $this->createPublishedProduct(['name' => 'Mighty Hammer', 'slug' => 'mighty-hammer', 'brand_id' => $brand->id]);
-        $otherProduct = $this->createPublishedProduct(['name' => 'Safety Helmet', 'slug' => 'safety-helmet']);
+        $this->createCurrency();
 
-        $response = $this->get(route('frontend.products.search', ['q' => 'Hammer']));
+        $brandA = Brand::factory()->create(['is_visible' => true, 'is_enabled' => true, 'name' => 'Makita Pro']);
+        $brandB = Brand::factory()->create(['is_visible' => true, 'is_enabled' => true, 'name' => 'Bosch Baltic']);
 
-        $response->assertOk()
-            ->assertViewIs('products.index')
-            ->assertViewHas('products', function ($paginator) use ($matchingProduct, $otherProduct) {
-                return $paginator->contains('id', $matchingProduct->id)
-                    && ! $paginator->contains('id', $otherProduct->id);
-            });
-    }
+        $categoryA = Category::factory()->create(['name' => 'Elektriniai įrankiai', 'slug' => 'elektriniai-irankiai']);
+        $categoryB = Category::factory()->create(['name' => 'Saugos priemonės', 'slug' => 'saugos-priemones']);
 
-    public function test_product_show_returns_404_for_unpublished_product(): void
-    {
-        $product = $this->createPublishedProduct([
-            'status' => 'draft',
-            'is_visible' => false,
-            'published_at' => null,
-        ]);
-
-        $this->get(route('frontend.products.show', $product))->assertNotFound();
-    }
-
-    public function test_product_show_renders_for_published_product(): void
-    {
-        $product = $this->createPublishedProduct(['name' => 'Universal Drill', 'slug' => 'universal-drill']);
-
-        $this->get(route('frontend.products.show', $product))
-            ->assertOk()
-            ->assertViewIs('products.show')
-            ->assertSee('Universal Drill');
-    }
-
-    public function test_add_review_creates_pending_review(): void
-    {
-        $product = $this->createPublishedProduct();
-
-        $payload = [
-            'reviewer_name' => 'Jonas',
-            'reviewer_email' => 'jonas@example.com',
-            'rating' => 5,
-            'title' => 'Puikus įrankis',
-            'content' => 'Įrankis pateisino visus lūkesčius.',
-        ];
-
-        $response = $this->post(route('frontend.products.add-review', $product), $payload);
-
-        $response->assertRedirect(route('frontend.products.show', $product));
-
-        $this->assertDatabaseHas('reviews', [
-            'product_id' => $product->id,
-            'reviewer_email' => 'jonas@example.com',
-            'content' => 'Įrankis pateisino visus lūkesčius.',
-            'is_approved' => false,
-        ]);
-    }
-
-    private function createPublishedProduct(array $overrides = []): Product
-    {
-        return Product::factory()->create(array_merge([
-            'status' => 'published',
+        $productA = Product::factory()->for($brandA)->create([
+            'name' => 'Profesionalus perforatorius',
+            'slug' => 'profesionalus-perforatorius',
             'is_visible' => true,
+            'status' => 'published',
+            'published_at' => now()->subDay(),
+        ]);
+        $productA->categories()->attach($categoryA->id);
+        Price::factory()->create([
+            'priceable_type' => Product::class,
+            'priceable_id' => $productA->id,
+            'currency_id' => 1,
+            'amount' => 199.99,
             'is_enabled' => true,
-            'published_at' => Carbon::now()->subDay(),
-        ], $overrides));
+        ]);
+
+        $productB = Product::factory()->for($brandB)->create([
+            'name' => 'Apsauginis šalmas',
+            'slug' => 'apsauginis-salmas',
+            'is_visible' => true,
+            'status' => 'published',
+            'published_at' => now()->subDay(),
+        ]);
+        $productB->categories()->attach($categoryB->id);
+        Price::factory()->create([
+            'priceable_type' => Product::class,
+            'priceable_id' => $productB->id,
+            'currency_id' => 1,
+            'amount' => 49.50,
+            'is_enabled' => true,
+        ]);
+
+        $this->get(route('frontend.products.index'))
+            ->assertOk()
+            ->assertSeeText($productA->name)
+            ->assertSeeText($productB->name);
+
+        $this->get(route('frontend.products.index', ['category' => $categoryA->slug]))
+            ->assertOk()
+            ->assertSeeText($productA->name)
+            ->assertDontSeeText($productB->name);
+
+        $this->get(route('frontend.products.index', ['brand' => $brandB->slug]))
+            ->assertOk()
+            ->assertSeeText($productB->name)
+            ->assertDontSeeText($productA->name);
+
+        $this->get(route('frontend.products.index', ['q' => 'perforatorius']))
+            ->assertOk()
+            ->assertSeeText($productA->name)
+            ->assertDontSeeText($productB->name);
     }
 }

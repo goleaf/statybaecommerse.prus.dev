@@ -1,25 +1,40 @@
-@extends('components.layouts.base')
+@extends('frontend.layouts.app')
 
 @section('title', __('Brands'))
 
 @section('content')
-    <x-container class="py-8 space-y-6">
-        <div>
-            <h1 class="text-3xl font-semibold text-gray-900">{{ __('Brands') }}</h1>
-            <p class="mt-2 text-gray-600">{{ __('Explore brands available in our store.') }}</p>
-        </div>
+    <div class="bg-gray-50 py-12">
+        <div class="mx-auto max-w-6xl space-y-10 px-6">
+            <header class="flex flex-col gap-2">
+                <h1 class="text-3xl font-bold text-gray-900">{{ __('Brands we work with') }}</h1>
+                <p class="text-sm text-gray-600">{{ __('Explore trusted manufacturers powering our marketplace.') }}</p>
+            </header>
 
-        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            @forelse ($brands as $brand)
-                <a href="{{ route('frontend.brands.show', $brand) }}" class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:border-primary-300">
-                    <h2 class="text-xl font-semibold text-gray-900">{{ $brand->name }}</h2>
-                    <p class="mt-2 text-sm text-gray-600 line-clamp-3">{{ $brand->description }}</p>
-                </a>
-            @empty
-                <div class="col-span-full rounded-lg border border-dashed border-gray-300 p-12 text-center text-gray-500">
-                    {{ __('No brands available yet.') }}
-                </div>
-            @endforelse
+            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                @forelse($brands as $brand)
+                    <a href="{{ route('frontend.brands.show', $brand) }}" class="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+                        <div class="flex items-center gap-4">
+                            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
+                                <span class="text-base font-semibold">{{ \Illuminate\Support\Str::upper(mb_substr($brand->name, 0, 2)) }}</span>
+                            </div>
+                            <div>
+                                <h2 class="text-lg font-semibold text-gray-900">{{ $brand->name }}</h2>
+                                <p class="text-xs uppercase tracking-wide text-gray-500">{{ trans_choice('{0}No products|{1}1 product|[2,*] :count products', $brand->products_count, ['count' => $brand->products_count]) }}</p>
+                            </div>
+                        </div>
+                        @if($brand->description)
+                            <p class="text-sm text-gray-600">{{ \Illuminate\Support\Str::limit(strip_tags($brand->description), 140) }}</p>
+                        @endif
+                        @if($brand->website)
+                            <span class="text-xs font-semibold uppercase tracking-wide text-indigo-600">{{ parse_url($brand->website, PHP_URL_HOST) ?? $brand->website }}</span>
+                        @endif
+                    </a>
+                @empty
+                    <p class="rounded-lg border border-dashed border-gray-300 bg-white p-8 text-center text-sm text-gray-600">
+                        {{ __('Brand data will appear once the catalogue synchronises.') }}
+                    </p>
+                @endforelse
+            </div>
         </div>
-    </x-container>
+    </div>
 @endsection

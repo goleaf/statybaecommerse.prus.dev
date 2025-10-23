@@ -6,64 +6,37 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use App\Services\Frontend\BrandShowcaseDataProvider;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 final class BrandController extends Controller
 {
+    public function __construct(private readonly BrandShowcaseDataProvider $dataProvider)
+    {
+    }
+
     public function index(Request $request): View
     {
-        $search = Str::of((string) $request->input('search'))->trim()->whenEmpty(fn () => null)->toString();
-
-        $brandsQuery = Brand::query()
-            ->withCount(['products as visible_products_count' => fn ($query) => $query->where('is_visible', true)]);
-
-        if ($search) {
-            $brandsQuery->where(function ($query) use ($search): void {
-                $query->where('name', 'like', '%'.$search.'%')
-                    ->orWhere('slug', 'like', '%'.$search.'%');
-            });
-        }
-
-        $sort = $request->input('sort', 'name_asc');
-
-        if ($sort === 'name_desc') {
-            $brandsQuery->orderByDesc('name');
-        } else {
-            $brandsQuery->orderBy('name');
-        }
-
-        /** @var LengthAwarePaginator $brands */
-        $brands = $brandsQuery->paginate(16)->withQueryString();
-
-        return view('brands.index', [
-            'brands' => $brands,
-            'search' => $search,
-            'sort' => $sort,
+        return view('frontend.brands.index', [
+            'brands' => $this->dataProvider->indexBrands(),
         ]);
     }
 
-    public function show(Brand $brand): View
+    public function show(Request $request, Brand $brand): View
     {
-        $brand->load(['media']);
+        $brand = $this->dataProvider->loadBrand($brand);
+        $filters = $this->dataProvider->resolveFilters($request);
+        $products = $this->dataProvider->products($brand, $filters, 12)->withQueryString();
 
-        $products = $brand->products()
-            ->with(['media', 'brand'])
-            ->where('is_visible', true)
-            ->latest()
-            ->take(12)
-            ->get();
-
-        $seoTitle = $brand->seo_title ?: $brand->name;
-        $seoDescription = $brand->seo_description ?: ($brand->description ? Str::limit($brand->description, 155) : $brand->name);
-
-        return view('brands.show', [
+        return view('frontend.brands.show', [
             'brand' => $brand,
+            'breadcrumbs' => $this->dataProvider->breadcrumbs($brand),
             'products' => $products,
-            'seoTitle' => $seoTitle,
-            'seoDescription' => $seoDescription,
+            'availableSorts' => $this->dataProvider->availableSorts(),
+            'activeFilters' => $filters,
         ]);
     }
 }

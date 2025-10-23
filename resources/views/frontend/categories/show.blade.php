@@ -1,46 +1,101 @@
 @extends('frontend.layouts.app')
 
+@section('title', $category->name)
+
 @section('content')
-    <div class="max-w-6xl mx-auto px-4 py-10 space-y-8">
-        <header class="space-y-2">
-            <h1 class="text-3xl font-semibold text-slate-900 dark:text-slate-100">{{ $category->name }}</h1>
-            <p class="text-slate-600 dark:text-slate-300">{{ $category->description ?? __('This category does not have a description yet.') }}</p>
-        </header>
+    <div class="bg-gray-50 py-12">
+        <div class="mx-auto max-w-6xl space-y-10 px-6">
+            <nav class="text-sm text-gray-500">
+                <ol class="flex flex-wrap items-center gap-2">
+                    @foreach($breadcrumbs as $crumb)
+                        <li class="flex items-center gap-2">
+                            @if(! $loop->last)
+                                <a href="{{ $crumb['url'] }}" class="hover:text-indigo-600">{{ $crumb['label'] }}</a>
+                                <span aria-hidden="true">/</span>
+                            @else
+                                <span class="text-gray-700">{{ $crumb['label'] }}</span>
+                            @endif
+                        </li>
+                    @endforeach
+                </ol>
+            </nav>
 
-        <div class="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-            <div class="text-sm text-slate-600 dark:text-slate-300">
-                {{ trans_choice(':count product|:count products', $products->total(), ['count' => $products->total()]) }}
-            </div>
-            <form method="get">
-                <label for="sort" class="sr-only">{{ __('Sort') }}</label>
-                <select id="sort" name="sort" class="rounded-lg border-slate-300 dark:border-slate-600 dark:bg-slate-900" onchange="this.form.submit()">
-                    <option value="latest" @selected($sort === 'latest')>{{ __('Newest first') }}</option>
-                    <option value="price_asc" @selected($sort === 'price_asc')>{{ __('Price: Low to high') }}</option>
-                    <option value="price_desc" @selected($sort === 'price_desc')>{{ __('Price: High to low') }}</option>
-                    <option value="name_asc" @selected($sort === 'name_asc')>{{ __('Name A–Z') }}</option>
-                    <option value="name_desc" @selected($sort === 'name_desc')>{{ __('Name Z–A') }}</option>
-                </select>
+            @php
+                $totalProducts = method_exists($products, 'total') ? $products->total() : $products->count();
+            @endphp
+            <header class="space-y-4 rounded-2xl bg-white p-8 shadow">
+                <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                        <span class="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-indigo-600">{{ __('Category') }}</span>
+                        <h1 class="mt-3 text-3xl font-bold text-gray-900">{{ $category->name }}</h1>
+                        @if($category->description)
+                            <p class="mt-3 text-sm text-gray-600">{{ \Illuminate\Support\Str::limit(strip_tags($category->description), 220) }}</p>
+                        @endif
+                    </div>
+                    <div class="rounded-xl bg-gray-50 p-4 text-sm text-gray-600">
+                        <p>{{ __('Products available:') }} <span class="font-semibold text-gray-900">{{ $totalProducts }}</span></p>
+                        @if($childCategories->isNotEmpty())
+                            <p class="mt-2 text-xs uppercase tracking-wide text-gray-500">{{ __('Subcategories') }}</p>
+                            <div class="mt-2 flex flex-wrap gap-2">
+                                @foreach($childCategories as $child)
+                                    <a href="{{ route('frontend.categories.show', $child) }}" class="inline-flex items-center rounded-full bg-white px-3 py-1 text-xs font-semibold text-indigo-600 shadow-sm hover:bg-indigo-50">{{ $child->name }}</a>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </header>
+
+            <form method="get" action="{{ route('frontend.categories.show', $category) }}" class="grid gap-4 rounded-xl bg-white p-6 shadow-sm lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:items-end">
+                <div>
+                    <label for="q" class="text-sm font-medium text-gray-700">{{ __('Search within category') }}</label>
+                    <input
+                        id="q"
+                        type="search"
+                        name="q"
+                        value="{{ $activeFilters['search'] ?? request('q') }}"
+                        placeholder="{{ __('Search products...') }}"
+                        class="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                    >
+                </div>
+                <div>
+                    <label for="brand" class="text-sm font-medium text-gray-700">{{ __('Brand') }}</label>
+                    <select
+                        id="brand"
+                        name="brand"
+                        class="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                    >
+                        <option value="">{{ __('All brands') }}</option>
+                        @foreach($brands as $brand)
+                            <option value="{{ $brand->slug }}" @selected(request('brand') === $brand->slug)>{{ $brand->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label for="sort" class="text-sm font-medium text-gray-700">{{ __('Sort by') }}</label>
+                    <select
+                        id="sort"
+                        name="sort"
+                        class="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                    >
+                        @foreach($availableSorts as $key => $label)
+                            <option value="{{ $key }}" @selected(($activeFilters['sort'] ?? request('sort', 'latest')) === $key)>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="flex flex-wrap justify-end gap-3 lg:col-span-2">
+                    <button type="submit" class="inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500">
+                        {{ __('Apply filters') }}
+                    </button>
+                    <a href="{{ route('frontend.categories.show', $category) }}" class="inline-flex items-center rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100">
+                        {{ __('Reset') }}
+                    </a>
+                </div>
             </form>
+
+            <section>
+                @include('frontend.products.partials.grid', ['products' => $products, 'emptyMessage' => __('No products match the selected filters yet.')])
+            </section>
         </div>
-
-        @if ($products->isEmpty())
-            <div class="rounded-xl border border-dashed border-slate-300 dark:border-slate-600 p-12 text-center text-slate-600 dark:text-slate-300">
-                {{ __('No products available in this category right now.') }}
-            </div>
-        @else
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                @foreach ($products as $product)
-                    <article class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-5 shadow-sm">
-                        <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                            <a class="hover:text-primary-600 dark:hover:text-primary-400" href="{{ route('frontend.products.show', $product) }}">{{ $product->name }}</a>
-                        </h2>
-                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ optional($product->brand)->name }}</p>
-                        <p class="mt-3 text-base font-semibold text-primary-600">{{ number_format((float) $product->price, 2) }} {{ config('app.currency', 'EUR') }}</p>
-                    </article>
-                @endforeach
-            </div>
-
-            <div class="mt-8">{{ $products->links() }}</div>
-        @endif
     </div>
 @endsection
