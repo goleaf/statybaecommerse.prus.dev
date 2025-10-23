@@ -151,19 +151,27 @@ final class CollectionResource extends Resource
                         ->label(__('collections.image'))
                         ->image()
                         ->imageEditor()
-                        ->maxFiles(1),
-                    SpatieMediaLibraryFileUpload::make('banner')
-                        ->collection('banner')
+                        ->imageEditorAspectRatios([
+                            '1:1',
+                            '16:9',
+                            '4:3',
+                        ])
+                        ->directory('collections/images')
+                        ->visibility('private'),
+                    FileUpload::make('banner')
                         ->label(__('collections.banner'))
                         ->image()
                         ->imageEditor()
-                        ->maxFiles(1),
-                ])
-                ->columns(2),
-            Section::make(__('collections.collection_info'))
-                ->components([
-                    Combobox::make('products')
-                        ->label(__('translations.products'))
+                        ->imageEditorAspectRatios([
+                            '21:9',
+                        ])
+                        ->directory('collections/banners')
+                        ->visibility('private'),
+                ]),
+            Section::make(__('collections.products'))
+                ->schema([
+                    Select::make('products')
+                        ->label(__('collections.products'))
                         ->relationship('products', 'name')
                         ->multiple()
                         ->searchable()

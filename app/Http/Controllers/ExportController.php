@@ -36,7 +36,7 @@ class ExportController extends Controller
             ->get();
 
         $files = $exports->map(function (Export $export): array {
-            $disk = $export->artifact_disk ?? config('filesystems.exports_disk', 'public');
+            $disk = $export->artifact_disk ?? config('media-security.disk', 'secure-media');
             $path = $export->artifact_path;
 
             $size = null;

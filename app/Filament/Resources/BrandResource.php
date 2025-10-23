@@ -160,20 +160,16 @@ final class BrandResource extends Resource
                             '16:9',
                             '4:3',
                         ])
-                        ->collection('logo')
-                        ->maxFiles(1)
-                        ->preserveFilenames()
+                        ->directory('brands/logos')
                         ->visibility('private'),
-                    SpatieMediaLibraryFileUpload::make('banner')
+                    FileUpload::make('banner')
                         ->label(__('brands.banner'))
                         ->image()
                         ->imageEditor()
                         ->imageEditorAspectRatios([
                             '21:9',
                         ])
-                        ->collection('banner')
-                        ->maxFiles(1)
-                        ->preserveFilenames()
+                        ->directory('brands/banners')
                         ->visibility('private'),
                 ]),
             Section::make(__('brands.seo'))

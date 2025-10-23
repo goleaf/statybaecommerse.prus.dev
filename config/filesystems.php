@@ -47,10 +47,11 @@ return [
             'report' => false,
         ],
 
-        'exports' => [
+        'secure-media' => [
             'driver' => 'local',
-            'root' => storage_path('app/exports'),
+            'root' => storage_path('app/secure-media'),
             'visibility' => 'private',
+            'serve' => true,
             'throw' => false,
             'report' => false,
         ],

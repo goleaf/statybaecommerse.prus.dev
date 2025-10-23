@@ -32,7 +32,7 @@ final class ExportService
 
     public function __construct(?string $disk = null)
     {
-        $this->disk = $disk ?? config('filesystems.exports_disk', config('filesystems.default', 'public'));
+        $this->disk = $disk ?? config('filesystems.exports_disk', config('media-security.disk', config('filesystems.default', 'secure-media')));
     }
 
     public function queue(ExportRequestData $data): Export

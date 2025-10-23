@@ -91,16 +91,7 @@ final class DocumentResource extends Resource
                                     ->label(__('admin.documents.form.fields.file_path'))
                                     ->required()
                                     ->directory('documents')
-                                    ->acceptedFileTypes([
-                                        'application/pdf',
-                                        'application/msword',
-                                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                                        'application/vnd.ms-excel',
-                                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                                        'image/jpeg',
-                                        'image/png',
-                                        'image/webp',
-                                    ])
+                                    ->acceptedFileTypes(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'image/jpeg', 'image/png', 'image/webp'])
                                     ->allowedFileExtensions(['pdf', 'doc', 'docx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png', 'webp'])
                                     ->maxSize(10 * 1024),
                                 Textarea::make('description')

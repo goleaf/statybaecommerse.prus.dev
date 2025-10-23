@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Models\Scopes\StatusScope;
 use App\Observers\AttributionObserver;
+use App\Support\Storage\SecureStorage;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -157,7 +158,11 @@ final class Document extends Model
             return null;
         }
 
-        return asset('storage/'.$this->file_path);
+        return SecureStorage::temporarySignedUrl(
+            $this->file_path,
+            now()->addMinutes((int) config('media-security.url_lifetime', 30)),
+            true
+        );
     }
 
     /**

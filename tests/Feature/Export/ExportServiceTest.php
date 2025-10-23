@@ -10,12 +10,15 @@ use App\Models\User;
 use App\Notifications\ExportReadyNotification;
 use App\Services\Export\Exporters\OrderExport;
 use App\Services\Export\ExportService;
+use App\Support\Storage\SecureStorage;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 
 test('it queues and processes exports', function (): void {
-    Storage::fake('public');
+    $disk = SecureStorage::disk();
+    config()->set('filesystems.default', $disk);
+    Storage::fake($disk);
     Notification::fake();
     Bus::fake();
 
@@ -44,7 +47,7 @@ test('it queues and processes exports', function (): void {
 
     expect($export->status)->toBe(ExportStatus::Completed)
         ->and($export->total_rows)->toBe(3)
-        ->and(Storage::disk('public')->exists((string) $export->artifact_path))->toBeTrue();
+        ->and(Storage::disk($disk)->exists($export->artifact_path))->toBeTrue();
 
     Notification::assertSentTo($user, ExportReadyNotification::class, function (ExportReadyNotification $notification) use ($export, $user): bool {
         $data = $notification->toArray($user);
@@ -54,7 +57,9 @@ test('it queues and processes exports', function (): void {
 });
 
 test('it returns signed download responses', function (): void {
-    Storage::fake('public');
+    $disk = SecureStorage::disk();
+    config()->set('filesystems.default', $disk);
+    Storage::fake($disk);
     Notification::fake();
 
     $user = User::factory()->create();
