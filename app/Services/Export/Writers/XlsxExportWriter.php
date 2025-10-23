@@ -5,48 +5,45 @@ declare(strict_types=1);
 namespace App\Services\Export\Writers;
 
 use App\Models\Export;
-use App\Services\Export\Contracts\ExportWriter;
 use Illuminate\Support\Facades\Storage;
-use Spatie\SimpleExcel\SimpleExcelWriter;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 final class XlsxExportWriter implements ExportWriter
 {
-    private ?SimpleExcelWriter $writer = null;
+    private Spreadsheet $spreadsheet;
 
-    public function open(Export $export, array $columns, string $path): void
+    private int $rowPointer = 1;
+
+    private string $path;
+
+    public function open(Export $export, array $headers): void
     {
-        Storage::disk('local')->makeDirectory(dirname($path));
-
-        $fullPath = Storage::disk('local')->path($path);
-
-        $this->writer = SimpleExcelWriter::create($fullPath);
-        $this->writer->addHeader(array_column($columns, 'label'));
+        $this->spreadsheet = new Spreadsheet;
+        $sheet = $this->spreadsheet->getActiveSheet();
+        $sheet->fromArray($headers, null, 'A1');
+        $this->rowPointer = 2;
+        $this->path = sprintf('exports/%s.%s', $export->id, $export->format->extension());
     }
 
-    public function append(iterable $rows): void
+    public function appendRows(iterable $rows): void
     {
-        if (! $this->writer instanceof SimpleExcelWriter) {
-            return;
-        }
-
+        $sheet = $this->spreadsheet->getActiveSheet();
         foreach ($rows as $row) {
-            $this->writer->addRow(array_values($row));
+            $sheet->fromArray([$row], null, 'A'.$this->rowPointer);
+            $this->rowPointer++;
         }
     }
 
-    public function close(): void
+    public function close(): string
     {
-        $this->writer?->close();
-        $this->writer = null;
-    }
+        $disk = Storage::disk(config('export.disk'));
+        $disk->makeDirectory('exports');
+        $fullPath = $disk->path($this->path);
+        $writer = new Xlsx($this->spreadsheet);
+        $writer->save($fullPath);
+        $this->spreadsheet->disconnectWorksheets();
 
-    public function extension(): string
-    {
-        return 'xlsx';
-    }
-
-    public function mimeType(): string
-    {
-        return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+        return $this->path;
     }
 }

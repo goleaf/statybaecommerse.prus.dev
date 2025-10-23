@@ -4,64 +4,131 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Enums\ExportFormat;
-use App\Enums\ExportStatus;
-use App\Enums\ExportType;
+use App\Services\Export\ExportFormat;
+use App\Services\Export\ExportStatus;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\URL;
 
+/**
+ * @property string $id
+ * @property string $name
+ * @property string $resource
+ * @property string $model
+ * @property ExportFormat $format
+ * @property array<int, string> $columns
+ * @property array<int, string>|null $selection
+ * @property array<string, mixed>|null $filters
+ * @property ExportStatus $status
+ * @property User|null $user
+ * @property string|null $path
+ * @property int|null $total_rows
+ * @property int $processed_rows
+ * @property int $chunk_size
+ * @property Carbon|null $available_until
+ */
 final class Export extends Model
 {
+    /** @use HasFactory<\Database\Factories\ExportFactory> */
     use HasFactory;
 
+    use HasUlids;
+
     protected $fillable = [
-        'requested_by',
-        'type',
+        'name',
+        'resource',
+        'model',
         'format',
-        'status',
-        'filters',
         'columns',
-        'file_name',
-        'file_path',
-        'mime_type',
-        'locale',
-        'timezone',
+        'selection',
+        'filters',
+        'status',
+        'path',
         'total_rows',
-        'completed_at',
-        'expires_at',
+        'processed_rows',
+        'chunk_size',
+        'available_until',
     ];
 
     protected function casts(): array
     {
         return [
-            'filters' => 'array',
             'columns' => 'array',
-            'completed_at' => 'datetime',
-            'expires_at' => 'datetime',
-            'type' => ExportType::class,
+            'selection' => 'array',
+            'filters' => 'array',
             'format' => ExportFormat::class,
             'status' => ExportStatus::class,
+            'available_until' => 'datetime',
         ];
     }
 
-    public function requester(): BelongsTo
+    /**
+     * @return BelongsTo<User, Export>
+     */
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'requested_by');
+        return $this->belongsTo(User::class);
     }
 
-    public function signedUrl(?Carbon $expiresAt = null): string
+    public function markProcessing(int $totalRows): void
     {
-        $expiry = $expiresAt ?? $this->expires_at ?? now()->addMinutes((int) config('exports.ttl_minutes', 1440));
+        $this->forceFill([
+            'status' => ExportStatus::Processing,
+            'total_rows' => $totalRows,
+            'processed_rows' => 0,
+        ])->save();
 
-        return URL::temporarySignedRoute('api.exports.download', $expiry, ['export' => $this->getKey()]);
+        $this->status = ExportStatus::Processing;
+        $this->total_rows = $totalRows;
+        $this->processed_rows = 0;
     }
 
-    public function columnLabels(): array
+    public function incrementProcessedRows(int $amount): void
     {
-        return Arr::pluck($this->columns ?? [], 'label', 'key');
+        $this->forceFill([
+            'processed_rows' => $this->processed_rows + $amount,
+        ])->save();
+
+        $this->processed_rows += $amount;
+    }
+
+    public function markCompleted(string $path): void
+    {
+        $retentionConfig = config('export.retention_hours');
+        $hours = 48;
+        if (is_int($retentionConfig)) {
+            $hours = $retentionConfig;
+        } elseif (is_string($retentionConfig) && is_numeric($retentionConfig)) {
+            $hours = (int) $retentionConfig;
+        }
+
+        $availableUntil = now()->addHours($hours);
+
+        $this->forceFill([
+            'status' => ExportStatus::Completed,
+            'path' => $path,
+            'available_until' => $availableUntil,
+        ])->save();
+
+        $this->status = ExportStatus::Completed;
+        $this->path = $path;
+        $this->available_until = $availableUntil;
+    }
+
+    public function markFailed(): void
+    {
+        $this->forceFill([
+            'status' => ExportStatus::Failed,
+        ])->save();
+
+        $this->status = ExportStatus::Failed;
+    }
+
+    public function isDownloadable(): bool
+    {
+        return $this->status === ExportStatus::Completed
+            && (! $this->available_until || now()->lessThanOrEqualTo($this->available_until));
     }
 }

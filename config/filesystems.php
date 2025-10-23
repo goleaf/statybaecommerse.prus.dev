@@ -47,9 +47,10 @@ return [
             'report' => false,
         ],
 
-        'backups' => [
+        'exports' => [
             'driver' => 'local',
-            'root' => storage_path('app/backups'),
+            'root' => storage_path('app/exports'),
+            'visibility' => 'private',
             'throw' => false,
             'report' => false,
         ],

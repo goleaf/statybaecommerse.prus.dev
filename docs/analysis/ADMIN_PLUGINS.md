@@ -234,3 +234,23 @@ Consider adding these additional plugins:
 - **Notifications**: Enhanced notification system
 - **Charts**: Data visualization widgets
 - **Calendar**: Event and scheduling management
+
+### Export column contract
+
+Reusable bulk exports rely on the `App\Services\Export\Contracts\DefinesExportColumns` interface. Resources implement `availableExportColumns()` and return keyed `ExportColumn` instances that resolve table values on demand.
+
+```php
+use App\Services\Export\Contracts\DefinesExportColumns;
+use App\Services\Export\ExportColumn;
+
+/** @return array<string, ExportColumn> */
+public static function availableExportColumns(): array
+{
+    return [
+        'name' => new ExportColumn('name', __('products.fields.name'), fn (Product $product): string => (string) $product->name),
+        // ...
+    ];
+}
+```
+
+Bulk actions feed the selected column keys and `ExportFormat` into `ExportService::queueResourceExport()`, which dispatches the queued job, persists the artifact, and notifies the requester when the signed download URL is ready.
