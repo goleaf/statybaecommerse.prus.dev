@@ -89,13 +89,8 @@ final class RecommendationAnalyticsResource extends Resource
                                     ->preload(),
                                 Select::make('product_id')
                                     ->label(__('admin.recommendation_analytics.product'))
-                                    ->relationship(
-                                        'product',
-                                        'name',
-                                        fn (Builder $query): Builder => $query->withoutGlobalScopes()
-                                    )
+                                    ->options(fn (): array => Product::withoutGlobalScopes()->pluck('name', 'id')->all())
                                     ->searchable()
-                                    ->preload()
                                     ->nullable(),
                                 Select::make('action')
                                     ->label(__('admin.recommendation_analytics.action'))
@@ -214,13 +209,8 @@ final class RecommendationAnalyticsResource extends Resource
                     ->preload(),
                 SelectFilter::make('product_id')
                     ->label(__('admin.recommendation_analytics.product'))
-                    ->relationship(
-                        'product',
-                        'name',
-                        fn (Builder $query): Builder => $query->withoutGlobalScopes()
-                    )
-                    ->searchable()
-                    ->preload(),
+                    ->options(fn (): array => Product::withoutGlobalScopes()->pluck('name', 'id')->all())
+                    ->searchable(),
                 SelectFilter::make('action')
                     ->label(__('admin.recommendation_analytics.action'))
                     ->options([
