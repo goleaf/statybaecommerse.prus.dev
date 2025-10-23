@@ -101,9 +101,13 @@ final class EnumValue extends Model
     // Methods
     public function getUsageCount(): int
     {
-        $usageCount = data_get($this->metadata, 'usage_count', 0);
+        $metadata = $this->metadata;
 
-        return is_numeric($usageCount) ? (int) $usageCount : 0;
+        if (! is_array($metadata)) {
+            return 0;
+        }
+
+        return (int) ($metadata['usage_count'] ?? 0);
     }
 
     public function activate(): bool
@@ -130,6 +134,15 @@ final class EnumValue extends Model
         $newEnumValue = $this->replicate();
         $newEnumValue->key = $this->key.'_copy';
         $newEnumValue->is_default = false;
+
+        $metadata = $newEnumValue->metadata;
+        if (! is_array($metadata)) {
+            $metadata = [];
+        }
+
+        $metadata['usage_count'] = 0;
+        $newEnumValue->metadata = $metadata;
+
         $newEnumValue->save();
 
         return $newEnumValue;
@@ -187,14 +200,24 @@ final class EnumValue extends Model
 
     public static function cleanupUnused(): int
     {
-        return self::query()
-            ->where('is_active', false)
-            ->where(function (Builder $query): void {
-                $query
-                    ->whereNull('metadata->usage_count')
-                    ->orWhere('metadata->usage_count', 0);
-            })
-            ->where('updated_at', '<', now()->subMonths(6))
-            ->delete();
+        $threshold = now()->subMonths(6);
+
+        $candidates = self::query()
+            ->where('created_at', '<', $threshold)
+            ->get();
+
+        $deleted = 0;
+
+        foreach ($candidates as $enumValue) {
+            if ($enumValue->getUsageCount() > 0) {
+                continue;
+            }
+
+            if ($enumValue->delete()) {
+                $deleted++;
+            }
+        }
+
+        return $deleted;
     }
 }

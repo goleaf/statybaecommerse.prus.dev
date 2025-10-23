@@ -56,7 +56,9 @@ use UnitEnum;
  */
 final class VariantAnalyticsResource extends Resource
 {
-    use HasNav;
+    protected static ?string $model = VariantAnalytics::class;
+
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
