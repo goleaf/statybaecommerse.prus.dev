@@ -160,6 +160,8 @@ class AppServiceProvider extends ServiceProvider
             class_alias(\Filament\Schemas\Components\Utilities\Set::class, \Filament\Forms\Set::class);
         }
 
+        $this->registerChannelResourceAliases();
+
         if (class_exists(\Filament\Forms\Components\FileUpload::class)) {
             \Filament\Forms\Components\FileUpload::configureUsing(
                 static function (\Filament\Forms\Components\FileUpload $component): void {
@@ -608,5 +610,24 @@ class AppServiceProvider extends ServiceProvider
         }
 
         SearchableComponentHelper::registerPayloadMacros();
+    }
+
+    /**
+     * Provide backwards compatible aliases for the legacy Channels namespace used in fixtures.
+     */
+    private function registerChannelResourceAliases(): void
+    {
+        $aliases = [
+            \App\Filament\Resources\ChannelResource\Pages\ListChannels::class  => \App\Filament\Resources\Channels\ChannelResource\Pages\ListChannels::class,
+            \App\Filament\Resources\ChannelResource\Pages\CreateChannel::class => \App\Filament\Resources\Channels\ChannelResource\Pages\CreateChannel::class,
+            \App\Filament\Resources\ChannelResource\Pages\EditChannel::class   => \App\Filament\Resources\Channels\ChannelResource\Pages\EditChannel::class,
+            \App\Filament\Resources\ChannelResource\Pages\ViewChannel::class   => \App\Filament\Resources\Channels\ChannelResource\Pages\ViewChannel::class,
+        ];
+
+        foreach ($aliases as $original => $alias) {
+            if (! class_exists($alias)) {
+                class_alias($original, $alias);
+            }
+        }
     }
 }
