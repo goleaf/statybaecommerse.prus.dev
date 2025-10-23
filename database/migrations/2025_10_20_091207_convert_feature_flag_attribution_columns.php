@@ -19,28 +19,18 @@ return new class extends Migration
         });
 
         Schema::table('feature_flags', function (Blueprint $table): void {
-            $shouldAddCreatedBy = ! Schema::hasColumn('feature_flags', 'created_by');
-
-            if ($shouldAddCreatedBy) {
-                $createdByColumn = $table->foreignId('created_by')->nullable();
-
-                if ($afterColumn = $this->getCreatedByPositionColumn()) {
-                    $createdByColumn->after($afterColumn);
-                }
-
-                $createdByColumn
+            if (! Schema::hasColumn('feature_flags', 'created_by')) {
+                $table->foreignId('created_by')
+                    ->nullable()
+                    ->after('created_by_name')
                     ->constrained('users')
                     ->nullOnDelete();
             }
 
             if (! Schema::hasColumn('feature_flags', 'updated_by')) {
-                $updatedByColumn = $table->foreignId('updated_by')->nullable();
-
-                if ($afterColumn = $this->getUpdatedByPositionColumn($shouldAddCreatedBy)) {
-                    $updatedByColumn->after($afterColumn);
-                }
-
-                $updatedByColumn
+                $table->foreignId('updated_by')
+                    ->nullable()
+                    ->after('created_by')
                     ->constrained('users')
                     ->nullOnDelete();
             }
@@ -84,68 +74,5 @@ return new class extends Migration
                 $table->renameColumn('created_by_name', 'created_by');
             }
         });
-    }
-
-    private function getCreatedByPositionColumn(): ?string
-    {
-        return $this->getFirstExistingColumn([
-            'created_by_name',
-            'approval_notes',
-            'approval_status',
-            'success_metrics',
-            'rollback_plan',
-            'rollout_strategy',
-            'impact_level',
-            'category',
-            'priority',
-            'metadata',
-            'end_date',
-            'start_date',
-            'ends_at',
-            'starts_at',
-            'environment',
-            'rollout_percentage',
-            'conditions',
-            'description',
-        ]);
-    }
-
-    private function getUpdatedByPositionColumn(bool $shouldAddCreatedBy): ?string
-    {
-        if ($shouldAddCreatedBy || Schema::hasColumn('feature_flags', 'created_by')) {
-            return 'created_by';
-        }
-
-        return $this->getFirstExistingColumn([
-            'created_by_name',
-            'approval_notes',
-            'approval_status',
-            'success_metrics',
-            'rollback_plan',
-            'rollout_strategy',
-            'impact_level',
-            'category',
-            'priority',
-            'metadata',
-            'end_date',
-            'start_date',
-            'ends_at',
-            'starts_at',
-            'environment',
-            'rollout_percentage',
-            'conditions',
-            'description',
-        ]);
-    }
-
-    private function getFirstExistingColumn(array $columns): ?string
-    {
-        foreach ($columns as $column) {
-            if (Schema::hasColumn('feature_flags', $column)) {
-                return $column;
-            }
-        }
-
-        return null;
     }
 };

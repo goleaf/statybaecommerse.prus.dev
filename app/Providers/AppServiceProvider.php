@@ -6,7 +6,13 @@ namespace App\Providers;
 
 use App\Domain\Product\Repositories\ProductRepositoryInterface;
 use App\Filament\Components\LiveNotificationFeed;
-use App\Services\CacheInvalidationService;
+use App\Models\DiscountCode;
+use App\Models\DiscountRedemption;
+use App\Models\Document;
+use App\Models\EmailCampaign;
+use App\Models\FeatureFlag;
+use App\Models\SystemSetting;
+use App\Observers\UserAttributionObserver;
 use App\Services\DocumentService;
 use App\Support\Filament\SearchableComponentHelper;
 use App\Support\Health\HealthReporter;
@@ -345,6 +351,7 @@ class AppServiceProvider extends ServiceProvider
         DiscountRedemption::observe($observer);
         Document::observe($observer);
         EmailCampaign::observe($observer);
+        FeatureFlag::observe($observer);
         SystemSetting::observe($observer);
     }
 
