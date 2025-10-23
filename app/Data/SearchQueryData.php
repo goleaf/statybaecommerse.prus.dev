@@ -30,8 +30,8 @@ final class SearchQueryData
     private readonly array $context;
 
     /**
-     * @param  array<int, string>  $types
-     * @param  array<string, mixed>  $context
+     * @param array<int, string>   $types
+     * @param array<string, mixed> $context
      */
     private function __construct(string $query, int $page, int $perPage, array $types, array $context)
     {
@@ -48,19 +48,34 @@ final class SearchQueryData
      */
     public static function fromArray(array $input, array $context = []): self
     {
-        $rawQuery = (string) ($input['query'] ?? $input['q'] ?? '');
+        $rawQueryValue = $input['query'] ?? $input['q'] ?? '';
+        if (! is_scalar($rawQueryValue)) {
+            $rawQueryValue = '';
+        }
+
+        $rawQuery = (string) $rawQueryValue;
         $query = trim(preg_replace('/\s+/', ' ', $rawQuery) ?? '');
 
         if ($query === '') {
             throw new InvalidArgumentException('Search query must be provided.');
         }
 
-        $page = (int) ($input['page'] ?? 1);
+        $pageValue = $input['page'] ?? 1;
+        if (! is_numeric($pageValue)) {
+            $pageValue = 1;
+        }
+
+        $page = (int) $pageValue;
         if ($page < 1) {
             $page = 1;
         }
 
-        $perPage = (int) ($input['per_page'] ?? self::DEFAULT_PER_PAGE);
+        $perPageValue = $input['per_page'] ?? self::DEFAULT_PER_PAGE;
+        if (! is_numeric($perPageValue)) {
+            $perPageValue = self::DEFAULT_PER_PAGE;
+        }
+
+        $perPage = (int) $perPageValue;
         if ($perPage < 1) {
             $perPage = 1;
         }
@@ -73,17 +88,30 @@ final class SearchQueryData
         }
 
         $allowedTypes = ['product', 'category', 'brand'];
-        $types = array_values(array_unique(array_filter(array_map(
-            static fn (mixed $value): ?string => is_string($value) && in_array($value, $allowedTypes, true)
-                ? $value
-                : null,
-            $rawTypes
-        ))));
+        $types = [];
+
+        foreach ($rawTypes as $value) {
+            if (! is_string($value)) {
+                continue;
+            }
+
+            $normalized = mb_strtolower(trim($value));
+
+            // Guard against upstream clients sending empty or unsupported type identifiers (bugfix: normalize case-sensitive values).
+            if ($normalized === '' || ! in_array($normalized, $allowedTypes, true)) {
+                continue;
+            }
+
+            $types[] = $normalized;
+        }
+
+        $types = array_values(array_unique($types));
 
         if ($types === []) {
             $types = $allowedTypes;
         }
 
+        /** @var array<string, mixed> $filteredContext */
         $filteredContext = Arr::where($context, static fn ($value): bool => $value !== null);
 
         return new self($query, $page, $perPage, $types, $filteredContext);
