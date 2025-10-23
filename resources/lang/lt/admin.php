@@ -90,6 +90,12 @@ return [
         'is_visible' => 'Matomas',
         'approve_selected' => 'Patvirtinti pasirinktus',
         'disapprove_selected' => 'Atšaukti pasirinktus',
+        'approve' => 'Patvirtinti',
+        'disapprove' => 'Atšaukti patvirtinimą',
+        'confirm_approve_heading' => 'Patvirtinti komentarą?',
+        'confirm_approve_description' => 'Šis veiksmas pažymės komentarą kaip patvirtintą ir matomą skaitytojams.',
+        'confirm_disapprove_heading' => 'Atšaukti komentaro patvirtinimą?',
+        'confirm_disapprove_description' => 'Šis veiksmas pažymės komentarą kaip nepatvirtintą ir paslėps jį nuo skaitytojų.',
     ],
     'news_images' => [
         'navigation_label' => 'Naujienų paveikslėliai',

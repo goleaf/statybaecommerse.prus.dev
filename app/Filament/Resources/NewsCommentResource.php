@@ -208,9 +208,8 @@ final class NewsCommentResource extends Resource
                         ? __('admin.news_comments.confirm_disapprove_description')
                         : __('admin.news_comments.confirm_approve_description'))
                     ->action(function (NewsComment $record): void {
-                        $record->forceFill([
-                            'is_approved' => ! $record->is_approved,
-                        ])->save();
+                        $record->is_approved = ! $record->is_approved;
+                        $record->save();
                     }),
             ])
             ->bulkActions([
