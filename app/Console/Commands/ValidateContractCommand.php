@@ -4,67 +4,79 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Support\Contracts\Entities\BrandContract;
+use App\Support\Contracts\Entities\CategoryContract;
+use App\Support\Contracts\Entities\OrderContract;
+use App\Support\Contracts\Entities\ProductContract;
+use App\Support\Contracts\Entities\UserContract;
 use App\Support\Contracts\SimpleJsonSchemaValidator;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
-use RuntimeException;
-use function base_path;
-use function json_decode;
-use function json_last_error;
-use function json_last_error_msg;
+use InvalidArgumentException;
 
 final class ValidateContractCommand extends Command
 {
-    protected $signature = 'contracts:validate {entity : Contract entity name (product, category, brand, order, user)} {file : Path to JSON file}';
+    protected $signature = 'contracts:validate {entity : product|category|brand|order|user} {payload? : Optional JSON payload file path} {--example : Validate the bundled example payload}';
 
-    protected $description = 'Validate a JSON payload against the versioned contract schema.';
+    protected $description = 'Validate a payload against one of the published API contracts.';
 
-    public function __construct(
-        private readonly SimpleJsonSchemaValidator $validator,
-        private readonly Filesystem $filesystem,
-    ) {
-        parent::__construct();
+    public function handle(SimpleJsonSchemaValidator $validator, Filesystem $filesystem): int
+    {
+        $entity = strtolower((string) $this->argument('entity'));
+        $class = $this->resolveContractClass($entity);
+
+        $schemaPath = $class::schemaPath();
+        $payloadPath = $this->option('example') ? $class::examplePath() : $this->argument('payload');
+
+        if (! is_string($payloadPath) || $payloadPath === '') {
+            $this->error('Provide a payload path or use the --example flag.');
+
+            return self::FAILURE;
+        }
+
+        if (! $filesystem->exists($payloadPath)) {
+            $this->error(sprintf('Payload file [%s] was not found.', $payloadPath));
+
+            return self::FAILURE;
+        }
+
+        $contents = $filesystem->get($payloadPath);
+        $payload = json_decode($contents, true);
+
+        if (! is_array($payload)) {
+            $this->error('Payload is not a valid JSON object.');
+
+            return self::FAILURE;
+        }
+
+        $errors = $validator->validate($payload, $schemaPath);
+
+        if ($errors === []) {
+            $this->info(sprintf('✔ %s payload is valid for %s.', basename($payloadPath), $entity));
+
+            return self::SUCCESS;
+        }
+
+        $this->error(sprintf('✘ %s payload has %d validation issue(s):', basename($payloadPath), count($errors)));
+        foreach ($errors as $error) {
+            $this->line('  • '.$error);
+        }
+
+        return self::FAILURE;
     }
 
-    public function handle(): int
+    /**
+     * @return class-string
+     */
+    private function resolveContractClass(string $entity): string
     {
-        $entity = (string) $this->argument('entity');
-        $file = (string) $this->argument('file');
-        $path = base_path($file);
-
-        if (! $this->filesystem->exists($path)) {
-            $this->components->error("JSON file not found at {$file}.");
-
-            return self::FAILURE;
-        }
-
-        $payload = $this->filesystem->get($path);
-        $decoded = json_decode($payload, true);
-        if (json_last_error() !== JSON_ERROR_NONE || ! is_array($decoded)) {
-            $message = json_last_error() !== JSON_ERROR_NONE ? json_last_error_msg() : 'Invalid JSON structure.';
-            $this->components->error("Unable to decode JSON: {$message}");
-
-            return self::FAILURE;
-        }
-
-        try {
-            $errors = $this->validator->validate($entity, $decoded);
-        } catch (RuntimeException $exception) {
-            $this->components->error($exception->getMessage());
-
-            return self::FAILURE;
-        }
-
-        if ($errors !== []) {
-            foreach ($errors as $error) {
-                $this->components->error($error);
-            }
-
-            return self::FAILURE;
-        }
-
-        $this->components->info('Payload is valid.');
-
-        return self::SUCCESS;
+        return match ($entity) {
+            'product' => ProductContract::class,
+            'category' => CategoryContract::class,
+            'brand' => BrandContract::class,
+            'order' => OrderContract::class,
+            'user' => UserContract::class,
+            default => throw new InvalidArgumentException(sprintf('Unsupported entity [%s].', $entity)),
+        };
     }
 }

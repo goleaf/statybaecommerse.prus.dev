@@ -6,15 +6,18 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\ShowAuthenticatedUserRequest;
+use App\Support\Contracts\Entities\UserContract;
+use App\Traits\HandlesContentNegotiation;
 use Illuminate\Http\JsonResponse;
 
 final class AuthenticatedUserController extends Controller
 {
+    use HandlesContentNegotiation;
+
     public function __invoke(ShowAuthenticatedUserRequest $request): JsonResponse
     {
-        return response()->json([
-            'success' => true,
-            'data' => $request->user(),
-        ]);
+        $payload = UserContract::forUser($request->user());
+
+        return $this->respondWithContract($request, $payload);
     }
 }

@@ -6,7 +6,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
-use App\Repositories\CategoryRepository;
+use App\Support\Contracts\Entities\CategoryContract;
 use App\Traits\HandlesContentNegotiation;
 use App\Support\ListQuery\ListQueryDefinition;
 use App\Support\ListQuery\ListQueryValidator;
@@ -71,33 +71,9 @@ final class CategoryController extends Controller
             });
         }
 
-        $query = $listQuery->apply($query, $definition);
+        $payload = CategoryContract::forCollection($categories);
 
-        if ($listQuery->sortField === 'sort_order') {
-            $query->orderBy('name');
-        }
-
-        $paginator = $query->paginate($listQuery->perPage, ['*'], 'page', $listQuery->page)
-            ->appends($request->query());
-
-        if ($request->expectsJson()) {
-            $response = ListResponse::fromPaginator(
-                $paginator->through(static function (Category $category) {
-                    return [
-                        'id' => $category->id,
-                        'name' => $category->name,
-                        'slug' => $category->slug,
-                        'description' => $category->description,
-                        'product_count' => $category->products_count,
-                        'url' => route('category.show', $category->slug),
-                    ];
-                }),
-            );
-
-            return response()->json($response);
-        }
-
-        return $this->handleCategoryContentNegotiation($request, $paginator);
+        return $this->respondWithContract($request, $payload);
     }
 
     /**
@@ -105,10 +81,8 @@ final class CategoryController extends Controller
      */
     public function show(Request $request, Category $category): JsonResponse|View|Response
     {
-        $category = $this->categories->loadForShow($category);
-        $data = ['category' => ['id' => $category->id, 'name' => $category->name, 'slug' => $category->slug, 'description' => $category->description, 'parent' => $category->parent ? ['id' => $category->parent->id, 'name' => $category->parent->name, 'slug' => $category->parent->slug] : null, 'children' => $category->children->map(function ($child) {
-            return ['id' => $child->id, 'name' => $child->name, 'slug' => $child->slug, 'description' => $child->description];
-        })->toArray(), 'url' => route('category.show', $category->slug), 'product_count' => $category->products_count ?? 0]];
+        $category->load(['children', 'parent']);
+        $payload = CategoryContract::forCategory($category);
 
         return $this->respondWithContract($request, $payload);
     }
