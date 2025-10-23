@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\EnumValueResource\Pages;
 
-use App\Filament\Pages\Support\BaseListRecords;
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\EnumValueResource;
 use App\Models\EnumValue;
 use Filament\Actions;
@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ListEnumValues extends BaseListRecords
 {
-    use HasWidgetTabs;
+    use HasResizableColumns;
 
     protected static string $resource = EnumValueResource::class;
 
@@ -29,9 +29,8 @@ class ListEnumValues extends BaseListRecords
     public function getWidgetTabs(): array
     {
         return [
-            'all' => WidgetTab::make('All Enum Values')
-                ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
-            'product_status' => WidgetTab::make('Product Status')
+            'all'            => Tab::make('All Enum Values'),
+            'product_status' => Tab::make('Product Status')
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'product_status'))
                 ->value(fn () => $this->getResource()::getModel()::where('type', 'product_status')->count()),
             'order_status' => WidgetTab::make('Order Status')

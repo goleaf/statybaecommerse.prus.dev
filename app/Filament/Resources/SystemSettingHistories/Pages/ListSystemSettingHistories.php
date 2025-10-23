@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingHistories\Pages;
 
-use App\Filament\Pages\Support\BaseListRecords;
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\SystemSettingHistories\SystemSettingHistoryResource;
 use Filament\Actions\CreateAction;
 
 class ListSystemSettingHistories extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = SystemSettingHistoryResource::class;
 
     protected function getHeaderActions(): array

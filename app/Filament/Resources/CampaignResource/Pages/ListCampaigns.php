@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CampaignResource\Pages;
 
-use App\Filament\Pages\Support\BaseListRecords;
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\CampaignResource;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 final class ListCampaigns extends BaseListRecords
 {
-    use HasWidgetTabs;
+    use HasResizableColumns;
 
     protected static string $resource = CampaignResource::class;
 
@@ -28,9 +28,8 @@ final class ListCampaigns extends BaseListRecords
     public function getWidgetTabs(): array
     {
         return [
-            'all' => WidgetTab::make($this->label('campaigns.tabs.all', 'All'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
-            'active' => WidgetTab::make($this->label('campaigns.tabs.active', 'Active'))
+            'all'    => Tab::make($this->label('campaigns.tabs.all', 'All')),
+            'active' => Tab::make($this->label('campaigns.tabs.active', 'Active'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'active'))
                 ->value(fn () => $this->getResource()::getEloquentQuery()->where('status', 'active')->count()),
             'scheduled' => WidgetTab::make($this->label('campaigns.tabs.scheduled', 'Scheduled'))

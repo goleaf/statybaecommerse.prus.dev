@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\UserResource\Pages;
 
-use App\Filament\Pages\Support\BaseListRecords;
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\UserResource;
 use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions\CreateAction;
@@ -13,7 +13,7 @@ use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatabl
 
 class ListUsers extends BaseListRecords
 {
-    use SpatieTranslatableListRecords; // Track the active locale for listing translated records.
+    use HasResizableColumns;
 
     protected static string $resource = UserResource::class;
 

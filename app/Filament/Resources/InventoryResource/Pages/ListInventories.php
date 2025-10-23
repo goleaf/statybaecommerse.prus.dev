@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\InventoryResource\Pages;
 
-use App\Filament\Pages\Support\BaseListRecords;
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\InventoryResource;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
@@ -17,7 +17,7 @@ use Illuminate\Http\Request;
 
 class ListInventories extends BaseListRecords
 {
-    use HasWidgetTabs;
+    use HasResizableColumns;
 
     protected static string $resource = InventoryResource::class;
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ReferralCodeResource\Pages;
 
-use App\Filament\Pages\Support\BaseListRecords;
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\ReferralCodeResource;
 use App\Filament\Resources\ReferralCodeResource\Widgets\ReferralCodeStatsWidget;
 use App\Filament\Resources\ReferralCodeResource\Widgets\ReferralCodeUsageChartWidget;
@@ -15,7 +15,7 @@ use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatabl
 
 final class ListReferralCodes extends BaseListRecords
 {
-    use SpatieTranslatableListRecords; // Track the active locale for listing translated records.
+    use HasResizableColumns;
 
     protected static string $resource = ReferralCodeResource::class;
 

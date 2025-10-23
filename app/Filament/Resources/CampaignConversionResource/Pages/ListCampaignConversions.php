@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CampaignConversionResource\Pages;
 
-use App\Filament\Pages\Support\BaseListRecords;
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\CampaignConversionResource;
 use App\Filament\Resources\CampaignConversionResource\Widgets\CampaignConversionDeviceBreakdownChart;
 use App\Filament\Resources\CampaignConversionResource\Widgets\CampaignConversionStatsOverview;
@@ -13,6 +13,8 @@ use Filament\Actions;
 
 final class ListCampaignConversions extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = CampaignConversionResource::class;
 
     protected function getHeaderActions(): array

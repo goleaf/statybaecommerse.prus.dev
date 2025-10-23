@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
-use App\Support\Nav;
+use Asmit\ResizedColumn\ResizedColumnPlugin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Enums\UserMenuPosition;
 use Filament\Http\Middleware\Authenticate;
@@ -80,8 +80,8 @@ final class AdminPanelProvider extends PanelProvider
                 'gray'    => Color::Slate,
                 'success' => Color::Green,
                 'warning' => Color::Amber,
-                'danger' => Color::Red,
-                'info' => Color::Sky,
+                'danger'  => Color::Red,
+                'info'    => Color::Sky,
             ])
             ->discoverResources(in: $this->appPath('Filament/Resources'), for: 'App\Filament\Resources')
             ->resources($resourceClasses)
@@ -140,7 +140,8 @@ final class AdminPanelProvider extends PanelProvider
                 ]),
                 fn (Panel $p) => $p->plugins([
                     FilamentShieldPlugin::make(),
-                    FilamentSpatieLaravelMediaLibraryPlugin::make(),
+                    ResizedColumnPlugin::make()
+                        ->preserveOnDB(),
                 ]))
             // Remove custom Vite theme to ensure default Filament styles load
             // ->viteTheme('resources/css/filament-enhancements.css')
