@@ -89,17 +89,9 @@ final class AdminPanelProvider extends PanelProvider
                 'danger' => Color::Red,
                 'info' => Color::Sky,
             ])
-            ->resources(Nav::orderedResources())
-            ->pages([
-                \App\Filament\Pages\Dashboard::class,
-                \App\Filament\Pages\SliderAnalytics::class,
-                \App\Filament\Pages\SliderManagement::class,
-                \App\Filament\Pages\InventoryManagement::class,
-                \App\Filament\Pages\AdvancedReports::class,
-                \App\Filament\Pages\UserImpersonation::class,
-            ])
-            ->resources($resourceClasses)
-            ->pages($pageClasses)
+            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
+            ->resources(config('filament.navigation.resources', []))
+            ->pages(config('filament.navigation.pages', []))
             ->widgets([
                 AccountWidget::class,
             ])
@@ -130,18 +122,7 @@ final class AdminPanelProvider extends PanelProvider
             ->unsavedChangesAlerts()
             ->databaseTransactions()
             ->readOnlyRelationManagersOnResourceViewPagesByDefault()
-            ->navigationGroups(array_map(
-                static function (array $group): NavigationGroup {
-                    $navigationGroup = NavigationGroup::make()->label($group['label']);
-
-                    if ($group['icon']) {
-                        $navigationGroup->icon($group['icon']);
-                    }
-
-                    return $navigationGroup;
-                },
-                Nav::navigationGroups()
-            ))
+            ->navigationGroups($this->configuredNavigationGroups())
             ->userMenuItems([
                 'profile' => \Filament\Navigation\MenuItem::make()
                     ->label(__('admin.navigation.profile'))
@@ -162,143 +143,27 @@ final class AdminPanelProvider extends PanelProvider
     }
 
     /**
-     * @return array<int, FilamentPlugin>
-     */
-    private function configuredPlugins(): array
-    {
-        $plugins = [];
-
-        if (class_exists(FilamentShieldPlugin::class)) {
-            $plugins[] = FilamentShieldPlugin::make();
-        }
-
-        if ($fullCalendar = $this->makeFullCalendarPlugin()) {
-            $plugins[] = $fullCalendar;
-        }
-
-        if (class_exists(TableLayoutTogglePlugin::class)) {
-            $tableLayoutPlugin = TableLayoutTogglePlugin::make()
-                ->setDefaultLayout('grid')
-                ->shareLayoutBetweenPages(false)
-                ->displayToggleAction()
-                ->toggleActionHook('tables::toolbar.search.after')
-                ->listLayoutButtonIcon('heroicon-o-list-bullet')
-                ->gridLayoutButtonIcon('heroicon-o-squares-2x2');
-
-            if (class_exists(LocalStoragePersister::class)) {
-                $tableLayoutPlugin->persistLayoutUsing(
-                    persister: LocalStoragePersister::class,
-                    cacheStore: 'redis',
-                    cacheTtl: 60 * 24,
-                );
-            }
-
-            $plugins[] = $tableLayoutPlugin;
-        }
-
-        if (class_exists(FilamentNordThemePlugin::class)) {
-            $plugins[] = FilamentNordThemePlugin::make();
-        }
-
-        if (class_exists(SpatieTranslatablePlugin::class)) {
-            $supportedLocales = array_values(array_filter(
-                (array) config('shared.localization.supported_locales', []),
-                static fn (mixed $locale): bool => is_string($locale) && $locale !== '',
-            ));
-
-            // Persist the admin locale switcher so users return to their last
-            // editing language across Filament sessions.
-            $plugins[] = SpatieTranslatablePlugin::make()
-                ->defaultLocales($supportedLocales !== [] ? $supportedLocales : null)
-                ->persist();
-        }
-
-        if (class_exists(ResizedColumnPlugin::class)) {
-            $plugins[] = ResizedColumnPlugin::make()->preserveOnDB();
-        }
-
-        return array_values($plugins);
-    }
-
-    /**
-     * Build Filament navigation groups by combining the central Nav registry with optional configuration overrides.
+     * Build Filament navigation groups from configuration.
      *
      * @return array<int, NavigationGroup>
      */
     private function configuredNavigationGroups(): array
     {
-        $configuredGroups = array_values(array_filter(
-            (array) config('filament.navigation.groups', []),
-            static fn (mixed $group): bool => is_array($group),
-        ));
+        return collect(config('filament.navigation.groups', []))
+            ->map(static function (array $group): NavigationGroup {
+                $navigationGroup = NavigationGroup::make()
+                    ->label(__($group['label'] ?? ''));
 
-        /** @var array<string, array{label?: string, icon?: string|null, collapsed?: bool|null}> $overrides */
-        $overrides = [];
-        $extras = [];
+                if (! empty($group['icon'])) {
+                    $navigationGroup->icon($group['icon']);
+                }
 
-        foreach ($configuredGroups as $group) {
-            $key = $group['key'] ?? $group['label'] ?? null;
+                if (($group['collapsed'] ?? false) === true) {
+                    $navigationGroup->collapsed();
+                }
 
-            if ($key !== null) {
-                $overrides[$key] = $group;
-            } else {
-                $extras[] = $group;
-            }
-        }
-
-        $navigationGroups = [];
-
-        foreach (Nav::navigationGroups() as $group) {
-            $override = $overrides[$group['key']] ?? null;
-            $label = $override['label'] ?? $group['label'];
-            $icon = $override['icon'] ?? $group['icon'];
-            $collapsed = $override['collapsed'] ?? false;
-
-            $navigationGroup = NavigationGroup::make()->label(__($label));
-
-            if (! empty($icon)) {
-                $navigationGroup->icon($icon);
-            }
-
-            if ($collapsed === true) {
-                $navigationGroup->collapsed();
-            }
-
-            $navigationGroups[] = $navigationGroup;
-
-            unset($overrides[$group['key']]);
-        }
-
-        foreach (array_merge(array_values($overrides), $extras) as $group) {
-            $navigationGroup = NavigationGroup::make()
-                ->label(__($group['label'] ?? ''));
-
-            if (! empty($group['icon'])) {
-                $navigationGroup->icon($group['icon']);
-            }
-
-            if (($group['collapsed'] ?? false) === true) {
-                $navigationGroup->collapsed();
-            }
-
-            $navigationGroups[] = $navigationGroup;
-        }
-
-        return $navigationGroups;
-    }
-
-    private function makeFullCalendarPlugin(): ?\Filament\Contracts\Plugin
-    {
-        $pluginClass = 'Saade\\FilamentFullCalendar\\FilamentFullCalendarPlugin';
-
-        if (! class_exists($pluginClass)) {
-            return null;
-        }
-
-        return $pluginClass::make()
-            ->selectable(true)
-            ->editable(true)
-            ->timezone('Europe/Vilnius')
-            ->locale('lt');
+                return $navigationGroup;
+            })
+            ->all();
     }
 }
