@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\DiscountCodeResource\RelationManagers;
 
 use Filament\Forms;
+use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Forms;
 use Filament\Schemas\Schema;

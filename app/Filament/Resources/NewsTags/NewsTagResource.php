@@ -13,6 +13,7 @@ use App\Filament\Resources\NewsTags\Schemas\NewsTagForm;
 use App\Filament\Resources\NewsTags\Tables\NewsTagsTable;
 use App\Models\NewsTag;
 use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;

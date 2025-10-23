@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use UnitEnum;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
@@ -16,6 +17,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -43,7 +45,7 @@ final class CategoryResource extends Resource
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
     /** @var string|BackedEnum|null Align the resource under the Products navigation section. */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 3;
 

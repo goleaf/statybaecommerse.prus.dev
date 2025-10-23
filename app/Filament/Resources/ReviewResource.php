@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use UnitEnum;
+use BackedEnum;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ReviewResource\Pages;
 use App\Models\Review;
@@ -58,7 +60,7 @@ final class ReviewResource extends Resource
     /**
      * @var string|\UnitEnum|null Allow enum-backed navigation grouping.
      */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::ContentManagement;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::ContentManagement;
 
     public static function getNavigationGroup(): ?string
     {

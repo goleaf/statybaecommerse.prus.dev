@@ -13,6 +13,7 @@ use App\Filament\Resources\Sliders\Schemas\SliderForm;
 use App\Filament\Resources\Sliders\Tables\SlidersTable;
 use App\Models\Slider;
 use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;

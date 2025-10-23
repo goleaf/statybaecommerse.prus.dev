@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use UnitEnum;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\RecommendationBlockResource\Pages;
 use App\Models\RecommendationBlock;
@@ -18,6 +19,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Novadaemon\FilamentCombobox\Combobox;
@@ -46,7 +48,7 @@ final class RecommendationBlockResource extends Resource
     /**
      * @var string|\UnitEnum|null Tracks the navigation group while remaining Filament compatible.
      */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 13;
 

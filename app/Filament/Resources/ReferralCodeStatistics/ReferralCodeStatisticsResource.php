@@ -11,6 +11,7 @@ use App\Filament\Resources\ReferralCodeStatistics\Schemas\ReferralCodeStatistics
 use App\Filament\Resources\ReferralCodeStatistics\Tables\ReferralCodeStatisticsTable;
 use App\Models\ReferralCodeStatistics;
 use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;

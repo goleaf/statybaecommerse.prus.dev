@@ -12,6 +12,7 @@ use App\Filament\Resources\NotificationTemplates\Schemas\NotificationTemplateFor
 use App\Filament\Resources\NotificationTemplates\Tables\NotificationTemplatesTable;
 use App\Models\NotificationTemplate;
 use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
