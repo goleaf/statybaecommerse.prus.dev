@@ -372,3 +372,25 @@ it('caches identical search results to avoid duplicate queries', function (): vo
     expect($firstQueryCount)->toBeGreaterThan(0);
     expect($secondQueryCount)->toBe(0);
 });
+
+it('reuses cached results for trimmed search queries', function (): void {
+    Product::factory()->create(['name' => 'Trim Cache Product']);
+
+    $component = AutocompleteSelect::make('test_field')
+        ->model(Product::class);
+
+    DB::enableQueryLog();
+
+    $component->getSearchResults('   Trim   ');
+    $initialQueries = count(DB::getQueryLog());
+
+    DB::flushQueryLog();
+
+    $component->getSearchResults('Trim');
+    $cachedQueries = count(DB::getQueryLog());
+
+    DB::disableQueryLog();
+
+    expect($initialQueries)->toBeGreaterThan(0);
+    expect($cachedQueries)->toBe(0);
+});
