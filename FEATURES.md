@@ -17,7 +17,7 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
-- Discount management panels now expose full Filament form/table coverage with slug automation, table filters, duplicate actions, and bulk activation toggles so merchandising teams can manage inactive promotions without relaxing storefront scopes.
+- Discount Condition management now ignores storefront-only scopes, aligns Filament v4 component namespaces, and ships anonymous component bridges so admins can see inactive records, run bulk actions, and sync product/category pivots without runtime errors.
 - Brands page now features a light-themed layout, shared card components, and refreshed translations so the partner directory feels consistent across locales.
 - Region-to-city lookups and the dedicated customers table are restored for the SQLite harness, ensuring analytics sparklines, customer factories, and Filament resources can attach geographic metadata without migration errors.
 - Localized product/category routing plus collection seeding were hardened, ensuring homepage product links, category landing pages, and collection showcases load without 404s or empty states.

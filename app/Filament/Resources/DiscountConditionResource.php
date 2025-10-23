@@ -10,29 +10,30 @@ use App\Filament\Resources\DiscountConditionResource\Widgets\DiscountConditionCh
 use App\Filament\Resources\DiscountConditionResource\Widgets\DiscountConditionStatsWidget;
 use App\Filament\Resources\DiscountConditionResource\Widgets\DiscountConditionTableWidget;
 use App\Models\DiscountCondition;
+use App\Models\Scopes\ActiveScope;
 use BackedEnum;
-use Filament\Schemas\Components\Section;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Get;
-use Filament\Infolists\Components\Grid as InfolistGrid;
 use Filament\Infolists\Components\IconEntry;
-use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as InfolistGrid;
+use Filament\Schemas\Components\Section as InfolistSection;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -386,6 +387,19 @@ final class DiscountConditionResource extends Resource
             'view'   => Pages\ViewDiscountCondition::route('/{record}'),
             'edit'   => Pages\EditDiscountCondition::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * Allow administrators to manage both active and inactive records inside Filament.
+     *
+     * The model applies an ActiveScope globally for storefront queries, so we explicitly
+     * remove it here to ensure table filters and bulk actions can work with every record.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes([
+            ActiveScope::class,
+        ]);
     }
 
     private static function encodeValueForTextarea(mixed $value): ?string
