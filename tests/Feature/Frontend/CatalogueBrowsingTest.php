@@ -91,27 +91,47 @@ final class CatalogueBrowsingTest extends TestCase
         ]);
         $featuredProduct->categories()->attach($category);
 
-        $hiddenProduct = Product::factory()->create([
-            'brand_id' => $brand->id,
-            'status' => 'published',
-            'is_visible' => true,
-            'is_featured' => false,
-            'published_at' => now()->subDay(),
-            'requests_count' => 2,
-            'price' => 90,
-            'sale_price' => null,
-            'manage_stock' => true,
-            'stock_quantity' => 5,
-        ]);
-        $hiddenProduct->categories()->attach($category);
+        $hiddenProduct = Product::factory()
+            ->for($brand)
+            ->create([
+                'is_visible' => false,
+                'status' => 'published',
+                'published_at' => now()->subHours(3),
+            ]);
+
+        $draftProduct = Product::factory()
+            ->for($brand)
+            ->create([
+                'is_visible' => true,
+                'status' => 'draft',
+                'published_at' => now()->subHours(4),
+            ]);
+
+        $scheduledProduct = Product::factory()
+            ->for($brand)
+            ->create([
+                'is_visible' => true,
+                'status' => 'published',
+                'published_at' => now()->addDay(),
+            ]);
+
+        $visibleProducts->each(fn (Product $product) => $product->categories()->attach($category->getKey()));
+        $hiddenProduct->categories()->attach($category->getKey());
+        $draftProduct->categories()->attach($category->getKey());
+        $scheduledProduct->categories()->attach($category->getKey());
 
         $response = $this->get(route('frontend.products.index', ['filter' => 'featured']));
 
         $response->assertOk();
         $response->assertViewIs('frontend.products.index');
         $response->assertViewHas('products');
-        $response->assertSeeText($featuredProduct->name);
+        $response->assertSeeText('Discover construction essentials');
+        foreach ($visibleProducts as $product) {
+            $response->assertSeeText($product->name);
+        }
         $response->assertDontSeeText($hiddenProduct->name);
+        $response->assertDontSeeText($draftProduct->name);
+        $response->assertDontSeeText($scheduledProduct->name);
     }
 
     public function test_category_page_displays_related_products(): void
@@ -141,17 +161,21 @@ final class CatalogueBrowsingTest extends TestCase
 
         $product->categories()->attach($category);
 
+        $hiddenProduct = Product::factory()->for($brand)->create([
+            'is_visible' => false,
+            'status' => 'published',
+            'published_at' => now()->subHours(2),
+        ]);
+        $hiddenProduct->categories()->attach($category->getKey());
+
         $response = $this->get(route('frontend.categories.show', $category));
 
         $response->assertOk();
         $response->assertViewIs('frontend.categories.show');
-        $response->assertViewHasAll([
-            'category',
-            'products',
-            'relatedCategories',
-            'highlightedBrands',
-        ]);
-        $response->assertSeeText($product->name);
+        $response->assertViewHas('category', fn ($viewCategory) => $viewCategory->is($category));
+        $response->assertSeeText($categoryProduct->name);
+        $response->assertDontSeeText($otherProduct->name);
+        $response->assertDontSeeText($hiddenProduct->name);
     }
 
     public function test_brand_page_surfaces_products_and_categories(): void
@@ -181,16 +205,20 @@ final class CatalogueBrowsingTest extends TestCase
 
         $product->categories()->attach($category);
 
+        $hiddenProduct = Product::factory()->for($brand)->create([
+            'is_visible' => false,
+            'status' => 'published',
+            'published_at' => now()->subHours(2),
+        ]);
+        $hiddenProduct->categories()->attach($category->getKey());
+
         $response = $this->get(route('frontend.brands.show', $brand));
 
         $response->assertOk();
         $response->assertViewIs('frontend.brands.show');
-        $response->assertViewHasAll([
-            'brand',
-            'products',
-            'relatedCategories',
-        ]);
-        $response->assertSeeText($product->name);
-        $response->assertSeeText($category->name);
+        $response->assertViewHas('brand', fn ($viewBrand) => $viewBrand->is($brand));
+        $response->assertSeeText($brandProduct->name);
+        $response->assertDontSeeText($otherProduct->name);
+        $response->assertDontSeeText($hiddenProduct->name);
     }
 }
