@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Frontend\SendContactMessageRequest;
 use App\Jobs\SendContactMessageJob;
 use App\Models\Company;
 use App\Models\ContactMessage;
 use App\Models\SystemSetting;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 final class ContactController extends Controller
@@ -26,9 +26,16 @@ final class ContactController extends Controller
         ]);
     }
 
-    public function send(SendContactMessageRequest $request): RedirectResponse
+    public function send(Request $request): RedirectResponse
     {
-        $validated = $request->validated();
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255'],
+            'subject' => ['required', 'string', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:50'],
+            'order_number' => ['nullable', 'string', 'max:100'],
+            'message' => ['required', 'string', 'max:1000'],
+        ]);
 
         $contactMessage = ContactMessage::create([
             'name' => $validated['name'],
