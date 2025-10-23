@@ -8,8 +8,9 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Review;
+use App\Services\Shared\CacheService as SharedCacheService;
 use App\Support\Cache\CacheKeys;
-use App\Support\Cache\TagAwareCache;
+use App\Support\Cache\CacheTagHelper;
 use App\Support\Frontend\DataProviders\Concerns\BuildsProductCatalogueQuery;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -22,48 +23,58 @@ final class HomepageCatalogueDataProvider
     {
         $locale = app()->getLocale();
 
-        $stats = TagAwareCache::remember(
+        /** @var SharedCacheService $sharedCache */
+        $sharedCache = app(SharedCacheService::class);
+
+        // Cache the headline statistics behind the merged product, category, and brand tag groups.
+        $stats = $sharedCache->rememberDefault(
             CacheKeys::homeStats($locale),
-            CacheKeys::TTL_ONE_HOUR,
             static function (): array {
                 return [
-                    'products_count' => Product::query()->count(),
+                    'products_count'  => Product::query()->count(),
                     'categories_count' => Category::query()->count(),
-                    'brands_count' => Brand::query()->count(),
-                    'reviews_count' => Review::query()->where('is_approved', true)->count(),
-                    'avg_rating' => (float) (Review::query()->where('is_approved', true)->avg('rating') ?? 0.0),
+                    'brands_count'    => Brand::query()->count(),
+                    'reviews_count'   => Review::query()->where('is_approved', true)->count(),
+                    'avg_rating'      => (float) (Review::query()->where('is_approved', true)->avg('rating') ?? 0.0),
                 ];
             },
-            [CacheKeys::homeTag(), CacheKeys::productAggregateTag()]
+            CacheKeys::TTL_ONE_HOUR,
+            CacheTagHelper::merge(
+                CacheTagHelper::products(),
+                CacheTagHelper::categories(),
+                CacheTagHelper::brands(),
+            ),
         );
 
-        $featuredProducts = TagAwareCache::remember(
+        // Feature shelves warm the storefront experience and depend on product mutations exclusively.
+        $featuredProducts = $sharedCache->rememberLong(
             CacheKeys::homeFeaturedProducts($locale),
-            CacheKeys::TTL_FIVE_MINUTES,
             function (): Collection {
                 return $this->baseProductQuery()
                     ->where('is_featured', true)
                     ->limit(8)
                     ->get();
             },
-            [CacheKeys::homeTag()]
+            CacheKeys::TTL_FIVE_MINUTES,
+            CacheTagHelper::products(),
         );
 
-        $latestProducts = TagAwareCache::remember(
+        // Latest arrivals are also product-driven and reuse the same tag grouping.
+        $latestProducts = $sharedCache->rememberLong(
             CacheKeys::homeLatestProducts($locale),
-            CacheKeys::TTL_FIVE_MINUTES,
             function (): Collection {
                 return $this->baseProductQuery()
                     ->orderByDesc('published_at')
                     ->limit(8)
                     ->get();
             },
-            [CacheKeys::homeTag()]
+            CacheKeys::TTL_FIVE_MINUTES,
+            CacheTagHelper::products(),
         );
 
-        $popularCategories = TagAwareCache::remember(
+        // Popular categories use both category and product relationships to determine demand.
+        $popularCategories = $sharedCache->rememberDefault(
             CacheKeys::categoryPopularList(6),
-            CacheKeys::TTL_ONE_HOUR,
             static function (): Collection {
                 return Category::query()
                     ->withCount([
@@ -77,12 +88,16 @@ final class HomepageCatalogueDataProvider
                     ->limit(6)
                     ->get();
             },
-            [CacheKeys::homeTag()]
+            CacheKeys::TTL_ONE_HOUR,
+            CacheTagHelper::merge(
+                CacheTagHelper::categories(),
+                CacheTagHelper::products(),
+            ),
         );
 
-        $topBrands = TagAwareCache::remember(
+        // Top brands highlight catalogue depth per manufacturer and should clear when either brand or product data shifts.
+        $topBrands = $sharedCache->rememberDefault(
             CacheKeys::brandTopList(6),
-            CacheKeys::TTL_ONE_HOUR,
             static function (): Collection {
                 return Brand::query()
                     ->withCount([
@@ -96,7 +111,11 @@ final class HomepageCatalogueDataProvider
                     ->limit(6)
                     ->get();
             },
-            [CacheKeys::homeTag()]
+            CacheKeys::TTL_ONE_HOUR,
+            CacheTagHelper::merge(
+                CacheTagHelper::brands(),
+                CacheTagHelper::products(),
+            ),
         );
 
         return [

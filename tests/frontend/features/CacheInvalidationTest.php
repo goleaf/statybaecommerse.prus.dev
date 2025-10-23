@@ -22,9 +22,9 @@ final class CacheInvalidationTest extends TestCase
     public function test_product_caches_are_invalidated_on_update(): void
     {
         $product = Product::factory()->create([
-            'name' => 'Original Product',
-            'is_visible' => true,
-            'is_featured' => true,
+            'name'         => 'Original Product',
+            'is_visible'   => true,
+            'is_featured'  => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -42,7 +42,7 @@ final class CacheInvalidationTest extends TestCase
     public function test_category_navigation_cache_is_invalidated(): void
     {
         $category = Category::factory()->create([
-            'name' => 'Original Category',
+            'name'       => 'Original Category',
             'is_visible' => true,
         ]);
 
@@ -59,8 +59,8 @@ final class CacheInvalidationTest extends TestCase
     public function test_brand_cache_is_invalidated_after_update(): void
     {
         $brand = Brand::factory()->create([
-            'name' => 'Original Brand',
-            'is_visible' => true,
+            'name'        => 'Original Brand',
+            'is_visible'  => true,
             'is_featured' => true,
         ]);
 
@@ -94,8 +94,8 @@ final class CacheInvalidationTest extends TestCase
     public function test_dashboard_caches_refresh_on_product_creation(): void
     {
         $visibleProduct = Product::factory()->create([
-            'is_visible' => true,
-            'is_featured' => true,
+            'is_visible'   => true,
+            'is_featured'  => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -107,8 +107,8 @@ final class CacheInvalidationTest extends TestCase
         );
 
         Product::factory()->create([
-            'is_visible' => true,
-            'is_featured' => true,
+            'is_visible'   => true,
+            'is_featured'  => true,
             'published_at' => now()->subDay(),
         ]);
 

@@ -8,8 +8,11 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
+use App\Services\CacheInvalidationService;
 use App\Support\Cache\CacheKeys;
-use App\Support\Cache\TagAwareCache;
+use App\Support\Cache\CacheTagHelper;
+use DateInterval;
+use Illuminate\Cache\TaggableStore;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -90,7 +93,7 @@ final class LiveDashboard extends Component
     #[Computed(persist: true, seconds: 60)]
     public function realTimeStats(): array
     {
-        return Cache::remember(CacheKeys::dashboardStats($this->timeRange), CacheKeys::TTL_MINUTE, function () {
+        return $this->rememberDashboard(CacheKeys::dashboardStats($this->timeRange), CacheKeys::TTL_MINUTE, function () {
             $since = $this->getSinceTimestamp();
 
             return [
@@ -128,7 +131,7 @@ final class LiveDashboard extends Component
     #[Computed(persist: true, seconds: 120)]
     public function liveActivity(): array
     {
-        return Cache::remember(CacheKeys::dashboardActivity($this->timeRange), CacheKeys::TTL_TWO_MINUTES, function () {
+        return $this->rememberDashboard(CacheKeys::dashboardActivity($this->timeRange), CacheKeys::TTL_TWO_MINUTES, function () {
             $since = $this->getSinceTimestamp();
 
             return [
@@ -181,7 +184,7 @@ final class LiveDashboard extends Component
     #[Computed(persist: true, seconds: 300)]
     public function performanceMetrics(): array
     {
-        return TagAwareCache::remember(CacheKeys::dashboardPerformance($this->timeRange), CacheKeys::TTL_FIVE_MINUTES, function () {
+        return $this->rememberDashboard(CacheKeys::dashboardPerformance($this->timeRange), CacheKeys::TTL_FIVE_MINUTES, function () {
             return [
                 'page_views' => rand(1000, 5000),
                 // Mock data - replace with real analytics
@@ -220,14 +223,27 @@ final class LiveDashboard extends Component
     }
 
     /**
+     * Remember dashboard cache entries while applying dashboard tags when supported.
+     *
+     * @return array<string, mixed>
+     */
+    private function rememberDashboard(string $key, int|DateInterval $ttl, callable $callback): array
+    {
+        $store = Cache::getStore();
+
+        if ($store instanceof TaggableStore) {
+            return Cache::tags(CacheTagHelper::dashboards())->remember($key, $ttl, $callback);
+        }
+
+        return Cache::remember($key, $ttl, $callback);
+    }
+
+    /**
      * Handle clearCache functionality with proper error handling.
      */
     private function clearCache(): void
     {
-        TagAwareCache::flush([CacheKeys::dashboardTag()]);
-        Cache::forget(CacheKeys::dashboardStats($this->timeRange));
-        Cache::forget(CacheKeys::dashboardActivity($this->timeRange));
-        Cache::forget(CacheKeys::dashboardPerformance($this->timeRange));
+        app(CacheInvalidationService::class)->flushDashboards();
     }
 
     /**

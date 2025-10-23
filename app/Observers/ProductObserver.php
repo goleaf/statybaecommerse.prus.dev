@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Services\Images\GradientImageService;
 use App\Support\Cache\CacheInvalidator;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 /**
  * ProductObserver
@@ -41,41 +42,11 @@ final class ProductObserver
             $generator = app(GradientImageService::class);
             $tmpPath = $generator->generateGradientPng(800, 800);
             $product->addMedia($tmpPath)->withCustomProperties(['placeholder' => true])->preservingOriginal()->toMediaCollection($collection);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Log::warning('Failed to attach placeholder image for product', ['product_id' => $product->id, 'error' => $e->getMessage()]);
         }
 
         app(InvalidateProductCache::class)();
-    }
-
-    public function updated(Product $product): void
-    {
-        app(InvalidateProductCache::class)();
-    }
-
-    public function deleted(Product $product): void
-    {
-        app(InvalidateProductCache::class)();
-    }
-
-    public function restored(Product $product): void
-    {
-        app(InvalidateProductCache::class)();
-    }
-
-    public function updated(Product $product): void
-    {
-        $this->invalidateCaches($product);
-    }
-
-    public function deleted(Product $product): void
-    {
-        $this->invalidateCaches($product);
-    }
-
-    private function invalidateCaches(Product $product): void
-    {
-        app(CacheInvalidationService::class)->flushForModel($product);
     }
 
     public function updated(Product $product): void
@@ -100,6 +71,7 @@ final class ProductObserver
 
     private function flushProductCaches(Product $product): void
     {
-        app(CacheInvalidator::class)->productChanged($product);
+        // Delegate to the cache invalidation use case so storefront shelves refresh consistently.
+        ($this->invalidateProductCache)($product);
     }
 }

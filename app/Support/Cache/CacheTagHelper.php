@@ -72,11 +72,16 @@ final class CacheTagHelper
     /**
      * Merge multiple tag groups, removing duplicates.
      *
-     * @param  array<int, string>  ...$groups
+     * @param  array<int, string> ...$groups
      * @return array<int, string>
      */
     public static function merge(array ...$groups): array
     {
+        if ($groups === []) {
+            // Provide a graceful fallback when no tag groups are supplied.
+            return [];
+        }
+
         return array_values(array_unique(array_merge(...$groups)));
     }
 }

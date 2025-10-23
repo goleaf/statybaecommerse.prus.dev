@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace App\Livewire\Home;
 
 use App\Models\Collection as ProductCollection;
+use App\Services\Shared\CacheService as SharedCacheService;
 use App\Support\Cache\CacheKeys;
-use App\Support\Cache\TagAwareCache;
+use App\Support\Cache\CacheTagHelper;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
@@ -25,13 +26,13 @@ final class CollectionsShowcase extends Component implements HasSchemas
     {
         $locale = app()->getLocale();
 
-        return TagAwareCache::remember(
+        return app(SharedCacheService::class)->rememberLong(
             CacheKeys::homeCollections($locale),
-            CacheKeys::TTL_FIVE_MINUTES,
             function () use ($locale) {
+
                 return ProductCollection::query()
                     ->with('media')
-                    ->with(['translations' => function ($q) use ($locale) {
+                    ->with(['translations' => function ($q) use ($locale): void {
                         $q->where('locale', $locale);
                     }])
                     ->withCount(['products'])
@@ -40,7 +41,8 @@ final class CollectionsShowcase extends Component implements HasSchemas
                     ->ordered()
                     ->get();
             },
-            [CacheKeys::homeTag()]
+            CacheKeys::TTL_FIVE_MINUTES,
+            CacheTagHelper::collections(),
         );
     }
 

@@ -18,30 +18,22 @@ When the Cache API accepts a `DateTimeInterface`, prefer expressive helpers such
 
 ## Tagging Conventions
 
-Use the helper when attaching cache tags to keep invalidation consistent:
+Prefer the dedicated `App\Support\Cache\CacheTagHelper` when attaching cache tags so the invalidation service can target entire feature areas with a single flush:
 
-- `CacheKeys::productTag($productId)` → `product:{id}`
-- `CacheKeys::categoryTag($categoryId)` → `category:{id}`
-- `CacheKeys::brandTag($brandId)` → `brand:{id}`
-- `CacheKeys::homeTag()` and `CacheKeys::dashboardTag()` for broad UI groupings
-- `CacheKeys::productAggregateTag()` / `CacheKeys::userAggregateTag()` / `CacheKeys::orderAggregateTag()` for repository- or metric-level aggregates
+- `CacheTagHelper::products()` → storefront product tiles, featured shelves, related product lists.
+- `CacheTagHelper::categories()` → navigation menus, category pickers, catalogue landing pages.
+- `CacheTagHelper::brands()` → brand carousels, filters, and top brand showcases.
+- `CacheTagHelper::collections()` → collection sliders and Livewire showcases.
+- `CacheTagHelper::dashboards()` → Livewire dashboard widgets, Filament overview cards, and reporting caches.
 
-### Cache tag helper
-
-The dedicated `App\Support\Cache\CacheTags` class now generates locale-, resource-, and identifier-specific tag names. Prefer the helper when tagging caches:
-
-- `CacheTags::locale($locale)` ensures translated storefront fragments clear correctly.
-- `CacheTags::products()`, `CacheTags::categories()`, `CacheTags::brands()`, `CacheTags::collections()` scope invalidation to catalogue resources.
-- `CacheTags::productIds([$id])`, `CacheTags::categoryIds([$id])`, etc., collapse identifier arrays into deterministic tag names for Livewire filters and show pages.
-
-Tagging ensures that refreshing a product or category can invalidate related home and dashboard fragments without manual key enumeration.
+Legacy helpers (`CacheKeys::productTag($id)`, `CacheKeys::homeTag()`, and similar) remain available when a specific key needs to be targeted, but feature-level tagging should always include the `CacheTagHelper` group so global flushes stay predictable.
 
 ## Invalidation Rules
 
-- Product mutations should clear featured, trending, and navigation caches using the product/category/brand tags.
-- Category structure changes must clear navigation trees (`CacheKeys::categoryNavigationTree()`) and home catalogue lookups.
-- Dashboard metrics rely on short TTLs but still respect `CacheKeys::dashboardTag()` for forced refreshes during deployments.
-- Product, user, and order observers flush the aggregate tags above on `created`, `updated`, `deleted`, `restored`, and `forceDeleted` so repository counts and dashboard snapshots never drift. When cache tags are unavailable (e.g. array store), the observers fall back to forgetting `CacheKeys::productTotalCount()`, `CacheKeys::userTotalCount()`, and the locale-aware dashboard metric keys.
+- The `App\Services\CacheInvalidationService` is the single entry point for cache flushing. Observers and service hooks call `flushForModel()` so changing a `Product`, `Category`, `Brand`, or `Collection` automatically clears the correct tag groups.
+- Product mutations therefore clear featured, trending, navigation, and dashboard caches through the shared product tag group. Category mutations flush category and related product caches, and so on.
+- Dashboard metrics rely on short TTLs but still receive `CacheTagHelper::dashboards()` so forced refreshes happen instantly during deployments or data imports.
+- When cache tags are unavailable (for example, while using the array driver) the invalidation service logs the issue and falls back to targeted key resets. Product events clear the `home:*` shelves, featured lists, and related product entries per locale and currency, while categories, brands, and collections drop their respective navigation trees and showcase caches.
 
 Where Redis tags are unavailable, fall back to targeted `Cache::forget()` calls that leverage the centralized builders.
 
