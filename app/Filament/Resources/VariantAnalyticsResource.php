@@ -100,7 +100,16 @@ final class VariantAnalyticsResource extends Resource
                                                     ->required()
                                                     ->searchable()
                                                     ->preload()
-                                                    ->live(),
+                                                    ->live()
+                                                    ->afterStateUpdated(function ($state, callable $set): void {
+                                                        if ($state) {
+                                                            $variant = \App\Models\ProductVariant::find($state);
+                                                            if ($variant) {
+                                                                $set('variant_name', $variant->name);
+                                                                $set('product_name', $variant->product->name ?? '');
+                                                            }
+                                                        }
+                                                    }),
                                                 DatePicker::make('date')
                                                     ->label(__('admin.variant_analytics.date'))
                                                     ->required()
