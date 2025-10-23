@@ -32,6 +32,7 @@ return new class extends Migration
         }
 
         if (! Schema::hasColumn($tableName, 'created_at')) {
+            // Skip tables that opt out of timestamps to keep the migration idempotent.
             return;
         }
 
@@ -67,12 +68,13 @@ return new class extends Migration
         $connection = Schema::getConnection();
 
         if (! method_exists($connection, 'getDoctrineSchemaManager')) {
-            // When Doctrine DBAL is missing (such as in lightweight testing setups), we skip the check.
             return false;
         }
 
         $schemaManager = $connection->getDoctrineSchemaManager();
-        $indexes = $schemaManager->listTableIndexes($connection->getTablePrefix() . $tableName);
+        $prefixedTable = $connection->getTablePrefix() . $tableName;
+
+        $indexes = $schemaManager->listTableIndexes($prefixedTable);
 
         return array_key_exists($indexName, $indexes);
     }
