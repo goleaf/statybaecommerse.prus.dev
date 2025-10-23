@@ -27,6 +27,11 @@ final class ApiServiceProvider extends ServiceProvider
             return Limit::perMinute((int) config('api.rate_limits.autocomplete', 30))
                 ->by($this->rateLimitKey($request, 'autocomplete'));
         });
+
+        RateLimiter::for('api.exports', function (Request $request): Limit {
+            return Limit::perMinute((int) config('api.rate_limits.exports', 10))
+                ->by($this->rateLimitKey($request, 'exports'));
+        });
     }
 
     private function rateLimitKey(Request $request, string $suffix = ''): string
