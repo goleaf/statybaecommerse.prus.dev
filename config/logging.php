@@ -6,25 +6,17 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
 use Monolog\Processor\PsrLogMessageProcessor;
 
-$sentryDsn = (string) env('SENTRY_LARAVEL_DSN', env('SENTRY_DSN', ''));
-$sentryAvailable = $sentryDsn !== '' && class_exists(\Sentry\Laravel\Integration::class);
+$stackChannels = explode(',', (string) env('LOG_STACK', 'single'));
 
-$configuredStackChannels = array_filter(array_map(
-    static fn (string $channel): ?string => $channel !== '' ? $channel : null,
-    explode(',', (string) env('LOG_STACK', 'daily'))
-));
+if (env('APP_ENV') === 'production') {
+    $stackChannels = ['daily_json'];
 
-$stackChannels = $configuredStackChannels === []
-    ? ['daily']
-    : array_values(array_unique($configuredStackChannels));
+    $sentryDsn = (string) (env('SENTRY_LARAVEL_DSN') ?? env('SENTRY_DSN', ''));
 
-$productionStackChannels = array_values(array_unique(array_merge(['daily'], $stackChannels)));
-
-if ($sentryAvailable) {
-    $stackChannels = array_values(array_unique(array_merge($stackChannels, ['sentry'])));
-    $productionStackChannels = array_values(array_unique(array_merge($productionStackChannels, ['sentry'])));
+    if ($sentryDsn !== '') {
+        $stackChannels[] = 'sentry';
+    }
 }
-$isProductionEnvironment = env('APP_ENV', 'production') === 'production';
 
 return [
 
@@ -75,7 +67,7 @@ return [
 
         'stack' => [
             'driver' => 'stack',
-            'channels' => explode(',', (string) env('LOG_STACK', 'single,maintenance')),
+            'channels' => $stackChannels,
             'ignore_exceptions' => false,
             'tap' => [App\Logging\ConfigureContextProcessors::class],
         ],
@@ -105,6 +97,20 @@ return [
                 'append_newline' => true,
             ],
             'tap' => [App\Logging\ConfigureContextProcessors::class],
+        ],
+
+        'daily_json' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/laravel.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => env('LOG_DAILY_DAYS', 30),
+            'tap' => [App\Logging\CustomizeFormatter::class],
+            'formatter' => JsonFormatter::class,
+            'formatter_with' => [
+                'batchMode' => JsonFormatter::BATCH_MODE_JSON,
+                'appendNewline' => true,
+            ],
+            'replace_placeholders' => true,
         ],
 
         'slack' => [
@@ -148,6 +154,11 @@ return [
         'sentry' => [
             'driver' => 'sentry',
             'level'  => env('SENTRY_LOG_LEVEL', env('LOG_LEVEL', 'error')),
+        ],
+
+        'sentry' => [
+            'driver' => 'sentry',
+            'level' => env('SENTRY_LOG_LEVEL', env('LOG_LEVEL', 'error')),
         ],
 
         'syslog' => [
