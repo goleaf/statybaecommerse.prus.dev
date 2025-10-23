@@ -248,4 +248,12 @@ final class ApiKey extends Model
     {
         return Collection::make(Arr::wrap($this->scopes))->filter()->values();
     }
+
+    /**
+     * Build a unique cache key for partner API rate limiting.
+     */
+    public function rateLimiterKey(): string
+    {
+        return 'partner_api:key:'.$this->getKey();
+    }
 }

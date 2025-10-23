@@ -42,10 +42,8 @@ return [
     ],
 
     'partner_api' => [
-        'key_header' => env('PARTNER_API_KEY_HEADER', 'X-Partner-Key'),
-        'secret_header' => env('PARTNER_API_SECRET_HEADER', 'X-Partner-Secret'),
+        'header' => env('PARTNER_API_HEADER', 'X-Api-Key'),
         'rate_limit' => [
-            'max_attempts' => (int) env('PARTNER_API_RATE_LIMIT', 60),
             'decay_seconds' => (int) env('PARTNER_API_RATE_LIMIT_DECAY', 60),
         ],
     ],
