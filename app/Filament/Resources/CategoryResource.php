@@ -10,11 +10,6 @@ use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
 use App\Support\Authorization\AuthorizationMatrix;
 use BackedEnum;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
@@ -24,9 +19,15 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
@@ -37,6 +38,7 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 final class CategoryResource extends Resource
@@ -129,24 +131,20 @@ final class CategoryResource extends Resource
     {
         return $form->schema([
             Section::make(__('categories.basic_information'))
-                ->components([
-                    LanguageTabs::make([
-                        TextInput::make('name')
-                            ->label(__('categories.name'))
-                            ->required()
-                            ->maxLength(255),
-                        TextInput::make('slug')
-                            ->label(__('categories.slug'))
-                            ->required()
-                            ->maxLength(255),
-                        Textarea::make('description')
-                            ->label(__('categories.description'))
-                            ->rows(3),
-                        Textarea::make('short_description')
-                            ->label(__('categories.short_description'))
-                            ->rows(2)
-                            ->maxLength(500),
-                    ]),
+                ->schema([
+                    Grid::make(2)
+                        ->schema([
+                            TextInput::make('name')
+                                ->label(__('categories.name'))
+                                ->required()
+                                ->maxLength(255)
+                                ->live(onBlur: true)
+                                ->afterStateUpdated(fn (string $operation, $state, Set $set) => $operation === 'create' ? $set('slug', Str::slug($state)) : null),
+                            TextInput::make('slug')
+                                ->label(__('categories.slug'))
+                                ->unique(ignoreRecord: true)
+                                ->rules(['alpha_dash']),
+                        ]),
                     Select::make('parent_id')
                         ->label(__('categories.parent_category'))
                         ->relationship('parent', 'name')
