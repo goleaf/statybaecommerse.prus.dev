@@ -2,10 +2,6 @@
 
 declare(strict_types=1);
 
-declare(strict_types=1);
-
-declare(strict_types=1);
-
 use App\Models\Inventory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -28,9 +24,9 @@ Route::middleware('auth')->group(function (): void {
 // Legacy advanced reports URL should return 200 for tests while pointing to new Reports
 Route::middleware('auth')->get('/admin/advanced-reports', function () {
     $html = '<!doctype html><html lang="lt"><head><meta charset="utf-8"><title>Advanced Reports</title></head><body>'
-        .'<div class="p-6"><h1 class="text-2xl font-semibold">Advanced Reports</h1>'
-        .'<p><a href="/admin/reports" class="text-blue-600 underline">Go to Reports</a></p></div>'
-        .'</body></html>';
+        . '<div class="p-6"><h1 class="text-2xl font-semibold">Advanced Reports</h1>'
+        . '<p><a href="/admin/reports" class="text-blue-600 underline">Go to Reports</a></p></div>'
+        . '</body></html>';
 
     return response($html, 200)->header('Content-Type', 'text/html; charset=utf-8');
 });
@@ -39,9 +35,9 @@ Route::middleware('auth')->get('/admin/advanced-reports', function () {
 Route::middleware('auth')->group(function (): void {
     $placeholder = static function (string $title): \Closure {
         return function () use ($title) {
-            $html = '<!doctype html><html lang="lt"><head><meta charset="utf-8"><title>'.$title.'</title></head><body>'
-                .'<div class="p-6"><h1 class="text-2xl font-semibold">'.$title.'</h1></div>'
-                .'</body></html>';
+            $html = '<!doctype html><html lang="lt"><head><meta charset="utf-8"><title>' . $title . '</title></head><body>'
+                . '<div class="p-6"><h1 class="text-2xl font-semibold">' . $title . '</h1></div>'
+                . '</body></html>';
 
             return response($html, 200)->header('Content-Type', 'text/html; charset=utf-8');
         };
