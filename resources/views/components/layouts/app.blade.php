@@ -51,10 +51,16 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
     {{-- Vite Assets --}}
-    @if (app()->environment('testing'))
-        {{-- Skip Vite in tests to prevent missing manifest errors while rendering admin routes. --}}
-    @else
+    @php
+        $shouldLoadViteAssets = ! app()->runningUnitTests() || file_exists(public_path('build/manifest.json'));
+    @endphp
+
+    @if ($shouldLoadViteAssets)
         @vite(['resources/css/app.scss', 'resources/js/app.js'])
+    @else
+        {{-- Provide a graceful no-op when the Vite manifest is missing during backend tests. --}}
+        <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+        <script src="{{ asset('js/app.js') }}" defer></script>
     @endif
 
     {{-- Livewire Styles --}}

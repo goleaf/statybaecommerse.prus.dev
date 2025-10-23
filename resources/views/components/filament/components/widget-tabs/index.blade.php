@@ -1,4 +1,4 @@
-{{-- Custom widget tab grid wrapper used across Filament list pages to provide consistent layout behaviour. --}}
+{{-- Compose the responsive container that hosts widget tabs with dynamic column counts across breakpoints. --}}
 @php
     $widgetsPerRow = $this->getWidgetsPerRow();
 

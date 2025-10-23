@@ -38,9 +38,9 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Multilingual experience** across storefront and admin via `spatie/laravel-translatable`, Volt-powered Livewire pages, and localized seed data.
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
-### Latest updates
-- Campaign product target Livewire tests now preload the custom widget tab components and bridge Filament schema aliases so the
-  resource suite passes without missing Blade components.
+-### Latest updates
+- Variant attribute value admin table filters now ignore storefront global scopes, keeping inactive fixtures visible when QA filters by attribute or variant.
+- Filament attribute value panels now render reliably in tests thanks to registered widget tab components, unscoped variant and attribute selectors, and conditional Vite fallbacks that bypass missing manifest errors.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
 - Attribute group selectors now reuse a shared translation helper so historical slugs render as human-readable labels across Filament forms, filters, and tables instead of exposing raw keys.

@@ -18,6 +18,9 @@ use Illuminate\Database\Eloquent\Builder;
 
 class WidgetTab extends Component
 {
+    // The upstream Filament component already ships with configuration helpers
+    // (via the Configurable trait), so we only need to opt into the pieces that
+    // power our widget tab metadata and dynamic query callbacks.
     use EvaluatesClosures;
     use HasExtraAttributes;
     use HasIcon;
