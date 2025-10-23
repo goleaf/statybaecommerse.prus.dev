@@ -167,7 +167,7 @@ final class Home extends Component
             'latestProducts' => $this->latestProducts,
             'latestReviews' => $this->latestReviews,
         ])->layout('components.layouts.base', [
-            'title' => __('Home').' - '.config('app.name'),
+            'title' => __('frontend.navigation.home').' - '.config('app.name'),
         ]);
     }
 }
