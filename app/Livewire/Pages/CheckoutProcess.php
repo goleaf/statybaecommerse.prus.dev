@@ -8,7 +8,7 @@ use App\Data\Pricing\PriceBreakdown;
 use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Services\Cart\CartLifecycleService;
+use App\Services\Pricing\PriceCalculator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -164,7 +164,10 @@ final class CheckoutProcess extends Component
      */
     private function createOrder($cartItems): Order
     {
-        $breakdown = $this->calculateBreakdown($cartItems);
+        $calculator = app(PriceCalculator::class);
+        $breakdown = $calculator->calculate(
+            $cartItems->map(fn (CartItem $item) => ['price' => (float) $item->price, 'quantity' => (int) $item->quantity])
+        );
 
         return Order::create([
             'number' => 'LT-'.strtoupper(uniqid()),
@@ -175,7 +178,7 @@ final class CheckoutProcess extends Component
             'shipping_amount' => $breakdown->shipping,
             'discount_amount' => $breakdown->discount,
             'total' => $breakdown->total,
-            'currency' => $breakdown->currency,
+            'currency' => current_currency(),
             'billing_address' => $this->getBillingAddress(),
             'shipping_address' => $this->getShippingAddress(),
             'notes' => $this->notes,
@@ -196,6 +199,9 @@ final class CheckoutProcess extends Component
 
     /**
      * Handle getCartItems functionality with proper error handling.
+     */
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection<int, CartItem>
      */
     private function getCartItems()
     {
@@ -227,19 +233,11 @@ final class CheckoutProcess extends Component
      */
     public function render(): View
     {
-        $items = $this->getCartItems();
-        $breakdown = $this->calculateBreakdown($items);
+        $cartItems = $this->getCartItems();
 
         return view('livewire.pages.checkout-process', [
-            'cartItems' => $items,
-            'summary' => $breakdown->toSummary(),
+            'cartItems' => $cartItems,
+            'subtotal' => $cartItems->sum(fn (CartItem $item) => $item->price * $item->quantity),
         ]);
-    }
-
-    private function calculateBreakdown($cartItems): PriceBreakdown
-    {
-        $subtotal = (float) $cartItems->sum(fn ($item) => $item->price * $item->quantity);
-
-        return app(PriceCalculator::class)->breakdown($subtotal);
     }
 }

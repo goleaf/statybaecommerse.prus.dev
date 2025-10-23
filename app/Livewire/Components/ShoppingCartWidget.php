@@ -207,17 +207,25 @@ final class ShoppingCartWidget extends Component
     protected function calculateCartSummary(): void
     {
         $cartItems = $this->getCartItems();
-        $subtotal = (float) $cartItems->sum(fn ($item) => $item->price * $item->quantity);
-        $discountAmount = 0.0;
+        $calculator = $this->priceCalculator();
 
-        if ($this->appliedDiscount) {
-            $discountAmount = $this->calculateDiscountAmount($subtotal);
-        }
+        $subtotal = $cartItems->sum(fn (CartItem $item) => $item->price * $item->quantity);
+        $discountAmount = $this->appliedDiscount ? $this->calculateDiscountAmount($subtotal) : 0.0;
 
-        $breakdown = app(PriceCalculator::class)->breakdown($subtotal, $discountAmount);
-        $summary = $breakdown->toSummary();
+        $breakdown = $calculator->calculate(
+            $cartItems->map(fn (CartItem $item) => ['price' => (float) $item->price, 'quantity' => (int) $item->quantity]),
+            $discountAmount
+        );
 
-        $this->cartSummary = ['items_count' => (int) $cartItems->sum('quantity')] + $summary;
+        $this->cartSummary = [
+            'items_count' => $cartItems->sum('quantity'),
+            'subtotal' => $breakdown->subtotal,
+            'discount_amount' => $breakdown->discount,
+            'tax_amount' => $breakdown->tax,
+            'shipping_amount' => $breakdown->shipping,
+            'total' => $breakdown->total,
+            'formatted_totals' => $breakdown->formatted(),
+        ];
     }
 
     /**
@@ -255,9 +263,17 @@ final class ShoppingCartWidget extends Component
     /**
      * Handle getCartItems functionality with proper error handling.
      */
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection<int, CartItem>
+     */
     protected function getCartItems()
     {
         return CartItem::where('session_id', Session::getId())->with(['product.media', 'product.brand'])->get();
+    }
+
+    private function priceCalculator(): PriceCalculator
+    {
+        return app(PriceCalculator::class);
     }
 
     /**
