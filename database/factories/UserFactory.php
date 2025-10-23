@@ -31,20 +31,15 @@ class UserFactory extends Factory
         // Generate unique email
         $baseEmail = fake()->safeEmail();
         $email = $baseEmail;
-
+        $counter = 1;
+        // Avoid querying a table that may not exist yet (e.g. before migrations run in memory) by
+        // ensuring the users table is present before attempting to enforce cross-test uniqueness.
         if (Schema::hasTable('users')) {
-            // When tests have already run migrations we loop until we find a free address in the table.
-            $counter = 1;
             while (\App\Models\User::where('email', $email)->exists()) {
                 $emailParts = explode('@', $baseEmail);
                 $email = $emailParts[0].$counter.'@'.$emailParts[1];
                 $counter++;
             }
-        } else {
-            // During early bootstrap (before migrations) fall back to a random suffix so sqlite in-memory tests do not hit
-            // a missing "users" table while still providing a deterministic-looking email value.
-            $emailParts = explode('@', $baseEmail);
-            $email = $emailParts[0].Str::random(6).'@'.$emailParts[1];
         }
 
         return [
