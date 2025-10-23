@@ -1,49 +1,57 @@
 # Documentation Index
 
-A curated map of the most useful documents for day-to-day development and operations. Start here after reading the project README.
+Use this page to discover the project's internal documentation. The content is organised into three domains—analysis, runbooks, and contracts—so you can jump to implementation history, operational procedures, or formal deliverables without combing through the repository tree.
 
-## Curated Path
+## Directory overview
+- [Analysis](analysis/) – research notes, implementation summaries, health reports, and historical memory-bank artefacts.
+- [Runbooks](runbooks/) – actionable guides, checklists, and supporting assets for repeatable operational tasks.
+- [Contracts](contracts/) – formal project deliverables, closure packets, and partner-facing specifications.
+- [Forms](forms/) – reusable field patterns and UI component references for Filament resources.
+- [UI](ui/) – visual behaviour guides, including column resizing rules and design tokens.
 
-### 1. Set Up Your Environment
-- [ARCHITECTURE_OVERVIEW](ARCHITECTURE_OVERVIEW.md) – orient yourself across backend, storefront, and automation systems.
-- [IMPLEMENTATION_STATUS](IMPLEMENTATION_STATUS.md) – confirm which subsystems are ready before provisioning services.
-- [AUTOFIX_SETUP](AUTOFIX_SETUP.md) & [REALTIME_AUTOFIX_GUIDE](REALTIME_AUTOFIX_GUIDE.md) – install the optional automation helpers that speed up local workflows.
+## Analysis highlights
+### Implementation summaries & deep dives
+- [Filament v4 implementation summary](analysis/FILAMENT_V4_IMPLEMENTATION_SUMMARY.md) – schema-based resource conventions and examples.
+- [News resource implementation summary](analysis/NEWS_RESOURCE_IMPLEMENTATION_SUMMARY.md) – editorial workflows, moderation, and translations.
+- [Company resource analysis](analysis/COMPANY_RESOURCE_ANALYSIS.md) – permissions, navigation, and localisation structure for company management.
+- [Components analysis summary](analysis/COMPONENTS_ANALYSIS_SUMMARY.md) – reusable Livewire, Filament, and Blade building blocks.
+- [Seeder factory conversion summary](analysis/SEEDER_FACTORY_CONVERSION_SUMMARY.md) – rationale behind factory-first seeding.
 
-### 2. Prepare for Deployment
-- [DEPLOYMENT_GUIDE](DEPLOYMENT_GUIDE.md) – infrastructure prerequisites, environment variables, and queue/cache expectations.
-- [DEPLOYMENT_READINESS_CHECKLIST](DEPLOYMENT_READINESS_CHECKLIST.md) – preflight checks to validate staging and production readiness.
-- [PRODUCTION_DEPLOYMENT_CHECKLIST](PRODUCTION_DEPLOYMENT_CHECKLIST.md) – runbook for final launch sequencing and verification.
+### Health & status snapshots
+- [Current system status](CURRENT_SYSTEM_STATUS.md) – active issues, mitigations, and follow-up owners.
+- [Implementation status](IMPLEMENTATION_STATUS.md) – subsystem readiness checklist.
+- [Performance report](PERFORMANCE_REPORT.md) – benchmarks and tuning recommendations.
+- [Migration summary](MIGRATION_SUMMARY.md) – schema evolution timeline and domain notes.
 
-### 3. Understand the Data Model
-- [MIGRATION_SUMMARY](MIGRATION_SUMMARY.md) – history of schema changes and domain-specific data notes.
-- [PRODUCT_VARIANTS_IMPLEMENTATION_SUMMARY](PRODUCT_VARIANTS_IMPLEMENTATION_SUMMARY.md) & [PRODUCT_VARIANTS_SUMMARY](PRODUCT_VARIANTS_SUMMARY.md) – catalogue relationships, pricing logic, and attribute usage.
-- [RECOMMENDATION_SYSTEM_IMPLEMENTATION](RECOMMENDATION_SYSTEM_IMPLEMENTATION.md) – outlines data flows powering personalised suggestions.
+### Tools & automation
+- [Architecture overview](ARCHITECTURE_OVERVIEW.md) – backend, storefront, and automation topology.
+- [Cache policy](CachePolicy.md) – cache key conventions and refresh strategy.
+- [Autofix setup](AUTOFIX_SETUP.md) & [Realtime autofix guide](REALTIME_AUTOFIX_GUIDE.md) – local repair tooling and workflows.
+- [Comprehensive system health report](COMPREHENSIVE_SYSTEM_HEALTH_REPORT.md) – aggregated diagnostics and remediation plans.
 
-### 4. Master the Admin Experience
-- [FILAMENT_V4_IMPLEMENTATION_SUMMARY](analysis/FILAMENT_V4_IMPLEMENTATION_SUMMARY.md) – component patterns and conventions for building admin UI.
-- [NEWS_RESOURCE_IMPLEMENTATION_SUMMARY](analysis/NEWS_RESOURCE_IMPLEMENTATION_SUMMARY.md) & [COMPANY_RESOURCE_ANALYSIS](analysis/COMPANY_RESOURCE_ANALYSIS.md) – worked examples of resources and permissions in action.
-- [Combobox field reference](forms/COMBOBOX.md) – where the dual-list picker is enabled, configuration knobs, and localisation tips.
-- [Searchable input metadata lifecycle](forms/SEARCHABLE_INPUT_METADATA.md) – the canonical `SearchResult` payload, helper APIs, and how forms hydrate dependent fields.
-- [Matrix choice permission grids](forms/MATRIX_CHOICE.md) – which Filament resources consult the permission matrix, how rows/columns are mapped, and how to extend the config safely.
-- [REFERRAL_SYSTEM_IMPLEMENTATION](REFERRAL_SYSTEM_IMPLEMENTATION.md) – loyalty and referral programme operations for support teams.
-- [Table Column Resizing](ui/RESIZED_COLUMNS.md) – how column width adjustments are saved, reset, and recovered when troubleshooting.
-- [Admin Translations Guide](analysis/FILAMENT_V4_IMPLEMENTATION_SUMMARY.md#spatie-translatable) – covers plugin registration, persisted locale behaviour, and required traits for locale-aware resources/pages.
-- Analytics dashboard table reference – see `resources/lang/*/analytics.php` for the localized column, filter, and summary keys powering the enhanced admin analytics view.
+## Runbook essentials
+- [Deployment guide](DEPLOYMENT_GUIDE.md) – infrastructure prerequisites and environment preparation.
+- [Deployment readiness checklist](DEPLOYMENT_READINESS_CHECKLIST.md) – staging and production preflight validation.
+- [Production deployment checklist](PRODUCTION_DEPLOYMENT_CHECKLIST.md) – go-live sequencing and verification.
+- [Backup and restore](runbooks/BACKUP_RESTORE.md) – recovery procedures for the primary data stores.
+- [Queue operations](runbooks/QUEUES.md) – Horizon, worker scaling, and failure handling.
+- [Database indexing](runbooks/DB_INDEXING.md) – index audits and maintenance cadence.
+- [Media pipeline](runbooks/MEDIA.md) – storage, conversions, and cleanup policies.
+- [Security playbook](runbooks/SECURITY.md) – incident response and secrets management expectations.
+- [Terminal freezing fixes](TERMINAL_FREEZING_FIXES.md) – remedies for local environment hiccups.
 
-### 5. Troubleshoot & Maintain
-- [TERMINAL_FREEZING_FIXES](TERMINAL_FREEZING_FIXES.md) – remedies for common local environment hiccups.
-- [Cache Policy](CachePolicy.md) – cache key conventions, TTLs, and when to refresh derived data.
-- [CURRENT_SYSTEM_STATUS](CURRENT_SYSTEM_STATUS.md) – snapshot of live issues, mitigations, and follow-up owners.
-- [Dependency automation schedule](operations/RENOVATE_OVERVIEW.md) – explains the Renovate rollup cadence and CI expectations.
-- [PR Branch Cleanup Workflow](../.github/workflows/pr-branch-cleanup.yml) – documents the automation that deletes local branches when pull requests close without merging; the job now ignores already-removed branches after validating the reference.
+## Contracts & closure artefacts
+- [Project gospel document](contracts/PROJECT_GOSPEL_DOCUMENT.md) – executive summary of business goals and outcomes.
+- [Project handover documentation](contracts/PROJECT_HANDOVER_DOCUMENTATION.md) – administrative context for new maintainers.
+- [Project testament document](contracts/PROJECT_TESTAMENT_DOCUMENT.md) – legal close-out package.
+- [Partner API contract](contracts/PARTNER_API.md) – storefront integration schema.
+- [Notifications API contract](contracts/NOTIFICATIONS_API.md) – messaging payload shapes and retry semantics.
+- [Routes contract](contracts/ROUTES.md) – canonical route inventory for storefront and admin entry points.
+- [Error catalogue](contracts/ERRORS.md) & [error codes reference](contracts/ERROR_CODES.md) – shared failure modes.
+- [Authorization matrix](contracts/AUTHORIZATION.md) – role/permission commitments.
+- [User profile dataset sample (CSV)](contracts/user_profiles.sample.csv) & [JSON variant](contracts/user_profiles.sample.json) – reference payloads for analytics importers.
 
-## Explore Further
-- [Analysis & Summary Index](analysis/INDEX.md) – master index to deep-dive research, audits, and rollout recaps.
-- [PROJECT_HANDOVER_DOCUMENTATION](PROJECT_HANDOVER_DOCUMENTATION.md) – business context and administrative handover notes.
-- [COMPLETE_PROJECT_ARCHIVE_INDEX](COMPLETE_PROJECT_ARCHIVE_INDEX.md) – historical artefacts for auditors and new maintainers.
-- [CHANGELOG](CHANGELOG.md) – high-level log of significant migrations and releases.
-- [PERFORMANCE_REPORT](PERFORMANCE_REPORT.md) – benchmarks and performance tuning recommendations.
-- [tests/README](../tests/README.md) – tour of automated test coverage for backend and UI.
-- [Public Collections API schema](openapi/collections.public.yaml) – contract exercised by automated OpenAPI validation for storefront collection endpoints.
-
-Need another guide? Search the `docs/` directory for keywords or open a summary above to continue exploring the knowledge base.
+## Contribution checklist
+- Review the [Documentation Style Guide](CONTRIBUTING_DOCS.md) before adding or updating any files in this directory.
+- After publishing a new document, update this index and, if applicable, the [analysis index](analysis/INDEX.md) or relevant sub-index so other contributors can discover the content quickly.
+- Keep each committed file under 2MB so the automated documentation size check succeeds.

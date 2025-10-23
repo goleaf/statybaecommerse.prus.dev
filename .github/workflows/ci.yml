@@ -25,8 +25,104 @@ env:
   COMPOSER_FLAGS: --no-interaction --prefer-dist --no-progress
 
 jobs:
-  build:
-    name: PHP ${{ matrix.php-version }} / Ubuntu
+  docs-size:
+    name: Documentation Asset Size
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # We fetch full history so the diff logic can compare against the base
+          # branch or previous commit without missing context.
+          fetch-depth: 0
+
+      - name: Detect documentation changes
+        id: docs_changes
+        run: |
+          # Detect whether any files under docs/ changed so we can skip the size
+          # guard on unrelated commits.
+          set -euo pipefail
+
+          if [ ! -d docs ]; then
+            echo "No docs/ directory present; skipping size enforcement." >&2
+            echo "docs_changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
+            # Align the diff range with the base branch for PR validation.
+            base_ref="origin/${GITHUB_BASE_REF}"
+            git fetch origin "${GITHUB_BASE_REF}:${GITHUB_BASE_REF}"
+            diff_range="${base_ref}...${GITHUB_SHA}"
+          else
+            # For push builds, compare against the previous commit when
+            # available; otherwise there is nothing to diff against (first push).
+            if git rev-parse --verify HEAD^ >/dev/null 2>&1; then
+              diff_range="HEAD^...HEAD"
+            else
+              echo "No previous commit to diff; skipping size enforcement." >&2
+              echo "docs_changed=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
+
+          changed_docs="$(git diff --name-only "${diff_range}" -- 'docs/**')"
+
+          if [[ -z "${changed_docs}" ]]; then
+            echo "No documentation changes detected; skipping size enforcement." >&2
+            echo "docs_changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          printf '%s\n' "${changed_docs}"
+
+          echo "docs_changed=true" >> "$GITHUB_OUTPUT"
+          {
+            echo "changed_list<<'EOF'"
+            printf '%s\n' "${changed_docs}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Ensure documentation files stay under 2MB
+        if: steps.docs_changes.outputs.docs_changed == 'true'
+        run: |
+          # Enforce the 2MB threshold only on the modified documentation files.
+          set -euo pipefail
+
+          changed_docs="${{ steps.docs_changes.outputs.changed_list }}"
+          offending_files=""
+
+          while IFS= read -r doc_path; do
+            # Ignore empty lines that can appear in multi-line outputs.
+            if [[ -z "${doc_path}" ]]; then
+              continue
+            fi
+
+            if [ ! -f "${doc_path}" ]; then
+              # Deleted files should not trigger the guard.
+              continue
+            fi
+
+            # Use stat so we can report the exact size when a file breaks the limit.
+            file_size_bytes=$(stat --format='%s' "${doc_path}")
+
+            if (( file_size_bytes > 2097152 )); then
+              offending_files+="${doc_path} (${file_size_bytes} bytes)\n"
+            fi
+          done <<< "${changed_docs}"
+
+          if [[ -n "${offending_files}" ]]; then
+            echo "The following documentation files exceed 2MB:" >&2
+            printf '%s' "${offending_files}" >&2
+            echo "Reduce their size or split them into smaller documents." >&2
+            exit 1
+          fi
+
+          echo "Documentation size check passed for updated files."
+
+  migration-freeze:
+    name: Migration Freeze Guard
+    needs: docs-size
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
