@@ -7,7 +7,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Bug Fixes
-* Restored the Discount Filament resource by wiring a full schema-based form, table filters, duplicate handling, slug automation, and bulk activation actions while bypassing storefront scopes so admin workflows and feature tests succeed against inactive promotions.
+* Restored the Discount Condition admin resource by skipping the ActiveScope inside Filament queries, updating action/tab imports for Filament v4, and wiring bridge views so widget tabs render while bulk actions reach inactive records again.
 * Re-enabled flexible system setting translations by replacing the locale uniqueness constraint with an index, restoring soft delete support, and trimming the fillable contract so replication and counting scenarios match the documented API.
 * Preserved Attribute validation rule strings while still decoding JSON arrays, refreshed the Filament form so arrays render as comma-separated chips, and added regression coverage for both storage paths.
 * Reintroduced the `regions` schema with defensive guards and rebuilt the `customers`/`orders` relationship so SQLite-backed factories and analytics widgets can create location-aware records without missing column errors during tests.

@@ -16,8 +16,8 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Multilingual experience** across storefront and admin via `spatie/laravel-translatable`, Volt-powered Livewire pages, and localized seed data.
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
-### Latest updates
-- Discount management resource now ships with a fully validated Filament form, filterable table, duplicate helper, and bulk activation controls so admins and tests can manage inactive promotions without disabling storefront scopes.
+-### Latest updates
+- Discount condition administration now bypasses storefront scopes, refreshes Filament v4 imports, and bridges custom widget tab components so list filters, bulk actions, and pivot syncing work across active and inactive records during test runs and live moderation.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
 - Region-aware address tables and the dedicated `customers` dataset are back online for the SQLite harness, letting factories and
