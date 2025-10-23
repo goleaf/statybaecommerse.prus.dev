@@ -1,5 +1,5 @@
-# Feature highlights
+# Feature Overview Updates
 
-## Feature flag administration
-- Administrators can review inactive and disabled feature toggles directly in Filament because the resource now ignores the Active and Enabled global scopes during listing.
+## Tooling reliability
+- Restored the executable Husky bootstrap shim so Git hooks keep invoking the repository's local toolchain despite Husky v10's deprecation banner stub.
 
