@@ -24,6 +24,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Builder; // Import the Builder contract so custom filter queries resolve correctly.
 
 final class CompanyResource extends Resource
 {
