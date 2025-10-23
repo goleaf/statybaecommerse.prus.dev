@@ -23,6 +23,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 // #[ScopedBy([ActiveScope::class, EnabledScope::class])]
 final class ShippingOption extends Model
 {
+    /**
+     * @use HasFactory<\Database\Factories\ShippingOptionFactory>
+     */
     /** @use HasFactory<\Database\Factories\ShippingOptionFactory> */
     use HasFactory;
 
@@ -72,6 +75,8 @@ final class ShippingOption extends Model
     /**
      * Handle orders functionality with proper error handling.
      *
+     * @return HasMany<Order, static>
+     *
      * @phpstan-return HasMany<Order, ShippingOption>
      */
     public function orders(): HasMany
@@ -98,24 +103,6 @@ final class ShippingOption extends Model
         return $relation;
     }
 
-    public function zone(): BelongsTo
-    {
-        return $this->belongsTo(Zone::class);
-    }
-
-    public function zone(): BelongsTo
-    {
-        return $this->belongsTo(Zone::class);
-    }
-
-    /**
-     * Shipping options belong to a geographic zone for localization logic.
-     */
-    public function zone(): BelongsTo
-    {
-        return $this->belongsTo(Zone::class);
-    }
-
     /**
      * Handle zone functionality with proper error handling.
      *
@@ -130,6 +117,8 @@ final class ShippingOption extends Model
     /**
      * Handle scopeEnabled functionality with proper error handling.
      *
+     * @param  Builder<self> $query
+     * @return Builder<self>
      * @param  Builder<ShippingOption> $query
      * @return Builder<ShippingOption>
      */
@@ -141,6 +130,8 @@ final class ShippingOption extends Model
     /**
      * Handle scopeDefault functionality with proper error handling.
      *
+     * @param  Builder<self> $query
+     * @return Builder<self>
      * @param  Builder<ShippingOption> $query
      * @return Builder<ShippingOption>
      */
@@ -152,6 +143,8 @@ final class ShippingOption extends Model
     /**
      * Handle scopeByCarrier functionality with proper error handling.
      *
+     * @param  Builder<self> $query
+     * @return Builder<self>
      * @param  Builder<ShippingOption> $query
      * @return Builder<ShippingOption>
      */
@@ -178,8 +171,22 @@ final class ShippingOption extends Model
     }
 
     /**
+     * Handle scopeByZone functionality with proper error handling.
+     *
+     * @param  Builder<self> $query
+     * @return Builder<self>
+     */
+    public function scopeByZone(Builder $query, int $zoneId): Builder
+    {
+        // Allow filtering by the owning zone so queries remain expressive.
+        return $query->where('zone_id', $zoneId);
+    }
+
+    /**
      * Handle scopeOrdered functionality with proper error handling.
      *
+     * @param  Builder<self> $query
+     * @return Builder<self>
      * @param  Builder<ShippingOption> $query
      * @return Builder<ShippingOption>
      */

@@ -5,6 +5,7 @@
   without hand-setting foreign keys.
 - Stock reservation migrations now create their tables before wiring foreign keys, so full database refreshes finish cleanly while live environments keep cascading deletes for products and variant inventories.
 - Shipping option delivery ranges in the Filament admin now display a precise window even when carriers promise same-day (0 day) service or when only one bound is stored, helping staff quickly spot incomplete data.
+- Shipping option entities once again declare their zone relationship, eligibility checks, and filter scopes, ensuring fulfilment automation and tests can target the correct carrier records without custom query shims.
 
 ## Data integrity & seeding
 - Orders now seed using the broadened `orders.status` enum (covering confirmed/completed/returned) so MySQL no longer truncates demo data during `php artisan migrate:fresh --seed` and admin analytics stay in sync.
