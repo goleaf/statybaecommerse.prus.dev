@@ -17,7 +17,8 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 ### Latest updates
-- Husky Git hook bootstrap script is restored so local commits keep running repository-defined quality checks while still surfacing the upstream deprecation warning for teams preparing for Husky v10.
+- User Product Interaction analytics tables now present rating badges and interaction filters with Filament v4-aligned formatting, keeping admin seeding from tripping PHP concatenation notices observed in upstream PR #1097 testing.
+- Developer tooling regained the full Husky bootstrap shim, ensuring local Git hooks run automatically after installs while still reminding contributors about the upcoming v10 script changes.
 - Shipping option management screens now present accurate delivery windows even when the minimum day value is zero or one side of the range is missing, giving merchandisers clearer expectations when auditing carriers.
 - Filament admin navigation icons once again rely on docblock-based overrides, preventing BackedEnum collisions, while variant stock history badges group destructive events under the shared danger palette and the `data:import` command advertises its purpose directly in Artisan listings.
 
@@ -72,6 +73,7 @@ composer run dev
 ## Latest maintenance
 
 - 2025-10-21: Tightened the User Product Interaction Filament resource to return concrete `Form` and `Table` instances so Filament v4 boots cleanly when analytics interactions are seeded.
+- 2025-10-21: Polished rating badge formatting and interaction filters in the same resource to eliminate concatenation warnings during analytics QA for PR #1097.
 - 2025-10-21: Reinstated docblock navigation icon overrides, consolidated variant stock danger badges, and documented the `data:import` signature/description so the fixes from PR #1098 remain stable across admin tooling and CLI discovery.
 
 ## Architecture cheatsheet
