@@ -54,9 +54,9 @@ return [
         'other'    => 'Other',
     ],
     'categories' => [
-        'business' => 'Business',
-        'sales' => 'Sales',
-        'legal' => 'Legal',
+        'business'  => 'Business',
+        'sales'     => 'Sales',
+        'legal'     => 'Legal',
         'financial' => 'Financial',
         'marketing' => 'Marketing',
         'technical' => 'Technical',
