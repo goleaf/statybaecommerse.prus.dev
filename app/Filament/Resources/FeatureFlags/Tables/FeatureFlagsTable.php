@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Resources\FeatureFlags\Tables;
 
 use App\Models\FeatureFlag;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
@@ -95,18 +96,18 @@ class FeatureFlagsTable
                 SelectFilter::make('category')
                     ->label(__('feature_flags.category'))
                     ->options([
-                        'ui'          => 'UI/UX',
+                        'ui' => 'UI/UX',
                         'performance' => 'Performance',
-                        'security'    => 'Security',
-                        'analytics'   => 'Analytics',
-                        'payment'     => 'Payment',
-                        'shipping'    => 'Shipping',
+                        'security' => 'Security',
+                        'analytics' => 'Analytics',
+                        'payment' => 'Payment',
+                        'shipping' => 'Shipping',
                     ]),
                 SelectFilter::make('environment')
                     ->label(__('feature_flags.environment'))
                     ->options([
-                        'local'      => 'Local',
-                        'staging'    => 'Staging',
+                        'local' => 'Local',
+                        'staging' => 'Staging',
                         'production' => 'Production',
                     ]),
                 TernaryFilter::make('is_active')
