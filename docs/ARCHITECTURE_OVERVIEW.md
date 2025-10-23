@@ -15,12 +15,11 @@ Laravel 12 provides the HTTP kernel, queue worker, and scheduler. Filament v4 su
 
 ## Backend structure
 
-- `app/Filament/` — Filament resources, widgets, actions, and custom pages. Resources follow v4 `Schema`/`Table` signatures and return the schema container so downstream `Schema::components([...])` pipelines stay intact while exposing product, marketing, and operations data.
+- `app/Filament/` — Filament resources, widgets, actions, and custom pages. Resources follow v4 signatures and lean on `Form`/`Table` builders to expose product, marketing, and operations data.
 - `app/Http/Controllers/` & `routes/*.php` — REST controllers and route definitions. `routes/admin.php` adds Filament-specific routing while `routes/web.php` handles storefront flows.
 - `app/Services/` — Coarse-grained services (pricing engines, recommendation systems, marketing automation). Many services accept DTOs from `app/Data/` and emit events consumed by listeners in `app/Listeners/`.
 - `app/Actions/` — Reusable command objects invoked by jobs, controllers, or Filament actions. Actions encapsulate multi-step workflows (e.g., syncing external catalogues).
 - `app/Support/` — Helper classes and traits shared across services/resources, including caching helpers, locale utilities, and feature toggles.
-- `app/Support/Authorization/AuthorizationMatrix.php` now inspects the active Filament panel to resolve the correct guard, and safely falls back to configuration defaults whenever the Filament container binding is unavailable (e.g., storefront queues), ensuring admin-only policies keep working even if `filament.auth.guard` is not explicitly configured.
 - `app/Jobs/` — Queueable jobs for imports, report generation, and notification delivery. Horizon monitors these queues; configuration lives in `config/horizon.php`.
 - `app/Observers/` & `app/Events/` — Domain events driving audit trails via `spatie/laravel-activitylog` and asynchronous side effects.
 
@@ -50,12 +49,12 @@ Laravel 12 provides the HTTP kernel, queue worker, and scheduler. Filament v4 su
 - `Makefile` — Wraps composer/npm commands for setup, quality checks, database resets, and dev-server orchestration.
 - `composer.json` scripts — Provide QA loops (`lint:php`, `analyze`, `fix`), docs maintenance (`docs:*`), and queue/cache helpers.
 - `package.json` scripts — Frontend build/dev plus MCP utilities (`mcp:filament`) and smoke-test runners (`scripts/e2e-*.mjs`).
-- `autofix-realtime.sh` — Launches the real-time autofix workflow described in `docs/runbooks/REALTIME_AUTOFIX_GUIDE.md`.
+- `autofix-realtime.sh` — Launches the real-time autofix workflow described in `docs/REALTIME_AUTOFIX_GUIDE.md`.
 
 ## Development quick reference
 
 - Use `make dev` for an all-in-one dev environment (PHP server, queue listener, Laravel Pail logs, Vite dev server).
 - Run `make analyse` before committing to combine Pint (style) and PHPStan (static analysis).
 - Horizon dashboard available at `/horizon` when running the queue worker.
-- Dusk/browser tests require `php artisan serve` + ChromeDriver; see `docs/analysis/TEST_ORGANIZATION_SUMMARY.md` for patterns.
-- Explore domain history and project evolution through the curated summaries in `docs/analysis/` — start with `docs/analysis/PROJECT_HANDOVER_DOCUMENTATION.md` and `docs/analysis/COMPANY_RESOURCE_ANALYSIS.md`.
+- Dusk/browser tests require `php artisan serve` + ChromeDriver; see `docs/TEST_ORGANIZATION_SUMMARY.md` for patterns.
+- Explore domain history and project evolution through the curated summaries in `docs/` — start with `docs/PROJECT_HANDOVER_DOCUMENTATION.md` and `docs/COMPANY_RESOURCE_ANALYSIS.md`.
