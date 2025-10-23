@@ -137,14 +137,6 @@ final class NormalSettingResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        if (is_array($state) || is_object($state)) {
-                            $state = json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-                        } elseif (is_bool($state)) {
-                            $state = $state ? 'true' : 'false';
-                        } elseif ($state !== null && ! is_string($state)) {
-                            $state = (string) $state;
-                        }
-
                         if (! is_string($state)) {
                             return null;
                         }
