@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-it('exports and imports categories and products with translations and images', function (): void {
+it('feature: exports and imports categories and products with translations and images', function (): void {
     Storage::fake('public');
 
     $cat = Category::query()->create(['name' => 'Elektronika', 'slug' => 'elektronika', 'is_enabled' => true, 'is_visible' => true]);

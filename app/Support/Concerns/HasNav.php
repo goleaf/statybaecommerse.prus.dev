@@ -8,6 +8,7 @@ use App\Support\Nav;
 use BackedEnum;
 use Illuminate\Contracts\Support\Htmlable;
 use UnitEnum;
+use Throwable;
 
 /**
  * Shared helpers that proxy Filament navigation metadata lookups to the central Nav registry.
@@ -39,5 +40,23 @@ trait HasNav
     public static function getNavigationSort(): ?int
     {
         return Nav::sortForResource(static::class);
+    }
+
+    /**
+     * Safely resolve resource URLs, falling back to a placeholder when routes are unavailable.
+     */
+    public static function getUrl(
+        ?string $name = null,
+        array $parameters = [],
+        bool $isAbsolute = true,
+        ?string $panel = null,
+        ?\Illuminate\Database\Eloquent\Model $tenant = null,
+        bool $shouldGuessMissingParameters = false
+    ): string {
+        try {
+            return parent::getUrl($name, $parameters, $isAbsolute, $panel, $tenant, $shouldGuessMissingParameters);
+        } catch (Throwable) {
+            return '#';
+        }
     }
 }

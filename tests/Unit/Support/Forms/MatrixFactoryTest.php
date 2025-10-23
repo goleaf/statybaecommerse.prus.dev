@@ -18,7 +18,7 @@ use Livewire\Component as LivewireComponent;
 use Filament\Schemas\Components\Utilities\Get;
 use LaraZeus\MatrixChoice\Components\Matrix;
 
-it('builds a permissions section with module toggle grids', function (): void {
+it('unit: builds a permissions section with module toggle grids', function (): void {
     $definition = [
         'orders' => [
             'view' => 'orders.view',
@@ -71,7 +71,7 @@ it('builds a permissions section with module toggle grids', function (): void {
         ->and($orderToggles[1]->getLabel())->toBe('Edit');
 });
 
-it('builds a radio grid for attribute selection', function (): void {
+it('unit: builds a radio grid for attribute selection', function (): void {
     $grid = MatrixFactory::radioGrid(
         'attributes',
         fn (Get $get): array => [
@@ -100,7 +100,7 @@ it('builds a radio grid for attribute selection', function (): void {
             ->toMatchArray(['red' => 'Red', 'blue' => 'Blue']);
 });
 
-it('renders a placeholder when no radio rows exist', function (): void {
+it('unit: renders a placeholder when no radio rows exist', function (): void {
     $grid = MatrixFactory::radioGrid('attributes', fn (Get $get): array => []);
 
     $schema = evaluate_grid_schema($grid);
@@ -113,7 +113,7 @@ it('renders a placeholder when no radio rows exist', function (): void {
             ->toBe(__('No attributes available'));
 });
 
-it('builds a checkbox matrix using the Zeus component', function (): void {
+it('unit: builds a checkbox matrix using the Zeus component', function (): void {
     $matrix = MatrixFactory::checkboxGrid(
         'shipping_matrix',
         ['domestic' => 'Domestic', 'international' => 'International'],

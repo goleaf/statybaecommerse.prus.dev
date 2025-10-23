@@ -81,6 +81,6 @@ final class ProductObserver
     {
         // Delegate to the central cache invalidation orchestrator so both taggable
         // stores and array/file fallbacks are refreshed consistently.
-        $this->cacheInvalidationService->flushProducts();
+        $this->cacheInvalidationService->flushProducts($product);
     }
 }

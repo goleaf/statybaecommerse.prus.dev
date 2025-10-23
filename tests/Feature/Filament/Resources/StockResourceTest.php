@@ -8,7 +8,7 @@ use App\Models\Inventory;
 use Filament\Facades\Filament;
 use Livewire\Livewire;
 
-it('mounts the list page and renders successfully', function (): void {
+it('feature: mounts the list page and renders successfully', function (): void {
     Filament::setCurrentPanel('admin');
 
     $admin = AdminUser::factory()->create();

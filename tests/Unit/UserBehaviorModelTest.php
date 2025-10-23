@@ -8,7 +8,10 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\UserBehavior;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 /**
@@ -18,7 +21,170 @@ use Tests\TestCase;
  */
 final class UserBehaviorModelTest extends TestCase
 {
-    use RefreshDatabase;
+    private string $databasePath;
+
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+
+        putenv('TEST_FORCE_MINIMAL_SQLITE=true');
+        $_ENV['TEST_FORCE_MINIMAL_SQLITE'] = 'true';
+        $_SERVER['TEST_FORCE_MINIMAL_SQLITE'] = 'true';
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        unset($_ENV['TEST_FORCE_MINIMAL_SQLITE'], $_SERVER['TEST_FORCE_MINIMAL_SQLITE']);
+        putenv('TEST_FORCE_MINIMAL_SQLITE');
+
+        parent::tearDownAfterClass();
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $storageDirectory = storage_path('testing/databases');
+
+        if (! is_dir($storageDirectory)) {
+            mkdir($storageDirectory, 0o755, true);
+        }
+
+        $this->databasePath = $storageDirectory . '/user_behavior_' . Str::random(12) . '.sqlite';
+
+        touch($this->databasePath);
+        chmod($this->databasePath, 0o666);
+
+        config()->set('database.default', 'sqlite');
+        config()->set('database.connections.sqlite.database', $this->databasePath);
+        config()->set('database.connections.sqlite.prefix', '');
+        config()->set('database.connections.sqlite.foreign_key_constraints', true);
+
+        DB::purge('sqlite');
+        DB::setDefaultConnection('sqlite');
+        DB::reconnect('sqlite');
+
+        Schema::connection('sqlite')->enableForeignKeyConstraints();
+
+        $this->createSchema();
+    }
+
+    protected function tearDown(): void
+    {
+        Schema::connection('sqlite')->disableForeignKeyConstraints();
+        Schema::dropIfExists('user_behaviors');
+        Schema::dropIfExists('product_categories');
+        Schema::dropIfExists('products');
+        Schema::dropIfExists('brands');
+        Schema::dropIfExists('categories');
+        Schema::dropIfExists('users');
+
+        DB::disconnect('sqlite');
+
+        if (isset($this->databasePath) && is_file($this->databasePath)) {
+            @unlink($this->databasePath);
+        }
+
+        parent::tearDown();
+    }
+
+    private function createSchema(): void
+    {
+        Schema::create('users', function (Blueprint $table): void {
+            $table->id();
+            $table->string('name')->nullable();
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->string('preferred_locale', 10)->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->boolean('is_admin')->default(false);
+            $table->rememberToken();
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::create('brands', function (Blueprint $table): void {
+            $table->id();
+            $table->string('name');
+            $table->string('slug')->unique();
+            $table->text('description')->nullable();
+            $table->string('website')->nullable();
+            $table->boolean('is_enabled')->default(true);
+            $table->boolean('is_visible')->default(true);
+            $table->boolean('is_active')->default(true);
+            $table->boolean('is_featured')->default(false);
+            $table->string('seo_title')->nullable();
+            $table->text('seo_description')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::create('categories', function (Blueprint $table): void {
+            $table->id();
+            $table->string('name');
+            $table->string('slug')->unique();
+            $table->text('description')->nullable();
+            $table->foreignId('parent_id')->nullable()->constrained('categories')->cascadeOnDelete();
+            $table->integer('sort_order')->default(0);
+            $table->boolean('is_visible')->default(true);
+            $table->string('seo_title')->nullable();
+            $table->text('seo_description')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::create('products', function (Blueprint $table): void {
+            $table->id();
+            $table->string('type')->default('simple');
+            $table->json('name');
+            $table->json('slug')->nullable();
+            $table->json('description')->nullable();
+            $table->json('short_description')->nullable();
+            $table->string('sku')->unique();
+            $table->decimal('price', 10, 2)->default(0);
+            $table->decimal('sale_price', 10, 2)->nullable();
+            $table->integer('stock_quantity')->default(0);
+            $table->integer('low_stock_threshold')->default(0);
+            $table->decimal('weight', 10, 2)->nullable();
+            $table->decimal('length', 10, 2)->nullable();
+            $table->decimal('width', 10, 2)->nullable();
+            $table->decimal('height', 10, 2)->nullable();
+            $table->boolean('is_visible')->default(true);
+            $table->boolean('is_enabled')->default(true);
+            $table->boolean('is_featured')->default(false);
+            $table->boolean('manage_stock')->default(true);
+            $table->string('status')->default('published');
+            $table->json('seo_title')->nullable();
+            $table->json('seo_description')->nullable();
+            $table->timestamp('published_at')->nullable();
+            $table->foreignId('brand_id')->nullable()->constrained('brands')->cascadeOnDelete();
+            $table->boolean('is_active')->default(true);
+            $table->json('metadata')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::create('product_categories', function (Blueprint $table): void {
+            $table->id();
+            $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
+            $table->foreignId('category_id')->constrained('categories')->cascadeOnDelete();
+        });
+
+        Schema::create('user_behaviors', function (Blueprint $table): void {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->string('session_id')->nullable();
+            $table->foreignId('product_id')->nullable()->constrained('products')->cascadeOnDelete();
+            $table->foreignId('category_id')->nullable()->constrained('categories')->cascadeOnDelete();
+            $table->string('behavior_type');
+            $table->json('metadata')->nullable();
+            $table->string('referrer')->nullable();
+            $table->text('user_agent')->nullable();
+            $table->string('ip_address', 45)->nullable();
+            $table->timestamp('created_at')->useCurrent();
+        });
+    }
 
     public function test_can_create_user_behavior(): void
     {

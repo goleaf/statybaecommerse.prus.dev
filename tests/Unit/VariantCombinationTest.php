@@ -25,13 +25,13 @@ beforeEach(function () {
 });
 
 describe('VariantCombination Model', function () {
-    it('can be created', function () {
+    it('unit: can be created', function () {
         expect($this->variantCombination)->toBeInstanceOf(VariantCombination::class);
         expect($this->variantCombination->product_id)->toBe($this->product->id);
         expect($this->variantCombination->is_available)->toBeTrue();
     });
 
-    it('has correct fillable attributes', function () {
+    it('unit: has correct fillable attributes', function () {
         $fillable = $this->variantCombination->getFillable();
 
         expect($fillable)->toContain('product_id');
@@ -40,14 +40,14 @@ describe('VariantCombination Model', function () {
         expect($fillable)->toContain('is_available');
     });
 
-    it('has correct casts', function () {
+    it('unit: has correct casts', function () {
         $casts = $this->variantCombination->getCasts();
 
         expect($casts['attribute_combinations'])->toBe('array');
         expect($casts['is_available'])->toBe('boolean');
     });
 
-    it('has correct appends', function () {
+    it('unit: has correct appends', function () {
         $appends = $this->variantCombination->getAppends();
 
         expect($appends)->toContain('formatted_combinations');
@@ -55,32 +55,32 @@ describe('VariantCombination Model', function () {
         expect($appends)->toContain('is_valid_combination');
     });
 
-    it('belongs to a product', function () {
+    it('unit: belongs to a product', function () {
         expect($this->variantCombination->product)->toBeInstanceOf(Product::class);
         expect($this->variantCombination->product->id)->toBe($this->product->id);
     });
 
-    it('can format combinations correctly', function () {
+    it('unit: can format combinations correctly', function () {
         $formatted = $this->variantCombination->formatted_combinations;
 
         expect($formatted)->toContain('Color: red');
         expect($formatted)->toContain('Size: large');
     });
 
-    it('generates combination hash correctly', function () {
+    it('unit: generates combination hash correctly', function () {
         $hash = $this->variantCombination->combination_hash;
 
         expect($hash)->toBeString();
         expect(strlen($hash))->toBe(64); // SHA-256 hash length
     });
 
-    it('validates combination correctly', function () {
+    it('unit: validates combination correctly', function () {
         $isValid = $this->variantCombination->is_valid_combination;
 
         expect($isValid)->toBeBool();
     });
 
-    it('can scope available combinations', function () {
+    it('unit: can scope available combinations', function () {
         $availableCombination = VariantCombination::factory()->create([
             'product_id' => $this->product->id,
             'is_available' => true,
@@ -94,10 +94,12 @@ describe('VariantCombination Model', function () {
         $availableCombinations = VariantCombination::available()->get();
 
         expect($availableCombinations)->toContainModel($availableCombination);
-        expect($availableCombinations)->not->toContainModel($unavailableCombination);
+        expect($availableCombinations->contains(function ($item) use ($unavailableCombination): bool {
+            return $item instanceof \Illuminate\Database\Eloquent\Model && $item->is($unavailableCombination);
+        }))->toBeFalse();
     });
 
-    it('can scope by product', function () {
+    it('unit: can scope by product', function () {
         $anotherProduct = Product::factory()->create();
         $anotherCombination = VariantCombination::factory()->create([
             'product_id' => $anotherProduct->id,
@@ -106,10 +108,12 @@ describe('VariantCombination Model', function () {
         $productCombinations = VariantCombination::byProduct($this->product->id)->get();
 
         expect($productCombinations)->toContainModel($this->variantCombination);
-        expect($productCombinations)->not->toContainModel($anotherCombination);
+        expect($productCombinations->contains(function ($item) use ($anotherCombination): bool {
+            return $item instanceof \Illuminate\Database\Eloquent\Model && $item->is($anotherCombination);
+        }))->toBeFalse();
     });
 
-    it('can scope by attribute value', function () {
+    it('unit: can scope by attribute value', function () {
         $redCombination = VariantCombination::factory()->create([
             'product_id' => $this->product->id,
             'attribute_combinations' => ['color' => 'red'],
@@ -123,10 +127,12 @@ describe('VariantCombination Model', function () {
         $redCombinations = VariantCombination::byAttributeValue('color', 'red')->get();
 
         expect($redCombinations)->toContainModel($redCombination);
-        expect($redCombinations)->not->toContainModel($blueCombination);
+        expect($redCombinations->contains(function ($item) use ($blueCombination): bool {
+            return $item instanceof \Illuminate\Database\Eloquent\Model && $item->is($blueCombination);
+        }))->toBeFalse();
     });
 
-    it('can scope by combination', function () {
+    it('unit: can scope by combination', function () {
         $redLargeCombination = VariantCombination::factory()->create([
             'product_id' => $this->product->id,
             'attribute_combinations' => [
@@ -149,10 +155,12 @@ describe('VariantCombination Model', function () {
         ])->get();
 
         expect($redLargeCombinations)->toContainModel($redLargeCombination);
-        expect($redLargeCombinations)->not->toContainModel($blueSmallCombination);
+        expect($redLargeCombinations->contains(function ($item) use ($blueSmallCombination): bool {
+            return $item instanceof \Illuminate\Database\Eloquent\Model && $item->is($blueSmallCombination);
+        }))->toBeFalse();
     });
 
-    it('can generate combinations for a product', function () {
+    it('unit: can generate combinations for a product', function () {
         $product = Product::factory()->create();
 
         $colorAttribute = \App\Models\Attribute::factory()->create(['name' => 'color']);
@@ -185,7 +193,7 @@ describe('VariantCombination Model', function () {
         expect($combinations)->toContain(['color' => 'blue', 'size' => 'large']);
     });
 
-    it('falls back to deterministic payloads when no attributes exist', function () {
+    it('unit: falls back to deterministic payloads when no attributes exist', function () {
         $product = Product::factory()->create();
 
         $combinations = VariantCombination::generateCombinations($product);
@@ -196,7 +204,7 @@ describe('VariantCombination Model', function () {
         ]);
     });
 
-    it('can create combinations for a product', function () {
+    it('unit: can create combinations for a product', function () {
         $product = Product::factory()->create();
 
         VariantCombination::createCombinationsForProduct($product);
@@ -206,7 +214,7 @@ describe('VariantCombination Model', function () {
         expect($combinations)->not->toBeEmpty();
     });
 
-    it('can find variant by combination', function () {
+    it('unit: can find variant by combination', function () {
         $product = Product::factory()->create();
         $combination = ['color' => 'red', 'size' => 'large'];
 
@@ -220,7 +228,7 @@ describe('VariantCombination Model', function () {
         expect($foundVariant)->toBeNull(); // No actual variant exists, just combination
     });
 
-    it('can get available combinations for a product', function () {
+    it('unit: can get available combinations for a product', function () {
         $product = Product::factory()->create();
 
         $availableCombination = VariantCombination::factory()->create([
@@ -238,7 +246,7 @@ describe('VariantCombination Model', function () {
         expect($availableCombinations)->toBeArray();
     });
 
-    it('can be soft deleted', function () {
+    it('unit: can be soft deleted', function () {
         $this->variantCombination->delete();
 
         expect($this->variantCombination->trashed())->toBeTrue();
@@ -249,7 +257,7 @@ describe('VariantCombination Model', function () {
         ]);
     });
 
-    it('can be restored from soft delete', function () {
+    it('unit: can be restored from soft delete', function () {
         $this->variantCombination->delete();
 
         expect($this->variantCombination->trashed())->toBeTrue();
@@ -259,7 +267,7 @@ describe('VariantCombination Model', function () {
         expect($this->variantCombination->trashed())->toBeFalse();
     });
 
-    it('can be force deleted', function () {
+    it('unit: can be force deleted', function () {
         $combinationId = $this->variantCombination->id;
 
         $this->variantCombination->forceDelete();
@@ -269,11 +277,11 @@ describe('VariantCombination Model', function () {
         ]);
     });
 
-    it('has correct table name', function () {
+    it('unit: has correct table name', function () {
         expect($this->variantCombination->getTable())->toBe('variant_combinations');
     });
 
-    it('can be replicated', function () {
+    it('unit: can be replicated', function () {
         $replicated = $this->variantCombination->replicate();
 
         expect($replicated)->toBeInstanceOf(VariantCombination::class);
@@ -282,7 +290,7 @@ describe('VariantCombination Model', function () {
         expect($replicated->is_available)->toBe($this->variantCombination->is_available);
     });
 
-    it('handles empty attribute combinations', function () {
+    it('unit: handles empty attribute combinations', function () {
         $emptyCombination = VariantCombination::factory()->create([
             'product_id' => $this->product->id,
             'attribute_combinations' => [],
@@ -294,7 +302,7 @@ describe('VariantCombination Model', function () {
         );
     });
 
-    it('handles null attribute combinations', function () {
+    it('unit: handles null attribute combinations', function () {
         $nullCombination = VariantCombination::factory()->create([
             'product_id' => $this->product->id,
             'attribute_combinations' => null,
@@ -306,7 +314,7 @@ describe('VariantCombination Model', function () {
         );
     });
 
-    it('can be created with factory', function () {
+    it('unit: can be created with factory', function () {
         $combination = VariantCombination::factory()->create();
 
         expect($combination)->toBeInstanceOf(VariantCombination::class);
@@ -315,7 +323,7 @@ describe('VariantCombination Model', function () {
         expect($combination->is_available)->toBeBool();
     });
 
-    it('can be created with specific attributes', function () {
+    it('unit: can be created with specific attributes', function () {
         $combination = VariantCombination::factory()->create([
             'product_id' => $this->product->id,
             'attribute_combinations' => ['test' => 'value'],
@@ -327,7 +335,7 @@ describe('VariantCombination Model', function () {
         expect($combination->is_available)->toBeFalse();
     });
 
-    it('hydrates cached combinations for strict model comparisons', function () {
+    it('unit: hydrates cached combinations for strict model comparisons', function () {
         VariantCombination::refreshCombinationCacheForProduct($this->product->id);
 
         $cached = VariantCombination::cachedForProduct($this->product->id);
@@ -339,6 +347,8 @@ describe('VariantCombination Model', function () {
 
         $cachedAfterDelete = VariantCombination::cachedForProduct($this->product->id);
 
-        expect($cachedAfterDelete)->not->toContainModel($this->variantCombination);
+        expect($cachedAfterDelete->contains(function ($item): bool {
+            return $item instanceof \Illuminate\Database\Eloquent\Model && $item->is($this->variantCombination);
+        }))->toBeFalse();
     });
 });

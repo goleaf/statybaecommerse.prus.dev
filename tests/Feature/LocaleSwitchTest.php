@@ -15,7 +15,7 @@ beforeEach(function (): void {
     App::setLocale('lt');
 });
 
-it('persists the selected locale and updates the user preference', function (): void {
+it('feature: persists the selected locale and updates the user preference', function (): void {
     $user = User::factory()->create(['preferred_locale' => 'lt']);
 
     $response = $this->actingAs($user)->post(route('locale.switch'), [
@@ -34,7 +34,7 @@ it('persists the selected locale and updates the user preference', function (): 
     expect($user->preferred_locale)->toBe('en');
 });
 
-it('falls back to the configured fallback locale when an unsupported locale is provided', function (): void {
+it('feature: falls back to the configured fallback locale when an unsupported locale is provided', function (): void {
     Session::put('locale', 'zz');
     Session::put('app.locale', 'zz');
 
@@ -47,7 +47,7 @@ it('falls back to the configured fallback locale when an unsupported locale is p
         ->and(Session::get('locale'))->toBe('en');
 });
 
-it('rejects unsafe redirect targets during locale switching', function (): void {
+it('feature: rejects unsafe redirect targets during locale switching', function (): void {
     $response = $this->post(route('locale.switch'), [
         'locale' => 'en',
         'redirect_to' => 'https://example.com/attack',

@@ -6,37 +6,37 @@ use App\Filament\Resources\DocumentTemplateResource;
 use App\Support\Nav;
 use App\Models\DocumentTemplate;
 
-it('can load DocumentTemplateResource class', function () {
+it('unit: can load DocumentTemplateResource class', function () {
     expect(class_exists(DocumentTemplateResource::class))->toBeTrue();
 });
 
-it('can load DocumentTemplate model class', function () {
+it('unit: can load DocumentTemplate model class', function () {
     expect(class_exists(DocumentTemplate::class))->toBeTrue();
 });
 
-it('can get DocumentTemplateResource model', function () {
+it('unit: can get DocumentTemplateResource model', function () {
     expect(DocumentTemplateResource::getModel())->toBe(DocumentTemplate::class);
 });
 
-it('can get DocumentTemplateResource navigation group', function () {
+it('unit: can get DocumentTemplateResource navigation group', function () {
     expect(DocumentTemplateResource::getNavigationGroup())->toBe(
         Nav::groupForResource(DocumentTemplateResource::class)
     );
 });
 
-it('can get DocumentTemplateResource navigation label', function () {
+it('unit: can get DocumentTemplateResource navigation label', function () {
     expect(DocumentTemplateResource::getNavigationLabel())->toBeString();
 });
 
-it('can get DocumentTemplateResource plural model label', function () {
+it('unit: can get DocumentTemplateResource plural model label', function () {
     expect(DocumentTemplateResource::getPluralModelLabel())->toBeString();
 });
 
-it('can get DocumentTemplateResource model label', function () {
+it('unit: can get DocumentTemplateResource model label', function () {
     expect(DocumentTemplateResource::getModelLabel())->toBeString();
 });
 
-it('can get DocumentTemplateResource pages', function () {
+it('unit: can get DocumentTemplateResource pages', function () {
     $pages = DocumentTemplateResource::getPages();
     expect($pages)->toBeArray();
     expect($pages)->toHaveKey('index');
@@ -45,7 +45,7 @@ it('can get DocumentTemplateResource pages', function () {
     expect($pages)->toHaveKey('edit');
 });
 
-it('can get DocumentTemplateResource relations', function () {
+it('unit: can get DocumentTemplateResource relations', function () {
     $relations = DocumentTemplateResource::getRelations();
     expect($relations)->toBeArray();
 });

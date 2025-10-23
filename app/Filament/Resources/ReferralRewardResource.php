@@ -314,14 +314,30 @@ final class ReferralRewardResource extends Resource
     {
         $icon = self::$navigationIcon;
 
-        return $icon instanceof BackedEnum|\UnitEnum ? $icon->value : $icon;
+        if ($icon instanceof BackedEnum) {
+            return $icon->value;
+        }
+
+        if ($icon instanceof \UnitEnum) {
+            return method_exists($icon, 'value') ? $icon->value : $icon->name;
+        }
+
+        return $icon;
     }
 
     public static function getNavigationGroup(): ?string
     {
         $group = self::$navigationGroup;
 
-        return $group instanceof UnitEnum ? $group->value : $group;
+        if ($group instanceof BackedEnum) {
+            return $group->value;
+        }
+
+        if ($group instanceof \UnitEnum) {
+            return method_exists($group, 'value') ? $group->value : $group->name;
+        }
+
+        return $group;
     }
 
     public static function getRelations(): array

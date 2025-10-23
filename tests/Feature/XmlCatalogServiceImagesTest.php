@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Storage;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-it('imports images from data uri and http url when download_images=true', function (): void {
+it('feature: imports images from data uri and http url when download_images=true', function (): void {
     Storage::fake('public');
 
     $xml = <<<'XML'

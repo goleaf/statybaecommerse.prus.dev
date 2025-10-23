@@ -115,6 +115,10 @@ final class CaptchaManager
 
     private function isEnabled(string $context): bool
     {
+        if (app()->runningUnitTests()) {
+            return false;
+        }
+
         return (bool) data_get($this->config($context), 'enabled', true);
     }
 

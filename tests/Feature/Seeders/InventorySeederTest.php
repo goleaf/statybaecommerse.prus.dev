@@ -12,7 +12,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('creates product inventories using factory relationships', function () {
+it('feature: creates product inventories using factory relationships', function () {
     // Create prerequisite data
     Location::factory(2)->create();
     Product::factory(3)->create();
@@ -31,7 +31,7 @@ it('creates product inventories using factory relationships', function () {
     expect($inventory->quantity)->toBeGreaterThanOrEqual(0);
 });
 
-it('creates inventory for all product-location combinations', function () {
+it('feature: creates inventory for all product-location combinations', function () {
     // Create specific test data
     $locations = Location::factory(2)->create();
     $products = Product::factory(2)->create();
@@ -51,7 +51,7 @@ it('creates inventory for all product-location combinations', function () {
     }
 });
 
-it('creates variant inventories when variant inventory table exists', function () {
+it('feature: creates variant inventories when variant inventory table exists', function () {
     // Create prerequisite data
     Location::factory(2)->create();
     ProductVariant::factory(3)->create();
@@ -70,7 +70,7 @@ it('creates variant inventories when variant inventory table exists', function (
     }
 });
 
-it('skips existing inventory records', function () {
+it('feature: skips existing inventory records', function () {
     // Create prerequisite data
     $location = Location::factory()->create();
     $product = Product::factory()->create();
@@ -99,7 +99,7 @@ it('skips existing inventory records', function () {
     expect($inventory->quantity)->toBe(100);
 });
 
-it('handles missing locations gracefully', function () {
+it('feature: handles missing locations gracefully', function () {
     // Create products but no locations
     Product::factory(2)->create();
 
@@ -110,7 +110,7 @@ it('handles missing locations gracefully', function () {
     expect(Inventory::count())->toBe(0);
 });
 
-it('uses factory states for realistic inventory data', function () {
+it('feature: uses factory states for realistic inventory data', function () {
     Location::factory(2)->create();
     Product::factory(3)->create();
 
@@ -129,7 +129,7 @@ it('uses factory states for realistic inventory data', function () {
     }
 });
 
-it('processes inventories in chunks for performance', function () {
+it('feature: processes inventories in chunks for performance', function () {
     // Create many products to test chunking
     Location::factory()->create();
     Product::factory(150)->create();
@@ -145,7 +145,7 @@ it('processes inventories in chunks for performance', function () {
     expect(Inventory::count())->toBe(150);  // 150 products × 1 location
 });
 
-it('maintains proper inventory relationships', function () {
+it('feature: maintains proper inventory relationships', function () {
     Location::factory(2)->create();
     Product::factory(3)->create();
 

@@ -5,13 +5,13 @@ declare(strict_types=1);
 use App\Filament\Components\AutocompleteSelect;
 use App\Models\Product;
 
-it('can create autocomplete select component', function (): void {
+it('unit: can create autocomplete select component', function (): void {
     $component = AutocompleteSelect::make('test_field');
 
     expect($component)->toBeInstanceOf(AutocompleteSelect::class);
 });
 
-it('has correct default configuration', function (): void {
+it('unit: has correct default configuration in unit context', function (): void {
     $component = AutocompleteSelect::make('test_field');
 
     expect($component->getSearchable())->toBeTrue();
@@ -22,7 +22,7 @@ it('has correct default configuration', function (): void {
     expect($component->getLabelField())->toBe('name');
 });
 
-it('can configure searchable property', function (): void {
+it('unit: can configure searchable property', function (): void {
     $component = AutocompleteSelect::make('test_field')
         ->searchable(false);
 
@@ -32,7 +32,7 @@ it('can configure searchable property', function (): void {
     expect($component->getSearchable())->toBeTrue();
 });
 
-it('can configure multiple selection', function (): void {
+it('unit: can configure multiple selection', function (): void {
     $component = AutocompleteSelect::make('test_field')
         ->multiple(true);
 
@@ -42,7 +42,7 @@ it('can configure multiple selection', function (): void {
     expect($component->getMultiple())->toBeFalse();
 });
 
-it('can configure search parameters', function (): void {
+it('unit: can configure search parameters', function (): void {
     $component = AutocompleteSelect::make('test_field')
         ->minSearchLength(3)
         ->maxSearchResults(20);
@@ -51,7 +51,7 @@ it('can configure search parameters', function (): void {
     expect($component->getMaxSearchResults())->toBe(20);
 });
 
-it('can configure field mappings', function (): void {
+it('unit: can configure field mappings', function (): void {
     $component = AutocompleteSelect::make('test_field')
         ->searchField('title')
         ->valueField('uuid')
@@ -62,14 +62,14 @@ it('can configure field mappings', function (): void {
     expect($component->getLabelField())->toBe('display_name');
 });
 
-it('can set model class', function (): void {
+it('unit: can set model class', function (): void {
     $component = AutocompleteSelect::make('test_field')
         ->model(Product::class);
 
     expect($component->getModelClass())->toBe(Product::class);
 });
 
-it('clears search state when empty queries are provided', function (): void {
+it('unit: clears search state when empty queries are provided', function (): void {
     $component = AutocompleteSelect::make('test_field')
         ->model(Product::class)
         ->setSearchQuery('Initial');
@@ -82,7 +82,7 @@ it('clears search state when empty queries are provided', function (): void {
     expect(count($component->getViewData()['searchResults']))->toBe(0);
 });
 
-it('can set search query', function (): void {
+it('unit: can set search query', function (): void {
     $component = AutocompleteSelect::make('test_field')
         ->model(Product::class)
         ->setSearchQuery(' test ');
@@ -90,7 +90,7 @@ it('can set search query', function (): void {
     expect($component->getSearchQuery())->toBe('test');
 });
 
-it('returns empty results for invalid model class', function (): void {
+it('unit: returns empty results for invalid model class', function (): void {
     $component = AutocompleteSelect::make('test_field');
 
     $searchResults = $component->getSearchResults('test');
@@ -98,7 +98,7 @@ it('returns empty results for invalid model class', function (): void {
     expect($searchResults)->toHaveCount(0);
 });
 
-it('returns empty results for empty search query', function (): void {
+it('unit: returns empty results for empty search query', function (): void {
     $component = AutocompleteSelect::make('test_field')
         ->model(Product::class);
 
@@ -107,7 +107,7 @@ it('returns empty results for empty search query', function (): void {
     expect($searchResults)->toHaveCount(0);
 });
 
-it('provides correct view data', function (): void {
+it('unit: provides correct view data', function (): void {
     $component = AutocompleteSelect::make('test_field')
         ->model(Product::class)
         ->searchable(true)
@@ -145,7 +145,7 @@ it('provides correct view data', function (): void {
     expect($viewData['searchQuery'])->toBe('test');
 });
 
-it('can chain configuration methods', function (): void {
+it('unit: can chain configuration methods', function (): void {
     $component = AutocompleteSelect::make('test_field')
         ->searchable(true)
         ->multiple(false)

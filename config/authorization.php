@@ -13,11 +13,11 @@ return [
             'access' => 'panel.access.admin',
         ],
         'products' => [
-            'viewAny' => 'products.viewAny',
-            'view'    => 'products.view',
-            'create'  => 'products.create',
-            'update'  => 'products.update',
-            'delete'  => 'products.delete',
+            'viewAny' => 'view_products',
+            'view'    => 'view_products',
+            'create'  => 'create_products',
+            'update'  => 'edit_products',
+            'delete'  => 'delete_products',
         ],
         'categories' => [
             'viewAny' => 'categories.viewAny',
@@ -60,7 +60,7 @@ return [
         'super_admin' => ['*'],
         'admin'       => [
             'panel.access.admin',
-            'products.viewAny', 'products.view', 'products.create', 'products.update', 'products.delete',
+            'view_products', 'create_products', 'edit_products', 'delete_products',
             'categories.viewAny', 'categories.view', 'categories.create', 'categories.update', 'categories.delete',
             'brands.viewAny', 'brands.view', 'brands.create', 'brands.update', 'brands.delete',
             'orders.viewAny', 'orders.view', 'orders.create', 'orders.update', 'orders.delete',
@@ -69,7 +69,7 @@ return [
         ],
         'administrator' => [
             'panel.access.admin',
-            'products.viewAny', 'products.view', 'products.create', 'products.update', 'products.delete',
+            'view_products', 'create_products', 'edit_products', 'delete_products',
             'categories.viewAny', 'categories.view', 'categories.create', 'categories.update', 'categories.delete',
             'brands.viewAny', 'brands.view', 'brands.create', 'brands.update', 'brands.delete',
             'orders.viewAny', 'orders.view', 'orders.create', 'orders.update', 'orders.delete',
@@ -78,7 +78,7 @@ return [
         ],
         'manager' => [
             'panel.access.admin',
-            'products.viewAny', 'products.view', 'products.create', 'products.update',
+            'view_products', 'create_products', 'edit_products',
             'categories.viewAny', 'categories.view', 'categories.create', 'categories.update',
             'brands.viewAny', 'brands.view', 'brands.update',
             'orders.viewAny', 'orders.view', 'orders.update',
@@ -86,7 +86,7 @@ return [
         ],
         'editor' => [
             'panel.access.admin',
-            'products.viewAny', 'products.view', 'products.update',
+            'view_products', 'edit_products',
             'categories.viewAny', 'categories.view', 'categories.update',
             'brands.viewAny', 'brands.view', 'brands.update',
         ],
@@ -97,7 +97,7 @@ return [
         ],
         'viewer' => [
             'panel.access.admin',
-            'products.viewAny', 'products.view',
+            'view_products',
             'categories.viewAny', 'categories.view',
             'brands.viewAny', 'brands.view',
             'orders.viewAny', 'orders.view',

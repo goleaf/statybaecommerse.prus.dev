@@ -344,8 +344,9 @@ final class SliderSeeder extends Seeder
         $imagePath = $imagePaths[$sortOrder] ?? null;
 
         if ($imagePath && file_exists(public_path($imagePath))) {
+            // Attach from absolute public path to avoid disk/path mismatches
             $slider
-                ->addMediaFromDisk($imagePath, 'public')
+                ->addMedia(public_path($imagePath))
                 ->toMediaCollection('slider_images');
 
             return;
@@ -367,32 +368,58 @@ final class SliderSeeder extends Seeder
 
         $color = $colors[$sortOrder] ?? '#6B7280';
 
-        $image = imagecreate(1200, 600);
-        $bgColor = $this->hexToRgb($color);
-        $backgroundColor = imagecolorallocate($image, $bgColor['r'], $bgColor['g'], $bgColor['b']);
-        imagefill($image, 0, 0, $backgroundColor);
+        // Prefer generating a JPEG via GD if available; otherwise, fall back to a static placeholder.
+        $gdAvailable = function_exists('imagecreate') && function_exists('imagejpeg') && function_exists('imagecolorallocate');
+        if ($gdAvailable) {
+            try {
+                $image = imagecreate(1200, 600);
+                $bgColor = $this->hexToRgb($color);
+                $backgroundColor = imagecolorallocate($image, $bgColor['r'], $bgColor['g'], $bgColor['b']);
+                imagefill($image, 0, 0, $backgroundColor);
 
-        $textColor = imagecolorallocate($image, 255, 255, 255);
-        $font = 5;
-        $text = "Slider {$sortOrder}";
-        $textWidth = imagefontwidth($font) * strlen($text);
-        $textHeight = imagefontheight($font);
-        $x = (int) ((1200 - $textWidth) / 2);
-        $y = (int) ((600 - $textHeight) / 2);
-        imagestring($image, $font, $x, $y, $text, $textColor);
+                $textColor = imagecolorallocate($image, 255, 255, 255);
+                $font = 5;
+                $text = "Slider {$sortOrder}";
+                $textWidth = imagefontwidth($font) * strlen($text);
+                $textHeight = imagefontheight($font);
+                $x = (int) ((1200 - $textWidth) / 2);
+                $y = (int) ((600 - $textHeight) / 2);
+                imagestring($image, $font, $x, $y, $text, $textColor);
 
-        $tempPath = sys_get_temp_dir()."/slider-{$sortOrder}.jpg";
-        imagejpeg($image, $tempPath, 90);
-        imagedestroy($image);
+                $tempPath = sys_get_temp_dir()."/slider-{$sortOrder}.jpg";
+                imagejpeg($image, $tempPath, 90);
+                imagedestroy($image);
 
-        $slider
-            ->addMedia($tempPath)
-            ->usingName("Slider {$sortOrder} Placeholder")
-            ->usingFileName("slider-{$sortOrder}.jpg")
-            ->toMediaCollection('slider_images');
+                $slider
+                    ->addMedia($tempPath)
+                    ->usingName("Slider {$sortOrder} Placeholder")
+                    ->usingFileName("slider-{$sortOrder}.jpg")
+                    ->toMediaCollection('slider_images');
 
-        if (file_exists($tempPath)) {
-            unlink($tempPath);
+                if (file_exists($tempPath)) {
+                    @unlink($tempPath);
+                }
+
+                return;
+            } catch (\Throwable $e) {
+                // Fall through to static placeholder path below
+            }
+        }
+
+        // Static fallback if GD is not available or generation failed
+        $staticFallbacks = [
+            public_path('images/placeholder-product.jpg'),
+            public_path('images/placeholder-image.png'),
+        ];
+        foreach ($staticFallbacks as $path) {
+            if (is_string($path) && file_exists($path)) {
+                $slider
+                    ->addMedia($path)
+                    ->usingName("Slider {$sortOrder} Placeholder")
+                    ->toMediaCollection('slider_images');
+
+                return;
+            }
         }
     }
 

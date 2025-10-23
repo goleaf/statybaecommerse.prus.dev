@@ -71,6 +71,7 @@ use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 
 use function in_array;
 
@@ -118,12 +119,14 @@ class AppServiceProvider extends ServiceProvider
 
         // Bind the domain-level product repository to its Eloquent implementation.
         $this->app->bind(ProductRepositoryInterface::class, EloquentProductRepository::class);
+
+        $this->registerFilamentResourceAutoloader();
     }
 
     public function boot(): void
     {
         if (class_exists(\Illuminate\Foundation\Vite::class) && method_exists(\Illuminate\Foundation\Vite::class, 'useCspNonce')) {
-            Vite::useCspNonce(fn (): string => csp_nonce());
+            Vite::useCspNonce(csp_nonce());
         }
 
         if (method_exists(Livewire::class, 'setScriptNonce')) {
@@ -160,7 +163,7 @@ class AppServiceProvider extends ServiceProvider
 
         if (method_exists(Vite::class, 'useCspNonce')) {
             // Ensure generated asset tags from Vite inherit the request-specific nonce value.
-            Vite::useCspNonce(static fn (): string => csp_nonce());
+            Vite::useCspNonce(csp_nonce());
         }
 
         Blade::anonymousComponentNamespace(
@@ -768,5 +771,33 @@ class AppServiceProvider extends ServiceProvider
                 class_alias($original, $alias);
             }
         }
+    }
+
+    private static bool $filamentResourceAutoloaderRegistered = false;
+
+    /**
+     * Register a lightweight fallback autoloader for Filament resources so tests
+     * continue to work even when Composer's optimised classmap misses new files.
+     */
+    private function registerFilamentResourceAutoloader(): void
+    {
+        if (self::$filamentResourceAutoloaderRegistered) {
+            return;
+        }
+
+        spl_autoload_register(static function (string $class): void {
+            if (! str_starts_with($class, 'App\\Filament\\Resources\\')) {
+                return;
+            }
+
+            $relative = Str::after($class, 'App\\');
+            $path = app_path(str_replace('\\', DIRECTORY_SEPARATOR, $relative) . '.php');
+
+            if (is_file($path)) {
+                require_once $path;
+            }
+        }, true, false);
+
+        self::$filamentResourceAutoloaderRegistered = true;
     }
 }

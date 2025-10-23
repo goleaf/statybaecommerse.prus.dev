@@ -19,7 +19,7 @@ afterEach(function (): void {
     m::close();
 });
 
-it('filters non displayable products and limits results', function (): void {
+it('unit: filters non displayable products and limits results', function (): void {
     $visibleProduct = new Product(
         id: 1,
         name: 'Visible Product',

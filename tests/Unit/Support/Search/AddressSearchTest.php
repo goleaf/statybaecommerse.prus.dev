@@ -58,7 +58,7 @@ beforeEach(function (): void {
     });
 });
 
-it('suggests formatted addresses', function (): void {
+it('unit: suggests formatted addresses', function (): void {
     $user = User::unguarded(fn () => User::create([
         'name'  => 'Jonas',
         'email' => 'jonas@example.test',
@@ -81,7 +81,7 @@ it('suggests formatted addresses', function (): void {
         ->toContain('Vilnius');
 });
 
-it('returns city search results with metadata', function (): void {
+it('unit: returns city search results with metadata', function (): void {
     $city = City::unguarded(fn () => City::create([
         'name'         => 'Kaunas',
         'code'         => 'KNS',

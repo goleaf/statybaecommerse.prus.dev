@@ -12,15 +12,11 @@ use Exception;
  */
 abstract class DomainException extends Exception
 {
-    private readonly string $translationKey;
-
     /**
      * @param  ErrorCode  $errorCode  Machine readable error code that describes the failure.
      * @param  array<string, mixed>  $context  Placeholder replacements that will be injected into the translation string.
      * @param  int  $status  HTTP status code that best represents the failure.
      */
-    private readonly string $translationKey;
-
     public function __construct(
         private readonly ErrorCode $errorCode,
         private readonly array $context = [],

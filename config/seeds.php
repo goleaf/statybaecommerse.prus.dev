@@ -8,6 +8,9 @@ use Database\Seeders\AttributeSeeder;
 use Database\Seeders\AttributeValueSeeder;
 use Database\Seeders\CurrencySeeder;
 use Database\Seeders\DemoStoreSeeder;
+use Database\Seeders\BrandSeeder;
+use Database\Seeders\ProductImageSeeder;
+use Database\Seeders\SliderSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 
 return [
@@ -41,6 +44,10 @@ return [
             RolesAndPermissionsSeeder::class,
             AdminUserSeeder::class,
             DemoStoreSeeder::class,
+            // Enrich storefront visuals with fake slides and images
+            SliderSeeder::class,
+            ProductImageSeeder::class,
+            BrandSeeder::class,
         ],
     ],
 ];

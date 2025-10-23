@@ -11,7 +11,7 @@ final class SearchQueryData
 {
     public const DEFAULT_PER_PAGE = 10;
 
-    public const MAX_PER_PAGE = 25;
+    public const MAX_PER_PAGE = 50;
 
     private readonly string $query;
 

@@ -29,7 +29,7 @@ function createUserWithRole(string $role): User
     return $user;
 }
 
-it('allows viewers to browse products but hides management actions', function (): void {
+it('feature: allows viewers to browse products but hides management actions', function (): void {
     $viewer = createUserWithRole('viewer');
     $product = Product::factory()->create();
 
@@ -48,7 +48,7 @@ it('allows viewers to browse products but hides management actions', function ()
     expect($component->instance()->getCachedHeaderActions())->toBeEmpty();
 });
 
-it('allows managers to create and edit products but not delete them', function (): void {
+it('feature: allows managers to create and edit products but not delete them', function (): void {
     $manager = createUserWithRole('manager');
     $product = Product::factory()->create();
 
@@ -65,7 +65,7 @@ it('allows managers to create and edit products but not delete them', function (
     expect($component->instance()->getCachedHeaderActions())->not->toBeEmpty();
 });
 
-it('restricts user management to privileged roles', function (): void {
+it('feature: restricts user management to privileged roles', function (): void {
     $viewer = createUserWithRole('viewer');
     $this->actingAs($viewer);
 

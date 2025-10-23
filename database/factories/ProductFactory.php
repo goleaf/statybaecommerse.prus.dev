@@ -230,7 +230,16 @@ class ProductFactory extends Factory
 
     private function createTranslations(Product $product): void
     {
-        if (! method_exists($product, 'translations') || $product->translations()->exists()) {
+        if (! method_exists($product, 'translations')) {
+            return;
+        }
+
+        $relation = $product->translations();
+        $connection = $relation->getQuery()->getConnection();
+        $schema = $connection->getSchemaBuilder();
+        $translationsTable = $relation->getRelated()->getTable();
+
+        if (! $schema->hasTable($translationsTable) || $relation->exists()) {
             return;
         }
 

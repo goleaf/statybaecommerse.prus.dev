@@ -38,7 +38,7 @@ beforeEach(function () {
 });
 
 describe('VariantCombinationResource', function () {
-    it('can render the list page', function () {
+    it('feature: can render the list page', function () {
         $this->actingAs($this->adminUser);
 
         livewire(ListVariantCombinations::class)
@@ -46,14 +46,14 @@ describe('VariantCombinationResource', function () {
             ->assertCanSeeTableRecords([$this->variantCombination]);
     });
 
-    it('can render the create page', function () {
+    it('feature: can render the create page', function () {
         $this->actingAs($this->adminUser);
 
         livewire(CreateVariantCombination::class)
             ->assertOk();
     });
 
-    it('can render the view page', function () {
+    it('feature: can render the view page', function () {
         $this->actingAs($this->adminUser);
 
         livewire(ViewVariantCombination::class, [
@@ -62,7 +62,7 @@ describe('VariantCombinationResource', function () {
             ->assertOk();
     });
 
-    it('can render the edit page', function () {
+    it('feature: can render the edit page', function () {
         $this->actingAs($this->adminUser);
 
         livewire(EditVariantCombination::class, [
@@ -71,7 +71,7 @@ describe('VariantCombinationResource', function () {
             ->assertOk();
     });
 
-    it('can create a new variant combination', function () {
+    it('feature: can create a new variant combination', function () {
         $this->actingAs($this->adminUser);
 
         $newCombinationData = [
@@ -94,7 +94,7 @@ describe('VariantCombinationResource', function () {
         ]);
     });
 
-    it('can update a variant combination', function () {
+    it('feature: can update a variant combination', function () {
         $this->actingAs($this->adminUser);
 
         $updatedData = [
@@ -118,7 +118,7 @@ describe('VariantCombinationResource', function () {
         ]);
     });
 
-    it('can delete a variant combination', function () {
+    it('feature: can delete a variant combination', function () {
         $this->actingAs($this->adminUser);
 
         livewire(EditVariantCombination::class, [
@@ -132,7 +132,7 @@ describe('VariantCombinationResource', function () {
         ]);
     });
 
-    it('can toggle availability of a variant combination', function () {
+    it('feature: can toggle availability of a variant combination', function () {
         $this->actingAs($this->adminUser);
 
         livewire(ListVariantCombinations::class)
@@ -143,7 +143,7 @@ describe('VariantCombinationResource', function () {
         expect($this->variantCombination->is_available)->toBeFalse();
     });
 
-    it('can duplicate a variant combination', function () {
+    it('feature: can duplicate a variant combination', function () {
         $this->actingAs($this->adminUser);
 
         livewire(ListVariantCombinations::class)
@@ -153,7 +153,7 @@ describe('VariantCombinationResource', function () {
         $this->assertDatabaseCount('variant_combinations', 2);
     });
 
-    it('can validate a variant combination', function () {
+    it('feature: can validate a variant combination', function () {
         $this->actingAs($this->adminUser);
 
         livewire(ListVariantCombinations::class)
@@ -161,7 +161,7 @@ describe('VariantCombinationResource', function () {
             ->assertNotified();
     });
 
-    it('can perform bulk actions', function () {
+    it('feature: can perform bulk actions', function () {
         $this->actingAs($this->adminUser);
 
         $secondCombination = VariantCombination::factory()->create([
@@ -180,7 +180,7 @@ describe('VariantCombinationResource', function () {
         expect($secondCombination->is_available)->toBeTrue();
     });
 
-    it('can filter by product', function () {
+    it('feature: can filter by product', function () {
         $this->actingAs($this->adminUser);
 
         $anotherProduct = Product::factory()->create();
@@ -194,7 +194,7 @@ describe('VariantCombinationResource', function () {
             ->assertCanNotSeeTableRecords([$anotherCombination]);
     });
 
-    it('can filter by availability', function () {
+    it('feature: can filter by availability', function () {
         $this->actingAs($this->adminUser);
 
         $unavailableCombination = VariantCombination::factory()->create([
@@ -208,7 +208,7 @@ describe('VariantCombinationResource', function () {
             ->assertCanNotSeeTableRecords([$unavailableCombination]);
     });
 
-    it('can search variant combinations', function () {
+    it('feature: can search variant combinations', function () {
         $this->actingAs($this->adminUser);
 
         livewire(ListVariantCombinations::class)
@@ -216,7 +216,7 @@ describe('VariantCombinationResource', function () {
             ->assertCanSeeTableRecords([$this->variantCombination]);
     });
 
-    it('can sort variant combinations', function () {
+    it('feature: can sort variant combinations', function () {
         $this->actingAs($this->adminUser);
 
         $olderCombination = VariantCombination::factory()->create([
@@ -229,7 +229,7 @@ describe('VariantCombinationResource', function () {
             ->assertCanSeeTableRecordsInOrder([$olderCombination, $this->variantCombination]);
     });
 
-    it('can generate combinations via header action', function () {
+    it('feature: can generate combinations via header action', function () {
         $this->actingAs($this->adminUser);
 
         livewire(ListVariantCombinations::class)
@@ -237,7 +237,7 @@ describe('VariantCombinationResource', function () {
             ->assertNotified();
     });
 
-    it('can validate selected combinations via bulk action', function () {
+    it('feature: can validate selected combinations via bulk action', function () {
         $this->actingAs($this->adminUser);
 
         $invalidCombination = VariantCombination::factory()->create([
@@ -250,7 +250,7 @@ describe('VariantCombinationResource', function () {
             ->assertNotified();
     });
 
-    it('can duplicate selected combinations via bulk action', function () {
+    it('feature: can duplicate selected combinations via bulk action', function () {
         $this->actingAs($this->adminUser);
 
         $secondCombination = VariantCombination::factory()->create([
@@ -264,7 +264,7 @@ describe('VariantCombinationResource', function () {
         $this->assertDatabaseCount('variant_combinations', 4); // 2 original + 2 duplicated
     });
 
-    it('can delete selected combinations via bulk action', function () {
+    it('feature: can delete selected combinations via bulk action', function () {
         $this->actingAs($this->adminUser);
 
         $secondCombination = VariantCombination::factory()->create([
@@ -284,13 +284,13 @@ describe('VariantCombinationResource', function () {
         ]);
     });
 
-    it('shows correct navigation labels', function () {
+    it('feature: shows correct navigation labels', function () {
         expect(VariantCombinationResource::getNavigationLabel())->toBe('admin.variant_combinations.navigation_label');
         expect(VariantCombinationResource::getPluralModelLabel())->toBe('admin.variant_combinations.plural_model_label');
         expect(VariantCombinationResource::getModelLabel())->toBe('admin.variant_combinations.model_label');
     });
 
-    it('has correct navigation configuration', function () {
+    it('feature: has correct navigation configuration', function () {
         expect(VariantCombinationResource::getNavigationIcon())->toBe(
             Nav::iconForResource(VariantCombinationResource::class)
         );
@@ -302,11 +302,11 @@ describe('VariantCombinationResource', function () {
         );
     });
 
-    it('has correct model configuration', function () {
+    it('feature: has correct model configuration', function () {
         expect(VariantCombinationResource::getModel())->toBe(VariantCombination::class);
     });
 
-    it('has correct pages configuration', function () {
+    it('feature: has correct pages configuration', function () {
         $pages = VariantCombinationResource::getPages();
 
         expect($pages)->toHaveKey('index');
@@ -315,14 +315,14 @@ describe('VariantCombinationResource', function () {
         expect($pages)->toHaveKey('edit');
     });
 
-    it('has correct relations configuration', function () {
+    it('feature: has correct relations configuration', function () {
         $relations = VariantCombinationResource::getRelations();
         expect($relations)->toBeArray();
     });
 });
 
 describe('VariantCombinationResource Form', function () {
-    it('has correct form schema', function () {
+    it('feature: has correct form schema', function () {
         $form = VariantCombinationResource::form(Schema::make());
 
         expect($form->getComponents())->toHaveCount(3); // 3 sections
@@ -336,7 +336,7 @@ describe('VariantCombinationResource Form', function () {
         expect($sectionLabels)->toContain('admin.variant_combinations.additional_information');
     });
 
-    it('has product selection field', function () {
+    it('feature: has product selection field', function () {
         $form = VariantCombinationResource::form(Schema::make());
         $schema = $form->getComponents();
 
@@ -348,7 +348,7 @@ describe('VariantCombinationResource Form', function () {
         expect($productField->getName())->toBe('product_id');
     });
 
-    it('has availability toggle field', function () {
+    it('feature: has availability toggle field', function () {
         $form = VariantCombinationResource::form(Schema::make());
         $schema = $form->getComponents();
 
@@ -360,7 +360,7 @@ describe('VariantCombinationResource Form', function () {
         expect($toggleField->getName())->toBe('is_available');
     });
 
-    it('has attribute combinations field', function () {
+    it('feature: has attribute combinations field', function () {
         $form = VariantCombinationResource::form(Schema::make());
         $schema = $form->getComponents();
 
@@ -373,7 +373,7 @@ describe('VariantCombinationResource Form', function () {
 });
 
 describe('VariantCombinationResource Table', function () {
-    it('has correct table columns', function () {
+    it('feature: has correct table columns', function () {
         $table = VariantCombinationResource::table(new \Filament\Tables\Table);
         $columns = $table->getColumns();
 
@@ -390,7 +390,7 @@ describe('VariantCombinationResource Table', function () {
         expect($columnNames)->toContain('updated_at');
     });
 
-    it('has correct table filters', function () {
+    it('feature: has correct table filters', function () {
         $table = VariantCombinationResource::table(new \Filament\Tables\Table);
         $filters = $table->getFilters();
 
@@ -403,7 +403,7 @@ describe('VariantCombinationResource Table', function () {
         expect($filterNames)->toContain('has_attributes');
     });
 
-    it('has correct table actions', function () {
+    it('feature: has correct table actions', function () {
         $table = VariantCombinationResource::table(new \Filament\Tables\Table);
         $actions = $table->getActions();
 
@@ -416,7 +416,7 @@ describe('VariantCombinationResource Table', function () {
         expect($actionNames)->toContain('validate_combination');
     });
 
-    it('has correct bulk actions', function () {
+    it('feature: has correct bulk actions', function () {
         $table = VariantCombinationResource::table(new \Filament\Tables\Table);
         $bulkActions = $table->getBulkActions();
 
@@ -429,7 +429,7 @@ describe('VariantCombinationResource Table', function () {
         expect($bulkActionNames)->toContain('validate_selected');
     });
 
-    it('has correct header actions', function () {
+    it('feature: has correct header actions', function () {
         $table = VariantCombinationResource::table(new \Filament\Tables\Table);
         $headerActions = $table->getHeaderActions();
 

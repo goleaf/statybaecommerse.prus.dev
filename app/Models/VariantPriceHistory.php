@@ -17,13 +17,12 @@ final class VariantPriceHistory extends Model
 {
     use HasFactory;
 
-    protected $table = 'variant_price_history';
-
     protected $fillable = [
         'variant_id',
         'old_price',
         'new_price',
         'price_type',
+        'reason',
         'change_reason',
         'changed_by',
         'effective_from',
@@ -38,6 +37,27 @@ final class VariantPriceHistory extends Model
             'effective_from' => 'datetime',
             'effective_until' => 'datetime',
         ];
+    }
+
+    public function setReasonAttribute(?string $value): void
+    {
+        $this->attributes['reason'] = $value;
+        $this->attributes['change_reason'] = $value;
+    }
+
+    public function getReasonAttribute(): ?string
+    {
+        return $this->attributes['reason'] ?? $this->attributes['change_reason'] ?? null;
+    }
+
+    public function setChangeReasonAttribute(?string $value): void
+    {
+        $this->setReasonAttribute($value);
+    }
+
+    public function getChangeReasonAttribute(): ?string
+    {
+        return $this->getReasonAttribute();
     }
 
     /**
@@ -150,6 +170,7 @@ final class VariantPriceHistory extends Model
             'old_price' => $oldPrice,
             'new_price' => $newPrice,
             'price_type' => $priceType,
+            'reason' => $changeReason,
             'change_reason' => $changeReason,
             'changed_by' => $changedBy,
             'effective_from' => $effectiveFrom,

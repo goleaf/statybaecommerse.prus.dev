@@ -8,7 +8,7 @@ use App\Models\User;
 use Database\Seeders\DocumentSeeder;
 use Database\Seeders\DocumentTemplateSeeder;
 
-it('seeds documents using factories and relationships', function (): void {
+it('feature: seeds documents using factories and relationships', function (): void {
     $this->seed(DocumentTemplateSeeder::class);
     $orders = Order::factory()->count(5)->create();
     $users = User::factory()->count(3)->create();

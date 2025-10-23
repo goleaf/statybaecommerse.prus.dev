@@ -9,6 +9,7 @@ use App\Models\Company;
 use App\Models\Country;
 use App\Models\Customer;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * @extends Factory<Customer>
@@ -30,9 +31,9 @@ final class CustomerFactory extends Factory
                 'preferred_language' => $this->faker->randomElement(['lt', 'en']),
                 'note'               => $this->faker->sentence(),
             ],
-            'country_id' => Country::factory(),
-            'city_id'    => City::factory(),
-            'company_id' => Company::factory(),
+            'country_id' => Schema::hasTable('countries') ? Country::factory() : null,
+            'city_id'    => Schema::hasTable('cities') ? City::factory() : null,
+            'company_id' => Schema::hasTable('companies') ? Company::factory() : null,
         ];
     }
 

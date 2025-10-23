@@ -140,14 +140,15 @@ return new class extends Migration
             });
         }
 
-        // Create variant_price_history table for price tracking
-        if (! Schema::hasTable('variant_price_history')) {
-            Schema::create('variant_price_history', function (Blueprint $table) {
+        // Create variant_price_histories table for price tracking
+        if (! Schema::hasTable('variant_price_histories')) {
+            Schema::create('variant_price_histories', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('variant_id');
                 $table->decimal('old_price', 10, 4);
                 $table->decimal('new_price', 10, 4);
                 $table->string('price_type')->default('regular');  // regular, sale, wholesale, member
+                $table->string('reason')->nullable();
                 $table->string('change_reason')->nullable();
                 $table->unsignedBigInteger('changed_by')->nullable();
                 $table->timestamp('effective_from')->nullable();
@@ -269,8 +270,8 @@ return new class extends Migration
             Schema::dropIfExists('variant_stock_history');
         }
 
-        if (Schema::hasTable('variant_price_history')) {
-            Schema::dropIfExists('variant_price_history');
+        if (Schema::hasTable('variant_price_histories')) {
+            Schema::dropIfExists('variant_price_histories');
         }
 
         if (Schema::hasTable('variant_attribute_values')) {

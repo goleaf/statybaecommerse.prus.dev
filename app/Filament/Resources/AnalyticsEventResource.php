@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources;
+
 use App\Support\Concerns\HasNav;
 use App\Filament\Resources\AnalyticsEventResource\Pages;
 use App\Models\AnalyticsEvent;
@@ -21,6 +22,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Forms\Form;
@@ -60,9 +62,9 @@ final class AnalyticsEventResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            SchemaSection::make(__('analytics_events.basic_information'))
+            Section::make(__('analytics_events.basic_information'))
                 ->schema([
-                    SchemaGrid::make(2)
+                    Grid::make(2)
                         ->schema([
                             TextInput::make('event_name')
                                 ->label(__('analytics_events.event_name'))
@@ -104,7 +106,7 @@ final class AnalyticsEventResource extends Resource
                         ->helperText(__('analytics_events.description_help'))
                         ->columnSpanFull(),
                 ]),
-            SchemaSection::make(__('analytics_events.user_information'))
+            Section::make(__('analytics_events.user_information'))
                 ->schema([
                     Select::make('user_id')
                         ->label(__('analytics_events.user'))
@@ -112,7 +114,7 @@ final class AnalyticsEventResource extends Resource
                         ->searchable()
                         ->preload()
                         ->live()
-                        ->afterStateUpdated(function ($state, \Filament\Schemas\Components\Utilities\Set $set): void {
+                        ->afterStateUpdated(function ($state, Set $set): void {
                             if ($state) {
                                 $user = User::find($state);
                                 if ($user) {
@@ -133,7 +135,7 @@ final class AnalyticsEventResource extends Resource
                         ->maxLength(500)
                         ->helperText(__('analytics_events.user_agent_help')),
                 ]),
-            SchemaSection::make(__('analytics_events.event_data'))
+            Section::make(__('analytics_events.event_data'))
                 ->schema([
                     KeyValue::make('event_data')
                         ->label(__('analytics_events.event_data'))
@@ -141,7 +143,7 @@ final class AnalyticsEventResource extends Resource
                         ->valueLabel(__('analytics_events.event_data_value'))
                         ->addActionLabel(__('analytics_events.add_event_data_field')),
                 ]),
-            SchemaSection::make(__('analytics_events.context_information'))
+            Section::make(__('analytics_events.context_information'))
                 ->schema([
                     TextInput::make('ip_address')
                         ->label(__('analytics_events.ip_address'))
@@ -165,7 +167,7 @@ final class AnalyticsEventResource extends Resource
                         ->label(__('analytics_events.city'))
                         ->helperText(__('analytics_events.city_help')),
                 ]),
-            SchemaSection::make(__('analytics_events.referral_information'))
+            Section::make(__('analytics_events.referral_information'))
                 ->schema([
                     TextInput::make('referrer_url')
                         ->label(__('analytics_events.referrer_url'))
@@ -187,7 +189,7 @@ final class AnalyticsEventResource extends Resource
                         ->label(__('analytics_events.utm_content'))
                         ->helperText(__('analytics_events.utm_content_help')),
                 ]),
-            SchemaSection::make(__('analytics_events.settings'))
+            Section::make(__('analytics_events.settings'))
                 ->schema([
                     Toggle::make('is_important')
                         ->label(__('analytics_events.is_important'))

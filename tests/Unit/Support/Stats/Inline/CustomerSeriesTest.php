@@ -38,7 +38,7 @@ afterEach(function (): void {
     Carbon::setTestNow();
 });
 
-it('builds a 12 month revenue series for a customer', function (): void {
+it('unit: builds a 12 month revenue series for a customer', function (): void {
     $customerId = 7;
 
     Order::withoutEvents(function () use ($customerId): void {

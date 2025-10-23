@@ -9,14 +9,16 @@ use App\Models\VariantPriceHistory;
 use Carbon\Carbon;
 use Closure;
 use DateTimeInterface;
-use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\Select as SelectInput;
-use EncoreDigitalGroup\Filament\Helpers\InputTypes\Text\TextInput as TextInputInput;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Component;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Get;
 use Filament\Notifications\Notification;
-use Filament\Schemas\Components\Component;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -31,7 +33,8 @@ final class VariantBulkPriceUpdate extends Action
             ->icon('heroicon-o-currency-euro')
             ->color('warning')
             ->form([
-                SelectInput::make('price_type', __('product_variants.fields.price_type'))
+                Select::make('price_type')
+                    ->label(__('product_variants.fields.price_type'))
                     ->options([
                         'price'             => __('product_variants.price_types.regular'),
                         'wholesale_price'   => __('product_variants.price_types.wholesale'),
@@ -40,7 +43,8 @@ final class VariantBulkPriceUpdate extends Action
                     ])
                     ->required()
                     ->default('price'),
-                SelectInput::make('update_type', __('product_variants.fields.update_type'))
+                Select::make('update_type')
+                    ->label(__('product_variants.fields.update_type'))
                     ->options([
                         'fixed_amount' => __('product_variants.update_types.fixed_amount'),
                         'percentage'   => __('product_variants.update_types.percentage'),
@@ -49,7 +53,8 @@ final class VariantBulkPriceUpdate extends Action
                     ])
                     ->required()
                     ->default('percentage'),
-                TextInputInput::make('update_value', __('product_variants.fields.update_value'))
+                TextInput::make('update_value')
+                    ->label(__('product_variants.fields.update_value'))
                     ->numeric()
                     ->step(0.01)
                     ->required()
@@ -60,7 +65,8 @@ final class VariantBulkPriceUpdate extends Action
                 Toggle::make('update_compare_price')
                     ->label(__('product_variants.fields.update_compare_price'))
                     ->default(false),
-                SelectInput::make('compare_price_action', __('product_variants.fields.compare_price_action'))
+                Select::make('compare_price_action')
+                    ->label(__('product_variants.fields.compare_price_action'))
                     ->options([
                         'no_change'                => __('product_variants.compare_price_actions.no_change'),
                         'match_new_price'          => __('product_variants.compare_price_actions.match_new_price'),
@@ -68,26 +74,37 @@ final class VariantBulkPriceUpdate extends Action
                         'increase_by_fixed_amount' => __('product_variants.compare_price_actions.increase_by_fixed_amount'),
                     ])
                     ->default('no_change')
-                    ->visible(fn (callable $get) => $get('update_compare_price')),
-                TextInputInput::make('compare_price_value', __('product_variants.fields.compare_price_value'))
+                    ->visible(fn (Get $get): bool => (bool) $get('update_compare_price')),
+                TextInput::make('compare_price_value')
+                    ->label(__('product_variants.fields.compare_price_value'))
                     ->numeric()
                     ->step(0.01)
-                    ->visible(fn (callable $get) => $get('update_compare_price') && in_array($get('compare_price_action'), ['increase_by_percentage', 'increase_by_fixed_amount'])),
+                    ->visible(
+                        fn (Get $get): bool => (bool) $get('update_compare_price')
+                            && in_array(
+                                $get('compare_price_action'),
+                                ['increase_by_percentage', 'increase_by_fixed_amount'],
+                                true,
+                            )
+                    ),
                 Toggle::make('set_sale_period')
                     ->label(__('product_variants.fields.set_sale_period'))
                     ->default(false),
-                self::makeSalePeriodPicker(
-                    name: 'sale_start_date',
-                    label: __('product_variants.fields.sale_start_date'),
-                    visibility: fn (callable $get): bool => (bool) $get('set_sale_period'),
-                    default: fn (): Carbon => now(),
-                ),
-                self::makeSalePeriodPicker(
-                    name: 'sale_end_date',
-                    label: __('product_variants.fields.sale_end_date'),
-                    visibility: fn (callable $get): bool => (bool) $get('set_sale_period'),
-                    default: fn (): Carbon => now()->addDays(30),
-                ),
+                Section::make('sale_period')
+                    ->label(__('product_variants.fields.set_sale_period'))
+                    ->visible(fn (Get $get): bool => (bool) $get('set_sale_period'))
+                    ->schema([
+                        self::makeSalePeriodPicker(
+                            name: 'sale_start_date',
+                            label: __('product_variants.fields.sale_start_date'),
+                            default: fn (): Carbon => now(),
+                        ),
+                        self::makeSalePeriodPicker(
+                            name: 'sale_end_date',
+                            label: __('product_variants.fields.sale_end_date'),
+                            default: fn (): Carbon => now()->addDays(30),
+                        ),
+                    ]),
                 Textarea::make('change_reason')
                     ->label(__('product_variants.fields.change_reason'))
                     ->maxLength(500)
@@ -98,6 +115,11 @@ final class VariantBulkPriceUpdate extends Action
                 DB::transaction(function () use ($data, $records): void {
                     $updatedCount = 0;
                     $skippedCount = 0;
+                    $rawReason = $data['change_reason'] ?? $data['reason'] ?? null;
+                    $reason = is_string($rawReason) ? trim((string) $rawReason) : '';
+                    if ($reason === '') {
+                        $reason = 'Bulk price update';
+                    }
 
                     foreach ($records as $record) {
                         /** @var ProductVariant $record */
@@ -135,8 +157,8 @@ final class VariantBulkPriceUpdate extends Action
                                 break;
                         }
 
-                        // Ensure price is not negative
-                        $newPrice = max(0, $newPrice);
+                        // Ensure price is not negative and persists with consistent precision
+                        $newPrice = round(max(0, $newPrice), 2);
 
                         // Update the price
                         $record->forceFill([$priceType => $newPrice]);
@@ -156,12 +178,14 @@ final class VariantBulkPriceUpdate extends Action
                                     break;
                                 case 'increase_by_percentage':
                                     if ($compareValue !== null) {
-                                        $record->forceFill(['compare_price' => $newPrice * (1 + ($compareValue / 100))]);
+                                        $adjusted = round($newPrice * (1 + ($compareValue / 100)), 2);
+                                        $record->forceFill(['compare_price' => max(0, $adjusted)]);
                                     }
                                     break;
                                 case 'increase_by_fixed_amount':
                                     if ($compareValue !== null) {
-                                        $record->forceFill(['compare_price' => $newPrice + $compareValue]);
+                                        $adjusted = round($newPrice + $compareValue, 2);
+                                        $record->forceFill(['compare_price' => max(0, $adjusted)]);
                                     }
                                     break;
                             }
@@ -199,7 +223,7 @@ final class VariantBulkPriceUpdate extends Action
                             $oldPrice,
                             $newPrice,
                             $priceType,
-                            is_string($data['change_reason'] ?? null) ? (string) $data['change_reason'] : 'Bulk price update',
+                            $reason,
                             $changedById,
                             $historyStartDate,
                             $historyEndDate,
@@ -224,10 +248,9 @@ final class VariantBulkPriceUpdate extends Action
     /**
      * Build a sale period date picker using Flatpickr when available, falling back to Filament's DateTimePicker otherwise.
      *
-     * @param  Closure(callable): bool  $visibility
      * @param  Closure(): Carbon  $default
      */
-    private static function makeSalePeriodPicker(string $name, string $label, Closure $visibility, Closure $default): Component
+    private static function makeSalePeriodPicker(string $name, string $label, Closure $default)
     {
         $componentClass = class_exists(self::FLATPICKR_COMPONENT)
             ? self::FLATPICKR_COMPONENT
@@ -236,7 +259,6 @@ final class VariantBulkPriceUpdate extends Action
         /** @var Component $component */
         $component = $componentClass::make($name)
             ->label($label)
-            ->visible($visibility)
             ->default($default);
 
         if ($componentClass === self::FLATPICKR_COMPONENT) {
@@ -245,8 +267,7 @@ final class VariantBulkPriceUpdate extends Action
                 ->time(true)
                 ->time24hr(true)
                 ->seconds(false)
-                ->format('Y-m-d H:i')
-                ->rangePicker();
+                ->format('Y-m-d H:i');
 
             return $component;
         }

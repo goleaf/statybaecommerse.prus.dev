@@ -7,7 +7,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-it('restores foreign key enforcement after truncation failure', function (): void {
+it('feature: restores foreign key enforcement after truncation failure', function (): void {
     Schema::dropIfExists('fk_children');
     Schema::dropIfExists('fk_parents');
 

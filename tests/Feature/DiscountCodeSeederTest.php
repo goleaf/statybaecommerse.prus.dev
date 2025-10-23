@@ -6,7 +6,7 @@ use App\Models\Discount;
 use App\Models\DiscountCode;
 use Database\Seeders\DiscountCodeSeeder;
 
-it('generates discount codes for existing discounts via factories', function (): void {
+it('feature: generates discount codes for existing discounts via factories', function (): void {
     $discount = Discount::factory()->create();
 
     expect($discount->codes)->toBeEmpty();

@@ -37,6 +37,23 @@ final class OrderItemFactory extends Factory
         ];
     }
 
+    public function configure(): static
+    {
+        return $this
+            ->afterMaking(function (OrderItem $item): void {
+                if ($item->total === null) {
+                    $item->total = (float) $item->quantity * (float) $item->unit_price;
+                }
+            })
+            ->afterCreating(function (OrderItem $item): void {
+                if ($item->total === null) {
+                    $item->forceFill([
+                        'total' => (float) $item->quantity * (float) $item->unit_price,
+                    ])->save();
+                }
+            });
+    }
+
     public function forOrder(Order $order): static
     {
         return $this->state(fn (array $attributes) => [
@@ -52,6 +69,7 @@ final class OrderItemFactory extends Factory
             'sku' => $product->sku,
             'unit_price' => $product->price,
             'price' => $product->price,
+            'total' => ($attributes['quantity'] ?? 1) * (float) $product->price,
         ]);
     }
 

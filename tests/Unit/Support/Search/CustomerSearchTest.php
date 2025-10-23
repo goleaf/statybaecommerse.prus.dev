@@ -26,7 +26,7 @@ beforeEach(function (): void {
     });
 });
 
-it('finds customers by email and phone', function (): void {
+it('unit: finds customers by email and phone', function (): void {
     $user = User::unguarded(fn () => User::create([
         'name'      => 'Aistė Statybaitė',
         'email'     => 'aiste@example.test',

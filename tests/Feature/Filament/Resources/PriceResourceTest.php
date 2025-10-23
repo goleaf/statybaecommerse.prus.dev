@@ -10,7 +10,7 @@ use function Pest\Laravel\actingAs;
 
 uses(RefreshDatabase::class);
 
-it('mounts the PriceResource index page', function (): void {
+it('feature: mounts the PriceResource index page', function (): void {
     $user = User::factory()->create();
     actingAs($user);
 

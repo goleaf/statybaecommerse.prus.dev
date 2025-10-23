@@ -8,7 +8,7 @@ use Filament\Facades\Filament;
 
 use function Pest\Laravel\get;
 
-it('mounts referral code index page', function () {
+it('feature: mounts referral code index page', function () {
     $user = User::factory()->create();
     actingAs($user);
 

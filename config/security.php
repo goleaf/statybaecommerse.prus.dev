@@ -2,6 +2,11 @@
 
 declare(strict_types=1);
 
+$passwordResetRateLimit = [
+    'max_attempts'  => (int) env('AUTH_RATE_LIMIT_PASSWORD_RESET_ATTEMPTS', 5),
+    'decay_seconds' => (int) env('AUTH_RATE_LIMIT_PASSWORD_RESET_DECAY', 300),
+];
+
 return [
     'headers' => [
         'enabled' => (bool) env('SECURITY_HEADERS_ENABLED', true),
@@ -123,15 +128,13 @@ return [
                 'per_ip' => (int) env('FRONTEND_RATE_LIMIT_CHECKOUT_PER_IP', (int) env('FRONTEND_RATE_LIMIT_CHECKOUT', 10)),
             ],
         ],
+        'password_reset' => $passwordResetRateLimit,
         'auth' => [
             'login' => [
                 'max_attempts'  => (int) env('AUTH_RATE_LIMIT_LOGIN_ATTEMPTS', 5),
                 'decay_seconds' => (int) env('AUTH_RATE_LIMIT_LOGIN_DECAY', 60),
             ],
-            'password_reset' => [
-                'max_attempts'  => (int) env('AUTH_RATE_LIMIT_PASSWORD_RESET_ATTEMPTS', 5),
-                'decay_seconds' => (int) env('AUTH_RATE_LIMIT_PASSWORD_RESET_DECAY', 300),
-            ],
+            'password_reset' => $passwordResetRateLimit,
         ],
     ],
     'captcha' => [

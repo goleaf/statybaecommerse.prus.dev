@@ -34,7 +34,7 @@ function policyUser(string $role): User
     return $user;
 }
 
-it('grants admins full catalog access', function (): void {
+it('unit: grants admins full catalog access', function (): void {
     $admin = policyUser('admin');
     $product = Product::factory()->make();
     $category = Category::factory()->make();
@@ -52,7 +52,7 @@ it('grants admins full catalog access', function (): void {
         ->and($brandPolicy->update($admin, $brand))->toBeTrue();
 });
 
-it('limits managers to non-destructive catalog changes', function (): void {
+it('unit: limits managers to non-destructive catalog changes', function (): void {
     $manager = policyUser('manager');
     $product = Product::factory()->make();
     $order = Order::factory()->make();
@@ -68,7 +68,7 @@ it('limits managers to non-destructive catalog changes', function (): void {
         ->and($orderPolicy->delete($manager, $order))->toBeFalse();
 });
 
-it('restricts editors to updates only', function (): void {
+it('unit: restricts editors to updates only', function (): void {
     $editor = policyUser('editor');
     $product = Product::factory()->make();
 
@@ -79,7 +79,7 @@ it('restricts editors to updates only', function (): void {
         ->and($productPolicy->delete($editor, $product))->toBeFalse();
 });
 
-it('allows viewers to read but not modify data', function (): void {
+it('unit: allows viewers to read but not modify data', function (): void {
     $viewer = policyUser('viewer');
     $product = Product::factory()->make();
     $order = Order::factory()->make();

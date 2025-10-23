@@ -31,6 +31,8 @@ beforeEach(function (): void {
         $table->timestamp('email_verified_at')->nullable();
         $table->string('password');
         $table->string('preferred_locale', 10)->nullable();
+        // Match factory expectations used across the suite
+        $table->boolean('is_active')->default(true);
         $table->boolean('is_admin')->default(false);
         $table->rememberToken();
         $table->timestamps();
@@ -93,7 +95,7 @@ afterEach(function (): void {
     }
 });
 
-it('can create analytics event', function () {
+it('unit: can create analytics event', function () {
     $user = User::factory()->create();
 
     $event = AnalyticsEvent::create([
@@ -114,7 +116,7 @@ it('can create analytics event', function () {
     expect($event->user_id)->toBe($user->id);
 });
 
-it('can track analytics event using static method', function () {
+it('unit: can track analytics event using static method', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
@@ -130,7 +132,7 @@ it('can track analytics event using static method', function () {
     expect($event->properties['page'])->toBe('/test-page');
 });
 
-it('belongs to user', function () {
+it('unit: belongs to user', function () {
     $user = User::factory()->create();
     $event = AnalyticsEvent::factory()->create(['user_id' => $user->id]);
 
@@ -138,7 +140,7 @@ it('belongs to user', function () {
     expect($event->user->id)->toBe($user->id);
 });
 
-it('can scope by event type', function () {
+it('unit: can scope by event type', function () {
     $pageViewEvent = AnalyticsEvent::factory()->create(['event_type' => 'page_view']);
     $clickEvent = AnalyticsEvent::factory()->create(['event_type' => 'click']);
 
@@ -148,7 +150,7 @@ it('can scope by event type', function () {
     expect($pageViewEvents->first()->id)->toBe($pageViewEvent->id);
 });
 
-it('can scope by user', function () {
+it('unit: can scope by user', function () {
     $user1 = User::factory()->create();
     $user2 = User::factory()->create();
 
@@ -161,7 +163,7 @@ it('can scope by user', function () {
     expect($user1Events->first()->id)->toBe($event1->id);
 });
 
-it('can scope by session', function () {
+it('unit: can scope by session', function () {
     $session1 = 'session-123';
     $session2 = 'session-456';
 
@@ -174,7 +176,7 @@ it('can scope by session', function () {
     expect($session1Events->first()->id)->toBe($event1->id);
 });
 
-it('can scope with value', function () {
+it('unit: can scope with value', function () {
     $eventWithValue = AnalyticsEvent::factory()->create(['value' => 99.99]);
     $eventWithoutValue = AnalyticsEvent::factory()->create(['value' => null]);
 
@@ -184,7 +186,7 @@ it('can scope with value', function () {
     expect($eventsWithValue->first()->id)->toBe($eventWithValue->id);
 });
 
-it('can scope registered users', function () {
+it('unit: can scope registered users', function () {
     $user = User::factory()->create();
     $registeredEvent = AnalyticsEvent::factory()->create(['user_id' => $user->id]);
     $anonymousEvent = AnalyticsEvent::factory()->create(['user_id' => null]);
@@ -195,7 +197,7 @@ it('can scope registered users', function () {
     expect($registeredEvents->first()->id)->toBe($registeredEvent->id);
 });
 
-it('can scope anonymous users', function () {
+it('unit: can scope anonymous users', function () {
     $user = User::factory()->create();
     $registeredEvent = AnalyticsEvent::factory()->create(['user_id' => $user->id]);
     $anonymousEvent = AnalyticsEvent::factory()->create(['user_id' => null]);
@@ -206,7 +208,7 @@ it('can scope anonymous users', function () {
     expect($anonymousEvents->first()->id)->toBe($anonymousEvent->id);
 });
 
-it('can scope by device type', function () {
+it('unit: can scope by device type', function () {
     $desktopEvent = AnalyticsEvent::factory()->create(['device_type' => 'desktop']);
     $mobileEvent = AnalyticsEvent::factory()->create(['device_type' => 'mobile']);
 
@@ -216,7 +218,7 @@ it('can scope by device type', function () {
     expect($desktopEvents->first()->id)->toBe($desktopEvent->id);
 });
 
-it('can scope by browser', function () {
+it('unit: can scope by browser', function () {
     $chromeEvent = AnalyticsEvent::factory()->create(['browser' => 'Chrome']);
     $firefoxEvent = AnalyticsEvent::factory()->create(['browser' => 'Firefox']);
 
@@ -226,7 +228,7 @@ it('can scope by browser', function () {
     expect($chromeEvents->first()->id)->toBe($chromeEvent->id);
 });
 
-it('can scope by date range', function () {
+it('unit: can scope by date range', function () {
     $oldEvent = AnalyticsEvent::factory()->create(['created_at' => now()->subDays(10)]);
     $recentEvent = AnalyticsEvent::factory()->create(['created_at' => now()->subDays(2)]);
     $newEvent = AnalyticsEvent::factory()->create(['created_at' => now()]);
@@ -241,7 +243,7 @@ it('can scope by date range', function () {
     expect($recentEvents->pluck('id'))->toContain($newEvent->id);
 });
 
-it('can scope today', function () {
+it('unit: can scope today', function () {
     $todayEvent = AnalyticsEvent::factory()->create(['created_at' => now()]);
     $yesterdayEvent = AnalyticsEvent::factory()->create(['created_at' => now()->subDay()]);
 
@@ -251,7 +253,7 @@ it('can scope today', function () {
     expect($todayEvents->first()->id)->toBe($todayEvent->id);
 });
 
-it('can scope this week', function () {
+it('unit: can scope this week', function () {
     $thisWeekEvent = AnalyticsEvent::factory()->create(['created_at' => now()]);
     $lastWeekEvent = AnalyticsEvent::factory()->create(['created_at' => now()->subWeek()]);
 
@@ -261,7 +263,7 @@ it('can scope this week', function () {
     expect($thisWeekEvents->first()->id)->toBe($thisWeekEvent->id);
 });
 
-it('can scope this month', function () {
+it('unit: can scope this month', function () {
     $thisMonthEvent = AnalyticsEvent::factory()->create(['created_at' => now()]);
     $lastMonthEvent = AnalyticsEvent::factory()->create(['created_at' => now()->subMonth()]);
 
@@ -271,13 +273,13 @@ it('can scope this month', function () {
     expect($thisMonthEvents->first()->id)->toBe($thisMonthEvent->id);
 });
 
-it('can get event type label', function () {
+it('unit: can get event type label', function () {
     $event = AnalyticsEvent::factory()->create(['event_type' => 'page_view']);
 
     expect($event->event_type_label)->toBeString();
 });
 
-it('can get device icon', function () {
+it('unit: can get device icon', function () {
     $desktopEvent = AnalyticsEvent::factory()->create(['device_type' => 'desktop']);
     $mobileEvent = AnalyticsEvent::factory()->create(['device_type' => 'mobile']);
     $tabletEvent = AnalyticsEvent::factory()->create(['device_type' => 'tablet']);
@@ -289,7 +291,7 @@ it('can get device icon', function () {
     expect($unknownEvent->device_icon)->toBe('heroicon-o-question-mark-circle');
 });
 
-it('can get formatted value', function () {
+it('unit: can get formatted value', function () {
     $eventWithValue = AnalyticsEvent::factory()->create(['value' => 99.99, 'currency' => 'EUR']);
     $eventWithoutValue = AnalyticsEvent::factory()->create(['value' => null]);
 
@@ -297,7 +299,7 @@ it('can get formatted value', function () {
     expect($eventWithoutValue->formatted_value)->toBeNull();
 });
 
-it('can check if user is registered', function () {
+it('unit: can check if user is registered', function () {
     $user = User::factory()->create();
     $registeredEvent = AnalyticsEvent::factory()->create(['user_id' => $user->id]);
     $anonymousEvent = AnalyticsEvent::factory()->create(['user_id' => null]);
@@ -306,7 +308,7 @@ it('can check if user is registered', function () {
     expect($anonymousEvent->is_registered_user)->toBeFalse();
 });
 
-it('can check if user is anonymous', function () {
+it('unit: can check if user is anonymous', function () {
     $user = User::factory()->create();
     $registeredEvent = AnalyticsEvent::factory()->create(['user_id' => $user->id]);
     $anonymousEvent = AnalyticsEvent::factory()->create(['user_id' => null]);
@@ -315,7 +317,7 @@ it('can check if user is anonymous', function () {
     expect($anonymousEvent->is_anonymous_user)->toBeTrue();
 });
 
-it('can get event types', function () {
+it('unit: can get event types', function () {
     $eventTypes = AnalyticsEvent::getEventTypes();
 
     expect($eventTypes)->toBeArray();
@@ -324,7 +326,7 @@ it('can get event types', function () {
     expect($eventTypes)->toHaveKey('purchase');
 });
 
-it('can get device types', function () {
+it('unit: can get device types', function () {
     $deviceTypes = AnalyticsEvent::getDeviceTypes();
 
     expect($deviceTypes)->toBeArray();
@@ -333,7 +335,7 @@ it('can get device types', function () {
     expect($deviceTypes)->toHaveKey('tablet');
 });
 
-it('can get browsers', function () {
+it('unit: can get browsers', function () {
     $browsers = AnalyticsEvent::getBrowsers();
 
     expect($browsers)->toBeArray();
@@ -343,7 +345,7 @@ it('can get browsers', function () {
     expect($browsers)->toHaveKey('Edge');
 });
 
-it('can get event type stats', function () {
+it('unit: can get event type stats', function () {
     AnalyticsEvent::factory()->count(3)->create(['event_type' => 'page_view']);
     AnalyticsEvent::factory()->count(2)->create(['event_type' => 'click']);
     AnalyticsEvent::factory()->count(1)->create(['event_type' => 'purchase']);
@@ -356,7 +358,7 @@ it('can get event type stats', function () {
     expect($stats['purchase'])->toBe(1);
 });
 
-it('can get device type stats', function () {
+it('unit: can get device type stats', function () {
     AnalyticsEvent::factory()->count(3)->create(['device_type' => 'desktop']);
     AnalyticsEvent::factory()->count(2)->create(['device_type' => 'mobile']);
     AnalyticsEvent::factory()->count(1)->create(['device_type' => null]);
@@ -368,7 +370,7 @@ it('can get device type stats', function () {
     expect($stats['mobile'])->toBe(2);
 });
 
-it('can get browser stats', function () {
+it('unit: can get browser stats', function () {
     AnalyticsEvent::factory()->count(3)->create(['browser' => 'Chrome']);
     AnalyticsEvent::factory()->count(2)->create(['browser' => 'Firefox']);
     AnalyticsEvent::factory()->count(1)->create(['browser' => null]);
@@ -380,7 +382,7 @@ it('can get browser stats', function () {
     expect($stats['Firefox'])->toBe(2);
 });
 
-it('can get revenue stats', function () {
+it('unit: can get revenue stats', function () {
     $today = now()->format('Y-m-d');
     $yesterday = now()->subDay()->format('Y-m-d');
 
@@ -404,7 +406,7 @@ it('can get revenue stats', function () {
     expect($stats[$yesterday])->toBe(75.0);
 });
 
-it('can handle trackable morph relationship', function () {
+it('unit: can handle trackable morph relationship', function () {
     $user = User::factory()->create();
     $event = AnalyticsEvent::factory()->create([
         'trackable_type' => User::class,
@@ -415,21 +417,21 @@ it('can handle trackable morph relationship', function () {
     expect($event->trackable->id)->toBe($user->id);
 });
 
-it('can cast properties to array', function () {
+it('unit: can cast properties to array', function () {
     $properties = ['page' => '/test', 'title' => 'Test Page'];
     $event = AnalyticsEvent::factory()->create(['properties' => $properties]);
 
     expect($event->properties)->toBe($properties);
 });
 
-it('can cast event_data to array', function () {
+it('unit: can cast event_data to array', function () {
     $eventData = ['custom_field' => 'value', 'another_field' => 123];
     $event = AnalyticsEvent::factory()->create(['event_data' => $eventData]);
 
     expect($event->event_data)->toBe($eventData);
 });
 
-it('can cast boolean fields', function () {
+it('unit: can cast boolean fields', function () {
     $event = AnalyticsEvent::factory()->create([
         'is_important' => true,
         'is_conversion' => false,
@@ -439,13 +441,13 @@ it('can cast boolean fields', function () {
     expect($event->is_conversion)->toBeFalse();
 });
 
-it('can cast decimal fields', function () {
+it('unit: can cast decimal fields', function () {
     $event = AnalyticsEvent::factory()->create(['conversion_value' => 99.99]);
 
     expect($event->conversion_value)->toBe(99.99);
 });
 
-it('can cast datetime fields', function () {
+it('unit: can cast datetime fields', function () {
     $now = now();
     $event = AnalyticsEvent::factory()->create(['created_at' => $now]);
 

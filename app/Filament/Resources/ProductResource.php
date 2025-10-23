@@ -19,6 +19,8 @@ use App\Models\Product;
 use App\Support\Authorization\AuthorizationMatrix;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Seo\LocaleUrlGenerator;
+use App\Filament\Forms\Components\Quantity;
+use App\Support\Forms\MatrixFactory;
 use Awcodes\BadgeableColumn\Components\Badge;
 use Awcodes\BadgeableColumn\Components\BadgeableColumn;
 use BackedEnum;
@@ -27,9 +29,9 @@ use App\Services\Export\Contracts\DefinesExportColumns;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
@@ -46,7 +48,7 @@ use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Components\Tabs as SchemaTabs;
 use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
-use Filament\Support\Enums\MaxWidth;
+use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
@@ -66,6 +68,7 @@ use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
+use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 
 /**
  * ProductResource
@@ -148,6 +151,20 @@ final class ProductResource extends Resource implements DefinesExportColumns
 
     public static function form(Schema $schema): Schema   
     {
+        $imagesUpload = FileUpload::make('images')
+            ->label(__('products.fields.images'))
+            ->image()
+            ->multiple()
+            ->directory('products')
+            ->disk('public')
+            ->visibility('public')
+            ->reorderable()
+            ->appendFiles();
+
+        if (method_exists($imagesUpload, 'relationship')) {
+            $imagesUpload->relationship('images', 'path');
+        }
+
         return $schema
             ->components([
                 SchemaTabs::make('Product Information')
@@ -289,16 +306,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
                             ->components([
                                 SchemaSection::make('Product Images')
                                     ->components([
-                                        FileUpload::make('images')
-                                            ->label(__('products.fields.images'))
-                                            ->image()
-                                            ->multiple()
-                                            ->relationship('images', 'path')
-                                            ->directory('products')
-                                            ->disk('public')
-                                            ->visibility('public')
-                                            ->reorderable()
-                                            ->appendFiles(),
+                                        $imagesUpload,
                                     ]),
                                 SchemaSection::make('SEO Settings')
                                     ->components([
@@ -678,7 +686,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
                     }),
                 TrashedFilter::make(),
             ])
-            ->filtersFormWidth(MaxWidth::Large)
+            ->filtersFormWidth(Width::Large)
             ->headerActions([
                 ExportAction::make()
                     ->label(__('Export'))

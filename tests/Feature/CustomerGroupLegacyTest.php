@@ -8,7 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('can create a customer group with legacy fields only', function () {
+it('feature: can create a customer group with legacy fields only', function () {
     $user = User::factory()->create(['is_admin' => true]);
 
     $customerGroup = CustomerGroup::create([
@@ -25,7 +25,7 @@ it('can create a customer group with legacy fields only', function () {
     expect($customerGroup->is_enabled)->toBeTrue();
 });
 
-it('can update customer group legacy fields', function () {
+it('feature: can update customer group legacy fields', function () {
     $customerGroup = CustomerGroup::create([
         'name' => 'Regular Customers',
         'code' => 'REG',
@@ -43,7 +43,7 @@ it('can update customer group legacy fields', function () {
     expect($customerGroup->fresh()->is_enabled)->toBeFalse();
 });
 
-it('can access customer group relationships', function () {
+it('feature: can access customer group relationships', function () {
     $customerGroup = CustomerGroup::create([
         'name' => 'Test Group',
         'code' => 'TEST',
@@ -59,7 +59,7 @@ it('can access customer group relationships', function () {
     expect($customerGroup->priceLists())->toBeInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class);
 });
 
-it('can use customer group scopes', function () {
+it('feature: can use customer group scopes', function () {
     CustomerGroup::create([
         'name' => 'Enabled Group',
         'code' => 'ENABLED',

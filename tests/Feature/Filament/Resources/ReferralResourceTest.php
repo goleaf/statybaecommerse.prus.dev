@@ -19,7 +19,7 @@ beforeEach(function () {
     ]);
 });
 
-it('loads index page', function () {
+it('feature: loads index page', function () {
     $user = User::factory()->create(['is_admin' => true]);
     $this->actingAs($user);
 
@@ -28,7 +28,7 @@ it('loads index page', function () {
         ->assertOk();
 });
 
-it('loads create page', function () {
+it('feature: loads create page', function () {
     $user = User::factory()->create(['is_admin' => true]);
     $this->actingAs($user);
 
@@ -37,7 +37,7 @@ it('loads create page', function () {
         ->assertOk();
 });
 
-it('loads view and edit pages', function () {
+it('feature: loads view and edit pages', function () {
     $user = User::factory()->create(['is_admin' => true]);
     $referrer = User::factory()->create();
     $referred = User::factory()->create();
@@ -60,7 +60,7 @@ it('loads view and edit pages', function () {
         ->assertOk();
 });
 
-it('creates a referral via form action', function () {
+it('feature: creates a referral via form action', function () {
     $user = User::factory()->create(['is_admin' => true]);
     $referrer = User::factory()->create();
     $referred = User::factory()->create();

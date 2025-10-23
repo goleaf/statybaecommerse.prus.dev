@@ -47,7 +47,7 @@ final class SystemSettingCategoryFactory extends Factory
                 'gray',
             ]),
             'sort_order' => $this->faker->numberBetween(0, 100),
-            'is_active' => $this->faker->boolean(90),
+            'is_active' => true,
             'parent_id' => null,
         ];
     }

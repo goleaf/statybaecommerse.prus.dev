@@ -101,10 +101,23 @@ final class ProductImageSeeder extends Seeder
             $sizes = ['thumb', 'small', 'medium', 'large', 'xlarge'];
 
             foreach ($sizes as $size) {
+                $path = "product-images/{$product->id}/{$size}-image.jpg";
+
+                // Create a physical placeholder for this variation so URLs resolve
+                $dimensions = match ($size) {
+                    'thumb' => [200, 200],
+                    'small' => [400, 400],
+                    'medium' => [600, 600],
+                    'large' => [800, 800],
+                    'xlarge' => [1200, 1200],
+                    default => [600, 600],
+                };
+                $this->createPlaceholderImage($path, $dimensions[0], $dimensions[1]);
+
                 ProductImage::factory()
                     ->for($product)
                     ->create([
-                        'path' => "product-images/{$product->id}/{$size}-image.jpg",
+                        'path' => $path,
                         'alt_text' => "{$product->name} - {$size} image",
                         'sort_order' => $this->getSortOrderForSize($size),
                     ]);
@@ -118,6 +131,9 @@ final class ProductImageSeeder extends Seeder
     private function createImageForProduct(Product $product, string $type, string $altText, int $sortOrder): void
     {
         $imagePath = $this->generateImagePath($product, $type, $sortOrder);
+
+        // Ensure a physical placeholder exists for the generated path
+        $this->createPlaceholderImage($imagePath, 800, 800);
 
         ProductImage::factory()
             ->for($product)
@@ -191,25 +207,34 @@ final class ProductImageSeeder extends Seeder
      */
     private function createPlaceholderImage(string $path, int $width, int $height): void
     {
-        // Create a simple colored rectangle as placeholder
-        $image = imagecreate($width, $height);
-        $backgroundColor = imagecolorallocate($image, rand(100, 255), rand(100, 255), rand(100, 255));
-        $textColor = imagecolorallocate($image, 255, 255, 255);
-
-        // Add text to the image
-        $text = "{$width}x{$height}";
-        $fontSize = min($width, $height) / 10;
-        imagestring($image, 5, $width / 2 - strlen($text) * 5, $height / 2 - 10, $text, $textColor);
-
-        // Save the image
+        // Create a simple colored rectangle as placeholder, or fallback to an empty file if GD is unavailable
         $fullPath = storage_path("app/public/{$path}");
         $directory = dirname($fullPath);
-
         if (! is_dir($directory)) {
-            mkdir($directory, 0755, true);
+            @mkdir($directory, 0755, true);
         }
 
-        imagejpeg($image, $fullPath, 80);
-        imagedestroy($image);
+        if (function_exists('imagecreate') && function_exists('imagejpeg') && function_exists('imagecolorallocate')) {
+            $image = imagecreate($width, $height);
+            if ($image !== false) {
+                $backgroundColor = imagecolorallocate($image, rand(100, 255), rand(100, 255), rand(100, 255));
+                imagefill($image, 0, 0, $backgroundColor);
+
+                $textColor = imagecolorallocate($image, 255, 255, 255);
+                $text = "{$width}x{$height}";
+                $x = max(5, (int) ($width / 2 - strlen($text) * 3));
+                $y = max(5, (int) ($height / 2 - 7));
+                @imagestring($image, 3, $x, $y, $text, $textColor);
+
+                @imagejpeg($image, $fullPath, 80);
+                @imagedestroy($image);
+                return;
+            }
+        }
+
+        // Fallback: write an empty file to avoid 404s if image generation failed
+        if (! file_exists($fullPath)) {
+            @file_put_contents($fullPath, '');
+        }
     }
 }

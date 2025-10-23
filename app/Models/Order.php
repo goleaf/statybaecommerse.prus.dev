@@ -85,6 +85,13 @@ final class Order extends Model
     protected $appends = ['total_items_count', 'formatted_total'];
 
     /**
+     * Cache whether the created_at index is available per connection to avoid repeated schema lookups.
+     *
+     * @var array<string, bool>
+     */
+    private static array $createdAtIndexAvailable = [];
+
+    /**
      * Handle getActivitylogOptions functionality with proper error handling.
      */
     public function getActivitylogOptions(): LogOptions
@@ -467,6 +474,10 @@ final class Order extends Model
      */
     private static function enforceCreatedAtIndex(Builder $query): void
     {
+        if (! self::createdAtIndexExists($query)) {
+            return;
+        }
+
         $baseTable = $query->getModel()->getTable();
         $connection = $query->getConnection();
         $prefixedTable = $connection->getTablePrefix() . $baseTable;
@@ -506,5 +517,38 @@ final class Order extends Model
         // acknowledge the standalone created_at index even when other covering indexes
         // are present.
         $query->fromRaw($hint);
+    }
+
+    /**
+     * Determine if the created_at index is present for the current connection and table.
+     */
+    private static function createdAtIndexExists(Builder $query): bool
+    {
+        $model = $query->getModel();
+        $table = $model->getTable();
+        $connection = $query->getConnection();
+        $connectionName = $connection->getName() ?? config('database.default');
+
+        if (! is_string($connectionName) || $connectionName === '') {
+            $connectionName = config('database.default');
+        }
+
+        $cacheKey = sprintf('%s:%s', $connectionName ?? 'default', $table);
+
+        if (array_key_exists($cacheKey, self::$createdAtIndexAvailable)) {
+            return self::$createdAtIndexAvailable[$cacheKey];
+        }
+
+        try {
+            $schema = Schema::connection($connectionName);
+        } catch (\Throwable) {
+            return self::$createdAtIndexAvailable[$cacheKey] = false;
+        }
+
+        if (! $schema->hasTable($table)) {
+            return self::$createdAtIndexAvailable[$cacheKey] = false;
+        }
+
+        return self::$createdAtIndexAvailable[$cacheKey] = $schema->hasIndex($table, 'orders_created_at_index');
     }
 }

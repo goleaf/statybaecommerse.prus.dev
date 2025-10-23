@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\Collection;
 use App\Models\Product;
 use App\Observers\Concerns\ResolvesSupportedLocales;
+use App\Support\Cache\CacheInvalidator;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTagHelper;
 use Illuminate\Cache\TaggableStore;
@@ -36,13 +37,13 @@ final class CacheInvalidationService
     public function flushForModel(Model $model): void
     {
         if ($model instanceof Product) {
-            $this->flushProducts();
+            $this->flushProducts($model);
 
             return;
         }
 
         if ($model instanceof Category) {
-            $this->flushCategories();
+            $this->flushCategories($model);
 
             return;
         }
@@ -61,14 +62,19 @@ final class CacheInvalidationService
     /**
      * Flush storefront caches that depend on product listings.
      */
-    public function flushProducts(): void
+    public function flushProducts(?Product $product = null): void
     {
+        if ($product instanceof Product) {
+            app(CacheInvalidator::class)->productChanged($product);
+        }
+
         // Include shared home/navigation tags so both storefront widgets and
         // menu payloads flush together when product data changes.
         $productTags = CacheTagHelper::merge(
             CacheTagHelper::products(),
             [CacheKeys::homeTag()],
-            [CacheKeys::navigationTag()]
+            [CacheKeys::navigationTag()],
+            [CacheKeys::productAggregateTag()]
         );
 
         $this->flushTags($productTags);
@@ -76,7 +82,11 @@ final class CacheInvalidationService
         // Execute the dedicated invalidator to clear any cache entries that
         // may have been written without tag metadata (e.g. array stores or
         // bespoke helpers that bypass the Cache facade helpers).
-        app(\App\UseCases\Cache\InvalidateProductCache::class)();
+        app(\App\UseCases\Cache\InvalidateProductCache::class)($product);
+
+        // Clear product payloads cached via the shared cache service which
+        // relies on array stores during tests and in certain queue contexts.
+        $this->flushSharedProductCaches($product);
 
         // Ensure every product mutation also refreshes dashboard caches so
         // Livewire components immediately observe the new catalogue totals.
@@ -86,8 +96,12 @@ final class CacheInvalidationService
     /**
      * Flush storefront caches that depend on category hierarchies.
      */
-    public function flushCategories(): void
+    public function flushCategories(?Category $category = null): void
     {
+        if ($category instanceof Category) {
+            app(CacheInvalidator::class)->categoryChanged($category);
+        }
+
         // Categories influence both storefront widgets and navigation menus.
         $categoryTags = CacheTagHelper::merge(
             CacheTagHelper::categories(),
@@ -174,6 +188,95 @@ final class CacheInvalidationService
 
         if (CacheTagHelper::supportsTags()) {
             Cache::tags(CacheTagHelper::dashboards())->forget(CacheKeys::dashboardSimplifiedSummary());
+        }
+    }
+
+    /**
+     * Remove cached product payloads stored via the shared cache service.
+     */
+    private function flushSharedProductCaches(?Product $product = null): void
+    {
+        $productId = $product?->getKey();
+
+        if (! is_numeric($productId)) {
+            $productId = null;
+        } else {
+            $productId = (int) $productId;
+        }
+
+        foreach ($this->supportedLocales() as $locale) {
+            $tags = CacheTagHelper::merge(
+                CacheTagHelper::products(),
+                CacheTagHelper::locale($locale)
+            );
+
+            foreach ($this->currenciesForLocale($locale) as $currency) {
+                $this->forgetSharedProductKey("featured_products.{$locale}.{$currency}", $tags);
+                $this->forgetSharedProductKey("new_arrivals.{$locale}.{$currency}", $tags);
+                $this->forgetSharedProductKey("home.featured_products.{$locale}.{$currency}", $tags);
+
+                if ($productId !== null) {
+                    $this->forgetSharedProductKey("related_products.{$productId}.{$locale}.{$currency}", $tags);
+                }
+            }
+        }
+    }
+
+    /**
+     * Resolve the currency codes that should be invalidated for a locale.
+     *
+     * @return array<int, string>
+     */
+    private function currenciesForLocale(string $locale): array
+    {
+        $mapping = config('shared.localization.locale_currency_mapping', []);
+
+        $currencies = [];
+
+        $configured = $mapping[$locale] ?? null;
+
+        if (is_string($configured) && $configured !== '') {
+            $currencies[] = $configured;
+        } elseif (is_array($configured)) {
+            foreach ($configured as $code) {
+                if (is_string($code) && $code !== '') {
+                    $currencies[] = $code;
+                }
+            }
+        }
+
+        foreach ([
+            config('shared.localization.default_currency'),
+            config('app.currency'),
+            current_currency(),
+        ] as $fallback) {
+            if (is_string($fallback) && $fallback !== '') {
+                $currencies[] = $fallback;
+            }
+        }
+
+        if ($currencies === []) {
+            $currencies[] = 'EUR';
+        }
+
+        $currencies = array_map(static fn (string $code): string => trim($code), $currencies);
+        $currencies = array_filter($currencies, static fn (string $code): bool => $code !== '');
+        $currencies = array_values(array_unique($currencies));
+
+        return $currencies;
+    }
+
+    /**
+     * Forget a shared cache key and clear the associated tag-aware entry.
+     *
+     * @param  array<int, string>  $tags
+     */
+    private function forgetSharedProductKey(string $key, array $tags): void
+    {
+        Cache::forget($key);
+
+        if ($tags !== [] && CacheTagHelper::supportsTags()) {
+            Cache::tags($tags)->forget($key);
         }
     }
 

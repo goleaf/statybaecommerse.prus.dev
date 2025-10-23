@@ -23,7 +23,7 @@ function attachFakeFilamentContainer(SearchableInput $component): void
     $schema->getComponents();
 }
 
-it('hydrates the searchable component with the canonical payload tuple', function (): void {
+it('unit: hydrates the searchable component with the canonical payload tuple', function (): void {
     // Arrange: prime the component with a fake record that exposes metadata.
     $component = SearchableInput::make('product_id');
     attachFakeFilamentContainer($component);
@@ -57,7 +57,7 @@ it('hydrates the searchable component with the canonical payload tuple', functio
     ]);
 });
 
-it('synchronises identifiers and payload metadata when selections change', function (): void {
+it('unit: synchronises identifiers and payload metadata when selections change', function (): void {
     // Arrange: mimic Filament\Forms\Set with a closure capturing field updates.
     $component = SearchableInput::make('product_id');
     attachFakeFilamentContainer($component);
@@ -145,7 +145,7 @@ it('synchronises identifiers and payload metadata when selections change', funct
     expect($component->getPayload())->toBe([]);
 });
 
-it('bootstraps payload macros lazily when none are registered', function (): void {
+it('unit: bootstraps payload macros lazily when none are registered', function (): void {
     // Arrange: emulate a clean environment where the ServiceProvider did not run yet.
     SearchableInput::flushMacros();
     $component = SearchableInput::make('order_id');

@@ -63,10 +63,11 @@ class SystemSettingCategoryTest extends TestCase
 
     public function test_casts_attributes(): void
     {
+        $parent = SystemSettingCategory::factory()->create();
         $category = SystemSettingCategory::factory()->create([
             'is_active' => '1',
             'sort_order' => '5',
-            'parent_id' => '10',
+            'parent_id' => (string) $parent->getKey(),
         ]);
 
         $this->assertIsBool($category->is_active);
@@ -74,7 +75,7 @@ class SystemSettingCategoryTest extends TestCase
         $this->assertIsInt($category->sort_order);
         $this->assertEquals(5, $category->sort_order);
         $this->assertIsInt($category->parent_id);
-        $this->assertEquals(10, $category->parent_id);
+        $this->assertEquals($parent->getKey(), $category->parent_id);
     }
 
     public function test_parent_relationship(): void
@@ -257,8 +258,8 @@ class SystemSettingCategoryTest extends TestCase
         ]);
 
         $this->assertEquals('Grandparent > Parent > Child', $child->getPath());
-        $this->assertEquals('Parent > Child', $parent->getPath());
-        $this->assertEquals('Child', $child->getPath());
+        $this->assertEquals('Grandparent > Parent', $parent->getPath());
+        $this->assertEquals('Grandparent', $grandParent->getPath());
     }
 
     public function test_get_depth(): void

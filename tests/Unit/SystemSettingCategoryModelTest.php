@@ -63,10 +63,13 @@ class SystemSettingCategoryModelTest extends TestCase
 
     public function test_casts_attributes(): void
     {
+        $parent = SystemSettingCategory::factory()->create();
         $category = SystemSettingCategory::factory()->create([
             'is_active' => '1',
             'sort_order' => '5',
-            'parent_id' => '10',
+            // Provide a string parent reference to exercise cast behaviour while
+            // avoiding foreign key violations under SQLite.
+            'parent_id' => (string) $parent->getKey(),
         ]);
 
         $this->assertIsBool($category->is_active);
@@ -74,7 +77,7 @@ class SystemSettingCategoryModelTest extends TestCase
         $this->assertIsInt($category->sort_order);
         $this->assertEquals(5, $category->sort_order);
         $this->assertIsInt($category->parent_id);
-        $this->assertEquals(10, $category->parent_id);
+        $this->assertEquals($parent->getKey(), $category->parent_id);
     }
 
     public function test_parent_relationship(): void

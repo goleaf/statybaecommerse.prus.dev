@@ -4,7 +4,7 @@ The admin panel now leans on the `novadaemon/filament-combobox` plugin for relat
 
 > **Shared defaults**: The wrapper automatically enables the dual search inputs and applies a 360 px panel height so most forms inherit a usable layout without extra method calls. Override `boxSearchs()` when you need to force the search boxes open or hidden (see the “simple” recommendation config) and adjust `height()` whenever a section demands a shorter or taller list, such as the news and discount modules.【F:app/Filament/Components/Combobox.php†L18-L26】【F:app/Filament/Resources/RecommendationConfigResourceSimple.php†L124-L159】【F:app/Filament/Resources/NewsResource.php†L135-L152】【F:app/Filament/Resources/DiscountConditionResource.php†L150-L170】
 
-> **Build note:** The combobox styles and scripts are imported through `resources/css/filament/admin/theme.css` and `resources/js/filament/admin/theme.js` so the Vite build can bundle the vendor assets alongside the rest of the Filament theme.【F:resources/css/filament/admin/theme.css†L5-L8】【F:resources/js/filament/admin/theme.js†L1-L2】【F:vite.config.js†L17-L24】
+> **Build note:** The combobox styles and scripts are imported through `resources/css/filament/admin/theme.scss` and `resources/js/filament/admin/theme.js` so the Vite build can bundle the vendor assets alongside the rest of the Filament theme.【F:resources/css/filament/admin/theme.scss†L5-L12】【F:resources/js/filament/admin/theme.js†L1-L2】【F:vite.config.js†L17-L24】
 
 ## Where it is used today
 

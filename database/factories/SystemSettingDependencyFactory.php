@@ -35,8 +35,6 @@ final class SystemSettingDependencyFactory extends Factory
             default => null,
         };
 
-        $selected = $this->faker->randomElement($conditions);
-
         return [
             'setting_id'            => SystemSetting::factory(),
             'depends_on_setting_id' => SystemSetting::factory(),

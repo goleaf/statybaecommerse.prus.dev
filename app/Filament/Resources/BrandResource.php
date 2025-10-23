@@ -105,8 +105,8 @@ final class BrandResource extends Resource
         // record regardless of the public storefront filters applied at the
         // model level.
         return $query
-            ->withoutGlobalScope(new EnabledScope())
-            ->withoutGlobalScope(new ActiveScope());
+            ->withoutGlobalScope(EnabledScope::class)
+            ->withoutGlobalScope(ActiveScope::class);
     }
 
     /**

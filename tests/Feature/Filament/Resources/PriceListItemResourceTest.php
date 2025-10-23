@@ -17,7 +17,7 @@ use function Pest\Laravel\actingAs;
 
 uses(RefreshDatabase::class);
 
-it('mounts the PriceListItemResource index page', function (): void {
+it('feature: mounts the PriceListItemResource index page', function (): void {
     $user = User::factory()->create();
     actingAs($user);
 
@@ -26,7 +26,7 @@ it('mounts the PriceListItemResource index page', function (): void {
         ->assertOk();
 });
 
-it('filters to only show items with a real discount', function (): void {
+it('feature: filters to only show items with a real discount', function (): void {
     $user = User::factory()->create();
     actingAs($user);
 

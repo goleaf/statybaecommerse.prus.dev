@@ -38,7 +38,7 @@ The admin panel registers `resources/css/filament/admin/theme.scss` as its custo
 @tailwind components;
 @tailwind utilities;
 
-@import '../../filament-enhancements.css';
+@import '../../filament-enhancements.scss';
 
 @source '../../../../app/Filament';
 @source '../../../../resources/views/filament';

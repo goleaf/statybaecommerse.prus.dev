@@ -12,7 +12,7 @@ final class ExportUrlGenerator
     public static function temporarySignedDownloadUrl(Export $export, ?int $minutes = null): string
     {
         return URL::temporarySignedRoute(
-            'exports.signed-download',
+            'api.exports.download',
             now()->addMinutes($minutes ?? 60),
             ['export' => $export],
         );

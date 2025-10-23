@@ -222,40 +222,41 @@ final class AdminSeederTest extends TestCase
 
         $this->assertDatabaseCount('products', 5);
 
-        $this->assertDatabaseHas('products', [
-            'name'       => 'Smartphone Pro',
-            'sku'        => 'SP-001',
-            'is_visible' => true,
-            'status'     => 'published',
-        ]);
+        $productsBySku = Product::query()
+            ->whereIn('sku', ['SP-001', 'WH-002', 'CT-003', 'GT-004', 'YM-005'])
+            ->get()
+            ->keyBy('sku');
 
-        $this->assertDatabaseHas('products', [
-            'name'       => 'Wireless Headphones',
-            'sku'        => 'WH-002',
-            'is_visible' => true,
-            'status'     => 'published',
-        ]);
+        $smartphone = $productsBySku->get('SP-001');
+        $headphones = $productsBySku->get('WH-002');
+        $tShirt = $productsBySku->get('CT-003');
+        $gardenTools = $productsBySku->get('GT-004');
+        $yogaMat = $productsBySku->get('YM-005');
 
-        $this->assertDatabaseHas('products', [
-            'name'       => 'Cotton T-Shirt',
-            'sku'        => 'CT-003',
-            'is_visible' => true,
-            'status'     => 'published',
-        ]);
+        $this->assertNotNull($smartphone);
+        $this->assertSame('Smartphone Pro', $smartphone->name);
+        $this->assertTrue($smartphone->is_visible);
+        $this->assertSame('published', $smartphone->status);
 
-        $this->assertDatabaseHas('products', [
-            'name'       => 'Garden Tools Set',
-            'sku'        => 'GT-004',
-            'is_visible' => true,
-            'status'     => 'published',
-        ]);
+        $this->assertNotNull($headphones);
+        $this->assertSame('Wireless Headphones', $headphones->name);
+        $this->assertTrue($headphones->is_visible);
+        $this->assertSame('published', $headphones->status);
 
-        $this->assertDatabaseHas('products', [
-            'name'       => 'Yoga Mat',
-            'sku'        => 'YM-005',
-            'is_visible' => true,
-            'status'     => 'published',
-        ]);
+        $this->assertNotNull($tShirt);
+        $this->assertSame('Cotton T-Shirt', $tShirt->name);
+        $this->assertTrue($tShirt->is_visible);
+        $this->assertSame('published', $tShirt->status);
+
+        $this->assertNotNull($gardenTools);
+        $this->assertSame('Garden Tools Set', $gardenTools->name);
+        $this->assertTrue($gardenTools->is_visible);
+        $this->assertSame('published', $gardenTools->status);
+
+        $this->assertNotNull($yogaMat);
+        $this->assertSame('Yoga Mat', $yogaMat->name);
+        $this->assertTrue($yogaMat->is_visible);
+        $this->assertSame('published', $yogaMat->status);
     }
 
     #[Test]

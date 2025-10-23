@@ -250,6 +250,12 @@ final class LoginForm extends Form
             return 0;
         }
 
+        if (RateLimiter::attempts($throttleKey) === 0) {
+            $store->forget($this->attemptCacheKey($throttleKey));
+
+            return 0;
+        }
+
         if (($payload['expires_at'] ?? 0) <= now()->getTimestamp()) {
             $store->forget($this->attemptCacheKey($throttleKey));
 

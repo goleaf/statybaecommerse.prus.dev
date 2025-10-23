@@ -8,6 +8,8 @@ use Andreia\FilamentNordTheme\FilamentNordThemePlugin;
 use App\Support\Nav;
 use Asmit\ResizedColumn\ResizedColumnPlugin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use App\Filament\Resources\ProductResource;
+use App\Filament\Resources\UserResource;
 
 use function class_exists;
 
@@ -30,6 +32,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use LaraZeus\SpatieTranslatable\SpatieTranslatablePlugin;
@@ -42,7 +45,7 @@ final class AdminPanelProvider extends PanelProvider
         if (class_exists(FilamentExport::class)) {
             FilamentExport::createExportUrlUsing(
                 static fn ($export): string => URL::temporarySignedRoute(
-                    'exports.signed-download',
+                    'api.exports.download',
                     now()->addMinutes(60),
                     ['export' => $export],
                 ),
@@ -61,6 +64,9 @@ final class AdminPanelProvider extends PanelProvider
             [...Nav::orderedResources(), ...$configuredResources],
             SORT_STRING,
         ));
+
+        // In testing, keep the full resource list so navigation snapshot and
+        // resource discovery tests can assert against the complete panel state.
 
         /** @var array<class-string> $resourceClasses */
         $pageClasses = array_values(array_filter(
@@ -193,9 +199,28 @@ final class AdminPanelProvider extends PanelProvider
             ->when(
                 app()->environment('testing'),
                 fn (Panel $p): Panel => $p,
-                fn (Panel $p): Panel => $p->viteTheme('resources/css/filament/admin/theme.css')
+                fn (Panel $p): Panel => $p->viteTheme('resources/css/filament/admin/theme.scss')
             )
             ->spa();
+    }
+
+    /**
+     * Resolve a route URL if the named route exists, otherwise return a safe fallback.
+     */
+    private function routeUrl(string $name, array $parameters = []): string
+    {
+        if (! Route::has($name)) {
+            return '#';
+        }
+
+        return route($name, $parameters);
+    }
+
+    private function currentLocale(): string
+    {
+        $locale = app()->getLocale();
+
+        return is_string($locale) && $locale !== '' ? $locale : (string) config('app.locale', 'en');
     }
 
     /**

@@ -94,9 +94,53 @@
     {{-- Livewire Scripts --}}
     @livewireScripts
 
+    {{-- Livewire client hardening: avoid accidental $wire.toJSON() server calls --}}
+    <script nonce="{{ csp_nonce() }}">
+        document.addEventListener('livewire:init', () => {
+            const patchComponent = (component) => {
+                try {
+                    const w = component?.$wire;
+                    if (!w || typeof w !== 'object') return;
+
+                    // Define a non-enumerable toJSON to stop JSON.stringify($wire)
+                    if (!Object.prototype.hasOwnProperty.call(w, 'toJSON')) {
+                        Object.defineProperty(w, 'toJSON', {
+                            value: () => ({ id: component.id, name: component.name || 'livewire-component' }),
+                            enumerable: false,
+                            configurable: true,
+                        });
+                    }
+                } catch (_) {
+                    // no-op: defensive guard only
+                }
+            };
+
+            // Patch existing components on load
+            try {
+                document.querySelectorAll('[wire\\:id]')
+                    .forEach((el) => {
+                        const id = el.getAttribute('wire:id');
+                        const cmp = window.Livewire?.find?.(id);
+                        if (cmp) patchComponent(cmp);
+                    });
+            } catch (_) {}
+
+            // Patch after each update
+            window.Livewire?.hook?.('message.processed', (message, component) => patchComponent(component));
+        });
+    </script>
+
     {{-- Additional Scripts --}}
     @stack('scripts')
 
+    {{-- Alpine CSP support (prevents unsafe-eval violations) --}}
+    <script nonce="{{ csp_nonce() }}" defer src="https://unpkg.com/@alpinejs/csp@3.x.x/dist/cdn.min.js"></script>
+    <script nonce="{{ csp_nonce() }}">
+        document.addEventListener('alpine:init', () => {
+            // Register CSP plugin before Alpine starts
+            window.Alpine?.plugin?.(window.csp);
+        });
+    </script>
     {{-- Alpine.js --}}
     <script nonce="{{ csp_nonce() }}" defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </body>

@@ -176,7 +176,7 @@ final class SystemSettingDependencyResource extends Resource
                     ->sortable()
                     ->toggleable()
                     ->limit(30),
-                TextColumn::make('dependsOnSetting.key')
+                TextColumn::make('dependsOnSettingRelation.key')
                     ->label(__('admin.system_setting_dependencies.depends_on_setting'))
                     ->searchable()
                     ->sortable()
@@ -184,7 +184,7 @@ final class SystemSettingDependencyResource extends Resource
                     ->color('secondary')
                     ->copyable()
                     ->copyMessage(__('admin.common.copied')),
-                TextColumn::make('dependsOnSetting.name')
+                TextColumn::make('dependsOnSettingRelation.name')
                     ->label(__('admin.system_setting_dependencies.depends_on_setting_name'))
                     ->searchable()
                     ->sortable()
@@ -295,7 +295,7 @@ final class SystemSettingDependencyResource extends Resource
                             );
                     }),
             ])
-            ->searchable(['condition', 'condition_value', 'setting.key', 'dependsOnSetting.key'])
+            ->searchable(['condition', 'condition_value', 'setting.key', 'dependsOnSettingRelation.key'])
             ->actions([
                 ViewAction::make()
                     ->label(__('admin.common.view'))

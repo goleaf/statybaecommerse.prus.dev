@@ -55,6 +55,6 @@ final class SystemSettingTranslation extends Model
      */
     public function systemSetting(): BelongsTo
     {
-        return $this->belongsTo(SystemSetting::class);
+        return $this->belongsTo(SystemSetting::class)->withoutGlobalScopes()->withTrashed();
     }
 }

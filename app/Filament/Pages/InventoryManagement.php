@@ -7,6 +7,7 @@ namespace App\Filament\Pages;
 use BackedEnum;
 use App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
 use App\Models\Product;
+use App\Filament\Forms\Components\Quantity;
 use Filament\Forms\Components\Select;
 use Filament\Pages\Page;
 use Filament\Tables\Actions\BulkAction;

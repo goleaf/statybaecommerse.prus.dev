@@ -24,7 +24,7 @@ use function Pest\Laravel\actingAs;
 
 uses(RefreshDatabase::class);
 
-it('queues, processes, and downloads order exports', function (): void {
+it('feature: queues, processes, and downloads order exports', function (): void {
     Storage::fake('local');
     Notification::fake();
     Queue::fake();
@@ -78,7 +78,7 @@ it('queues, processes, and downloads order exports', function (): void {
     $response->assertHeaderContains('content-disposition', 'attachment');
 });
 
-it('streams one hundred thousand users without exhausting memory', function (): void {
+it('feature: streams one hundred thousand users without exhausting memory', function (): void {
     Storage::fake('local');
     Notification::fake();
     Queue::fake();
@@ -139,7 +139,7 @@ it('streams one hundred thousand users without exhausting memory', function (): 
     expect(memory_get_usage(true))->toBeLessThan(256 * 1024 * 1024);
 });
 
-it('generates aligned columns for csv, xlsx, and pdf formats', function (): void {
+it('feature: generates aligned columns for csv, xlsx, and pdf formats', function (): void {
     Storage::fake('local');
     Notification::fake();
     Queue::fake();

@@ -9,7 +9,7 @@ use App\Domain\Product\Entities\ProductImage;
 use App\Domain\Product\Entities\ProductVariant;
 use App\Domain\Product\Specifications\DisplayableProductSpecification;
 
-it('accepts visible products with price and slug', function (): void {
+it('unit: accepts visible products with price and slug', function (): void {
     $product = new Product(
         id: 1,
         name: 'Test Product',
@@ -39,7 +39,7 @@ it('accepts visible products with price and slug', function (): void {
     expect($specification->isSatisfiedBy($product))->toBeTrue();
 });
 
-it('rejects hidden or non priced products', function (): void {
+it('unit: rejects hidden or non priced products', function (): void {
     $hidden = new Product(
         id: 2,
         name: 'Hidden Product',

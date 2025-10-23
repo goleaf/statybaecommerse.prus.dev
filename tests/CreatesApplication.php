@@ -34,6 +34,12 @@ trait CreatesApplication
             });
         }
 
+        // Avoid forcing a per-process SQLite path so the test suite can reuse
+        // a single on-disk database across runs. This keeps migrations stable
+        // and avoids stray worker-specific files during local execution.
+        // If TEST_TOKEN is already provided by the environment (e.g. parallel
+        // runners), it will be respected by Tests\Support\TestingDatabase::path().
+
         // Prime environment variables before Laravel boots so the framework resolves
         // the correct SQLite connection on its initial pass through configuration.
         $databasePath = TestingDatabase::path();
@@ -73,12 +79,11 @@ trait CreatesApplication
             return $this->sqliteDatabasePath;
         }
 
-        $databasePath = dirname(__DIR__) . '/storage/framework/testing/testing.sqlite';
+        $databasePath = TestingDatabase::path();
         $this->sqliteDatabasePreExisted = file_exists($databasePath);
 
         if (! $this->sqliteDatabasePreExisted) {
-            // Touch the file so SQLite has a persistent database to migrate against.
-            touch($databasePath);
+            TestingDatabase::ensureExists();
         }
 
         $this->sqliteDatabasePath = $databasePath;

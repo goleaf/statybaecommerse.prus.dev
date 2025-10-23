@@ -50,7 +50,7 @@ final class SystemSettingDependency extends Model
     }
 
     /**
-     * Handle dependsOn functionality with proper error handling.
+     * Direct relation to the dependency source setting.
      */
     public function dependsOn(): BelongsTo
     {
@@ -58,11 +58,19 @@ final class SystemSettingDependency extends Model
     }
 
     /**
-     * Handle dependsOnSetting functionality with proper error handling.
+     * Relation used for eager loading and attribute access without clashing with scopes.
      */
-    public function dependsOnSetting(): BelongsTo
+    public function dependsOnSettingRelation(): BelongsTo
     {
         return $this->belongsTo(SystemSetting::class, 'depends_on_setting_id');
+    }
+
+    /**
+     * Accessor to expose the dependsOnSetting relation under the expected property name.
+     */
+    public function getDependsOnSettingAttribute(): ?SystemSetting
+    {
+        return $this->getRelationValue('dependsOnSettingRelation');
     }
 
     /**
@@ -102,7 +110,7 @@ final class SystemSettingDependency extends Model
      * @param mixed $query
      * @param mixed $settingId
      */
-    public function scopeDependsOnSetting($query, $settingId)
+    public function scopeDependsOnSetting(Builder $query, int|string $settingId): Builder
     {
         return $query->where('depends_on_setting_id', $settingId);
     }
@@ -177,7 +185,7 @@ final class SystemSettingDependency extends Model
                         ->where('key', 'like', "%{$search}%")
                         ->orWhere('name', 'like', "%{$search}%");
                 })
-                ->orWhereHas('dependsOnSetting', function ($q) use ($search): void {
+                ->orWhereHas('dependsOnSettingRelation', function ($q) use ($search): void {
                     $q
                         ->where('key', 'like', "%{$search}%")
                         ->orWhere('name', 'like', "%{$search}%");
@@ -212,7 +220,7 @@ final class SystemSettingDependency extends Model
      */
     public function scopeOrderByCondition($query)
     {
-        return $query->orderBy('condition', 'asc');
+        return $query->orderBy('condition', 'desc');
     }
 
     /**

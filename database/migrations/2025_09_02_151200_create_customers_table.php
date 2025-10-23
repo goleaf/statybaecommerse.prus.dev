@@ -13,6 +13,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('customers')) {
+            return;
+        }
+
         $countriesAvailable = Schema::hasTable('countries');
         $citiesAvailable = Schema::hasTable('cities');
         $companiesAvailable = Schema::hasTable('companies');

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Filesystem\Filesystem;
 
-it('does not use inline notification strings', function (): void {
+it('feature: does not use inline notification strings', function (): void {
     $filesystem = new Filesystem();
     $invalidUsages = [];
 

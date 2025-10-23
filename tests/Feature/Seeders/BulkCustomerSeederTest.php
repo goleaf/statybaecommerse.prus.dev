@@ -10,7 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('creates users using factory with proper attributes', function () {
+it('feature: creates users using factory with proper attributes', function () {
     $seeder = new BulkCustomerSeeder;
     $seeder->run();
 
@@ -26,7 +26,7 @@ it('creates users using factory with proper attributes', function () {
     expect($user->email_verified_at)->not->toBeNull();
 });
 
-it('creates addresses using factory relationships', function () {
+it('feature: creates addresses using factory relationships', function () {
     $seeder = new BulkCustomerSeeder;
     $seeder->run();
 
@@ -42,7 +42,7 @@ it('creates addresses using factory relationships', function () {
     expect($address->city)->not->toBeNull();
 });
 
-it('creates both shipping and billing addresses for each user', function () {
+it('feature: creates both shipping and billing addresses for each user', function () {
     $seeder = new BulkCustomerSeeder;
     $seeder->run();
 
@@ -56,7 +56,7 @@ it('creates both shipping and billing addresses for each user', function () {
     }
 });
 
-it('assigns users to customer groups using relationships', function () {
+it('feature: assigns users to customer groups using relationships', function () {
     // Create a customer group first
     CustomerGroup::factory()->create();
 
@@ -74,7 +74,7 @@ it('assigns users to customer groups using relationships', function () {
     expect($pivotData->updated_at)->not->toBeNull();
 });
 
-it('handles chunked processing correctly', function () {
+it('feature: handles chunked processing correctly', function () {
     $seeder = new BulkCustomerSeeder;
     $seeder->run();
 
@@ -89,7 +89,7 @@ it('handles chunked processing correctly', function () {
     }
 });
 
-it('creates proper locale distribution', function () {
+it('feature: creates proper locale distribution', function () {
     $seeder = new BulkCustomerSeeder;
     $seeder->run();
 
@@ -101,7 +101,7 @@ it('creates proper locale distribution', function () {
     expect($enUsers)->toBeGreaterThan(0);
 });
 
-it('handles missing customer groups gracefully', function () {
+it('feature: handles missing customer groups gracefully', function () {
     // Ensure no customer groups exist
     CustomerGroup::query()->delete();
 
@@ -115,7 +115,7 @@ it('handles missing customer groups gracefully', function () {
     expect(Address::count())->toBeGreaterThan(0);
 });
 
-it('creates addresses with proper default settings', function () {
+it('feature: creates addresses with proper default settings', function () {
     $seeder = new BulkCustomerSeeder;
     $seeder->run();
 
@@ -132,7 +132,7 @@ it('creates addresses with proper default settings', function () {
     }
 });
 
-it('maintains data integrity across relationships', function () {
+it('feature: maintains data integrity across relationships', function () {
     CustomerGroup::factory()->create();
 
     $seeder = new BulkCustomerSeeder;

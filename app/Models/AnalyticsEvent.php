@@ -86,6 +86,7 @@ final class AnalyticsEvent extends Model
     ];
 
     protected $casts = [
+        'user_id'         => 'integer',
         'properties'       => 'array',
         'event_data'       => 'array',
         'is_important'     => 'boolean',

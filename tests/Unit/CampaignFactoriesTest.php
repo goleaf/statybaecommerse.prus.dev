@@ -12,7 +12,7 @@ use App\Models\CampaignView;
 use App\Models\CustomerGroup;
 use Illuminate\Support\Facades\Schema;
 
-it('creates campaign via factory with relationships', function () {
+it('unit: creates campaign via factory with relationships', function () {
     $campaign = Campaign::factory()->active()->create();
 
     expect($campaign->id)
@@ -45,7 +45,7 @@ it('creates campaign via factory with relationships', function () {
         ->toBe(1);
 });
 
-it('creates product target, customer segment and schedule via factories', function () {
+it('unit: creates product target, customer segment and schedule via factories', function () {
     $campaign = Campaign::factory()->create();
 
     $ensureActive = static fn (string $table) => Schema::hasColumn($table, 'is_active') ? ['is_active' => true] : [];

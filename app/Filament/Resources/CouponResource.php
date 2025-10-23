@@ -9,6 +9,7 @@ use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\CouponResource\Pages;
 use App\Models\Coupon;
+use App\Filament\Forms\Components\Quantity;
 use App\Models\Scopes\ActiveScope;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\Action;

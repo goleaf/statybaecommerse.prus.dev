@@ -67,6 +67,12 @@ final class CampaignClick extends Model
                     return $value->copy()->setTimezone('UTC')->format('Y-m-d H:i:s');
                 }
 
+                if ($value instanceof \DateTimeInterface) {
+                    return CarbonImmutable::instance($value)
+                        ->setTimezone('UTC')
+                        ->format('Y-m-d H:i:s');
+                }
+
                 if ($value === null || $value === '') {
                     return null;
                 }
