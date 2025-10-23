@@ -27,7 +27,13 @@ final class SystemSettingDependency extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['setting_id', 'depends_on_setting_id', 'condition', 'condition_value', 'is_active'];
+    protected $fillable = [
+        'setting_id',
+        'depends_on_setting_id',
+        'condition',
+        'condition_value',
+        'is_active',
+    ];
 
     protected $casts = [
         'condition' => 'string',
@@ -109,34 +115,24 @@ final class SystemSettingDependency extends Model
      */
     public function scopeWithCondition($query, $condition)
     {
-        return $query->where(function ($q) use ($condition) {
-            $q->where('condition', 'like', "%{$condition}%")
+        return $query->where(function ($q) use ($condition): void {
+            $q
+                ->where('condition', 'like', "%{$condition}%")
                 ->orWhere('condition_value', 'like', "%{$condition}%");
         });
     }
 
     /**
      * Scope the query to dependencies matching the given condition operator.
-     *
-     * Supports case-insensitive matches on both the JSON `condition->operator`
-     * key and the legacy string `condition` column representation for operators
-     * such as `equals_to`, `greater_than`, and `contains`.
      */
     public function scopeByCondition(Builder $query, string $operator): Builder
     {
-        // Normalize the operator and account for legacy uppercase values.
         $normalizedOperator = strtolower($operator);
 
-        $acceptedOperators = array_unique([
-            $operator,
-            $normalizedOperator,
-            strtoupper($normalizedOperator),
-        ]);
-
-        return $query->where(function (Builder $builder) use ($acceptedOperators): void {
+        return $query->where(function (Builder $builder) use ($operator, $normalizedOperator): void {
             $builder
-                ->whereIn('condition->operator', $acceptedOperators)
-                ->orWhereIn('condition', $acceptedOperators);
+                ->where('condition', $operator)
+                ->orWhere('condition', $normalizedOperator);
         });
     }
 
@@ -175,6 +171,7 @@ final class SystemSettingDependency extends Model
         return $query->where(function ($q) use ($search): void {
             $q
                 ->where('condition', 'like', "%{$search}%")
+                ->orWhere('condition_value', 'like', "%{$search}%")
                 ->orWhereHas('setting', function ($q) use ($search): void {
                     $q
                         ->where('key', 'like', "%{$search}%")
@@ -236,189 +233,113 @@ final class SystemSettingDependency extends Model
         if (! $this->dependsOn) {
             return false;
         }
+        $dependencyValue = $this->dependsOn->value;
+        $operator = strtolower(trim((string) ($this->condition ?? '')));
+        $expectedValue = $this->condition_value;
 
-        return match ($condition['operator'] ?? 'equals') {
-            'equals'       => $dependencyValue == $condition['value'],
-            'not_equals'   => $dependencyValue != $condition['value'],
-            'greater_than' => $dependencyValue > $condition['value'],
-            'less_than'    => $dependencyValue < $condition['value'],
-            'contains'     => str_contains($dependencyValue, $condition['value']),
-            'not_contains' => ! str_contains($dependencyValue, $condition['value']),
-            'in'           => in_array($dependencyValue, $condition['value'] ?? []),
-            'not_in'       => ! in_array($dependencyValue, $condition['value'] ?? []),
-            default        => false,
+        if ($operator === '') {
+            return false;
+        }
+
+        // Operators that require an explicit comparison value.
+        $operatorsRequiringValue = [
+            'equals',
+            'not_equals',
+            'greater_than',
+            'greater_or_equals',
+            'less_than',
+            'less_or_equals',
+            'contains',
+            'not_contains',
+            'starts_with',
+            'ends_with',
+            'in',
+            'not_in',
+        ];
+
+        if (in_array($operator, $operatorsRequiringValue, true) && ($expectedValue === null || (is_string($expectedValue) && trim($expectedValue) === ''))) {
+            return false;
+        }
+
+        $normalizedValue = is_string($dependencyValue) ? trim($dependencyValue) : $dependencyValue;
+        $normalizedExpected = is_string($expectedValue) ? trim($expectedValue) : $expectedValue;
+
+        return match ($operator) {
+            'equals' => $this->compareValues($normalizedValue, $normalizedExpected) === 0,
+            'not_equals' => $this->compareValues($normalizedValue, $normalizedExpected) !== 0,
+            'greater_than' => $this->compareValues($normalizedValue, $normalizedExpected) === 1,
+            'greater_or_equals' => $this->compareValues($normalizedValue, $normalizedExpected) >= 0,
+            'less_than' => $this->compareValues($normalizedValue, $normalizedExpected) === -1,
+            'less_or_equals' => $this->compareValues($normalizedValue, $normalizedExpected) <= 0,
+            'contains' => is_string($normalizedValue) && is_string($normalizedExpected) && str_contains($normalizedValue, $normalizedExpected),
+            'not_contains' => is_string($normalizedValue) && is_string($normalizedExpected) && ! str_contains($normalizedValue, $normalizedExpected),
+            'starts_with' => is_string($normalizedValue) && is_string($normalizedExpected) && str_starts_with($normalizedValue, $normalizedExpected),
+            'ends_with' => is_string($normalizedValue) && is_string($normalizedExpected) && str_ends_with($normalizedValue, $normalizedExpected),
+            'in' => $this->isInList($normalizedValue, $normalizedExpected),
+            'not_in' => ! $this->isInList($normalizedValue, $normalizedExpected),
+            'is_empty' => blank($normalizedValue),
+            'is_not_empty' => filled($normalizedValue),
+            'is_true' => $this->toBoolean($normalizedValue) === true,
+            'is_false' => $this->toBoolean($normalizedValue) === false,
+            default => false,
         };
     }
 
-    private function compareEquality(mixed $actual, mixed $expected): bool
+    /**
+     * Compare actual and expected values with support for numeric and string data.
+     */
+    private function compareValues(mixed $actual, mixed $expected): int
     {
-        if ($expected === null) {
-            return $actual === null || $this->isEmptyValue($actual);
+        if ($actual === null || $expected === null) {
+            return $actual === $expected ? 0 : ($actual === null ? -1 : 1);
         }
 
-        if (is_bool($actual) || is_bool($expected)) {
-            $actualBool = $this->toBool($actual);
-            $expectedBool = $this->toBool($expected);
-
-            return $actualBool !== null && $expectedBool !== null && $actualBool === $expectedBool;
+        if (is_numeric($actual) && is_numeric($expected)) {
+            return $actual <=> $expected;
         }
 
-        return $this->normalizeString($actual) === $this->normalizeString($expected);
+        return strcmp((string) $actual, (string) $expected);
     }
 
-    private function compareNumeric(mixed $actual, mixed $expected, callable $comparator): bool
-    {
-        $actualNumber = $this->toNumber($actual);
-        $expectedNumber = $this->toNumber($expected);
-
-        if ($actualNumber === null || $expectedNumber === null) {
-            return false;
-        }
-
-        return (bool) $comparator($actualNumber, $expectedNumber);
-    }
-
-    private function containsValue(mixed $actual, mixed $expected): bool
+    /**
+     * Determine if a value exists in a comma separated or JSON encoded list.
+     */
+    private function isInList(mixed $actual, mixed $expected): bool
     {
         if ($expected === null) {
             return false;
         }
 
-        if (is_array($actual)) {
-            return in_array($expected, $actual, true);
-        }
-
-        $actualString = $this->normalizeString($actual);
-        $expectedString = $this->normalizeString($expected);
-
-        return $actualString !== '' && $expectedString !== '' && str_contains($actualString, $expectedString);
-    }
-
-    private function inCollection(mixed $actual, mixed $expected): bool
-    {
-        if ($expected === null) {
-            return false;
-        }
-
-        $collection = $this->toArray($expected);
-
-        if ($collection === []) {
-            return false;
-        }
-
-        if (is_array($actual)) {
-            return (bool) array_intersect($actual, $collection);
-        }
-
-        return in_array($this->normalizeString($actual), array_map([$this, 'normalizeString'], $collection), true);
-    }
-
-    private function stringComparison(mixed $actual, mixed $expected, callable $callback): bool
-    {
-        if ($expected === null) {
-            return false;
-        }
-
-        $actualString = $this->normalizeString($actual);
-        $expectedString = $this->normalizeString($expected);
-
-        return $actualString !== '' && $expectedString !== '' && $callback($actualString, $expectedString);
-    }
-
-    private function isEmptyValue(mixed $value): bool
-    {
-        if ($value === null) {
-            return true;
-        }
-
-        if (is_string($value)) {
-            return trim($value) === '';
-        }
-
-        if (is_array($value)) {
-            return count($value) === 0;
-        }
-
-        return false;
-    }
-
-    private function normalizeString(mixed $value): string
-    {
-        if ($value === null) {
-            return '';
-        }
-
-        if (is_string($value)) {
-            return $value;
-        }
-
-        if (is_bool($value)) {
-            return $value ? 'true' : 'false';
-        }
-
-        if (is_array($value) || is_object($value)) {
-            return json_encode($value, JSON_THROW_ON_ERROR);
-        }
-
-        return (string) $value;
-    }
-
-    private function toNumber(mixed $value): ?float
-    {
-        if (is_int($value) || is_float($value)) {
-            return (float) $value;
-        }
-
-        if (is_string($value) && is_numeric($value)) {
-            return (float) $value;
-        }
-
-        return null;
-    }
-
-    private function toBool(mixed $value): ?bool
-    {
-        if (is_bool($value)) {
-            return $value;
-        }
-
-        if (is_int($value)) {
-            return $value !== 0;
-        }
-
-        if (is_string($value)) {
-            $normalized = strtolower(trim($value));
-
-            return match ($normalized) {
-                '1', 'true', 'yes', 'on' => true,
-                '0', 'false', 'no', 'off', '' => false,
-                default => null,
-            };
-        }
-
-        return null;
-    }
-
-    private function toArray(mixed $value): array
-    {
-        if (is_array($value)) {
-            return $value;
-        }
-
-        if ($value === null) {
-            return [];
-        }
-
-        if (is_string($value)) {
-            $decoded = json_decode($value, true);
+        if (is_string($expected)) {
+            $decoded = json_decode($expected, true);
 
             if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                return $decoded;
+                $expected = $decoded;
+            } else {
+                $expected = array_map('trim', array_filter(explode(',', $expected), static fn ($item): bool => $item !== ''));
             }
-
-            return array_filter(array_map('trim', explode(',', $value)), fn ($item) => $item !== '');
         }
 
-        return [$value];
+        if (! is_array($expected)) {
+            return false;
+        }
+
+        return in_array($actual, $expected, ! is_string($actual));
+    }
+
+    /**
+     * Convert supported textual values to booleans for consistent comparisons.
+     */
+    private function toBoolean(mixed $value): ?bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        if ($value === null) {
+            return null;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
     }
 }

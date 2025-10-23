@@ -14,26 +14,34 @@ final class SystemSettingDependencyFactory extends Factory
 
     public function definition(): array
     {
-        $conditions = [
-            ['operator' => 'equals', 'value' => 'enabled'],
-            ['operator' => 'equals', 'value' => 'disabled'],
-            ['operator' => 'greater_than', 'value' => '0'],
-            ['operator' => 'less_than', 'value' => '100'],
-            ['operator' => 'contains', 'value' => 'test'],
-            ['operator' => 'not_contains', 'value' => 'test'],
-            ['operator' => 'is_empty', 'value' => null],
-            ['operator' => 'is_not_empty', 'value' => null],
-            ['operator' => 'is_true', 'value' => null],
-            ['operator' => 'is_false', 'value' => null],
-        ];
+        $operator = $this->faker->randomElement([
+            'equals',
+            'not_equals',
+            'greater_than',
+            'less_than',
+            'contains',
+            'not_contains',
+            'is_empty',
+            'is_not_empty',
+            'is_true',
+            'is_false',
+        ]);
+
+        // Generate realistic sample values that align with the chosen operator.
+        $value = match ($operator) {
+            'equals', 'not_equals' => $this->faker->word(),
+            'greater_than', 'less_than' => (string) $this->faker->numberBetween(1, 100),
+            'contains', 'not_contains' => $this->faker->word(),
+            default => null,
+        };
 
         $selected = $this->faker->randomElement($conditions);
 
         return [
             'setting_id'            => SystemSetting::factory(),
             'depends_on_setting_id' => SystemSetting::factory(),
-            'condition' => $selected['operator'],
-            'condition_value' => $selected['value'],
+            'condition' => $operator,
+            'condition_value' => $value,
             'is_active' => $this->faker->boolean(90), // 90% chance of being active
         ];
     }

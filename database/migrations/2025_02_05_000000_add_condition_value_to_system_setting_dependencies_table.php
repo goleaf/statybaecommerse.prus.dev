@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('system_setting_dependencies', function (Blueprint $table): void {
+            // Store the parsed operator and value separately for improved querying.
             $table->string('condition_operator', 100)->nullable()->after('condition');
             $table->string('condition_value')->nullable()->after('condition_operator');
         });
@@ -44,7 +45,7 @@ return new class extends Migration
                 ->where('id', $dependency->id)
                 ->update([
                     'condition_operator' => $operator,
-                    'condition_value'    => is_array($value) ? json_encode($value) : $value,
+                    'condition_value' => is_array($value) ? json_encode($value) : $value,
                 ]);
         }
 
@@ -53,6 +54,7 @@ return new class extends Migration
         });
 
         Schema::table('system_setting_dependencies', function (Blueprint $table): void {
+            // The operator now lives in the `condition` column directly.
             $table->string('condition', 100)->nullable()->after('depends_on_setting_id');
         });
 
@@ -94,7 +96,7 @@ return new class extends Migration
 
                 $payload = json_encode([
                     'operator' => $operator,
-                    'value'    => $value,
+                    'value' => $value,
                 ]);
             }
 
