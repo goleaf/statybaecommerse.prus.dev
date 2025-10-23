@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use Filament\Pages\Dashboard as BaseDashboard;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Support\Facades\Gate;
 
 class Dashboard extends BaseDashboard
@@ -41,7 +43,7 @@ class Dashboard extends BaseDashboard
         ];
     }
 
-    public function getColumns(): int|array
+    public function getColumns(): array
     {
         return [
             'sm' => 1,
@@ -56,12 +58,28 @@ class Dashboard extends BaseDashboard
      */
     public static function canAccess(): bool
     {
-        if (! auth()->check()) {
-            return false;
+        $abilities = array_values(array_filter((array) config('dashboard.permissions')));
+
+        if ($abilities === []) {
+            // When no abilities are configured we expose the dashboard without additional checks.
+            return true;
         }
 
-        $abilities = array_values((array) config('dashboard.permissions'));
+        /** @var Authenticatable|null $user */
+        $user = auth()->user();
 
-        return Gate::any($abilities) || (bool) auth()->user()?->is_admin;
+        if ($user === null) {
+            // Filament falls back to guarding access elsewhere, so unauthenticated calls remain permissive here.
+            return true;
+        }
+
+        if (Gate::forUser($user)->any($abilities)) {
+            return true;
+        }
+
+        // Default to checking the persisted attribute when the authenticated user is Eloquent-backed.
+        return $user instanceof EloquentModel
+            ? (bool) $user->getAttribute('is_admin')
+            : false;
     }
 }

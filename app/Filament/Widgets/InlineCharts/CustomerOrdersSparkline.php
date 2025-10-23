@@ -6,6 +6,7 @@ namespace App\Filament\Widgets\InlineCharts;
 
 use App\Models\Customer;
 use App\Support\Stats\Series\CustomerSeries;
+use Illuminate\Database\Eloquent\Model;
 use LaraZeus\InlineChart\InlineChartWidget;
 
 /**
@@ -14,9 +15,9 @@ use LaraZeus\InlineChart\InlineChartWidget;
 final class CustomerOrdersSparkline extends InlineChartWidget
 {
     /**
-     * The customer record currently powering the sparkline widget.
+     * The customer record currently powering the sparkline widget while honouring the base contract.
      */
-    public ?Customer $record = null;
+    public ?Model $record = null;
 
     /**
      * Hide the default heading for compact table rendering.
@@ -38,7 +39,7 @@ final class CustomerOrdersSparkline extends InlineChartWidget
     /**
      * Hash of the current dataset that the Livewire view can use for quick change detection.
      */
-    public string $dataChecksum = '';
+    public ?string $dataChecksum = null;
 
     /**
      * Prepare the component for rendering and prime the dataset cache.
@@ -103,7 +104,8 @@ final class CustomerOrdersSparkline extends InlineChartWidget
     private function refreshDataset(): void
     {
         $this->cachedDataset = $this->resolveDataset();
-        $this->dataChecksum = md5(json_encode($this->cachedDataset));
+        // Cast the JSON payload to a string so checksum generation stays deterministic for Chart.js consumers.
+        $this->dataChecksum = md5((string) json_encode($this->cachedDataset));
     }
 
     /**
