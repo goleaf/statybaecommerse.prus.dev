@@ -122,7 +122,8 @@ final class NewsImageResource extends Resource
                                                     return;
                                                 }
 
-                                                $disk = Storage::disk(SecureStorage::disk());
+                                                $diskName = SecureStorage::disk();
+                                                $disk = Storage::disk($diskName);
 
                                                 if (! $disk->exists($state)) {
                                                     return;
@@ -134,21 +135,9 @@ final class NewsImageResource extends Resource
                                                 $path = null;
 
                                                 try {
-                                                    $path = $disk->path($state);
-                                                } catch (\Throwable $exception) {
-                                                    $path = null;
-                                                }
-
-                                                if ($path && ! file_exists($path)) {
-                                                    $path = null;
-                                                }
-
-                                                if (! $path && method_exists($disk, 'temporaryUrl')) {
-                                                    try {
-                                                        $path = $disk->temporaryUrl($state, now()->addMinutes(5));
-                                                    } catch (\Throwable $exception) {
-                                                        $path = null;
-                                                    }
+                                                    $imagePath = Storage::disk($diskName)->path($state);
+                                                } catch (Throwable) {
+                                                    $imagePath = null;
                                                 }
 
                                                 if ($path) {
