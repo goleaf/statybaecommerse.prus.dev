@@ -6,6 +6,9 @@ namespace App\Application\Product\DTOs;
 
 use App\Domain\Product\Collections\ProductVariantCollection;
 
+/**
+ * Helper DTO ensuring product variants are serialised consistently.
+ */
 final class ProductVariantCollectionDto
 {
     /** @var list<ProductVariantDto> */
@@ -29,6 +32,9 @@ final class ProductVariantCollectionDto
         return new self($items);
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     public function toArray(): array
     {
         return array_map(static fn (ProductVariantDto $variant) => $variant->toArray(), $this->items);

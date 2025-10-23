@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Application\Product\DTOs;
 
+/**
+ * Immutable DTO capturing filters and pagination for the catalog listing.
+ */
 final class ListCatalogProductsInputDto
 {
     public function __construct(
@@ -13,7 +16,15 @@ final class ListCatalogProductsInputDto
         private readonly ?string $brandSlug,
         private readonly string $sortBy,
         private readonly string $sortOrder,
-    ) {}
+    ) {
+        // Normalise pagination to always be within a sensible range.
+        if ($this->perPage < 1) {
+            throw new \InvalidArgumentException('Per-page value must be greater than zero.');
+        }
+        if ($this->page < 1) {
+            throw new \InvalidArgumentException('Page value must be greater than zero.');
+        }
+    }
 
     public function getPerPage(): int
     {

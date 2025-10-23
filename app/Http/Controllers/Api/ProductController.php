@@ -7,22 +7,16 @@ namespace App\Http\Controllers\Api;
 use App\Application\Product\DTOs\GetProductDetailsInputDto;
 use App\Application\Product\DTOs\ListCatalogProductsInputDto;
 use App\Application\Product\DTOs\SearchProductsInputDto;
+use App\Application\Product\Presenters\ProductContractPresenter;
 use App\Application\Product\UseCases\GetProductDetailsUseCase;
 use App\Application\Product\UseCases\ListCatalogProductsUseCase;
 use App\Application\Product\UseCases\SearchProductsUseCase;
 use App\Domain\Product\Exceptions\ProductNotFoundException;
 use App\Http\Controllers\Controller;
-use App\Models\Product;
-use App\Support\Contracts\Entities\ProductContract;
-use App\Support\ListQuery\ListQueryDefinition;
-use App\Support\ListQuery\ListQueryValidator;
-use App\Support\ListQuery\ListResponse;
 use App\Traits\HandlesContentNegotiation;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\View\View;
 
 /**
@@ -34,8 +28,12 @@ final class ProductController extends Controller
 {
     use HandlesContentNegotiation;
 
-    public function __construct(private readonly ProductRepository $products)
-    {
+    public function __construct(
+        private readonly SearchProductsUseCase $searchProductsUseCase,
+        private readonly ListCatalogProductsUseCase $listCatalogProductsUseCase,
+        private readonly GetProductDetailsUseCase $getProductDetailsUseCase,
+    ) {
+        // The injected use cases keep the controller thin and testable.
     }
 
     /**
@@ -43,22 +41,15 @@ final class ProductController extends Controller
      */
     public function search(Request $request): JsonResponse|View|Response
     {
-        $limit = min((int) $request->get('limit', 10), 50);
-        // Use LazyCollection with timeout to prevent long-running search operations
-        $timeout = now()->addSeconds(10);
-        // 10 second timeout for product search
-        $products = Product::query()->where('is_visible', true)->where(function ($q) use ($query) {
-            $q->where('name', 'like', "%{$query}%")->orWhere('description', 'like', "%{$query}%")->orWhere('sku', 'like', "%{$query}%");
-        })->with(['brand', 'media', 'category'])->cursor()->takeUntilTimeout($timeout)->take($limit)->collect();
-        // Apply skipWhile to filter out products that are not properly configured
-        $filteredProducts = $products->skipWhile(function (Product $product) {
-            return empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug);
-        });
-        $payload = ProductContract::forCollection($filteredProducts, [
-            'query' => $query,
-            'total' => $filteredProducts->count(),
-            'limit' => $limit,
-        ]);
+        $limit = min(max((int) $request->get('limit', 10), 1), 50);
+        $input = new SearchProductsInputDto(
+            (string) $request->get('q', ''),
+            $limit,
+            10,
+        );
+
+        $result = $this->searchProductsUseCase->execute($input);
+        $payload = ProductContractPresenter::fromSearch($result);
 
         return $this->respondWithContract($request, $payload);
     }
@@ -68,62 +59,19 @@ final class ProductController extends Controller
      */
     public function catalog(Request $request): JsonResponse|View|Response
     {
-        $definition = new ListQueryDefinition(
-            filters: [
-                'category' => [
-                    'type' => 'string',
-                    'callback' => static function (Builder $builder, string $slug): void {
-                        $builder->whereHas('category', static function (Builder $query) use ($slug): void {
-                            $query->where('slug', $slug);
-                        });
-                    },
-                ],
-                'brand' => [
-                    'type' => 'string',
-                    'callback' => static function (Builder $builder, string $slug): void {
-                        $builder->whereHas('brand', static function (Builder $query) use ($slug): void {
-                            $query->where('slug', $slug);
-                        });
-                    },
-                ],
-            ],
-            sortable: [
-                'name' => ['column' => 'products.name'],
-                'price' => ['column' => 'products.price'],
-                'created_at' => ['column' => 'products.created_at'],
-            ],
-            defaultSort: 'name',
-            defaultDirection: 'asc',
-            defaultPerPage: 20,
-            maxPerPage: 100,
+        $perPage = max(1, min((int) $request->get('per_page', 20), 100));
+        $currentPage = max(1, (int) $request->get('page', 1));
+        $input = new ListCatalogProductsInputDto(
+            $perPage,
+            $currentPage,
+            $request->filled('category') ? (string) $request->get('category') : null,
+            $request->filled('brand') ? (string) $request->get('brand') : null,
+            (string) $request->get('sort_by', 'name'),
+            (string) $request->get('sort_order', 'asc'),
         );
 
-        $listQuery = ListQueryValidator::fromRequest($request, $definition);
-
-        $query = Product::query()->where('is_visible', true)->with(['brand', 'media', 'category']);
-        $listQuery->applyFilters($query);
-        $listQuery->applySorts($query);
-
-        if (! $listQuery->hasSort('name')) {
-            $query->orderBy('products.name');
-        }
-
-        $products = $query->get()->skipWhile(function (Product $product) {
-            // Skip products that are not properly configured for catalog display
-            return empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug);
-        });
-        // Apply pagination manually after skipWhile filtering
-        $total = $products->count();
-        $currentPage = $listQuery->page();
-        $perPage = $listQuery->perPage();
-        $offset = ($currentPage - 1) * $perPage;
-        $paginatedProducts = $products->slice($offset, $perPage)->values();
-        $paginatedData = new LengthAwarePaginator($paginatedProducts, $total, $perPage, $currentPage, ['path' => $request->url(), 'pageName' => 'page']);
-
-        $payload = ProductContract::forCollection($paginatedData, ListResponse::meta($listQuery, $paginatedData, [
-            'total' => $total,
-            'limit' => $perPage,
-        ]));
+        $result = $this->listCatalogProductsUseCase->execute($input);
+        $payload = ProductContractPresenter::fromCatalog($result);
 
         $paginator = $listQuery->apply($query, $definition);
 
@@ -173,8 +121,13 @@ final class ProductController extends Controller
      */
     public function show(Request $request, string $slug): JsonResponse|View|Response
     {
-        $product->load(['brand', 'media', 'category', 'variants']);
-        $payload = ProductContract::forProduct($product);
+        try {
+            $result = $this->getProductDetailsUseCase->execute(new GetProductDetailsInputDto($slug));
+        } catch (ProductNotFoundException $exception) {
+            abort(404, $exception->getMessage());
+        }
+
+        $payload = ProductContractPresenter::fromDetails($result);
 
         return $this->respondWithContract($request, $payload);
     }

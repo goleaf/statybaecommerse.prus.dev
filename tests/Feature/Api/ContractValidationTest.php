@@ -50,7 +50,7 @@ final class ContractValidationTest extends TestCase
             ]);
         $product->categories()->attach($category->getKey());
 
-        $response = $this->getJson(route('api.products.show', ['product' => $product->slug]));
+        $response = $this->getJson(route('api.products.show', ['slug' => $product->slug]));
         $response->assertOk();
 
         $payload = $response->json();

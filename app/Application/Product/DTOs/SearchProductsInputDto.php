@@ -4,13 +4,20 @@ declare(strict_types=1);
 
 namespace App\Application\Product\DTOs;
 
+/**
+ * Input DTO for keyword-based product search.
+ */
 final class SearchProductsInputDto
 {
     public function __construct(
         private readonly string $query,
         private readonly int $limit,
         private readonly int $timeoutSeconds,
-    ) {}
+    ) {
+        if ($this->limit < 1) {
+            throw new \InvalidArgumentException('Search limit must be at least 1.');
+        }
+    }
 
     public function getQuery(): string
     {

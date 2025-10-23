@@ -23,7 +23,7 @@ final class ProductCollection implements IteratorAggregate, Countable
      */
     public function __construct(array $items = [])
     {
-        $this->items = $items;
+        $this->items = array_values($items);
     }
 
     public function getIterator(): Traversable

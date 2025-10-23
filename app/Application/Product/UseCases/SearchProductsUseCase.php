@@ -12,12 +12,17 @@ use App\Domain\Product\Repositories\ProductRepositoryInterface;
 use App\Domain\Product\Specifications\DisplayableProductSpecification;
 use App\Domain\Product\ValueObjects\ProductSearchCriteria;
 
+/**
+ * Performs keyword search over products with a displayable filter.
+ */
 final class SearchProductsUseCase
 {
     public function __construct(
         private readonly ProductRepositoryInterface $repository,
         private readonly DisplayableProductSpecification $displayableProductSpecification,
-    ) {}
+    ) {
+        // Both dependencies are simple to mock in tests.
+    }
 
     public function execute(SearchProductsInputDto $input): SearchProductsOutputDto
     {

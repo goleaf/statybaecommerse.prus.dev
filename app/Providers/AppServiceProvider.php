@@ -7,10 +7,9 @@ namespace App\Providers;
 use App\Console\Commands\ProfiledSeedCommand;
 use App\Contracts\DocumentServiceContract;
 use App\Contracts\HealthReporter as HealthReporterContract;
-use App\Contracts\SystemNotificationSender;
+use App\Domain\Product\Repositories\ProductRepositoryInterface;
 use App\Filament\Components\LiveNotificationFeed;
-use App\Mail\Auth\PasswordResetMail;
-use App\Mail\Auth\VerifyEmailMail;
+use App\Infrastructure\Product\Repositories\EloquentProductRepository;
 use App\Models\DiscountCode;
 use App\Models\DiscountRedemption;
 use App\Models\Document;
@@ -91,10 +90,8 @@ class AppServiceProvider extends ServiceProvider
             });
         }
 
-        $this->app->scoped(LogContext::class, static fn (): LogContext => new LogContext());
-        $this->app->scoped(StructuredLogger::class, function ($app): StructuredLogger {
-            return new StructuredLogger($app->make(LogContext::class));
-        });
+        // Bind the domain-level product repository to its Eloquent implementation.
+        $this->app->bind(ProductRepositoryInterface::class, EloquentProductRepository::class);
     }
 
     public function boot(): void

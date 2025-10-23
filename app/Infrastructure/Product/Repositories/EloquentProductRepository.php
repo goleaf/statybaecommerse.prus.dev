@@ -16,6 +16,9 @@ use App\Domain\Product\ValueObjects\ProductSearchCriteria;
 use App\Domain\Product\ValueObjects\ProductSlug;
 use App\Models\Product;
 
+/**
+ * Eloquent-backed repository for domain product read models.
+ */
 final class EloquentProductRepository implements ProductRepositoryInterface
 {
     private const DEFAULT_SORTABLE_COLUMNS = ['name', 'price', 'created_at'];
@@ -24,13 +27,13 @@ final class EloquentProductRepository implements ProductRepositoryInterface
     {
         $query = Product::query()
             ->where('is_visible', true)
-            ->where(function ($q) use ($criteria) {
+            ->where(static function ($builder) use ($criteria): void {
                 $term = $criteria->getQuery();
-                $q->where('name', 'like', "%{$term}%")
+                $builder->where('name', 'like', "%{$term}%")
                     ->orWhere('description', 'like', "%{$term}%")
                     ->orWhere('sku', 'like', "%{$term}%");
             })
-            ->with(['brand', 'category', 'variants']);
+            ->with(['brand', 'categories', 'variants']);
 
         $timeout = now()->addSeconds($criteria->getTimeoutSeconds());
 
@@ -48,17 +51,17 @@ final class EloquentProductRepository implements ProductRepositoryInterface
     {
         $builder = Product::query()
             ->where('is_visible', true)
-            ->with(['brand', 'category', 'variants']);
+            ->with(['brand', 'categories', 'variants']);
 
         if ($query->getCategorySlug()) {
-            $builder->whereHas('category', static function ($q) use ($query) {
-                $q->where('slug', $query->getCategorySlug());
+            $builder->whereHas('categories', static function ($relation) use ($query): void {
+                $relation->where('slug', $query->getCategorySlug());
             });
         }
 
         if ($query->getBrandSlug()) {
-            $builder->whereHas('brand', static function ($q) use ($query) {
-                $q->where('slug', $query->getBrandSlug());
+            $builder->whereHas('brand', static function ($relation) use ($query): void {
+                $relation->where('slug', $query->getBrandSlug());
             });
         }
 
@@ -70,7 +73,9 @@ final class EloquentProductRepository implements ProductRepositoryInterface
 
         $builder->orderBy($sortBy, $sortOrder);
 
-        $products = $builder->get()->map(fn (Product $product) => $this->mapToDomainProduct($product))->all();
+        $products = $builder->get()
+            ->map(fn (Product $product) => $this->mapToDomainProduct($product))
+            ->all();
 
         return new ProductCollection($products);
     }
@@ -79,7 +84,7 @@ final class EloquentProductRepository implements ProductRepositoryInterface
     {
         $product = Product::query()
             ->where('slug', $slug->getValue())
-            ->with(['brand', 'category', 'variants'])
+            ->with(['brand', 'categories', 'variants'])
             ->first();
 
         return $product ? $this->mapToDomainProduct($product) : null;
@@ -91,10 +96,10 @@ final class EloquentProductRepository implements ProductRepositoryInterface
 
         $images = new ProductImageCollection(
             $product->getMedia('images')
-                ->map(fn ($media) => new ProductImage(
+                ->map(static fn ($media) => new ProductImage(
                     $media->getUrl(),
                     $media->getUrl('thumb'),
-                    $media->getCustomProperty('alt', null)
+                    $media->getCustomProperty('alt', null),
                 ))
                 ->values()
                 ->all()
@@ -110,6 +115,19 @@ final class EloquentProductRepository implements ProductRepositoryInterface
             ))->all()
         );
 
+        $brand = $product->brand?->exists ? [
+            'id' => $product->brand->getKey(),
+            'name' => (string) $product->brand->name,
+            'slug' => (string) $product->brand->slug,
+        ] : null;
+
+        $primaryCategory = $product->categories->first();
+        $category = $primaryCategory?->exists ? [
+            'id' => $primaryCategory->getKey(),
+            'name' => (string) $primaryCategory->name,
+            'slug' => (string) $primaryCategory->slug,
+        ] : null;
+
         return new DomainProduct(
             $product->id,
             (string) $product->name,
@@ -117,13 +135,17 @@ final class EloquentProductRepository implements ProductRepositoryInterface
             (string) $product->sku,
             (float) $product->price,
             $product->sale_price !== null ? (float) $product->sale_price : null,
-            $product->brand?->name,
-            $product->category?->name,
+            $brand,
+            $category,
             (bool) $product->is_visible,
+            (bool) $product->is_featured,
+            (bool) $product->manage_stock,
+            (bool) $product->isInStock(),
             (int) ($product->stock_quantity ?? 0),
             $images,
             $variants,
             $product->description,
+            $product->short_description,
         );
     }
 }
