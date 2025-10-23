@@ -40,6 +40,7 @@ use Filament\Tables\Columns\TextColumn;
 use BackedEnum;
 use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\Filter;
+use BackedEnum;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;

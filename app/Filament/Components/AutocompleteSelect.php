@@ -61,9 +61,12 @@ final class AutocompleteSelect extends Select
     {
         parent::searchable($condition);
 
-        $this->searchable = is_array($condition)
-            ? $condition !== []
-            : (bool) $this->evaluate($condition);
+        $evaluatedCondition = $this->evaluate($condition);
+
+        $this->searchable = match (true) {
+            is_array($evaluatedCondition) => true,
+            default => (bool) $evaluatedCondition,
+        };
 
         return $this;
     }
