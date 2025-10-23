@@ -8,219 +8,111 @@ use App\Data\SearchQueryData;
 use App\Repositories\Search\BrandSearchRepository;
 use App\Repositories\Search\CategorySearchRepository;
 use App\Repositories\Search\ProductSearchRepository;
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
 
-/**
- * SearchService
- *
- * Service class containing SearchService business logic, external integrations, and complex operations with proper error handling and logging.
- */
 final class SearchService
 {
-    private const PRODUCT_RATIO = 0.6;
-
-    private const CATEGORY_RATIO = 0.25;
-
-    private const BRAND_RATIO = 0.15;
+    private CacheRepository $cache;
 
     public function __construct(
         private readonly ProductSearchRepository $productRepository,
         private readonly CategorySearchRepository $categoryRepository,
         private readonly BrandSearchRepository $brandRepository,
-        private readonly SearchRankingService $rankingService,
-        private readonly SearchCacheService $cacheService
+        ?CacheRepository $cache = null,
     ) {
+        $this->cache = $cache ?? Cache::store();
     }
 
-    /**
-     * Handle search functionality with proper error handling.
-     */
-    public function search(string|SearchQueryData $query, ?int $limit = null): array
+    public function aggregate(SearchQueryData $query, array $limits = []): array
     {
-        $isAggregated = $query instanceof SearchQueryData;
-        $queryData = $isAggregated
-            ? $query
-            : $this->legacyQueryData((string) $query, $limit);
+        $limits = $this->normalizeLimits($query, $limits);
+        $cacheKey = $this->cacheKey($query, $limits);
 
-        // Immediately short-circuit any suspicious looking queries so we do not even
-        // attempt to send them towards the database layer (defence in depth against
-        // SQL injection style payloads that might bypass upstream validation).
-        if ($this->isSuspiciousQuery($queryData->query())) {
-            return $isAggregated
-                ? $this->emptyAggregatedPayload($queryData)
-                : [];
-        }
+        return $this->cache->remember($cacheKey, now()->addSeconds(120), function () use ($query, $limits) {
+            $products = $this->productRepository->search($query, $limits['products']);
+            $categories = $this->categoryRepository->search($query, $limits['categories']);
+            $brands = $this->brandRepository->search($query, $limits['brands']);
 
-        $cachePayload = array_merge($queryData->context(), [
-            'page' => $queryData->page(),
-            'per_page' => $queryData->perPage(),
-            'types' => $queryData->types(),
-            'locale' => app()->getLocale(),
-        ]);
-        $cacheKey = $this->cacheService->generateCacheKey($queryData->query(), $cachePayload);
-
-        if ($cached = $this->cacheService->getCachedResults($cacheKey)) {
-            if (isset($cached['meta'])) {
-                $cached['meta']['cached'] = true;
-            }
-
-            return $isAggregated ? $cached : ($cached['data'] ?? []);
-        }
-
-        $started = microtime(true);
-        $buckets = $this->collectBuckets($queryData);
-        $merged = [];
-
-        foreach ($buckets as $results) {
-            $merged = array_merge($merged, $results);
-        }
-        $ranked = $this->rankingService->rankResults($merged, $queryData->query(), $queryData->context());
-        $total = count($ranked);
-        $offset = $queryData->offset();
-        $pageResults = array_slice($ranked, $offset, $queryData->perPage());
-
-        $bucketCounts = [
-            'product' => count($buckets['product'] ?? []),
-            'category' => count($buckets['category'] ?? []),
-            'brand' => count($buckets['brand'] ?? []),
-        ];
-
-        $payload = [
-            'data' => $pageResults,
-            'meta' => [
-                'query' => $queryData->query(),
-                'page' => $queryData->page(),
-                'per_page' => $queryData->perPage(),
-                'max_per_page' => SearchQueryData::MAX_PER_PAGE,
-                'total_results' => $total,
-                'returned' => count($pageResults),
-                'has_more' => ($offset + count($pageResults)) < $total,
-                'took_ms' => (int) round((microtime(true) - $started) * 1000),
-                'types' => $queryData->types(),
-                'cached' => false,
-            ],
-            'buckets' => $bucketCounts,
-        ];
-
-        $this->cacheService->cacheSearchResults($cacheKey, $payload, $queryData->query(), $cachePayload);
-
-        return $isAggregated ? $payload : $payload['data'];
+            return [
+                'products' => $products,
+                'categories' => $categories,
+                'brands' => $brands,
+                'meta' => [
+                    'query' => $query->q,
+                    'sort' => $query->sort(),
+                    'page' => $query->page(),
+                    'per_page' => $query->perPage(),
+                    'filters' => [
+                        'brand' => $query->brandIds(),
+                        'category' => $query->categoryIds(),
+                        'price_min' => $query->price_min,
+                        'price_max' => $query->price_max,
+                    ],
+                ],
+            ];
+        });
     }
 
-    /**
-     * Handle clearCache functionality with proper error handling.
-     */
+    public function search(string $term, int $limit = 10): array
+    {
+        $limit = (int) min(max($limit, 1), SearchQueryData::MAX_PER_PAGE);
+        $query = new SearchQueryData(q: $term, per_page: $limit);
+        $limits = [
+            'products' => min((int) ceil($limit * 0.6), SearchQueryData::MAX_PER_PAGE),
+            'categories' => min((int) ceil($limit * 0.2), SearchQueryData::MAX_PER_PAGE),
+            'brands' => min((int) ceil($limit * 0.2), SearchQueryData::MAX_PER_PAGE),
+        ];
+
+        $results = $this->aggregate($query, $limits);
+
+        return collect([$results['products']['items'], $results['categories']['items'], $results['brands']['items']])
+            ->collapse()
+            ->sortByDesc('score')
+            ->take($limit)
+            ->values()
+            ->map(function (array $item) {
+                $item['relevance_score'] = $item['score'];
+                unset($item['score']);
+
+                return $item;
+            })
+            ->all();
+    }
+
     public function clearCache(): void
     {
-        Cache::flush();
+        $this->cache->flush();
     }
 
-    /**
-     * @return array<string, array<int, array<string, mixed>>>
-     */
-    private function collectBuckets(SearchQueryData $queryData): array
+    public function clearSearchCache(string $query): void
     {
-        $perPage = $queryData->perPage();
-        $limits = [
-            'product' => max(1, (int) ceil($perPage * self::PRODUCT_RATIO * 2)),
-            'category' => max(1, (int) ceil($perPage * self::CATEGORY_RATIO * 2)),
-            'brand' => max(1, (int) ceil($perPage * self::BRAND_RATIO * 2)),
+        $this->cache->flush();
+    }
+
+    private function cacheKey(SearchQueryData $query, array $limits): string
+    {
+        return $this->cacheNamespace().'|'.app()->getLocale().'|'.$query->normalizedCacheKey().'|'.md5(json_encode($limits, JSON_THROW_ON_ERROR));
+    }
+
+    private function cacheNamespace(): string
+    {
+        return 'search:aggregate';
+    }
+
+    private function normalizeLimits(SearchQueryData $query, array $limits): array
+    {
+        $defaults = [
+            'products' => $query->perPage(),
+            'categories' => min(5, $query->perPage()),
+            'brands' => min(5, $query->perPage()),
         ];
 
-        $limits['product'] = max($limits['product'], $perPage);
-        $limits['category'] = max($limits['category'], (int) ceil($perPage / 2));
-        $limits['brand'] = max($limits['brand'], (int) ceil($perPage / 2));
+        $merged = array_merge($defaults, Arr::only($limits, ['products', 'categories', 'brands']));
 
-        $buckets = [];
-
-        foreach ($queryData->types() as $type) {
-            if ($type === 'product') {
-                $buckets['product'] = $this->productRepository->search($queryData, $limits['product']);
-            }
-
-            if ($type === 'category') {
-                $buckets['category'] = $this->categoryRepository->search($queryData, $limits['category']);
-            }
-
-            if ($type === 'brand') {
-                $buckets['brand'] = $this->brandRepository->search($queryData, $limits['brand']);
-            }
-        }
-
-        return $buckets;
-    }
-
-    private function legacyQueryData(string $query, ?int $limit): SearchQueryData
-    {
-        $perPage = $limit ?? SearchQueryData::DEFAULT_PER_PAGE;
-
-        return SearchQueryData::fromArray([
-            'query' => $query,
-            'page' => 1,
-            'per_page' => $perPage,
-            'types' => ['product', 'category', 'brand'],
-        ], [
-            'source' => 'legacy-search',
-            'locale' => app()->getLocale(),
-        ]);
-    }
-
-    /**
-     * Determine if the incoming query looks like an SQL injection attempt.
-     */
-    private function isSuspiciousQuery(string $query): bool
-    {
-        $normalized = Str::lower($query);
-
-        // Simple heuristics that catch the most common payload styles without
-        // being overly aggressive for legitimate catalogue searches.
-        $dangerousFragments = [
-            "' or ",
-            '" or ',
-            '--',
-            ';',
-            '/*',
-            '*/',
-            ' union ',
-            ' select ',
-        ];
-
-        foreach ($dangerousFragments as $fragment) {
-            if (str_contains($normalized, $fragment)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Build the standard aggregated payload for the suspicious query branch.
-     */
-    private function emptyAggregatedPayload(SearchQueryData $queryData): array
-    {
-        // We keep the meta structure identical to successful searches so the
-        // API contract remains predictable for callers.
-        return [
-            'data' => [],
-            'meta' => [
-                'query' => $queryData->query(),
-                'page' => $queryData->page(),
-                'per_page' => $queryData->perPage(),
-                'max_per_page' => SearchQueryData::MAX_PER_PAGE,
-                'total_results' => 0,
-                'returned' => 0,
-                'has_more' => false,
-                'took_ms' => 0,
-                'types' => $queryData->types(),
-                'cached' => false,
-            ],
-            'buckets' => [
-                'product' => 0,
-                'category' => 0,
-                'brand' => 0,
-            ],
-        ];
+        return collect($merged)
+            ->map(fn ($value) => (int) min(max((int) $value, 1), SearchQueryData::MAX_PER_PAGE))
+            ->all();
     }
 }
