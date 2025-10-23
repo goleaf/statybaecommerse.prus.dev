@@ -18,6 +18,7 @@ This snapshot complements the changelog by listing functional capabilities that 
 
 ## Latest Update
 - Brands page now features a light-themed layout, shared card components, and refreshed translations so the partner directory feels consistent across locales.
+- Region-to-city lookups and the dedicated customers table are restored for the SQLite harness, ensuring analytics sparklines, customer factories, and Filament resources can attach geographic metadata without migration errors.
 - Localized product/category routing plus collection seeding were hardened, ensuring homepage product links, category landing pages, and collection showcases load without 404s or empty states.
 - PHPUnit harness now boots a shared `database/testing.sqlite` schema (including Spatie permission tables and variant attribute pivots) and registers Filament SearchableInput payload macros so admin feature suites stay v4-compatible while reusing deterministic migrations.
 - Parallel test execution now provisions per-worker SQLite databases using Laravel's parallel token, and the SearchableInput payload macros register on demand so hydrate/sync helpers avoid TypeErrors even when the provider layer has not initialised them yet.

@@ -19,6 +19,8 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 -### Latest updates
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
+- Region-aware address tables and the dedicated `customers` dataset are back online for the SQLite harness, letting factories and
+  analytics widgets build customer journeys without missing foreign keys during PHPUnit runs.
 - SearchableInput payload macros are registered lazily with safer fallbacks, and the SQLite testing harness now spins up one
   database per parallel worker so hydrate/clear flows avoid TypeErrors and filesystem locks during `php artisan test --parallel`.
 - Brands directory now ships with a light-focused layout, shared card components, and complete EN/LT copy so visitors get a consistent multilingual experience.
