@@ -8,6 +8,7 @@ use App\Data\SearchQueryData;
 use App\Services\SearchService;
 use BackedEnum;
 use Filament\Pages\Page;
+
 final class SearchExplorer extends Page
 {
     /**

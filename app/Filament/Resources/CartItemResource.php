@@ -28,6 +28,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -159,15 +160,12 @@ final class CartItemResource extends Resource
                     // The product name is derived from the related product, therefore we never dehydrate the value.
                     TextInput::make('product_name')
                         ->label(__('cart_items.product_name'))
-                        ->readOnly()
-                        ->dehydrated(false)
-                        ->maxLength(255),
-                    // The product SKU behaves like the name above and remains display-only.
+                        ->disabled()
+                        ->dehydrated(false),
                     TextInput::make('product_sku')
                         ->label(__('cart_items.product_sku'))
-                        ->readOnly()
-                        ->dehydrated(false)
-                        ->maxLength(255),
+                        ->disabled()
+                        ->dehydrated(false),
                     Grid::make(2)
                         ->schema([
                             TextInput::make('quantity')
@@ -231,7 +229,7 @@ final class CartItemResource extends Resource
                                 ->label(__('cart_items.total'))
                                 ->prefix('€')
                                 ->disabled()
-                                ->dehydrated(),
+                                ->dehydrated(true),
                         ]),
                 ]),
             Section::make(__('cart_items.additional_info'))
