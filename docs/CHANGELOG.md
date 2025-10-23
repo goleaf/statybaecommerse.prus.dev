@@ -44,4 +44,4 @@
 - Reinstated the Husky shared bootstrap script so Git hooks run without deprecation notices or missing PATH exports during repository installs.
 - Captured the `sh -n .husky/_/husky.sh` smoke check that verifies the restored script syntax before publishing commits.
 - Removed the deprecated Husky v10 warning stub that overwrote the shim so local Git hooks keep executing through the repository toolchain instead of exiting early.
-- Pointed the Composer `test` scripts to the project-local Pest runner to keep the suite executable without global installs while preserving CI log and coverage output expectations.
+- Migrated the Address resource form and table definitions to Filament v4's Schema/Table signatures so `artisan package:discover` no longer fatals during Composer installs and reviewers can rely on the standardized admin scaffolding.
