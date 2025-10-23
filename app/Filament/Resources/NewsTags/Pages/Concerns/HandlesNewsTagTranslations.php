@@ -22,29 +22,29 @@ trait HandlesNewsTagTranslations
 
                 return [
                     $locale => [
-                        'id'          => $translation['id'] ?? null,
-                        'locale'      => $locale,
-                        'name'        => $translation['name'] ?? null,
-                        'slug'        => $translation['slug'] ?? null,
+                        'id' => $translation['id'] ?? null,
+                        'locale' => $locale,
+                        'name' => $translation['name'] ?? null,
+                        'slug' => $translation['slug'] ?? null,
                         'description' => $translation['description'] ?? null,
                     ],
                 ];
             });
 
         $translations[$defaultLocale] = [
-            'id'          => $translations[$defaultLocale]['id'] ?? null,
-            'locale'      => $defaultLocale,
-            'name'        => $data['name'] ?? $translations[$defaultLocale]['name'] ?? null,
-            'slug'        => $data['slug'] ?? $translations[$defaultLocale]['slug'] ?? null,
+            'id' => $translations[$defaultLocale]['id'] ?? null,
+            'locale' => $defaultLocale,
+            'name' => $data['name'] ?? $translations[$defaultLocale]['name'] ?? null,
+            'slug' => $data['slug'] ?? $translations[$defaultLocale]['slug'] ?? null,
             'description' => $data['description'] ?? $translations[$defaultLocale]['description'] ?? null,
         ];
 
         $data['translations'] = $translations
             ->map(function (array $translation): array {
                 $prepared = [
-                    'locale'      => $translation['locale'],
-                    'name'        => $translation['name'],
-                    'slug'        => $translation['slug'],
+                    'locale' => $translation['locale'],
+                    'name' => $translation['name'],
+                    'slug' => $translation['slug'],
                     'description' => $translation['description'] ?? null,
                 ];
 
