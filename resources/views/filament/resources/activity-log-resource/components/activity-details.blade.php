@@ -1,10 +1,15 @@
 @php
     $causerName = $activity->causer?->name ?? __('System');
     $subject = $activity->subject;
+    $subjectType = (string) $activity->subject_type;
+    $subjectTypeName = filled($subjectType)
+        ? class_basename($subjectType)
+        : __('N/A');
+
     $subjectName = $subject && method_exists($subject, 'getAttribute')
-        ? ($subject->getAttribute('name') ?? class_basename($activity->subject_type))
-        : class_basename((string) $activity->subject_type);
-    $properties = collect($activity->properties ?? []);
+        ? ($subject->getAttribute('name') ?? $subjectTypeName)
+        : $subjectTypeName;
+    $properties = collect($activity->properties?->toArray() ?? []);
 @endphp
 
 <div class="space-y-4">
