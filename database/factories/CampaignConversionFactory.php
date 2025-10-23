@@ -28,9 +28,10 @@ final class CampaignConversionFactory extends Factory
             'customer_id'      => User::factory(),
             'conversion_type'  => $this->faker->randomElement(['purchase', 'signup', 'download', 'subscription', 'lead', 'custom']),
             'conversion_value' => $this->faker->randomFloat(2, 10, 1000),
-            'status' => $this->faker->randomElement(['completed', 'pending', 'confirmed', 'cancelled']),
-            'converted_at' => now(),
-            'session_id' => $this->faker->uuid(),
+            'status'           => $this->faker->randomElement(['completed', 'pending', 'confirmed', 'cancelled']),
+            // Keep conversion timestamps near "now" so date-based scopes and tests remain stable.
+            'converted_at'    => now()->subHours($this->faker->numberBetween(0, 12)),
+            'session_id'      => $this->faker->uuid(),
             'conversion_data' => [
                 'source'        => $this->faker->randomElement(['google', 'facebook', 'twitter', 'linkedin']),
                 'campaign_name' => $this->faker->words(3, true),
