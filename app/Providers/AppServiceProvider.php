@@ -21,6 +21,7 @@ use App\Observers\UserAttributionObserver;
 use App\Services\CacheInvalidationService;
 use App\Services\DocumentService;
 use App\Support\Filament\SearchableComponentHelper;
+use App\Support\Cache\TestingAwareRateLimiter;
 use App\Support\Filesystem\GracefulFilesystem;
 use App\Support\Health\HealthReporter;
 use App\Support\Html\HtmlSanitizer;
@@ -47,6 +48,7 @@ use Filament\Tables\Testing\TestsSummaries;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
@@ -72,6 +74,7 @@ use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Illuminate\Cache\RateLimiter as RateLimiterManager;
 
 use function in_array;
 
@@ -99,6 +102,24 @@ class AppServiceProvider extends ServiceProvider
         // Replace the default filesystem binding with the graceful shim for deterministic backup tests.
         $this->app->singleton(Filesystem::class, static fn (): Filesystem => new GracefulFilesystem);
         $this->app->alias(Filesystem::class, 'files');
+
+        $this->app->extend(RateLimiterManager::class, function (RateLimiterManager $limiter, $app): RateLimiterManager {
+            if ($limiter instanceof TestingAwareRateLimiter) {
+                return $limiter;
+            }
+
+            $cacheStore = (function (): Repository {
+                return $this->cache;
+            })->call($limiter);
+
+            $limiters = (function (): array {
+                return $this->limiters;
+            })->call($limiter);
+
+            return new TestingAwareRateLimiter($cacheStore, $limiters);
+        });
+
+        RateLimiter::clearResolvedInstance(RateLimiterManager::class);
 
         if ($this->app->runningInConsole()) {
             // Register import utilities and override the core db:seed command with a profiled variant.

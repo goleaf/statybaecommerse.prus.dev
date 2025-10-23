@@ -24,7 +24,12 @@ final class PartnerApiAuthenticate
             return $this->unauthorizedResponse();
         }
 
-        $query = ApiKey::query()->where('key', $keyValue)->where('is_active', true);
+        $query = ApiKey::query()
+            ->where(function ($builder) use ($keyValue): void {
+                // Accept both hashed and plain text keys so older partner integrations continue to work.
+                $builder->where('key', $keyValue)->orWhere('key', ApiKey::hashKey($keyValue));
+            })
+            ->where('is_active', true);
 
         if ($secretValue !== null) {
             $query->where(function ($builder) use ($secretValue): void {
@@ -39,9 +44,11 @@ final class PartnerApiAuthenticate
             return $this->unauthorizedResponse();
         }
 
-        $apiKey->forceFill(['last_used_at' => now()])->save();
+        $apiKey->forceFill(['last_used_at' => now()])->saveQuietly();
 
         $request->attributes->set('partner_api_key', $apiKey);
+        $request->attributes->set('partner_api_abilities', $apiKey->resolvedScopes());
+        $request->attributes->set('partner_api_legacy_pipeline', true);
 
         return $next($request);
     }

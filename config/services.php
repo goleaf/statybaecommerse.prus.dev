@@ -43,7 +43,11 @@ return [
 
     'partner_api' => [
         'header' => env('PARTNER_API_HEADER', 'X-Api-Key'),
+        // Support the legacy partner integration headers while keeping the new configuration in place.
+        'key_header' => env('PARTNER_API_KEY_HEADER', 'X-Partner-Key'),
+        'secret_header' => env('PARTNER_API_SECRET_HEADER', 'X-Partner-Secret'),
         'rate_limit' => [
+            'max_attempts' => (int) env('PARTNER_API_RATE_LIMIT_MAX_ATTEMPTS', 60),
             'decay_seconds' => (int) env('PARTNER_API_RATE_LIMIT_DECAY', 60),
         ],
     ],

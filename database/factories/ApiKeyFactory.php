@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Enums\ApiKeyScope;
 use App\Models\ApiKey;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -17,24 +16,17 @@ final class ApiKeyFactory extends Factory
 
     public function definition(): array
     {
-        $cases = ApiKeyScope::cases();
-
-        $scopes = collect($cases)
-            ->shuffle()
-            ->take(random_int(1, count($cases)))
-            ->map(static fn (ApiKeyScope $scope): string => $scope->value)
-            ->values()
-            ->all();
-
         $credentials = ApiKey::generateCredentials();
 
         return [
             'name' => sprintf('%s API Access', $this->faker->company()),
             'key' => $credentials['hashed'],
             'secret' => ApiKey::generatePlainTextSecret(),
-            'scopes' => array_values($scopes),
+            // Leave scopes and permissions empty by default so tests can opt in to whichever convention they require.
+            'scopes' => null,
             'permissions' => null,
-            'rate_limit' => $this->faker->numberBetween(100, 1000),
+            // Default to no explicit rate limit so configuration values drive the throttle behaviour unless tests override it.
+            'rate_limit' => null,
             'is_active' => true,
             'last_used_at' => $this->faker->optional()->dateTimeBetween('-1 month', 'now'),
         ];

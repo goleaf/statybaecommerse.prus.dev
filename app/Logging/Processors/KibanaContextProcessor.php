@@ -34,7 +34,16 @@ final class KibanaContextProcessor
             'environment' => $environment,
         ];
 
-        if ($pid !== false) {
+        $pid = null;
+
+        if (function_exists('posix_getpid')) {
+            // Prefer posix_getpid when available because it avoids triggering warnings on systems without pcntl.
+            $pid = posix_getpid();
+        } elseif (function_exists('getmypid')) {
+            $pid = getmypid();
+        }
+
+        if (is_int($pid) && $pid > 0) {
             $extra['process'] = [
                 'pid' => $pid,
             ];

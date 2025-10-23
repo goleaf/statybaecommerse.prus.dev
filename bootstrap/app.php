@@ -75,7 +75,8 @@ $app = Application::configure(basePath: dirname(__DIR__))
             'permissions'            => Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission'     => Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'localize'               => App\Http\Middleware\SetLocale::class,
-            'partner.api'            => App\Http\Middleware\EnsurePartnerApiKey::class,
+            // Provide a backwards-compatible alias that mirrors the legacy partner API authentication flow.
+            'partner.api'            => App\Http\Middleware\PartnerApiAuthenticate::class,
             'partner.api.auth'       => App\Http\Middleware\EnsurePartnerApiKey::class,
             'partner.api.scope'      => App\Http\Middleware\EnsurePartnerApiScope::class,
             'partner.api.rate_limit' => App\Http\Middleware\EnsurePartnerApiRateLimit::class,

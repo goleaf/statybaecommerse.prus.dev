@@ -23,14 +23,21 @@ final class EnsurePartnerApiRateLimit
             return $next($request);
         }
 
-        $limit = $apiKey->rate_limit;
+        $limitConfig = (array) config('services.partner_api.rate_limit', []);
+        $limit = is_numeric($apiKey->rate_limit ?? null) ? (int) $apiKey->rate_limit : null;
+
+        if ($limit === null || $limit <= 0) {
+            // Fall back to the global configuration when the credential does not define a bespoke limit.
+            $configuredAttempts = data_get($limitConfig, 'max_attempts');
+            $limit = is_numeric($configuredAttempts) ? (int) $configuredAttempts : null;
+        }
 
         if ($limit === null || $limit <= 0) {
             return $next($request);
         }
 
         $rateLimiterKey = $apiKey->rateLimiterKey();
-        $configuredDecay = config('services.partner_api.rate_limit.decay_seconds', 60);
+        $configuredDecay = data_get($limitConfig, 'decay_seconds', 60);
         $decaySeconds = is_numeric($configuredDecay) ? (int) $configuredDecay : 60;
 
         if (RateLimiter::tooManyAttempts($rateLimiterKey, $limit)) {

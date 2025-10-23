@@ -30,8 +30,12 @@ final class EnsurePartnerApiScope
         $normalizedScopes = array_values($scopes);
 
         if (! $apiKey->hasAnyScope($normalizedScopes)) {
+            $legacyResponses = (bool) $request->attributes->get('partner_api_legacy_pipeline', false);
+
             // Communicate that the key exists but does not satisfy the requested scope set.
-            return $this->reject('Insufficient partner API permissions.', Response::HTTP_FORBIDDEN);
+            $message = $legacyResponses ? 'Forbidden.' : 'Insufficient partner API permissions.';
+
+            return $this->reject($message, Response::HTTP_FORBIDDEN);
         }
 
         $request->attributes->set('partner_api_required_scopes', $normalizedScopes);
