@@ -7,10 +7,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Support\Contracts\Entities\CategoryContract;
-use App\Traits\HandlesContentNegotiation;
 use App\Support\ListQuery\ListQueryDefinition;
 use App\Support\ListQuery\ListQueryValidator;
 use App\Support\ListQuery\ListResponse;
+use App\Traits\HandlesContentNegotiation;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -47,49 +47,47 @@ final class CategoryController extends Controller
      */
     public function index(Request $request): JsonResponse|View|Response
     {
-        $definition = $this->categoryListDefinition();
+        $definition = new ListQueryDefinition(
+            filters: [
+                'search' => [
+                    'type' => 'string',
+                    'callback' => static function (Builder $builder, string $term): void {
+                        $builder->where(function (Builder $query) use ($term): void {
+                            $query->where('name', 'like', "%{$term}%")
+                                ->orWhere('description', 'like', "%{$term}%");
+                        });
+                    },
+                ],
+            ],
+            sortable: [
+                'name' => ['column' => 'categories.name'],
+                'sort_order' => ['column' => 'categories.sort_order'],
+            ],
+            defaultSort: 'sort_order',
+            defaultDirection: 'asc',
+            defaultPerPage: 20,
+            maxPerPage: 100,
+        );
+
         $listQuery = ListQueryValidator::fromRequest($request, $definition);
 
-        $query = Category::query()
-            ->where('is_visible', true)
-            ->withCount('products');
+        $query = Category::query()->where('is_visible', true)->withCount('products');
+        $listQuery->applyFilters($query);
+        $listQuery->applySorts($query);
 
-        $paginator = $listQuery->apply($query, $definition);
-
-        $response = ListResponse::fromPaginator(
-            $paginator,
-            $listQuery,
-            static fn (Category $category): array => [
-                'id' => $category->id,
-                'name' => $category->name,
-                'slug' => $category->slug,
-                'description' => $category->description,
-                'sort_order' => $category->sort_order,
-                'is_visible' => (bool) $category->is_visible,
-                'product_count' => $category->products_count ?? 0,
-            ],
-        );
-
-        if ($request->accepts(['application/json', 'text/json'])) {
-            return response()->json([
-                'success' => true,
-                'data' => $response['data'],
-                'meta' => $response['meta'],
-                'links' => $response['links'],
-            ]);
+        if (! $listQuery->hasSort('sort_order')) {
+            $query->orderBy('sort_order');
         }
 
-        return $this->handleCategoryContentNegotiation(
-            $request,
-            $paginator->getCollection(),
-            null,
-            [
-                'pagination' => $response['meta']['pagination'],
-                'sorting' => $response['meta']['sort'],
-                'filters' => $response['meta']['filters'],
-                'links' => $response['links'],
-            ],
-        );
+        if (! $listQuery->hasSort('name')) {
+            $query->orderBy('name');
+        }
+
+        $categories = $query->paginate($listQuery->perPage(), ['*'], 'page', $listQuery->page());
+
+        $payload = CategoryContract::forCollection($categories, ListResponse::meta($listQuery, $categories));
+
+        return $this->respondWithContract($request, $payload);
     }
 
     /**

@@ -4,21 +4,37 @@ declare(strict_types=1);
 
 namespace App\Support\ListQuery;
 
-use Closure;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * @phpstan-type AppliedFilter array{
+ *     key: string,
+ *     value: mixed,
+ *     column: string|null,
+ *     operator: string,
+ *     callback: (callable(Builder, mixed): void)|null,
+ * }
+ * @phpstan-type AppliedSort array{
+ *     key: string,
+ *     column: string,
+ *     direction: string,
+ * }
+ */
 final class ListQuery
 {
     /**
+     * @param array<int, AppliedFilter> $filterDefinitions
+     * @param array<int, AppliedSort> $sortDefinitions
      * @param array<string, mixed> $filters
+     * @param array<int, array{key: string, direction: string}> $sorts
      */
     public function __construct(
         private readonly int $page,
         private readonly int $perPage,
-        private readonly string $sortBy,
-        private readonly string $sortDirection,
+        private readonly array $filterDefinitions,
+        private readonly array $sortDefinitions,
         private readonly array $filters,
+        private readonly array $sorts,
     ) {}
 
     public function page(): int
@@ -31,14 +47,45 @@ final class ListQuery
         return $this->perPage;
     }
 
-    public function sortBy(): string
+    /**
+     * Apply the configured filters to the query builder.
+     */
+    public function applyFilters(Builder $builder): Builder
     {
-        return $this->sortBy;
+        foreach ($this->filterDefinitions as $filter) {
+            if ($filter['callback'] !== null) {
+                ($filter['callback'])($builder, $filter['value']);
+                continue;
+            }
+
+            if ($filter['column'] === null) {
+                continue;
+            }
+
+            $builder->where($filter['column'], $filter['operator'], $filter['value']);
+        }
+
+        return $builder;
     }
 
-    public function sortDirection(): string
+    /**
+     * Apply the configured sorts to the query builder.
+     */
+    public function applySorts(Builder $builder): Builder
     {
-        return $this->sortDirection;
+        foreach ($this->sortDefinitions as $sort) {
+            $builder->orderBy($sort['column'], $sort['direction']);
+        }
+
+        return $builder;
+    }
+
+    /**
+     * Apply both filters and sorts to the query builder.
+     */
+    public function apply(Builder $builder): Builder
+    {
+        return $this->applySorts($this->applyFilters($builder));
     }
 
     /**
@@ -50,132 +97,26 @@ final class ListQuery
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<int, array{key: string, direction: string}>
      */
-    public function activeFilters(): array
+    public function sorts(): array
     {
-        return array_filter(
-            $this->filters,
-            static function ($value): bool {
-                if ($value === null) {
-                    return false;
-                }
+        return $this->sorts;
+    }
 
-                if (is_string($value)) {
-                    return $value !== '';
-                }
-
-                if (is_array($value)) {
-                    return count($value) > 0;
-                }
-
+    public function hasSort(string $key): bool
+    {
+        foreach ($this->sorts as $sort) {
+            if ($sort['key'] === $key) {
                 return true;
-            },
-        );
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function toQueryParameters(): array
-    {
-        return array_merge([
-            'page' => $this->page,
-            'per_page' => $this->perPage,
-            'sort_by' => $this->sortBy,
-            'sort_dir' => $this->sortDirection,
-        ], $this->filters);
-    }
-
-    public function apply(Builder $builder, ListQueryDefinition $definition): LengthAwarePaginator
-    {
-        $this->applyFilters($builder, $definition);
-        $this->applySorting($builder, $definition);
-
-        $paginator = $builder->paginate($this->perPage, ['*'], 'page', $this->page);
-
-        return $paginator->appends($this->toQueryParameters());
-    }
-
-    private function applyFilters(Builder $builder, ListQueryDefinition $definition): void
-    {
-        foreach ($this->activeFilters() as $name => $value) {
-            $filter = $definition->getFilter($name);
-
-            if ($filter === null) {
-                continue;
             }
-
-            $this->applyFilter($builder, $filter, $value);
         }
+
+        return false;
     }
 
-    /**
-     * @param array{column?: string, type?: string, operator?: string, callback?: Closure, scope?: string, nullable?: bool, allowed?: array<int, string|int|float>, enum?: class-string} $filter
-     */
-    private function applyFilter(Builder $builder, array $filter, mixed $value): void
+    public function filterValue(string $key, mixed $default = null): mixed
     {
-        if (isset($filter['callback']) && $filter['callback'] instanceof Closure) {
-            ($filter['callback'])($builder, $value);
-
-            return;
-        }
-
-        if (isset($filter['scope'])) {
-            $builder->{$filter['scope']}($value);
-
-            return;
-        }
-
-        $column = $filter['column'] ?? null;
-
-        if ($column === null) {
-            return;
-        }
-
-        $operator = $filter['operator'] ?? '=';
-
-        if ($operator === 'in') {
-            $builder->whereIn($column, is_array($value) ? $value : [$value]);
-
-            return;
-        }
-
-        if ($operator === 'like') {
-            $builder->where($column, 'like', '%'.$value.'%');
-
-            return;
-        }
-
-        $builder->where($column, $operator, $value);
-    }
-
-    private function applySorting(Builder $builder, ListQueryDefinition $definition): void
-    {
-        $sortDefinition = $definition->getSort($this->sortBy);
-
-        if ($sortDefinition === null) {
-            $builder->orderBy($this->sortBy, $this->sortDirection);
-
-            return;
-        }
-
-        if (isset($sortDefinition['callback']) && $sortDefinition['callback'] instanceof Closure) {
-            ($sortDefinition['callback'])($builder, $this->sortDirection);
-
-            return;
-        }
-
-        $columns = $sortDefinition['column'] ?? $this->sortBy;
-
-        if (is_array($columns)) {
-            foreach ($columns as $column) {
-                $builder->orderBy($column, $this->sortDirection);
-            }
-
-            return;
-        }
-
-        $builder->orderBy($columns, $this->sortDirection);
+        return $this->filters[$key] ?? $default;
     }
 }
