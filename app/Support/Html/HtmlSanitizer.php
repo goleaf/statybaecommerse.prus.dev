@@ -42,15 +42,15 @@ final class HtmlSanitizer
 
         // Define the attributes that are safe to keep on a per-element basis.
         $this->allowedAttributes = [
-            'a' => ['href', 'title', 'target', 'rel'],
-            'img' => ['src', 'alt', 'title', 'width', 'height', 'loading'],
-            'table' => ['summary'],
-            'th' => ['scope', 'colspan', 'rowspan'],
-            'td' => ['colspan', 'rowspan'],
-            'ol' => ['start', 'type', 'reversed'],
-            'ul' => ['type'],
+            'a'          => ['href', 'title', 'target', 'rel'],
+            'img'        => ['src', 'alt', 'title', 'width', 'height', 'loading'],
+            'table'      => ['summary'],
+            'th'         => ['scope', 'colspan', 'rowspan'],
+            'td'         => ['colspan', 'rowspan'],
+            'ol'         => ['start', 'type', 'reversed'],
+            'ul'         => ['type'],
             'blockquote' => ['cite'],
-            'q' => ['cite'],
+            'q'          => ['cite'],
         ];
 
         // Allow a minimal global attribute set for accessibility and CSS hooks.
@@ -74,8 +74,8 @@ final class HtmlSanitizer
 
         try {
             $document->loadHTML(
-                '<?xml encoding="utf-8" ?><div>'.$trimmed.'</div>',
-                LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_COMPACT
+                '<?xml encoding="utf-8" ?><div>' . $trimmed . '</div>',
+                LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_COMPACT,
             );
         } finally {
             libxml_clear_errors();
@@ -141,7 +141,7 @@ final class HtmlSanitizer
         }
 
         if ($tag === 'a' && $element->hasAttribute('href')) {
-            $rel = trim($element->getAttribute('rel'). ' noopener noreferrer');
+            $rel = trim($element->getAttribute('rel') . ' noopener noreferrer');
             $rel = implode(' ', array_unique(array_filter(explode(' ', $rel))));
             $element->setAttribute('rel', $rel);
         }

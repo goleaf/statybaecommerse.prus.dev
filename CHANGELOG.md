@@ -18,6 +18,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Ensured the User Product Interaction Filament resource now returns concrete `Form`/`Table` instances so Filament v4 boots without schema contract errors during analytics validation.
 * Normalized Filament navigation icon overrides to rely on docblocks, consolidated variant stock danger badges, and refreshed the `data:import` command metadata to resolve regressions from PR #1098.
 * Smoothed out User Product Interaction rating badges and filter option spacing so Filament v4 renders the analytics table without concatenation warnings spotted while reviewing PR #1097.
+* Introduced a reusable HTML sanitization pipeline with a maintenance command, model hooks, and storefront renderer updates to harden product and legal content.
 
 ### Bug Fixes
 * Ensured the price list discount filter only surfaces items where the compare price actually exceeds the net price and added coverage to guard the behaviour going forward.

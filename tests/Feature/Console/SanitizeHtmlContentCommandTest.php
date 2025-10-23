@@ -19,27 +19,27 @@ final class SanitizeHtmlContentCommandTest extends TestCase
     {
         // Seed intentionally unsafe markup across product and translation records.
         $product = Product::factory()->create([
-            'description' => '<p>Good</p><script>alert(1)</script>',
+            'description'       => '<p>Good</p><script>alert(1)</script>',
             'short_description' => '<span onclick="doBad()">Summary</span>',
-            'is_visible' => true,
-            'status' => 'active',
-            'published_at' => now(),
+            'is_visible'        => true,
+            'status'            => 'active',
+            'published_at'      => now(),
         ]);
 
         ProductTranslation::factory()->create([
-            'product_id' => $product->id,
-            'locale' => 'en',
-            'description' => '<div><iframe src="https://evil.test"></iframe><p>Trusted</p></div>',
+            'product_id'        => $product->id,
+            'locale'            => 'en',
+            'description'       => '<div><iframe src="https://evil.test"></iframe><p>Trusted</p></div>',
             'short_description' => '<span style="color:red" onclick="doBad()">Short</span>',
-            'summary' => '<section data-test="ok">Summary<script>alert(1)</script></section>',
+            'summary'           => '<section data-test="ok">Summary<script>alert(1)</script></section>',
         ]);
 
         $legal = Legal::factory()->create();
 
         LegalTranslation::factory()->create([
             'legal_id' => $legal->id,
-            'locale' => 'en',
-            'content' => '<section><h2>Title</h2><script>alert(1)</script><p data-safe="1">Body</p></section>',
+            'locale'   => 'en',
+            'content'  => '<section><h2>Title</h2><script>alert(1)</script><p data-safe="1">Body</p></section>',
         ]);
 
         $this->artisan('maintenance:sanitize-html')->assertExitCode(0);
