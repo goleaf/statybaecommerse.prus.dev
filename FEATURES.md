@@ -21,6 +21,7 @@ This snapshot complements the changelog by listing functional capabilities that 
 - API search now short-circuits suspicious payloads and boosts exact-title matches so catalogue lookups stay precise while SQL injection attempts return empty responses.
 - Search experiences normalise mixed-case `types[]` filters so targeted product/category/brand lookups keep the requested scope even when storefront clients send capitalised identifiers.
 - The custom Edit Profile page now imports `Filament\\Schemas\\Schema`, keeping Filament authentication tooling aligned with v4 expectations and eliminating namespace-related fatal errors during automated runs.
+- Discount Redemption admin tooling now groups under Marketing with a warning navigation badge, uses Filament v4 badge styling for status indicators, and ships with a HasTable-aware Pest harness so table schemas build successfully during tests.
 - Pest-powered test helpers now wrap the `login()` helper in a function-existence guard so repeated bootstrap cycles during `php artisan test` runs avoid fatal redeclaration errors.
 - Order lifecycle tooling now recognises the expanded `orders.status` enum (including confirmed, completed, and returned flows), keeping admin filters and demo seeds consistent without MySQL truncation warnings during fresh installs.
 - Introduced a baseline `customer_groups` table so every subsequent enhancement (extra fields, translations, soft deletes) can execute successfully during fresh database provisions and automated refresh cycles.
