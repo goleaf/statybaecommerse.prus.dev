@@ -27,7 +27,9 @@ use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Filament\Schemas\Schema;
+use Illuminate\Support\Str;
+use JsonException;
+use Stringable;
 
 use Filament\Schemas\Schema;
 final class AttributeResource extends Resource
@@ -39,7 +41,7 @@ final class AttributeResource extends Resource
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
-    public static function getNavigationGroup(): string|UnitEnum|null
+    public static function getNavigationGroup(): string
     {
         return 'Products';
     }
@@ -148,13 +150,54 @@ final class AttributeResource extends Resource
                         ->label(__('attributes.validation_rules'))
                         ->helperText(__('attributes.validation_rules_help'))
                         ->placeholder('required|min:3')
-                        ->formatStateUsing(static function ($state): ?string {
+                        ->formatStateUsing(static function (mixed $state): ?string {
                             // Avoid leaking raw JSON to the interface by presenting array payloads as comma-separated strings.
                             if (is_array($state)) {
-                                return implode(', ', array_map(static fn ($rule): string => (string) $rule, $state));
+                                return implode(', ', array_map(
+                                    static function (mixed $rule): string {
+                                        if (is_string($rule)) {
+                                            return $rule;
+                                        }
+
+                                        if (is_numeric($rule)) {
+                                            return (string) $rule;
+                                        }
+
+                                        if ($rule instanceof Stringable) {
+                                            return (string) $rule;
+                                        }
+
+                                        try {
+                                            return json_encode($rule, JSON_THROW_ON_ERROR);
+                                        } catch (JsonException) {
+                                            return '';
+                                        }
+                                    },
+                                    $state
+                                ));
                             }
 
-                            return $state;
+                            if ($state === null) {
+                                return null;
+                            }
+
+                            if (is_string($state)) {
+                                return $state;
+                            }
+
+                            if (is_numeric($state)) {
+                                return (string) $state;
+                            }
+
+                            if ($state instanceof Stringable) {
+                                return (string) $state;
+                            }
+
+                            try {
+                                return json_encode($state, JSON_THROW_ON_ERROR);
+                            } catch (JsonException) {
+                                return null;
+                            }
                         })
                         ->dehydrateStateUsing(static function ($state) {
                             // When authors enter multiple rules separated by commas we hydrate them back into an array so the
@@ -210,23 +253,7 @@ final class AttributeResource extends Resource
                                 ->default(0),
                             Select::make('group_name')
                                 ->label(__('attributes.group'))
-                                ->options([
-                                    // Legacy / factory-generated group names
-                                    'basic_info'      => 'basic_info',
-                                    'technical_specs' => 'technical_specs',
-                                    'materials'       => 'materials',
-                                    'features'        => 'features',
-                                    'compatibility'   => 'compatibility',
-                                    'warranty'        => 'warranty',
-                                    // Current UI groups
-                                    'general'    => __('attributes.groups.general'),
-                                    'technical'  => __('attributes.groups.technical'),
-                                    'appearance' => __('attributes.groups.appearance'),
-                                    'dimensions' => __('attributes.groups.dimensions'),
-                                    'shipping'   => __('attributes.groups.shipping'),
-                                    'seo'        => __('attributes.groups.seo'),
-                                    'other'      => __('attributes.groups.other'),
-                                ])
+                                ->options(static fn (): array => self::getGroupOptions())
                                 ->default('general'),
                         ]),
                 ]),
@@ -272,9 +299,7 @@ final class AttributeResource extends Resource
                     }),
                 TextColumn::make('group_name')
                     ->label(__('attributes.group'))
-                    ->formatStateUsing(fn (?string $state): string => $state
-                        ? __("attributes.groups.{$state}")
-                        : __('attributes.none'))
+                    ->formatStateUsing(static fn (?string $state): string => self::translateGroupName($state))
                     ->color('gray')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('options_count')
@@ -328,15 +353,7 @@ final class AttributeResource extends Resource
                         'url'         => __('attributes.types.url'),
                     ]),
                 SelectFilter::make('group_name')
-                    ->options([
-                        'general'    => __('attributes.groups.general'),
-                        'technical'  => __('attributes.groups.technical'),
-                        'appearance' => __('attributes.groups.appearance'),
-                        'dimensions' => __('attributes.groups.dimensions'),
-                        'shipping'   => __('attributes.groups.shipping'),
-                        'seo'        => __('attributes.groups.seo'),
-                        'other'      => __('attributes.groups.other'),
-                    ]),
+                    ->options(static fn (): array => self::getGroupOptions()),
                 TernaryFilter::make('is_required')
                     ->trueLabel(__('attributes.required_only'))
                     ->falseLabel(__('attributes.optional_only'))
@@ -448,5 +465,56 @@ final class AttributeResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->withoutGlobalScopes();
+    }
+
+    /**
+     * Provide consistent labels for both legacy and modern group names while preserving translations when present.
+     *
+     * @return array<string, string>
+     */
+    private static function getGroupOptions(): array
+    {
+        // Combining legacy slugs with the current UI groups keeps seeded factories and historical data functional.
+        $groups = [
+            'basic_info',
+            'technical_specs',
+            'materials',
+            'features',
+            'compatibility',
+            'warranty',
+            'general',
+            'technical',
+            'appearance',
+            'dimensions',
+            'shipping',
+            'seo',
+            'other',
+        ];
+
+        return collect($groups)
+            ->mapWithKeys(static fn (string $group): array => [
+                $group => self::translateGroupName($group),
+            ])
+            ->all();
+    }
+
+    /**
+     * Translate a group name while gracefully handling null values and missing translations.
+     */
+    private static function translateGroupName(?string $state): string
+    {
+        if ($state === null || $state === '') {
+            return __('attributes.none');
+        }
+
+        $translationKey = "attributes.groups.{$state}";
+        $translated = __($translationKey);
+
+        if ($translated !== $translationKey) {
+            return $translated;
+        }
+
+        // Fallback to a human readable label if no translation exists (legacy factory data uses snake_case values).
+        return Str::of($state)->headline()->value();
     }
 }
