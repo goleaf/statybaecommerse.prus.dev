@@ -48,6 +48,10 @@ class AuthServiceProvider extends ServiceProvider
                 return true;
             }
 
+            if (property_exists($user, 'is_admin') && (bool) $user->is_admin) {
+                return true;
+            }
+
             return null;
         });
 
