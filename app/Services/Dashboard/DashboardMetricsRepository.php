@@ -8,7 +8,6 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Scopes\ActiveScope;
 use App\Models\User;
-use App\Support\Cache\CacheKeys;
 use Carbon\CarbonImmutable;
 use Closure;
 use Illuminate\Support\Facades\Cache;
@@ -24,11 +23,10 @@ final class DashboardMetricsRepository
 
             return Order::query()
                 ->withoutGlobalScopes([ActiveScope::class])
-                // Wrap the daily window in the created_at scope to leverage the standalone index.
-                ->createdBetween($startOfDay, $endOfDay)
+                ->whereBetween('created_at', [$startOfDay, $endOfDay])
                 ->whereNull('deleted_at')
                 ->count();
-        }, [CacheKeys::orderAggregateTag()]);
+        });
     }
 
     public function revenueLastSevenDays(): float
@@ -41,13 +39,12 @@ final class DashboardMetricsRepository
             $total = Order::query()
                 ->withoutGlobalScopes([ActiveScope::class])
                 ->when($statuses !== [], fn ($query) => $query->whereIn('status', $statuses))
-                // Pivot to the createdSince scope so the revenue rollup stays aligned with the index.
-                ->createdSince($startDate)
+                ->where('created_at', '>=', $startDate)
                 ->whereNull('deleted_at')
                 ->sum('total');
 
             return (float) $total;
-        }, [CacheKeys::orderAggregateTag()]);
+        });
     }
 
     public function newUsersToday(): int
@@ -61,7 +58,7 @@ final class DashboardMetricsRepository
                 ->whereBetween('created_at', [$startOfDay, $endOfDay])
                 ->whereNull('deleted_at')
                 ->count();
-        }, [CacheKeys::userAggregateTag()]);
+        });
     }
 
     public function lowStockItems(): int
@@ -73,32 +70,25 @@ final class DashboardMetricsRepository
                 ->withoutGlobalScopes([ActiveScope::class])
                 ->where('manage_stock', true)
                 ->whereNull('deleted_at')
-                ->where(function ($query) use ($threshold): void {
-                    $query->where(function ($innerQuery): void {
+                ->where(function ($query) use ($threshold) {
+                    $query->where(function ($innerQuery) {
                         $innerQuery
                             ->whereNotNull('low_stock_threshold')
                             ->whereColumn('stock_quantity', '<=', 'low_stock_threshold');
-                    })->orWhere(function ($innerQuery) use ($threshold): void {
+                    })->orWhere(function ($innerQuery) use ($threshold) {
                         $innerQuery
                             ->whereNull('low_stock_threshold')
                             ->where('stock_quantity', '<=', $threshold);
                     });
                 })
                 ->count();
-        }, [CacheKeys::productAggregateTag()]);
+        });
     }
 
-    private function remember(string $key, Closure $callback, array $tags = []): mixed
+    private function remember(string $key, Closure $callback): mixed
     {
-        $ttl = (int) Config::get('dashboard.cache_ttl', CacheKeys::TTL_MINUTE);
-        $ttl = $ttl > 0 ? $ttl : CacheKeys::TTL_MINUTE;
-        $cacheKey = CacheKeys::dashboardMetric($key, app()->getLocale());
-
-        if (Cache::supportsTags()) {
-            $tagSet = array_values(array_unique(array_merge([CacheKeys::dashboardTag()], $tags)));
-
-            return Cache::tags($tagSet)->remember($cacheKey, now()->addSeconds($ttl), $callback);
-        }
+        $ttl = (int) Config::get('dashboard.cache_ttl', 60);
+        $cacheKey = sprintf('dashboard.metrics.%s.%s', app()->getLocale(), $key);
 
         return Cache::remember($cacheKey, now()->addSeconds($ttl), $callback);
     }
