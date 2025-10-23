@@ -25,6 +25,7 @@
 - Weekly Dependabot runs now open dependency pull requests pre-labeled for triage and auto-merge when safe, tightening our update cadence without manual babysitting.
 - `scripts/upgrade_filament_schema.php` now updates navigation icon docblocks automatically while refactoring `form`, `infolist`, and `table` signatures, making repeated schema migrations safe for the entire Filament tree.
 - The `data:import` Artisan command now documents its signature and description directly on the command class, improving discoverability via `php artisan list`.
+- Legacy diagnostics artisan commands were retired in favour of PHPUnit suites guarded by a configurable coverage extension and Paratest-aware composer scripts, making quality checks part of every test run.
 
 ## API experience
 - Problem+JSON responses now include the shared `error.rate_limited` code for HTTP 429 throttling scenarios, helping integrators react uniformly when the throttle middleware triggers.

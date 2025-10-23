@@ -232,9 +232,15 @@
         "filament:fix-simple": [
             "@php artisan filament:fix-simple-issues"
         ],
-        "app:test-analytics": "phpunit --configuration phpunit.xml --filter AnalyticsEventSmokeTest",
-        "app:test-brand": "phpunit --configuration phpunit.xml --filter BrandResourceMetadataTest",
-        "app:test-seeders": "phpunit --configuration phpunit.xml --filter DiagnosticSeedersTest"
+        "app:test-analytics": [
+            "@php vendor/bin/phpunit --testsuite=Unit --filter=AnalyticsEventDiagnosticsTest"
+        ],
+        "app:test-brand": [
+            "@php vendor/bin/phpunit --testsuite=Unit --filter=BrandResourceMetadataTest"
+        ],
+        "app:test-seeders": [
+            "@php vendor/bin/phpunit --testsuite=Feature --filter=DiagnosticsSeedersTest"
+        ]
     },
     "extra": {
         "laravel": {
