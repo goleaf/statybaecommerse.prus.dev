@@ -21,6 +21,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - Expanded the currency schema and demo country seeder so multilingual fields, activation flags, and translation records stay in sync, keeping `php artisan migrate:fresh --seed` reliable on both SQLite and MySQL setups.
 - Added an initial `customer_groups` table migration so downstream enhancements (missing fields, soft deletes, translations) run without errors during `php artisan migrate:fresh --seed` on clean environments.
 - Stock reservation migrations now stage foreign keys after their parent tables exist, preventing `php artisan migrate:fresh --seed` from failing on pristine databases while keeping cascade rules in place for live systems.
+- Discount schema rebuild scripts now re-enable foreign key checks before recreating tables and only disable them while copying legacy rows, eliminating the MySQL system-table constraint error triggered during `php artisan migrate:fresh --seed`.
 - Filament admin navigation now standardises every icon and group declaration on the BackedEnum/UnitEnum union types mandated by v4, eliminating the PHP 8.3 fatals that previously surfaced during `composer install`.
 - Logged the Oct 21–22, 2025 PR triage outcome directly in `docs/analysis/CURRENT_SYSTEM_STATUS.md`, highlighting which Husky and Filament fixes are ready to merge, which legacy branches to close as superseded, and which submissions still need action so maintainers can prioritise reviews without re-scraping GitHub.
 - Curated a high-level repository analysis that catalogues the 24 open pull requests, highlighting the repeated Filament Schema API migrations, Husky bootstrap shim restorations, and the layered rate-limiting proposal so maintainers can prioritise reviews without manually expanding each PR.
@@ -98,6 +99,7 @@ composer run dev
 
 - 2025-10-24: Reinstated the Husky bootstrap shim file contents and permissions so Git hooks execute using the local toolchain again while continuing to surface the upstream v10 deprecation warning banner for contributor awareness.
 - 2025-10-24: Hardened content security policies with request-scoped nonces, refreshed inline Blade assets to inject the helper automatically, and expanded rate limiting configuration so API throttles can stack per-minute and per-hour limits.
+- 2025-10-25: Re-sequenced the discount rebuild migration to stage renames before table creation and only suppress constraints during data copy, resolving the MySQL `discount_codes_created_by_foreign` failure encountered in `php artisan migrate:fresh --seed`.
 
 - 2025-10-23: Wired the cache invalidation service into global model events, updated navigation caches to use shared tag helpers, and expanded regression coverage so dashboard stats and storefront widgets refresh automatically after catalogue edits.
 
