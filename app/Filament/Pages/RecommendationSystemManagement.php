@@ -27,10 +27,7 @@ final class RecommendationSystemManagement extends Page
 
     protected static ?string $slug = 'recommendation-system-management';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Analytics';
-    }
+    protected static string|UnitEnum|null $navigationGroup = 'Analytics';
 
     protected static ?int $navigationSort = 40;
 
