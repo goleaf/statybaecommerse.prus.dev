@@ -29,6 +29,9 @@
   data and scope-free product relations so duplicate analytics records no
   longer collide with unique keys during regression tests.
 
+## Admin UI & Search
+- Filament autocomplete select components now discard model global scopes during lookups so catalog managers immediately see freshly created records in suggestion lists while still benefiting from cached, trimmed queries.
+
 ## Discounts & promotions
 - Coupon Usage administration now exposes the standard delete action and an exact-date filter that also accepts Livewire's `filterTable()` strings, keeping the Filament UI and regression coverage perfectly aligned.
 - Coupon migrations now provision maximum discount caps, per-user usage limits, and product/category scoping columns so factories, admin forms, and API tests share the same schema snapshot during refreshes.

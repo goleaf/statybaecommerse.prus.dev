@@ -3,6 +3,26 @@
 [![CI](https://github.com/prus-dev/statybaecommerse.prus.dev/actions/workflows/ci.yml/badge.svg)](https://github.com/prus-dev/statybaecommerse.prus.dev/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/badge/coverage-manual--run-lightgrey.svg)](https://github.com/prus-dev/statybaecommerse.prus.dev/actions/workflows/ci.yml)
 
+## Python scripts
+
+Below are run and test commands for the project's Python scripts.
+
+### How to Run
+
+```bash
+python main.py
+```
+
+### How to Test
+
+```bash
+pytest test_main.py
+```
+
+### Recent Maintenance
+
+- Autocomplete selects in the Filament admin now bypass model-level global scopes when searching so freshly created products and supporting records appear immediately in the dropdown suggestions.
+
 ## What it is
 A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing construction-product catalogues, analytics, and operations for statybaecommerse.prus.dev. The repository ships extensive Filament resources, analytics dashboards, and seeders so you can explore the platform locally without extra setup.
 
