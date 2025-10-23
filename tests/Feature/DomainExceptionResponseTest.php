@@ -33,29 +33,23 @@ final class DomainExceptionResponseTest extends TestCase
 
         $response
             ->assertStatus(404)
-            ->assertJsonStructure(['error' => ['code', 'message'], 'correlation_id'])
-            ->assertJson([
-                'error' => [
-                    'code' => ErrorCodes::ORDER_NOT_FOUND,
-                    'message' => TranslationService::get(
-                        ErrorCodes::messageKey(ErrorCodes::ORDER_NOT_FOUND),
-                        ['order' => 'ORD-123'],
-                        $defaultLocale,
-                    ),
-                ],
-            ]);
-
-        $expectedMessage = TranslationService::get(
-            ErrorCodes::translationKey(ErrorCodes::ORDER_NOT_FOUND),
-            ['order' => 'ORD-123'],
-            $defaultLocale
-        );
-        $this->assertSame($expectedMessage, $response->json('error.message'));
+            ->assertJsonStructure([
+                'error' => ['code', 'message', 'locale', 'context'],
+                'meta' => ['correlation_id', 'timestamp'],
+            ])
+            ->assertJsonPath('error.code', 'orders.not_found')
+            ->assertJsonPath('error.message', TranslationService::get('exceptions.orders.not_found', ['order' => 'ORD-123'], $defaultLocale))
+            ->assertJsonPath('error.locale', $defaultLocale)
+            ->assertJsonPath('error.context.order', 'ORD-123');
 
         $correlationId = $response->json('meta.correlation_id');
         $this->assertIsString($correlationId);
         $this->assertNotEmpty($correlationId);
         $this->assertSame($correlationId, $response->headers->get('X-Correlation-ID'));
+
+        $timestamp = $response->json('meta.timestamp');
+        $this->assertIsString($timestamp);
+        $this->assertNotEmpty($timestamp);
     }
 
     public function test_domain_exception_payload_varies_per_exception(): void
@@ -66,17 +60,9 @@ final class DomainExceptionResponseTest extends TestCase
 
         $response
             ->assertStatus(409)
-            ->assertJson([
-                'error' => [
-                    'code' => ErrorCodes::INVENTORY_INSUFFICIENT,
-                    'message' => TranslationService::get(
-                        ErrorCodes::messageKey(ErrorCodes::INVENTORY_INSUFFICIENT),
-                        ['sku' => 'SKU-42'],
-                        $defaultLocale,
-                    ),
-                ],
-            ])
-            ->assertJsonStructure(['error' => ['code', 'message'], 'correlation_id']);
+            ->assertJsonPath('error.code', 'inventory.insufficient')
+            ->assertJsonPath('error.message', TranslationService::get('exceptions.inventory.insufficient', ['sku' => 'SKU-42'], $defaultLocale))
+            ->assertJsonPath('error.context.sku', 'SKU-42');
     }
 
     public function test_accept_language_header_changes_localized_message(): void
@@ -84,28 +70,14 @@ final class DomainExceptionResponseTest extends TestCase
         $responseEn = $this->withHeader('Accept-Language', 'en')->getJson('/testing/domain-exception');
         $responseEn
             ->assertStatus(404)
-            ->assertJson([
-                'error' => [
-                    'message' => TranslationService::get(
-                        ErrorCodes::messageKey(ErrorCodes::ORDER_NOT_FOUND),
-                        ['order' => 'ORD-123'],
-                        'en',
-                    ),
-                ],
-            ]);
+            ->assertJsonPath('error.message', TranslationService::get('exceptions.orders.not_found', ['order' => 'ORD-123'], 'en'))
+            ->assertJsonPath('error.locale', 'en');
 
         $responseDe = $this->withHeader('Accept-Language', 'de')->getJson('/testing/domain-exception');
         $responseDe
             ->assertStatus(404)
-            ->assertJson([
-                'error' => [
-                    'message' => TranslationService::get(
-                        ErrorCodes::messageKey(ErrorCodes::ORDER_NOT_FOUND),
-                        ['order' => 'ORD-123'],
-                        'de',
-                    ),
-                ],
-            ]);
+            ->assertJsonPath('error.message', TranslationService::get('exceptions.orders.not_found', ['order' => 'ORD-123'], 'de'))
+            ->assertJsonPath('error.locale', 'de');
     }
 
     public function test_unsupported_locale_falls_back_to_default(): void
@@ -116,14 +88,7 @@ final class DomainExceptionResponseTest extends TestCase
 
         $response
             ->assertStatus(404)
-            ->assertJson([
-                'error' => [
-                    'message' => TranslationService::get(
-                        ErrorCodes::messageKey(ErrorCodes::ORDER_NOT_FOUND),
-                        ['order' => 'ORD-123'],
-                        $defaultLocale,
-                    ),
-                ],
-            ]);
+            ->assertJsonPath('error.message', TranslationService::get('exceptions.orders.not_found', ['order' => 'ORD-123'], $defaultLocale))
+            ->assertJsonPath('error.locale', $defaultLocale);
     }
 }

@@ -15,39 +15,73 @@ final class SetLocale
 {
     public function handle(Request $request, Closure $next): mixed
     {
+        // Resolve the list of supported locales declared in configuration.
+        $supportedConfig = config('app.supported_locales', ['lt', 'en']);
+        $configuredLocales = [];
+
+        if (is_array($supportedConfig)) {
+            $configuredLocales = array_filter($supportedConfig, static fn ($locale): bool => is_string($locale) && $locale !== '');
+        } elseif (is_string($supportedConfig)) {
+            $configuredLocales = array_filter(
+                array_map(
+                    static fn (string $locale): string => trim($locale),
+                    explode(',', $supportedConfig)
+                ),
+                static fn (string $locale): bool => $locale !== ''
+            );
+        }
+
+        $supportedLocales = array_values(array_map(
+            static fn (string $locale): string => trim($locale),
+            $configuredLocales
+        ));
+
         // Prefer locale from route parameter if present (e.g., /{locale}/...)
         $routeLocale = $request->route('locale');
         // Allow explicit override via query (?locale=xx)
         $queryLocale = $request->query('locale');
 
-        // Determine supported locales from configuration
-        $supported = config('app.supported_locales', ['lt', 'en']);
-        $supportedLocales = is_array($supported)
-            ? $supported
-            : array_filter(array_map('trim', explode(',', (string) $supported)));
-        $supportedLocales = array_values(array_filter(array_map('trim', $supportedLocales)));
+        // Honor the Accept-Language header if it matches a supported locale.
+        $headerLocale = null;
+        if ($request->hasHeader('Accept-Language')) {
+            $preferred = $request->getPreferredLanguage($supportedLocales);
+            if (is_string($preferred) && $preferred !== '') {
+                $headerLocale = $preferred;
+            }
+        }
 
-        $headerLocale = $request->getPreferredLanguage($supportedLocales);
+        // Get locale from query, header, session, cookie, or user preference
+        $defaultLocaleConfig = config('app.locale', 'lt');
+        $defaultLocale = is_string($defaultLocaleConfig) && $defaultLocaleConfig !== ''
+            ? $defaultLocaleConfig
+            : 'lt';
 
-        // Get locale from query, session (both keys), cookie, Accept-Language header, or user preference
-        $locale = $routeLocale
-            ?? $queryLocale
-            ?? Session::get('locale')
-            ?? Session::get('app.locale')
-            ?? $request->cookie('app_locale')
-            ?? (auth()->check() ? auth()->user()->preferred_locale ?? null : null)
-            ?? (is_string($headerLocale) && $headerLocale !== '' ? $headerLocale : null)
-            ?? config('app.locale', 'lt');
+        $candidateLocales = array_values(array_filter([
+            $routeLocale,
+            $queryLocale,
+            $headerLocale,
+            Session::get('locale'),
+            Session::get('app.locale'),
+            $request->cookie('app_locale'),
+            auth()->check() ? (auth()->user()->preferred_locale ?? null) : null,
+        ], static fn ($candidate): bool => is_string($candidate) && $candidate !== ''));
+
+        $locale = $defaultLocale;
+
+        foreach ($candidateLocales as $candidate) {
+            if (in_array($candidate, $supportedLocales, true)) {
+                $locale = $candidate;
+                break;
+            }
+        }
 
         if (! in_array($locale, $supportedLocales, true)) {
-            $locale = is_string($headerLocale) && in_array($headerLocale, $supportedLocales, true)
-                ? $headerLocale
-                : (string) (config('app.locale', 'lt'));
+            $locale = $defaultLocale;
         }
 
         // Set application locale
         App::setLocale($locale);
-        $request->attributes->set('resolved_locale', $locale);
+        app()->instance('request_locale', $locale);
 
         // Store in session and cookie for persistence
         Session::put('locale', $locale);

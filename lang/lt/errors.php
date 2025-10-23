@@ -3,34 +3,24 @@
 declare(strict_types=1);
 
 return [
-    'orders' => [
-        // @translators: Rodoma, kai nurodytas užsakymo numeris neegzistuoja.
-        'not_found' => 'Užsakymas :order nerastas.',
-    ],
-    'inventory' => [
-        // @translators: Rodoma, kai nurodytam SKU nepakanka atsargų.
-        'insufficient' => 'Atsargų SKU :sku nepakanka.',
-    ],
-    'http' => [
-        // @translators: Rodoma, kai prašomas išteklius nerastas (HTTP 404).
-        'not_found' => 'Prašomas išteklius nerastas.',
-        // @translators: Rodoma, kai vartotojas neprisijungęs (HTTP 401).
-        'unauthorized' => 'Norint pasiekti šį išteklių reikia prisijungti.',
-        // @translators: Rodoma, kai vartotojui trūksta teisių (HTTP 403).
-        'forbidden' => 'Neturite leidimo atlikti šį veiksmą.',
-        // @translators: Rodoma, kai HTTP metodas neleidžiamas (HTTP 405).
-        'method_not_allowed' => 'Šis HTTP metodas neleidžiamas.',
-        // @translators: Rodoma, kai užklausa suformuota neteisingai (HTTP 400).
-        'bad_request' => 'Užklausos nepavyko apdoroti dėl neteisingo formato.',
-        // @translators: Rodoma, kai klientas apribojamas dėl per dažno naudojimo (HTTP 429).
-        'too_many_requests' => 'Per daug užklausų. Bandykite dar kartą vėliau.',
-    ],
-    'validation' => [
-        // @translators: Rodoma, kai pateikti duomenys neatitinka taisyklių.
-        'failed' => 'Pateikti duomenys yra neteisingi.',
-    ],
-    'internal' => [
-        // @translators: Rodoma, kai įvyksta nenumatyta serverio klaida (HTTP 500).
-        'server_error' => 'Įvyko netikėta klaida.',
-    ],
+    // @translators: Rodoma, kai prašomas puslapis ar įrašas nerandamas (HTTP 404).
+    ErrorCodes::NOT_FOUND => 'Puslapis nerastas',
+
+    // @translators: Rodoma, kai sistema susiduria su nenumatyta serverio klaida (HTTP 500).
+    ErrorCodes::SERVER_ERROR => 'Serverio klaida',
+
+    // @translators: Naudojama, kai įvesti duomenys neatitinka validacijos taisyklių.
+    ErrorCodes::VALIDATION_FAILED => 'Patikrinkite įvestus duomenis',
+
+    // @translators: Rodoma, kai vartotojas turi prisijungti prie sistemos.
+    ErrorCodes::UNAUTHORIZED => 'Neturite teisių',
+
+    // @translators: Rodoma, kai vartotojas prisijungęs, bet neturi reikiamų teisių veiksmui.
+    ErrorCodes::FORBIDDEN => 'Prieiga uždrausta',
+
+    // @translators: Rodoma, kai sistema neranda užsakymo pagal pateiktą numerį.
+    ErrorCodes::ORDER_NOT_FOUND => 'Užsakymas :order nerastas.',
+
+    // @translators: Rodoma, kai pasirinktos prekės SKU atsargų neužtenka užsakymui įvykdyti.
+    ErrorCodes::INVENTORY_INSUFFICIENT => 'SKU :sku atsargų nepakanka.',
 ];

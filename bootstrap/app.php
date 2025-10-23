@@ -68,15 +68,12 @@ return Application::configure(basePath: dirname(__DIR__))
             $availableLocales = TranslationService::getAvailableLocales();
             $resolved = $request->attributes->get('resolved_locale');
             $preferred = $request->getPreferredLanguage($availableLocales);
-            $current = app()->getLocale();
-
-            $locale = is_string($resolved) && $resolved !== ''
-                ? $resolved
-                : (is_string($preferred) && $preferred !== ''
-                    ? $preferred
-                    : (is_string($current) && $current !== ''
-                        ? $current
-                        : TranslationService::getDefaultLocale()));
+            $currentLocale = app()->getLocale();
+            $locale = is_string($preferred) && $preferred !== ''
+                ? $preferred
+                : ($currentLocale !== ''
+                    ? $currentLocale
+                    : TranslationService::getDefaultLocale());
 
             if (! in_array($locale, $availableLocales, true)) {
                 $locale = TranslationService::getDefaultLocale();
@@ -127,177 +124,65 @@ return Application::configure(basePath: dirname(__DIR__))
         ) use ($correlationId, $resolveLocale) {
             $locale = $resolveLocale($request);
             app()->setLocale($locale);
+            app()->instance('request_locale', $locale);
 
             return $locale;
         };
 
-        $buildResponse = static function (
-            Request $request,
-            string $code,
-            string $translationKey,
-            array $context,
-            int $status,
-            array $details = [],
-        ) use ($resolveCorrelationId, $resolveLocale): array {
-            $locale = $resolveLocale($request);
-            $message = TranslationService::get($translationKey, $context, $locale);
-            $correlationId = $resolveCorrelationId($request);
+            $attributeCorrelationRaw = $request->attributes->get('correlation_id');
+            $attributeCorrelationId = is_string($attributeCorrelationRaw) ? $attributeCorrelationRaw : null;
+
+            if ($attributeCorrelationId !== null && $attributeCorrelationId !== '') {
+                $correlationId = $attributeCorrelationId;
+            } elseif (app()->bound('request_correlation_id')) {
+                $resolvedCorrelation = app()->make('request_correlation_id');
+                $correlationId = is_string($resolvedCorrelation) && $resolvedCorrelation !== ''
+                    ? $resolvedCorrelation
+                    : Str::uuid()->toString();
+            } else {
+                $correlationId = Str::uuid()->toString();
+            }
+
+            $correlationHeaderConfig = config('app.correlation_header', 'X-Correlation-ID');
+            $correlationHeader = is_string($correlationHeaderConfig) && $correlationHeaderConfig !== ''
+                ? $correlationHeaderConfig
+                : 'X-Correlation-ID';
+
+            Log::withContext([
+                'correlation_id' => $correlationId,
+                'locale' => $locale,
+                'error_code' => $exception->errorCode(),
+                'request_path' => $request->path(),
+                'request_method' => $request->method(),
+            ]);
+
+            Log::warning('Domain exception rendered.', [
+                'exception' => $exception::class,
+                'status' => $exception->status(),
+                'translation_key' => $exception->translationKey(),
+                'context' => $exception->context(),
+            ]);
 
             $payload = [
                 'error' => [
-                    'code' => $code,
+                    'code' => $exception->errorCode(),
                     'message' => $message,
+                    'locale' => $locale,
                 ],
-                'correlation_id' => $correlationId,
+                'meta' => [
+                    'correlation_id' => $correlationId,
+                    'timestamp' => now()->toIso8601String(),
+                ],
             ];
 
-            if ($details !== []) {
-                $payload['error']['details'] = $details;
+            if ($exception->context() !== []) {
+                $payload['error']['context'] = $exception->context();
             }
 
-            return [$correlationId, new JsonResponse($payload, $status)];
-        };
-
-        $exceptions->render(function (DomainException $exception, Request $request) use ($buildResponse) {
-            [$correlationId, $response] = $buildResponse(
-                $request,
-                $exception->errorCode(),
-                $exception->translationKey(),
-                $exception->context(),
-                $exception->status(),
-            );
-
-            Log::warning($exception->getMessage(), [
-                'error_code' => $exception->errorCode(),
-                'context' => $exception->context(),
-                'correlation_id' => $correlationId,
-                'exception' => $exception,
-            ]);
-
-            return $response;
-        });
-
-        $exceptions->render(function (ValidationException $exception, Request $request) use ($buildResponse) {
-            $details = ['fields' => $exception->errors()];
-
-            [$correlationId, $response] = $buildResponse(
-                $request,
-                ErrorCodes::VALIDATION_FAILED,
-                ErrorCodes::messageKey(ErrorCodes::VALIDATION_FAILED),
-                [],
-                $exception->status,
-                $details,
-            );
-
-            Log::info('Validation failed', [
-                'errors' => $exception->errors(),
-                'correlation_id' => $correlationId,
-            ]);
-
-            return $response;
-        });
-
-        $exceptions->render(function (AuthenticationException $exception, Request $request) use ($buildResponse) {
-            [$correlationId, $response] = $buildResponse(
-                $request,
-                ErrorCodes::HTTP_UNAUTHORIZED,
-                ErrorCodes::messageKey(ErrorCodes::HTTP_UNAUTHORIZED),
-                [],
-                401,
-            );
-
-            Log::warning($exception->getMessage(), [
-                'error_code' => ErrorCodes::HTTP_UNAUTHORIZED,
-                'correlation_id' => $correlationId,
-                'exception' => $exception,
-            ]);
-
-            return $response;
-        });
-
-        $exceptions->render(function (AuthorizationException $exception, Request $request) use ($buildResponse) {
-            [$correlationId, $response] = $buildResponse(
-                $request,
-                ErrorCodes::HTTP_FORBIDDEN,
-                ErrorCodes::messageKey(ErrorCodes::HTTP_FORBIDDEN),
-                [],
-                403,
-            );
-
-            Log::warning($exception->getMessage(), [
-                'error_code' => ErrorCodes::HTTP_FORBIDDEN,
-                'correlation_id' => $correlationId,
-                'exception' => $exception,
-            ]);
-
-            return $response;
-        });
-
-        $exceptions->render(function (ModelNotFoundException $exception, Request $request) use ($buildResponse) {
-            [$correlationId, $response] = $buildResponse(
-                $request,
-                ErrorCodes::HTTP_NOT_FOUND,
-                ErrorCodes::messageKey(ErrorCodes::HTTP_NOT_FOUND),
-                [],
-                404,
-            );
-
-            Log::warning($exception->getMessage(), [
-                'error_code' => ErrorCodes::HTTP_NOT_FOUND,
-                'correlation_id' => $correlationId,
-                'exception' => $exception,
-            ]);
-
-            return $response;
-        });
-
-        $exceptions->render(function (HttpExceptionInterface $exception, Request $request) use ($buildResponse) {
-            $status = $exception->getStatusCode();
-
-            $code = match ($status) {
-                400 => ErrorCodes::HTTP_BAD_REQUEST,
-                401 => ErrorCodes::HTTP_UNAUTHORIZED,
-                403 => ErrorCodes::HTTP_FORBIDDEN,
-                404 => ErrorCodes::HTTP_NOT_FOUND,
-                405 => ErrorCodes::HTTP_METHOD_NOT_ALLOWED,
-                429 => ErrorCodes::HTTP_TOO_MANY_REQUESTS,
-                default => ErrorCodes::INTERNAL_SERVER_ERROR,
-            };
-
-            [$correlationId, $response] = $buildResponse(
-                $request,
-                $code,
-                ErrorCodes::messageKey($code),
-                [],
-                $status,
-            );
-
-            Log::warning($exception->getMessage(), [
-                'status' => $status,
-                'error_code' => $code,
-                'correlation_id' => $correlationId,
-                'exception' => $exception,
-            ]);
-
-            return $response;
-        });
-
-        $exceptions->render(function (Throwable $exception, Request $request) use ($buildResponse) {
-            [$correlationId, $response] = $buildResponse(
-                $request,
-                ErrorCodes::INTERNAL_SERVER_ERROR,
-                ErrorCodes::messageKey(ErrorCodes::INTERNAL_SERVER_ERROR),
-                [],
-                500,
-            );
-
-            Log::error($exception->getMessage(), [
-                'error_code' => ErrorCodes::INTERNAL_SERVER_ERROR,
-                'correlation_id' => $correlationId,
-                'exception' => $exception,
-            ]);
-
-            return $response;
+            return response()
+                ->json($payload, $exception->status())
+                ->header($correlationHeader, $correlationId)
+                ->header('Content-Language', $locale);
         });
     })
     ->withProviders([

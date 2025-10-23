@@ -16,18 +16,78 @@ final class ErrorCodes
 
     public const HTTP_METHOD_NOT_ALLOWED = 'http.method_not_allowed';
 
-    public const HTTP_FORBIDDEN = 'http.forbidden';
+    /**
+     * Code returned when an order record cannot be located.
+     */
+    public const ORDER_NOT_FOUND = 'orders.not_found';
 
-    public const HTTP_UNAUTHORIZED = 'http.unauthorized';
+    /**
+     * Code returned when available inventory cannot satisfy a request.
+     */
+    public const INVENTORY_INSUFFICIENT = 'inventory.insufficient';
 
-    public const HTTP_TOO_MANY_REQUESTS = 'http.too_many_requests';
+    /**
+     * Registry of error code descriptions keyed by the machine-readable code.
+     *
+     * @var array<string, string>
+     */
+    private const DEFINITIONS = [
+        self::NOT_FOUND => 'Resource requested by the client could not be located.',
+        self::SERVER_ERROR => 'Unexpected server exception occurred while handling the request.',
+        self::VALIDATION_FAILED => 'Provided data failed validation checks.',
+        self::UNAUTHORIZED => 'Request lacks valid authentication credentials.',
+        self::FORBIDDEN => 'Authenticated request does not have permission to access the resource.',
+        self::ORDER_NOT_FOUND => 'Requested order record is missing.',
+        self::INVENTORY_INSUFFICIENT => 'Inventory could not satisfy the requested quantity.',
+    ];
 
-    public const HTTP_BAD_REQUEST = 'http.bad_request';
+    private function __construct() {}
 
-    public const INTERNAL_SERVER_ERROR = 'internal.server_error';
-
-    public static function messageKey(string $code): string
+    /**
+     * Retrieve all registered error codes.
+     *
+     * @return list<string>
+     */
+    public static function all(): array
     {
-        return 'errors.'.$code;
+        return array_keys(self::DEFINITIONS);
+    }
+
+    /**
+     * Retrieve the descriptions for every registered error code.
+     *
+     * @return array<string, string>
+     */
+    public static function descriptions(): array
+    {
+        return self::DEFINITIONS;
+    }
+
+    /**
+     * Get the human-readable description for a specific error code.
+     */
+    public static function describe(string $code): ?string
+    {
+        return self::DEFINITIONS[$code] ?? null;
+    }
+
+    /**
+     * Determine if the provided error code is registered.
+     */
+    public static function isValid(string $code): bool
+    {
+        return array_key_exists($code, self::DEFINITIONS);
+    }
+
+    /**
+     * Ensure the provided code is registered.
+     *
+     * @throws InvalidArgumentException when the code is unknown.
+     */
+    public static function assertValid(string $code): void
+    {
+        if (! self::isValid($code)) {
+            throw new InvalidArgumentException(sprintf('Unknown error code "%s".', $code));
+        }
     }
 }

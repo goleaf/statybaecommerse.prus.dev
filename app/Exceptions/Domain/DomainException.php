@@ -29,9 +29,9 @@ abstract class DomainException extends Exception
         private readonly int $status = 400,
         ?Exception $previous = null,
     ) {
-        $this->translationKey = $translationKey ?? ErrorCodes::messageKey($errorCode);
+        ErrorCodes::assertValid($errorCode);
 
-        parent::__construct($this->translationKey, $status, $previous);
+        parent::__construct($translationKey, $status, $previous);
     }
 
     public function errorCode(): string
