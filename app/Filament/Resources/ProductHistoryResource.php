@@ -17,8 +17,8 @@ use DateTimeInterface;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\Select as SelectInput;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
@@ -35,10 +35,7 @@ final class ProductHistoryResource extends Resource
 
     protected static ?string $model = ProductHistory::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-clock';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clock';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
@@ -122,7 +119,12 @@ final class ProductHistoryResource extends Resource
                 TextColumn::make('action')
                     ->label(__('product_history.action'))
                     ->badge()
-                    ->color(fn (string $state): string => self::actionColor($state))
+                    ->color(fn (string $state): string => match ($state) {
+                        'created' => 'success',
+                        'updated' => 'warning',
+                        'deleted' => 'danger',
+                        default => 'gray',
+                    })
                     ->sortable(),
                 TextColumn::make('field_name')
                     ->label(__('product_history.field_name'))
@@ -165,13 +167,11 @@ final class ProductHistoryResource extends Resource
                     ])
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
-                        $from = self::formatDateFilterValue($data['from'] ?? null);
-                        if ($from !== null) {
-                            $indicators[] = __('product_history.from') . ': ' . $from;
+                        if ($data['from'] ?? null) {
+                            $indicators[] = __('product_history.from').': '.$data['from'];
                         }
-                        $until = self::formatDateFilterValue($data['until'] ?? null);
-                        if ($until !== null) {
-                            $indicators[] = __('product_history.until') . ': ' . $until;
+                        if ($data['until'] ?? null) {
+                            $indicators[] = __('product_history.until').': '.$data['until'];
                         }
 
                         return $indicators;
@@ -181,14 +181,8 @@ final class ProductHistoryResource extends Resource
                         $until = self::formatDateFilterValue($data['until'] ?? null);
 
                         return $query
-                            ->when(
-                                $from,
-                                static fn (Builder $query) => $query->whereDate('created_at', '>=', $from)
-                            )
-                            ->when(
-                                $until,
-                                static fn (Builder $query) => $query->whereDate('created_at', '<=', $until)
-                            );
+                            ->when($data['from'] ?? null, fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date))
+                            ->when($data['until'] ?? null, fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date));
                     }),
             ]);
     }

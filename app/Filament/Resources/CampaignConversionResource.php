@@ -11,10 +11,7 @@ use App\Filament\Resources\CampaignConversionResource\Pages;
 use App\Models\Campaign;
 use App\Models\CampaignConversion;
 use App\Models\User;
-use BackedEnum;
 use Filament\Forms;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -27,19 +24,20 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Support\Number;
 use UnitEnum;
 
+/**
+ * CampaignConversionResource
+ *
+ * Filament v4 resource for CampaignConversion management in the admin panel with comprehensive CRUD operations, filters, and actions.
+ */
 final class CampaignConversionResource extends Resource
 {
     use HasNav;
 
     protected static ?string $model = CampaignConversion::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rocket-launch';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rocket-launch';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.

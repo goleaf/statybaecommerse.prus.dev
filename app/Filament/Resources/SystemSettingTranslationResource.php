@@ -44,16 +44,22 @@ use Illuminate\Database\Eloquent\Collection;
 use Throwable;
 use UnitEnum;
 
+/**
+ * SystemSettingTranslationResource
+ *
+ * Filament v4 resource for SystemSettingTranslation management in the admin panel with comprehensive CRUD operations, filters, and actions.
+ */
 final class SystemSettingTranslationResource extends Resource
 {
     use HasNav;
 
     protected static ?string $model = SystemSettingTranslation::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
+    protected static ?int $navigationSort = 14;
+
+    protected static ?string $recordTitleAttribute = 'name';
+
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.

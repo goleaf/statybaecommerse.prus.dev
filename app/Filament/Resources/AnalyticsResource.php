@@ -9,9 +9,6 @@ use App\Support\Concerns\HasNav;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\AnalyticsResource\Pages;
 use App\Models\Order;
-use App\Support\Filament\Components\Flatpickr;
-use App\Support\Filament\Filters\DateRangeFilter;
-use BackedEnum;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\ViewAction;
@@ -32,10 +29,7 @@ final class AnalyticsResource extends Resource
 
     protected static ?string $model = Order::class;
 
-    /**
-     * Mirror the Filament base class union so icon definitions support both enum-backed and string identifiers.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
     /**
      * Preserve the typed navigation group union to keep enum-backed grouping working across PHP upgrades.
@@ -93,76 +87,13 @@ final class AnalyticsResource extends Resource
                 ])
             )
             ->columns([
-                // Order number helps link analytics rows back to operational records.
-                TextColumn::make('number')
-                    ->label(__('analytics.order_number'))
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable()
-                    ->summarize([
-                        Count::make()->label(__('analytics.total_orders')),
-                    ]),
-                // Preserve the localized order date column but keep the explicit accessor for clarity.
-                TextColumn::make('order_date')
-                    ->label(__('analytics.order_date'))
-                    ->date()
-                    ->sortable()
-                    ->getStateUsing(static fn (Order $record) => $record->created_at)
-                    ->toggleable(),
-                // Show the purchasing customer's name for segmentation.
-                TextColumn::make('user.name')
-                    ->label(__('analytics.customer'))
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable(),
-                // Provide the customer's email to support outreach workflows directly from analytics.
-                TextColumn::make('user.email')
-                    ->label(__('analytics.customer_email'))
-                    ->searchable()
-                    ->toggleable(),
-                // Channel names aid in marketing attribution when reviewing performance.
-                TextColumn::make('channel.name')
-                    ->label(__('analytics.channel'))
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                // Count items through the eager-loaded relationship for accurate basket analysis.
-                TextColumn::make('items_count')
-                    ->label(__('analytics.items'))
-                    ->getStateUsing(static fn (Order $record): int => $record->items->count())
-                    ->toggleable(),
-                // Total revenue column contributes to aggregate KPIs.
-                TextColumn::make('total')
-                    ->label(__('analytics.total'))
-                    ->money('EUR')
-                    ->sortable()
-                    ->toggleable()
-                    ->summarize([
-                        Sum::make('total')->label(__('analytics.total_revenue'))->money('EUR'),
-                        Average::make('total')->label(__('analytics.avg_order_value'))->money('EUR'),
-                    ]),
-                // Translate status badges so the dashboard remains localized.
-                TextColumn::make('status')
-                    ->label(__('analytics.status'))
-                    ->sortable()
-                    ->badge()
-                    ->formatStateUsing(static fn (string $state): string => __('analytics.' . strtolower($state)))
-                    ->color(static fn (string $state): string => match ($state) {
-                        'completed', 'delivered' => 'success',
-                        'pending' => 'warning',
-                        'cancelled', 'refunded' => 'danger',
-                        default => 'gray',
-                    })
-                    ->toggleable(),
-                // Maintain timestamps for auditing and allow toggling visibility per user preference.
-                TextColumn::make('created_at')
-                    ->label(__('analytics.created'))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(),
-                TextColumn::make('updated_at')
-                    ->label(__('analytics.updated'))
-                    ->dateTime()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('order_date')->label('order_date')->date()->toggleable(),
+                TextColumn::make('user.name')->label('user.name')->toggleable(),
+                TextColumn::make('items_count')->label('items_count')->getStateUsing(fn (Order $record): int => method_exists($record, 'items') ? (int) $record->items()->count() : 0)->toggleable(),
+                TextColumn::make('total')->label('total')->money('EUR')->toggleable(),
+                TextColumn::make('status')->label('status')->badge()->toggleable(),
+                TextColumn::make('created_at')->label('created_at')->dateTime()->toggleable(),
+                TextColumn::make('updated_at')->label('updated_at')->dateTime()->toggleable(),
             ])
             ->filters([
                 SelectFilter::make('status')
@@ -186,49 +117,16 @@ final class AnalyticsResource extends Resource
                     ->label(__('analytics.channel'))
                     ->searchable(),
                 Filter::make('created_at')
-                    ->label(__('analytics.order_date_range'))
-                    ->form([
-                        Flatpickr::makeRange('range')
-                            ->label(__('analytics.from_date'))
-                            ->format('Y-m-d')
-                            ->displayFormat('Y-m-d'),
-                    ])
-                    ->indicateUsing(static fn (array $data): ?string => isset($data['range']['start'], $data['range']['end'])
-                        ? __('analytics.order_date_range') . ': ' . $data['range']['start'] . ' → ' . $data['range']['end']
-                        : null)
-                    ->query(static fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
-                        $query,
-                        $data['range'] ?? null,
-                        'created_at',
-                    )),
+                    ->form([])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when($data['created_from'] ?? null, fn (Builder $q, $date): Builder => $q->whereDate('created_at', '>=', $date))
+                            ->when($data['created_until'] ?? null, fn (Builder $q, $date): Builder => $q->whereDate('created_at', '<=', $date));
+                    }),
                 Filter::make('high_value')
-                    ->label(__('analytics.high_value_orders'))
-                    ->query(static fn (Builder $query): Builder => $query->where('total', '>=', 500)),
+                    ->query(fn (Builder $query): Builder => $query->where('total', '>=', 500)),
                 Filter::make('this_month')
-                    ->label(__('analytics.this_month'))
-                    ->query(static fn (Builder $query): Builder => $query->whereBetween('created_at', [
-                        now()->startOfMonth(),
-                        now()->endOfMonth(),
-                    ])),
-            ])
-            ->groups([
-                // Allow analysts to cluster orders by lifecycle stage.
-                Group::make('status')
-                    ->label(__('analytics.status'))
-                    ->collapsible(),
-                // Provide chronological grouping by month for period-over-period reviews.
-                Group::make('created_at')
-                    ->label(__('analytics.month'))
-                    ->date('Y-m'),
-            ])
-            ->defaultSort('created_at', 'desc')
-            ->actions([
-                // Deep-link into the order resource for detailed investigation of anomalies.
-                ViewAction::make()
-                    ->label(__('analytics.view_order'))
-                    ->icon('heroicon-o-eye')
-                    ->url(static fn (Order $record): string => OrderResource::getUrl('view', ['record' => $record]))
-                    ->openUrlInNewTab(),
+                    ->query(fn (Builder $query): Builder => $query->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])),
             ]);
     }
 

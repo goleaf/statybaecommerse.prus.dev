@@ -42,8 +42,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Str;
-use Throwable;
+use UnitEnum;
 
 final class ReportResource extends Resource
 {

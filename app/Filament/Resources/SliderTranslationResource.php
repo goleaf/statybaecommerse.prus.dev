@@ -25,16 +25,18 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
 
+/**
+ * SliderTranslationResource
+ *
+ * Filament v4 resource for SliderTranslation management in the admin panel with comprehensive CRUD operations, filters, and actions.
+ */
 final class SliderTranslationResource extends Resource
 {
     use HasNav;
 
     protected static ?string $model = SliderTranslation::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?int $navigationSort = 3;
 
@@ -112,11 +114,11 @@ final class SliderTranslationResource extends Resource
                     ->label(__('admin.slider_translations.locale'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'en'    => 'success',
-                        'lt'    => 'info',
-                        'de'    => 'warning',
-                        'fr'    => 'danger',
-                        'es'    => 'primary',
+                        'en' => 'success',
+                        'lt' => 'info',
+                        'de' => 'warning',
+                        'fr' => 'danger',
+                        'es' => 'primary',
                         default => 'gray',
                     }),
                 TextColumn::make('title')

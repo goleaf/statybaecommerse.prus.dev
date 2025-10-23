@@ -1,54 +1,52 @@
 <?php
 
-declare(strict_types=1);
-
-namespace Darryldecode\Cart;
-
-use Illuminate\Support\Collection;
-
-if (! class_exists(CartCollection::class)) {
-    class CartCollection extends Collection {}
+if (! class_exists(Awcodes\Curator\Curations\ThumbnailPreset::class)) {
+    class_alias(\stdClass::class, Awcodes\Curator\Curations\ThumbnailPreset::class);
 }
 
-if (! class_exists(Cart::class)) {
-    class Cart
-    {
-        public function getContent(): CartCollection
-        {
-            return new CartCollection;
-        }
-
-        public function getSubTotal(): float
-        {
-            return 0.0;
-        }
-
-        public function remove(string|int $id): void {}
-
-        public function isEmpty(): bool
-        {
-            return true;
-        }
-
-        public function getTotalQuantity(): int
-        {
-            return 0;
-        }
-
-        public function clear(): void {}
-    }
+if (! class_exists(Awcodes\Curator\Glide\DefaultServerFactory::class)) {
+    class_alias(\stdClass::class, Awcodes\Curator\Glide\DefaultServerFactory::class);
 }
 
-namespace Darryldecode\Cart\Facades;
+if (! class_exists(Awcodes\Curator\Models\Media::class)) {
+    class_alias(\stdClass::class, Awcodes\Curator\Models\Media::class);
+}
 
-use Darryldecode\Cart\Cart;
+if (! class_exists(Awcodes\Curator\Resources\MediaResource::class)) {
+    class_alias(\stdClass::class, Awcodes\Curator\Resources\MediaResource::class);
+}
 
-if (! class_exists(CartFacade::class)) {
-    class CartFacade
-    {
-        public static function session(?string $sessionKey = null): Cart
-        {
-            return new Cart;
-        }
+if (! class_exists(Spatie\MediaLibraryPro\Models\TemporaryUpload::class)) {
+    class_alias(\stdClass::class, Spatie\MediaLibraryPro\Models\TemporaryUpload::class);
+}
+
+if (! class_exists(Laravel\Telescope\Http\Middleware\Authorize::class)) {
+    class_alias(\stdClass::class, Laravel\Telescope\Http\Middleware\Authorize::class);
+}
+
+foreach ([
+    'BatchWatcher',
+    'CacheWatcher',
+    'ClientRequestWatcher',
+    'CommandWatcher',
+    'DumpWatcher',
+    'EventWatcher',
+    'ExceptionWatcher',
+    'GateWatcher',
+    'JobWatcher',
+    'LogWatcher',
+    'MailWatcher',
+    'ModelWatcher',
+    'NotificationWatcher',
+    'QueryWatcher',
+    'RedisWatcher',
+    'RequestWatcher',
+    'ScheduleWatcher',
+    'ViewWatcher',
+] as $watcher) {
+    $class = "Laravel\\Telescope\\Watchers\\{$watcher}";
+
+    if (! class_exists($class)) {
+        class_alias(\stdClass::class, $class);
     }
 }

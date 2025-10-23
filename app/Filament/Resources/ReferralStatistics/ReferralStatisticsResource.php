@@ -11,7 +11,6 @@ use App\Filament\Resources\ReferralStatistics\Pages\ListReferralStatistics;
 use App\Filament\Resources\ReferralStatistics\Schemas\ReferralStatisticsForm;
 use App\Filament\Resources\ReferralStatistics\Tables\ReferralStatisticsTable;
 use App\Models\ReferralStatistics;
-use BackedEnum;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
@@ -23,10 +22,7 @@ class ReferralStatisticsResource extends Resource
 
     protected static ?string $model = ReferralStatistics::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Form $form): Form
     {

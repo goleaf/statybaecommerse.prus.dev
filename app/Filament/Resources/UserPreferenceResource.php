@@ -31,16 +31,18 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
+/**
+ * UserPreferenceResource
+ *
+ * Filament v4 resource for UserPreference management in the admin panel with comprehensive CRUD operations, filters, and actions.
+ */
 final class UserPreferenceResource extends Resource
 {
     use HasNav;
 
     protected static ?string $model = UserPreference::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.

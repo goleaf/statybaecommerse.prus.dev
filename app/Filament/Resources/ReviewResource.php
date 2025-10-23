@@ -46,10 +46,7 @@ final class ReviewResource extends Resource
 
     protected static ?string $model = Review::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-star';
 
     protected static ?int $navigationSort = 4;
 

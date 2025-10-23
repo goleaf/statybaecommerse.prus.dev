@@ -105,7 +105,7 @@ return [
     'locale_mapping' => array_filter([
         'lt' => ['currency' => 'EUR', 'zone' => 'eu'],
         // Add more mappings as needed
-    ]),
+    ], static fn (?array $mapping): bool => filled($mapping)),
 
     /*
      * |--------------------------------------------------------------------------
@@ -121,7 +121,8 @@ return [
     'key' => env('APP_KEY'),
     'previous_keys' => [
         ...array_filter(
-            explode(',', (string) env('APP_PREVIOUS_KEYS', ''))
+            explode(',', (string) env('APP_PREVIOUS_KEYS', '')),
+            static fn (string $key): bool => $key !== ''
         ),
     ],
 

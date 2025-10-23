@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Models\Slider;
-use App\Support\Filament\Components\Flatpickr;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Pages\Dashboard\Actions\FilterAction;
@@ -20,10 +18,11 @@ class SliderAnalytics extends BaseDashboard
     use HasFiltersAction;
     use InteractsWithPageFilters;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
+    protected static ?string $title = 'Slider Analytics';
+
+    protected static ?string $navigationLabel = 'Slider Analytics';
+
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?int $navigationSort = 3;
 

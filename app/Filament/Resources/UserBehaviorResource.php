@@ -37,16 +37,18 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
+/**
+ * UserBehaviorResource
+ *
+ * Filament v4 resource for UserBehavior management in the admin panel with comprehensive CRUD operations, filters, and actions.
+ */
 final class UserBehaviorResource extends Resource
 {
     use HasNav;
 
     protected static ?string $model = UserBehavior::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
@@ -180,9 +182,9 @@ final class UserBehaviorResource extends Resource
                     ->label(__('admin.user_behaviors.behavior_type'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'view'             => 'info',
-                        'click'            => 'success',
-                        'add_to_cart'      => 'warning',
+                        'view' => 'info',
+                        'click' => 'success',
+                        'add_to_cart' => 'warning',
                         'remove_from_cart' => 'danger',
                         'purchase'         => 'primary',
                         'search'           => 'secondary',
@@ -282,11 +284,17 @@ final class UserBehaviorResource extends Resource
                             ->format('Y-m-d')
                             ->displayFormat('Y-m-d'),
                     ])
-                    ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
-                        $query,
-                        $data['range'] ?? null,
-                        'created_at',
-                    )),
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['created_from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['created_until'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    }),
                 Filter::make('recent_behaviors')
                     ->label(__('admin.user_behaviors.recent_behaviors'))
                     ->query(fn (Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(7))),

@@ -27,10 +27,7 @@ final class ProductFeatureResource extends Resource
 
     protected static ?string $model = ProductFeature::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-star';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.

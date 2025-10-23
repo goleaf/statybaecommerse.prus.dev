@@ -12,9 +12,9 @@ use App\Filament\Resources\RecommendationAnalytics\Pages\ViewRecommendationAnaly
 use App\Filament\Resources\RecommendationAnalytics\Schemas\RecommendationAnalyticsForm;
 use App\Filament\Resources\RecommendationAnalytics\Tables\RecommendationAnalyticsTable;
 use App\Models\RecommendationAnalytics;
-use BackedEnum;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 final class RecommendationAnalyticsResource extends Resource
@@ -23,34 +23,7 @@ final class RecommendationAnalyticsResource extends Resource
 
     protected static ?string $model = RecommendationAnalytics::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
-
-    protected static ?int $navigationSort = 8;
-
-    protected static ?string $recordTitleAttribute = 'action';
-
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Analytics';
-    }
-
-    public static function getNavigationLabel(): string
-    {
-        return __('recommendation_analytics.navigation_label');
-    }
-
-    public static function getPluralModelLabel(): string
-    {
-        return __('recommendation_analytics.plural_model_label');
-    }
-
-    public static function getModelLabel(): string
-    {
-        return __('recommendation_analytics.model_label');
-    }
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Form $form): Form
     {

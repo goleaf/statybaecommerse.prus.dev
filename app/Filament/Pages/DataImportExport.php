@@ -5,13 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Services\ImportExport\ProviderRegistry;
-use App\Support\Storage\SecureStorage;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms;
-use Filament\Forms\Components\Fieldset;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Forms\Form;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Storage;
 
@@ -19,10 +15,7 @@ final class DataImportExport extends Page
 {
     protected string $view = 'filament.pages.data-import-export';
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-arrow-down-tray';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-arrow-down-tray';
 
     public ?string $provider = 'xml';
 

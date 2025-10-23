@@ -11,7 +11,6 @@ use App\Filament\Resources\SystemSettingHistories\Pages\ListSystemSettingHistori
 use App\Filament\Resources\SystemSettingHistories\Schemas\SystemSettingHistoryForm;
 use App\Filament\Resources\SystemSettingHistories\Tables\SystemSettingHistoriesTable;
 use App\Models\SystemSettingHistory;
-use BackedEnum;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
@@ -23,10 +22,7 @@ class SystemSettingHistoryResource extends Resource
 
     protected static ?string $model = SystemSettingHistory::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Form $form): Form
     {

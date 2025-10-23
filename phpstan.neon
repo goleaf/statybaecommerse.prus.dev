@@ -1,12 +1,11 @@
 includes:
   - vendor/larastan/larastan/extension.neon
-  - phpstan-baseline.neon
+  - vendor/phpstan/phpstan-deprecation-rules/rules.neon
+  - vendor/phpstan/phpstan/conf/bleedingEdge.neon
 
 parameters:
   level: 9
   paths:
-    - app
-    - database
     - config
   scanFiles:
     - stubs/phpstan/livewire-components.php
@@ -26,6 +25,8 @@ parameters:
   tmpDir: storage/framework/cache/phpstan
   universalObjectCratesClasses:
     - Illuminate\Support\Fluent
+  bootstrapFiles:
+    - stubs/optional-packages.php
 
 # Filament v4 specific ignores
 # ignoreErrors:
