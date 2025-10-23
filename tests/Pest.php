@@ -23,7 +23,7 @@ beforeAll(function () {
             'LOG_CHANNEL=stack',
             'DB_CONNECTION=sqlite',
             'DB_DATABASE=:memory:',
-        ]).PHP_EOL);
+        ]) . PHP_EOL);
     }
 
     config()->set('database.default', 'sqlite');
@@ -91,3 +91,14 @@ if (! function_exists('post')) {
         return test()->post($uri, $data, $headers);
     }
 }
+
+expect()->extend('toHaveCountLessThan', function (int $expected) {
+    $value = $this->value;
+
+    // Count array-like values so assertions remain expressive in navigation tests.
+    $actualCount = is_countable($value) ? count($value) : count((array) $value);
+
+    expect($actualCount)->toBeLessThan($expected);
+
+    return $this;
+});

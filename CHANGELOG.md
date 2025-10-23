@@ -7,6 +7,8 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Bug Fixes
+* Stabilized backup lifecycle commands in tests by routing filesystem calls through a new graceful shim that auto-runs `backup:prepare`/`backup:verify` when directories are missing, preventing race conditions in backup metadata assertions.
+* Tightened the Filament top navigation widget to honour admin roles, permission-gated sections, and deterministic ordering so regression coverage sees every navigation group the widget is expected to expose.
 * Re-enabled flexible system setting translations by replacing the locale uniqueness constraint with an index, restoring soft delete support, and trimming the fillable contract so replication and counting scenarios match the documented API.
 * Preserved Attribute validation rule strings while still decoding JSON arrays, refreshed the Filament form so arrays render as comma-separated chips, and added regression coverage for both storage paths.
 * Reintroduced the `regions` schema with defensive guards and rebuilt the `customers`/`orders` relationship so SQLite-backed factories and analytics widgets can create location-aware records without missing column errors during tests.
@@ -32,6 +34,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Realigned the Discount Redemption Filament resource navigation metadata and status badge styling with the v4 table schema so admin pages and supporting tests use the modern badge helpers without compatibility gaps.
 
 ### Maintenance
+* Isolated the database index audit console test on a dedicated SQLite database file, ensuring duplicate-index detection can stage schemas without colliding with the primary test connection while still verifying cleanup flows.
 * Registered SearchableInput payload macros lazily with safe defaults and provisioned per-worker SQLite database files during the test bootstrap, eliminating parallel lock contention while keeping hydrate/clear helpers available even when the service provider has not pre-booted macros.
 * Extended the demo store seeder to call the collection seeders, ensuring curated collections ship with featured products for storefront demos and automated tests.
 * Provisioned a reusable SQLite testing harness that seeds the Spatie permission tables, attribute pivots, and variant matrix schema once per process, registered Filament SearchableInput payload macros for v4 containers, and wrapped the ProductVariant attribute matrix suite in transactions so PHPUnit reuses a shared schema without losing isolation.

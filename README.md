@@ -32,6 +32,9 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Multilingual experience** across storefront and admin via `spatie/laravel-translatable`, Volt-powered Livewire pages, and localized seed data.
 
 -### Latest updates
+- Graceful filesystem shim now powers test backups, automatically running `backup:prepare`/`backup:verify` when fresh directories are created so artisan exit-code assertions no longer flake during metadata checks.
+- Database index audit regression coverage spins up an isolated SQLite database file per run, avoiding collisions with the shared testing connection while still exercising duplicate detection and cleanup.
+- Filament top navigation widget now derives navigation groups from the enum metadata with permission and role awareness, giving Livewire tests deterministic ordering and complete coverage of admin/public sections.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
 - Region-aware address tables and the dedicated `customers` dataset are back online for the SQLite harness, letting factories and
