@@ -42,6 +42,7 @@
         "spatie/laravel-permission": "^6.21",
         "spatie/laravel-sluggable": "^3.7",
         "spatie/laravel-translatable": "^6.11",
+        "tapp/filament-value-range-filter": "^2.0",
         "zircote/swagger-php": "^4.9",
         "zvizvi/relation-manager-repeater": "^2.0"
     },

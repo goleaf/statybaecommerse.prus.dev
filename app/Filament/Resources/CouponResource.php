@@ -26,7 +26,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
-use LaraZeus\Quantity\Components\Quantity;
+use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 
 final class CouponResource extends Resource
 {
@@ -278,6 +278,21 @@ final class CouponResource extends Resource
                         'fixed'         => __('coupons.types.fixed'),
                         'free_shipping' => __('coupons.types.free_shipping'),
                     ]),
+                SelectFilter::make('customer_group_id')
+                    ->relationship('customerGroup', 'name')
+                    ->preload(),
+                ValueRangeFilter::make('minimum_amount')
+                    ->label(__('coupons.minimum_amount'))
+                    ->currency()
+                    ->currencyCode('EUR')
+                    ->locale('lt')
+                    ->currencyInSmallestUnit(false),
+                ValueRangeFilter::make('value')
+                    ->label(__('coupons.value')),
+                ValueRangeFilter::make('usage_limit')
+                    ->label(__('coupons.usage_limit')),
+                ValueRangeFilter::make('used_count')
+                    ->label(__('coupons.used_count')),
                 TernaryFilter::make('is_active')
                     ->label(__('coupons.is_active'))
                     ->trueLabel(__('coupons.active_only'))
