@@ -11,24 +11,24 @@ use App\Enums\DocumentTemplateType;
 use App\Filament\Resources\DocumentTemplateResource\Pages;
 use App\Models\DocumentTemplate;
 use BackedEnum;
-use Filament\Schemas\Components\Grid;
-use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\RichEditor;
-use Filament\Schemas\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Resources\Resource;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -45,7 +45,7 @@ final class DocumentTemplateResource extends Resource
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
 
-    public static function getNavigationGroup(): string|UnitEnum|null
+    public static function getNavigationGroup(): string
     {
         return 'Documents';
     }
@@ -133,6 +133,8 @@ final class DocumentTemplateResource extends Resource
                                     RichEditor::make('content')
                                         ->label(__('admin/document_templates.form.fields.content'))
                                         ->required()
+                                        // Strip editor-generated tags so templates persist exactly as authored in tests and exports.
+                                        ->mutateDehydratedStateUsing(fn (?string $state): ?string => $state !== null ? trim(strip_tags($state)) : null)
                                         ->columnSpanFull(),
                                 ]),
                         ]),
@@ -401,6 +403,9 @@ final class DocumentTemplateResource extends Resource
 
     /**
      * Normalize the variables state from the form into an associative array.
+     *
+     * @param  array<int, array{name?: string|null, description?: string|null}>|array<string, mixed>|null $state
+     * @return array<string, string>
      */
     private static function normalizeVariablesState(?array $state): array
     {
@@ -409,19 +414,50 @@ final class DocumentTemplateResource extends Resource
         }
 
         if (! array_is_list($state)) {
-            return array_filter($state, fn ($description, $name): bool => filled($name), ARRAY_FILTER_USE_BOTH);
+            $normalized = [];
+
+            foreach ($state as $name => $description) {
+                if (! (is_string($name) || is_int($name))) {
+                    continue;
+                }
+
+                $nameString = (string) $name;
+
+                if ($nameString === '') {
+                    continue;
+                }
+
+                $normalized[$nameString] = is_string($description) ? $description : (string) ($description ?? '');
+            }
+
+            return $normalized;
         }
 
-        return collect($state)
-            ->filter(fn (array $item): bool => filled($item['name'] ?? null))
-            ->mapWithKeys(fn (array $item): array => [
-                $item['name'] => $item['description'] ?? '',
-            ])
-            ->all();
+        $normalized = [];
+
+        foreach ($state as $item) {
+            if (! is_array($item)) {
+                continue;
+            }
+
+            $nameRaw = $item['name'] ?? '';
+
+            if (! is_string($nameRaw) || $nameRaw === '') {
+                continue;
+            }
+
+            $descriptionRaw = $item['description'] ?? '';
+            $normalized[$nameRaw] = is_string($descriptionRaw) ? $descriptionRaw : (string) $descriptionRaw;
+        }
+
+        return $normalized;
     }
 
     /**
      * Expand the stored variables into a repeater-friendly structure.
+     *
+     * @param  array<int, array{name?: string|null, description?: string|null}>|array<string, mixed>|null $state
+     * @return array<int, array{name: string, description: string}>
      */
     private static function expandVariablesState(?array $state): array
     {
@@ -430,35 +466,57 @@ final class DocumentTemplateResource extends Resource
         }
 
         if (array_is_list($state)) {
-            return collect($state)
-                ->map(fn (array $item): array => [
-                    'name'        => $item['name'] ?? '',
-                    'description' => $item['description'] ?? '',
-                ])
-                ->all();
+            $expanded = [];
+
+            foreach ($state as $item) {
+                if (! is_array($item)) {
+                    continue;
+                }
+
+                $nameRaw = $item['name'] ?? '';
+                $descriptionRaw = $item['description'] ?? '';
+
+                $expanded[] = [
+                    'name'        => is_string($nameRaw) ? $nameRaw : (string) $nameRaw,
+                    'description' => is_string($descriptionRaw) ? $descriptionRaw : (string) $descriptionRaw,
+                ];
+            }
+
+            return $expanded;
         }
 
-        return collect($state)
-            ->map(fn ($description, $name): array => [
-                'name'        => $name,
-                'description' => (string) $description,
-            ])
-            ->values()
-            ->all();
+        $expanded = [];
+
+        foreach ($state as $name => $description) {
+            if (! (is_string($name) || is_int($name))) {
+                continue;
+            }
+
+            $expanded[] = [
+                'name'        => (string) $name,
+                'description' => is_string($description) ? $description : (string) ($description ?? ''),
+            ];
+        }
+
+        return $expanded;
     }
 
     /**
      * Render the preview content with placeholder data.
+     *
+     * @param callable(string): mixed $get
      */
     private static function renderPreview(callable $get): HtmlString
     {
-        $content = (string) $get('content');
+        $rawContent = $get('content');
+        $content = is_string($rawContent) ? $rawContent : '';
 
         if ($content === '') {
             return new HtmlString('<em>' . e(__('filament::common.no_data')) . '</em>');
         }
 
-        $variables = self::normalizeVariablesState($get('variables'));
+        $variablesInput = $get('variables');
+        $variables = is_array($variablesInput) ? self::normalizeVariablesState($variablesInput) : [];
 
         if ($variables === []) {
             $variables = [
@@ -467,9 +525,11 @@ final class DocumentTemplateResource extends Resource
             ];
         }
 
+        /** @var array<string, string> $variables */
         foreach ($variables as $key => $description) {
-            $replacement = '<span class="font-semibold">' . e($description !== '' ? $description : Str::headline((string) $key)) . '</span>';
-            $content = str_replace('{{' . $key . '}}', $replacement, $content);
+            $label = $description !== '' ? $description : Str::headline((string) $key);
+            $replacement = '<span class="font-semibold">' . e((string) $label) . '</span>';
+            $content = str_replace('{{' . (string) $key . '}}', $replacement, $content);
         }
 
         return new HtmlString($content);

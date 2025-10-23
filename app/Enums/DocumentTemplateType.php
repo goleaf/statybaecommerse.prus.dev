@@ -32,6 +32,9 @@ enum DocumentTemplateType: string
         };
     }
 
+    /**
+     * @return array<string, string>
+     */
     public static function options(): array
     {
         return collect(self::cases())
