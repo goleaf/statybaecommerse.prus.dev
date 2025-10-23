@@ -375,7 +375,7 @@ final class EnumValueResource extends Resource
         return $activeCount === $count ? (string) $count : "{$activeCount}/{$count}";
     }
 
-    public static function getNavigationBadgeColor(): ?string
+    public static function getNavigationBadgeColor(): string|array|null
     {
         $count = self::getModel()::count();
         $activeCount = self::getModel()::where('is_active', true)->count();

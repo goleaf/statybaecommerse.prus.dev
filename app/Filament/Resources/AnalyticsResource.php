@@ -65,7 +65,7 @@ final class AnalyticsResource extends Resource
         return $count > 0 ? (string) $count : null;
     }
 
-    public static function getNavigationBadgeColor(): ?string
+    public static function getNavigationBadgeColor(): string|array|null
     {
         return 'warning';
     }
