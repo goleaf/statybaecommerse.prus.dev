@@ -76,7 +76,7 @@ final class NormalSettingResource extends Resource
                                 ->rows(3),
                             Select::make('type')
                                 ->label(__('normal_settings.type'))
-                                ->options(self::getTypeOptions())
+                                ->options(self::typeOptions())
                                 ->required()
                                 ->native(false),
                         ]),
@@ -165,8 +165,8 @@ final class NormalSettingResource extends Resource
             ->filters([
                 SelectFilter::make('type')
                     ->label(__('normal_settings.type'))
-                    ->options(self::getTypeOptions()),
-            TernaryFilter::make('is_public')
+                    ->options(self::typeOptions()),
+                TernaryFilter::make('is_public')
                     ->label(__('normal_settings.is_public'))
                     ->nullable(),
                 TernaryFilter::make('is_encrypted')
@@ -190,16 +190,14 @@ final class NormalSettingResource extends Resource
     /**
      * @return array<string, string>
      */
-    private static function getTypeOptions(): array
+    private static function typeOptions(): array
     {
-        return [
-            'text' => __('normal_settings.types.text'),
-            'number' => __('normal_settings.types.number'),
-            'boolean' => __('normal_settings.types.boolean'),
-            'array' => __('normal_settings.types.array'),
-            'json' => __('normal_settings.types.json'),
-            'string' => __('normal_settings.types.string'),
-            'integer' => __('normal_settings.types.integer'),
-        ];
+        $options = [];
+
+        foreach (NormalSetting::CANONICAL_TYPES as $type) {
+            $options[$type] = __('normal_settings.types.' . $type);
+        }
+
+        return $options;
     }
 }
