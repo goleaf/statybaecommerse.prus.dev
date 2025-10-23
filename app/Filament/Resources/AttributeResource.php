@@ -61,7 +61,7 @@ final class AttributeResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema->schema([
             Section::make(__('attributes.basic_information'))

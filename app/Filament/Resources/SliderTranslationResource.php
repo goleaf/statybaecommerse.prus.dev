@@ -60,7 +60,7 @@ final class SliderTranslationResource extends Resource
         return __('admin.slider_translations.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema->schema([
             SchemaSection::make(__('admin.slider_translations.basic_information'))

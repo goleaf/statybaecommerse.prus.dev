@@ -69,7 +69,7 @@ final class SystemSettingDependencyResource extends Resource
         return __('admin.system_setting_dependencies.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema->schema([
             Section::make(__('admin.system_setting_dependencies.basic_information'))

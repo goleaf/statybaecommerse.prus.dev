@@ -86,7 +86,7 @@ final class UserBehaviorResource extends Resource
         return __('admin.user_behaviors.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema
             ->schema([

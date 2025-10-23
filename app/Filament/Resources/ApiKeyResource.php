@@ -72,7 +72,7 @@ final class ApiKeyResource extends Resource
         return __('api_keys.navigation.plural');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema->schema([
             Section::make(__('api_keys.sections.details'))

@@ -26,7 +26,7 @@ final class MenuItemsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'allItems';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
         return $schema->schema([
             Grid::make(2)

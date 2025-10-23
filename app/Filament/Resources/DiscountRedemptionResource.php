@@ -73,7 +73,7 @@ final class DiscountRedemptionResource extends Resource
         return __('admin.discount_redemptions.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema->schema([
             Section::make(__('discount_redemptions.sections.associations'))

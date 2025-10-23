@@ -13,18 +13,58 @@ namespace {
         class_alias(\Filament\Schemas\Schema::class, \Filament\Forms\Form::class);
     }
 
-    if (! class_exists(Get::class) && class_exists(\Filament\Schemas\Components\Utilities\Get::class)) {
-        class_alias(\Filament\Schemas\Components\Utilities\Get::class, Get::class);
+    if (! class_exists(\Filament\Infolists\Infolist::class) && class_exists(\Filament\Schemas\Schema::class)) {
+        class_alias(\Filament\Schemas\Schema::class, \Filament\Infolists\Infolist::class);
     }
 
-    if (! class_exists(Set::class) && class_exists(\Filament\Schemas\Components\Utilities\Set::class)) {
-        class_alias(\Filament\Schemas\Components\Utilities\Set::class, Set::class);
+    if (! class_exists(\Filament\Tables\Table::class) && class_exists(\Filament\Resources\Table::class)) {
+        class_alias(\Filament\Resources\Table::class, \Filament\Tables\Table::class);
     }
 
     if (! class_exists(\Filament\Forms\Components\Flatpickr::class) && class_exists(\Coolsam\Flatpickr\Forms\Components\Flatpickr::class)) {
         // Preserve the legacy component namespace so third-party discovery hooks can resolve Flatpickr during upgrades.
         class_alias(\Coolsam\Flatpickr\Forms\Components\Flatpickr::class, \Filament\Forms\Components\Flatpickr::class);
     }
+
+    spl_autoload_register(static function (string $class): void {
+        if (class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false)) {
+            return;
+        }
+
+        /**
+         * Map legacy Filament namespaces to their v4 Schema equivalents so existing resources keep functioning without
+         * requiring a massive, error-prone refactor. We only alias classes that actually exist in the new namespace to
+         * avoid autoload recursion when third-party packages ship their own implementations.
+         *
+         * @var array<string, string> $prefixes
+         */
+        $prefixes = [
+            'Filament\\Forms\\Components\\' => 'Filament\\Schemas\\Components\\',
+            'Filament\\Forms\\Concerns\\' => 'Filament\\Schemas\\Concerns\\',
+            'Filament\\Forms\\Contracts\\' => 'Filament\\Schemas\\Contracts\\',
+            'Filament\\Forms\\Testing\\' => 'Filament\\Schemas\\Testing\\',
+            'Filament\\Infolists\\Components\\' => 'Filament\\Schemas\\Components\\',
+            'Filament\\Infolists\\Concerns\\' => 'Filament\\Schemas\\Concerns\\',
+            'Filament\\Infolists\\Contracts\\' => 'Filament\\Schemas\\Contracts\\',
+            'Filament\\Infolists\\Testing\\' => 'Filament\\Schemas\\Testing\\',
+        ];
+
+        foreach ($prefixes as $legacyPrefix => $modernPrefix) {
+            if (! str_starts_with($class, $legacyPrefix)) {
+                continue;
+            }
+
+            $replacement = $modernPrefix . substr($class, strlen($legacyPrefix));
+
+            if (! class_exists($replacement) && ! interface_exists($replacement) && ! trait_exists($replacement)) {
+                continue;
+            }
+
+            class_alias($replacement, $class);
+
+            return;
+        }
+    });
 }
 
 namespace Filament\Forms\Components {

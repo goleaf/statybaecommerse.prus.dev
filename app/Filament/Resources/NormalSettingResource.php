@@ -52,7 +52,7 @@ final class NormalSettingResource extends Resource
         return __('admin.normal_settings.navigation');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema->schema([
             Tabs::make(__('normal_settings.tabs.label'))

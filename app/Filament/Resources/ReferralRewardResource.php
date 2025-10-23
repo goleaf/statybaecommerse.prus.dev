@@ -50,7 +50,7 @@ final class ReferralRewardResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Referral';
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema
             ->schema([
@@ -283,7 +283,7 @@ final class ReferralRewardResource extends Resource
             ]);
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Infolist $infolist): Infolist
     {
         return $schema
             ->schema([

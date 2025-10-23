@@ -49,7 +49,7 @@ final class CartItemResource extends Resource
     /**
      * @var string|\BackedEnum|null Define the navigation icon in a docblock to keep compatibility with Filament's autoloading.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static ?string $model = CartItem::class;
 

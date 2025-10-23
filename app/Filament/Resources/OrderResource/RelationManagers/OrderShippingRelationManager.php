@@ -55,7 +55,7 @@ final class OrderShippingRelationManager extends BaseRelationManager
     /**
      * Configure the form schema for order shipping.
      */
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
         return $schema
             ->schema([

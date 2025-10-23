@@ -31,7 +31,7 @@ final class ReferralCodeUsageLogResource extends Resource
         return Heroicon::OutlinedRectangleStack;
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return ReferralCodeUsageLogForm::configure($schema);
     }

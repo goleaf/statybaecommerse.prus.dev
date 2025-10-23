@@ -75,7 +75,7 @@ final class CountryResource extends Resource
         return __('countries.models.countries');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema
             ->schema([

@@ -48,15 +48,11 @@ final class EnumValueResource extends Resource
 
     protected static ?string $model = EnumValue::class;
 
-    /**
-     * @var string|\BackedEnum|null Provide a consistent icon for value maintenance.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
+    /** @var string|\BackedEnum|null Provide a consistent icon for value maintenance. */
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-squares-2x2';
 
-    /**
-     * @var string|\UnitEnum|null Keep enum value tools inside the System cluster.
-     */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
+    /** @var string|\BackedEnum|null Keep enum value tools inside the System cluster. */
+    protected static string | \UnitEnum | null $navigationGroup = NavigationGroup::System;
 
     public static function getNavigationGroup(): ?string
     {

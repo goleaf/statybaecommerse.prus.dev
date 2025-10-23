@@ -51,7 +51,7 @@ final class ReferralResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'referral_code';
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema
             ->components([

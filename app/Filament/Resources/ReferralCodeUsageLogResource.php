@@ -47,7 +47,7 @@ final class ReferralCodeUsageLogResource extends Resource
         return __('admin.referral_code_usage_logs.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return ReferralCodeUsageLogFormSchema::configure($schema);
     }

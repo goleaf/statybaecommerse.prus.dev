@@ -65,7 +65,7 @@ final class UserPreferenceResource extends Resource
         return __('admin/user_preferences.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema
             ->schema([

@@ -29,7 +29,7 @@ final class NewsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'News';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
         return $schema
             ->schema([

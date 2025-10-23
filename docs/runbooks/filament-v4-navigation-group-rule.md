@@ -92,3 +92,9 @@ final class BrandResource extends Resource
 - Type errors on `$navigationGroup` property
 
 This rule ensures 100% compatibility with Filament v4 navigation group requirements and prevents future type errors.
+
+## Legacy component compatibility helper
+
+- The `bootstrap/filament_compat.php` bootstrapper now registers an autoloader that aliases legacy `Filament\Forms\...` and `Filament\Infolists\...` namespaces to their Filament v4 `Filament\Schemas\...` counterparts when the modern class exists.
+- This keeps existing resources, support classes, and tests functional while gradually migrating imports to the new schema-based APIs.
+- When authoring new code prefer the v4 namespaces directly, but the bridge guarantees that older packages and internal helpers continue to resolve without fatal errors.

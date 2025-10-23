@@ -42,7 +42,7 @@ final class ReferralCodeResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Referral';
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema
             ->components([

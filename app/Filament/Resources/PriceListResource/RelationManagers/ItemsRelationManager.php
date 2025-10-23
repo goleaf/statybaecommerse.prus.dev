@@ -28,7 +28,7 @@ final class ItemsRelationManager extends BaseRelationManager
         return __('price_lists.relation_managers.items.title');
     }
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
         return $schema
             ->components([

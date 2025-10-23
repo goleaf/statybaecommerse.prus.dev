@@ -72,7 +72,7 @@ final class NewsTagResource extends Resource
         return __('admin.news_tags.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema->schema([
             FormSection::make(__('admin.news_tags.form.sections.basic_information'))
