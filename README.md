@@ -17,6 +17,8 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 ### Latest updates
+- Product API endpoints now resolve via dedicated application use cases, an Eloquent-backed repository, and a presenter that preserves the public contract while filtering non-displayable catalogue entries.
+- Menu Item resource navigation icons rely on the shared docblock convention with documented schema/table delegators, keeping Filament v4 reviewers aligned on our configurator pattern.
 - Wishlist Item admin navigation now uses the Filament-standard static icon property with a documented sidebar sort note, keeping customer tooling metadata consistent across the admin.
 - Diagnostics coverage moved from bespoke artisan commands to dedicated PHPUnit suites with a minimum coverage extension and Paratest-ready tooling, making the quality gate observable directly from standard test runs.
 - Security middleware now shares request-scoped CSP nonces with Livewire and Vite, tightens HSTS/permissions policy headers, and updates inline Blade assets to honour nonce-based CSP directives end-to-end.

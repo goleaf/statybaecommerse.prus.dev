@@ -13,7 +13,7 @@ use App\Filament\Resources\MenuItems\Pages\ListMenuItems;
 use App\Filament\Resources\MenuItems\Schemas\MenuItemForm;
 use App\Filament\Resources\MenuItems\Tables\MenuItemsTable;
 use App\Models\MenuItem;
-use BackedEnum;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -26,17 +26,27 @@ class MenuItemResource extends Resource
     use HasNav;
 
     protected static ?string $model = MenuItem::class;
-    /** @var string|\BackedEnum|null */
+
+    /**
+     * @var string|\BackedEnum|null Menu item icon aligned with Filament v4 guidance.
+     */
     protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $schema): Schema   
+    /**
+     * Compose the shared form schema for creating and editing menu items.
+     */
+    public static function form(Schema $schema): Schema
     {
+        // Delegate field layout to the dedicated schema configurator for reuse.
         return MenuItemForm::configure($schema);
     }
 
-    public static function table(Table $table): Table   
+    /**
+     * Build the reusable table definition for listing menu items.
+     */
+    public static function table(Table $table): Table
     {
-        // Configure the table definition for the streamlined Filament v4 return type.
+        // Centralise column configuration in the shared table builder.
         return MenuItemsTable::configure($table);
     }
 
