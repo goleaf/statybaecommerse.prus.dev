@@ -16,13 +16,13 @@
         {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::RESOURCE_TABS_START, scopes: $renderHookScopes) }}
         {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::RESOURCE_PAGES_LIST_RECORDS_TABS_START, scopes: $renderHookScopes) }}
 
-        <x-filament.components.widget-tabs.index>
+        <x-filament.components::widget-tabs.index>
             @foreach ($widgetTabs as $widgetTabKey => $widgetTab)
                 @php
                     $widgetTabKey = strval($widgetTabKey);
                 @endphp
 
-                <x-filament.components.widget-tabs.item
+                <x-filament.components::widget-tabs.item
                     :alpine-active="'widgetTab === \'' . $widgetTabKey . '\''"
                     x-on:click="toggleWidgetTab('{{ $widgetTabKey }}')"
                     :value="$widgetTab->getValue()"

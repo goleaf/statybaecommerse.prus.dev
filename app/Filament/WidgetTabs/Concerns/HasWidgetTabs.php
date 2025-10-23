@@ -13,8 +13,13 @@ use Livewire\Attributes\Url;
 
 trait HasWidgetTabs
 {
-    #[Url]
+    #[Url(as: 'activeTab')]
     public ?string $activeWidgetTab = null;
+
+    /**
+     * Mirror the widget tab selection for legacy callers and tests that refer to the property as `activeTab`.
+     */
+    public ?string $activeTab = null;
 
     /**
      * @var array<string|int, WidgetTab>
@@ -37,6 +42,9 @@ trait HasWidgetTabs
         if ($this->shouldLoadDefaultActiveWidgetTab()) {
             $this->loadDefaultActiveWidgetTab();
         }
+
+        // Keep both public properties aligned so external interactions stay backwards compatible.
+        $this->synchroniseActiveTabAliases();
     }
 
     protected function shouldLoadDefaultActiveWidgetTab(): bool
@@ -46,11 +54,31 @@ trait HasWidgetTabs
 
     protected function loadDefaultActiveWidgetTab(): void
     {
-        if (filled($this->activeWidgetTab)) {
+        if (filled($this->getActiveWidgetTabValue())) {
             return;
         }
 
-        $this->activeWidgetTab = $this->getDefaultActiveWidgetTab();
+        $this->setActiveWidgetTab($this->getDefaultActiveWidgetTab());
+    }
+
+    protected function synchroniseActiveTabAliases(): void
+    {
+        if ($this->activeWidgetTab === $this->activeTab) {
+            return;
+        }
+
+        $this->activeTab = $this->activeWidgetTab;
+    }
+
+    protected function getActiveWidgetTabValue(): string|int|null
+    {
+        return $this->activeWidgetTab ?? $this->activeTab;
+    }
+
+    protected function setActiveWidgetTab(string|int|null $tab): void
+    {
+        $this->activeWidgetTab = $tab === null ? null : (string) $tab;
+        $this->activeTab = $this->activeWidgetTab;
     }
 
     public function getDefaultActiveWidgetTab(): string|int|null
@@ -93,22 +121,46 @@ trait HasWidgetTabs
 
     protected function modifyQueryWithActiveWidgetTab(Builder $query): Builder
     {
-        if (blank($this->activeWidgetTab)) {
+        $activeTab = $this->getActiveWidgetTabValue();
+
+        if (blank($activeTab)) {
             return $query;
         }
 
         $widgetTabs = $this->getCachedWidgetTabs();
 
-        if (! array_key_exists($this->activeWidgetTab, $widgetTabs)) {
+        if (! array_key_exists($activeTab, $widgetTabs)) {
             return $query;
         }
 
-        return $widgetTabs[$this->activeWidgetTab]->modifyQuery($query);
+        return $widgetTabs[$activeTab]->modifyQuery($query);
     }
 
     protected function applyWidgetTabFilters(Builder $query): Builder
     {
         return $this->modifyQueryWithActiveWidgetTab($query);
+    }
+
+    public function updatedActiveWidgetTab(string|int|null $tab): void
+    {
+        // Keep the alias property synchronised without triggering unnecessary Livewire updates.
+        if ($this->activeTab === ($tab === null ? null : (string) $tab)) {
+            return;
+        }
+
+        $this->activeTab = $tab === null ? null : (string) $tab;
+    }
+
+    public function updatedActiveTab(): void
+    {
+        // Ensure direct mutations to `activeTab` update the canonical widget tab property too.
+        $normalisedTab = $this->activeTab === null ? null : (string) $this->activeTab;
+
+        if ($this->activeWidgetTab === $normalisedTab) {
+            return;
+        }
+
+        $this->activeWidgetTab = $normalisedTab;
     }
 
     protected function getTableQuery(): Builder

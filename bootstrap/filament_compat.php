@@ -26,45 +26,10 @@ namespace {
         class_alias(\Coolsam\Flatpickr\Forms\Components\Flatpickr::class, \Filament\Forms\Components\Flatpickr::class);
     }
 
-    spl_autoload_register(static function (string $class): void {
-        if (class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false)) {
-            return;
-        }
-
-        /**
-         * Map legacy Filament namespaces to their v4 Schema equivalents so existing resources keep functioning without
-         * requiring a massive, error-prone refactor. We only alias classes that actually exist in the new namespace to
-         * avoid autoload recursion when third-party packages ship their own implementations.
-         *
-         * @var array<string, string> $prefixes
-         */
-        $prefixes = [
-            'Filament\\Forms\\Components\\' => 'Filament\\Schemas\\Components\\',
-            'Filament\\Forms\\Concerns\\' => 'Filament\\Schemas\\Concerns\\',
-            'Filament\\Forms\\Contracts\\' => 'Filament\\Schemas\\Contracts\\',
-            'Filament\\Forms\\Testing\\' => 'Filament\\Schemas\\Testing\\',
-            'Filament\\Infolists\\Components\\' => 'Filament\\Schemas\\Components\\',
-            'Filament\\Infolists\\Concerns\\' => 'Filament\\Schemas\\Concerns\\',
-            'Filament\\Infolists\\Contracts\\' => 'Filament\\Schemas\\Contracts\\',
-            'Filament\\Infolists\\Testing\\' => 'Filament\\Schemas\\Testing\\',
-        ];
-
-        foreach ($prefixes as $legacyPrefix => $modernPrefix) {
-            if (! str_starts_with($class, $legacyPrefix)) {
-                continue;
-            }
-
-            $replacement = $modernPrefix . substr($class, strlen($legacyPrefix));
-
-            if (! class_exists($replacement) && ! interface_exists($replacement) && ! trait_exists($replacement)) {
-                continue;
-            }
-
-            class_alias($replacement, $class);
-
-            return;
-        }
-    });
+    if (! class_exists(\Filament\Tables\Actions\DeleteAction::class) && class_exists(\Filament\Actions\DeleteAction::class)) {
+        // Maintain backwards compatibility with test helpers and legacy code targeting table-specific delete actions.
+        class_alias(\Filament\Actions\DeleteAction::class, \Filament\Tables\Actions\DeleteAction::class);
+    }
 }
 
 namespace Filament\Forms\Components {
