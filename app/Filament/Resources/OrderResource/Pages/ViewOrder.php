@@ -7,8 +7,6 @@ namespace App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\DiscountRedemptionResource;
 use App\Filament\Resources\DocumentResource;
 use App\Filament\Resources\OrderResource;
-use App\Models\DiscountRedemption;
-use App\Models\Document;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Filament\Actions;
@@ -17,11 +15,6 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Schema;
 use Icetalker\FilamentTableRepeatableEntry\Infolists\Components\TableRepeatableEntry;
-use Illuminate\Support\Number;
-use LaraZeus\ListGroup\Entries\ListItem;
-use LaraZeus\ListGroup\Infolists\ListEntry;
-use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\ViewRecord\Concerns\Translatable as SpatieTranslatableViewRecord;
 
 final class ViewOrder extends ViewRecord
 {
@@ -39,128 +32,7 @@ final class ViewOrder extends ViewRecord
 
     public function infolist(Schema $schema): Schema
     {
-        return $schema->schema([
-            ListEntry::make('orderQuickLinks')
-                ->heading(__('Quick links'))
-                ->list()
-                ->state(function (Order $record): array {
-                    // Keep money formatting and translations consistent across quick link items.
-                    $currency = $record->currency ?? config('shared.localization.default_currency', 'EUR');
-
-                    return [
-                        ListItem::make()
-                            ->id('order-customer-view-' . $record->getKey())
-                            ->label(__('View customer order page'))
-                            ->icon('heroicon-m-shopping-bag')
-                            ->color('primary')
-                            ->url(route('account.orders.detail', ['number' => $record->number]))
-                            ->tooltip(__('Open the customer-facing order detail for :number', ['number' => $record->number]))
-                            ->toArray(),
-                        ListItem::make()
-                            ->id('order-invoice-' . $record->getKey())
-                            ->label(__('Download invoice'))
-                            ->icon('heroicon-m-document-arrow-down')
-                            ->color('info')
-                            ->url(route('account.orders.invoice', ['number' => $record->number]))
-                            ->tooltip(__('Download the invoice for :number (:total)', [
-                                'number' => $record->number,
-                                'total'  => Number::currency($record->total, $currency),
-                            ]))
-                            ->toArray(),
-                    ];
-                }),
-            ListEntry::make('orderDiscountRedemptions')
-                ->heading(__('discount_redemptions.title'))
-                ->list()
-                ->state(function (Order $record): array {
-                    // Ensure translated discount and code data is available for every redemption item.
-                    $locale = app()->getLocale();
-                    $record->loadMissing(['discountRedemptions.discount', 'discountRedemptions.code']);
-                    $currency = $record->currency ?? config('shared.localization.default_currency', 'EUR');
-
-                    return $record->discountRedemptions
-                        ->map(function (DiscountRedemption $redemption) use ($currency, $locale): array {
-                            $discount = $redemption->discount;
-                            $code = $redemption->code;
-                            $discountName = $discount?->getTranslation('name', $locale) ?? $discount?->name ?? __('discount_redemptions.single');
-                            $codeValue = $code?->code ?? $redemption->getTranslation('status_description', $locale);
-
-                            return ListItem::make()
-                                ->id('order-discount-redemption-' . $redemption->getKey())
-                                ->label(__('discount_redemptions.list_item_label', ['discount' => $discountName]))
-                                ->icon('heroicon-m-ticket')
-                                ->color('warning')
-                                ->url(DiscountRedemptionResource::getUrl('view', ['record' => $redemption]))
-                                ->tooltip(__('discount_redemptions.list_item_tooltip', [
-                                    'amount' => Number::currency($redemption->amount_saved, $currency),
-                                    'code'   => $codeValue,
-                                ]))
-                                ->toArray();
-                        })
-                        ->all();
-                }),
-            ListEntry::make('orderDocuments')
-                ->heading(__('orders.documents'))
-                ->list()
-                ->state(function (Order $record): array {
-                    // Documents may include localized titles; capture them for the active locale.
-                    $locale = app()->getLocale();
-                    $record->loadMissing(['documents.template']);
-
-                    return $record->documents
-                        ->map(function (Document $document) use ($locale): array {
-                            // Some document templates expose translated titles, while others remain plain strings.
-                            $title = method_exists($document, 'getTranslation')
-                                ? ($document->getTranslation('title', $locale) ?? $document->title)
-                                : $document->title;
-                            $title ??= $document->name ?? __('orders.document');
-
-                            return ListItem::make()
-                                ->id('order-document-' . $document->getKey())
-                                ->label($title)
-                                ->icon('heroicon-m-document-text')
-                                ->color('info')
-                                ->url(DocumentResource::getUrl('view', ['record' => $document]))
-                                ->tooltip(__('orders.document_version_tooltip', [
-                                    'version' => $document->version ?? 1,
-                                ]))
-                                ->toArray();
-                        })
-                        ->all();
-                }),
-            ListEntry::make('orderItemsSummary')
-                ->heading(__('orders.order_items'))
-                ->list()
-                ->state(function (Order $record): array {
-                    // Order items need translated product names for localized admins.
-                    $locale = app()->getLocale();
-                    $record->loadMissing(['items.product']);
-                    $currency = $record->currency ?? config('shared.localization.default_currency', 'EUR');
-
-                    return $record->items
-                        ->map(function (OrderItem $item) use ($currency, $locale): array {
-                            $product = $item->product;
-                            $productName = $product?->getTranslation('name', $locale) ?? $item->name;
-                            $productUrl = $product !== null
-                                ? route('frontend.products.show', $product)
-                                : route('frontend.products.index');
-
-                            return ListItem::make()
-                                ->id('order-item-' . $item->getKey())
-                                ->label(__('x:quantity — :product', [
-                                    'quantity' => $item->quantity,
-                                    'product'  => $productName,
-                                ]))
-                                ->icon('heroicon-m-rectangle-stack')
-                                ->color('success')
-                                ->url($productUrl)
-                                ->tooltip(__('Line total: :total', [
-                                    'total' => Number::currency($item->total, $currency),
-                                ]))
-                                ->toArray();
-                        })
-                        ->all();
-                }),
+        return $schema->components([
             Section::make(__('orders.order_items'))
                 ->schema([
                     TableRepeatableEntry::make('items')
@@ -171,11 +43,11 @@ final class ViewOrder extends ViewRecord
 
                             return $record->items
                                 ->map(fn (OrderItem $item): array => [
-                                    'product'  => $item->product?->name ?? $item->name,
-                                    'sku'      => $item->sku,
+                                    'product' => $item->product?->name ?? $item->name,
+                                    'sku' => $item->sku,
                                     'quantity' => $item->quantity,
-                                    'price'    => $item->unit_price ?? $item->price,
-                                    'total'    => $item->total,
+                                    'price' => $item->unit_price ?? $item->price,
+                                    'total' => $item->total,
                                 ])
                                 ->values()
                                 ->all();
