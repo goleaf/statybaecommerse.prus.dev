@@ -108,6 +108,23 @@ final class SystemSettingDependency extends Model
         return $query->where('condition', 'like', "%{$condition}%");
     }
 
+    public function scopeByCondition(Builder $query, string $operator): Builder
+    {
+        $normalizedOperator = strtolower($operator);
+
+        $acceptedOperators = array_unique([
+            $operator,
+            $normalizedOperator,
+            strtoupper($normalizedOperator),
+        ]);
+
+        return $query->where(function (Builder $builder) use ($acceptedOperators): void {
+            $builder
+                ->whereIn('condition->operator', $acceptedOperators)
+                ->orWhereIn('condition', $acceptedOperators);
+        });
+    }
+
     /**
      * Scope the query to dependencies matching the given condition operator.
      *
@@ -236,12 +253,12 @@ final class SystemSettingDependency extends Model
             'equals'       => $dependencyValue == $condition['value'],
             'not_equals'   => $dependencyValue != $condition['value'],
             'greater_than' => $dependencyValue > $condition['value'],
-            'less_than' => $dependencyValue < $condition['value'],
-            'contains' => str_contains($dependencyValue, $condition['value']),
+            'less_than'    => $dependencyValue < $condition['value'],
+            'contains'     => str_contains($dependencyValue, $condition['value']),
             'not_contains' => ! str_contains($dependencyValue, $condition['value']),
-            'in' => in_array($dependencyValue, $condition['value'] ?? []),
-            'not_in' => ! in_array($dependencyValue, $condition['value'] ?? []),
-            default => false,
+            'in'           => in_array($dependencyValue, $condition['value'] ?? []),
+            'not_in'       => ! in_array($dependencyValue, $condition['value'] ?? []),
+            default        => false,
         };
     }
 }
