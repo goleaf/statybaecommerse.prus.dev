@@ -41,7 +41,8 @@ final class VariantStockResource extends Resource
 
     protected static ?string $model = VariantInventory::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-archive-box';
+    /** Navigation icon for the resource (string|\BackedEnum|null). */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
