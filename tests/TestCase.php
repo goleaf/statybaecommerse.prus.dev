@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
+use RuntimeException;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -27,10 +28,34 @@ abstract class TestCase extends BaseTestCase
 
     private ?Panel $resolvedAdminPanel = null;
 
+    /**
+     * Track the absolute path to the SQLite database that powers integration tests.
+     */
+    private string $sqliteDatabasePath = '';
+
     protected function setUp(): void
     {
-        // Reset the refresh state before Laravel boots so feature tests always run migrations.
-        RefreshDatabaseState::$migrated = false;
+        // Resolve the SQLite database path before the application boots so migrations
+        // can target a persistent file instead of the default in-memory database that
+        // loses tables between separate PDO connections.
+        $this->sqliteDatabasePath = dirname(__DIR__) . '/database/testing.sqlite';
+
+        if (! file_exists($this->sqliteDatabasePath)) {
+            // Create the SQLite file eagerly to avoid runtime race conditions when the
+            // framework attempts to run the first migration during the boot cycle.
+            if (@touch($this->sqliteDatabasePath) === false) {
+                throw new RuntimeException('Unable to create the testing SQLite database file.');
+            }
+        }
+
+        // Force the environment to rely on the persistent SQLite database file for
+        // every test execution so RefreshDatabase operates consistently.
+        putenv('DB_CONNECTION=sqlite');
+        putenv('DB_DATABASE=' . $this->sqliteDatabasePath);
+        $_ENV['DB_CONNECTION'] = 'sqlite';
+        $_ENV['DB_DATABASE'] = $this->sqliteDatabasePath;
+        $_SERVER['DB_CONNECTION'] = 'sqlite';
+        $_SERVER['DB_DATABASE'] = $this->sqliteDatabasePath;
 
         parent::setUp();
 
@@ -52,31 +77,20 @@ abstract class TestCase extends BaseTestCase
         }
 
         Config::set('database.default', 'sqlite');
-        Config::set('database.connections.sqlite.database', database_path('database.sqlite'));
+        // Point the connection to the same persistent SQLite database file that was
+        // created before bootstrapping so model factories run against real tables.
+        Config::set('database.connections.sqlite.database', $this->sqliteDatabasePath);
         Config::set('app.key', 'base64:' . base64_encode(random_bytes(32)));
         // Ensure Telescope doesn't use MySQL during tests and avoid watchers overhead
         Config::set('telescope.enabled', false);
         Config::set('telescope.storage.database.connection', 'sqlite');
-        // Provision the companies table on demand when migrations are unavailable in isolated unit tests.
-        if (! Schema::hasTable('companies')) {
-            Schema::create('companies', function (Blueprint $table): void {
-                $table->id();
-                $table->string('name');
-                $table->string('email')->nullable();
-                $table->string('phone')->nullable();
-                $table->text('address')->nullable();
-                $table->string('website')->nullable();
-                $table->string('industry')->nullable();
-                $table->enum('size', ['small', 'medium', 'large'])->nullable();
-                $table->text('description')->nullable();
-                $table->boolean('is_active')->default(true);
-                $table->json('metadata')->nullable();
-                $table->timestamps();
-                $table->index('is_active');
-                $table->index('industry');
-                $table->index('size');
-            });
+
+        if (! Schema::hasTable('migrations')) {
+            // Ensure the schema exists before factories execute so contract tests get
+            // deterministic table structures on file-based SQLite databases.
+            Artisan::call('migrate:fresh', ['--database' => 'sqlite']);
         }
+
         $this->refreshTranslationLoader();
         app()->instance('request', Request::create('/'));
         $this->withoutMiddleware([

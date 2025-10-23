@@ -17,8 +17,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 ### Latest updates
-- Feature tests now reset Laravel's refresh flag before booting, ensuring in-memory SQLite migrations run for every suite and avoiding the missing table exceptions previously raised by the API endpoints.
-- Recently viewed storefront responses now fall back to bare identifiers for draft products while still returning the full media payload for published catalogue entries, keeping session-driven history widgets predictable.
+- API contract validation now runs against a persistent SQLite testing database with refreshed factories, keeping the product, brand, category, order, and user endpoints reachable during regression runs.
 - Search endpoints now respect mixed-case `types[]` filters by normalizing them server-side, preventing fallback to all buckets when storefront clients request specific result categories.
 - Company model unit tests now bootstrap the SQLite `companies` table and defer the active scope until migrations complete, eliminating missing-table crashes during `php artisan test` runs.
 - Storefront autocomplete now trims and caches queries, reuses injected services for faster bucket lookups, and delivers safe highlight markup so Live Search suggestions no longer show raw `<mark>` tags.
@@ -109,6 +108,9 @@ Need background workers, logs, and Vite in one go? Use the existing dev loop:
 ```bash
 composer run dev
 ```
+
+### Testing & contract validation
+- Run `php artisan test --filter=ContractValidationTest` to verify the public product, category, brand, order, and user contracts. The bootstrap now creates `database/testing.sqlite` automatically so migrations and model factories align with the published schemas even on clean machines.
 
 ## Latest maintenance
 
