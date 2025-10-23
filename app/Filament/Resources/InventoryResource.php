@@ -7,7 +7,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\InventoryResource\Pages;
 use App\Models\Inventory;
 use App\Models\Product;
-use App\Support\Filament\SearchableInputHelper;
+use App\Support\Filament\SearchableComponentHelper;
 use App\Support\Search\ProductSearch;
 use App\Support\Search\SearchableComponentHelper;
 use App\Support\Search\SearchResultPayload;
@@ -15,8 +15,9 @@ use BackedEnum;
 use Closure;
 use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Set;
@@ -86,53 +87,41 @@ final class InventoryResource extends Resource
                                 ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
                                 ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?Inventory $record): void {
-                                    // Hydrate via shared helper per docs/forms/SEARCHABLE_INPUT_METADATA.md guidance.
-                                    SearchableInputHelper::hydrate(
+                                    // Hydrate via shared helper to reuse canonical payload normalisation across resources.
+                                    SearchableComponentHelper::hydrate(
                                         $component,
                                         $state,
-                                        static function (int $value) use ($record): ?array {
-                                            $product = $record?->product;
-
-                                            if (! $product instanceof Product || $product->getKey() !== $value) {
-                                                $product = Product::query()
-                                                    ->select(['id', 'sku', 'name'])
-                                                    ->find($value);
-                                            }
-
-                                            if (! $product instanceof Product) {
-                                                return null;
-                                            }
-
-                                            return [
-                                                'value' => $product->getKey(),
-                                                'label' => ProductSearch::label($product),
-                                            ];
+                                        static function (int $value) use ($record): ?Product {
+                                            return self::resolveInventoryProduct($value, $record);
+                                        },
+                                        static function (Product $product): array {
+                                            return self::normaliseInventoryProduct($product);
                                         },
                                         static fn (Product $product): array => self::normaliseProductComponentPayload($product),
                                     );
                                 })
                                 ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
-                                    if ($state === null || $state === '') {
-                                        // Reset persisted identifiers when lookup clears.
-                                        SearchableInputHelper::clear($component, $set, ['product_id' => null]);
-
-                                        return;
-                                    }
-
-                                    $product = Product::query()
-                                        ->select(['id'])
-                                        ->find((int) $state);
-
-                                    if (! $product instanceof Product) {
-                                        return;
-                                    }
-
-                                    $set('product_id', $product->getKey());
-                                }),
+                                    // Synchronise the persisted foreign key alongside a cached payload snapshot.
+                                    SearchableComponentHelper::syncSelectedRecord(
+                                        $component,
+                                        $state,
+                                        $set,
+                                        'product_id',
+                                        static function (string $value): ?Product {
+                                            return self::resolveInventoryProduct((int) $value);
+                                        },
+                                        static function (Product $product): array {
+                                            return self::normaliseInventoryProduct($product);
+                                        },
+                                        'product_payload',
+                                        self::defaultInventoryProductPayload(),
+                                    );
+                                })
+                                ->live(), // Live mode ensures metadata stays in sync while administrators adjust the lookup.
                             Hidden::make('product_payload')
-                                ->default([])
+                                ->default(self::defaultInventoryProductPayload())
                                 ->dehydrated(false)
-                                ->columnSpanFull(), // Preserve the enriched payload for downstream Livewire interactions without persisting it.
+                                ->columnSpanFull(), // Cache the canonical payload for downstream automation without persisting it.
                             Select::make('location_id')
                                 ->label(__('Location'))
                                 ->relationship('location', 'name')
@@ -478,6 +467,86 @@ final class InventoryResource extends Resource
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    /**
+     * Resolve the inventory product for helper hydration while avoiding redundant queries.
+     */
+    private static function resolveInventoryProduct(int $productId, ?Inventory $record = null): ?Product
+    {
+        if ($record instanceof Inventory) {
+            $product = $record->product;
+
+            if ($product instanceof Product && (int) $product->getKey() === $productId) {
+                return $product;
+            }
+        }
+
+        return Product::query()
+            ->select(['id', 'sku', 'name', 'price'])
+            ->find($productId);
+    }
+
+    /**
+     * Normalise the product metadata into the tuple consumed by the searchable helper.
+     *
+     * @return array{value:int, label:string, payload: array<string, mixed>}
+     */
+    private static function normaliseInventoryProduct(Product $product): array
+    {
+        $identifier = (int) $product->getKey();
+
+        /** @var string|null $rawSku */
+        $rawSku = $product->getAttribute('sku');
+        $sku = is_string($rawSku) ? $rawSku : '';
+
+        $price = $product->getAttribute('price');
+        $numericPrice = is_numeric($price) ? (float) $price : 0.0;
+
+        return [
+            'value'   => $identifier,
+            'label'   => ProductSearch::label($product),
+            'payload' => [
+                'product_id' => $identifier,
+                'sku'        => $sku,
+                'name'       => self::resolveInventoryProductName($product),
+                'price'      => $numericPrice,
+            ],
+        ];
+    }
+
+    /**
+     * Extract a translated product name suitable for payload metadata.
+     */
+    private static function resolveInventoryProductName(Product $product): string
+    {
+        $rawName = $product->getAttribute('name');
+
+        if (is_array($rawName)) {
+            $locale = app()->getLocale();
+            $value = $rawName[$locale] ?? reset($rawName);
+
+            return is_string($value) ? $value : '';
+        }
+
+        return is_string($rawName) ? $rawName : '';
+    }
+
+    /**
+     * Provide the default payload shape so cached metadata always exposes predictable keys.
+     *
+     * @return array<string, mixed>
+     */
+    private static function defaultInventoryProductPayload(): array
+    {
+        return [
+            'id'         => null,
+            'label'      => '',
+            'product_id' => null,
+            'sku'        => '',
+            'name'       => '',
+            'price'      => 0.0,
+        ];
     }
 
     private static function makeInventoryExport(): ExcelExport
