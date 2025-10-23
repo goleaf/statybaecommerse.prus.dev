@@ -6,6 +6,7 @@ namespace Database\Factories;
 
 use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 /**
@@ -87,12 +88,13 @@ class CategoryFactory extends Factory
         ];
 
         $name = $this->faker->randomElement($lithuanianCategories);
-        $uniqueSuffix = $this->faker->unique()->numerify('###');
+        $baseSlug = Str::slug($name);
+        $slug = $this->generateUniqueSlug($baseSlug);
 
         return [
             'name' => $name,
-            // Append a short unique suffix to keep database constraints happy during dense factory usage.
-            'slug'            => Str::slug($name . '-' . $uniqueSuffix),
+            // Ensure slug collisions from deterministic category names do not break SQLite tests.
+            'slug'            => $slug,
             'description'     => $this->generateCategoryDescription($name),
             'parent_id'       => null, // Will be set by seeder for subcategories
             'sort_order'      => $this->faker->numberBetween(0, 100),
@@ -100,6 +102,26 @@ class CategoryFactory extends Factory
             'seo_title'       => $name . ' - Profesionalūs sprendimai statybininkams',
             'seo_description' => 'Platus ' . strtolower($name) . ' asortimentas geriausiomis kainomis. Greitas pristatymas visoje Lietuvoje.',
         ];
+    }
+
+    /**
+     * Generate a unique slug while tolerating missing category tables during in-memory migrations.
+     */
+    private function generateUniqueSlug(string $baseSlug): string
+    {
+        if (! Schema::hasTable('categories')) {
+            return $baseSlug . '-' . Str::random(6);
+        }
+
+        $slug = $baseSlug;
+        $counter = 1;
+
+        while (Category::where('slug', $slug)->exists()) {
+            $slug = $baseSlug . '-' . $counter;
+            $counter++;
+        }
+
+        return $slug;
     }
 
     private function generateCategoryDescription(string $categoryName): string

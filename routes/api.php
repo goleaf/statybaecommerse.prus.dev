@@ -25,12 +25,16 @@ Route::prefix('v1')
 
         Route::middleware('auth:sanctum')->group(function (): void {
             Route::get('/user', AuthenticatedUserController::class)
-                ->middleware(['abilities:profile.read', 'throttle:api.profile'])
+                // Ability checks are handled inside ShowAuthenticatedUserRequest so we only keep the
+                // dedicated profile rate limit middleware on the route definition itself.
+                ->middleware(['throttle:api.profile'])
                 ->name('user.show');
 
             Route::post('/autocomplete-search', AutocompleteSearchController::class)
-                ->middleware(['abilities:system.autocomplete', 'throttle:api.autocomplete'])
-                ->withoutMiddleware(['throttle:api.default', 'throttle:api.read'])
+                // AutocompleteRequest performs the Sanctum ability validation which keeps response
+                // messaging consistent with the rest of our API layer while we retain rate limiting.
+                ->middleware(['throttle:api.autocomplete'])
+                ->withoutMiddleware('throttle:api.default')
                 ->name('autocomplete.search');
 
             require __DIR__ . '/api/notifications.php';
@@ -51,3 +55,6 @@ Route::prefix('partner')
 Route::get('audit-logs', [AuditLogController::class, 'index'])
     ->middleware(['throttle:api.read'])
     ->name('api.audit-logs.index');
+
+// Pull in the legacy campaign click endpoints until we consolidate them under the versioned API namespace.
+require base_path('routes/campaign-clicks.php');

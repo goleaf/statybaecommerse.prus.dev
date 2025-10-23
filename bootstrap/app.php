@@ -535,27 +535,9 @@ $app = Application::configure(basePath: dirname(__DIR__))
                     );
 
                     foreach ($throwable->getHeaders() as $name => $value) {
-                        // Cast header values to Symfony-compatible types to avoid TypeErrors in the test environment.
-                        if (is_array($value)) {
-                            $normalized = array_map(
-                                static fn ($item): string => $item instanceof \DateTimeInterface
-                                    ? $item->format(DATE_RFC7231)
-                                    : (string) $item,
-                                array_filter($value, static fn ($item): bool => $item !== null),
-                            );
-
-                            $response->headers->set($name, $normalized);
-
-                            continue;
-                        }
-
-                        if ($value instanceof \DateTimeInterface) {
-                            $response->headers->set($name, $value->format(DATE_RFC7231));
-
-                            continue;
-                        }
-
-                        $response->headers->set($name, $value === null ? null : (string) $value);
+                        // Symfony's header bag expects scalar values to be strings, so normalise integers from rate limiting
+                        // exceptions to avoid type errors while preserving array headers untouched.
+                        $response->headers->set($name, is_array($value) ? $value : (string) $value);
                     }
 
                     return $response;
