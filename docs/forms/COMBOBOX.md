@@ -43,3 +43,7 @@ Every implementation follows a small set of options:
 - Campaign pickers resolve translation keys like `campaigns.combobox.options.target_categories`; if a locale does not provide them yet, the helper falls back to the inline English fallback so nothing breaks during rollout.【F:app/Filament/Resources/CampaignResource.php†L143-L186】【F:app/Filament/Resources/CampaignResource.php†L337-L344】
 
 Add any new combobox translations in the same module-specific language files to keep localisation discoverable for content and operations teams.
+
+## Related docs
+
+- [Searchable input metadata lifecycle](SEARCHABLE_INPUT_METADATA.md) – how `SearchResult` payloads are shaped and consumed across Filament forms.

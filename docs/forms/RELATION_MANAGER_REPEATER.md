@@ -21,4 +21,20 @@ Refer to the corresponding relation manager class (for example `Channels\Relatio
 
 ## Eligibility guidance
 
-Attach/detach-only relation managers without a native create action remain unchanged. Document any new skips here if future pivots or bespoke flows cannot rely on the repeater pattern.
+Use the repeater action for relations that:
+
+- Manage high-churn HasMany data where multiple rows frequently change together.
+- Share the same schema as the existing create/edit form so validation remains aligned.
+- Benefit from reordering, cloning, or quick toggles without exposing destructive pivot edits.
+
+Opt out of the action when a relation manager:
+
+- Relies on attach/detach flows (typical for BelongsToMany or pivot-heavy relationships).
+- Requires nested repeaters or deeply relational fields that do not serialize cleanly in the modal.
+- Performs side effects during save that assume single-record edits.
+
+When new relation managers are introduced, evaluate them against the criteria above and document the outcome here so the global rollout stays consistent.
+
+## Related docs
+
+- [Searchable input metadata lifecycle](SEARCHABLE_INPUT_METADATA.md) – guidance for hydrating searchable field metadata alongside relation manager repeaters.
