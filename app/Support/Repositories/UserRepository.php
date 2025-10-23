@@ -4,17 +4,39 @@ declare(strict_types=1);
 
 namespace App\Support\Repositories;
 
-use App\Models\User;
-use Illuminate\Database\ConnectionInterface;
+use App\Support\Cache\CacheKeys;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 final class UserRepository
 {
-    public function __construct(private readonly ConnectionInterface $connection) {}
-
-    public function count(): int
+    public function count(?string $connection = null): int
     {
-        $table = (new User)->getTable();
+        $defaultConnection = config('database.default');
 
-        return (int) $this->connection->table($table)->count();
+        if ($connection !== null && $connection !== $defaultConnection) {
+            return $this->countUsingConnection($connection);
+        }
+
+        $callback = static fn (): int => (int) DB::table('users')->count();
+        $expiresAt = now()->addSeconds(CacheKeys::TTL_MINUTE);
+
+        if (! Cache::supportsTags()) {
+            /** @var int $count */
+            $count = Cache::remember(CacheKeys::userTotalCount(), $expiresAt, $callback);
+
+            return $count;
+        }
+
+        /** @var int $count */
+        $count = Cache::tags([CacheKeys::userAggregateTag(), CacheKeys::dashboardTag()])
+            ->remember(CacheKeys::userTotalCount(), $expiresAt, $callback);
+
+        return $count;
+    }
+
+    private function countUsingConnection(string $connection): int
+    {
+        return (int) DB::connection($connection)->table('users')->count();
     }
 }

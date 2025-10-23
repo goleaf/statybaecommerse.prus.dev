@@ -39,7 +39,7 @@ Where Redis tags are unavailable, fall back to targeted `Cache::forget()` calls 
 
 ## Repository & Dashboard Metrics
 
-- `App\Repositories\ProductRepository::count()` and `App\Repositories\UserRepository::count()` cache totals for the default connection using `CacheKeys::productTotalCount()` / `CacheKeys::userTotalCount()` with aggregate + dashboard tags. Passing a non-default connection bypasses caching to keep verification workflows accurate.
+- `App\Support\Repositories\ProductRepository::count()` and `App\Support\Repositories\UserRepository::count()` cache totals for the default connection using `CacheKeys::productTotalCount()` / `CacheKeys::userTotalCount()` with aggregate + dashboard tags. Passing a non-default connection bypasses caching to keep verification workflows accurate.
 - `App\Services\Dashboard\DashboardMetricsRepository` now tags the fast-path metrics:
   - `orders_today` & `revenue_last_seven_days` → `CacheKeys::orderAggregateTag()`
   - `new_users_today` → `CacheKeys::userAggregateTag()`

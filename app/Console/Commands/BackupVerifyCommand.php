@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Support\Repositories\ProductRepository;
+use App\Support\Repositories\UserRepository;
 use Illuminate\Console\Command;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
@@ -31,8 +33,74 @@ final class BackupVerifyCommand extends Command
         /** @var non-empty-string $connectionName */
         $disk = Storage::disk($diskName);
 
-        if (! $disk->exists($path)) {
-            $this->components->error(sprintf('Backup artifact [%s] was not found on disk [%s].', $path, $diskName));
+        $defaultWorking = config('backup.verify.working_path', storage_path('app/backup-verify'));
+        $workingPath = $this->normalizePath($this->optionString('working-path', is_string($defaultWorking) ? $defaultWorking : storage_path('app/backup-verify')));
+
+        $defaultConnectionName = config('backup.verify.connection_name', 'backup-verify');
+        $connectionName = $this->optionString('connection', is_string($defaultConnectionName) ? $defaultConnectionName : 'backup-verify');
+        $keepWorking = (bool) $this->option('keep-working');
+
+        try {
+            $latestBackup = $this->findLatestBackupDirectory($storageRoot);
+
+            if ($latestBackup === null) {
+                throw new RuntimeException('No backups were found to verify.');
+            }
+
+            $metadata = $this->readMetadata($latestBackup);
+
+            $databaseArtifact = $latestBackup . '/' . $metadata['artifacts']['database']['filename'];
+            $mediaArtifact = $latestBackup . '/' . $metadata['artifacts']['media']['filename'];
+
+            $this->assertChecksum($databaseArtifact, $metadata['artifacts']['database']['checksum'] ?? null, 'database');
+            $this->assertChecksum($mediaArtifact, $metadata['artifacts']['media']['checksum'] ?? null, 'media');
+
+            $this->components->info('Extracting media archive...');
+            $mediaExtractionPath = $workingPath . '/media';
+            $this->prepareWorkingDirectory($workingPath, $mediaExtractionPath);
+            $this->extractArchive($mediaArtifact, $mediaExtractionPath);
+
+            $this->components->info('Restoring database snapshot...');
+            $connectionConfig = $this->resolveVerificationConnectionConfig($connectionName);
+            $driver = $metadata['artifacts']['database']['driver'] ?? $metadata['connection']['driver'] ?? $connectionConfig['driver'] ?? null;
+
+            if (! is_string($driver) || $driver === '') {
+                throw new RuntimeException('Unable to determine database driver for verification.');
+            }
+
+            config(["database.connections.{$connectionName}" => $connectionConfig]);
+            DB::purge($connectionName);
+
+            $this->restoreDatabase($driver, $connectionConfig, $databaseArtifact);
+
+            DB::purge($connectionName);
+            DB::reconnect($connectionName);
+
+            $this->components->info('Running sanity checks...');
+            $userCount = $userRepository->count($connectionName);
+            $productCount = $productRepository->count($connectionName);
+
+            $expectedCounts = $metadata['counts'] ?? [];
+            $expectedUsers = $expectedCounts['users'] ?? null;
+            $expectedProducts = $expectedCounts['products'] ?? null;
+
+            $this->compareCounts('users', $expectedUsers, $userCount);
+            $this->compareCounts('products', $expectedProducts, $productCount);
+
+            $this->components->twoColumnDetail(
+                'Users (expected/actual)',
+                sprintf('%s / %s', $expectedUsers !== null ? (string) $expectedUsers : 'n/a', (string) $userCount),
+            );
+            $this->components->twoColumnDetail(
+                'Products (expected/actual)',
+                sprintf('%s / %s', $expectedProducts !== null ? (string) $expectedProducts : 'n/a', (string) $productCount),
+            );
+
+            $this->components->info('Backup verification completed successfully.');
+
+            return self::SUCCESS;
+        } catch (Throwable $exception) {
+            $this->components->error($exception->getMessage());
 
             return self::FAILURE;
         }
@@ -42,15 +110,53 @@ final class BackupVerifyCommand extends Command
         if (! is_string($contents)) {
             $this->components->error('Unable to read the backup artifact contents.');
 
-            return self::FAILURE;
+    private function findLatestBackupDirectory(string $storageRoot): ?string
+    {
+        if (! File::exists($storageRoot)) {
+            return null;
+        }
+
+        $directories = array_values(array_filter(
+            File::directories($storageRoot),
+            static function ($path): bool {
+                return is_string($path) && File::isDirectory($path);
+            },
+        ));
+
+        if ($directories === []) {
+            return null;
+        }
+
+        rsort($directories);
+
+        /** @var string $latest */
+        $latest = $directories[0];
+
+        return $latest;
+    }
+
+    /**
+     * @return array{
+     *     artifacts: array{
+     *         database: array{filename: string, checksum?: string|null, driver?: string|null},
+     *         media: array{filename: string, checksum?: string|null}
+     *     },
+     *     connection?: array{driver?: string|null},
+     *     counts?: array{users?: int|null, products?: int|null}
+     * }
+     */
+    private function readMetadata(string $backupPath): array
+    {
+        $metadataPath = $backupPath . '/metadata.json';
+
+        if (! File::exists($metadataPath)) {
+            throw new RuntimeException('Backup metadata file is missing.');
         }
 
         try {
             $payload = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $exception) {
-            $this->components->error('Unable to decode backup artifact: '.$exception->getMessage());
-
-            return self::FAILURE;
+            throw new RuntimeException('Failed to parse backup metadata: ' . $exception->getMessage(), 0, $exception);
         }
 
         if (! is_array($payload)) {
@@ -84,8 +190,59 @@ final class BackupVerifyCommand extends Command
             $users->each(static function ($user) use ($ephemeral): void {
                 $userId = $user['id'] ?? null;
 
-                if (! is_numeric($userId)) {
-                    return;
+        $databaseInfo = ['filename' => $databaseFilename];
+
+        if (array_key_exists('checksum', $database)) {
+            $checksum = $database['checksum'];
+
+            if ($checksum !== null && ! is_string($checksum)) {
+                throw new RuntimeException('Backup metadata database checksum must be a string or null.');
+            }
+
+            $databaseInfo['checksum'] = $checksum;
+        }
+
+        if (array_key_exists('driver', $database)) {
+            $driver = $database['driver'];
+
+            if ($driver !== null && ! is_string($driver)) {
+                throw new RuntimeException('Backup metadata database driver must be a string or null.');
+            }
+
+            $databaseInfo['driver'] = $driver;
+        }
+
+        $mediaInfo = ['filename' => $mediaFilename];
+
+        if (array_key_exists('checksum', $media)) {
+            $checksum = $media['checksum'];
+
+            if ($checksum !== null && ! is_string($checksum)) {
+                throw new RuntimeException('Backup metadata media checksum must be a string or null.');
+            }
+
+            $mediaInfo['checksum'] = $checksum;
+        }
+
+        $result = [
+            'artifacts' => [
+                'database' => $databaseInfo,
+                'media'    => $mediaInfo,
+            ],
+        ];
+
+        if (isset($decoded['connection'])) {
+            if (! is_array($decoded['connection'])) {
+                throw new RuntimeException('Backup metadata connection details must be an array.');
+            }
+
+            $connectionInfo = [];
+
+            if (array_key_exists('driver', $decoded['connection'])) {
+                $driver = $decoded['connection']['driver'];
+
+                if ($driver !== null && ! is_string($driver)) {
+                    throw new RuntimeException('Backup metadata connection driver must be a string or null.');
                 }
 
                 $ephemeral->table('backup_users')->insert([
@@ -207,7 +364,7 @@ final class BackupVerifyCommand extends Command
     }
 
     /**
-     * @param  array<string, mixed>  $connectionConfig
+     * @param array<string, mixed> $connectionConfig
      */
     private function restoreDatabase(string $driver, array $connectionConfig, string $artifactPath): void
     {
@@ -220,7 +377,7 @@ final class BackupVerifyCommand extends Command
     }
 
     /**
-     * @param  array<string, mixed>  $connectionConfig
+     * @param array<string, mixed> $connectionConfig
      */
     private function restoreSqliteDatabase(array $connectionConfig, string $artifactPath): void
     {
@@ -247,7 +404,7 @@ final class BackupVerifyCommand extends Command
     }
 
     /**
-     * @param  array<string, mixed>  $connectionConfig
+     * @param array<string, mixed> $connectionConfig
      */
     private function restoreMysqlDatabase(array $connectionConfig, string $artifactPath): void
     {
@@ -297,7 +454,7 @@ final class BackupVerifyCommand extends Command
     }
 
     /**
-     * @param  array<string, mixed>  $connectionConfig
+     * @param array<string, mixed> $connectionConfig
      */
     private function restorePostgresDatabase(array $connectionConfig, string $artifactPath): void
     {
@@ -360,7 +517,7 @@ final class BackupVerifyCommand extends Command
     }
 
     /**
-     * @param  array<string, mixed>  $config
+     * @param array<string, mixed> $config
      */
     private function connectionValue(array $config, string $key, ?string $default = null): ?string
     {
