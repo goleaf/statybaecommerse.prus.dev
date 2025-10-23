@@ -191,37 +191,30 @@ final class CustomerResource extends Resource
                     ->label(__('customers.name'))
                     ->searchable()
                     ->sortable()
-                    ->prefixBadges([
-                        Badge::make('status')
-                            ->label(fn (Customer $record): string => $record->is_active ? __('customers.badges.active') : __('customers.badges.inactive'))
-                            ->color(fn (Customer $record): string => $record->is_active ? 'success' : 'danger'),
-                    ])
-                    ->suffixBadges(function (Customer $record): array {
-                        $badges = [];
-
-                        if ($record->company?->name) {
-                            $badges[] = Badge::make('company-' . $record->company->getKey())
-                                ->label($record->company->name)
-                                ->color('warning');
-                        }
-
-                        if ($record->country?->name) {
-                            $badges[] = Badge::make('country-' . $record->country->getKey())
-                                ->label($record->country->name)
-                                ->color('primary');
-                        }
-
-                        if ($record->city?->name) {
-                            $badges[] = Badge::make('city-' . $record->city->getKey())
-                                ->label($record->city->name)
-                                ->color('info');
-                        }
-
-                        return $badges;
+                    ->weight('bold'),
+                ViewColumn::make('quick_links')
+                    ->label(__('Quick links'))
+                    ->view('filament.tables.columns.list-group')
+                    ->state(function (Customer $record): array {
+                        return collect([
+                            filled($record->email) ? [
+                                'label' => __('Email :email', ['email' => $record->email]),
+                                'url' => 'mailto:'.$record->email,
+                                'icon' => 'heroicon-o-envelope',
+                                'color' => 'info',
+                            ] : null,
+                            filled($record->phone) ? [
+                                'label' => __('Call :phone', ['phone' => $record->phone]),
+                                'url' => 'tel:'.preg_replace('/[^0-9+]/', '', (string) $record->phone),
+                                'icon' => 'heroicon-o-phone',
+                                'color' => 'success',
+                            ] : null,
+                        ])
+                            ->filter()
+                            ->values()
+                            ->all();
                     })
-                    ->asPills()
-                    ->separator('•')
-                    ->size(Size::Small),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('email')
                     ->label(__('customers.email'))
                     ->searchable()

@@ -16,8 +16,7 @@ use App\Services\Export\Exporters\OrderExport;
 use App\Services\Export\ExportService;
 use App\Support\Authorization\AuthorizationMatrix;
 use App\Support\Search\CustomerSearch;
-use Awcodes\BadgeableColumn\Components\Badge;
-use Awcodes\BadgeableColumn\Components\BadgeableColumn;
+use App\Support\Seo\LocaleUrlGenerator;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Exception;
@@ -55,6 +54,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Route;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
 
@@ -517,52 +517,52 @@ final class OrderResource extends Resource implements DefinesExportColumns
                     ->searchable()
                     ->sortable()
                     ->copyable()
-                    ->prefixBadges([
-                        Badge::make('order-status')
-                            ->label(fn (Order $record): string => __('orders.statuses.' . ($record->status ?? 'pending')))
-                            ->color(fn (Order $record): string => match ($record->status) {
-                                'delivered', 'completed' => 'success',
-                                'processing', 'confirmed' => 'primary',
-                                'shipped' => 'info',
-                                'cancelled', 'returned' => 'danger',
-                                default => 'warning',
-                            }),
-                        Badge::make('payment-status')
-                            ->label(fn (Order $record): string => __('orders.payment_statuses.' . ($record->payment_status ?? 'pending')))
-                            ->color(fn (Order $record): string => match ($record->payment_status) {
-                                'paid' => 'success',
-                                'refunded', 'partially_refunded' => 'gray',
-                                'failed' => 'danger',
-                                default  => 'warning',
-                            }),
-                    ])
-                    ->suffixBadges(function (Order $record): array {
-                        $badges = [];
+                    ->weight('bold'),
+                ViewColumn::make('quick_links')
+                    ->label(__('Quick links'))
+                    ->view('filament.tables.columns.list-group')
+                    ->state(function (Order $record): array {
+                        $localeUrlGenerator = app(LocaleUrlGenerator::class);
+                        $locales = collect($localeUrlGenerator->supportedLocales());
 
-                        $shippingStatus = $record->shipping?->status;
+                        $items = $locales
+                            ->map(function (string $locale) use ($record, $localeUrlGenerator): ?array {
+                                $url = $localeUrlGenerator->localizedRoute(
+                                    'localized.orders.show',
+                                    ['order' => $record->number],
+                                    $locale,
+                                );
 
-                        if ($shippingStatus) {
-                            $badges[] = Badge::make('shipping-status')
-                                ->label(__('admin.enums.shipping_statuses.' . $shippingStatus))
-                                ->color(match ($shippingStatus) {
-                                    'delivered' => 'success',
-                                    'returned'  => 'danger',
-                                    'in_transit', 'shipped' => 'info',
-                                    default => 'primary',
-                                });
+                                if (! $url && Route::has('frontend.orders.show')) {
+                                    $url = route('frontend.orders.show', $record);
+                                }
+
+                                if (! $url) {
+                                    return null;
+                                }
+
+                                return [
+                                    'label' => __('Order (:locale)', ['locale' => strtoupper($locale)]),
+                                    'url' => $url,
+                                    'icon' => 'heroicon-o-arrow-top-right-on-square',
+                                    'color' => 'primary',
+                                ];
+                            })
+                            ->filter()
+                            ->values();
+
+                        if (Route::has('api.orders.show')) {
+                            $items->push([
+                                'label' => __('Order API (:number)', ['number' => $record->number]),
+                                'url' => route('api.orders.show', ['order' => $record->number]),
+                                'icon' => 'heroicon-o-code-bracket',
+                                'color' => 'info',
+                            ]);
                         }
 
-                        if (in_array($record->payment_status, ['paid', 'captured', 'settled', 'authorized'], true)) {
-                            $badges[] = Badge::make('paid')
-                                ->label(__('orders.payment_statuses.paid'))
-                                ->color('success');
-                        }
-
-                        return $badges;
+                        return $items->all();
                     })
-                    ->asPills()
-                    ->separator('•')
-                    ->size(Size::Small),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('user.name')
                     ->label(__('orders.fields.customer'))
                     ->limit(30)
