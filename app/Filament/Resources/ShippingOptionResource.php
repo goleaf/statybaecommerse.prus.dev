@@ -94,11 +94,13 @@ final class ShippingOptionResource extends Resource
                                 TextInput::make('carrier_name')
                                     ->label(__('admin.shipping_options.carrier_name'))
                                     ->maxLength(255),
+                                // Allow shipping options to be attached to a geographic zone for targeted availability.
                                 Select::make('zone_id')
                                     ->label(__('admin.shipping_options.zone'))
                                     ->relationship('zone', 'name')
                                     ->preload()
-                                    ->searchable(),
+                                    ->searchable()
+                                    ->helperText(__('admin.shipping_options.zone_help')),
                                 Select::make('service_type')
                                     ->label(__('admin.shipping_options.service_type'))
                                     ->options([
@@ -240,10 +242,12 @@ final class ShippingOptionResource extends Resource
                             : Number::currency((float) $state, $record->currency_code ?? 'EUR', app()->getLocale())
                     )
                     ->sortable(),
+                // Surface the assigned zone so operators can audit coverage quickly.
                 TextColumn::make('zone.name')
                     ->label(__('admin.shipping_options.zone'))
                     ->badge()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('estimated_days_min')
                     ->label(__('admin.shipping_options.estimated_days'))
                     ->formatStateUsing(
@@ -272,6 +276,10 @@ final class ShippingOptionResource extends Resource
                         'overnight' => __('admin.shipping_options.service_types.overnight'),
                         'economy'   => __('admin.shipping_options.service_types.economy'),
                     ]),
+                // Filter by zone to narrow down shipping options for a specific market.
+                SelectFilter::make('zone_id')
+                    ->label(__('admin.shipping_options.zone'))
+                    ->relationship('zone', 'name'),
                 ValueRangeFilter::make('price')
                     ->label(__('admin.shipping_options.price'))
                     ->currency()
