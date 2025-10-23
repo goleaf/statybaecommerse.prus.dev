@@ -17,7 +17,6 @@ use App\Models\WishlistItem;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;
-use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Exception;
 use Filament\Actions\Action;
@@ -44,8 +43,6 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
@@ -63,21 +60,22 @@ use Filament\Schemas\Schema;
  */
 final class WishlistItemResource extends Resource
 {
-    use HasNav;
-
-    
-
     protected static ?string $model = WishlistItem::class;
 
     /**
-     * @var string|BackedEnum|Htmlable|null Explicit navigation icon configuration for Filament v4 sidebar rendering.
+     * @var string|\BackedEnum|null Navigation icon used for the sidebar entry.
      */
     protected static $navigationIcon = 'heroicon-o-heart';
 
     /**
-     * @var int|null Keep the wishlist entry near other customer tools in the Filament sidebar.
+     * @var int|null Sidebar order to keep wishlist management near other customer tooling.
      */
     protected static ?int $navigationSort = 10;
+
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Customers';
+    }
 
     protected static ?string $recordTitleAttribute = 'product.name';
 
