@@ -1,41 +1,23 @@
 # Security Baseline
 
-This runbook summarizes the default HTTP hardening and rate limiting controls that ship with the application.
+## HTTP Security Headers
 
-## Response Headers
+The application now applies security headers to every HTTP response via the `App\Http\Middleware\AddSecurityHeaders` middleware. Defaults are managed in `config/security.php` and include:
 
-All first-party routes run through the `App\Http\Middleware\AddSecurityHeaders` middleware. The middleware reads its configuration from `config/security.php` and applies it to every successful response.
+- `X-Frame-Options: DENY`
+- `X-Content-Type-Options: nosniff`
+- `Referrer-Policy: strict-origin-when-cross-origin`
+- `Permissions-Policy` disabling sensitive browser features
+- `Content-Security-Policy-Report-Only` restricting core resource origins
 
-- Static headers are defined in `security.headers.values`. They include the default clickjacking, MIME sniffing, referrer, and permissions policies used across the storefront and APIs.
-- Content Security Policy directives are configured under `security.headers.content_security_policy`. The middleware compiles the directives into the final `Content-Security-Policy` header automatically.
-- You can toggle the middleware globally by setting `security.headers.enabled` (or the `SECURITY_HEADERS_ENABLED` environment variable).
+Update the config file if routes require custom policies. When adjusting CSP values, keep the policy in report-only mode until verified in production logs, then migrate to an enforcing `Content-Security-Policy` header.
 
 ## Rate Limiting
 
-Baseline rate limits also live in `config/security.php` and are registered by `App\Providers\SecurityServiceProvider` during boot.
+Centralized rate-limit defaults live in `config/security.php` and are registered by `App\Providers\SecurityServiceProvider`:
 
-### API limits
+- **Login form** – 5 attempts per minute keyed by email and client IP. Exceeding the limit returns HTTP 429.
+- **Password reset form** – 3 requests per 10 minutes keyed by email and client IP with 429 responses on saturation.
+- **API traffic** – 60 requests per minute keyed by bearer token, `X-API-KEY`, authenticated user ID, or IP. Apply the `throttle:api` middleware to new API routes to enforce these limits.
 
-| Limiter | Default | Keying strategy |
-| --- | --- | --- |
-| `api.default` | 60 requests/minute | User ID for authenticated calls, otherwise IP address |
-| `api.notifications` | 60 requests/minute | Same as `api.default`, plus `|notifications` suffix |
-| `api.autocomplete` | 30 requests/minute | Same as `api.default`, plus `|autocomplete` suffix |
-
-Override the API defaults with the `API_RATE_LIMIT_*` environment variables.
-
-### Authentication limits
-
-Authentication flows use configurable limits that default to conservative values:
-
-| Flow | Attempts | Decay window | Notes |
-| --- | --- | --- | --- |
-| Login | 5 attempts | 60 seconds | Tracked per lowercase email + request IP; cleared after a successful login. |
-| Password reset | 5 attempts | 5 minutes | Tracked per lowercase email + request IP; counts every reset email request. |
-
-Set `AUTH_RATE_LIMIT_LOGIN_*` and `AUTH_RATE_LIMIT_PASSWORD_RESET_*` environment variables to tune these thresholds.
-
-## Operational Tips
-
-- The rate limiter keys always fall back to `unknown` when an IP address cannot be determined, so clearing `RateLimiter` state with either the computed key or the fallback will reset the counters.
-- Feature tests in `tests/Feature/SecurityHeadersTest.php` and `tests/Feature/Auth/LoginRateLimitingTest.php` cover the middleware and authentication throttles. Run them whenever the security configuration changes.
+Use the shared config to tune limits for incident response without modifying core code. Tests covering the login and password reset flows assert that throttling emits HTTP 429 once thresholds are exceeded.

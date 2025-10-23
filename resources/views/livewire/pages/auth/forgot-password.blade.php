@@ -33,33 +33,16 @@ new #[Layout('components.layouts.base')] class extends Component
             'email' => ['required', 'string', 'email'],
         ]);
 
-        $captchaManager = app(CaptchaManager::class);
-        $monitor = app(SuspiciousIpMonitor::class);
+        $this->ensureIsNotRateLimited();
 
-        $this->ensureIsNotRateLimited($captchaManager, $monitor);
+        $limiterKey = $this->rateLimiterKey();
+        $decaySeconds = (int) config('security.rate_limiting.password_reset.decay_seconds', 600);
 
-        if ($captchaManager->shouldChallenge($this->throttleKey(), 'auth.password_reset')) {
-            $this->syncCaptchaState($captchaManager);
+        RateLimiter::hit($limiterKey, $decaySeconds);
 
-            $this->validate([
-                'captchaToken'    => ['required', 'string'],
-                'captchaResponse' => ['required', 'string'],
-            ]);
-
-            if (! $captchaManager->verify($this->throttleKey(), 'auth.password_reset', (string) $this->captchaToken, (string) $this->captchaResponse)) {
-                $this->syncCaptchaState($captchaManager, true);
-                $this->captchaResponse = '';
-
-                throw ValidationException::withMessages([
-                    'captchaResponse' => __('The security check response did not match. Please try again.'),
-                ]);
-            }
-        } else {
-            $this->syncCaptchaState($captchaManager);
-        }
-
-        RateLimiter::hit($this->throttleKey(), $this->decaySeconds());
-
+        // We will send the password reset link to this user. Once we have attempted
+        // to send the link, we will examine the response then see the message we
+        // need to show to the user. Finally, we'll send out a proper response.
         $status = Password::sendResetLink($this->only('email'));
 
         if ($status != Password::RESET_LINK_SENT) {
@@ -86,98 +69,32 @@ new #[Layout('components.layouts.base')] class extends Component
         session()->flash('status', __($status));
     }
 
-    public function hydrate(CaptchaManager $captchaManager): void
+    private function ensureIsNotRateLimited(): void
     {
-        $this->syncCaptchaState($captchaManager);
-    }
+        $key = $this->rateLimiterKey();
+        $maxAttempts = (int) config('security.rate_limiting.password_reset.max_attempts', 3);
 
-    public function refreshCaptcha(CaptchaManager $captchaManager): void
-    {
-        $this->syncCaptchaState($captchaManager, true);
-    }
-
-    private function ensureIsNotRateLimited(CaptchaManager $captchaManager, SuspiciousIpMonitor $monitor): void
-    {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), $this->maxAttempts())) {
+        if (! RateLimiter::tooManyAttempts($key, $maxAttempts)) {
             return;
         }
 
-        $captchaManager->markRequired($this->throttleKey(), 'auth.password_reset');
-        $monitor->record($this->ipAddress(), 'password-reset-rate-limit', [
-            'email'        => $this->email,
-            'attempts'     => RateLimiter::attempts($this->throttleKey()),
-            'max_attempts' => $this->maxAttempts(),
-        ]);
-        $this->syncCaptchaState($captchaManager, true);
+        $seconds = RateLimiter::availableIn($key);
 
-        event(new Lockout(request()));
-
-        $seconds = RateLimiter::availableIn($this->throttleKey());
-
-        throw ValidationException::withMessages([
+        $exception = ValidationException::withMessages([
             'email' => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => (int) ceil($seconds / 60),
             ]),
         ]);
+
+        $exception->status = 429;
+
+        throw $exception;
     }
 
-    private function syncCaptchaState(CaptchaManager $captchaManager, bool $forceRefresh = false): void
+    private function rateLimiterKey(): string
     {
-        if (! $captchaManager->shouldChallenge($this->throttleKey(), 'auth.password_reset')) {
-            $this->resetCaptcha();
-
-            return;
-        }
-
-        $challenge = $captchaManager->challenge($this->throttleKey(), 'auth.password_reset', $forceRefresh);
-
-        if ($challenge === null) {
-            $this->resetCaptcha();
-
-            return;
-        }
-
-        $questionChanged = $this->captchaQuestion !== $challenge->question();
-
-        $this->captchaQuestion = $challenge->question();
-        $this->captchaToken = $challenge->token();
-
-        if ($forceRefresh || $questionChanged) {
-            $this->captchaResponse = '';
-        }
-    }
-
-    private function throttleKey(): string
-    {
-        $ip = request()->ip();
-        $ipAddress = is_string($ip) && $ip !== '' ? $ip : 'unknown';
-
-        return Str::transliterate('password-reset|' . Str::lower($this->email) . '|' . $ipAddress);
-    }
-
-    private function resetCaptcha(): void
-    {
-        $this->captchaQuestion = null;
-        $this->captchaToken = null;
-        $this->captchaResponse = null;
-    }
-
-    private function ipAddress(): string
-    {
-        $ip = request()->ip();
-
-        return is_string($ip) && $ip !== '' ? $ip : 'unknown';
-    }
-
-    private function maxAttempts(): int
-    {
-        return max(1, (int) data_get(config('security.rate_limiting.auth.password_reset'), 'max_attempts', 5));
-    }
-
-    private function decaySeconds(): int
-    {
-        return max(1, (int) data_get(config('security.rate_limiting.auth.password_reset'), 'decay_seconds', 300));
+        return 'password-reset:'.Str::transliterate(Str::lower($this->email).'|'.request()->ip());
     }
 }; ?>
 
