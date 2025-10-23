@@ -10,8 +10,6 @@ use App\Filament\Resources\VariantAnalyticsResource\Pages;
 use App\Models\ProductVariant;
 use App\Models\VariantAnalytics;
 use App\Support\Filament\Components\Flatpickr;
-use BackedEnum;
-use UnitEnum;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -56,15 +54,15 @@ final class VariantAnalyticsResource extends Resource
      */
     protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    /**
-     * Default navigation group leveraging BackedEnum support for Filament 4.
-     */
-    protected static string|BackedEnum|null $navigationGroup = NavigationGroup::Inventory;
+    /** @var string|\BackedEnum|null Ensure inventory analytics stay grouped centrally. */
+    protected static $navigationGroup = NavigationGroup::Inventory;
 
     public static function getNavigationGroup(): string|UnitEnum|null
     {
-        // Map the enum to its localized label so navigation remains translated.
-        return NavigationGroup::Inventory->label();
+        // Centralize the NavigationGroup handling to leverage enum labels.
+        $group = static::$navigationGroup;
+
+        return $group instanceof NavigationGroup ? $group->label() : $group;
     }
 
     protected static ?int $navigationSort = 2;
@@ -89,7 +87,7 @@ final class VariantAnalyticsResource extends Resource
         return __('admin.variant_analytics.model_label');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -269,7 +267,7 @@ final class VariantAnalyticsResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

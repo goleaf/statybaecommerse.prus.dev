@@ -171,6 +171,12 @@ protected static $navigationIcon = 'heroicon-o-cube';
 protected static $navigationGroup = NavigationGroup::Products;
 ```
 
+### Navigation Group Property
+```php
+/** @var string|\BackedEnum|null */
+protected static $navigationGroup = NavigationGroup::Products;
+```
+
 ### Table Configuration Guidelines
 - Use the consolidated `Filament\Tables` namespace (for example, `Tables\Actions\EditAction::make()`) to match Filament v4 stubs and avoid deprecated action aliases.
 - When composing nested labels (such as parent/child category names), prefer Laravel's `Str` helper for clarity over global string helpers.
