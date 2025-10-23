@@ -1,7 +1,6 @@
 # Documentation Style Guide
 
-The knowledge base now lives inside dedicated collections so contributors can find runbooks, contracts, and analytical reports in
-predictable places. Use this guide whenever you add, rename, or link documentation.
+The knowledge base now lives inside dedicated collections so contributors can find runbooks, contracts, and analytical reports in predictable places. Use this guide whenever you add, rename, or link documentation.
 
 ## Directory layout
 - `docs/analysis/` – long-form audits, summaries, and retrospective documents that explain _why_ we made decisions.
@@ -11,17 +10,14 @@ predictable places. Use this guide whenever you add, rename, or link documentati
 - `docs/forms/`, `docs/ui/`, `docs/operations/` – existing topical directories continue to group smaller reference notes.
 
 ## Naming conventions
-- Favour descriptive uppercase file names such as `PROJECT_COMPLETION_SUMMARY.md` for legacy artefacts that already ship with that
-  convention.
+- Favour descriptive uppercase file names such as `PROJECT_COMPLETION_SUMMARY.md` for legacy artefacts that already ship with that convention.
 - For new documents prefer `kebab-case` that matches the directory focus, e.g. `queue-drain-runbook.md` inside `docs/runbooks/`.
-- Prefix runbooks with verbs that describe the outcome (`reset-search-index.md`) and analyses with the domain they cover (`catalog-
-  attribution-retrospective.md`).
+- Prefix runbooks with verbs that describe the outcome (`reset-search-index.md`) and analyses with the domain they cover (`catalog-attribution-retrospective.md`).
 
 ## Linking rules
 - When referencing documents inside the same directory use relative links (`[Cache Policy](CachePolicy.md)`).
 - When linking across directories, include the folder name (`[Deployment Guide](runbooks/DEPLOYMENT_GUIDE.md)`).
-- Update both the main [documentation index](INDEX.md) and the relevant sub-index (for example `analysis/INDEX.md`) after moving or
-  creating a document.
+- Update both the main [documentation index](INDEX.md) and the relevant sub-index (for example `analysis/INDEX.md`) after moving or creating a document.
 
 ## Contribution checklist
 1. Confirm the document sits in the correct directory based on the guidance above.
