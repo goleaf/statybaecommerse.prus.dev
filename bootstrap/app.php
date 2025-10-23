@@ -1,17 +1,14 @@
 <?php
 
-use App\Exceptions\Domain\DomainException;
 use App\Http\Middleware\AttachCorrelationId;
 use App\Http\Middleware\SecurityHeaders;
-use App\Services\TranslationService;
+use App\Support\ApiErrorResponse;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Throwable;
 
 require_once __DIR__.'/../app/Support/filament_compat.php';
 
@@ -51,12 +48,14 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->render(function (\Throwable $exception, Request $request) {
+        $exceptions->shouldRenderJsonWhen(static fn (Request $request): bool => $request->expectsJson());
+
+        $exceptions->render(static function (Throwable $throwable, Request $request) {
             if (! $request->expectsJson()) {
                 return null;
             }
 
-            return ApiErrorResponse::fromThrowable($exception, $request);
+            return ApiErrorResponse::fromThrowable($throwable, $request);
         });
     })
     ->withProviders([

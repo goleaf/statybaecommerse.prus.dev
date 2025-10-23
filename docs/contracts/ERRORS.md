@@ -1,79 +1,57 @@
 # API Error Contract
 
-All API endpoints return errors using a common RFC 7807 inspired envelope. Every response sets `Content-Type: application/problem+json`.
+All API exceptions are normalized into [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807) "problem details" envelopes by `App\Support\ApiErrorResponse`. The helper ensures every failure response includes a stable error code, a correlation identifier for observability, and structured details that clients can automate against.
+
+## Envelope shape
 
 ```json
 {
+  "type": "tag:statybaecommerse.prus.dev,2024:error:error.validation",
+  "title": "Validation failed",
+  "status": 422,
+  "detail": "The submitted data was invalid.",
+  "instance": "https://example.test/api/example",
+  "correlation_id": "d3f1a5ab-8e90-4f2b-bcb4-2d8bfcf16dd2",
   "error": {
-    "code": "string",
-    "message": "string",
-    "details": { "optional": "object" },
-    "correlation_id": "uuid"
+    "code": "error.validation",
+    "locale": "en",
+    "context": {
+      "email": ["The email field is required."]
+    }
+  },
+  "meta": {
+    "timestamp": "2024-04-16T08:00:00Z"
   }
 }
 ```
 
-- `code` &mdash; Stable, machine-readable identifier for the error condition.
-- `message` &mdash; Localized, human readable description suitable for end-users.
-- `details` &mdash; Optional structured payload (for example validation errors or retry hints). Omitted as `null` when not needed.
-- `correlation_id` &mdash; UUID attached to application logs that helps support teams trace requests. Present on every error response, regardless of environment.
+### Field reference
 
-## Standard error codes
+| Field | Required | Description |
+| --- | --- | --- |
+| `type` | ✅ | Stable URI constructed as `tag:statybaecommerse.prus.dev,2024:error:{code}` to aid documentation cross-links. |
+| `title` | ✅ | Localised, human-friendly summary of the error. For domain exceptions it maps to the translated message. |
+| `status` | ✅ | HTTP status code mirrored in the response status line. |
+| `detail` | ✅ | Additional information suitable for end users; equals `title` for domain errors and is context-specific for framework exceptions. |
+| `instance` | ✅ | Fully-qualified URL of the request that triggered the problem. |
+| `correlation_id` | ✅ | UUID applied to the request/response lifecycle and echoed via the `X-Correlation-ID` header. |
+| `error.code` | ✅ | Machine-readable identifier sourced from `App\Support\ErrorCodes`. |
+| `error.locale` | ⚠️ | Present when localisation is available (domain exceptions). |
+| `error.context` | ⚠️ | Structured payload carrying validation errors or domain-specific placeholders. |
+| `meta.timestamp` | ✅ | ISO-8601 timestamp indicating when the response was generated. |
 
-| HTTP Status | Code                | Description                                                                 |
-| ----------- | ------------------- | --------------------------------------------------------------------------- |
-| 400         | `domain_error`      | Domain or business rule violation (for example unsupported model lookup).  |
-| 401         | `unauthenticated`   | Authentication failed or credentials were missing.                          |
-| 403         | `forbidden`         | Authenticated user lacks permission to perform the action.                  |
-| 404         | `resource_not_found`| Target model or route could not be resolved.                                |
-| 422         | `validation_error`  | Request payload did not pass validation. `details.errors` lists violations. |
-| 429         | `rate_limited`      | Rate limit exceeded. `details.retry_after` may contain retry hints.         |
-| 5xx         | `server_error`      | Unexpected exception. Message is generic; diagnostics only in logs.         |
-| *varies*    | `http_error`        | Other HTTP exceptions (405, 409, etc.).                                     |
+The correlation identifier is also returned in the `X-Correlation-ID` header. When domain translations are involved, the response includes `Content-Language` with the resolved locale so HTTP caches remain coherent.
 
-## Examples
+## Standard codes
 
-### Validation failure (422)
+The helper maps common framework exceptions onto the shared error codes registered in [`App\Support\ErrorCodes`](ERROR_CODES.md):
 
-```json
-{
-  "error": {
-    "code": "validation_error",
-    "message": "The given data was invalid.",
-    "details": {
-      "errors": {
-        "email": ["The email field is required."]
-      }
-    },
-    "correlation_id": "87b42a5c-7803-45d4-8f89-c5bfd0a9e482"
-  }
-}
-```
+| Exception | HTTP | Error code | Notes |
+| --- | --- | --- | --- |
+| `Illuminate\Validation\ValidationException` | 422 | `error.validation` | `error.context` contains the validator message bag. |
+| `Illuminate\Auth\AuthenticationException` | 401 | `error.unauthorized` | Title and detail explain that authentication is required. |
+| `Illuminate\Auth\Access\AuthorizationException` | 403 | `error.forbidden` | Signals missing permissions. |
+| `Symfony\Component\HttpKernel\Exception\NotFoundHttpException` | 404 | `error.not_found` | Used for missing routes and resources. |
+| Any other `Throwable` | 500 | `error.server` | Fallback for uncaught exceptions. |
 
-### Authentication failure (401)
-
-```json
-{
-  "error": {
-    "code": "unauthenticated",
-    "message": "Unauthenticated.",
-    "details": null,
-    "correlation_id": "3bdb8b8c-b2ab-4ff0-9aef-d4c08a687e4c"
-  }
-}
-```
-
-### Unexpected server error (500)
-
-```json
-{
-  "error": {
-    "code": "server_error",
-    "message": "An unexpected error occurred.",
-    "details": null,
-    "correlation_id": "4efef77a-9abc-41a5-8eac-8b17f6cd1b3f"
-  }
-}
-```
-
-> **Note:** Stack traces never leak in production responses. Use the `correlation_id` to locate log entries for diagnostics.
+Domain-level failures (`App\Exceptions\Domain\DomainException`) retain their specific error codes and translation contexts, while still adopting the same RFC 7807 envelope.
