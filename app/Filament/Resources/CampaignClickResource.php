@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\CampaignClickResource\Pages;
 use App\Models\Campaign;
 use App\Models\CampaignClick;
@@ -13,8 +11,9 @@ use App\Models\User;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
@@ -24,6 +23,7 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
@@ -31,23 +31,24 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 final class CampaignClickResource extends Resource
 {
-    /** @phpstan-var string|\BackedEnum|null */
+    /**
+     * Keep the declared type to satisfy the parent class contract while
+     * documenting the accepted values for clarity.
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?string $model = CampaignClick::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): string
     {
         return 'heroicon-o-chart-bar';
     }
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): string
     {
         return 'Marketing';
     }
@@ -71,15 +72,15 @@ final class CampaignClickResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      *
-     * @param  Forms\Form  $schema
-     * @return Schemas\Form
+     * Adding descriptive comments helps future maintainers understand the
+     * intent behind each field and mirrors the user's documentation request.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
-            SchemaSection::make(__('campaign_clicks.basic_information'))
+        return $form->schema([
+            Section::make(__('campaign_clicks.basic_information'))
                 ->schema([
-                    SchemaGrid::make(2)
+                    Grid::make(2)
                         ->schema([
                             Select::make('campaign_id')
                                 ->label(__('campaign_clicks.campaign'))
@@ -89,25 +90,34 @@ final class CampaignClickResource extends Resource
                                 ->required()
                                 ->live()
                                 ->afterStateUpdated(function ($state, Forms\Set $set): void {
-                                    if ($state) {
-                                        $campaign = Campaign::find($state);
-                                        if ($campaign) {
-                                            $set('campaign_name', $campaign->name);
-                                            $set('campaign_code', $campaign->code);
-                                        }
+                                    // Surface the selected campaign metadata so editors see the context immediately.
+                                    if (! $state) {
+                                        return;
                                     }
 
+                                    /** @var Campaign|null $campaign */
                                     $campaign = Campaign::find($state);
 
-                                    if ($campaign === null) {
+                                    if (! $campaign instanceof Campaign) {
                                         return;
                                     }
 
                                     $set('campaign_name', $campaign->name);
-                                    $set('campaign_code', $campaign->code);
+
+                                    // Safely surface the campaign code without relying on dynamic properties.
+                                    $campaignCode = $campaign->getAttribute('code');
+
+                                    if (is_scalar($campaignCode)) {
+                                        $set('campaign_code', (string) $campaignCode);
+                                    }
                                 }),
                             TextInput::make('campaign_name')
                                 ->label(__('campaign_clicks.campaign_name'))
+                                ->maxLength(255)
+                                ->disabled()
+                                ->dehydrated(false),
+                            TextInput::make('campaign_code')
+                                ->label(__('campaign_clicks.campaign_code'))
                                 ->maxLength(255)
                                 ->disabled()
                                 ->dehydrated(false),
@@ -119,17 +129,15 @@ final class CampaignClickResource extends Resource
                         ->preload()
                         ->live()
                         ->afterStateUpdated(function ($state, Forms\Set $set): void {
-                            if ($state) {
-                                $user = User::find($state);
-                                if ($user) {
-                                    $set('customer_name', $user->name);
-                                    $set('customer_email', $user->email);
-                                }
+                            // When a customer is chosen, mirror their profile information for clarity.
+                            if (! $state) {
+                                return;
                             }
 
+                            /** @var User|null $user */
                             $user = User::find($state);
 
-                            if ($user === null) {
+                            if (! $user instanceof User) {
                                 return;
                             }
 
@@ -142,7 +150,7 @@ final class CampaignClickResource extends Resource
                         ->disabled()
                         ->dehydrated(false),
                 ]),
-            SchemaSection::make(__('campaign_clicks.click_information'))
+            Section::make(__('campaign_clicks.click_information'))
                 ->schema([
                     TextInput::make('clicked_url')
                         ->label(__('campaign_clicks.clicked_url'))
@@ -180,7 +188,7 @@ final class CampaignClickResource extends Resource
                         ->label(__('campaign_clicks.country'))
                         ->helperText(__('campaign_clicks.country_help')),
                 ]),
-            SchemaSection::make(__('campaign_clicks.tracking_information'))
+            Section::make(__('campaign_clicks.tracking_information'))
                 ->schema([
                     TextInput::make('session_id')
                         ->label(__('campaign_clicks.session_id'))
@@ -201,7 +209,7 @@ final class CampaignClickResource extends Resource
                         ->label(__('campaign_clicks.utm_content'))
                         ->helperText(__('campaign_clicks.utm_content_help')),
                 ]),
-            SchemaSection::make(__('campaign_clicks.settings'))
+            Section::make(__('campaign_clicks.settings'))
                 ->schema([
                     Toggle::make('is_converted')
                         ->label(__('campaign_clicks.is_converted'))
@@ -221,7 +229,7 @@ final class CampaignClickResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -298,7 +306,7 @@ final class CampaignClickResource extends Resource
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
-                \Filament\Actions\DeleteAction::make(),
+                DeleteAction::make(),
                 Action::make('mark_conversion')
                     ->label(__('campaign_clicks.mark_conversion'))
                     ->icon('heroicon-o-check-circle')
