@@ -4,8 +4,88 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "06992731898b054784566ffd06c67efe",
+    "content-hash": "cfef3f4400827511b94f22acca3ca4c4",
     "packages": [
+        {
+            "name": "andreia/filament-nord-theme",
+            "version": "v2.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/andreia/filament-nord-theme.git",
+                "reference": "a0dc6d9cb7c7756f332d45d2c90c6b6e0b8e81cf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/andreia/filament-nord-theme/zipball/a0dc6d9cb7c7756f332d45d2c90c6b6e0b8e81cf",
+                "reference": "a0dc6d9cb7c7756f332d45d2c90c6b6e0b8e81cf",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^4.0",
+                "illuminate/contracts": "^10.0|^11.0|^12.0",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "larastan/larastan": "^2.0.1||^3.0",
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^7.10.0||^8.1.1",
+                "orchestra/testbench": "^8.22.0||^9.0.0||^10.0.0",
+                "pestphp/pest": "^2.1||^3.0",
+                "pestphp/pest-plugin-arch": "^2.0||^3.0",
+                "pestphp/pest-plugin-laravel": "^2.0||^3.0",
+                "pestphp/pest-plugin-livewire": "^2.1||^3.0",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan-deprecation-rules": "^1.0||^2.0",
+                "phpstan/phpstan-phpunit": "^1.0||^2.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Andreia\\FilamentNordTheme\\FilamentNordThemeServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Andreia\\FilamentNordTheme\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andreia Bohner",
+                    "email": "andreiabohner@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A minimalist Arctic Nord theme for FilamentPHP",
+            "homepage": "https://github.com/andreia/filament-nord-theme",
+            "keywords": [
+                "arctic",
+                "filament",
+                "filament-theme",
+                "filamentphp",
+                "laravel",
+                "nord-theme",
+                "php",
+                "theme"
+            ],
+            "support": {
+                "issues": "https://github.com/andreia/filament-nord-theme/issues",
+                "source": "https://github.com/andreia/filament-nord-theme"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/andreia",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-09-21T17:52:13+00:00"
+        },
         {
             "name": "anourvalar/eloquent-serialize",
             "version": "1.3.4",
@@ -1501,6 +1581,82 @@
                 }
             ],
             "time": "2024-05-06T16:37:16+00:00"
+        },
+        {
+            "name": "coolsam/flatpickr",
+            "version": "v5.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/coolsam726/flatpickr.git",
+                "reference": "9606656c9c657a68f4308a62555a0c6f6be1c788"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/coolsam726/flatpickr/zipball/9606656c9c657a68f4308a62555a0c6f6be1c788",
+                "reference": "9606656c9c657a68f4308a62555a0c6f6be1c788",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^4.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "require-dev": {
+                "barryvdh/laravel-ide-helper": "^3.5",
+                "laravel/pint": "^1.0",
+                "nunomaduro/larastan": "^3.1.0",
+                "orchestra/testbench": "^9.12",
+                "pestphp/pest-plugin-laravel": "^3.1",
+                "pestphp/pest-plugin-livewire": "^3.0",
+                "phpstan/extension-installer": "^1.4.3",
+                "spatie/laravel-ray": "^1.39"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "Flatpickr": "FilamentFlatpickr"
+                    },
+                    "providers": [
+                        "Coolsam\\Flatpickr\\FlatpickrServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Coolsam\\Flatpickr\\": "src/",
+                    "Coolsam\\Flatpickr\\Database\\Factories\\": "database/factories/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sam Maosa",
+                    "email": "maosa.sam@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Flatpickr input for Filamentphp",
+            "homepage": "https://github.com/coolsam/flatpickr",
+            "keywords": [
+                "coolsam",
+                "flatpickr",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/coolsam/flatpickr/issues",
+                "source": "https://github.com/coolsam/flatpickr"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/coolsam",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-08-28T02:48:54+00:00"
         },
         {
             "name": "danharrin/date-format-converter",
@@ -3921,6 +4077,75 @@
                 }
             ],
             "time": "2025-08-26T09:31:21+00:00"
+        },
+        {
+            "name": "icetalker/filament-table-repeatable-entry",
+            "version": "v2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/icetalker/filament-table-repeatable-entry.git",
+                "reference": "17a3039fc65165a0198c31792d84f336695774f2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/icetalker/filament-table-repeatable-entry/zipball/17a3039fc65165a0198c31792d84f336695774f2",
+                "reference": "17a3039fc65165a0198c31792d84f336695774f2",
+                "shasum": ""
+            },
+            "require": {
+                "filament/infolists": "^4.0",
+                "illuminate/contracts": "^10.0|^11.0|^12.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.14.0"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^7.9",
+                "orchestra/testbench": "^8.0",
+                "pestphp/pest": "^2.0",
+                "pestphp/pest-plugin-arch": "^2.0",
+                "pestphp/pest-plugin-laravel": "^2.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "FilamentTableRepeatableEntry": "Icetalker\\FilamentTableRepeatableEntry\\Facades\\FilamentTableRepeatableEntry"
+                    },
+                    "providers": [
+                        "Icetalker\\FilamentTableRepeatableEntry\\FilamentTableRepeatableEntryServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Icetalker\\FilamentTableRepeatableEntry\\": "src",
+                    "Icetalker\\FilamentTableRepeatableEntry\\Database\\Factories\\": "database/factories"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Martin Hwang",
+                    "email": "termlong.com@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Display Filament RepeatableEntry as table",
+            "homepage": "https://github.com/icetalker/filament-table-repeatable-entry",
+            "keywords": [
+                "filament-table-repeatable-entry",
+                "icetalker",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/icetalker/filament-table-repeatable-entry/issues",
+                "source": "https://github.com/icetalker/filament-table-repeatable-entry/tree/v2.0.0"
+            },
+            "time": "2025-07-31T00:43:10+00:00"
         },
         {
             "name": "intervention/image",
