@@ -94,7 +94,7 @@ it('performs search when query is set', function (): void {
     $component = AutocompleteSelect::make('test_field')
         ->model(Product::class);
 
-    $searchResults = $component->getSearchResults('Test');
+    $searchResults = $component->getViewData()['searchResults'];
 
     expect($searchResults)->toHaveCount(2);
     expect(array_values($searchResults))->toContain('Test Product 1');
@@ -113,7 +113,7 @@ it('respects minimum search length', function (): void {
         ->model(Product::class)
         ->minSearchLength(5);
 
-    $searchResults = $component->getSearchResults('Te');
+    $searchResults = $component->getViewData()['searchResults'];
 
     expect($searchResults)->toBeEmpty();
 });
@@ -130,7 +130,7 @@ it('limits search results', function (): void {
         ->model(Product::class)
         ->maxSearchResults(5);
 
-    $searchResults = $component->getSearchResults('Test');
+    $searchResults = $component->getViewData()['searchResults'];
 
     expect($searchResults)->toHaveCount(5);
 });
@@ -147,7 +147,7 @@ it('uses custom search field', function (): void {
         ->model(Product::class)
         ->searchField('description');
 
-    $searchResults = $component->getSearchResults('Test');
+    $searchResults = $component->getViewData()['searchResults'];
 
     expect($searchResults)->toHaveCount(1);
 });
@@ -174,6 +174,39 @@ it('returns empty results for empty search query', function (): void {
     $searchResults = $component->getSearchResults('');
 
     expect($searchResults)->toBeEmpty();
+});
+
+it('trims search queries before execution', function (): void {
+    Product::factory()->create(['name' => 'Trimmed Test Product']);
+
+    $component = AutocompleteSelect::make('test_field')
+        ->model(Product::class)
+        ->setSearchQuery('   Trimmed   ');
+
+    expect($component->getSearchQuery())->toBe('Trimmed');
+
+    $searchResults = $component->getViewData()['searchResults'];
+
+    expect($searchResults)->toHaveCount(1);
+});
+
+it('caches search results for identical queries', function (): void {
+    Product::factory()->count(2)->create(['name' => 'Cache Product']);
+
+    $component = AutocompleteSelect::make('test_field')
+        ->model(Product::class);
+
+    DB::enableQueryLog();
+
+    $component->getSearchResults('Cache');
+    $firstQueryCount = count(DB::getQueryLog());
+
+    $component->getSearchResults('  Cache  ');
+    $secondQueryCount = count(DB::getQueryLog());
+
+    expect($secondQueryCount)->toBe($firstQueryCount);
+
+    DB::flushQueryLog();
 });
 
 it('provides correct view data', function (): void {
@@ -226,7 +259,7 @@ it('handles search with no results', function (): void {
         ->model(Product::class)
         ->setSearchQuery('NonExistent');
 
-    $searchResults = $component->getSearchResults('NonExistent');
+    $searchResults = $component->getViewData()['searchResults'];
 
     expect($searchResults)->toBeEmpty();
 });
