@@ -160,14 +160,25 @@ final class NormalSettingResourceTest extends TestCase
 
     public function test_can_filter_normal_settings_by_type(): void
     {
-        NormalSetting::factory()->create(['type' => 'text']);
-        NormalSetting::factory()->create(['type' => 'number']);
+        foreach (NormalSetting::CANONICAL_TYPES as $type) {
+            NormalSetting::factory()->create([
+                'type'  => $type,
+                'value' => match ($type) {
+                    NormalSetting::TYPE_INTEGER => 5,
+                    NormalSetting::TYPE_BOOLEAN => true,
+                    NormalSetting::TYPE_ARRAY   => ['items' => ['alpha']],
+                    NormalSetting::TYPE_JSON    => ['meta' => ['foo' => 'bar']],
+                    default                     => 'string-value',
+                },
+            ]);
+        }
 
         $this->actingAs($this->admin);
 
-        $response = $this->get('/admin/normal-settings?filter[type]=text');
-
-        $response->assertStatus(200);
+        foreach (NormalSetting::CANONICAL_TYPES as $type) {
+            $this->get("/admin/normal-settings?filter[type]={$type}")
+                ->assertStatus(200);
+        }
     }
 
     public function test_can_filter_public_normal_settings(): void
@@ -397,7 +408,6 @@ final class NormalSettingResourceTest extends TestCase
         $setting = NormalSetting::factory()->create([
             'is_public'    => '1',
             'is_encrypted' => '0',
-            'is_active'    => '1',
             'sort_order'   => '5',
         ]);
 

@@ -27,15 +27,15 @@ it('renders normal settings create page', function () {
 
 it('creates a normal setting', function () {
     $payload = [
-        'group' => 'general',
-        'key' => 'homepage_title',
-        'type' => 'text',
-        'value' => 'Welcome',
-        'description' => 'Homepage H1 title',
-        'is_public' => true,
-        'is_encrypted' => false,
+        'group'            => 'general',
+        'key'              => 'homepage_title',
+        'type'             => 'string',
+        'value'            => 'Welcome',
+        'description'      => 'Homepage H1 title',
+        'is_public'        => true,
+        'is_encrypted'     => false,
         'validation_rules' => [],
-        'sort_order' => 0,
+        'sort_order'       => 0,
     ];
 
     actingAs($this->admin)
@@ -48,8 +48,8 @@ it('creates a normal setting', function () {
 it('views, edits and deletes a normal setting', function () {
     $record = NormalSetting::factory()->create([
         'group' => 'general',
-        'key' => 'temp_key',
-        'type' => 'text',
+        'key'   => 'temp_key',
+        'type'  => 'string',
         'value' => 'old',
     ]);
 
@@ -58,15 +58,15 @@ it('views, edits and deletes a normal setting', function () {
         ->assertSuccessful();
 
     $update = [
-        'group' => 'general',
-        'key' => 'updated_key',
-        'type' => 'text',
-        'value' => 'new',
-        'description' => $record->description,
-        'is_public' => $record->is_public,
-        'is_encrypted' => $record->is_encrypted,
+        'group'            => 'general',
+        'key'              => 'updated_key',
+        'type'             => 'string',
+        'value'            => 'new',
+        'description'      => $record->description,
+        'is_public'        => $record->is_public,
+        'is_encrypted'     => $record->is_encrypted,
         'validation_rules' => $record->validation_rules,
-        'sort_order' => $record->sort_order,
+        'sort_order'       => $record->sort_order,
     ];
 
     actingAs($this->admin)

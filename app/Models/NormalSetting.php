@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Exception;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use JsonSerializable;
 
 /**
  * NormalSetting
@@ -35,6 +37,27 @@ final class NormalSetting extends Model
 
     protected $casts = ['is_public' => 'boolean', 'is_encrypted' => 'boolean', 'is_active' => 'boolean', 'sort_order' => 'integer', 'validation_rules' => 'json'];
 
+    public const TYPE_STRING = 'string';
+
+    public const TYPE_INTEGER = 'integer';
+
+    public const TYPE_BOOLEAN = 'boolean';
+
+    public const TYPE_ARRAY = 'array';
+
+    public const TYPE_JSON = 'json';
+
+    /**
+     * @var array<int, string>
+     */
+    public const CANONICAL_TYPES = [
+        self::TYPE_STRING,
+        self::TYPE_INTEGER,
+        self::TYPE_BOOLEAN,
+        self::TYPE_ARRAY,
+        self::TYPE_JSON,
+    ];
+
     /**
      * Handle value functionality with proper error handling.
      */
@@ -56,7 +79,7 @@ final class NormalSetting extends Model
                     }
                 }
             }
-            if (in_array($this->attributes['type'] ?? '', ['json', 'array'])) {
+            if (in_array($this->attributes['type'] ?? '', [self::TYPE_JSON, self::TYPE_ARRAY], true)) {
                 if (is_string($value)) {
                     $decoded = json_decode($value, true);
 
@@ -66,14 +89,36 @@ final class NormalSetting extends Model
                 return is_array($value) ? $value : [];
             }
             // Handle boolean type
-            if (($this->attributes['type'] ?? '') === 'boolean') {
+            if (($this->attributes['type'] ?? '') === self::TYPE_BOOLEAN) {
                 return (bool) $value;
+            }
+
+            if (($this->attributes['type'] ?? '') === self::TYPE_INTEGER) {
+                return $value === null ? null : (int) $value;
             }
 
             return $value;
         }, set: function ($value) {
-            if (in_array($this->attributes['type'] ?? '', ['json', 'array']) && (is_array($value) || is_object($value))) {
-                $value = json_encode($value);
+            if (($this->attributes['type'] ?? '') === self::TYPE_INTEGER && $value !== null) {
+                $value = (int) $value;
+            }
+
+            if (($this->attributes['type'] ?? '') === self::TYPE_BOOLEAN && $value !== null) {
+                $value = (bool) $value;
+            }
+
+            if (in_array($this->attributes['type'] ?? '', [self::TYPE_JSON, self::TYPE_ARRAY], true)) {
+                if ($value instanceof Arrayable) {
+                    $value = $value->toArray();
+                } elseif ($value instanceof JsonSerializable) {
+                    $value = $value->jsonSerialize();
+                } elseif (is_object($value) && method_exists($value, 'toArray')) {
+                    $value = $value->toArray();
+                }
+
+                if (is_array($value) || is_object($value)) {
+                    $value = json_encode($value);
+                }
             }
             if (($this->attributes['is_encrypted'] ?? false) && $value !== null) {
                 try {
@@ -173,15 +218,90 @@ final class NormalSetting extends Model
     public static function setValue(string $key, $value, string $group = 'general', ?string $locale = null): void
     {
         $locale = $locale ?? app()->getLocale();
+        $type = self::inferTypeFromValue($value);
+
         self::updateOrCreate(
             ['key' => $key, 'locale' => $locale],
             [
-                'value'     => $value,
-                'group'     => $group,
-                'type'      => is_array($value) || is_object($value) ? 'json' : 'text',
-                'is_active' => true,
-            ]
+                'group' => $group,
+                'type'  => $type,
+                'value' => self::normalizeValueForStorage($value, $type),
+            ],
         );
+    }
+
+    private static function inferTypeFromValue($value): string
+    {
+        if (is_bool($value)) {
+            return self::TYPE_BOOLEAN;
+        }
+
+        if (is_int($value)) {
+            return self::TYPE_INTEGER;
+        }
+
+        if ($value instanceof Arrayable) {
+            return self::TYPE_ARRAY;
+        }
+
+        if (is_array($value)) {
+            return self::TYPE_ARRAY;
+        }
+
+        if ($value instanceof JsonSerializable) {
+            return self::TYPE_JSON;
+        }
+
+        if (is_object($value)) {
+            return self::TYPE_JSON;
+        }
+
+        return self::TYPE_STRING;
+    }
+
+    private static function normalizeValueForStorage($value, string $type)
+    {
+        if ($type === self::TYPE_ARRAY) {
+            if ($value instanceof Arrayable) {
+                return $value->toArray();
+            }
+
+            if ($value instanceof JsonSerializable) {
+                $decoded = $value->jsonSerialize();
+
+                return is_array($decoded) ? $decoded : (array) $decoded;
+            }
+
+            if (is_object($value) && method_exists($value, 'toArray')) {
+                return $value->toArray();
+            }
+
+            return (array) $value;
+        }
+
+        if ($type === self::TYPE_JSON) {
+            if ($value instanceof Arrayable) {
+                return $value->toArray();
+            }
+
+            if ($value instanceof JsonSerializable) {
+                return $value->jsonSerialize();
+            }
+
+            if (is_object($value) && method_exists($value, 'toArray')) {
+                return $value->toArray();
+            }
+        }
+
+        if ($type === self::TYPE_INTEGER) {
+            return $value === null ? null : (int) $value;
+        }
+
+        if ($type === self::TYPE_BOOLEAN) {
+            return $value === null ? null : (bool) $value;
+        }
+
+        return $value;
     }
 
     /**
