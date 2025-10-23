@@ -158,6 +158,16 @@ final class SystemSettingDependency extends Model
     }
 
     /**
+     * Scope the query to dependencies matching the given condition operator.
+     */
+    public function scopeByCondition(Builder $query, string $operator): Builder
+    {
+        $normalizedOperator = strtolower($operator);
+
+        return $query->whereRaw('LOWER(condition) = ?', [$normalizedOperator]);
+    }
+
+    /**
      * Handle scopeCreatedBetween functionality with proper error handling.
      *
      * @param mixed $query
@@ -192,8 +202,7 @@ final class SystemSettingDependency extends Model
         return $query->where(function ($q) use ($search): void {
             $q
                 ->where('condition', 'like', "%{$search}%")
-                ->orWhere('condition_value', 'like', "%{$search}%")
-                ->orWhereHas('setting', function ($q) use ($search) {
+                ->orWhereHas('setting', function ($q) use ($search): void {
                     $q
                         ->where('key', 'like', "%{$search}%")
                         ->orWhere('name', 'like', "%{$search}%");
@@ -255,33 +264,16 @@ final class SystemSettingDependency extends Model
             return false;
         }
 
-        $operator = $this->condition;
-
-        if (! is_string($operator) || $operator === '') {
-            return false;
-        }
-
-        $dependencyValue = $this->dependsOn->value;
-        $conditionValue = $this->condition_value;
-
-        return match ($operator) {
-            'equals' => $this->compareEquality($dependencyValue, $conditionValue),
-            'not_equals' => ! $this->compareEquality($dependencyValue, $conditionValue),
-            'greater_than' => $this->compareNumeric($dependencyValue, $conditionValue, fn ($a, $b) => $a > $b),
-            'greater_than_or_equals' => $this->compareNumeric($dependencyValue, $conditionValue, fn ($a, $b) => $a >= $b),
-            'less_than' => $this->compareNumeric($dependencyValue, $conditionValue, fn ($a, $b) => $a < $b),
-            'less_than_or_equals' => $this->compareNumeric($dependencyValue, $conditionValue, fn ($a, $b) => $a <= $b),
-            'contains' => $this->containsValue($dependencyValue, $conditionValue),
-            'not_contains' => ! $this->containsValue($dependencyValue, $conditionValue),
-            'in' => $this->inCollection($dependencyValue, $conditionValue),
-            'not_in' => ! $this->inCollection($dependencyValue, $conditionValue),
-            'starts_with' => $this->stringComparison($dependencyValue, $conditionValue, fn ($haystack, $needle) => str_starts_with($haystack, $needle)),
-            'ends_with' => $this->stringComparison($dependencyValue, $conditionValue, fn ($haystack, $needle) => str_ends_with($haystack, $needle)),
-            'is_empty' => $this->isEmptyValue($dependencyValue),
-            'is_not_empty' => ! $this->isEmptyValue($dependencyValue),
-            'is_true' => $this->toBool($dependencyValue) === true,
-            'is_false' => $this->toBool($dependencyValue) === false,
-            default => false,
+        return match ($condition['operator'] ?? 'equals') {
+            'equals'       => $dependencyValue == $condition['value'],
+            'not_equals'   => $dependencyValue != $condition['value'],
+            'greater_than' => $dependencyValue > $condition['value'],
+            'less_than'    => $dependencyValue < $condition['value'],
+            'contains'     => str_contains($dependencyValue, $condition['value']),
+            'not_contains' => ! str_contains($dependencyValue, $condition['value']),
+            'in'           => in_array($dependencyValue, $condition['value'] ?? []),
+            'not_in'       => ! in_array($dependencyValue, $condition['value'] ?? []),
+            default        => false,
         };
     }
 
