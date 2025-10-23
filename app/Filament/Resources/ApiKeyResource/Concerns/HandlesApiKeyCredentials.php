@@ -5,44 +5,40 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ApiKeyResource\Concerns;
 
 use App\Models\ApiKey;
-use Filament\Notifications\Notification;
 
 trait HandlesApiKeyCredentials
 {
-    public function revealCredentials(): void
-    {
-        if (! $this->record instanceof ApiKey) {
-            return;
-        }
+    protected ?string $plainTextApiKey = null;
 
-        $this->dispatchCredentialModal([
-            'key' => $this->record->key,
-            'secret' => $this->record->secret,
-        ]);
+    public function generateFreshPlainTextKey(): void
+    {
+        $credentials = ApiKey::generateCredentials();
+
+        $this->plainTextApiKey = $credentials['plain_text'];
+
+        $state = $this->form->getState();
+        $state['plain_text_key'] = $credentials['plain_text'];
+        $this->form->fill($state);
+
+        $this->rememberPlainTextKey($this->record ?? null, $credentials['plain_text']);
     }
 
-    public function regenerateCredentials(): void
+    public function rememberPlainTextKey(?ApiKey $record, string $plainText): void
     {
-        if (! $this->record instanceof ApiKey) {
-            return;
-        }
+        $this->plainTextApiKey = $plainText;
 
-        $credentials = $this->record->regenerateCredentials();
-
-        $this->dispatchCredentialModal($credentials);
-
-        Notification::make()
-            ->title(__('api_keys.notifications.regenerated.title'))
-            ->body(__('api_keys.notifications.regenerated.body', ['key' => $credentials['key']]))
-            ->success()
-            ->send();
+        session()->flash(static::getCredentialSessionKey($record), $plainText);
     }
 
-    /**
-     * @param  array{key: string, secret: string|null}  $credentials
-     */
-    protected function dispatchCredentialModal(array $credentials): void
+    public function pullPlainTextKey(?ApiKey $record): ?string
     {
-        $this->dispatch('api-key:show', key: $credentials['key'], secret: $credentials['secret']);
+        return session()->get(static::getCredentialSessionKey($record));
+    }
+
+    protected static function getCredentialSessionKey(ApiKey|int|string|null $record): string
+    {
+        $identifier = $record instanceof ApiKey ? $record->getKey() : $record;
+
+        return sprintf('filament.api_keys.%s.plain_text', $identifier ?? 'draft');
     }
 }

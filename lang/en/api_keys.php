@@ -1,63 +1,90 @@
 <?php
 
 return [
-    'navigation' => 'API Keys',
-    'plural' => 'API Keys',
-    'single' => 'API Key',
-    'fields' => [
-        'name' => 'Name',
-        'rate_limit' => 'Rate limit',
-        'scopes' => 'Scopes',
-        'is_active' => 'Active',
-        'last_used_at' => 'Last used',
-        'masked_key' => 'Masked key',
-        'key' => 'API key',
-        'secret' => 'API secret',
-    ],
-    'helpers' => [
-        'rate_limit' => 'Leave empty to allow unlimited requests. Set an integer to throttle requests per minute.',
-        'scopes' => 'Choose the capabilities that this key should be allowed to access.',
+    'navigation' => [
+        'label' => 'API Keys',
+        'singular' => 'API Key',
+        'plural' => 'API Keys',
     ],
     'sections' => [
-        'details' => 'Key details',
-        'credentials' => 'Credentials & security',
+        'details' => 'Details',
+        'credentials' => 'Credentials',
+        'activity' => 'Activity',
     ],
-    'messages' => [
-        'no_key' => 'The raw key will be shown once after saving.',
-        'unlimited' => 'Unlimited',
-        'requests_per_minute' => ':value req/min',
-        'copied' => 'Copied!',
-        'secret_warning' => 'Store this secret securely. It will not be shown again.',
-        'generate_after_save' => 'Save the key to generate credentials. You can reveal them once after creation.',
-        'key_modal_hint' => 'Reveal or regenerate the credentials securely. Copy them immediately – they will only be displayed while this dialog is open.',
+    'fields' => [
+        'name' => 'Name',
+        'scopes' => 'Scopes',
+        'rate_limit' => 'Rate limit (requests / minute)',
+        'active' => 'Active',
+        'plain_text_key' => 'Secret key',
+        'last_used_at' => 'Last used',
+        'created_at' => 'Created at',
+        'updated_at' => 'Updated at',
+    ],
+    'placeholders' => [
+        'name' => 'Internal name used for auditing',
+        'rate_limit' => 'Unlimited',
+    ],
+    'hints' => [
+        'scopes' => 'Select the permissions that this key will grant.',
+        'rate_limit' => 'Set the number of allowed requests per minute. Leave empty for unlimited access.',
+        'generated_once' => 'Copy the secret now. It will not be shown again after you leave this page.',
+    ],
+    'filters' => [
+        'active' => 'Status',
+        'scope' => 'Scope',
     ],
     'actions' => [
-        'reveal_key' => 'Reveal key',
-        'regenerate_key' => 'Regenerate key',
+        'create' => 'Create API Key',
+        'regenerate' => 'Regenerate',
+        'confirm_regenerate' => 'Regenerate key',
+        'reveal' => 'Reveal',
+        'hide' => 'Hide',
         'copy' => 'Copy',
         'close' => 'Close',
-        'reveal_secret' => 'Reveal secret',
-        'hide_secret' => 'Hide secret',
-        'reactivate' => 'Reactivate',
-        'revoke' => 'Revoke',
-    ],
-    'modals' => [
-        'reveal_key' => [
-            'heading' => 'API credentials',
-        ],
     ],
     'notifications' => [
-        'regenerated' => [
-            'title' => 'API key regenerated',
-            'body' => 'New key: :key',
-        ],
+        'created' => 'API key created successfully.',
+        'updated' => 'API key updated successfully.',
+        'regenerated' => 'API key regenerated successfully.',
+    ],
+    'modals' => [
+        'reveal_title' => 'API key for :name',
+        'reveal_description' => 'Copy and store the secret securely. It is displayed only once.',
+        'regenerate_description' => 'Generating a new secret will immediately invalidate the current credentials.',
+        'regenerate_warning' => 'Clients using the previous key will stop working until you update them with the new value.',
+    ],
+    'rate_limit' => [
+        'unlimited' => 'Unlimited',
     ],
     'scopes' => [
-        'read_products' => 'Read products',
-        'write_products' => 'Manage products',
-        'read_orders' => 'Read orders',
-        'manage_orders' => 'Manage orders',
-        'manage_customers' => 'Manage customers',
-        'access_analytics' => 'Access analytics',
+        'orders_read' => [
+            'label' => 'Orders (read)',
+            'description' => 'Allows retrieving order information.',
+        ],
+        'orders_write' => [
+            'label' => 'Orders (write)',
+            'description' => 'Allows creating or updating order data.',
+        ],
+        'products_read' => [
+            'label' => 'Products (read)',
+            'description' => 'Allows reading product catalog data.',
+        ],
+        'products_write' => [
+            'label' => 'Products (write)',
+            'description' => 'Allows creating or updating product information.',
+        ],
+        'customers_read' => [
+            'label' => 'Customers (read)',
+            'description' => 'Allows accessing customer records.',
+        ],
+        'customers_write' => [
+            'label' => 'Customers (write)',
+            'description' => 'Allows creating or updating customer records.',
+        ],
+        'analytics_read' => [
+            'label' => 'Analytics (read)',
+            'description' => 'Allows retrieving analytics dashboards and metrics.',
+        ],
     ],
 ];

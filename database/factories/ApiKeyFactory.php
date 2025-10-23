@@ -26,14 +26,15 @@ final class ApiKeyFactory extends Factory
             ->values()
             ->all();
 
+        $credentials = ApiKey::generateCredentials();
+
         return [
-            'name' => $this->faker->unique()->words(2, true),
-            'key' => ApiKey::generatePlainTextKey(),
-            'secret' => ApiKey::generatePlainTextSecret(),
-            'permissions' => $scopes,
-            'rate_limits' => ['default' => random_int(60, 600)],
-            'is_active' => true,
-            'last_used_at' => now()->subMinutes(random_int(1, 1440)),
+            'key' => $credentials['hashed'],
+            'name' => sprintf('%s API Access', $this->faker->company()),
+            'scopes' => array_values($scopes),
+            'rate_limit' => $this->faker->numberBetween(100, 1000),
+            'active' => true,
+            'last_used_at' => $this->faker->optional()->dateTimeBetween('-1 month', 'now'),
         ];
     }
 }
