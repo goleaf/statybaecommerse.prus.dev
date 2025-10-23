@@ -17,7 +17,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 ### Latest updates
-- Developer tooling regained the full Husky bootstrap shim, ensuring local Git hooks run automatically after installs while still reminding contributors about the upcoming v10 script changes.
+- Development environments now execute Git hooks again because the Husky shim once more points to the repository-managed toolchain instead of the deprecated placeholder stub.
 - Shipping option management screens now present accurate delivery windows even when the minimum day value is zero or one side of the range is missing, giving merchandisers clearer expectations when auditing carriers.
 
 ### Latest updates

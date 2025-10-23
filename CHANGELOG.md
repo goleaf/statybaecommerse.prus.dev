@@ -14,7 +14,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Synced Collection Rule resource signatures, modal reorder UX, and cache maintenance tooling with Filament v4 to retire legacy array fallbacks.
 * Delivered the Campaign Product Target management resource with localized strings, reinforced widget navigation metadata, and hardened media path migrations for safer marketing workflows.
 * Updated the Feature Flag resource to bypass active/enabled scopes so administrators can review inactive toggles directly from the listing view.
-* Restored the Husky bootstrap shim so Git hooks keep executing with the repository's local toolchain while still surfacing the upstream v10 deprecation guidance.
+* Restored the Husky bootstrap shim so local Git hooks execute repository tools instead of aborting with the v10 deprecation banner.
 
 ### Bug Fixes
 * Ensured the price list discount filter only surfaces items where the compare price actually exceeds the net price and added coverage to guard the behaviour going forward.
