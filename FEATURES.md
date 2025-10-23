@@ -17,7 +17,9 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
-- API rate limiting now layers per-user and per-IP budgets with structured logging and updated route/security documentation so integrators can separate read and write traffic when tuning clients.
+- Stock reservation schema guardrails now delay foreign key enforcement until product and variant inventory tables are present, keeping fresh database bootstraps reliable without dropping cascade behaviour.
+- Added a repository analysis snapshot that summarises the 24 open pull requests into themes—Filament Schema migrations, Husky bootstrap shim restorations, and layered rate limiting—so product and engineering stakeholders can digest the queue at a glance.
+- Tracking the open security enhancement proposal from PR #289 that introduces layered API rate limits per user and IP, distinct buckets for read/write/notification/autocomplete flows, and correlation-aware throttling logs so operators can assess the pending protection improvements.
 - Filament admin resources, relation managers, widgets, and standalone pages now follow the Schema-based API with normalized navigation icon docblocks, eliminating BackedEnum collisions while documenting how each builder composes the new schema pipeline.
 - Navigation icons and groups across every Filament page, resource, widget, and relation manager now rely on the BackedEnum/UnitEnum union types mandated by v4 so PHP 8.3 environments boot without property type fatals.
 - Product API contract delivery now runs through dedicated application-layer use cases, a presenter, and an Eloquent repository, ensuring storefront consumers receive filtered, displayable catalogue data without breaking schema guarantees.
