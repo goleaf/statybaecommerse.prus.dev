@@ -30,9 +30,13 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -40,11 +44,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
-use Filament\Support\Enums\MaxWidth;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
@@ -55,10 +54,10 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 /**
@@ -68,7 +67,7 @@ use UnitEnum;
  */
 final class ProductResource extends Resource implements DefinesExportColumns
 {
-    use HasNav;
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-cube';
 
     protected static ?string $model = Product::class;
 
@@ -112,12 +111,10 @@ final class ProductResource extends Resource implements DefinesExportColumns
         return AuthorizationMatrix::check('products', 'update');
     }
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
-        return 'heroicon-o-cube';
+        return 'Products';
     }
-
-    
 
     protected static ?int $navigationSort = 1;
 
@@ -208,9 +205,17 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                                 ->maxLength(500),
                                         ]),
                                         Grid::make(2)
-                                            ->components([
-                                                TextInput::make('sku')
-                                                    ->label(__('products.fields.sku'))
+                                            ->schema([
+                                                TextInput::make('name')
+                                                    ->label(__('products.fields.name'))
+                                                    ->required()
+                                                    ->maxLength(255)
+                                                    ->live()
+                                                    ->afterStateUpdated(function (?string $state, callable $set): void {
+                                                        $set('slug', Str::slug((string) $state));
+                                                    }),
+                                                TextInput::make('slug')
+                                                    ->label(__('products.fields.slug'))
                                                     ->required()
                                                     ->unique(ignoreRecord: true)
                                                     ->maxLength(255),
@@ -218,6 +223,38 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                                     ->label(__('products.fields.barcode'))
                                                     ->maxLength(255),
                                             ]),
+                                        TextInput::make('sku')
+                                            ->label(__('products.fields.sku'))
+                                            ->required()
+                                            ->unique(ignoreRecord: true)
+                                            ->maxLength(255),
+                                        TextInput::make('barcode')
+                                            ->label(__('products.fields.barcode'))
+                                            ->maxLength(255),
+                                        RichEditor::make('description')
+                                            ->label(__('products.fields.description'))
+                                            ->toolbarButtons([
+                                                'bold',
+                                                'italic',
+                                                'underline',
+                                                'strike',
+                                                'link',
+                                                'bulletList',
+                                                'orderedList',
+                                                'grid',
+                                                'gridDelete',
+                                                'textColor',
+                                            ])
+                                            ->textColors([
+                                                'primary' => '#1d4ed8',
+                                                'emerald' => '#047857',
+                                                'amber'   => '#f59e0b',
+                                                'slate'   => '#475569',
+                                            ]),
+                                        Textarea::make('short_description')
+                                            ->label(__('products.fields.short_description'))
+                                            ->rows(3)
+                                            ->maxLength(500),
                                     ]),
                                 Section::make('Pricing & Inventory')
                                     ->components([
@@ -637,9 +674,13 @@ final class ProductResource extends Resource implements DefinesExportColumns
                         ->color('success')
                         ->form([
                             Select::make('format')
-                                ->label(__('exports.filament.bulk_action.format_label'))
-                                ->options($formatOptions)
-                                ->default($defaultFormat)
+                                ->label(__('Format'))
+                                ->options([
+                                    'csv'  => 'CSV',
+                                    'xlsx' => 'XLSX',
+                                    'pdf'  => 'PDF',
+                                ])
+                                ->default('csv')
                                 ->required(),
                             CheckboxList::make('columns')
                                 ->label(__('exports.filament.bulk_action.columns_label'))
