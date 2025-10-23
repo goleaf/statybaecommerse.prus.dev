@@ -159,13 +159,9 @@ final class MenuItemResource extends Resource
                             return null;
                         }
 
-                        $stateString = (string) $state;
+                        $state = (string) $state;
 
-                        if (strlen($stateString) <= 30) {
-                            return null;
-                        }
-
-                        return $stateString;
+                        return strlen($state) > 30 ? $state : null;
                     }),
                 TextColumn::make('route_name')
                     ->label(__('admin.menu_items.route_name'))
