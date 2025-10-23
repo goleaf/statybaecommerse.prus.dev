@@ -236,13 +236,18 @@ final class CampaignResource extends Resource
                 TextColumn::make('status')
                     ->label(self::label('campaigns.fields.status', 'Status'))
                     ->badge()
-                    ->formatStateUsing(fn (string $state): string => self::label('campaigns.status.' . $state, Str::headline($state)))
+                    ->formatStateUsing(
+                        fn (?string $state): string => self::label(
+                            'campaigns.status.'.($state ?? 'unknown'),
+                            $state ? Str::headline($state) : 'Unknown'
+                        )
+                    )
                     ->colors([
-                        'primary' => fn (string $state): bool => in_array($state, ['draft', 'scheduled']),
-                        'success' => fn (string $state): bool => $state === 'active',
-                        'warning' => fn (string $state): bool => $state === 'paused',
-                        'info'    => fn (string $state): bool => $state === 'completed',
-                        'danger'  => fn (string $state): bool => $state === 'cancelled',
+                        'primary' => fn (?string $state): bool => in_array($state, ['draft', 'scheduled'], true),
+                        'success' => fn (?string $state): bool => $state === 'active',
+                        'warning' => fn (?string $state): bool => $state === 'paused',
+                        'info' => fn (?string $state): bool => $state === 'completed',
+                        'danger' => fn (?string $state): bool => $state === 'cancelled',
                     ]),
                 IconColumn::make('is_active')
                     ->label(self::label('campaigns.fields.is_active', 'Active'))
@@ -268,7 +273,7 @@ final class CampaignResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('conversion_rate')
                     ->label(self::label('campaigns.fields.conversion_rate', 'Conversion rate'))
-                    ->formatStateUsing(fn ($state): string => number_format((float) $state, 2) . '%')
+                    ->formatStateUsing(fn (?float $state): string => number_format($state ?? 0.0, 2).'%')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('translations_count')
