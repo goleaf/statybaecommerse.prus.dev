@@ -58,9 +58,16 @@
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
 
     <!-- Scripts -->
-    {{-- Skip Vite asset loading when the manifest is absent during testing to prevent runtime exceptions. --}}
-    @if (file_exists(public_path('build/manifest.json')))
+    @php
+        $shouldLoadViteAssets = ! app()->runningUnitTests() || file_exists(public_path('build/manifest.json'));
+    @endphp
+
+    @if ($shouldLoadViteAssets)
         @vite(['resources/css/app.scss', 'resources/js/app.js'])
+    @else
+        {{-- Skip Vite during isolated feature tests when the manifest is absent to keep Blade rendering resilient. --}}
+        <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+        <script src="{{ asset('js/app.js') }}" defer></script>
     @endif
 
     <!-- Livewire Styles -->

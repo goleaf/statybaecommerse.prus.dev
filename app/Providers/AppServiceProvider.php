@@ -252,6 +252,17 @@ class AppServiceProvider extends ServiceProvider
             Livewire::component('filament.admin.resources.product-comparisons.edit', \App\Filament\Resources\ProductComparisonResource\Pages\EditProductComparison::class);
         }
 
+        // Surface our bespoke Filament view components (for example the widget tab
+        // partials) under the `x-filament.components.*` namespace so Blade can
+        // resolve them during Livewire driven feature tests without relying on
+        // package level defaults that omit our overrides.
+        Blade::anonymousComponentNamespace('components/filament/components', 'filament.components');
+
+        // Explicitly map the anonymous component path as well because the dot
+        // notation (`x-filament.components.*`) used by our Blade includes relies
+        // on the path based resolver instead of the namespace aware variant.
+        Blade::anonymousComponentPath(resource_path('views/components/filament/components'), 'filament.components');
+
         // Register View Creators
         // $this->registerViewCreators();
 
