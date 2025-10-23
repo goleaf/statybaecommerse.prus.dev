@@ -32,7 +32,7 @@ final class ProductRequestResource extends Resource
     protected static ?string $model = ProductRequest::class;
 
     /**
-     * @var string|BackedEnum|null Navigation icon identifier.
+     * @var string|BackedEnum|null Navigation icon identifier for the resource.
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-clipboard-document-list';
 
