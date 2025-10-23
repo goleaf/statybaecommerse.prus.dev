@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Support\Repositories\ProductRepository;
-use App\Support\Repositories\UserRepository;
+use App\Support\Backup\RepositoryRegistry;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Container\Container;
@@ -82,7 +81,8 @@ final class BackupPrepareCommand extends Command
                 throw new RuntimeException('Failed to compute artifact checksums.');
             }
 
-            $repositoryMetrics = $this->repositoryMetrics($connectionName);
+            $repositoryRegistry = RepositoryRegistry::fromConfig($this->container());
+            $repositoryCounts = $repositoryRegistry->counts($connectionName);
 
             $metadata = [
                 'timestamp'  => $timestamp,
@@ -93,7 +93,7 @@ final class BackupPrepareCommand extends Command
                 ],
                 'commit_hash'  => $commitHash,
                 'media_paths'  => $mediaPaths,
-                'repositories' => $repositoryMetrics['classes'],
+                'repositories' => $repositoryRegistry->definitions(),
                 'artifacts'    => [
                     'database' => [
                         'filename' => basename($databaseArtifact['path']),
@@ -105,7 +105,7 @@ final class BackupPrepareCommand extends Command
                         'checksum' => $mediaChecksum,
                     ],
                 ],
-                'counts'       => $repositoryMetrics['counts'],
+                'counts'       => $repositoryCounts,
                 'generated_at' => CarbonImmutable::now()->toIso8601String(),
             ];
 
@@ -123,7 +123,7 @@ final class BackupPrepareCommand extends Command
             $this->components->twoColumnDetail('Media archive', $mediaArtifact);
             $this->components->twoColumnDetail('Metadata', $backupPath . '/metadata.json');
 
-            foreach ($repositoryMetrics['counts'] as $label => $count) {
+            foreach ($repositoryCounts as $label => $count) {
                 $this->components->twoColumnDetail(
                     sprintf('Records [%s]', Str::headline($label)),
                     (string) $count,
@@ -370,127 +370,6 @@ final class BackupPrepareCommand extends Command
         }
 
         return trim($process->getOutput()) ?: null;
-    }
-
-    /**
-     * @return array{counts: array<string, int>, classes: array<string, string>}
-     */
-    private function repositoryMetrics(string $connection): array
-    {
-        $repositories = $this->instantiateRepositories();
-
-        if ($repositories === []) {
-            return [
-                'counts'  => [],
-                'classes' => [],
-            ];
-        }
-
-        $counts = [];
-        $classes = [];
-
-        foreach ($repositories as $label => $repository) {
-            $counts[$label] = $this->repositoryCount($repository, $connection);
-            $classes[$label] = $repository::class;
-        }
-
-        return [
-            'counts'  => $counts,
-            'classes' => $classes,
-        ];
-    }
-
-    /**
-     * @return array<string, object>
-     */
-    private function instantiateRepositories(): array
-    {
-        $definitions = $this->repositoryConfiguration();
-
-        if ($definitions === []) {
-            return [];
-        }
-
-        $repositories = [];
-        $container = $this->container();
-
-        foreach ($definitions as $label => $class) {
-            if (! class_exists($class)) {
-                throw new RuntimeException(sprintf('Backup repository class [%s] does not exist.', $class));
-            }
-
-            $instance = $container->make($class);
-
-            if (! method_exists($instance, 'count')) {
-                throw new RuntimeException(sprintf('Backup repository [%s] must define a count method.', $class));
-            }
-
-            $repositories[$label] = $instance;
-        }
-
-        return $repositories;
-    }
-
-    /**
-     * @return array<string, class-string>
-     */
-    private function repositoryConfiguration(): array
-    {
-        $configured = config('backup.repositories');
-
-        if ($configured === null) {
-            return $this->defaultRepositoryConfiguration();
-        }
-
-        if ($configured === []) {
-            return [];
-        }
-
-        if (! is_array($configured) || array_is_list($configured)) {
-            throw new RuntimeException('Backup repositories configuration must be an associative array.');
-        }
-
-        $normalized = [];
-
-        foreach ($configured as $label => $class) {
-            if (! is_string($label) || $label === '') {
-                throw new RuntimeException('Backup repository keys must be non-empty strings.');
-            }
-
-            if (! is_string($class) || $class === '') {
-                throw new RuntimeException(sprintf('Backup repository [%s] must reference a class name.', $label));
-            }
-
-            $normalized[$label] = $class;
-        }
-
-        return $normalized;
-    }
-
-    /**
-     * @return array<string, class-string>
-     */
-    private function defaultRepositoryConfiguration(): array
-    {
-        return [
-            'users'    => UserRepository::class,
-            'products' => ProductRepository::class,
-        ];
-    }
-
-    private function repositoryCount(object $repository, string $connection): int
-    {
-        $count = $repository->count($connection);
-
-        if (is_int($count)) {
-            return $count;
-        }
-
-        if (is_numeric($count)) {
-            return (int) $count;
-        }
-
-        throw new RuntimeException(sprintf('Backup repository [%s]::count() must return an integer.', $repository::class));
     }
 
     private function container(): Container
