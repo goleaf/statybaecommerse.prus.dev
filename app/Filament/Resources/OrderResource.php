@@ -45,7 +45,7 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Database\Eloquent\Model;
 use UnitEnum;
 
 /**
@@ -104,6 +104,41 @@ final class OrderResource extends Resource implements DefinesExportColumns
     public static function shouldRegisterNavigation(): bool
     {
         return AuthorizationMatrix::check('orders', 'viewAny');
+    }
+
+    public static function canViewAny(): bool
+    {
+        return AuthorizationMatrix::check('orders', 'viewAny');
+    }
+
+    public static function canView(Model $record): bool
+    {
+        return AuthorizationMatrix::check('orders', 'view');
+    }
+
+    public static function canCreate(): bool
+    {
+        return AuthorizationMatrix::check('orders', 'create');
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return AuthorizationMatrix::check('orders', 'update');
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return AuthorizationMatrix::check('orders', 'delete');
+    }
+
+    public static function canForceDelete(Model $record): bool
+    {
+        return AuthorizationMatrix::check('orders', 'delete');
+    }
+
+    public static function canRestore(Model $record): bool
+    {
+        return AuthorizationMatrix::check('orders', 'update');
     }
 
     public static function getNavigationIcon(): string|\BackedEnum|null
@@ -697,18 +732,40 @@ final class OrderResource extends Resource implements DefinesExportColumns
                             ->format('Y-m-d')
                             ->displayFormat('Y-m-d'),
                     ])
-                    ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
-                        $query,
-                        $data['range'] ?? null,
-                        'created_at',
-                    )),
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['created_from'] ?? null,
+                                fn (Builder $q, $date): Builder => $q->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['created_until'] ?? null,
+                                fn (Builder $q, $date): Builder => $q->whereDate('created_at', '<=', $date),
+                            );
+                    }),
+                Filter::make('total_range')
+                    ->form([
+                        TextInput::make('total_from')
+                            ->label(__('orders.total_from'))
+                            ->numeric()
+                            ->prefix('€'),
+                        TextInput::make('total_until')
+                            ->label(__('orders.total_until'))
+                            ->numeric()
+                            ->prefix('€'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['total_from'],
+                                fn (Builder $query, $amount): Builder => $query->where('total', '>=', $amount),
+                            )
+                            ->when(
+                                $data['total_until'],
+                                fn (Builder $query, $amount): Builder => $query->where('total', '<=', $amount),
+                            );
+                    }),
                 TrashedFilter::make(),
-            ])
-            ->filtersFormWidth(MaxWidth::Large)
-            ->headerActions([
-                ExportAction::make('export')
-                    ->label(__('Export'))
-                    ->exports(self::getExportPresets()),
             ])
             ->actions([
                 ViewAction::make()

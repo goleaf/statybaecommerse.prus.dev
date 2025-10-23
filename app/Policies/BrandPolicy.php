@@ -13,16 +13,20 @@ final class BrandPolicy
 {
     public function viewAny(AdminUser|User $user): bool
     {
-        return $user instanceof AdminUser
-            ? AuthorizationMatrix::check('brands', 'viewAny', $user)
-            : (bool) ($user->is_admin ?? false);
+        if (! $user instanceof AdminUser) {
+            return false;
+        }
+
+        return AuthorizationMatrix::check('brands', 'viewAny', $user);
     }
 
     public function view(AdminUser|User $user, Brand $brand): bool
     {
-        return $user instanceof AdminUser
-            ? AuthorizationMatrix::check('brands', 'view', $user)
-            : (bool) ($user->is_admin ?? false);
+        if (! $user instanceof AdminUser) {
+            return false;
+        }
+
+        return AuthorizationMatrix::check('brands', 'view', $user);
     }
 
     public function create(AdminUser $user): bool
