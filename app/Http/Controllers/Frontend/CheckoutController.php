@@ -5,59 +5,96 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Contracts\View\View;
+use App\Models\CartItem;
+use App\Models\Order;
+use App\Models\OrderItem;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 final class CheckoutController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
+        $items = $this->getCartItems($request);
+
         return view('frontend.checkout.index', [
-            'cart' => $this->buildCartSummary(),
+            'cartItems' => $items,
+            'summary' => $this->summarize($items),
         ]);
     }
 
     public function process(Request $request): RedirectResponse
     {
-        $cart = $this->buildCartSummary();
-
-        if ($cart['items']->isEmpty()) {
-            return redirect()->route('frontend.cart.index')->with('status', __('Your cart is empty.'));
+        $items = $this->getCartItems($request);
+        if ($items->isEmpty()) {
+            return redirect()->route('frontend.cart.index')->with('error', __('Your cart is empty.'));
         }
 
-        $data = $request->validate([
-            'email' => ['required', 'email'],
-            'name' => ['required', 'string', 'max:255'],
-            'address' => ['required', 'string', 'max:500'],
-            'city' => ['required', 'string', 'max:255'],
-            'postal_code' => ['required', 'string', 'max:50'],
-            'payment_method' => ['required', 'string'],
+        $validated = $request->validate([
+            'payment_method' => ['required', 'string', 'max:255'],
+            'confirm' => ['accepted'],
         ]);
 
-        $orderReference = 'CHK-' . now()->format('YmdHis');
+        $order = DB::transaction(function () use ($items, $request, $validated) {
+            $subtotal = (float) $items->sum(fn (CartItem $item) => $item->calculateSubtotal());
 
-        Session::put('checkout.receipt', [
-            'order_reference' => $orderReference,
-            'customer' => $data,
-            'cart' => $cart,
-            'processed_at' => now(),
-        ]);
+            $order = Order::query()->create([
+                'number' => Str::upper(Str::random(10)),
+                'user_id' => $request->user()?->id,
+                'status' => 'processing',
+                'subtotal' => $subtotal,
+                'tax_amount' => 0,
+                'shipping_amount' => 0,
+                'discount_amount' => 0,
+                'total' => $subtotal,
+                'currency' => current_currency(),
+                'billing_address' => [],
+                'shipping_address' => [],
+                'payment_status' => 'paid',
+                'payment_method' => $validated['payment_method'],
+                'payment_reference' => (string) Str::uuid(),
+            ]);
 
-        Session::forget('cart');
+            foreach ($items as $item) {
+                OrderItem::query()->create([
+                    'order_id' => $order->getKey(),
+                    'product_id' => $item->product_id,
+                    'product_variant_id' => $item->product_variant_id,
+                    'name' => $item->product_snapshot['name'] ?? $item->product?->name,
+                    'sku' => $item->product_snapshot['sku'] ?? $item->product?->sku,
+                    'quantity' => $item->quantity,
+                    'unit_price' => (float) $item->price,
+                    'price' => (float) $item->price,
+                    'total' => $item->calculateSubtotal(),
+                    'notes' => $item->notes,
+                ]);
 
-        return redirect()->route('frontend.checkout.success');
+                $item->forceDelete();
+            }
+
+            return $order;
+        });
+
+        $request->session()->put('checkout.last_order_id', $order->getKey());
+
+        return redirect()->route('frontend.checkout.success')->with('status', __('Order placed successfully.'));
     }
 
-    public function success(): View
+    public function success(Request $request): View|RedirectResponse
     {
-        $receipt = Session::get('checkout.receipt');
+        $orderId = $request->session()->pull('checkout.last_order_id');
+        if (! $orderId) {
+            return redirect()->route('frontend.cart.index')->with('info', __('No recent checkout found.'));
+        }
 
-        abort_if(empty($receipt), 404);
+        $order = Order::withoutGlobalScopes()->with('items')->findOrFail($orderId);
 
         return view('frontend.checkout.success', [
-            'receipt' => $receipt,
+            'order' => $order,
         ]);
     }
 
@@ -66,37 +103,22 @@ final class CheckoutController extends Controller
         return view('frontend.checkout.cancel');
     }
 
-    private function buildCartSummary(): array
+    private function getCartItems(Request $request): Collection
     {
-        $items = collect(Session::get('cart', []))->map(function (array $item) {
-            $quantity = (int) ($item['quantity'] ?? 0);
-            $price = (float) ($item['price'] ?? 0);
+        return CartItem::query()
+            ->where('session_id', $request->session()->getId())
+            ->orderBy('created_at')
+            ->get();
+    }
 
-            return [
-                'id' => $item['id'] ?? null,
-                'product_id' => $item['product_id'] ?? null,
-                'name' => $item['name'] ?? '',
-                'price' => $price,
-                'quantity' => $quantity,
-                'total' => round($price * $quantity, 2),
-                'slug' => $item['slug'] ?? null,
-            ];
-        });
-
-        $subtotal = $items->sum('total');
-        $taxRate = (float) config('shared.tax.default_rate', 0.21);
-        $tax = round($subtotal * $taxRate, 2);
-        $shipping = $subtotal > 50 ? 0.0 : 5.99;
-        $discount = (float) Session::get('cart_discount', 0);
-        $total = max(0, round($subtotal + $tax + $shipping - $discount, 2));
+    private function summarize(Collection $items): array
+    {
+        $subtotal = (float) $items->sum(fn (CartItem $item) => $item->calculateSubtotal());
 
         return [
-            'items' => $items,
-            'subtotal' => round($subtotal, 2),
-            'tax' => $tax,
-            'shipping' => round($shipping, 2),
-            'discount' => round($discount, 2),
-            'total' => $total,
+            'item_count' => (int) $items->sum('quantity'),
+            'subtotal' => $subtotal,
+            'formatted_subtotal' => app_money_format($subtotal),
         ];
     }
 }
