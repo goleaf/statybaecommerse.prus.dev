@@ -63,6 +63,10 @@ Need background workers, logs, and Vite in one go? Use the existing dev loop:
 composer run dev
 ```
 
+## Latest maintenance
+
+- 2025-10-21: Ensured the User Product Interaction Filament resource now uses the proper `Form`/`Table` return signatures mandated by Filament v4 so panel boot no longer fails when seeding analytics data during PR #534 verification.
+
 ## Architecture cheatsheet
 
 | Area | Location(s) | Notes |
