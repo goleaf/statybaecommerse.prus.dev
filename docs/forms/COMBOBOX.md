@@ -2,8 +2,6 @@
 
 The admin panel now leans on the `novadaemon/filament-combobox` plugin for relationship pickers that benefit from a two-column, searchable layout. The package ships with Filament and is available to every resource through `Filament\Forms\Components\Combobox`.【F:composer.json†L11-L46】
 
-To keep behaviour consistent across modules, prefer the thin wrapper at `App\Filament\Components\Combobox`, which preconfigures search panes, panel height, native select behaviour, and eager loading while exposing helper methods for localised column headers.【F:app/Filament/Components/Combobox.php†L7-L67】
-
 ## Where it is used today
 
 | Resource | Field(s) | Notes |
@@ -33,7 +31,6 @@ Every implementation follows a small set of options:
 - `height('###px')` keeps the dual lists tall enough for comfortable browsing (320–360 px in current resources).【F:app/Filament/Resources/NewsResource.php†L134-L153】【F:app/Filament/Resources/CampaignResource.php†L140-L177】
 - `optionsLabel()` / `selectedLabel()` override the column headers so translators can localize “available” vs “selected” phrasing per resource.【F:app/Filament/Resources/NewsResource.php†L134-L153】【F:app/Filament/Resources/CampaignResource.php†L140-L177】【F:app/Filament/Resources/DiscountConditionResource.php†L142-L166】
 - Combine with standard Filament modifiers such as `relationship()`, `multiple()`, `preload()`, `searchable()`, and `createOptionForm()` to match the data model while keeping the combobox experience consistent.【F:app/Filament/Resources/CollectionResource.php†L165-L175】【F:app/Filament/Resources/RecommendationConfigResourceSimple.php†L124-L162】
-- When you need quick localisation, call `$combobox->withLocalizedLabels('module.combobox.options.key', 'module.combobox.selected.key')` to set both column headings lazily for the current language. Pair it with `$combobox->withLabels('Available', 'Selected')` for hard-coded admin-only copy when translations are unnecessary.【F:app/Filament/Components/Combobox.php†L28-L66】
 
 ## Localization
 
@@ -42,7 +39,3 @@ Every implementation follows a small set of options:
 - Campaign pickers resolve translation keys like `campaigns.combobox.options.target_categories`; if a locale does not provide them yet, the helper falls back to the inline English fallback so nothing breaks during rollout.【F:app/Filament/Resources/CampaignResource.php†L140-L177】【F:app/Filament/Resources/CampaignResource.php†L337-L344】
 
 Add any new combobox translations in the same module-specific language files to keep localisation discoverable for content and operations teams.
-
-## Related docs
-
-- [Searchable input metadata lifecycle](SEARCHABLE_INPUT_METADATA.md) – how `SearchResult` payloads are shaped and consumed across Filament forms.
