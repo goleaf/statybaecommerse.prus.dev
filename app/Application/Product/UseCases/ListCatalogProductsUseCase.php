@@ -13,17 +13,12 @@ use App\Domain\Product\Repositories\ProductRepositoryInterface;
 use App\Domain\Product\Specifications\DisplayableProductSpecification;
 use App\Domain\Product\ValueObjects\ProductCatalogQuery;
 
-/**
- * Coordinates the catalog listing flow including filtering and pagination.
- */
 final class ListCatalogProductsUseCase
 {
     public function __construct(
         private readonly ProductRepositoryInterface $repository,
         private readonly DisplayableProductSpecification $displayableProductSpecification,
-    ) {
-        // Dependencies allow reuse of the specification in tests.
-    }
+    ) {}
 
     public function execute(ListCatalogProductsInputDto $input): ListCatalogProductsOutputDto
     {
@@ -42,9 +37,9 @@ final class ListCatalogProductsUseCase
         $offset = ($input->getPage() - 1) * $input->getPerPage();
         $paginatedProducts = $products->slice($offset, $input->getPerPage());
 
-        return new ListCatalogProductsOutputDto(
-            ProductSummaryCollectionDto::fromDomainCollection($paginatedProducts),
-            new PaginationDto($total, $input->getPerPage(), $input->getPage()),
-        );
+        $collectionDto = ProductSummaryCollectionDto::fromDomainCollection($paginatedProducts);
+        $paginationDto = new PaginationDto($total, $input->getPerPage(), $input->getPage());
+
+        return new ListCatalogProductsOutputDto($collectionDto, $paginationDto);
     }
 }

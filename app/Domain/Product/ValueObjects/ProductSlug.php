@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\Domain\Product\ValueObjects;
 
-/**
- * Strongly-typed slug value object.
- */
 final class ProductSlug
 {
     public function __construct(private readonly string $value)

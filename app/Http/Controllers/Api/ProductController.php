@@ -7,7 +7,6 @@ namespace App\Http\Controllers\Api;
 use App\Application\Product\DTOs\GetProductDetailsInputDto;
 use App\Application\Product\DTOs\ListCatalogProductsInputDto;
 use App\Application\Product\DTOs\SearchProductsInputDto;
-use App\Application\Product\Presenters\ProductContractPresenter;
 use App\Application\Product\UseCases\GetProductDetailsUseCase;
 use App\Application\Product\UseCases\ListCatalogProductsUseCase;
 use App\Application\Product\UseCases\SearchProductsUseCase;
@@ -32,20 +31,27 @@ final class ProductController extends Controller
         private readonly SearchProductsUseCase $searchProductsUseCase,
         private readonly ListCatalogProductsUseCase $listCatalogProductsUseCase,
         private readonly GetProductDetailsUseCase $getProductDetailsUseCase,
-    ) {
-        // The injected use cases keep the controller thin and testable.
-    }
+    ) {}
 
     /**
      * Handle search functionality with proper error handling.
      */
     public function search(Request $request): JsonResponse|View|Response
     {
-        $limit = min(max((int) $request->get('limit', 10), 1), 50);
-        $input = new SearchProductsInputDto(
-            (string) $request->get('q', ''),
-            $limit,
-            10,
+        $limit = min((int) $request->get('limit', 10), 50);
+
+        $result = $this->searchProductsUseCase->execute(
+            new SearchProductsInputDto(
+                (string) $request->get('q', ''),
+                $limit,
+                10,
+            )
+        );
+
+        $data = $result->toArray();
+        $data['products'] = array_map(
+            static fn (array $product) => $product + ['url' => route('product.show', $product['slug'])],
+            $data['products'],
         );
 
         $result = $this->searchProductsUseCase->execute($input);
@@ -60,20 +66,30 @@ final class ProductController extends Controller
     public function catalog(Request $request): JsonResponse|View|Response
     {
         $perPage = max(1, min((int) $request->get('per_page', 20), 100));
+        $category = $request->get('category');
+        $brand = $request->get('brand');
+        $sortBy = $request->get('sort_by', 'name');
+        $sortOrder = $request->get('sort_order', 'asc');
         $currentPage = max(1, (int) $request->get('page', 1));
-        $input = new ListCatalogProductsInputDto(
-            $perPage,
-            $currentPage,
-            $request->filled('category') ? (string) $request->get('category') : null,
-            $request->filled('brand') ? (string) $request->get('brand') : null,
-            (string) $request->get('sort_by', 'name'),
-            (string) $request->get('sort_order', 'asc'),
+
+        $result = $this->listCatalogProductsUseCase->execute(
+            new ListCatalogProductsInputDto(
+                $perPage,
+                $currentPage,
+                $category ? (string) $category : null,
+                $brand ? (string) $brand : null,
+                (string) $sortBy,
+                (string) $sortOrder,
+            )
         );
 
-        $result = $this->listCatalogProductsUseCase->execute($input);
-        $payload = ProductContractPresenter::fromCatalog($result);
+        $data = $result->toArray();
+        $data['products'] = array_map(
+            static fn (array $product) => $product + ['url' => route('product.show', $product['slug'])],
+            $data['products'],
+        );
 
-        return $this->respondWithContract($request, $payload);
+        return $this->handleContentNegotiation($request, $data);
     }
 
     /**
@@ -86,6 +102,9 @@ final class ProductController extends Controller
         } catch (ProductNotFoundException $exception) {
             abort(404, $exception->getMessage());
         }
+
+        $data = $result->toArray();
+        $data['product']['url'] = route('product.show', $data['product']['slug']);
 
         $payload = ProductContractPresenter::fromDetails($result);
 
