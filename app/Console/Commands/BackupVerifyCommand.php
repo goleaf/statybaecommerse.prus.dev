@@ -8,115 +8,125 @@ use App\Support\Backup\RepositoryRegistry;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use JsonException;
+use RuntimeException;
+use Throwable;
 
 final class BackupVerifyCommand extends Command
 {
-    protected $signature = 'backup:verify {--disk=backups : Storage disk hosting the artifacts} {--path=artifacts/backup.json : Relative artifact path on the disk} {--connection= : Database connection used for verification}';
+    protected $signature = <<<'SIGNATURE'
+        backup:verify
+            {--storage-path= : Directory containing prepared backup artifacts}
+            {--working-path= : Temporary directory used for verification}
+            {--connection= : Database connection used for verification}
+            {--keep-working : Preserve the working directory after verification}
+    SIGNATURE;
 
-    protected $description = 'Verify a prepared backup artifact against an ephemeral database connection.';
+    protected $description = 'Verify a prepared backup artifact against an isolated database connection.';
 
     public function handle(): int
     {
-        $diskName = (string) $this->option('disk');
-        $path = (string) $this->option('path');
-        $connection = $this->option('connection');
-        $defaultConnection = config('database.default');
-        $connectionName = is_string($connection) && $connection !== ''
-            ? $connection
-            : (is_string($defaultConnection) && $defaultConnection !== '' ? $defaultConnection : 'sqlite');
-        /** @var non-empty-string $connectionName */
-        $disk = Storage::disk($diskName);
+        $container = $this->container();
 
-        $defaultWorking = config('backup.verify.working_path', storage_path('app/backup-verify'));
-        $workingPath = $this->normalizePath($this->optionString('working-path', is_string($defaultWorking) ? $defaultWorking : storage_path('app/backup-verify')));
-
-        $defaultConnectionName = config('backup.verify.connection_name', 'backup-verify');
-        $connectionName = $this->optionString('connection', is_string($defaultConnectionName) ? $defaultConnectionName : 'backup-verify');
+        $storagePath = $this->optionString('storage-path', (string) config('backup.storage_path', storage_path('app/backups')));
+        $workingPath = $this->optionString('working-path', (string) config('backup.verify.working_path', storage_path('app/backup-verify')));
+        $connection = $this->optionString('connection', (string) config('backup.verify.connection_name', 'backup-verify'));
         $keepWorking = (bool) $this->option('keep-working');
 
+        if ($storagePath === '') {
+            $this->components->error('A storage path is required to verify backups.');
+
+            return self::FAILURE;
+        }
+
+        if ($connection === '') {
+            $this->components->error('A verification database connection must be provided.');
+
+            return self::FAILURE;
+        }
+
+        /** @var array<string, mixed>|null $connectionConfig */
+        $connectionConfig = config('backup.verify.connection');
+
+        if (! is_array($connectionConfig) || array_is_list($connectionConfig)) {
+            $this->components->error('Backup verification connection configuration is invalid.');
+
+            return self::FAILURE;
+        }
+
+        config(["database.connections.{$connection}" => $connectionConfig]);
+
+        $backupPath = $this->findLatestBackupDirectory($storagePath);
+
+        if ($backupPath === null) {
+            $this->components->error('No backup artifacts were found to verify.');
+
+            return self::FAILURE;
+        }
+
+        File::ensureDirectoryExists($backupPath);
+
+        File::deleteDirectory($workingPath);
+        File::ensureDirectoryExists($workingPath);
+
         try {
-            $latestBackup = $this->findLatestBackupDirectory($storageRoot);
+            $metadata = $this->readMetadata($backupPath);
 
-            if ($latestBackup === null) {
-                throw new RuntimeException('No backups were found to verify.');
+            $databaseInfo = $metadata['artifacts']['database'] ?? [];
+            $mediaInfo = $metadata['artifacts']['media'] ?? [];
+
+            $databaseArtifact = $backupPath . DIRECTORY_SEPARATOR . $this->assertFilename($databaseInfo, 'database');
+            $mediaArtifact = $backupPath . DIRECTORY_SEPARATOR . $this->assertFilename($mediaInfo, 'media');
+
+            $this->assertChecksum($databaseArtifact, $databaseInfo['checksum'] ?? null, 'database');
+            $this->assertChecksum($mediaArtifact, $mediaInfo['checksum'] ?? null, 'media');
+
+            $driver = $databaseInfo['driver'] ?? $connectionConfig['driver'] ?? null;
+
+            if ($driver !== 'sqlite') {
+                throw new RuntimeException(sprintf('Only sqlite verification is supported, received [%s].', (string) $driver));
             }
 
-            $metadata = $this->readMetadata($latestBackup);
+            $targetDatabasePath = $connectionConfig['database'] ?? null;
 
-            $databaseArtifact = $latestBackup . '/' . $metadata['artifacts']['database']['filename'];
-            $mediaArtifact = $latestBackup . '/' . $metadata['artifacts']['media']['filename'];
-
-            $this->assertChecksum($databaseArtifact, $metadata['artifacts']['database']['checksum'] ?? null, 'database');
-            $this->assertChecksum($mediaArtifact, $metadata['artifacts']['media']['checksum'] ?? null, 'media');
-
-            $this->components->info('Extracting media archive...');
-            $mediaExtractionPath = $workingPath . '/media';
-            $this->prepareWorkingDirectory($workingPath, $mediaExtractionPath);
-            $this->extractArchive($mediaArtifact, $mediaExtractionPath);
-
-            $this->components->info('Restoring database snapshot...');
-            $connectionConfig = $this->resolveVerificationConnectionConfig($connectionName);
-            $driver = $metadata['artifacts']['database']['driver'] ?? $metadata['connection']['driver'] ?? $connectionConfig['driver'] ?? null;
-
-            if (! is_string($driver) || $driver === '') {
-                throw new RuntimeException('Unable to determine database driver for verification.');
+            if (! is_string($targetDatabasePath) || $targetDatabasePath === '') {
+                throw new RuntimeException('Verification database path is not configured.');
             }
 
-            config(["database.connections.{$connectionName}" => $connectionConfig]);
-            DB::purge($connectionName);
+            File::ensureDirectoryExists(dirname($targetDatabasePath));
+            File::copy($databaseArtifact, $targetDatabasePath);
 
-            $this->restoreDatabase($driver, $connectionConfig, $databaseArtifact);
+            DB::purge($connection);
+            DB::reconnect($connection);
 
-            DB::purge($connectionName);
-            DB::reconnect($connectionName);
+            $registry = array_key_exists('repositories', $metadata)
+                ? RepositoryRegistry::fromDefinitions($container, (array) $metadata['repositories'])
+                : RepositoryRegistry::fromConfig($container);
 
-            $this->components->info('Running sanity checks...');
+            $expectedCounts = [];
 
-            $metadataRepositories = $metadata['repositories'] ?? [];
-            $repositoryRegistry = $metadataRepositories !== []
-                ? RepositoryRegistry::fromDefinitions($this->container(), $metadataRepositories)
-                : RepositoryRegistry::fromConfig($this->container());
-            $expectedCounts = $metadata['counts'] ?? [];
-
-            if ($repositoryRegistry->isEmpty()) {
-                $this->components->warn('No repository counts were recorded in the backup metadata.');
-            } else {
-                $actualCounts = $repositoryRegistry->counts($connectionName);
-                $results = [];
-
-                $labels = array_unique(array_merge(
-                    array_keys($repositoryRegistry->definitions()),
-                    array_keys($expectedCounts),
-                ));
-
-                foreach ($labels as $label) {
-                    $expected = $expectedCounts[$label] ?? null;
-                    $actualCount = $actualCounts[$label] ?? null;
-
-                    if ($actualCount === null) {
-                        throw new RuntimeException(sprintf('Backup repository [%s] is not available for verification.', $label));
+            if (isset($metadata['counts']) && is_array($metadata['counts'])) {
+                foreach ($metadata['counts'] as $label => $value) {
+                    if (is_string($label) && $label !== '') {
+                        $expectedCounts[$label] = is_int($value) ? $value : (is_numeric($value) ? (int) $value : null);
                     }
-
-                    $this->compareCounts($label, $expected, $actualCount);
-
-                    $results[$label] = [
-                        'expected' => $expected,
-                        'actual'   => $actualCount,
-                    ];
                 }
+            }
 
-                foreach ($results as $label => $comparison) {
-                    $this->components->twoColumnDetail(
-                        sprintf('%s (expected/actual)', Str::headline($label)),
-                        sprintf(
-                            '%s / %s',
-                            $comparison['expected'] !== null ? (string) $comparison['expected'] : 'n/a',
-                            (string) $comparison['actual'],
-                        ),
-                    );
+            $actualCounts = $registry->counts($connection);
+
+            foreach ($expectedCounts as $label => $expected) {
+                $actual = $actualCounts[$label] ?? null;
+
+                if ($expected !== null && $actual !== $expected) {
+                    throw new RuntimeException(sprintf(
+                        'Repository [%s] expected %s records but found %s.',
+                        $label,
+                        $expected,
+                        $actual ?? 'unknown'
+                    ));
                 }
             }
 
@@ -125,14 +135,15 @@ final class BackupVerifyCommand extends Command
             return self::SUCCESS;
         } catch (Throwable $exception) {
             $this->components->error($exception->getMessage());
+            logger()->error('backup.verify_failed', ['exception' => $exception]);
 
             return self::FAILURE;
+        } finally {
+            if (! $keepWorking) {
+                File::deleteDirectory($workingPath);
+            }
         }
-
-        $contents = $disk->get($path);
-
-        if (! is_string($contents)) {
-            $this->components->error('Unable to read the backup artifact contents.');
+    }
 
     private function findLatestBackupDirectory(string $storageRoot): ?string
     {
@@ -140,494 +151,86 @@ final class BackupVerifyCommand extends Command
             return null;
         }
 
-        /** @var array<int, string> $directories */
-        $directories = array_values(array_filter(
-            File::directories($storageRoot),
-            static function ($path): bool {
-                return is_string($path) && File::isDirectory($path);
-            },
-        ));
+        $directories = array_filter(File::directories($storageRoot), static fn ($path): bool => is_string($path));
 
         if ($directories === []) {
             return null;
         }
 
-        /** @var array<int, string> $directories */
         rsort($directories);
 
         return $directories[0] ?? null;
     }
 
     /**
-     * @return array{
-     *     artifacts: array{
-     *         database: array{filename: string, checksum?: string|null, driver?: string|null},
-     *         media: array{filename: string, checksum?: string|null}
-     *     },
-     *     connection?: array{driver?: string|null},
-     *     counts?: array<string, int|null>,
-     *     repositories?: array<string, string>
-     * }
+     * @return array<string, mixed>
      */
     private function readMetadata(string $backupPath): array
     {
-        $metadataPath = $backupPath . '/metadata.json';
+        $metadataPath = $backupPath . DIRECTORY_SEPARATOR . 'metadata.json';
 
         if (! File::exists($metadataPath)) {
             throw new RuntimeException('Backup metadata file is missing.');
         }
 
         try {
-            $payload = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+            $contents = File::get($metadataPath);
+            $metadata = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $exception) {
-            throw new RuntimeException('Failed to parse backup metadata: ' . $exception->getMessage(), 0, $exception);
+            throw new RuntimeException('Failed to decode backup metadata.', 0, $exception);
         }
 
-        if (! is_array($payload)) {
-            $this->components->error('The backup artifact does not contain a valid payload structure.');
-
-            return self::FAILURE;
+        if (! is_array($metadata) || array_is_list($metadata)) {
+            throw new RuntimeException('Backup metadata file is malformed.');
         }
 
-        $userRecords = array_values(array_filter(
-            is_array($payload['users'] ?? null) ? $payload['users'] : [],
-            static fn ($item): bool => is_array($item),
-        ));
-
-        $productRecords = array_values(array_filter(
-            is_array($payload['products'] ?? null) ? $payload['products'] : [],
-            static fn ($item): bool => is_array($item),
-        ));
-
-        $users = collect($userRecords);
-        $products = collect($productRecords);
-
-        /** @var Connection $ephemeral */
-        $ephemeral = DB::connection($connectionName);
-        $ephemeral->getPdo();
-
-        $schema = Schema::connection($connectionName);
-
-        $this->createBackupTables($schema);
-
-        $ephemeral->transaction(function () use ($ephemeral, $users, $products): void {
-            $users->each(static function ($user) use ($ephemeral): void {
-                $userId = $user['id'] ?? null;
-
-        $databaseInfo = ['filename' => $databaseFilename];
-
-        if (array_key_exists('checksum', $database)) {
-            $checksum = $database['checksum'];
-
-            if ($checksum !== null && ! is_string($checksum)) {
-                throw new RuntimeException('Backup metadata database checksum must be a string or null.');
-            }
-
-            $databaseInfo['checksum'] = $checksum;
-        }
-
-        if (array_key_exists('driver', $database)) {
-            $driver = $database['driver'];
-
-            if ($driver !== null && ! is_string($driver)) {
-                throw new RuntimeException('Backup metadata database driver must be a string or null.');
-            }
-
-            $databaseInfo['driver'] = $driver;
-        }
-
-        $mediaInfo = ['filename' => $mediaFilename];
-
-        if (array_key_exists('checksum', $media)) {
-            $checksum = $media['checksum'];
-
-            if ($checksum !== null && ! is_string($checksum)) {
-                throw new RuntimeException('Backup metadata media checksum must be a string or null.');
-            }
-
-            $mediaInfo['checksum'] = $checksum;
-        }
-
-        $result = [
-            'artifacts' => [
-                'database' => $databaseInfo,
-                'media'    => $mediaInfo,
-            ],
-        ];
-
-        if (isset($decoded['connection'])) {
-            if (! is_array($decoded['connection'])) {
-                throw new RuntimeException('Backup metadata connection details must be an array.');
-            }
-
-            $connectionInfo = [];
-
-            if (array_key_exists('driver', $decoded['connection'])) {
-                $driver = $decoded['connection']['driver'];
-
-                if ($driver !== null && ! is_string($driver)) {
-                    throw new RuntimeException('Backup metadata connection driver must be a string or null.');
-                }
-
-                $ephemeral->table('backup_users')->insert([
-                    'id' => (int) $userId,
-                    'name' => $user['name'] ?? null,
-                    'email' => $user['email'] ?? null,
-                    'locale' => $user['locale'] ?? null,
-                ]);
-            });
-
-            $products->each(static function ($product) use ($ephemeral): void {
-                $productId = $product['id'] ?? null;
-
-        if (isset($decoded['counts'])) {
-            if (! is_array($decoded['counts']) || array_is_list($decoded['counts'])) {
-                throw new RuntimeException('Backup metadata counts must be an associative array.');
-            }
-
-            $countsInfo = [];
-
-            foreach ($decoded['counts'] as $label => $value) {
-                if (! is_string($label) || $label === '') {
-                    throw new RuntimeException('Backup metadata count keys must be non-empty strings.');
-                }
-
-                if ($value !== null && ! is_int($value)) {
-                    throw new RuntimeException(sprintf('Backup metadata count for [%s] must be an integer or null.', $label));
-                }
-
-                $countsInfo[$label] = $value;
-            }
-
-            if ($countsInfo !== []) {
-                $result['counts'] = $countsInfo;
-            }
-        }
-
-        if (isset($decoded['repositories'])) {
-            if (! is_array($decoded['repositories']) || array_is_list($decoded['repositories'])) {
-                throw new RuntimeException('Backup metadata repositories must be an associative array.');
-            }
-
-            $repositoryInfo = [];
-
-            foreach ($decoded['repositories'] as $label => $class) {
-                if (! is_string($label) || $label === '') {
-                    throw new RuntimeException('Backup metadata repository keys must be non-empty strings.');
-                }
-
-                if (! is_string($class) || $class === '') {
-                    throw new RuntimeException(sprintf('Backup metadata repository [%s] must reference a class name.', $label));
-                }
-
-                $repositoryInfo[$label] = $class;
-            }
-
-            if ($repositoryInfo !== []) {
-                $result['repositories'] = $repositoryInfo;
-            }
-        }
-
-        return $result;
+        return $metadata;
     }
 
-    private function createBackupTables(Builder $schema): void
+    private function assertChecksum(string $path, ?string $expected, string $label): void
     {
-        $schema->dropIfExists('backup_users');
-        $schema->dropIfExists('backup_products');
-
-        $schema->create('backup_users', static function (Blueprint $table): void {
-            $table->unsignedBigInteger('id')->primary();
-            $table->string('name')->nullable();
-            $table->string('email')->nullable();
-            $table->string('locale')->nullable();
-        });
-
-        $schema->create('backup_products', static function (Blueprint $table): void {
-            $table->unsignedBigInteger('id')->primary();
-            $table->string('name')->nullable();
-            $table->string('slug')->nullable();
-            $table->string('sku')->nullable();
-        });
-    }
-
-    private function dropBackupTables(Builder $schema): void
-    {
-        File::deleteDirectory($workingPath);
-        File::ensureDirectoryExists($workingPath);
-        File::ensureDirectoryExists($mediaExtractionPath);
-    }
-
-    private function extractArchive(string $archive, string $destination): void
-    {
-        if (Str::endsWith($archive, '.empty')) {
-            $this->components->warn('Media archive was a placeholder - skipping extraction.');
-
+        if ($expected === null || $expected === '') {
             return;
         }
 
-        $tarBinary = $this->binary('tar', 'tar');
-        $flags = $this->archiveFlags('extract_flags', '-xzf');
-        $command = sprintf('%s %s %s -C %s', escapeshellarg($tarBinary), $flags, escapeshellarg($archive), escapeshellarg($destination));
-        $process = Process::fromShellCommandline($command);
-        $process->setTimeout(null);
-        $process->mustRun();
+        $hash = hash_file('sha256', $path);
+
+        if ($hash === false) {
+            throw new RuntimeException(sprintf('Unable to calculate checksum for %s artifact.', $label));
+        }
+
+        if (! hash_equals($expected, $hash)) {
+            throw new RuntimeException(sprintf('Checksum mismatch for %s artifact.', $label));
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $info
+     */
+    private function assertFilename(array $info, string $label): string
+    {
+        $filename = $info['filename'] ?? null;
+
+        if (! is_string($filename) || $filename === '') {
+            throw new RuntimeException(sprintf('The %s artifact filename is missing from metadata.', $label));
+        }
+
+        return $filename;
+    }
+
+    private function optionString(string $name, ?string $default = null): string
+    {
+        $value = $this->option($name);
+
+        if (is_string($value) && $value !== '') {
+            return $value;
+        }
+
+        return $default ?? '';
     }
 
     private function container(): Container
     {
-        /** @var Container $container */
-        $container = $this->laravel;
-
-        return $container;
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function resolveVerificationConnectionConfig(string $connectionName): array
-    {
-        $configured = config('backup.verify.connection');
-
-        if (is_array($configured) && $configured !== []) {
-            if (array_is_list($configured)) {
-                throw new RuntimeException('Verification connection configuration must be an associative array.');
-            }
-
-            /** @var array<string, mixed> $configuredArray */
-            $configuredArray = $configured;
-
-            return $configuredArray;
-        }
-
-        $fallback = config("database.connections.{$connectionName}");
-
-        if (! is_array($fallback) || array_is_list($fallback)) {
-            throw new RuntimeException("Verification connection [{$connectionName}] is not configured.");
-        }
-
-        /** @var array<string, mixed> $fallbackArray */
-        $fallbackArray = $fallback;
-
-        return $fallbackArray;
-    }
-
-    /**
-     * @param array<string, mixed> $connectionConfig
-     */
-    private function restoreDatabase(string $driver, array $connectionConfig, string $artifactPath): void
-    {
-        match ($driver) {
-            'sqlite' => $this->restoreSqliteDatabase($connectionConfig, $artifactPath),
-            'mysql', 'mariadb' => $this->restoreMysqlDatabase($connectionConfig, $artifactPath),
-            'pgsql' => $this->restorePostgresDatabase($connectionConfig, $artifactPath),
-            default => throw new RuntimeException("Verification for driver [{$driver}] is not supported."),
-        };
-    }
-
-    /**
-     * @param array<string, mixed> $connectionConfig
-     */
-    private function restoreSqliteDatabase(array $connectionConfig, string $artifactPath): void
-    {
-        $databasePath = $connectionConfig['database'] ?? null;
-
-        if (! is_string($databasePath) || $databasePath === '') {
-            throw new RuntimeException('SQLite verification database path is not configured.');
-        }
-
-        File::ensureDirectoryExists(dirname($databasePath));
-        File::delete($databasePath);
-
-        if (Str::endsWith($artifactPath, '.sqlite')) {
-            File::copy($artifactPath, $databasePath);
-
-            return;
-        }
-
-        $sqliteBinary = $this->binary('sqlite3', 'sqlite3');
-        $command = sprintf('%s %s < %s', escapeshellarg($sqliteBinary), escapeshellarg($databasePath), escapeshellarg($artifactPath));
-        $process = Process::fromShellCommandline($command);
-        $process->setTimeout(null);
-        $process->mustRun();
-    }
-
-    /**
-     * @param array<string, mixed> $connectionConfig
-     */
-    private function restoreMysqlDatabase(array $connectionConfig, string $artifactPath): void
-    {
-        $database = $this->connectionValue($connectionConfig, 'database');
-        $host = $this->connectionValue($connectionConfig, 'host', '127.0.0.1') ?? '127.0.0.1';
-        $port = $this->connectionValue($connectionConfig, 'port', '3306') ?? '3306';
-        $username = $this->connectionValue($connectionConfig, 'username');
-        $password = $this->connectionValue($connectionConfig, 'password', '') ?? '';
-
-        if ($database === null || $database === '') {
-            throw new RuntimeException('MySQL verification database is not configured.');
-        }
-
-        if ($username === null || $username === '') {
-            throw new RuntimeException('MySQL verification username is not configured.');
-        }
-
-        $mysqlBinary = $this->binary('mysql', 'mysql');
-        $createCommand = sprintf(
-            '%s --host=%s --port=%s --user=%s -e %s',
-            escapeshellarg($mysqlBinary),
-            escapeshellarg($host),
-            escapeshellarg($port),
-            escapeshellarg($username),
-            escapeshellarg(sprintf('DROP DATABASE IF EXISTS `%s`; CREATE DATABASE `%s`;', $database, $database)),
-        );
-
-        $mysqlEnv = $password === '' ? [] : ['MYSQL_PWD' => $password];
-
-        $createProcess = Process::fromShellCommandline($createCommand, null, $mysqlEnv);
-        $createProcess->setTimeout(null);
-        $createProcess->mustRun();
-
-        $importCommand = sprintf(
-            '%s --host=%s --port=%s --user=%s %s < %s',
-            escapeshellarg($mysqlBinary),
-            escapeshellarg($host),
-            escapeshellarg($port),
-            escapeshellarg($username),
-            escapeshellarg($database),
-            escapeshellarg($artifactPath),
-        );
-
-        $importProcess = Process::fromShellCommandline($importCommand, null, $mysqlEnv);
-        $importProcess->setTimeout(null);
-        $importProcess->mustRun();
-    }
-
-    /**
-     * @param array<string, mixed> $connectionConfig
-     */
-    private function restorePostgresDatabase(array $connectionConfig, string $artifactPath): void
-    {
-        $database = $this->connectionValue($connectionConfig, 'database');
-        $host = $this->connectionValue($connectionConfig, 'host', '127.0.0.1') ?? '127.0.0.1';
-        $port = $this->connectionValue($connectionConfig, 'port', '5432') ?? '5432';
-        $username = $this->connectionValue($connectionConfig, 'username');
-        $password = $this->connectionValue($connectionConfig, 'password', '') ?? '';
-
-        if ($database === null || $database === '') {
-            throw new RuntimeException('PostgreSQL verification database is not configured.');
-        }
-
-        if ($username === null || $username === '') {
-            throw new RuntimeException('PostgreSQL verification username is not configured.');
-        }
-
-        $psqlBinary = $this->binary('psql', 'psql');
-        $dropCommand = sprintf(
-            '%s --host=%s --port=%s --username=%s --command %s',
-            escapeshellarg($psqlBinary),
-            escapeshellarg($host),
-            escapeshellarg($port),
-            escapeshellarg($username),
-            escapeshellarg(sprintf('DROP DATABASE IF EXISTS "%s";', $database)),
-        );
-
-        $createCommand = sprintf(
-            '%s --host=%s --port=%s --username=%s --command %s',
-            escapeshellarg($psqlBinary),
-            escapeshellarg($host),
-            escapeshellarg($port),
-            escapeshellarg($username),
-            escapeshellarg(sprintf('CREATE DATABASE "%s";', $database)),
-        );
-
-        $env = $password === '' ? [] : ['PGPASSWORD' => $password];
-
-        $dropProcess = Process::fromShellCommandline($dropCommand, null, $env);
-        $dropProcess->setTimeout(null);
-        $dropProcess->mustRun();
-
-        $createProcess = Process::fromShellCommandline($createCommand, null, $env);
-        $createProcess->setTimeout(null);
-        $createProcess->mustRun();
-
-        $importCommand = sprintf(
-            '%s --host=%s --port=%s --username=%s --dbname=%s -f %s',
-            escapeshellarg($psqlBinary),
-            escapeshellarg($host),
-            escapeshellarg($port),
-            escapeshellarg($username),
-            escapeshellarg($database),
-            escapeshellarg($artifactPath),
-        );
-
-        $importProcess = Process::fromShellCommandline($importCommand, null, $env);
-        $importProcess->setTimeout(null);
-        $importProcess->mustRun();
-    }
-
-    /**
-     * @param array<string, mixed> $config
-     */
-    private function connectionValue(array $config, string $key, ?string $default = null): ?string
-    {
-        if (! array_key_exists($key, $config)) {
-            return $default;
-        }
-
-        $value = $config[$key];
-
-        if ($value === null) {
-            return null;
-        }
-
-        if (is_scalar($value)) {
-            return (string) $value;
-        }
-
-        throw new RuntimeException(sprintf('Verification connection value for [%s] must be a scalar or null.', $key));
-    }
-
-    private function compareCounts(string $label, ?int $expected, int $actual): void
-    {
-        if ($expected === null) {
-            $this->components->warn(sprintf('No expected count recorded for %s.', $label));
-
-            return;
-        }
-
-        if ($expected !== $actual) {
-            throw new RuntimeException(sprintf('Sanity check failed for %s count. Expected %d, found %d.', $label, $expected, $actual));
-        }
-    }
-
-    private function optionString(string $name, string $default): string
-    {
-        $value = $this->option($name);
-
-        return is_string($value) && $value !== '' ? $value : $default;
-    }
-
-    private function binary(string $key, string $default): string
-    {
-        $configured = config("backup.binaries.{$key}");
-
-        if (! is_string($configured) || $configured === '') {
-            return $default;
-        }
-
-        return $configured;
-    }
-
-    private function archiveFlags(string $key, string $default): string
-    {
-        $flags = config("backup.archive.{$key}", $default);
-
-        if (! is_string($flags)) {
-            return $default;
-        }
-
-        $trimmed = trim($flags);
-
-        return $trimmed !== '' ? $trimmed : $default;
+        return $this->laravel ?? app();
     }
 }

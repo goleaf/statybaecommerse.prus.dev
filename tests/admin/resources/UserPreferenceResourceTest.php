@@ -8,7 +8,6 @@ use App\Filament\Resources\UserPreferenceResource;
 use App\Support\Nav;
 use App\Models\User;
 use App\Models\UserPreference;
-use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;

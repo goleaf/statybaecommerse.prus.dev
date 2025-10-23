@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 use App\Models\User;
 
-uses(\Tests\TestCase::class);
-
 it('rejects invalid pagination values', function (): void {
     $user = User::factory()->create();
 
@@ -29,4 +27,3 @@ it('requires a search query parameter', function (): void {
             'errors' => ['q'],
         ]);
 });
-
