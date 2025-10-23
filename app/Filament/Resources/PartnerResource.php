@@ -14,6 +14,7 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -173,8 +174,8 @@ final class PartnerResource extends Resource
         return [
             'index'  => Pages\ListPartners::route('/'),
             'create' => Pages\CreatePartner::route('/create'),
-            'view'   => Pages\ViewPartner::route('/{record}'), // Provide a dedicated read-only partner detail page.
-            'edit'   => Pages\EditPartner::route('/{record}/edit'),
+            'view' => Pages\ViewPartner::route('/{record}'),
+            'edit' => Pages\EditPartner::route('/{record}/edit'),
         ];
     }
 }
