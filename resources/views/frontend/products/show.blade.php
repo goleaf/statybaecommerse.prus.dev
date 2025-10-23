@@ -4,16 +4,20 @@
 @section('description', $product->seo_description ?: str($product->short_description)->stripTags()->limit(160))
 
 @section('content')
-    <div class="bg-white py-12">
-        <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <nav class="flex items-center gap-2 text-sm text-gray-500">
-                <a href="{{ route('home') }}" class="hover:text-indigo-600">{{ __('Home') }}</a>
-                @if ($primaryCategory)
-                    <x-untitledui-chevron-right class="h-4 w-4" />
-                    <a href="{{ route('frontend.categories.show', $primaryCategory) }}" class="hover:text-indigo-600">{{ $primaryCategory->name }}</a>
-                @endif
-                <x-untitledui-chevron-right class="h-4 w-4" />
-                <span class="font-semibold text-indigo-600">{{ $product->name }}</span>
+    <div class="bg-gray-50 py-12">
+        <div class="mx-auto max-w-6xl space-y-12 px-4 sm:px-6 lg:px-8">
+            <nav class="text-sm text-gray-500" aria-label="Breadcrumb">
+                <ol class="flex flex-wrap items-center gap-2">
+                    <li>
+                        <a href="{{ route('frontend.home') }}" class="text-blue-600 hover:text-blue-700">{{ __('frontend.navigation.home') }}</a>
+                    </li>
+                    <li>/</li>
+                    <li>
+                        <a href="{{ route('frontend.products.index') }}" class="text-blue-600 hover:text-blue-700">{{ __('Products') }}</a>
+                    </li>
+                    <li>/</li>
+                    <li class="text-gray-700">{{ $product->name }}</li>
+                </ol>
             </nav>
 
             <div class="mt-10 grid gap-10 lg:grid-cols-[1.1fr_1fr]">

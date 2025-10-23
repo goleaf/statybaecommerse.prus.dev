@@ -72,26 +72,33 @@ return [
                     'link' => 'Susipažinkite su ženklais',
                 ],
             ],
+            'lists' => [
+                'categories' => [
+                    'title' => 'Populiariausios katalogo kategorijos',
+                    'subtitle' => 'Mūsų lankomiausi skyriai – nuo sunkiųjų įrankių iki apdailos medžiagų.',
+                    'link' => 'Visos kategorijos',
+                    'item_count' => ':count įtrauktų produktų',
+                    'empty' => 'Kategorijos bus parodytos, kai tik bus publikuotos.',
+                ],
+                'brands' => [
+                    'title' => 'Išskirtiniai statybų prekės ženklai',
+                    'subtitle' => 'Lyderiai profesionalios įrangos, izoliacijos ir konstrukcinių sistemų srityse.',
+                    'link' => 'Visi prekės ženklai',
+                    'item_count' => ':count prekių sandėlyje',
+                    'empty' => 'Prekės ženklų vitrina atsiras netrukus.',
+                ],
+            ],
         ],
         'highlights' => [
             'title' => 'Kasdieninis įkvėpimas',
             'subtitle' => 'Sekite tendencijas, naujienas ir geriausius pasiūlymus, atnaujinamus kiekvieną dieną.',
-            'blocks' => [
-                'latest' => [
-                    'title' => 'Naujausios prekės',
-                    'subtitle' => 'Šviežiai į sandėlį atvykusios prekės, atnaujinamos kasdien.',
-                    'link' => 'Peržiūrėti naujienas',
-                ],
-                'trending' => [
-                    'title' => 'Populiaru dabar',
-                    'subtitle' => 'Geriausiai perkami ir dažniausiai peržiūrimi pasiūlymai.',
-                    'link' => 'Atrasti populiariausius',
-                ],
-                'sale' => [
-                    'title' => 'Laikinos akcijos',
-                    'subtitle' => 'Šiandien galiojančios nuolaidos ir rinkinių pasiūlymai.',
-                    'link' => 'Peržiūrėti akcijas',
-                ],
+            'latest' => [
+                'title' => 'Naujausios sandėlio siuntos',
+                'empty' => 'Naujos atsargos bus matomos netrukus.',
+            ],
+            'brands' => [
+                'fallback_description' => 'Baltijos statybų favoritai.',
+                'cta' => 'Peržiūrėti prekės ženklą',
             ],
         ],
         'discovery' => [

@@ -5,27 +5,29 @@
 
 @section('content')
     <div class="bg-gray-50 py-12">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <nav class="flex items-center gap-2 text-sm text-gray-500">
-                <a href="{{ route('home') }}" class="hover:text-indigo-600">{{ __('Home') }}</a>
-                <x-untitledui-chevron-right class="h-4 w-4" />
-                <a href="{{ route('frontend.brands.index') }}" class="hover:text-indigo-600">{{ __('Brands') }}</a>
-                <x-untitledui-chevron-right class="h-4 w-4" />
-                <span class="font-semibold text-indigo-600">{{ $brand->name }}</span>
-            </nav>
-
-            <header class="mt-8 rounded-3xl bg-gradient-to-r from-rose-600 via-orange-500 to-amber-500 p-10 text-white shadow-xl">
-                <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-                    <div class="max-w-2xl space-y-4">
-                        <span class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide">{{ __('Brand spotlight') }}</span>
-                        <h1 class="text-3xl font-bold sm:text-4xl">{{ $brand->name }}</h1>
-                        @if ($brand->description)
-                            <p class="text-sm text-white/80 sm:text-base">{!! $brand->description !!}</p>
-                        @endif
-                        @if ($brand->website)
-                            <a href="{{ $brand->website }}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-rose-600 shadow-sm transition hover:bg-rose-50">
-                                <x-untitledui-link-04 class="h-4 w-4" />
-                                <span>{{ parse_url($brand->website, PHP_URL_HOST) }}</span>
+        <div class="mx-auto max-w-7xl space-y-12 px-4 sm:px-6 lg:px-8">
+            <div class="space-y-4">
+                <nav class="text-sm text-gray-500" aria-label="Breadcrumb">
+                    <ol class="flex flex-wrap items-center gap-2">
+                        <li><a href="{{ route('frontend.home') }}" class="text-emerald-600 hover:text-emerald-700">{{ __('frontend.navigation.home') }}</a></li>
+                        <li>/</li>
+                        <li><a href="{{ route('frontend.brands.index') }}" class="text-emerald-600 hover:text-emerald-700">{{ __('Brands') }}</a></li>
+                        <li>/</li>
+                        <li class="text-gray-700">{{ $brand->name }}</li>
+                    </ol>
+                </nav>
+                <div class="flex flex-col gap-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+                    <div class="space-y-3">
+                        <span class="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-sm font-semibold text-emerald-700">
+                            <x-untitledui-sparkle class="h-4 w-4" />
+                            {{ __('Brand spotlight') }}
+                        </span>
+                        <h1 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">{{ $brand->name }}</h1>
+                        <p class="text-gray-600">{{ $brand->description ?? __('Premium-grade tools and construction supplies trusted across Europe.') }}</p>
+                        @if($brand->website)
+                            <a href="{{ $brand->website }}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 hover:text-emerald-700">
+                                <x-untitledui-link-05 class="h-4 w-4" />
+                                {{ parse_url($brand->website, PHP_URL_HOST) ?? $brand->website }}
                             </a>
                         @endif
                     </div>

@@ -4,25 +4,30 @@
 @section('description', $category->seo_description ?: str($category->description)->stripTags()->limit(160))
 
 @section('content')
-    <div class="bg-white py-12">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <nav class="flex items-center gap-2 text-sm text-gray-500">
-                <a href="{{ route('home') }}" class="hover:text-indigo-600">{{ __('Home') }}</a>
-                @foreach ($breadcrumbs as $crumb)
-                    <x-untitledui-chevron-right class="h-4 w-4" />
-                    <a href="{{ route('frontend.categories.show', $crumb) }}" class="hover:text-indigo-600 {{ $crumb->is($category) ? 'font-semibold text-indigo-600' : '' }}">
-                        {{ $crumb->name }}
-                    </a>
-                @endforeach
-            </nav>
-
-            <header class="mt-8 rounded-3xl bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-900 p-10 text-white shadow-xl">
-                <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-                    <div class="max-w-2xl space-y-4">
-                        <span class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide">{{ __('Category spotlight') }}</span>
-                        <h1 class="text-3xl font-bold sm:text-4xl">{{ $category->name }}</h1>
-                        @if ($category->description)
-                            <p class="text-sm text-white/80 sm:text-base">{!! $category->description !!}</p>
+    <div class="bg-gray-50 py-12">
+        <div class="mx-auto max-w-7xl space-y-12 px-4 sm:px-6 lg:px-8">
+            <div class="space-y-4">
+                <nav class="text-sm text-gray-500" aria-label="Breadcrumb">
+                    <ol class="flex flex-wrap items-center gap-2">
+                        <li><a href="{{ route('frontend.home') }}" class="text-blue-600 hover:text-blue-700">{{ __('frontend.navigation.home') }}</a></li>
+                        <li>/</li>
+                        <li><a href="{{ route('frontend.categories.index') }}" class="text-blue-600 hover:text-blue-700">{{ __('Categories') }}</a></li>
+                        <li>/</li>
+                        <li class="text-gray-700">{{ $category->name }}</li>
+                    </ol>
+                </nav>
+                <div class="flex flex-col gap-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+                    <div class="space-y-3">
+                        <span class="inline-flex items-center gap-2 rounded-full bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-700">
+                            <x-untitledui-tag class="h-4 w-4" />
+                            {{ __('Category spotlight') }}
+                        </span>
+                        <h1 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">{{ $category->name }}</h1>
+                        <p class="text-gray-600">{{ $category->description }}</p>
+                        @if($category->parent)
+                            <p class="text-sm text-gray-500">
+                                {{ __('Part of :parent', ['parent' => $category->parent->name]) }}
+                            </p>
                         @endif
                     </div>
                     <div class="flex flex-col gap-3 rounded-3xl bg-white/10 p-6 text-sm text-white/80">
