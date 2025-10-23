@@ -13,7 +13,6 @@ use App\Support\ListQuery\ListQueryValidator;
 use App\Support\ListQuery\ListResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Database\Eloquent\Builder;
 
 /**
  * UserController
@@ -28,40 +27,12 @@ class UserController extends Controller
     public function index(Request $request): JsonResponse
     {
         $this->authorize('viewAny', User::class);
-        $definition = new ListQueryDefinition(
-            filters: [
-                'search' => [
-                    'type' => 'string',
-                    'callback' => static function (Builder $builder, string $term): void {
-                        $builder->where(function (Builder $query) use ($term): void {
-                            $query->where('name', 'like', "%{$term}%")
-                                ->orWhere('email', 'like', "%{$term}%")
-                                ->orWhere('first_name', 'like', "%{$term}%")
-                                ->orWhere('last_name', 'like', "%{$term}%");
-                        });
-                    },
-                ],
-                'status' => [
-                    'type' => 'bool',
-                    'nullable' => true,
-                    'callback' => static function (Builder $builder, bool $status): void {
-                        $builder->where('is_active', $status);
-                    },
-                ],
-                'role' => [
-                    'type' => 'string',
-                    'callback' => static function (Builder $builder, string $role): void {
-                        $builder->whereHas('roles', static function (Builder $query) use ($role): void {
-                            $query->where('name', $role);
-                        });
-                    },
-                ],
-            ],
-            sortable: [
-                'name' => ['column' => 'users.name'],
-                'email' => ['column' => 'users.email'],
-                'created_at' => ['column' => 'users.created_at', 'default_direction' => 'desc'],
-                'last_login_at' => ['column' => 'users.last_login_at', 'default_direction' => 'desc'],
+        $definition = ListQueryDefinition::make(
+            allowedSorts: [
+                'created_at' => 'created_at',
+                'name' => 'name',
+                'email' => 'email',
+                'last_login_at' => 'last_login_at',
             ],
             defaultSort: 'created_at',
             defaultDirection: 'desc',
@@ -70,25 +41,41 @@ class UserController extends Controller
         );
 
         $listQuery = ListQueryValidator::fromRequest($request, $definition);
+        $filters = $listQuery->filters;
 
-        $query = User::with(['addresses', 'orders', 'wishlist', 'reviews', 'partners', 'referrals']);
-        $listQuery->applyFilters($query);
-        $listQuery->applySorts($query);
+        $users = User::with(['addresses', 'orders', 'wishlist', 'reviews', 'partners', 'referrals']);
 
-        $users = $query->paginate($listQuery->perPage(), ['*'], 'page', $listQuery->page());
+        if ($search = $filters['search'] ?? null) {
+            $users->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%");
+            });
+        }
 
-        $items = AdminUserResource::collection($users->items())->resolve();
+        if (array_key_exists('status', $filters)) {
+            $isActive = filter_var($filters['status'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            if ($isActive !== null) {
+                $users->where('is_active', $isActive);
+            }
+        }
 
-        return response()->json([
-            'success' => true,
-            'data' => $items,
-            'meta' => array_merge([
-                'timestamp' => now()->toISOString(),
-                'version' => '1.0',
-                'admin_view' => true,
-            ], ListResponse::meta($listQuery, $users)),
-            'links' => ListResponse::links($users),
-        ]);
+        if ($role = $filters['role'] ?? null) {
+            $users->whereHas('roles', function ($q) use ($role) {
+                $q->where('name', $role);
+            });
+        }
+
+        $users = $listQuery->apply($users, $definition)
+            ->paginate($listQuery->perPage, ['*'], 'page', $listQuery->page)
+            ->appends($request->query());
+
+        $response = ListResponse::fromPaginator(
+            $users->through(fn (User $user) => (new AdminUserResource($user))->toArray($request)),
+        );
+
+        return response()->json($response);
     }
 
     /**

@@ -7,12 +7,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCampaignClickRequest;
 use App\Http\Requests\UpdateCampaignClickRequest;
-use App\Http\Resources\CampaignClickCollection;
 use App\Http\Resources\CampaignClickResource;
 use App\Models\CampaignClick;
 use App\Support\ListQuery\ListQueryDefinition;
 use App\Support\ListQuery\ListQueryValidator;
-use Illuminate\Database\Eloquent\Builder;
+use App\Support\ListQuery\ListResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -70,57 +69,76 @@ final class CampaignClickController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $definition = new ListQueryDefinition(
-            filters: [
-                'campaign_id'  => ['type' => 'int', 'column' => 'campaign_clicks.campaign_id'],
-                'click_type'   => ['type' => 'string', 'column' => 'campaign_clicks.click_type'],
-                'device_type'  => ['type' => 'string', 'column' => 'campaign_clicks.device_type'],
-                'is_converted' => ['type' => 'bool', 'column' => 'campaign_clicks.is_converted'],
-                'country'      => ['type' => 'string', 'column' => 'campaign_clicks.country'],
-                'utm_source'   => ['type' => 'string', 'column' => 'campaign_clicks.utm_source'],
-                'date_from'    => ['type' => 'datetime', 'column' => 'campaign_clicks.clicked_at', 'operator' => '>='],
-                'date_to'      => ['type' => 'datetime', 'column' => 'campaign_clicks.clicked_at', 'operator' => '<='],
-                'search'       => [
-                    'type'     => 'string',
-                    'callback' => static function (Builder $builder, string $value): void {
-                        $builder->where(function (Builder $query) use ($value): void {
-                            $query->where('utm_source', 'like', "%{$value}%")
-                                ->orWhere('click_type', 'like', "%{$value}%")
-                                ->orWhere('device_type', 'like', "%{$value}%")
-                                ->orWhere('country', 'like', "%{$value}%");
-                        });
-                    },
-                ],
-            ],
-            sortable: [
-                'clicked_at'       => ['column' => 'campaign_clicks.clicked_at', 'default_direction' => 'desc'],
-                'conversion_value' => ['column' => 'campaign_clicks.conversion_value'],
+        $definition = ListQueryDefinition::make(
+            allowedSorts: [
+                'clicked_at' => 'clicked_at',
+                'created_at' => 'created_at',
+                'conversion_value' => 'conversion_value',
             ],
             defaultSort: 'clicked_at',
             defaultDirection: 'desc',
-            defaultPerPage: 25,
+            defaultPerPage: 15,
             maxPerPage: 100,
         );
 
         $listQuery = ListQueryValidator::fromRequest($request, $definition);
 
         $query = CampaignClick::with(['campaign', 'customer']);
-        $listQuery->applyFilters($query);
+
+        // Route bound campaign (campaign/{campaign}/clicks) should be respected
+        if ($request->route('campaign')) {
+            $query->where('campaign_id', (int) $request->route('campaign'));
+        }
+
+        $filters = $listQuery->filters;
+
+        if (array_key_exists('campaign_id', $filters)) {
+            $query->where('campaign_id', $filters['campaign_id']);
+        }
+
+        if (array_key_exists('click_type', $filters)) {
+            $query->where('click_type', $filters['click_type']);
+        }
+
+        if (array_key_exists('device_type', $filters)) {
+            $query->where('device_type', $filters['device_type']);
+        }
+
+        if (array_key_exists('is_converted', $filters)) {
+            $query->where('is_converted', filter_var($filters['is_converted'], FILTER_VALIDATE_BOOLEAN));
+        }
+
+        if (array_key_exists('country', $filters)) {
+            $query->where('country', $filters['country']);
+        }
+
+        if (array_key_exists('utm_source', $filters)) {
+            $query->where('utm_source', $filters['utm_source']);
+        }
+
+        if (array_key_exists('date_from', $filters)) {
+            $query->where('clicked_at', '>=', $filters['date_from']);
+        }
+
+        if (array_key_exists('date_to', $filters)) {
+            $query->where('clicked_at', '<=', $filters['date_to']);
+        }
 
         // For authenticated users, show only their clicks
         if (Auth::check()) {
             $query->where('customer_id', Auth::id());
         }
 
-        $listQuery->applySorts($query);
+        $query = $listQuery->apply($query, $definition);
 
-        if (! $listQuery->hasSort('clicked_at')) {
-            $query->orderByDesc('campaign_clicks.clicked_at');
-        }
+        $paginator = $query->paginate($listQuery->perPage, ['*'], 'page', $listQuery->page)
+            ->appends($request->query());
 
-        $clicks = $query->paginate($listQuery->perPage(), ['*'], 'page', $listQuery->page());
+        $response = ListResponse::fromPaginator(
+            $paginator->through(fn (CampaignClick $click) => (new CampaignClickResource($click))->resolve()),
+        );
 
-        return response()->json((new CampaignClickCollection($clicks))->withListQuery($listQuery));
+        return response()->json($response);
     }
 
     #[OA\Post(

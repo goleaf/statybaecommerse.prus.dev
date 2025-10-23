@@ -11,7 +11,9 @@ use App\Support\ListQuery\ListQueryDefinition;
 use App\Support\ListQuery\ListQueryValidator;
 use App\Support\ListQuery\ListResponse;
 use App\Traits\HandlesContentNegotiation;
-use Illuminate\Database\Eloquent\Builder;
+use App\Support\ListQuery\ListQueryDefinition;
+use App\Support\ListQuery\ListQueryValidator;
+use App\Support\ListQuery\ListResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -31,33 +33,99 @@ final class ProductHistoryController extends Controller
      */
     public function index(Request $request, Product $product): JsonResponse|View|Response
     {
-        $definition = new ListQueryDefinition(
-            filters: [
-                'action' => ['type' => 'string', 'column' => 'product_histories.action'],
-                'field_name' => ['type' => 'string', 'column' => 'product_histories.field_name'],
-                'user_id' => ['type' => 'int', 'column' => 'product_histories.user_id'],
-                'date_from' => ['type' => 'datetime', 'column' => 'product_histories.created_at', 'operator' => '>='],
-                'date_to' => ['type' => 'datetime', 'column' => 'product_histories.created_at', 'operator' => '<='],
-                'search' => [
-                    'type' => 'string',
-                    'callback' => static function (Builder $builder, string $search): void {
-                        $builder->where(function (Builder $query) use ($search): void {
-                            $query->where('description', 'like', "%{$search}%")
-                                ->orWhere('action', 'like', "%{$search}%")
-                                ->orWhere('field_name', 'like', "%{$search}%");
-                        });
-                    },
-                ],
-            ],
-            sortable: [
-                'created_at' => ['column' => 'product_histories.created_at', 'default_direction' => 'desc'],
-                'action' => ['column' => 'product_histories.action'],
+        $definition = ListQueryDefinition::make(
+            allowedSorts: [
+                'created_at' => 'created_at',
+                'action' => 'action',
+                'field_name' => 'field_name',
             ],
             defaultSort: 'created_at',
             defaultDirection: 'desc',
             defaultPerPage: 15,
             maxPerPage: 100,
         );
+
+        $listQuery = ListQueryValidator::fromRequest($request, $definition);
+
+        $query = $product->histories()->with(['user:id,name,email']);
+
+        $filters = $listQuery->filters;
+
+        if (array_key_exists('action', $filters)) {
+            $query->byAction($filters['action']);
+        }
+
+        if (array_key_exists('field_name', $filters)) {
+            $query->byField($filters['field_name']);
+        }
+
+        if (array_key_exists('user_id', $filters)) {
+            $query->byUser($filters['user_id']);
+        }
+
+        if (array_key_exists('date_from', $filters)) {
+            $query->where('created_at', '>=', $filters['date_from']);
+        }
+
+        if (array_key_exists('date_to', $filters)) {
+            $query->where('created_at', '<=', $filters['date_to']);
+        }
+
+        if (array_key_exists('search', $filters)) {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('description', 'like', "%{$search}%")
+                    ->orWhere('action', 'like', "%{$search}%")
+                    ->orWhere('field_name', 'like', "%{$search}%");
+            });
+        }
+
+        $query = $listQuery->apply($query, $definition);
+
+        $paginator = $query->paginate($listQuery->perPage, ['*'], 'page', $listQuery->page)
+            ->appends($request->query());
+
+        if ($request->expectsJson()) {
+            $response = ListResponse::fromPaginator(
+                $paginator->through(static fn (ProductHistory $history) => [
+                    'id' => $history->id,
+                    'action' => $history->action,
+                    'field_name' => $history->field_name,
+                    'description' => $history->description,
+                    'old_value' => $history->old_value,
+                    'new_value' => $history->new_value,
+                    'created_at' => $history->created_at,
+                    'user' => $history->user,
+                ]),
+            );
+
+            $response['context'] = [
+                'product' => [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'sku' => $product->sku,
+                ],
+            ];
+
+            return response()->json($response);
+        }
+
+        $data = [
+            'histories' => $paginator->items(),
+            'pagination' => [
+                'current_page' => $paginator->currentPage(),
+                'last_page' => $paginator->lastPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+                'from' => $paginator->firstItem(),
+                'to' => $paginator->lastItem(),
+            ],
+            'product' => [
+                'id' => $product->id,
+                'name' => $product->name,
+                'sku' => $product->sku,
+            ],
+        ];
 
         $listQuery = ListQueryValidator::fromRequest($request, $definition);
 
