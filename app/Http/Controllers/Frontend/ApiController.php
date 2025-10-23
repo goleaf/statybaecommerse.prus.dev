@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\CartItem;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\Scopes\ActiveScope;
-use App\Models\Scopes\PublishedScope;
-use App\Models\Scopes\VisibleScope;
 use App\Models\UserWishlist;
 use App\Models\WishlistItem;
 use App\Services\Cart\CartService;
@@ -18,7 +16,9 @@ use Illuminate\Http\Request;
 
 final class ApiController extends Controller
 {
-    public function __construct(private readonly CartService $cartService) {}
+    public function __construct(private readonly CartService $cartService)
+    {
+    }
 
     public function searchProducts(Request $request): JsonResponse
     {
@@ -103,11 +103,7 @@ final class ApiController extends Controller
 
         $productId = (int) $request->integer('product_id');
 
-        if ($productId <= 0 || ! Product::query()
-            // Accept products regardless of storefront visibility but still respect soft-deletes.
-            ->withoutGlobalScopes([ActiveScope::class, PublishedScope::class, VisibleScope::class])
-            ->whereKey($productId)
-            ->exists()) {
+        if ($productId <= 0 || ! Product::query()->whereKey($productId)->exists()) {
             return response()->json(['error' => 'Product not found'], 404);
         }
 
@@ -128,7 +124,7 @@ final class ApiController extends Controller
             $wishlist->items()->create([
                 'product_id' => $productId,
                 'variant_id' => $variantId,
-                'quantity'   => 1,
+                'quantity' => 1,
             ]);
             $added = true;
         }
@@ -149,28 +145,13 @@ final class ApiController extends Controller
             return response()->json([]);
         }
 
-        $orderedIds = array_values(array_unique(array_slice($recentlyViewed, 0, 10)));
+        $recentlyViewed = array_slice($recentlyViewed, 0, 10);
 
         $products = Product::query()
-            // Surface even if drafts/hidden, but still exclude soft-deleted products.
-            ->withoutGlobalScopes([ActiveScope::class, PublishedScope::class, VisibleScope::class])
-            ->whereIn('id', $orderedIds)
-            ->get(['id'])
-            ->sortBy(static function (Product $product) use ($orderedIds): int {
-                // Preserve the original order from the session store to keep UX expectations intact.
-                $position = array_search($product->id, $orderedIds, true);
-
-                return $position === false ? PHP_INT_MAX : $position;
-            })
-            ->values()
-            ->map(static function (Product $product): array {
-                // The API contract intentionally exposes only the identifier so the
-                // consuming Alpine/Livewire components can fetch the full product
-                // payload lazily without duplicating cacheable data here.
-                return [
-                    'id' => $product->id,
-                ];
-            });
+            ->whereIn('id', $recentlyViewed)
+            ->get(['id', 'name', 'price', 'image'])
+            ->sortBy(fn (Product $product) => array_search($product->getKey(), $recentlyViewed, true))
+            ->values();
 
         return response()->json($products);
     }
