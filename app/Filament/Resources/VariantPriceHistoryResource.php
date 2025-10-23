@@ -43,7 +43,6 @@ final class VariantPriceHistoryResource extends Resource
                     ->numeric()
                     ->minValue(0)
                     ->step(0.0001)
-                    // Require the legacy price for audit trails and Filament 4 callbacks.
                     ->required(),
                 Forms\Components\TextInput::make('new_price')
                     ->label('New Price')
@@ -135,7 +134,7 @@ final class VariantPriceHistoryResource extends Resource
                             '(COALESCE(new_price, 0) - COALESCE(old_price, 0)) '.$direction
                         );
                     })
-                    ->color(fn ($record) => $record->isIncrease() ? 'success' : ($record->isDecrease() ? 'danger' : 'gray')),
+                    ->color(fn (VariantPriceHistory $record): string => $record->isIncrease() ? 'success' : ($record->isDecrease() ? 'danger' : 'gray')),
                 Tables\Columns\TextColumn::make('price_type')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
@@ -204,7 +203,7 @@ final class VariantPriceHistoryResource extends Resource
                         Flatpickr::makeDate('effective_until')
                             ->label('Effective Until'),
                     ])
-                    ->query(static function (Builder $query, array $data): Builder {
+                    ->query(function (Builder $query, array $data): Builder {
                         return $query
                             ->when(
                                 $data['effective_from'],
@@ -221,8 +220,8 @@ final class VariantPriceHistoryResource extends Resource
                     ->trueLabel('Increases only')
                     ->falseLabel('Decreases only')
                     ->queries(
-                        true: fn ($query) => $query->increases(),
-                        false: fn ($query) => $query->decreases(),
+                        true: fn (Builder $query): Builder => $query->increases(),
+                        false: fn (Builder $query): Builder => $query->decreases(),
                     ),
             ])
             ->actions([
