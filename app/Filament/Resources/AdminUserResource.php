@@ -64,15 +64,12 @@ final class AdminUserResource extends Resource
     }
 
     /**
-     * Configure the Filament form schema using the v4 Schema contract so the
-     * resource signature remains compatible with the upstream Resource base class.
+     * Configure the Filament schema container with fields and validation for admin users.
      */
     public static function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form->schema([
+        // Register components through the Schema container to stay aligned with Filament v4 expectations.
+        return $schema->schema([
             Section::make(__('admin.admin_users.form.sections.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -142,12 +139,11 @@ final class AdminUserResource extends Resource
     }
 
     /**
-     * Configure the Filament table while returning the Table instance to satisfy
-     * Filament v4's stricter resource method typing.
+     * Configure the Filament table with columns, filters, and actions for admin users.
      */
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Return the configured Table instance so the resource honours the stricter v4 contract.
         return $table
             ->columns([
                 TextColumn::make('name')
