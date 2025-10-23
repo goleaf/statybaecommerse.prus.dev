@@ -7,16 +7,11 @@ namespace App\Filament\Resources;
 use App\Data\ExportRequestData;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
-use App\Services\Export\ExportColumn;
-use App\Services\Export\ExportService;
-use App\Services\Export\Exporters\UserExport;
-use BackedEnum;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Forms\Components\CheckboxList;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -238,9 +233,9 @@ final class UserResource extends Resource implements DefinesExportColumns
             ])
             ->actions([
                 EditAction::make()
-                    ->visible(fn () => AuthorizationMatrix::check('users', 'update')),
+                    ->visible(fn (User $record): bool => static::authorizeUser($record, 'update')),
                 DeleteAction::make()
-                    ->visible(fn () => AuthorizationMatrix::check('users', 'delete')),
+                    ->visible(fn (User $record): bool => static::authorizeUser($record, 'delete')),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -297,7 +292,7 @@ final class UserResource extends Resource implements DefinesExportColumns
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn () => AuthorizationMatrix::check('users', 'update')),
+                        ->visible(fn (): bool => static::authorizeUser(null, 'update')),
                     BulkAction::make('deactivate')
                         ->label(__('users.actions.deactivate'))
                         ->icon('heroicon-o-x-circle')
@@ -307,46 +302,48 @@ final class UserResource extends Resource implements DefinesExportColumns
                                 ->title(__('users.messages.bulk_deactivate_success'))
                                 ->success()
                                 ->send();
-                        }),
-                    BulkAction::make('export_users')
-                        ->label(__('exports.actions.export_users'))
-                        ->icon('heroicon-o-arrow-down-tray')
-                        ->color('gray')
-                        ->form([
-                            Select::make('format')
-                                ->label(__('exports.form.format'))
-                                ->options(collect(ExportFormat::cases())->mapWithKeys(fn (ExportFormat $format) => [$format->value => $format->label()])->all())
-                                ->default(ExportFormat::Csv->value)
-                                ->required(),
-                            CheckboxList::make('columns')
-                                ->label(__('exports.form.columns'))
-                                ->options(self::exportColumnOptions())
-                                ->default(array_keys(self::exportColumnOptions()))
-                                ->columns(2)
-                                ->required(),
-                        ])
-                        ->action(function (Collection $records, array $data): void {
-                            /** @var ExportService $exportService */
-                            $exportService = app(ExportService::class);
-
-                            $exportService->queueResourceExport(
-                                resourceClass: self::class,
-                                records: $records,
-                                columnKeys: $data['columns'],
-                                format: ExportFormat::from($data['format']),
-                                requestedBy: auth()->user(),
-                            );
-
-                            Notification::make()
-                                ->title(__('exports.notifications.queued'))
-                                ->body(__('exports.notifications.queued_body'))
-                                ->success()
-                                ->send();
-                        }),
-                    DeleteBulkAction::make(),
-                ]),
+                        })
+                        ->visible(fn (): bool => static::authorizeUser(null, 'update')),
+                    DeleteBulkAction::make()
+                        ->visible(fn (): bool => static::authorizeUser(null, 'delete')),
+                ])->visible(fn (): bool => static::authorizeUser(null, 'update') || static::authorizeUser(null, 'delete')),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::canViewAny();
+    }
+
+    public static function canViewAny(): bool
+    {
+        return static::authorizeUser(null, 'viewAny');
+    }
+
+    public static function canCreate(): bool
+    {
+        return static::authorizeUser(null, 'create');
+    }
+
+    public static function canView(User $record): bool
+    {
+        return static::authorizeUser($record, 'view');
+    }
+
+    public static function canEdit(User $record): bool
+    {
+        return static::authorizeUser($record, 'update');
+    }
+
+    public static function canDelete(User $record): bool
+    {
+        return static::authorizeUser($record, 'delete');
+    }
+
+    public static function canRestore(User $record): bool
+    {
+        return static::authorizeUser($record, 'restore');
     }
 
     /**
@@ -383,5 +380,18 @@ final class UserResource extends Resource implements DefinesExportColumns
             'view'   => Pages\ViewUser::route('/{record}'),
             'edit'   => Pages\EditUser::route('/{record}/edit'),
         ];
+    }
+
+    private static function authorizeUser(?User $user, string $ability): bool
+    {
+        $current = auth()->user();
+
+        if (! $current) {
+            return false;
+        }
+
+        return $user instanceof User
+            ? $current->can($ability, $user)
+            : $current->can($ability, User::class);
     }
 }

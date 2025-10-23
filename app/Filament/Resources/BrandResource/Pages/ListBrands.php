@@ -15,6 +15,10 @@ final class ListBrands extends BaseListRecords
 
     protected function getHeaderActions(): array
     {
+        if (! BrandResource::canCreate()) {
+            return [];
+        }
+
         return [
             Actions\CreateAction::make()
                 ->visible(fn () => AuthorizationMatrix::check('brands', 'create')),

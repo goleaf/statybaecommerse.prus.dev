@@ -19,6 +19,10 @@ class ListUsers extends BaseListRecords
 
     protected function getHeaderActions(): array
     {
+        if (! UserResource::canCreate()) {
+            return [];
+        }
+
         return [
             LocaleSwitcher::make(), // Provide a quick language toggle for the grid view.
             CreateAction::make()

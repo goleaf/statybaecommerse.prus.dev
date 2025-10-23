@@ -4,46 +4,43 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Models\AdminUser;
 use App\Models\Brand;
 use App\Models\User;
+use App\Policies\Concerns\HandlesRolePermissions;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
-/**
- * Authorization policy for managing brands through permissions.
- */
 final class BrandPolicy
 {
-    public function viewAny(User|AdminUser $user): bool
+    use HandlesAuthorization;
+    use HandlesRolePermissions;
+
+    public function viewAny(User $user): bool
     {
-        return $this->hasPermission($user, 'view_brands');
+        return $this->allows($user, 'brand', 'viewAny');
     }
 
-    public function view(User|AdminUser $user, Brand $brand): bool
+    public function view(User $user, Brand $brand): bool
     {
-        return $this->hasPermission($user, 'view_brands');
+        return $this->allows($user, 'brand', 'view');
     }
 
-    public function create(User|AdminUser $user): bool
+    public function create(User $user): bool
     {
-        return $this->hasPermission($user, 'create_brands');
+        return $this->allows($user, 'brand', 'create');
     }
 
-    public function update(User|AdminUser $user, Brand $brand): bool
+    public function update(User $user, Brand $brand): bool
     {
-        return $this->hasPermission($user, 'edit_brands');
+        return $this->allows($user, 'brand', 'update');
     }
 
-    public function delete(User|AdminUser $user, Brand $brand): bool
+    public function delete(User $user, Brand $brand): bool
     {
-        return $this->hasPermission($user, 'delete_brands');
+        return $this->allows($user, 'brand', 'delete');
     }
 
-    private function hasPermission(User|AdminUser $user, string $permission): bool
+    public function restore(User $user, Brand $brand): bool
     {
-        if (! method_exists($user, 'can')) {
-            return false;
-        }
-
-        return (bool) $user->can($permission);
+        return $this->allows($user, 'brand', 'restore');
     }
 }

@@ -6,22 +6,18 @@ namespace App\Providers;
 
 use App\Models\Brand;
 use App\Models\Category;
-use App\Models\Customer;
-use App\Models\Legal;
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\SystemSetting;
+use App\Models\User;
 use App\Policies\BrandPolicy;
 use App\Policies\CategoryPolicy;
-use App\Policies\CustomerPolicy;
-use App\Policies\LegalPolicy;
 use App\Policies\OrderPolicy;
 use App\Policies\ProductPolicy;
-use App\Policies\SystemSettingPolicy;
+use App\Policies\UserPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
-class AuthServiceProvider extends ServiceProvider
+final class AuthServiceProvider extends ServiceProvider
 {
     protected $policies = [
         Export::class => ExportPolicy::class,
@@ -54,23 +50,31 @@ class AuthServiceProvider extends ServiceProvider
     ];
 
     /**
+     * The policy mappings for the application.
+     *
+     * @var array<class-string, class-string>
+     */
+    protected $policies = [
+        Brand::class => BrandPolicy::class,
+        Category::class => CategoryPolicy::class,
+        Order::class => OrderPolicy::class,
+        Product::class => ProductPolicy::class,
+        User::class => UserPolicy::class,
+    ];
+
+    /**
      * Register any authentication / authorization services.
      */
     public function boot(): void
     {
         $this->registerPolicies();
 
-        // Allow privileged admin roles to bypass granular authorization checks
         Gate::before(function ($user, ?string $ability = null) {
-            if (! $user instanceof AdminUser) {
+            if (! method_exists($user, 'hasRole')) {
                 return null;
             }
 
-            if (property_exists($user, 'is_admin') && (bool) $user->is_admin) {
-                return true;
-            }
-
-            if (property_exists($user, 'is_admin') && (bool) $user->is_admin) {
+            if ($user->hasRole('admin') || $user->hasRole('administrator') || $user->hasRole('super_admin')) {
                 return true;
             }
 

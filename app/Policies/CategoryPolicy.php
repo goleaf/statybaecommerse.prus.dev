@@ -4,46 +4,43 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Models\AdminUser;
 use App\Models\Category;
 use App\Models\User;
+use App\Policies\Concerns\HandlesRolePermissions;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
-/**
- * Authorization policy for managing categories through permissions.
- */
 final class CategoryPolicy
 {
-    public function viewAny(User|AdminUser $user): bool
+    use HandlesAuthorization;
+    use HandlesRolePermissions;
+
+    public function viewAny(User $user): bool
     {
-        return $this->hasPermission($user, 'view_categories');
+        return $this->allows($user, 'category', 'viewAny');
     }
 
-    public function view(User|AdminUser $user, Category $category): bool
+    public function view(User $user, Category $category): bool
     {
-        return $this->hasPermission($user, 'view_categories');
+        return $this->allows($user, 'category', 'view');
     }
 
-    public function create(User|AdminUser $user): bool
+    public function create(User $user): bool
     {
-        return $this->hasPermission($user, 'create_categories');
+        return $this->allows($user, 'category', 'create');
     }
 
-    public function update(User|AdminUser $user, Category $category): bool
+    public function update(User $user, Category $category): bool
     {
-        return $this->hasPermission($user, 'edit_categories');
+        return $this->allows($user, 'category', 'update');
     }
 
-    public function delete(User|AdminUser $user, Category $category): bool
+    public function delete(User $user, Category $category): bool
     {
-        return $this->hasPermission($user, 'delete_categories');
+        return $this->allows($user, 'category', 'delete');
     }
 
-    private function hasPermission(User|AdminUser $user, string $permission): bool
+    public function restore(User $user, Category $category): bool
     {
-        if (! method_exists($user, 'can')) {
-            return false;
-        }
-
-        return (bool) $user->can($permission);
+        return $this->allows($user, 'category', 'restore');
     }
 }

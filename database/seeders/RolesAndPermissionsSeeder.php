@@ -5,77 +5,66 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-class RolesAndPermissionsSeeder extends Seeder
+final class RolesAndPermissionsSeeder extends Seeder
 {
     public function run(): void
     {
-        // Guards
         $guard = 'web';
+        $rolesConfig = config('permissions.roles', []);
+        $aliases = config('permissions.aliases', []);
+        $entities = config('permissions.entities', []);
 
-        // Create roles using factory relationships
-        $admin = Role::findOrCreate('administrator', $guard);
-        // Backwards-compatible alias used by tests and some seeders
-        $superAdmin = Role::findOrCreate('super_admin', $guard);
-        $manager = Role::findOrCreate('manager', $guard);
-        $user = Role::findOrCreate('user', $guard);
+        $permissionNames = Collection::make($rolesConfig)
+            ->merge(Collection::make($aliases)->mapWithKeys(fn (string $target) => [$target => $rolesConfig[$target] ?? []]))
+            ->flatMap(fn (array $abilities) => $this->expandAbilities($abilities, $entities))
+            ->unique()
+            ->sort()
+            ->values();
 
-        // Permission groups and actions
-        $groups = [
-            'system',
-            'brands',
-            'categories',
-            'collections',
-            'products',
-            'customers',
-            'orders',
-            'discounts',
-            'reviews',
-            'pricing',
-            'attributes',
-            'settings',
-            'inventories',
-        ];
+        $permissions = $permissionNames->map(fn (string $name) => Permission::findOrCreate($name, $guard));
 
-        $actions = ['view', 'create', 'update', 'delete'];
+        $roleNames = Collection::make(array_keys($rolesConfig))
+            ->merge(array_keys($aliases))
+            ->unique()
+            ->values();
 
-        // Create permissions using factory relationships
-        $permissions = collect();
-        foreach ($groups as $group) {
-            foreach ($actions as $action) {
-                $permissions->push(Permission::findOrCreate("{$action} {$group}", $guard));
-            }
-        }
+        $roleNames->each(function (string $roleName) use ($rolesConfig, $aliases, $entities, $permissions, $guard): void {
+            $resolvedRole = $aliases[$roleName] ?? $roleName;
+            $role = Role::findOrCreate($roleName, $guard);
+            $abilityNames = $this->expandAbilities($rolesConfig[$resolvedRole] ?? [], $entities);
+            $rolePermissions = $permissions->filter(fn (Permission $permission) => $abilityNames->contains($permission->name));
 
-        // Shopper-specific browse_* permissions used by admin UI
-        $browse = [
-            'browse_products',
-            'browse_categories',
-            'browse_collections',
-            'browse_brands',
-            'browse_orders',
-            'browse_discounts',
-            'browse_customers',
-            'browse_attributes',
-            'browse_inventories',
-        ];
-        foreach ($browse as $name) {
-            $permissions->push(Permission::findOrCreate($name, $guard));
-        }
-
-        // Assign permissions using relationships
-        $admin->syncPermissions($permissions);
-        $superAdmin->syncPermissions($permissions);
-
-        // Assign a subset to manager using relationships
-        $managerPermissions = $permissions->filter(function ($perm) {
-            return str_contains($perm->name, 'view') || str_contains($perm->name, 'update');
+            $role->syncPermissions($rolePermissions);
         });
-        $manager->syncPermissions($managerPermissions);
+    }
 
-        // User role: reserved for customers; no backend permissions by default
-        $user->syncPermissions([]);
+    /**
+     * @param  array<int, string>  $abilities
+     */
+    private function expandAbilities(array $abilities, array $entities): Collection
+    {
+        return Collection::make($abilities)
+            ->flatMap(function (string $ability) use ($entities) {
+                if ($ability === '*') {
+                    return Collection::make($entities)
+                        ->flatMap(fn (array $actions, string $entity) => Collection::make($actions)->map(fn (string $action) => sprintf('%s.%s', $entity, $action)));
+                }
+
+                if (Str::endsWith($ability, '.*')) {
+                    $entity = Str::before($ability, '.');
+                    $actions = $entities[$entity] ?? [];
+
+                    return Collection::make($actions)->map(fn (string $action) => sprintf('%s.%s', $entity, $action));
+                }
+
+                return [$ability];
+            })
+            ->unique()
+            ->values();
     }
 }
