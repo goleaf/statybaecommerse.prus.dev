@@ -54,7 +54,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
-use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
 use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
@@ -594,8 +594,8 @@ final class OrderResource extends Resource implements DefinesExportColumns
 
                                 return [
                                     'label' => __('Order (:locale)', ['locale' => strtoupper($locale)]),
-                                    'url' => $url,
-                                    'icon' => 'heroicon-o-arrow-top-right-on-square',
+                                    'url'   => $url,
+                                    'icon'  => 'heroicon-o-arrow-top-right-on-square',
                                     'color' => 'primary',
                                 ];
                             })
@@ -605,8 +605,8 @@ final class OrderResource extends Resource implements DefinesExportColumns
                         if (Route::has('api.orders.show')) {
                             $items->push([
                                 'label' => __('Order API (:number)', ['number' => $record->number]),
-                                'url' => route('api.orders.show', ['order' => $record->number]),
-                                'icon' => 'heroicon-o-code-bracket',
+                                'url'   => route('api.orders.show', ['order' => $record->number]),
+                                'icon'  => 'heroicon-o-code-bracket',
                                 'color' => 'info',
                             ]);
                         }

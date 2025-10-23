@@ -27,9 +27,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Collection;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
-use Illuminate\Support\Facades\URL;
-use pxlrbt\FilamentExcel\FilamentExport;
+use LaraZeus\SpatieTranslatable\SpatieTranslatablePlugin;
 
 final class AdminPanelProvider extends PanelProvider
 {
@@ -58,16 +56,12 @@ final class AdminPanelProvider extends PanelProvider
         ));
 
         /** @var array<class-string> $pageClasses */
-        $configuredLocales = config('app.supported_locales', ['lt', 'en']);
-        $defaultLocales = collect(is_array($configuredLocales) ? $configuredLocales : explode(',', (string) $configuredLocales))
+        $configuredLocales = config('app.supported_locales', []);
+        $supportedLocales = collect(is_array($configuredLocales) ? $configuredLocales : explode(',', (string) $configuredLocales))
             ->map(static fn (mixed $locale): string => trim((string) $locale))
             ->filter()
             ->values()
             ->all();
-
-        if ($defaultLocales === []) {
-            $defaultLocales = ['en'];
-        }
 
         return $panel
             ->default()
@@ -169,6 +163,9 @@ final class AdminPanelProvider extends PanelProvider
                         ->toggleActionHook('tables::toolbar.search.after')
                         ->listLayoutButtonIcon('heroicon-o-list-bullet')
                         ->gridLayoutButtonIcon('heroicon-o-squares-2x2'),
+                    SpatieTranslatablePlugin::make()
+                        ->defaultLocales($supportedLocales ?: null)
+                        ->persist(),
                     FilamentNordThemePlugin::make(),
                     ResizedColumnPlugin::make()->preserveOnDB(),
                 ]))
