@@ -25,13 +25,17 @@ final class OrdersChartWidget extends ChartWidget
     {
         $data = collect(range(0, 11))->map(function ($month) {
             $date = now()->subMonths($month);
+            $startOfMonth = $date->copy()->startOfMonth();
+            $endOfMonth = $date->copy()->endOfMonth();
 
             return [
-                'month'  => $date->format('M Y'),
-                'orders' => Order::createdInMonth($date)
+                'month' => $date->format('M Y'),
+                'orders' => Order::query()
+                    ->createdBetween($startOfMonth, $endOfMonth)
                     ->count(),
-                'revenue' => Order::createdInMonth($date)
+                'revenue' => Order::query()
                     ->where('status', '!=', 'cancelled')
+                    ->createdBetween($startOfMonth, $endOfMonth)
                     ->sum('total'),
             ];
         })->reverse()->values();

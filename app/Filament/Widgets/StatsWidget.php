@@ -20,6 +20,7 @@ final class StatsWidget extends BaseStatsOverviewWidget
 
     public function getStats(): array
     {
+        $now = Carbon::now();
         $totalRevenue = (float) (Order::sum('total') ?? 0);
         $totalOrders = (int) Order::count();
         $totalProducts = (int) Product::where('is_visible', true)->count();
@@ -30,7 +31,7 @@ final class StatsWidget extends BaseStatsOverviewWidget
         $approvedReviews = (int) Review::where('is_approved', true)->count();
         $avgRating = (float) (Review::where('is_approved', true)->avg('rating') ?? 0);
         $avgOrderValue = $totalOrders > 0 ? $totalRevenue / $totalOrders : 0.0;
-        $monthOrders = (int) Order::createdThisMonth()->count();
+        $monthOrders = (int) Order::query()->createdBetween($now->copy()->startOfMonth(), $now)->count();
 
         return [
             Stat::make(__('analytics.total_revenue'), '€' . number_format($totalRevenue, 2))->color('success'),
@@ -50,9 +51,8 @@ final class StatsWidget extends BaseStatsOverviewWidget
 
     public function getRevenueChart(): array
     {
-        $since = Carbon::now()->subDays(30);
-
-        return Order::createdSince($since)
+        return Order::query()
+            ->createdSince(Carbon::now()->subDays(30))
             ->selectRaw('DATE(created_at) as date, SUM(total) as revenue')
             ->groupBy('date')
             ->orderBy('date')
@@ -62,9 +62,8 @@ final class StatsWidget extends BaseStatsOverviewWidget
 
     public function getOrdersChart(): array
     {
-        $since = Carbon::now()->subDays(30);
-
-        return Order::createdSince($since)
+        return Order::query()
+            ->createdSince(Carbon::now()->subDays(30))
             ->selectRaw('DATE(created_at) as date, COUNT(*) as orders')
             ->groupBy('date')
             ->orderBy('date')

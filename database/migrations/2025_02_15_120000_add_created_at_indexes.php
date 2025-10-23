@@ -22,95 +22,51 @@ return new class extends Migration
         $this->dropCreatedAtIndex('users', 'users_created_at_index');
     }
 
-    /**
-     * Safely add an index on the created_at column when both the table and column exist.
-     */
-    private function addCreatedAtIndex(string $tableName, string $indexName): void
+    private function addCreatedAtIndex(string $table, string $indexName): void
     {
-        if (! Schema::hasTable($tableName)) {
+        if (! Schema::hasTable($table)) {
             return;
         }
 
-        if (! Schema::hasColumn($tableName, 'created_at')) {
+        if (! Schema::hasColumn($table, 'created_at')) {
             return;
         }
 
-        Schema::table($tableName, function (Blueprint $table) use ($tableName, $indexName): void {
-            if ($this->indexExists($tableName, $indexName)) {
-                return;
-            }
+        if ($this->indexExists($table, $indexName)) {
+            return;
+        }
 
-            // Ensure we only create the index once to avoid duplicate key errors in production deployments.
+        Schema::table($table, function (Blueprint $table) use ($indexName) {
             $table->index('created_at', $indexName);
         });
     }
 
-    /**
-     * Drop the created_at index when present to keep rollbacks idempotent.
-     */
-    private function dropCreatedAtIndex(string $tableName, string $indexName): void
+    private function dropCreatedAtIndex(string $table, string $indexName): void
     {
-        if (! Schema::hasTable($tableName) || ! $this->indexExists($tableName, $indexName)) {
+        if (! Schema::hasTable($table)) {
             return;
         }
 
-        Schema::table($tableName, function (Blueprint $table) use ($indexName): void {
+        if (! $this->indexExists($table, $indexName)) {
+            return;
+        }
+
+        Schema::table($table, function (Blueprint $table) use ($indexName) {
             $table->dropIndex($indexName);
         });
     }
 
-    /**
-     * Determine whether the target index already exists without assuming Doctrine is installed.
-     */
-    private function indexExists(string $tableName, string $indexName): bool
+    private function indexExists(string $table, string $indexName): bool
     {
         $connection = Schema::getConnection();
 
         if (! method_exists($connection, 'getDoctrineSchemaManager')) {
-            // Doctrine DBAL is optional, therefore we fall back to driver-specific introspection so
-            // that repeated deployments remain idempotent even in minimal installations.
-            return $this->indexExistsViaInformationSchema($connection, $tableName, $indexName);
+            return false;
         }
 
         $schemaManager = $connection->getDoctrineSchemaManager();
-        $indexes = $schemaManager->listTableIndexes($connection->getTablePrefix() . $tableName);
+        $indexes = $schemaManager->listTableIndexes($connection->getTablePrefix().$table);
 
-        foreach ($indexes as $name => $index) {
-            // Doctrine may normalise index names to uppercase on some database drivers, therefore
-            // we compare the names in a case-insensitive manner to avoid false negatives.
-            if (strcasecmp($name, $indexName) === 0) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Use lightweight INFORMATION_SCHEMA queries when Doctrine DBAL support is unavailable.
-     */
-    private function indexExistsViaInformationSchema($connection, string $tableName, string $indexName): bool
-    {
-        $driver = $connection->getDriverName();
-        $table = $connection->getTablePrefix() . $tableName;
-
-        return match ($driver) {
-            'mysql', 'mariadb' => (bool) $connection->selectOne(
-                // MySQL exposes index metadata via information_schema.statistics.
-                'SELECT 1 FROM information_schema.statistics WHERE table_schema = ? AND table_name = ? AND index_name = ? LIMIT 1',
-                [$connection->getDatabaseName(), $table, $indexName],
-            ),
-            'pgsql' => (bool) $connection->selectOne(
-                // PostgreSQL stores index metadata in pg_indexes; we scope to the current schema.
-                'SELECT 1 FROM pg_indexes WHERE schemaname = current_schema() AND tablename = ? AND indexname = ? LIMIT 1',
-                [$table, $indexName],
-            ),
-            'sqlite' => (bool) collect(
-                // SQLite provides the pragma_index_list command for the same purpose; parameter binding
-                // is not supported, so we safely interpolate the known table identifier.
-                $connection->select(sprintf("PRAGMA index_list('%s')", str_replace("'", "''", $table))),
-            )->firstWhere('name', $indexName),
-            default => false,
-        };
+        return array_key_exists($indexName, $indexes);
     }
 };
