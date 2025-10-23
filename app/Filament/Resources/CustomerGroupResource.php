@@ -25,9 +25,8 @@ use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
 use Filament\Schemas\Schema;
@@ -122,7 +121,6 @@ final class CustomerGroupResource extends Resource
                             TextInput::make('discount_fixed')
                                 ->label(__('customer_groups.discount_fixed'))
                                 ->numeric()
-                                ->step(0.01)
                                 ->minValue(0)
                                 ->prefix('€')
                                 ->helperText(__('customer_groups.discount_fixed_help')),
@@ -322,22 +320,59 @@ final class CustomerGroupResource extends Resource
                         'retail'    => __('customer_groups.types.retail'),
                         'corporate' => __('customer_groups.types.corporate'),
                     ]),
-                TernaryFilter::make('is_active')
-                    ->trueLabel(__('customer_groups.active_only'))
-                    ->falseLabel(__('customer_groups.inactive_only'))
-                    ->native(false),
-                TernaryFilter::make('is_default')
-                    ->trueLabel(__('customer_groups.default_only'))
-                    ->falseLabel(__('customer_groups.non_default_only'))
-                    ->native(false),
-                TernaryFilter::make('has_special_pricing')
-                    ->trueLabel(__('customer_groups.special_pricing_only'))
-                    ->falseLabel(__('customer_groups.no_special_pricing'))
-                    ->native(false),
-                TernaryFilter::make('has_volume_discounts')
-                    ->trueLabel(__('customer_groups.volume_discounts_only'))
-                    ->falseLabel(__('customer_groups.no_volume_discounts'))
-                    ->native(false),
+                SelectFilter::make('is_active')
+                    ->label(__('customer_groups.is_active'))
+                    ->options([
+                        1 => __('customer_groups.active_only'),
+                        0 => __('customer_groups.inactive_only'),
+                    ])
+                    ->query(function (Builder $query, $value) {
+                        // Normalise truthy values coming from Livewire during table filtering.
+                        return $query->when($value !== null, function (Builder $innerQuery) use ($value) {
+                            $state = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? (bool) $value;
+
+                            return $innerQuery->where('is_active', $state);
+                        });
+                    }),
+                SelectFilter::make('is_default')
+                    ->label(__('customer_groups.is_default'))
+                    ->options([
+                        1 => __('customer_groups.default_only'),
+                        0 => __('customer_groups.non_default_only'),
+                    ])
+                    ->query(function (Builder $query, $value) {
+                        return $query->when($value !== null, function (Builder $innerQuery) use ($value) {
+                            $state = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? (bool) $value;
+
+                            return $innerQuery->where('is_default', $state);
+                        });
+                    }),
+                SelectFilter::make('has_special_pricing')
+                    ->label(__('customer_groups.has_special_pricing'))
+                    ->options([
+                        1 => __('customer_groups.special_pricing_only'),
+                        0 => __('customer_groups.no_special_pricing'),
+                    ])
+                    ->query(function (Builder $query, $value) {
+                        return $query->when($value !== null, function (Builder $innerQuery) use ($value) {
+                            $state = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? (bool) $value;
+
+                            return $innerQuery->where('has_special_pricing', $state);
+                        });
+                    }),
+                SelectFilter::make('has_volume_discounts')
+                    ->label(__('customer_groups.has_volume_discounts'))
+                    ->options([
+                        1 => __('customer_groups.volume_discounts_only'),
+                        0 => __('customer_groups.no_volume_discounts'),
+                    ])
+                    ->query(function (Builder $query, $value) {
+                        return $query->when($value !== null, function (Builder $innerQuery) use ($value) {
+                            $state = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? (bool) $value;
+
+                            return $innerQuery->where('has_volume_discounts', $state);
+                        });
+                    }),
             ])
             ->actions([
                 ViewAction::make(),

@@ -7,9 +7,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Bug Fixes
-* Directed order date scopes to explicitly use the standalone `orders_created_at_index`,
-  restored that index in the orders table migration, and relaxed the shared `ActiveScope`
-  so diagnostics seeders can persist processing orders for coverage checks.
+* Restored the CustomerGroup model fillable contract, boolean casts, and metadata helpers while relaxing its global scopes so Filament CRUD, filters, and automated tests can manage inactive, default, and discounted segments end-to-end.
 * Re-enabled flexible system setting translations by replacing the locale uniqueness constraint with an index, restoring soft delete support, and trimming the fillable contract so replication and counting scenarios match the documented API.
 * Preserved Attribute validation rule strings while still decoding JSON arrays, refreshed the Filament form so arrays render as comma-separated chips, and added regression coverage for both storage paths.
 * Reintroduced the `regions` schema with defensive guards and rebuilt the `customers`/`orders` relationship so SQLite-backed factories and analytics widgets can create location-aware records without missing column errors during tests.

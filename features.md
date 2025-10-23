@@ -39,7 +39,8 @@
 - OpenAPI documentation now mirrors the lean product meta payload and nullable media thumbnails emitted by the presenter, keeping schema validators and client SDKs in sync with production responses.
 
 ## Admin panel resilience
-- Discount Condition resource tooling now skips the ActiveScope when building Filament tables, refreshes the v4 action/tab imports, and provides widget tab bridge components so moderators can view, filter, and bulk toggle inactive records without Livewire exceptions.
+- Customer group resource now exposes inactive/default toggles, bulk activation helpers, boolean filters, and numeric discount
+  validation through aligned model casts, ensuring admin workflows and regression suites can manage every segment consistently.
 - Attribute administration keeps validation rule strings verbatim, surfaces array-based rules as comma-separated chips, and pairs with regression tests that prove both paths round-trip correctly through Filament.
 - Filament dashboard access checks now fall back to open access when no
   permissions are configured and inline sparkline widgets respect the base
