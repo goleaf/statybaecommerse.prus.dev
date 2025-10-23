@@ -8,9 +8,7 @@ use App\Filament\Components\Combobox;
 use App\Filament\Resources\CollectionResource\Pages;
 use App\Models\Collection;
 use BackedEnum;
-use Filament\Forms;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Combobox;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
@@ -188,10 +186,14 @@ final class CollectionResource extends Resource
                 ])
                 ->columns(2),
             Section::make(__('collections.collection_info'))
-                ->schema([
+                ->components([
                     Combobox::make('products')
                         ->label(__('translations.products'))
                         ->relationship('products', 'name')
+                        ->multiple()
+                        ->searchable()
+                        ->boxSearchs()
+                        ->height('350px')
                         ->preload(),
                 ]),
             Section::make(__('collections.seo_info'))
