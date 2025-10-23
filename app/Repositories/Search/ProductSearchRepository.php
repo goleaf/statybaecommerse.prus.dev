@@ -31,7 +31,27 @@ SELECT
     p.description,
     p.price,
     p.is_featured,
-{$metricColumns}
+    -- The historical programme exposed denormalised counters on the products table,
+    -- however several of our lightweight environments (including sqlite-driven
+    -- tests) never carried those nullable columns. The subqueries below keep the
+    -- API contract intact without assuming the fields exist.
+    (
+        SELECT COALESCE(SUM(oi.quantity), 0)
+        FROM order_items AS oi
+        WHERE oi.product_id = p.id
+    ) AS sales_count,
+    (
+        SELECT COUNT(*)
+        FROM reviews AS r
+        WHERE r.product_id = p.id
+            AND r.is_approved = 1
+    ) AS reviews_count,
+    (
+        SELECT COALESCE(AVG(r.rating), 0)
+        FROM reviews AS r
+        WHERE r.product_id = p.id
+            AND r.is_approved = 1
+    ) AS average_rating,
     p.sku,
     b.name AS brand_name,
     COALESCE(pt.name, '') AS translated_name,
@@ -84,38 +104,72 @@ SQL;
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function mapRow(object $row, SearchQueryData $queryData): array
     {
-        $price = (float) ($row->price ?? 0);
-        $subtitle = $row->brand_name ?? null;
-        $description = $row->short_description ?: ($row->description ?: $row->translated_description ?: null);
+        /** @var array<string, mixed> $attributes */
+        $attributes = get_object_vars($row);
+
+        $rawPrice = $attributes['price'] ?? 0;
+        $price = is_numeric($rawPrice) ? (float) $rawPrice : 0.0;
+        $subtitle = isset($attributes['brand_name']) && is_string($attributes['brand_name']) && $attributes['brand_name'] !== ''
+            ? $attributes['brand_name']
+            : null;
+
+        $shortDescription = $attributes['short_description'] ?? null;
+        $fullDescription = $attributes['description'] ?? null;
+        $translatedDescription = $attributes['translated_description'] ?? null;
+        $description = is_string($shortDescription) && $shortDescription !== ''
+            ? $shortDescription
+            : (is_string($fullDescription) && $fullDescription !== ''
+                ? $fullDescription
+                : (is_string($translatedDescription) && $translatedDescription !== '' ? $translatedDescription : null));
+
+        $title = isset($attributes['name']) && is_string($attributes['name']) ? $attributes['name'] : '';
+        $slug = isset($attributes['slug']) && is_string($attributes['slug']) ? $attributes['slug'] : '';
+        $salesCount = $attributes['sales_count'] ?? 0;
+        $reviewsCount = $attributes['reviews_count'] ?? 0;
+        $averageRating = $attributes['average_rating'] ?? 0.0;
 
         return [
-            'id' => (int) $row->id,
-            'type' => 'product',
-            'title' => (string) $row->name,
-            'subtitle' => $subtitle,
-            'description' => $description,
-            'price' => $price,
+            'id'              => is_numeric($attributes['id'] ?? null) ? (int) $attributes['id'] : 0,
+            'type'            => 'product',
+            'title'           => $title,
+            'subtitle'        => $subtitle,
+            'description'     => $description,
+            'price'           => $price,
             'formatted_price' => Number::currency($price, 'EUR', app()->getLocale()),
-            'image' => null,
-            'url' => route('products.show', $row->slug),
-            'relevance_score' => $this->calculateRelevanceScore($row, $queryData->query()),
-            'sales_count' => (int) ($row->sales_count ?? 0),
-            'reviews_count' => (int) ($row->reviews_count ?? 0),
-            'average_rating' => (float) ($row->average_rating ?? 0),
-            'is_featured' => (bool) $row->is_featured,
+            'image'           => null,
+            'url'             => route('products.show', $slug),
+            'relevance_score' => $this->calculateRelevanceScore($attributes, $queryData->query()),
+            'sales_count'     => is_numeric($salesCount) ? (int) $salesCount : 0,
+            'reviews_count'   => is_numeric($reviewsCount) ? (int) $reviewsCount : 0,
+            'average_rating'  => is_numeric($averageRating) ? (float) $averageRating : 0.0,
+            'is_featured'     => (bool) ($attributes['is_featured'] ?? false),
         ];
     }
 
-    private function calculateRelevanceScore(object $row, string $query): int
+    /**
+     * @param array<string, mixed> $attributes
+     */
+    private function calculateRelevanceScore(array $attributes, string $query): int
     {
         $score = 0;
         $normalizedQuery = Str::lower($query);
-        $name = Str::lower((string) $row->name);
-        $sku = Str::lower((string) ($row->sku ?? ''));
-        $description = Str::lower((string) ($row->description ?? ''));
-        $translatedDescription = Str::lower((string) ($row->translated_description ?? ''));
+        $name = isset($attributes['name']) && is_string($attributes['name'])
+            ? Str::lower($attributes['name'])
+            : '';
+        $sku = isset($attributes['sku']) && is_string($attributes['sku'])
+            ? Str::lower($attributes['sku'])
+            : '';
+        $description = isset($attributes['description']) && is_string($attributes['description'])
+            ? Str::lower($attributes['description'])
+            : '';
+        $translatedDescription = isset($attributes['translated_description']) && is_string($attributes['translated_description'])
+            ? Str::lower($attributes['translated_description'])
+            : '';
 
         if ($name === $normalizedQuery) {
             $score += 100;
@@ -135,7 +189,7 @@ SQL;
             $score += 10;
         }
 
-        if ((bool) $row->is_featured) {
+        if ((bool) ($attributes['is_featured'] ?? false)) {
             $score += 10;
         }
 

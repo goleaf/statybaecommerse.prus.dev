@@ -37,10 +37,9 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 -### Latest updates
-- Product search harness now restores the legacy attribute tables for the SQLite
-  test database, treats `products.name` as JSON-backed translations, and relaxes
-  the repository's published scope so API lookups surface freshly seeded
-  fixtures during regression runs.
+- Search API now queries the `product_categories` pivot, rebuilds product metrics on the fly, gracefully skips Redis-only cache
+  writes when the extension is absent, and soft-caps oversized page sizes so SQLite-backed API suites stay green without extra
+  environment setup.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
 - Attribute group selectors now reuse a shared translation helper so historical slugs render as human-readable labels across Filament forms, filters, and tables instead of exposing raw keys.

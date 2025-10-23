@@ -6,6 +6,8 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
+use Log;
+use Throwable;
 
 final class SearchCacheService
 {
@@ -26,14 +28,14 @@ final class SearchCacheService
     {
         try {
             $ttl = $this->calculateIntelligentTTL($query, $results, $context);
-            $cacheKey = self::CACHE_PREFIX.$key;
+            $cacheKey = self::CACHE_PREFIX . $key;
 
             $cacheData = [
-                'results' => $results,
-                'query' => $query,
-                'context' => $context,
-                'cached_at' => now()->toISOString(),
-                'ttl' => $ttl,
+                'results'      => $results,
+                'query'        => $query,
+                'context'      => $context,
+                'cached_at'    => now()->toISOString(),
+                'ttl'          => $ttl,
                 'result_count' => count($results),
             ];
 
@@ -45,8 +47,10 @@ final class SearchCacheService
             // Update cache statistics
             $this->updateCacheStatistics($key, $query, count($results));
 
-        } catch (\Throwable $e) {
-            \Log::warning('Search cache storage failed: '.$e->getMessage());
+        } catch (Throwable $e) {
+            // We intentionally swallow any cache backend issues so the search response
+            // still completes even when Redis or other stores are unavailable.
+            Log::warning('Search cache storage failed: ' . $e->getMessage());
         }
     }
 
@@ -56,7 +60,7 @@ final class SearchCacheService
     public function getCachedResults(string $key): ?array
     {
         try {
-            $cacheKey = self::CACHE_PREFIX.$key;
+            $cacheKey = self::CACHE_PREFIX . $key;
             $cachedData = Cache::get($cacheKey);
 
             if ($cachedData) {
@@ -67,8 +71,8 @@ final class SearchCacheService
             }
 
             return null;
-        } catch (\Throwable $e) {
-            \Log::warning('Search cache retrieval failed: '.$e->getMessage());
+        } catch (Throwable $e) {
+            Log::warning('Search cache retrieval failed: ' . $e->getMessage());
 
             return null;
         }
@@ -79,15 +83,15 @@ final class SearchCacheService
      */
     public function getCacheStatistics(): array
     {
-        $cacheKey = self::CACHE_PREFIX.'statistics';
+        $cacheKey = self::CACHE_PREFIX . 'statistics';
 
         return Cache::remember($cacheKey, 300, function () {
             return [
                 'total_cached_queries' => $this->getTotalCachedQueries(),
-                'cache_hit_rate' => $this->getCacheHitRate(),
+                'cache_hit_rate'       => $this->getCacheHitRate(),
                 'most_popular_queries' => $this->getMostPopularQueries(),
-                'cache_size' => $this->getCacheSize(),
-                'memory_usage' => $this->getMemoryUsage(),
+                'cache_size'           => $this->getCacheSize(),
+                'memory_usage'         => $this->getMemoryUsage(),
             ];
         });
     }
@@ -103,7 +107,7 @@ final class SearchCacheService
             // Check if already cached
             if (! $this->getCachedResults($key)) {
                 // This would typically trigger a search to populate cache
-                \Log::info("Warming up cache for query: {$query}");
+                Log::info("Warming up cache for query: {$query}");
             }
         }
     }
@@ -114,7 +118,7 @@ final class SearchCacheService
     public function clearCacheByPattern(string $pattern): int
     {
         try {
-            $keys = Cache::getRedis()->keys(self::CACHE_PREFIX.$pattern);
+            $keys = Cache::getRedis()->keys(self::CACHE_PREFIX . $pattern);
             $deleted = 0;
 
             foreach ($keys as $key) {
@@ -124,8 +128,8 @@ final class SearchCacheService
             }
 
             return $deleted;
-        } catch (\Throwable $e) {
-            \Log::warning('Cache pattern clearing failed: '.$e->getMessage());
+        } catch (Throwable $e) {
+            Log::warning('Cache pattern clearing failed: ' . $e->getMessage());
 
             return 0;
         }
@@ -153,8 +157,8 @@ final class SearchCacheService
             }
 
             return $removed;
-        } catch (\Throwable $e) {
-            \Log::warning('Cache optimization failed: '.$e->getMessage());
+        } catch (Throwable $e) {
+            Log::warning('Cache optimization failed: ' . $e->getMessage());
 
             return 0;
         }
@@ -167,7 +171,7 @@ final class SearchCacheService
     {
         $contextString = serialize($context);
 
-        return md5($query.$contextString);
+        return md5($query . $contextString);
     }
 
     /**
@@ -210,8 +214,8 @@ final class SearchCacheService
     {
         try {
             Redis::setex($key, $ttl, json_encode($data));
-        } catch (\Throwable $e) {
-            \Log::warning('Redis storage failed: '.$e->getMessage());
+        } catch (Throwable $e) {
+            Log::warning('Redis storage failed: ' . $e->getMessage());
         }
     }
 
@@ -221,11 +225,11 @@ final class SearchCacheService
     private function updateCacheStatistics(string $key, string $query, int $resultCount): void
     {
         try {
-            $statsKey = self::CACHE_PREFIX.'statistics';
+            $statsKey = self::CACHE_PREFIX . 'statistics';
             $stats = Cache::get($statsKey, [
                 'total_queries' => 0,
                 'total_results' => 0,
-                'query_counts' => [],
+                'query_counts'  => [],
             ]);
 
             $stats['total_queries']++;
@@ -233,8 +237,8 @@ final class SearchCacheService
             $stats['query_counts'][$query] = ($stats['query_counts'][$query] ?? 0) + 1;
 
             Cache::put($statsKey, $stats, self::ANALYTICS_TTL);
-        } catch (\Throwable $e) {
-            \Log::warning('Cache statistics update failed: '.$e->getMessage());
+        } catch (Throwable $e) {
+            Log::warning('Cache statistics update failed: ' . $e->getMessage());
         }
     }
 
@@ -244,11 +248,11 @@ final class SearchCacheService
     private function updateAccessStatistics(string $key): void
     {
         try {
-            $accessKey = self::CACHE_PREFIX.'access:'.$key;
+            $accessKey = self::CACHE_PREFIX . 'access:' . $key;
             $accessCount = Cache::get($accessKey, 0);
             Cache::put($accessKey, $accessCount + 1, self::ANALYTICS_TTL);
-        } catch (\Exception $e) {
-            \Log::warning('Access statistics update failed: '.$e->getMessage());
+        } catch (Throwable $e) {
+            Log::warning('Access statistics update failed: ' . $e->getMessage());
         }
     }
 
@@ -257,7 +261,7 @@ final class SearchCacheService
      */
     private function isPopularQuery(string $query): bool
     {
-        $stats = Cache::get(self::CACHE_PREFIX.'statistics', []);
+        $stats = Cache::get(self::CACHE_PREFIX . 'statistics', []);
         $queryCount = $stats['query_counts'][$query] ?? 0;
 
         return $queryCount > 10; // Threshold for popular queries
@@ -278,10 +282,10 @@ final class SearchCacheService
     private function getTotalCachedQueries(): int
     {
         try {
-            $keys = Cache::getRedis()->keys(self::CACHE_PREFIX.'*');
+            $keys = Cache::getRedis()->keys(self::CACHE_PREFIX . '*');
 
             return count($keys);
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
             return 0;
         }
     }
@@ -292,7 +296,7 @@ final class SearchCacheService
     private function getCacheHitRate(): float
     {
         try {
-            $stats = Cache::get(self::CACHE_PREFIX.'statistics', []);
+            $stats = Cache::get(self::CACHE_PREFIX . 'statistics', []);
             $totalQueries = $stats['total_queries'] ?? 0;
             $totalResults = $stats['total_results'] ?? 0;
 
@@ -301,7 +305,7 @@ final class SearchCacheService
             }
 
             return round(($totalResults / $totalQueries) * 100, 2);
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
             return 0.0;
         }
     }
@@ -312,13 +316,13 @@ final class SearchCacheService
     private function getMostPopularQueries(): array
     {
         try {
-            $stats = Cache::get(self::CACHE_PREFIX.'statistics', []);
+            $stats = Cache::get(self::CACHE_PREFIX . 'statistics', []);
             $queryCounts = $stats['query_counts'] ?? [];
 
             arsort($queryCounts);
 
             return array_slice($queryCounts, 0, 10, true);
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
             return [];
         }
     }
@@ -329,7 +333,7 @@ final class SearchCacheService
     private function getCacheSize(): int
     {
         try {
-            $keys = Cache::getRedis()->keys(self::CACHE_PREFIX.'*');
+            $keys = Cache::getRedis()->keys(self::CACHE_PREFIX . '*');
             $totalSize = 0;
 
             foreach ($keys as $key) {
@@ -338,7 +342,7 @@ final class SearchCacheService
             }
 
             return $totalSize;
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
             return 0;
         }
     }
@@ -352,16 +356,16 @@ final class SearchCacheService
             $info = Cache::getRedis()->info('memory');
 
             return [
-                'used_memory' => $info['used_memory'] ?? 0,
-                'used_memory_human' => $info['used_memory_human'] ?? '0B',
-                'used_memory_peak' => $info['used_memory_peak'] ?? 0,
+                'used_memory'            => $info['used_memory'] ?? 0,
+                'used_memory_human'      => $info['used_memory_human'] ?? '0B',
+                'used_memory_peak'       => $info['used_memory_peak'] ?? 0,
                 'used_memory_peak_human' => $info['used_memory_peak_human'] ?? '0B',
             ];
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
             return [
-                'used_memory' => 0,
-                'used_memory_human' => '0B',
-                'used_memory_peak' => 0,
+                'used_memory'            => 0,
+                'used_memory_human'      => '0B',
+                'used_memory_peak'       => 0,
                 'used_memory_peak_human' => '0B',
             ];
         }
@@ -373,17 +377,17 @@ final class SearchCacheService
     private function getAccessStatistics(): array
     {
         try {
-            $keys = Cache::getRedis()->keys(self::CACHE_PREFIX.'access:*');
+            $keys = Cache::getRedis()->keys(self::CACHE_PREFIX . 'access:*');
             $stats = [];
 
             foreach ($keys as $key) {
                 $accessCount = Cache::get($key, 0);
-                $queryKey = str_replace(self::CACHE_PREFIX.'access:', '', $key);
+                $queryKey = str_replace(self::CACHE_PREFIX . 'access:', '', $key);
                 $stats[$queryKey] = ['access_count' => $accessCount];
             }
 
             return $stats;
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
             return [];
         }
     }
@@ -394,7 +398,7 @@ final class SearchCacheService
     private function getAllCachedQueries(): array
     {
         try {
-            $keys = Cache::getRedis()->keys(self::CACHE_PREFIX.'*');
+            $keys = Cache::getRedis()->keys(self::CACHE_PREFIX . '*');
             $queries = [];
 
             foreach ($keys as $key) {
@@ -404,7 +408,7 @@ final class SearchCacheService
             }
 
             return $queries;
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
             return [];
         }
     }

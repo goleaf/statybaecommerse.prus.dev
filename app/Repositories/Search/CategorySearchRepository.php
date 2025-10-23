@@ -21,18 +21,19 @@ final class CategorySearchRepository extends AbstractSearchRepository
         $categoryFilters = $this->categoryVisibilityFilter();
         $productFilters = $this->productPublicationFilter();
 
+        // Category/product relationships live in the `product_categories` pivot, so we
+        // join through that table to keep MySQL and SQLite test schemas aligned.
         return <<<SQL
 SELECT
     c.id,
     c.name,
     c.slug,
     c.description,
-    COUNT(DISTINCT p.id) AS products_count,
+    COUNT(DISTINCT pc.product_id) AS products_count,
     COALESCE(ct.name, '') AS translated_name,
     COALESCE(ct.description, '') AS translated_description
 FROM categories AS c
 JOIN product_categories AS pc ON pc.category_id = c.id
-JOIN products AS p ON p.id = pc.product_id
 LEFT JOIN category_translations AS ct ON ct.category_id = c.id AND ct.locale = ?
 WHERE 1 = 1{$categoryFilters}{$productFilters}
   AND c.slug IS NOT NULL
@@ -83,14 +84,14 @@ SQL;
         $description = $row->description ?: ($row->translated_description ?: null);
 
         return [
-            'id' => (int) $row->id,
-            'type' => 'category',
-            'title' => (string) $row->name,
-            'subtitle' => __('frontend.search.category_with_products', ['count' => $productsCount]),
-            'description' => $description,
-            'image' => null,
-            'url' => route('categories.show', $row->slug),
-            'products_count' => $productsCount,
+            'id'              => (int) $row->id,
+            'type'            => 'category',
+            'title'           => (string) $row->name,
+            'subtitle'        => __('frontend.search.category_with_products', ['count' => $productsCount]),
+            'description'     => $description,
+            'image'           => null,
+            'url'             => route('categories.show', $row->slug),
+            'products_count'  => $productsCount,
             'relevance_score' => $this->calculateRelevanceScore($row, $queryData->query()),
         ];
     }
