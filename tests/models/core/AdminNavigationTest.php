@@ -11,5 +11,6 @@ it('has consolidated admin navigation labels configured', function (): void {
     expect(__('admin.navigation.content'))->not()->toBe('admin.navigation.content');
     expect(__('admin.navigation.analytics'))->not()->toBe('admin.navigation.analytics');
     expect(__('admin.navigation.system'))->not()->toBe('admin.navigation.system');
+
     expect(__('admin.navigation.commerce'))->toBe('Prekyba');
 });
