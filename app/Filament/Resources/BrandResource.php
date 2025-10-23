@@ -41,7 +41,9 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\DB;
-use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
+use Illuminate\Support\Facades\Gate;
+
+use Filament\Forms\Form;
 
 final class BrandResource extends Resource
 {
@@ -92,6 +94,31 @@ final class BrandResource extends Resource
     public static function canRestore(Model $record): bool
     {
         return AuthorizationMatrix::check('brands', 'update');
+    }
+
+    public static function canViewAny(): bool
+    {
+        return Gate::allows('viewAny', Brand::class);
+    }
+
+    public static function canView(Brand $record): bool
+    {
+        return Gate::allows('view', $record);
+    }
+
+    public static function canCreate(): bool
+    {
+        return Gate::allows('create', Brand::class);
+    }
+
+    public static function canEdit(Brand $record): bool
+    {
+        return Gate::allows('update', $record);
+    }
+
+    public static function canDelete(Brand $record): bool
+    {
+        return Gate::allows('delete', $record);
     }
 
     public static function getEloquentQuery(): Builder

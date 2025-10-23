@@ -57,15 +57,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
-use LaraZeus\InlineChart\Tables\Columns\InlineChart;
-use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
-use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
-use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
-use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
-use pxlrbt\FilamentExcel\Columns\Column;
-use pxlrbt\FilamentExcel\Exports\ExcelExport;
-use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
+use Illuminate\Support\Facades\Gate;
 use UnitEnum;
 
 /**
@@ -86,6 +78,31 @@ final class ProductResource extends Resource
     protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function canViewAny(): bool
+    {
+        return Gate::allows('viewAny', Product::class);
+    }
+
+    public static function canView(Product $record): bool
+    {
+        return Gate::allows('view', $record);
+    }
+
+    public static function canCreate(): bool
+    {
+        return Gate::allows('create', Product::class);
+    }
+
+    public static function canEdit(Product $record): bool
+    {
+        return Gate::allows('update', $record);
+    }
+
+    public static function canDelete(Product $record): bool
+    {
+        return Gate::allows('delete', $record);
+    }
 
     public static function getNavigationLabel(): string
     {
