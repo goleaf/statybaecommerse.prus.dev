@@ -9,17 +9,23 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\PriceResource\Pages;
 use App\Models\Price;
 use App\Models\Product;
-use App\Support\Search\ProductSearch;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use App\Models\ProductVariant;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\MorphToSelect;
-use Filament\Forms\Components\MorphToSelect\Type as MorphToSelectType;
+use Filament\Forms\Components\MorphToSelect\Type;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Set;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -37,10 +43,8 @@ final class PriceResource extends Resource
 
     protected static ?string $model = Price::class;
 
-    /**
-     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
-     */
-    protected static UnitEnum|string|null $navigationGroup = 'Products';
+    /** @var string|UnitEnum|null Keep price management grouped with products in the navigation. */
+    protected static $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 12;
 
@@ -48,71 +52,108 @@ final class PriceResource extends Resource
     {
         return $form
             ->schema([
-                Section::make(__('admin.prices.sections.basic_information'))
+                Section::make(__('admin.prices.priceable_association'))
+                    ->description(__('admin.prices.priceable_association_description'))
                     ->schema([
                         MorphToSelect::make('priceable')
-                            ->label(__('admin.prices.fields.priceable'))
+                            ->label(__('admin.prices.priceable'))
                             ->types([
-                                MorphToSelectType::make(Product::class)
-                                    ->title(__('admin.prices.priceable_types.product'))
-                                    ->getRecordTitleAttribute('name'),
-                                MorphToSelectType::make(ProductVariant::class)
-                                    ->title(__('admin.prices.priceable_types.variant'))
-                                    ->getRecordTitleAttribute('name'),
+                                Type::make(Product::class)
+                                    ->label(__('admin.prices.priceable_types.product'))
+                                    ->titleAttribute('name')
+                                    ->searchColumns(['name', 'sku'])
+                                    ->modifyOptionLabelUsing(static fn (Product $record): string => sprintf('%s • %s', $record->sku ?? __('admin.prices.sku_missing'), $record->name ?? '')),
+                                Type::make(ProductVariant::class)
+                                    ->label(__('admin.prices.priceable_types.variant'))
+                                    ->titleAttribute('name')
+                                    ->searchColumns(['name', 'sku'])
+                                    ->modifyOptionLabelUsing(static fn (ProductVariant $record): string => sprintf('%s • %s', $record->sku ?? __('admin.prices.sku_missing'), $record->name ?? '')),
                             ])
+                            ->required()
+                            ->native(false)
+                            ->columnSpanFull(),
+                        Select::make('currency_id')
+                            ->label(__('admin.prices.currency'))
+                            ->relationship('currency', 'code')
                             ->searchable()
-                            ->required(),
-                        Grid::make(2)
+                            ->preload()
+                            ->required()
+                            ->rules(['exists:currencies,id'])
+                            ->helperText(__('admin.prices.currency_helper')),
+                    ])
+                    ->columns(2),
+                Section::make(__('admin.prices.pricing_details'))
+                    ->description(__('admin.prices.pricing_details_description'))
+                    ->schema([
+                        Grid::make(3)
                             ->schema([
-                                SearchableInput::make('product_id')
-                                    ->label(__('admin.prices.product'))
-                                    ->placeholder('SKU / EAN / name')
-                                    ->required()
-                                    ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
-                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
-                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                        if ($state === null) {
-                                            return;
-                                        }
-
-                                        $product = Product::query()
-                                            ->select(['id', 'sku', 'name'])
-                                            ->find($state);
-
-                                        if (! $product instanceof Product) {
-                                            return;
-                                        }
-
-                                        $component
-                                            ->state((string) $state)
-                                            ->options([
-                                                (string) $product->getKey() => ProductSearch::label($product),
-                                            ]);
-                                    })
-                                    ->afterStateUpdated(function (?string $state, Set $set): void {
-                                        if ($state === null || $state === '') {
-                                            return;
-                                        }
-
-                                        $product = Product::query()
-                                            ->select(['id'])
-                                            ->find((int) $state);
-
-                                        if (! $product instanceof Product) {
-                                            return;
-                                        }
-
-                                        $set('product_id', $product->getKey());
-                                    }),
                                 TextInput::make('amount')
                                     ->label(__('admin.prices.amount'))
                                     ->numeric()
+                                    ->minValue(0.0)
+                                    ->step(0.0001)
+                                    ->required()
+                                    ->rules(['numeric', 'gte:0'])
                                     ->prefix('€')
-                                    ->required(),
+                                    ->helperText(__('admin.prices.amount_helper')),
+                                TextInput::make('compare_amount')
+                                    ->label(__('admin.prices.compare_amount'))
+                                    ->numeric()
+                                    ->minValue(0.0)
+                                    ->step(0.0001)
+                                    ->rules(['nullable', 'numeric', 'gte:0'])
+                                    ->helperText(__('admin.prices.compare_amount_helper')),
+                                TextInput::make('cost_amount')
+                                    ->label(__('admin.prices.cost_amount'))
+                                    ->numeric()
+                                    ->minValue(0.0)
+                                    ->step(0.0001)
+                                    ->rules(['nullable', 'numeric', 'gte:0'])
+                                    ->helperText(__('admin.prices.cost_amount_helper')),
+                            ]),
+                        Select::make('type')
+                            ->label(__('admin.prices.price_type'))
+                            ->options([
+                                'regular' => __('admin.prices.price_types.regular'),
+                                'sale' => __('admin.prices.price_types.sale'),
+                                'wholesale' => __('admin.prices.price_types.wholesale'),
+                            ])
+                            ->required()
+                            ->rules(['in:regular,sale,wholesale'])
+                            ->default('regular')
+                            ->helperText(__('admin.prices.price_type_helper')),
+                    ]),
+                Section::make(__('admin.prices.lifecycle'))
+                    ->description(__('admin.prices.lifecycle_description'))
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                DateTimePicker::make('starts_at')
+                                    ->label(__('admin.prices.starts_at'))
+                                    ->seconds(false)
+                                    ->nullable()
+                                    ->helperText(__('admin.prices.starts_at_helper')),
+                                DateTimePicker::make('ends_at')
+                                    ->label(__('admin.prices.ends_at'))
+                                    ->seconds(false)
+                                    ->nullable()
+                                    ->helperText(__('admin.prices.ends_at_helper')),
                             ]),
                         Toggle::make('is_enabled')
-                            ->label(__('admin.prices.fields.is_enabled'))
-                            ->default(true),
+                            ->label(__('admin.prices.is_enabled'))
+                            ->default(true)
+                            ->helperText(__('admin.prices.is_enabled_helper')),
+                    ]),
+                Section::make(__('admin.prices.metadata'))
+                    ->description(__('admin.prices.metadata_description'))
+                    ->schema([
+                        KeyValue::make('metadata')
+                            ->label(__('admin.prices.metadata_pairs'))
+                            ->keyLabel(__('admin.prices.metadata_key'))
+                            ->valueLabel(__('admin.prices.metadata_value'))
+                            ->nullable()
+                            ->columnSpanFull()
+                            ->helperText(__('admin.prices.metadata_helper')),
                     ]),
                 Section::make(__('admin.prices.sections.pricing'))
                     ->schema([
@@ -163,47 +204,64 @@ final class PriceResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('priceable_type')
-                    ->label(__('admin.prices.fields.priceable_type'))
-                    ->badge()
-                    ->formatStateUsing(fn (string $state): string => self::getPriceableTypeLabels()[$state] ?? $state)
-                    ->sortable(),
-                TextColumn::make('priceable.name')
-                    ->label(__('admin.prices.fields.priceable_name'))
-                    ->searchable()
+                TextColumn::make('priceable_display')
+                    ->label(__('admin.prices.priceable'))
+                    ->getStateUsing(static fn (Price $record): string => self::formatPriceableLabel($record))
+                    ->description(static fn (Price $record): string => self::formatPriceableType($record))
+                    ->searchable(query: static function (Builder $query, string $search): Builder {
+                        // Allow searching across product and variant attributes when filtering prices.
+                        return $query->whereHasMorph(
+                            'priceable',
+                            [Product::class, ProductVariant::class],
+                            static function (Builder $morphQuery) use ($search): void {
+                                $morphQuery->where(function (Builder $builder) use ($search): void {
+                                    $builder
+                                        ->where('name', 'like', "%{$search}%")
+                                        ->orWhere('sku', 'like', "%{$search}%");
+                                });
+                            },
+                        );
+                    })
                     ->sortable(),
                 TextColumn::make('currency.code')
                     ->label(__('admin.prices.fields.currency'))
                     ->badge()
                     ->sortable(),
                 TextColumn::make('amount')
-                    ->label(__('admin.prices.fields.amount'))
-                    ->sortable()
-                    ->formatStateUsing(fn ($state, Price $record): string => Number::currency((float) $state, $record->currency?->code ?? 'EUR', locale: app()->getLocale())),
-                TextColumn::make('compare_amount')
-                    ->label(__('admin.prices.fields.compare_amount'))
-                    ->sortable()
-                    ->formatStateUsing(fn ($state, Price $record): ?string => blank($state)
-                        ? null
-                        : Number::currency((float) $state, $record->currency?->code ?? 'EUR', locale: app()->getLocale()))
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('cost_amount')
-                    ->label(__('admin.prices.fields.cost_amount'))
-                    ->sortable()
-                    ->formatStateUsing(fn ($state, Price $record): ?string => blank($state)
-                        ? null
-                        : Number::currency((float) $state, $record->currency?->code ?? 'EUR', locale: app()->getLocale()))
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('type')
-                    ->label(__('admin.prices.fields.type'))
+                    ->label(__('admin.prices.amount'))
+                    ->formatStateUsing(static fn ($state, Price $record): string => Number::currency((float) $state, $record->currency?->code ?? 'EUR'))
+                    ->sortable(),
+                TextColumn::make('currency.code')
+                    ->label(__('admin.prices.currency'))
                     ->badge()
-                    ->formatStateUsing(fn (string $state): string => self::getPriceTypeOptions()[$state] ?? $state)
-                    ->color(fn (string $state): string => match ($state) {
+                    ->sortable(),
+                TextColumn::make('type')
+                    ->label(__('admin.prices.price_type'))
+                    ->badge()
+                    ->formatStateUsing(static fn (?string $state): string => __('admin.prices.price_types.'.($state ?? 'regular')))
+                    ->color(static fn (?string $state): string => match ($state) {
                         'sale' => 'success',
                         'wholesale' => 'warning',
-                        'special' => 'info',
-                        default => 'gray',
+                        default => 'primary',
                     })
+                    ->sortable(),
+                IconColumn::make('is_enabled')
+                    ->label(__('admin.prices.is_enabled'))
+                    ->boolean(),
+                TextColumn::make('starts_at')
+                    ->label(__('admin.prices.starts_at'))
+                    ->dateTime()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->sortable(),
+                TextColumn::make('ends_at')
+                    ->label(__('admin.prices.ends_at'))
+                    ->dateTime()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->sortable(),
+                TextColumn::make('created_at')
+                    ->label(__('admin.prices.created_at'))
+                    ->dateTime()
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->sortable(),
                 IconColumn::make('is_enabled')
                     ->label(__('admin.prices.fields.is_enabled'))
@@ -228,41 +286,70 @@ final class PriceResource extends Resource
             ->filters([
                 SelectFilter::make('priceable_type')
                     ->label(__('admin.prices.filters.priceable_type'))
-                    ->options(self::getPriceableTypeLabels()),
+                    ->options([
+                        Product::class => __('admin.prices.priceable_types.product'),
+                        ProductVariant::class => __('admin.prices.priceable_types.variant'),
+                    ]),
                 SelectFilter::make('currency_id')
                     ->label(__('admin.prices.filters.currency'))
                     ->relationship('currency', 'code')
-                    ->searchable(),
-                SelectFilter::make('type')
-                    ->label(__('admin.prices.filters.type'))
-                    ->options(self::getPriceTypeOptions()),
+                    ->searchable()
+                    ->preload(),
                 TernaryFilter::make('is_enabled')
-                    ->label(__('admin.prices.filters.is_enabled')),
-                Filter::make('active')
-                    ->label(__('admin.prices.filters.active'))
-                    ->query(fn (Builder $query): Builder => $query
-                        ->where('is_enabled', true)
-                        ->where(function (Builder $builder): void {
-                            $builder
-                                ->whereNull('starts_at')
-                                ->orWhere('starts_at', '<=', now());
-                        })
-                        ->where(function (Builder $builder): void {
-                            $builder
-                                ->whereNull('ends_at')
-                                ->orWhere('ends_at', '>=', now());
-                        })),
+                    ->label(__('admin.prices.filters.enabled_state')),
+                Filter::make('lifecycle')
+                    ->label(__('admin.prices.filters.lifecycle'))
+                    ->form([
+                        Select::make('stage')
+                            ->label(__('admin.prices.filters.lifecycle_stage'))
+                            ->options([
+                                'active' => __('admin.prices.filters.lifecycle_options.active'),
+                                'upcoming' => __('admin.prices.filters.lifecycle_options.upcoming'),
+                                'expired' => __('admin.prices.filters.lifecycle_options.expired'),
+                            ]),
+                    ])
+                    ->query(static function (Builder $query, array $data): Builder {
+                        // Provide lifecycle snapshots without duplicating scope logic in the model.
+                        return match ($data['stage'] ?? null) {
+                            'active' => $query->where('is_enabled', true)
+                                ->where(function (Builder $builder): void {
+                                    $builder
+                                        ->whereNull('starts_at')
+                                        ->orWhere('starts_at', '<=', now());
+                                })
+                                ->where(function (Builder $builder): void {
+                                    $builder
+                                        ->whereNull('ends_at')
+                                        ->orWhere('ends_at', '>=', now());
+                                }),
+                            'upcoming' => $query->where('is_enabled', true)
+                                ->whereNotNull('starts_at')
+                                ->where('starts_at', '>', now()),
+                            'expired' => $query->where(function (Builder $builder): void {
+                                $builder
+                                    ->where('is_enabled', false)
+                                    ->orWhere(function (Builder $inner): void {
+                                        $inner
+                                            ->whereNotNull('ends_at')
+                                            ->where('ends_at', '<', now());
+                                    });
+                            }),
+                            default => $query,
+                        };
+                    }),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])
+            ->recordUrl(static fn (Price $record): string => self::getUrl('view', ['record' => $record]))
+            ->modifyQueryUsing(static fn (Builder $query): Builder => $query->with(['priceable', 'currency']))
             ->defaultSort('created_at', 'desc');
     }
 
@@ -271,32 +358,40 @@ final class PriceResource extends Resource
         return [
             'index'  => Pages\ListPrices::route('/'),
             'create' => Pages\CreatePrice::route('/create'),
-            'view' => Pages\ViewPrice::route('/{record}'),
-            'edit' => Pages\EditPrice::route('/{record}/edit'),
+            'view'   => Pages\ViewPrice::route('/{record}'),
+            'edit'   => Pages\EditPrice::route('/{record}/edit'),
         ];
     }
 
     /**
-     * @return array<string, string>
+     * Build a human-readable label for the related priceable entity.
      */
-    private static function getPriceableTypeLabels(): array
+    private static function formatPriceableLabel(Price $record): string
     {
-        return [
-            Product::class => __('admin.prices.priceable_types.product'),
-            ProductVariant::class => __('admin.prices.priceable_types.variant'),
-        ];
+        $priceable = $record->priceable;
+
+        if ($priceable instanceof ProductVariant) {
+            return trim(sprintf('%s • %s', $priceable->sku ?? __('admin.prices.sku_missing'), $priceable->name ?? ''));
+        }
+
+        if ($priceable instanceof Product) {
+            return trim(sprintf('%s • %s', $priceable->sku ?? __('admin.prices.sku_missing'), $priceable->name ?? ''));
+        }
+
+        return __('admin.prices.unknown_priceable');
     }
 
     /**
-     * @return array<string, string>
+     * Surface the translated priceable type label alongside the primary column value.
      */
-    private static function getPriceTypeOptions(): array
+    private static function formatPriceableType(Price $record): string
     {
-        return [
-            'retail' => __('admin.prices.types.retail'),
-            'wholesale' => __('admin.prices.types.wholesale'),
-            'special' => __('admin.prices.types.special'),
-            'sale' => __('admin.prices.types.sale'),
-        ];
+        $priceable = $record->priceable;
+
+        return match (true) {
+            $priceable instanceof ProductVariant => __('admin.prices.priceable_types.variant'),
+            $priceable instanceof Product => __('admin.prices.priceable_types.product'),
+            default => __('admin.prices.priceable_types.unknown'),
+        };
     }
 }
