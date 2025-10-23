@@ -338,4 +338,5 @@ final class DiscountCode extends Model
     {
         return (float) ($this->attributes['value'] ?? 0);
     }
+
 }
