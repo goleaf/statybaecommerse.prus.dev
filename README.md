@@ -17,8 +17,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 -### Latest updates
-- Customer group administration now syncs the model fillable list, boolean casts, and metadata helpers, enabling Filament CRUD
-  flows to manage inactive, default, and discounted groups while keeping validation for discount fields and toggles consistent.
+- Coupon usage admin coverage now sees the same delete button and used-at filter the UI exposes, thanks to a renamed filter key that also accepts direct date strings when Livewire tests call `filterTable()`.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
 - Customer group creation now auto-generates slugs from the supplied code or localized name so SQLite-powered tests and admin
