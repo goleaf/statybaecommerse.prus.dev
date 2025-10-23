@@ -36,6 +36,7 @@ describe('VariantCombination Model', function () {
 
         expect($fillable)->toContain('product_id');
         expect($fillable)->toContain('attribute_combinations');
+        expect($fillable)->toContain('combination_hash');
         expect($fillable)->toContain('is_available');
     });
 
@@ -70,7 +71,7 @@ describe('VariantCombination Model', function () {
         $hash = $this->variantCombination->combination_hash;
 
         expect($hash)->toBeString();
-        expect(strlen($hash))->toBe(32); // MD5 hash length
+        expect(strlen($hash))->toBe(64); // SHA-256 hash length
     });
 
     it('validates combination correctly', function () {
@@ -92,8 +93,8 @@ describe('VariantCombination Model', function () {
 
         $availableCombinations = VariantCombination::available()->get();
 
-        expect($availableCombinations)->toContain($availableCombination);
-        expect($availableCombinations)->not->toContain($unavailableCombination);
+        expect($availableCombinations)->toContainModel($availableCombination);
+        expect($availableCombinations)->not->toContainModel($unavailableCombination);
     });
 
     it('can scope by product', function () {
@@ -104,8 +105,8 @@ describe('VariantCombination Model', function () {
 
         $productCombinations = VariantCombination::byProduct($this->product->id)->get();
 
-        expect($productCombinations)->toContain($this->variantCombination);
-        expect($productCombinations)->not->toContain($anotherCombination);
+        expect($productCombinations)->toContainModel($this->variantCombination);
+        expect($productCombinations)->not->toContainModel($anotherCombination);
     });
 
     it('can scope by attribute value', function () {
@@ -121,8 +122,8 @@ describe('VariantCombination Model', function () {
 
         $redCombinations = VariantCombination::byAttributeValue('color', 'red')->get();
 
-        expect($redCombinations)->toContain($redCombination);
-        expect($redCombinations)->not->toContain($blueCombination);
+        expect($redCombinations)->toContainModel($redCombination);
+        expect($redCombinations)->not->toContainModel($blueCombination);
     });
 
     it('can scope by combination', function () {
@@ -147,24 +148,52 @@ describe('VariantCombination Model', function () {
             'size' => 'large',
         ])->get();
 
-        expect($redLargeCombinations)->toContain($redLargeCombination);
-        expect($redLargeCombinations)->not->toContain($blueSmallCombination);
+        expect($redLargeCombinations)->toContainModel($redLargeCombination);
+        expect($redLargeCombinations)->not->toContainModel($blueSmallCombination);
     });
 
     it('can generate combinations for a product', function () {
         $product = Product::factory()->create();
 
-        // Mock attributes for the product
-        $attributes = [
-            ['name' => 'color', 'values' => ['red', 'blue']],
-            ['name' => 'size', 'values' => ['small', 'large']],
-        ];
+        $colorAttribute = \App\Models\Attribute::factory()->create(['name' => 'color']);
+        $sizeAttribute = \App\Models\Attribute::factory()->create(['name' => 'size']);
+
+        \App\Models\AttributeValue::factory()->create([
+            'attribute_id' => $colorAttribute->id,
+            'value' => 'red',
+        ]);
+        \App\Models\AttributeValue::factory()->create([
+            'attribute_id' => $colorAttribute->id,
+            'value' => 'blue',
+        ]);
+
+        \App\Models\AttributeValue::factory()->create([
+            'attribute_id' => $sizeAttribute->id,
+            'value' => 'small',
+        ]);
+        \App\Models\AttributeValue::factory()->create([
+            'attribute_id' => $sizeAttribute->id,
+            'value' => 'large',
+        ]);
+
+        $product->attributes()->attach([$colorAttribute->id, $sizeAttribute->id]);
 
         $combinations = VariantCombination::generateCombinations($product);
 
         expect($combinations)->toBeArray();
-        // Should generate 2 * 2 = 4 combinations
-        expect(count($combinations))->toBe(4);
+        expect($combinations)->toHaveCount(4);
+        expect($combinations)->toContain(['color' => 'blue', 'size' => 'large']);
+    });
+
+    it('falls back to deterministic payloads when no attributes exist', function () {
+        $product = Product::factory()->create();
+
+        $combinations = VariantCombination::generateCombinations($product);
+
+        expect($combinations)->toHaveCount(1);
+        expect($combinations[0])->toBe([
+            '__fallback' => 'product-'.(string) $product->getKey(),
+        ]);
     });
 
     it('can create combinations for a product', function () {
@@ -260,7 +289,9 @@ describe('VariantCombination Model', function () {
         ]);
 
         expect($emptyCombination->formatted_combinations)->toBe('No combinations');
-        expect($emptyCombination->combination_hash)->toBe('');
+        expect($emptyCombination->combination_hash)->toBe(
+            hash('sha256', 'fallback:'.$this->product->getKey())
+        );
     });
 
     it('handles null attribute combinations', function () {
@@ -270,7 +301,9 @@ describe('VariantCombination Model', function () {
         ]);
 
         expect($nullCombination->formatted_combinations)->toBe('No combinations');
-        expect($nullCombination->combination_hash)->toBe('');
+        expect($nullCombination->combination_hash)->toBe(
+            hash('sha256', 'fallback:'.$this->product->getKey())
+        );
     });
 
     it('can be created with factory', function () {
@@ -292,5 +325,20 @@ describe('VariantCombination Model', function () {
         expect($combination->product_id)->toBe($this->product->id);
         expect($combination->attribute_combinations)->toBe(['test' => 'value']);
         expect($combination->is_available)->toBeFalse();
+    });
+
+    it('hydrates cached combinations for strict model comparisons', function () {
+        VariantCombination::refreshCombinationCacheForProduct($this->product->id);
+
+        $cached = VariantCombination::cachedForProduct($this->product->id);
+
+        expect($cached)->toBeInstanceOf(\Illuminate\Database\Eloquent\Collection::class);
+        expect($cached)->toContainModel($this->variantCombination);
+
+        $this->variantCombination->delete();
+
+        $cachedAfterDelete = VariantCombination::cachedForProduct($this->product->id);
+
+        expect($cachedAfterDelete)->not->toContainModel($this->variantCombination);
     });
 });
