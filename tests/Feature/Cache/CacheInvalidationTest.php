@@ -99,4 +99,29 @@ final class CacheInvalidationTest extends TestCase
             CacheKeys::categoryTag($category->id),
         ]);
     }
+
+    public function test_product_brand_change_flushes_previous_brand_cache(): void
+    {
+        $fake = TagAwareCache::fake();
+
+        $originalBrand = Brand::factory()->create();
+        $newBrand = Brand::factory()->create();
+
+        $product = Product::factory()->published()->create([
+            'brand_id' => $originalBrand->id,
+            'is_visible' => true,
+            'published_at' => now(),
+        ]);
+
+        // Reassign the product to a different brand to ensure both brand caches are purged.
+        $product->update(['brand_id' => $newBrand->id]);
+
+        $fake->assertFlushed([
+            CacheKeys::homeTag(),
+            CacheKeys::productAggregateTag(),
+            CacheKeys::productTag($product->id),
+            CacheKeys::brandTag($originalBrand->id),
+            CacheKeys::brandTag($newBrand->id),
+        ]);
+    }
 }
