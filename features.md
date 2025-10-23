@@ -46,6 +46,7 @@
   storefront metrics while trimming duplicate queries from feature coverage.
 
 ## Admin panel resilience
+- Customer Management resource now aligns its form/table signatures with Filament v4, restores locale-aware field mappings, and re-enables email/active filters so customer moderation tests cover the intended workflows without runtime errors.
 - Filament top navigation widget surfaces the enum-driven metadata with admin/role checks and deterministic ordering, letting Livewire tests confirm visibility rules without missing groups or inconsistent priorities.
 - Attribute administration keeps validation rule strings verbatim, surfaces array-based rules as comma-separated chips, and pairs with regression tests that prove both paths round-trip correctly through Filament.
 - Filament dashboard tests spin up a minimal widget stack with a temporary Vite manifest and heroicon fallback while keeping full resource/page discovery active, and a dedicated admin authenticate middleware redirects guests to the Filament login screen, keeping feature coverage aligned with browser flows.
