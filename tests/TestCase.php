@@ -12,7 +12,8 @@ use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schema;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -46,6 +47,12 @@ abstract class TestCase extends BaseTestCase
         // Ensure Telescope doesn't use MySQL during tests and avoid watchers overhead
         Config::set('telescope.enabled', false);
         Config::set('telescope.storage.database.connection', 'sqlite');
+
+        if (! Schema::hasTable('users')) {
+            // Guarantee that the core migrations are available before factories interact with the database, especially when
+            // running focused suites where RefreshDatabase may not have warmed the in-memory sqlite schema yet.
+            Artisan::call('migrate');
+        }
         $this->refreshTranslationLoader();
         app()->instance('request', Request::create('/'));
         $this->withoutMiddleware([
