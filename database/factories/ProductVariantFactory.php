@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Services\ProductVariantAttributeMatrixService;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 /**
@@ -20,28 +21,40 @@ class ProductVariantFactory extends Factory
 
     public function definition(): array
     {
-        return [
-            'product_id' => Product::factory(),
-            'name' => Str::title($this->faker->words(2, true)),
-            'sku' => strtoupper(Str::random(12)),
-            'barcode' => $this->faker->boolean(40) ? strtoupper(Str::random(12)) : null,
-            'price' => $this->faker->randomFloat(2, 10, 500),
-            'compare_price' => $this->faker->boolean(30) ? $this->faker->randomFloat(2, 500, 800) : null,
-            'cost_price' => $this->faker->randomFloat(2, 5, 300),
-            'stock_quantity' => $this->faker->numberBetween(0, 100),
-            'weight' => $this->faker->randomFloat(3, 0.1, 10.0),
-            'track_inventory' => $this->faker->boolean(80),
-            'is_default' => $this->faker->boolean(10),
-            'is_enabled' => true,
-            'attributes' => null,
+        $attributes = [
+            'product_id'               => Product::factory(),
+            'name'                     => Str::title($this->faker->words(2, true)),
+            'sku'                      => strtoupper(Str::random(12)),
+            'barcode'                  => $this->faker->boolean(40) ? strtoupper(Str::random(12)) : null,
+            'price'                    => $this->faker->randomFloat(2, 10, 500),
+            'compare_price'            => $this->faker->boolean(30) ? $this->faker->randomFloat(2, 500, 800) : null,
+            'cost_price'               => $this->faker->randomFloat(2, 5, 300),
+            'stock_quantity'           => $this->faker->numberBetween(0, 100),
+            'weight'                   => $this->faker->randomFloat(3, 0.1, 10.0),
+            'track_inventory'          => $this->faker->boolean(80),
+            'is_default'               => $this->faker->boolean(10),
+            'is_enabled'               => true,
+            'attributes'               => null,
             'variant_attribute_matrix' => null,
         ];
+
+        // Skip matrix storage when the backing schema does not expose the JSON column
+        // (for example, simplified schemas defined inside isolated component tests).
+        if (! Schema::hasColumn((new ProductVariant)->getTable(), 'variant_attribute_matrix')) {
+            unset($attributes['variant_attribute_matrix']);
+        }
+
+        return $attributes;
     }
 
     public function configure(): static
     {
         return $this
             ->afterMaking(function (ProductVariant $variant): void {
+                if (! Schema::hasColumn($variant->getTable(), 'variant_attribute_matrix')) {
+                    return;
+                }
+
                 if (! empty($variant->variant_attribute_matrix)) {
                     return;
                 }
@@ -50,6 +63,10 @@ class ProductVariantFactory extends Factory
             })
             ->afterCreating(function (ProductVariant $variant): void {
                 $this->createTranslations($variant);
+
+                if (! Schema::hasColumn($variant->getTable(), 'variant_attribute_matrix')) {
+                    return;
+                }
 
                 $matrix = $variant->variant_attribute_matrix;
 
@@ -86,7 +103,7 @@ class ProductVariantFactory extends Factory
         return $attributes
             ->filter(fn ($attribute) => $attribute->values->isNotEmpty())
             ->mapWithKeys(fn ($attribute) => [
-                'attribute_'.$attribute->getKey() => $attribute->values->first()->getKey(),
+                'attribute_' . $attribute->getKey() => $attribute->values->first()->getKey(),
             ])
             ->all();
     }
