@@ -8,7 +8,7 @@
 - Shipping option entities once again declare their zone relationship, eligibility checks, and filter scopes, ensuring fulfilment automation and tests can target the correct carrier records without custom query shims.
 
 ## Data integrity & seeding
-- Variant analytics records now seed a zero conversion rate when none is supplied, keeping SQLite migrations and automated tracking tests from failing with NOT NULL violations.
+- User behavior analytics now skip storefront scopes when linking products or categories, and category factories suffix slugs with unique tokens so SQLite test runs avoid null relations and duplicate key violations.
 - Demo store seeder now calls the collection and collection-product seeders, ensuring curated collections always feature representative products during fresh installs and automated demos.
 - PHPUnit harness now provisions a shared `database/testing.sqlite` file, runs a focused SQLite migration that seeds Spatie permission tables and variant attribute pivots, and registers Filament SearchableInput payload macros so suites share deterministic schema state without losing compatibility.
 - Region hierarchies and the `customers` table now provision automatically during SQLite migrations, ensuring factories, analytics widgets, and Filament resources can persist customer journeys without manual schema patches.
