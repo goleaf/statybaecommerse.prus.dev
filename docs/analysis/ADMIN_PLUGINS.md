@@ -120,6 +120,17 @@ This document provides an overview of all Filament v4 plugins installed and conf
   - Seamless integration via `LaraZeus\\InlineChart\\Tables\\Columns\\InlineChart`
 - **Usage**: Apply the `InlineChart` column in table definitions and point it to `App\\Filament\\Widgets\\InlineCharts\\ProductSalesSparkline` or `CustomerOrdersSparkline` to share the cached datasets.
 
+### 12. Spatie Translatable Locale Switcher
+- **Package**: `lara-zeus/spatie-translatable`
+- **Purpose**: Adds a locale switcher to Filament resources backed by `spatie/laravel-translatable`
+- **Configuration**:
+  - `defaultLocales([...])`: Populated from `config('shared.localization.supported_locales')`; update `config/shared.php` to change the languages available in the admin and storefront.
+  - `persist()`: Enabled in `App\Providers\Filament\AdminPanelProvider` so editors resume in their last used locale after navigating away or signing back in.
+- **Resource integration**:
+  - Resources include the aliased `LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable` trait to expose locale-aware form fields.
+  - Resource pages (`Create*`, `Edit*`, `List*`, `View*`) mix in the matching traits from the package so the toolbar locale switcher and the form payload stay aligned with the active language.
+- **Further reading**: See the [Admin Translations Guide](analysis/FILAMENT_V4_IMPLEMENTATION_SUMMARY.md#spatie-translatable) for end-to-end usage patterns and translation tab conventions.
+
 ## Demo Implementation
 
 The project includes a complete demonstration of all plugins through the `Post` model and `PostResource`:
