@@ -6,6 +6,8 @@ namespace App\Filament\Resources;
 
 
 use App\Support\Concerns\HasNav;
+// Import shared helper to keep searchable inputs consistent with repository conventions.
+use App\Support\Filament\SearchableInputHelper;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\CouponUsageResource\Pages;
 use App\Models\Coupon;
@@ -14,7 +16,8 @@ use App\Support\Filament\Components\Flatpickr;
 use App\Support\Search\CouponSearch;
 use App\Support\Search\CustomerSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
-use Filament\Forms\Components\Grid;
+// Alias schema grid to match Filament v4 schema-based layouts in the resource.
+use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
 use Filament\Schemas\Components\Section as SchemaSection;
