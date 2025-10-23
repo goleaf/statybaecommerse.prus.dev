@@ -6,7 +6,6 @@ namespace App\Filament\Pages;
 
 use BackedEnum;
 use Filament\Pages\Page;
-
 final class AdvancedReports extends Page
 {
     /**
@@ -16,7 +15,10 @@ final class AdvancedReports extends Page
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Analytics';
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Analytics';
+    }
 
     protected static ?string $title = 'Advanced Reports';
 
