@@ -36,7 +36,10 @@ use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ViewColumn;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
@@ -171,7 +174,7 @@ final class PostResource extends Resource
                                     ])
                                     ->default('draft')
                                     ->required()
-                                    ->disableOptionWhen('published', fn (): bool => true)
+                                    ->disableOptionWhen(fn (string $value): bool => $value === 'published')
                                     ->helperText(__('posts.status_managed_by_workflow')),
                                 Select::make('user_id')
                                     ->label(__('posts.fields.user_id'))
