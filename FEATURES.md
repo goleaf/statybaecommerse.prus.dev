@@ -17,7 +17,11 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
-- Admin campaign conversion endpoints now return lightweight HTML listings, verification toggles, and CSV exports so automated coverage can validate analytics-ready data without booting the Filament Livewire stack.
+- Customer group administration now aligns with Filament v4 action APIs, bridges the legacy `create` Livewire helper, defaults
+  decimal fields for SQLite runs, and flattens single-locale translations back to plain strings so regression tests and admin
+  workflows stay stable without sacrificing multilingual editing.
+- Customer group activation toggles now keep the `is_active` and `is_enabled` columns mirrored, coercing boolean-like payloads
+  from factories, seeders, and Filament forms so downstream scopes and dashboards reflect the intended state consistently.
 - Brands page now features a light-themed layout, shared card components, and refreshed translations so the partner directory feels consistent across locales.
 - Attribute group selectors now rely on a shared translation helper so historical slugs show friendly labels across Filament forms, tables, and filters instead of exposing raw keys.
 - Region-to-city lookups and the dedicated customers table are restored for the SQLite harness, ensuring analytics sparklines, customer factories, and Filament resources can attach geographic metadata without migration errors.

@@ -48,7 +48,9 @@
 - OpenAPI documentation now mirrors the lean product meta payload and nullable media thumbnails emitted by the presenter, keeping schema validators and client SDKs in sync with production responses.
 
 ## Admin panel resilience
-- Campaign conversion HTTP fallbacks now expose filterable HTML, verification toggles, and CSV exports so HTTP feature tests can assert outcomes without booting the Filament Livewire stack.
+- Customer group management now honours Filament v4 action namespaces, bridges the legacy `create` helper to mounted actions, sets sensible defaults for discount fields, and normalises single-locale translations back to plain strings so regression tests and admin workflows stay aligned without sacrificing multilingual support.
+- Customer group activation toggles now mirror `is_active` and `is_enabled` updates, coercing boolean-like values from forms,
+  factories, and seed data so scopes, dashboards, and legacy queries all read the same state.
 - Attribute administration keeps validation rule strings verbatim, surfaces array-based rules as comma-separated chips, and pairs with regression tests that prove both paths round-trip correctly through Filament.
 - Attribute group filters, columns, and form selectors now share a translation fallback so legacy group slugs render as readable labels instead of raw keys throughout the Filament admin.
 - Filament dashboard access checks now fall back to open access when no

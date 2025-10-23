@@ -7,7 +7,11 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Bug Fixes
-* Added lightweight admin HTTP endpoints for campaign conversions so feature tests can exercise filtering, verification, attribution, import/export, and CRUD flows without relying on Livewire rendering, alongside schema defaults that expose verification flags for assertions.
+* Realigned customer group management with Filament v4 by using the new action namespaces, defaulting decimal fields, bridging
+  the legacy `create` helper, and normalising single-locale translations back to plain strings so the refreshed regression suite
+  can assert legacy data without sacrificing multilingual support.
+* Synced the `is_active` and `is_enabled` customer group flags both ways, normalising boolean-like payloads so factories, admin
+  forms, and scoped queries all agree on a group's activation state.
 * Re-enabled flexible system setting translations by replacing the locale uniqueness constraint with an index, restoring soft delete support, and trimming the fillable contract so replication and counting scenarios match the documented API.
 * Preserved Attribute validation rule strings while still decoding JSON arrays, refreshed the Filament form so arrays render as comma-separated chips, and added regression coverage for both storage paths.
 * Normalized attribute group labels inside the Filament resource so legacy slugs fall back to readable headlines when translations are missing, keeping filters, columns, and forms from leaking raw keys in admin listings.

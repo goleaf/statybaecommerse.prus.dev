@@ -26,4 +26,20 @@ abstract class BaseListRecords extends ListRecords
 
         return $this->applyToggleableTableLayout($table);
     }
+
+    /**
+     * Bridge legacy Livewire test helpers that still call the `create` method directly.
+     */
+    public function create(): void
+    {
+        $activeActions = $this->mountedActions ?? [];
+
+        if ($activeActions !== [] && ($activeActions[array_key_last($activeActions)]['name'] ?? null) === 'create') {
+            $this->callMountedAction();
+
+            return;
+        }
+
+        $this->mountAction('create');
+    }
 }
