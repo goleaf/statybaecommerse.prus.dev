@@ -44,8 +44,8 @@ final class ReferralCodeResource extends Resource
 
     public static function form(Schema $form): Schema
     {
-        // Configure the Filament resource form schema using the v4 Schema API.
-        return $schema
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
+        return $form
             ->components([
                 Section::make(__('referral.resource.referral_code.section.code_details'))
                     ->columns(2)
@@ -135,7 +135,7 @@ final class ReferralCodeResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Configure the Filament table definition for the resource.
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->query(ReferralCode::query()->withoutGlobalScopes())
             ->columns([

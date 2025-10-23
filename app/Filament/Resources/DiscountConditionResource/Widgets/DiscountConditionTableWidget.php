@@ -20,7 +20,7 @@ final class DiscountConditionTableWidget extends BaseWidget
 
     public function table(Table $table): Table
     {
-        // Configure the Filament table definition for the resource.
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->query(
                 DiscountCondition::query()->latest('created_at')->limit(10)

@@ -24,7 +24,7 @@ use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-use BackedEnum;
+use Filament\Schemas\Schema;
 
 final class AnalyticsResource extends Resource
 {
@@ -71,13 +71,13 @@ final class AnalyticsResource extends Resource
 
     public static function form(Schema $form): Schema
     {
-        // Configure the Filament resource form schema using the v4 Schema API.
-        return $schema;
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
+        return $form;
     }
 
     public static function table(Table $table): Table
     {
-        // Configure the Filament table definition for the resource.
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             // Preload frequently accessed relationships so table metrics do not suffer from N+1 queries.
             ->modifyQueryUsing(

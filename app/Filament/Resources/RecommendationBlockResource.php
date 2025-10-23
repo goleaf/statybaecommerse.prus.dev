@@ -28,6 +28,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Schemas\Schema;
 use UnitEnum;
 
 /**
@@ -44,7 +45,7 @@ final class RecommendationBlockResource extends Resource
     /**
      * @var string|\BackedEnum|null Tracks the navigation group while remaining Filament compatible.
      */
-    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::Products;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 13;
 
@@ -88,8 +89,8 @@ final class RecommendationBlockResource extends Resource
      */
     public static function form(Schema $form): Schema
     {
-        // Configure the Filament resource form schema using the v4 Schema API.
-        return $schema->schema([
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
+        return $form->schema([
             Section::make(__('recommendation_blocks.basic_information'))
                 ->schema([
                     TextInput::make('name')
@@ -165,7 +166,7 @@ final class RecommendationBlockResource extends Resource
      */
     public static function table(Table $table): Table
     {
-        // Configure the Filament table definition for the resource.
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('name')

@@ -179,8 +179,8 @@ final class ProductResource extends Resource implements DefinesExportColumns
 
     public static function form(Schema $form): Schema
     {
-        // Configure the Filament resource form schema using the v4 Schema API.
-        return $schema
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
+        return $form
             ->components([
                 Tabs::make('Product Information')
                     ->tabs([
@@ -450,7 +450,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
 
     public static function table(Table $table): Table
     {
-        // Configure the Filament table definition for the resource.
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->defaultPaginationPageOption(25)
             ->paginationPageOptions([25, 50, 100])

@@ -40,6 +40,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Filament\Schemas\Schema;
 use UnitEnum;
 
 /**
@@ -56,7 +57,7 @@ final class SystemSettingCategoryResource extends Resource
     /**
      * @var string|BackedEnum|null Keep navigation grouping aligned with the shared enum helper.
      */
-    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::System;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
 
     public static function getNavigationGroup(): ?string
     {
@@ -101,8 +102,8 @@ final class SystemSettingCategoryResource extends Resource
      */
     public static function form(Schema $form): Schema
     {
-        // Configure the Filament resource form schema using the v4 Schema API.
-        return $schema
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
+        return $form
             ->schema([
                 Section::make(__('system_setting_categories.basic_information'))
                     ->schema([
@@ -188,7 +189,7 @@ final class SystemSettingCategoryResource extends Resource
      */
     public static function table(Table $table): Table
     {
-        // Configure the Filament table definition for the resource.
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->modifyQueryUsing(static fn (Builder $query): Builder => $query->withoutGlobalScopes([ActiveScope::class]))
             ->deferLoading(false)

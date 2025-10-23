@@ -18,7 +18,7 @@ abstract class BaseRelationManager extends RelationManager
 
     public function table(Table $table): Table
     {
-        // Configure the shared relation manager table, ensuring toggleable layouts remain applied.
+        // Configure the base relation manager table to align with Filament v4's required return type.
         $table = parent::table($table);
 
         return $this->applyToggleableTableLayout($table);

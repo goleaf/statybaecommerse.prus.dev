@@ -16,17 +16,14 @@ use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\AddressSearch;
 use App\Support\Search\CustomerSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Components\Utilities\Set;
-use Filament\Schemas\Schema;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
@@ -105,9 +102,10 @@ final class AddressResource extends Resource
     /**
      * Configure the Filament form schema using the Schema API introduced in Filament v4.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Configure the Filament resource form schema using the v4 Schema API.
+        // Return the schema instance so that the resource complies with the
+        // Filament v4 expectations introduced by the Schema-based APIs.
         return $schema->schema([
             Section::make(__('translations.address_information'))
                 ->components([
@@ -338,7 +336,7 @@ final class AddressResource extends Resource
      */
     public static function table(Table $table): Table
     {
-        // Configure the Filament table definition for the resource.
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             // Returning the configured Table instance ensures bulk actions remain type-checked by Filament.
             ->columns([

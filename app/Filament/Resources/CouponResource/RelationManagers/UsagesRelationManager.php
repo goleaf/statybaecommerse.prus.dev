@@ -30,8 +30,8 @@ final class UsagesRelationManager extends BaseRelationManager
 
     public function form(Schema $form): Schema
     {
-        // Configure the Filament resource form schema using the v4 Schema API.
-        return $schema->schema([
+        // Bridge the relation manager form to the Schema-based builder expected by Filament v4.
+        return $form->schema([
             Forms\Components\Select::make('user_id')
                 ->label(__('admin.common.user'))
                 ->relationship('user', 'name')
@@ -56,7 +56,7 @@ final class UsagesRelationManager extends BaseRelationManager
 
     public function table(Table $table): Table
     {
-        // Configure the Filament table definition for the resource.
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->recordTitleAttribute('used_at')
             ->columns([

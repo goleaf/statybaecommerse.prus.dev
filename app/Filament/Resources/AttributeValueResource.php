@@ -85,8 +85,8 @@ final class AttributeValueResource extends Resource
 
     public static function form(Schema $form): Schema
     {
-        // Configure the Filament resource form schema using the v4 Schema API.
-        return $schema->schema([
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
+        return $form->schema([
             Section::make(__('attribute_values.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -167,7 +167,7 @@ final class AttributeValueResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Configure the Filament table definition for the resource.
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('attribute.name')

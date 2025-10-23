@@ -85,7 +85,7 @@ final class CollectionRuleResource extends Resource
      */
     public static function form(Schema $form): Schema
     {
-        // Configure the Filament resource form schema using the v4 Schema API.
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         // Expose the schema via the Filament v4 `Form` instance to drop the deprecated array fallback.
         return $schema->schema([
             Tabs::make('collection_rule_tabs')
@@ -169,7 +169,7 @@ final class CollectionRuleResource extends Resource
      */
     public static function table(Table $table): Table
     {
-        // Configure the Filament table definition for the resource.
+        // Configure the table definition for the streamlined Filament v4 return type.
         // Publish the full table definition through the Filament v4 `Table` signature for consistency.
         return $table
             ->columns([

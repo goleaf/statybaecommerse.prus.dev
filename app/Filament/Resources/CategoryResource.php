@@ -33,15 +33,16 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
+use Filament\Schemas\Schema;
 use UnitEnum;
 
 final class CategoryResource extends Resource
 {
-    /** @var string|\BackedEnum|null Keep compatibility with Filament v4 navigation icon expectations. */
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-tag';
+    /** @var string|BackedEnum|null Keep compatibility with Filament v4 navigation icon expectations. */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
-    /** @var string|\UnitEnum|null Align the resource under the Products navigation section. */
-    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::Products;
+    /** @var string|BackedEnum|null Align the resource under the Products navigation section. */
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 3;
 
@@ -101,8 +102,8 @@ final class CategoryResource extends Resource
 
     public static function form(Schema $form): Schema
     {
-        // Configure the Filament resource form schema using the v4 Schema API.
-        return $schema->schema([
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
+        return $form->schema([
             Section::make(__('categories.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -199,7 +200,7 @@ final class CategoryResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Configure the Filament table definition for the resource.
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 ImageColumn::make('image')
