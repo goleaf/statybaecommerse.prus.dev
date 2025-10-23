@@ -20,6 +20,7 @@ composer.lock
 /public/storage
 /storage/*.key
 /storage/app/coverage/
+/storage/app/backups/
 /storage/pail
 /vendor
 database/testing.sqlite
@@ -30,11 +31,6 @@ Thumbs.db
 # Backup archives
 *.sql.gz
 *.tar
-
-# Prevent accidental commits of session and network capture artifacts
-*cookies*.txt
-*.session
-*.har
 
 # PHPDoc generated files
 /docs/html/
