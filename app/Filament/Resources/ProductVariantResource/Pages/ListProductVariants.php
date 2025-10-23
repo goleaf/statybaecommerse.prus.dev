@@ -41,12 +41,7 @@ final class ListProductVariants extends BaseListRecords
                                 ->orWhere('available_quantity', '>', 0);
                         }
                     )
-                )
-                ->value(fn () => $this->getResource()::getEloquentQuery()
-                    ->where(fn (Builder $query) => $query
-                        ->where('track_inventory', false)
-                        ->orWhere('available_quantity', '>', 0)
-                    )->count()),
+                ),
 
             'low_stock' => WidgetTab::make(__('product_variants.tabs.low_stock'))
                 ->icon('heroicon-o-exclamation-triangle')
@@ -54,11 +49,7 @@ final class ListProductVariants extends BaseListRecords
                     fn (Builder $query) => $query
                         ->where('track_inventory', true)
                         ->whereColumn('available_quantity', '<=', 'low_stock_threshold')
-                )
-                ->value(fn () => $this->getResource()::getEloquentQuery()
-                    ->where('track_inventory', true)
-                    ->whereColumn('available_quantity', '<=', 'low_stock_threshold')
-                    ->count()),
+                ),
 
             'out_of_stock' => WidgetTab::make(__('product_variants.tabs.out_of_stock'))
                 ->icon('heroicon-o-x-circle')
@@ -66,11 +57,7 @@ final class ListProductVariants extends BaseListRecords
                     fn (Builder $query) => $query
                         ->where('track_inventory', true)
                         ->where('available_quantity', '<=', 0)
-                )
-                ->value(fn () => $this->getResource()::getEloquentQuery()
-                    ->where('track_inventory', true)
-                    ->where('available_quantity', '<=', 0)
-                    ->count()),
+                ),
 
             'size_variants' => WidgetTab::make(__('product_variants.tabs.size_variants'))
                 ->icon('heroicon-o-cube')
