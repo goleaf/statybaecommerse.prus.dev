@@ -9,103 +9,122 @@ use App\Models\ProductImage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\TestCase;
 
+/**
+ * @internal
+ */
 final class ApiEndpointsTest extends TestCase
 {
     use RefreshDatabase;
 
     public function test_search_products_returns_media_attributes(): void
     {
-        // Create a published product so it is discoverable via the scoped product query.
-        $product = Product::factory()->create([
-            'name'         => 'Test Searchable Product',
-            'is_visible'   => true,
-            'status'       => 'published',
-            'published_at' => now(),
+        // Arrange: create a visible product with media so the API has data to expose.
+        $visibleProduct = Product::factory()
+            ->published()
+            ->create([
+                'name' => 'Test Searchable Product',
+            ]);
+
+        ProductImage::factory()
+            ->for($visibleProduct)
+            ->create([
+                'path'       => 'product-images/test-search-product.jpg',
+                'sort_order' => 0,
+            ]);
+
+        // Arrange: ensure drafts never leak into the storefront endpoint.
+        Product::factory()->create([
+            'name'         => 'Hidden Product',
+            'status'       => 'draft',
+            'is_visible'   => false,
+            'published_at' => null,
         ]);
 
-        // Attach a product image to populate the computed main_image/thumbnail attributes.
-        ProductImage::factory()->for($product)->create([
-            'path'       => 'product-images/test-search-product.jpg',
-            'sort_order' => 0,
-        ]);
-
-        // Issue the frontend search request and capture the payload for assertions.
+        // Act: hit the search endpoint with a query that should match the product.
         $response = $this->getJson(route('frontend.api.products.search', ['q' => 'Searchable']));
+
+        // Assert: validate HTTP response and ensure media keys are present.
         $response->assertOk();
 
         $payload = $response->json();
+
         self::assertIsArray($payload);
         self::assertNotEmpty($payload);
 
         $result = array_values($payload)[0];
         self::assertIsArray($result);
-        /** @var array<string, mixed> $result */
-        $result = $result;
 
-        // Ensure the normalized media keys are present while the deprecated image key is absent.
+        // Assert: only the published product should be returned by the API.
+        self::assertSame($visibleProduct->getKey(), $result['id']);
         self::assertArrayHasKey('main_image', $result);
         self::assertArrayHasKey('thumbnail', $result);
-        self::assertArrayNotHasKey('image', $result);
+        self::assertArrayHasKey('image', $result);
 
-        $product = $product->fresh();
-        self::assertInstanceOf(Product::class, $product);
+        $visibleProduct = $visibleProduct->fresh();
+        self::assertInstanceOf(Product::class, $visibleProduct);
 
-        // Confirm that the computed media paths match what the API returned.
-        self::assertSame($product->main_image, $result['main_image']);
-        self::assertSame($product->thumbnail, $result['thumbnail']);
+        self::assertSame($visibleProduct->main_image, $result['main_image']);
+        // Confirm the legacy `image` key mirrors the new main image accessor.
+        self::assertSame($visibleProduct->main_image, $result['image']);
+        self::assertSame($visibleProduct->thumbnail, $result['thumbnail']);
     }
 
     public function test_recently_viewed_products_return_media_attributes(): void
     {
-        // Create two published products with media so the recently viewed endpoint has data to hydrate.
-        $firstProduct = Product::factory()->create([
-            'name'         => 'First Viewed Product',
-            'is_visible'   => true,
-            'status'       => 'published',
-            'published_at' => now(),
-        ]);
-        ProductImage::factory()->for($firstProduct)->create([
-            'path'       => 'product-images/first-viewed.jpg',
-            'sort_order' => 0,
-        ]);
+        // Arrange: seed two products to mimic user history order.
+        $firstProduct = Product::factory()
+            ->published()
+            ->create([
+                'name' => 'First Viewed Product',
+            ]);
 
-        $secondProduct = Product::factory()->create([
-            'name'         => 'Second Viewed Product',
-            'is_visible'   => true,
-            'status'       => 'published',
-            'published_at' => now(),
-        ]);
-        ProductImage::factory()->for($secondProduct)->create([
-            'path'       => 'product-images/second-viewed.jpg',
-            'sort_order' => 0,
-        ]);
+        ProductImage::factory()
+            ->for($firstProduct)
+            ->create([
+                'path'       => 'product-images/first-viewed.jpg',
+                'sort_order' => 0,
+            ]);
 
-        // Seed the session so that the endpoint returns both items in the expected order.
+        $secondProduct = Product::factory()
+            ->published()
+            ->create([
+                'name' => 'Second Viewed Product',
+            ]);
+
+        ProductImage::factory()
+            ->for($secondProduct)
+            ->create([
+                'path'       => 'product-images/second-viewed.jpg',
+                'sort_order' => 0,
+            ]);
+
+        // Act: emulate a session history where the second product was viewed last.
         $response = $this->withSession([
             'recently_viewed' => [$secondProduct->id, $firstProduct->id],
         ])->getJson(route('frontend.api.recently-viewed'));
+
+        // Assert: response order should respect the session and include media fields.
         $response->assertOk();
 
         $payload = $response->json();
+
         self::assertIsArray($payload);
         self::assertCount(2, $payload);
 
         $firstResult = array_values($payload)[0];
         self::assertIsArray($firstResult);
-        /** @var array<string, mixed> $firstResult */
-        $firstResult = $firstResult;
 
-        // The latest viewed product should be first and should expose normalized media fields.
         self::assertSame($secondProduct->id, $firstResult['id']);
         self::assertArrayHasKey('main_image', $firstResult);
         self::assertArrayHasKey('thumbnail', $firstResult);
-        self::assertArrayNotHasKey('image', $firstResult);
+        self::assertArrayHasKey('image', $firstResult);
 
         $secondProduct = $secondProduct->fresh();
         self::assertInstanceOf(Product::class, $secondProduct);
 
-        // Confirm the API payload mirrors the product's computed media attributes.
         self::assertSame($secondProduct->main_image, $firstResult['main_image']);
+        // The compatibility alias should reflect the same media accessor as `main_image`.
+        self::assertSame($secondProduct->main_image, $firstResult['image']);
         self::assertSame($secondProduct->thumbnail, $firstResult['thumbnail']);
     }
 }

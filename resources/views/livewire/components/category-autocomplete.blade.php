@@ -143,7 +143,7 @@
                         <div class="flex items-center space-x-3">
                             {{-- Category Image --}}
                             <div class="flex-shrink-0">
-                                {{-- Calculate the category thumbnail while supporting legacy payloads. --}}
+                                {{-- Support the new media keys while gracefully degrading to legacy data. --}}
                                 @php($image = $result['main_image'] ?? $result['thumbnail'] ?? ($result['image'] ?? null))
                                 @if($image)
                                     <img
