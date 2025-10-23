@@ -7,11 +7,17 @@ namespace App\Filament\Resources;
 use App\Data\ExportRequestData;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
+use App\Support\Authorization\AuthorizationMatrix;
+use App\Services\Export\ExportColumn;
+use App\Services\Export\ExportService;
+use App\Services\Export\Exporters\UserExport;
+use BackedEnum;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -58,41 +64,6 @@ final class UserResource extends Resource implements DefinesExportColumns
     public static function shouldRegisterNavigation(): bool
     {
         return AuthorizationMatrix::check('users', 'viewAny');
-    }
-
-    public static function canViewAny(): bool
-    {
-        return AuthorizationMatrix::check('users', 'viewAny');
-    }
-
-    public static function canView(Model $record): bool
-    {
-        return AuthorizationMatrix::check('users', 'view');
-    }
-
-    public static function canCreate(): bool
-    {
-        return AuthorizationMatrix::check('users', 'create');
-    }
-
-    public static function canEdit(Model $record): bool
-    {
-        return AuthorizationMatrix::check('users', 'update');
-    }
-
-    public static function canDelete(Model $record): bool
-    {
-        return AuthorizationMatrix::check('users', 'delete');
-    }
-
-    public static function canForceDelete(Model $record): bool
-    {
-        return AuthorizationMatrix::check('users', 'delete');
-    }
-
-    public static function canRestore(Model $record): bool
-    {
-        return AuthorizationMatrix::check('users', 'update');
     }
 
     /**
@@ -233,9 +204,9 @@ final class UserResource extends Resource implements DefinesExportColumns
             ])
             ->actions([
                 EditAction::make()
-                    ->visible(fn (User $record): bool => static::authorizeUser($record, 'update')),
+                    ->visible(fn () => AuthorizationMatrix::check('users', 'update')),
                 DeleteAction::make()
-                    ->visible(fn (User $record): bool => static::authorizeUser($record, 'delete')),
+                    ->visible(fn () => AuthorizationMatrix::check('users', 'delete')),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -281,7 +252,8 @@ final class UserResource extends Resource implements DefinesExportColumns
                                 ->success()
                                 ->send();
                         })
-                        ->deselectRecordsAfterCompletion(),
+                        ->deselectRecordsAfterCompletion()
+                        ->visible(fn () => AuthorizationMatrix::check('users', 'viewAny')),
                     BulkAction::make('activate')
                         ->label(__('users.actions.activate'))
                         ->icon('heroicon-o-check-circle')
@@ -292,7 +264,7 @@ final class UserResource extends Resource implements DefinesExportColumns
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn (): bool => static::authorizeUser(null, 'update')),
+                        ->visible(fn () => AuthorizationMatrix::check('users', 'update')),
                     BulkAction::make('deactivate')
                         ->label(__('users.actions.deactivate'))
                         ->icon('heroicon-o-x-circle')
@@ -303,10 +275,10 @@ final class UserResource extends Resource implements DefinesExportColumns
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn (): bool => static::authorizeUser(null, 'update')),
+                        ->visible(fn () => AuthorizationMatrix::check('users', 'update')),
                     DeleteBulkAction::make()
-                        ->visible(fn (): bool => static::authorizeUser(null, 'delete')),
-                ])->visible(fn (): bool => static::authorizeUser(null, 'update') || static::authorizeUser(null, 'delete')),
+                        ->visible(fn () => AuthorizationMatrix::check('users', 'delete')),
+                ]),
             ])
             ->defaultSort('created_at', 'desc');
     }

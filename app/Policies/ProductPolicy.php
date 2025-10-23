@@ -4,43 +4,49 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Models\AdminUser;
 use App\Models\Product;
 use App\Models\User;
-use App\Policies\Concerns\HandlesRolePermissions;
-use Illuminate\Auth\Access\HandlesAuthorization;
+use App\Support\Authorization\AuthorizationMatrix;
 
 final class ProductPolicy
 {
-    use HandlesAuthorization;
-    use HandlesRolePermissions;
-
-    public function viewAny(User $user): bool
+    public function viewAny(AdminUser|User $user): bool
     {
-        return $this->allows($user, 'product', 'viewAny');
+        return $user instanceof AdminUser
+            ? AuthorizationMatrix::check('products', 'viewAny', $user)
+            : (bool) ($user->is_admin ?? false);
     }
 
-    public function view(User $user, Product $product): bool
+    public function view(AdminUser|User $user, Product $product): bool
     {
-        return $this->allows($user, 'product', 'view');
+        return $user instanceof AdminUser
+            ? AuthorizationMatrix::check('products', 'view', $user)
+            : (bool) ($user->is_admin ?? false);
     }
 
-    public function create(User $user): bool
+    public function create(AdminUser $user): bool
     {
-        return $this->allows($user, 'product', 'create');
+        return AuthorizationMatrix::check('products', 'create', $user);
     }
 
-    public function update(User $user, Product $product): bool
+    public function update(AdminUser $user, Product $product): bool
     {
-        return $this->allows($user, 'product', 'update');
+        return AuthorizationMatrix::check('products', 'update', $user);
     }
 
-    public function delete(User $user, Product $product): bool
+    public function delete(AdminUser $user, Product $product): bool
     {
-        return $this->allows($user, 'product', 'delete');
+        return AuthorizationMatrix::check('products', 'delete', $user);
     }
 
-    public function restore(User $user, Product $product): bool
+    public function restore(AdminUser $user, Product $product): bool
     {
-        return $this->allows($user, 'product', 'restore');
+        return AuthorizationMatrix::check('products', 'update', $user);
+    }
+
+    public function forceDelete(AdminUser $user, Product $product): bool
+    {
+        return AuthorizationMatrix::check('products', 'delete', $user);
     }
 }

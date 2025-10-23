@@ -45,9 +45,12 @@ final class CategoryResource extends Resource
 
     protected static ?string $model = Category::class;
 
-    
+    public static function shouldRegisterNavigation(): bool
+    {
+        return AuthorizationMatrix::check('categories', 'viewAny');
+    }
 
-    public static function canViewAny(): bool
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         return Gate::allows('viewAny', Category::class);
     }
@@ -259,9 +262,9 @@ final class CategoryResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                    ->visible(fn (Category $record): bool => static::authorizeCategory($record, 'view')),
+                    ->visible(fn () => AuthorizationMatrix::check('categories', 'view')),
                 EditAction::make()
-                    ->visible(fn (Category $record): bool => static::authorizeCategory($record, 'update')),
+                    ->visible(fn () => AuthorizationMatrix::check('categories', 'update')),
                 Action::make('toggle_active')
                     ->label(fn (Category $record): string => $record->is_active ? __('categories.deactivate') : __('categories.activate'))
                     ->icon(fn (Category $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
@@ -274,12 +277,12 @@ final class CategoryResource extends Resource
                             ->send();
                     })
                     ->requiresConfirmation()
-                    ->visible(fn (Category $record): bool => static::authorizeCategory($record, 'update')),
+                    ->visible(fn () => AuthorizationMatrix::check('categories', 'update')),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
-                        ->visible(fn (): bool => static::authorizeCategory(null, 'delete')),
+                        ->visible(fn () => AuthorizationMatrix::check('categories', 'delete')),
                     BulkAction::make('activate')
                         ->label(__('categories.activate_selected'))
                         ->icon('heroicon-o-eye')
@@ -292,7 +295,7 @@ final class CategoryResource extends Resource
                                 ->send();
                         })
                         ->requiresConfirmation()
-                        ->visible(fn (): bool => static::authorizeCategory(null, 'update')),
+                        ->visible(fn () => AuthorizationMatrix::check('categories', 'update')),
                     BulkAction::make('deactivate')
                         ->label(__('categories.deactivate_selected'))
                         ->icon('heroicon-o-eye-slash')
@@ -305,8 +308,8 @@ final class CategoryResource extends Resource
                                 ->send();
                         })
                         ->requiresConfirmation()
-                        ->visible(fn (): bool => static::authorizeCategory(null, 'update')),
-                ])->visible(fn (): bool => static::authorizeCategory(null, 'update') || static::authorizeCategory(null, 'delete')),
+                        ->visible(fn () => AuthorizationMatrix::check('categories', 'update')),
+                ]),
             ])
             ->defaultSort('sort_order');
     }

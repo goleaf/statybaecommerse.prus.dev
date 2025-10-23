@@ -4,42 +4,62 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Models\AdminUser;
 use App\Models\User;
-use App\Policies\Concerns\HandlesRolePermissions;
-use Illuminate\Auth\Access\HandlesAuthorization;
+use App\Support\Authorization\AuthorizationMatrix;
 
 final class UserPolicy
 {
-    use HandlesAuthorization;
-    use HandlesRolePermissions;
-
-    public function viewAny(User $user): bool
+    public function viewAny(AdminUser|User $user): bool
     {
-        return $this->allows($user, 'user', 'viewAny');
+        return $user instanceof AdminUser
+            ? AuthorizationMatrix::check('users', 'viewAny', $user)
+            : (bool) ($user->is_admin ?? false);
     }
 
-    public function view(User $user, User $model): bool
+    public function view(AdminUser|User $user, User $model): bool
     {
-        return $this->allows($user, 'user', 'view');
+        if ($user instanceof AdminUser) {
+            return AuthorizationMatrix::check('users', 'view', $user);
+        }
+
+        if ($user->is_admin ?? false) {
+            return true;
+        }
+
+        return $user->is($model);
     }
 
-    public function create(User $user): bool
+    public function create(AdminUser $user): bool
     {
-        return $this->allows($user, 'user', 'create');
+        return AuthorizationMatrix::check('users', 'create', $user);
     }
 
-    public function update(User $user, User $model): bool
+    public function update(AdminUser|User $user, User $model): bool
     {
-        return $this->allows($user, 'user', 'update');
+        if ($user instanceof AdminUser) {
+            return AuthorizationMatrix::check('users', 'update', $user);
+        }
+
+        if ($user->is_admin ?? false) {
+            return true;
+        }
+
+        return $user->is($model);
     }
 
-    public function delete(User $user, User $model): bool
+    public function delete(AdminUser $user, User $model): bool
     {
-        return $this->allows($user, 'user', 'delete');
+        return AuthorizationMatrix::check('users', 'delete', $user);
     }
 
-    public function restore(User $user, User $model): bool
+    public function restore(AdminUser $user, User $model): bool
     {
-        return $this->allows($user, 'user', 'restore');
+        return AuthorizationMatrix::check('users', 'update', $user);
+    }
+
+    public function forceDelete(AdminUser $user, User $model): bool
+    {
+        return AuthorizationMatrix::check('users', 'delete', $user);
     }
 }
