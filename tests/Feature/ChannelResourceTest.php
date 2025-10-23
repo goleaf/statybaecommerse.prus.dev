@@ -28,23 +28,23 @@ class ChannelResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\ChannelResource\Pages\CreateChannel::class)
             ->fillForm([
-                'name' => 'Test Channel',
-                'slug' => 'test-channel',
-                'code' => 'TEST',
-                'type' => 'web',
-                'description' => 'Test channel description',
-                'url' => 'https://test.example.com',
-                'domain' => 'test.example.com',
-                'timezone' => 'UTC',
-                'currency_code' => 'EUR',
-                'currency_symbol' => '€',
+                'name'              => 'Test Channel',
+                'slug'              => 'test-channel',
+                'code'              => 'TEST',
+                'type'              => 'web',
+                'description'       => 'Test channel description',
+                'url'               => 'https://test.example.com',
+                'domain'            => 'test.example.com',
+                'timezone'          => 'UTC',
+                'currency_code'     => 'EUR',
+                'currency_symbol'   => '€',
                 'currency_position' => 'after',
-                'is_enabled' => true,
-                'is_default' => false,
-                'is_active' => true,
-                'ssl_enabled' => true,
+                'is_enabled'        => true,
+                'is_default'        => false,
+                'is_active'         => true,
+                'ssl_enabled'       => true,
                 'analytics_enabled' => false,
-                'sort_order' => 0,
+                'sort_order'        => 0,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -65,15 +65,15 @@ class ChannelResourceTest extends TestCase
             'record' => $channel->getRouteKey(),
         ])
             ->fillForm([
-                'name' => 'Updated Channel',
+                'name'        => 'Updated Channel',
                 'description' => 'Updated description',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('channels', [
-            'id' => $channel->id,
-            'name' => 'Updated Channel',
+            'id'          => $channel->id,
+            'name'        => 'Updated Channel',
             'description' => 'Updated description',
         ]);
     }
@@ -158,7 +158,10 @@ class ChannelResourceTest extends TestCase
             ->fillForm([
                 'name' => 'Test Channel Name',
             ])
-            ->assertFormSet('slug', 'test-channel-name');
+            // Filament v4 expects an associative array for assertFormSet checks.
+            ->assertFormSet([
+                'slug' => 'test-channel-name',
+            ]);
     }
 
     public function test_channel_unique_validation(): void
