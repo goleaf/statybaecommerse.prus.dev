@@ -106,6 +106,11 @@ final class ShippingOption extends Model
         return $this->belongsTo(Zone::class);
     }
 
+    public function zone(): BelongsTo
+    {
+        return $this->belongsTo(Zone::class);
+    }
+
     /**
      * Handle scopeEnabled functionality with proper error handling.
      *
@@ -145,24 +150,8 @@ final class ShippingOption extends Model
         return $query->where('carrier_name', $carrier);
     }
 
-    public function scopeByZone(Builder $query, null|int|string $zoneId): Builder
+    public function scopeByZone(Builder $query, int|string $zoneId): Builder
     {
-        if ($zoneId === null || $zoneId === '') {
-            return $query;
-        }
-
-        return $query->where('zone_id', $zoneId);
-    }
-
-    /**
-     * Handle scopeByZone functionality with proper error handling.
-     *
-     * @param  Builder<self> $query
-     * @return Builder<self>
-     */
-    public function scopeByZone(Builder $query, int $zoneId): Builder
-    {
-        // Allow filtering by the owning zone so queries remain expressive.
         return $query->where('zone_id', $zoneId);
     }
 

@@ -87,14 +87,29 @@ it('can set search query', function (): void {
 });
 
 it('performs search when query is set', function (): void {
-    Product::factory()->create(['name' => 'Test Product 1']);
-    Product::factory()->create(['name' => 'Test Product 2']);
-    Product::factory()->create(['name' => 'Another Item']);
+    Product::factory()->create([
+        'name' => 'Test Product 1',
+        'is_visible' => true,
+        'status' => 'published',
+        'published_at' => now()->subDay(),
+    ]);
+    Product::factory()->create([
+        'name' => 'Test Product 2',
+        'is_visible' => true,
+        'status' => 'published',
+        'published_at' => now()->subDay(),
+    ]);
+    Product::factory()->create([
+        'name' => 'Another Item',
+        'is_visible' => true,
+        'status' => 'published',
+        'published_at' => now()->subDay(),
+    ]);
 
     $component = AutocompleteSelect::make('test_field')
         ->model(Product::class);
 
-    $searchResults = $component->getSearchResults('Test');
+    $searchResults = $component->getSearchResultsCollection();
 
     expect($searchResults)->toHaveCount(2);
     expect(array_values($searchResults))->toContain('Test Product 1');
@@ -102,37 +117,52 @@ it('performs search when query is set', function (): void {
 });
 
 it('respects minimum search length', function (): void {
-    Product::factory()->create(['name' => 'Test Product']);
+    Product::factory()->create([
+        'name' => 'Test Product',
+        'is_visible' => true,
+        'status' => 'published',
+        'published_at' => now()->subDay(),
+    ]);
 
     $component = AutocompleteSelect::make('test_field')
         ->model(Product::class)
         ->minSearchLength(5);
 
-    $searchResults = $component->getSearchResults('Te');
+    $searchResults = $component->getSearchResultsCollection();
 
     expect($searchResults)->toHaveCount(0);
 });
 
 it('limits search results', function (): void {
-    Product::factory()->count(15)->create(['name' => 'Test Product']);
+    Product::factory()->count(15)->create([
+        'name' => 'Test Product',
+        'is_visible' => true,
+        'status' => 'published',
+        'published_at' => now()->subDay(),
+    ]);
 
     $component = AutocompleteSelect::make('test_field')
         ->model(Product::class)
         ->maxSearchResults(5);
 
-    $searchResults = $component->getSearchResults('Test');
+    $searchResults = $component->getSearchResultsCollection();
 
     expect($searchResults)->toHaveCount(5);
 });
 
 it('uses custom search field', function (): void {
-    Product::factory()->create(['description' => 'Test Description']);
+    Product::factory()->create([
+        'description' => 'Test Description',
+        'is_visible' => true,
+        'status' => 'published',
+        'published_at' => now()->subDay(),
+    ]);
 
     $component = AutocompleteSelect::make('test_field')
         ->model(Product::class)
         ->searchField('description');
 
-    $searchResults = $component->getSearchResults('Test');
+    $searchResults = $component->getSearchResultsCollection();
 
     expect($searchResults)->toHaveCount(1);
 });
@@ -140,18 +170,23 @@ it('uses custom search field', function (): void {
 it('returns empty results for invalid model class', function (): void {
     $component = AutocompleteSelect::make('test_field');
 
-    $searchResults = $component->getSearchResults('test');
+    $searchResults = $component->getSearchResultsCollection();
 
     expect($searchResults)->toHaveCount(0);
 });
 
 it('returns empty results for empty search query', function (): void {
-    Product::factory()->create(['name' => 'Test Product']);
+    Product::factory()->create([
+        'name' => 'Test Product',
+        'is_visible' => true,
+        'status' => 'published',
+        'published_at' => now()->subDay(),
+    ]);
 
     $component = AutocompleteSelect::make('test_field')
         ->model(Product::class);
 
-    $searchResults = $component->getSearchResults('');
+    $searchResults = $component->getSearchResultsCollection();
 
     expect($searchResults)->toHaveCount(0);
 });
@@ -195,13 +230,18 @@ it('provides correct view data', function (): void {
 });
 
 it('handles search with no results', function (): void {
-    Product::factory()->create(['name' => 'Different Product']);
+    Product::factory()->create([
+        'name' => 'Different Product',
+        'is_visible' => true,
+        'status' => 'published',
+        'published_at' => now()->subDay(),
+    ]);
 
     $component = AutocompleteSelect::make('test_field')
         ->model(Product::class)
         ->setSearchQuery('NonExistent');
 
-    $searchResults = $component->getSearchResults('NonExistent');
+    $searchResults = $component->getSearchResultsCollection();
 
     expect($searchResults)->toHaveCount(0);
 });

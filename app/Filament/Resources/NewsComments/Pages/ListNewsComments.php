@@ -6,7 +6,8 @@ namespace App\Filament\Resources\NewsComments\Pages;
 
 use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\NewsComments\NewsCommentResource;
-use Filament\Actions\CreateAction;
+use Filament\Actions;
+use Filament\Resources\Pages\ListRecords;
 
 class ListNewsComments extends BaseListRecords
 {
@@ -15,7 +16,7 @@ class ListNewsComments extends BaseListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            Actions\CreateAction::make(),
         ];
     }
 }
