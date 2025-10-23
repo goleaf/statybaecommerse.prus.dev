@@ -30,7 +30,7 @@ class UpdateUserProfileRequest extends FormRequest
             'bio' => ['nullable', 'string', 'max:1000'],
             'company' => ['nullable', 'string', 'max:255'],
             'position' => ['nullable', 'string', 'max:255'],
-            'website' => ['nullable', new UrlRule, 'max:255'],
+            'website' => ['nullable', new UrlRule(), 'max:255'],
             'preferred_locale' => ['required', 'in:en,lt'],
             'timezone' => ['nullable', 'string', 'max:255'],
         ];
