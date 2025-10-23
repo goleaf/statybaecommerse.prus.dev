@@ -5,18 +5,33 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Support\Frontend\DataProviders\HomepageCatalogueDataProvider;
+use App\Models\Product;
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+
+use function now;
 
 final class HomeController extends Controller
 {
-    public function __construct(private readonly HomepageCatalogueDataProvider $dataProvider) {}
-
-    public function index(Request $request): View
+    public function index(): View
     {
-        $data = $this->dataProvider->get();
+        $products = $this->getFeaturedProducts();
 
-        return view('frontend.home.index', $data);
+        return view('shop.index', [
+            'products' => $products,
+        ]);
+    }
+
+    private function getFeaturedProducts(): Collection
+    {
+        return Product::query()
+            ->withoutGlobalScopes()
+            ->where('is_visible', true)
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->with(['media', 'prices.currency'])
+            ->latest('published_at')
+            ->limit(12)
+            ->get();
     }
 }

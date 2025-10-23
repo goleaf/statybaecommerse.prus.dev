@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use DateTimeInterface;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -183,7 +183,9 @@ final class VariantAnalytics extends Model
         string|DateTimeInterface $date,
         array $data = []
     ): self {
-        $normalizedDate = self::normalizeDate($date);
+        $normalizedDate = $date instanceof \DateTimeInterface
+            ? CarbonImmutable::parse($date->format('Y-m-d'))
+            : CarbonImmutable::parse($date);
 
         $defaultData = [
             'variant_id' => $variantId,

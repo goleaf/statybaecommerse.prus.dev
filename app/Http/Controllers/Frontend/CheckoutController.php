@@ -5,179 +5,98 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Models\CartItem;
-use App\Models\Order;
-use App\Models\OrderItem;
-use App\Services\Cart\CartLifecycleService;
-use App\Services\Pricing\PriceCalculator;
-use App\Support\ApiErrorResponse;
-use App\Support\ErrorCodes;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use Illuminate\View\View;
+use Illuminate\Support\Facades\Session;
 
 final class CheckoutController extends Controller
 {
-    public function index(Request $request): View
+    public function index(): View
     {
-        $items = $this->getCartItems($request);
-
         return view('frontend.checkout.index', [
-            'cartItems' => $items,
-            'summary'   => $this->summarize($items),
+            'cart' => $this->buildCartSummary(),
         ]);
     }
 
-    public function process(Request $request, CartLifecycleService $cartLifecycleService): RedirectResponse|JsonResponse
+    public function process(Request $request): RedirectResponse
     {
-        $items = $this->getCartItems($request);
-        if ($items->isEmpty()) {
-            if ($request->expectsJson()) {
-                // Produce a structured error payload when the cart has no purchasable items.
-                return ApiErrorResponse::problem(
-                    request: $request,
-                    errorCode: ErrorCodes::CHECKOUT_CART_EMPTY,
-                    detail: __('errors.messages.checkout_empty'),
-                    status: 422,
-                    title: ApiErrorResponse::titleFor(ErrorCodes::CHECKOUT_CART_EMPTY),
-                );
-            }
+        $cart = $this->buildCartSummary();
 
-            return redirect()->route('frontend.cart.index')->with('error', __('Your cart is empty.'));
+        if ($cart['items']->isEmpty()) {
+            return redirect()->route('frontend.cart.index')->with('status', __('Your cart is empty.'));
         }
 
-        $validated = $request->validate([
-            'payment_method' => ['required', 'string', 'max:255'],
-            'confirm'        => ['accepted'],
+        $data = $request->validate([
+            'email' => ['required', 'email'],
+            'name' => ['required', 'string', 'max:255'],
+            'address' => ['required', 'string', 'max:500'],
+            'city' => ['required', 'string', 'max:255'],
+            'postal_code' => ['required', 'string', 'max:50'],
+            'payment_method' => ['required', 'string'],
         ]);
 
-        $order = DB::transaction(function () use ($items, $request, $validated) {
-            $subtotal = (float) $items->sum(fn (CartItem $item) => $item->calculateSubtotal());
-            $breakdown = app(PriceCalculator::class)->breakdown($subtotal);
+        $orderReference = 'CHK-' . now()->format('YmdHis');
 
-            $order = Order::query()->create([
-                'number'            => Str::upper(Str::random(10)),
-                'user_id'           => $request->user()?->id,
-                'status'            => 'processing',
-                'subtotal'          => $breakdown->subtotal,
-                'tax_amount'        => $breakdown->tax,
-                'shipping_amount'   => $breakdown->shipping,
-                'discount_amount'   => $breakdown->discount,
-                'total'             => $breakdown->total,
-                'currency'          => $breakdown->currency,
-                'billing_address'   => [],
-                'shipping_address'  => [],
-                'payment_status'    => 'paid',
-                'payment_method'    => $validated['payment_method'],
-                'payment_reference' => (string) Str::uuid(),
-            ]);
+        Session::put('checkout.receipt', [
+            'order_reference' => $orderReference,
+            'customer' => $data,
+            'cart' => $cart,
+            'processed_at' => now(),
+        ]);
 
-            foreach ($items as $item) {
-                OrderItem::query()->create([
-                    'order_id'           => $order->getKey(),
-                    'product_id'         => $item->product_id,
-                    'product_variant_id' => $item->product_variant_id,
-                    'name'               => $item->product_snapshot['name'] ?? $item->product?->name,
-                    'sku'                => $item->product_snapshot['sku'] ?? $item->product?->sku,
-                    'quantity'           => $item->quantity,
-                    'unit_price'         => (float) $item->price,
-                    'price'              => (float) $item->price,
-                    'total'              => $item->calculateSubtotal(),
-                    'notes'              => $item->notes,
-                ]);
-            }
+        Session::forget('cart');
 
-            return $order;
-        });
-
-        $cartLifecycleService->clearAfterCheckout(
-            $request->user()?->id,
-            $request->session()->getId(),
-            $order->payment_status ?? null
-        );
-
-        $request->session()->put('checkout.last_order_id', $order->getKey());
-
-        if ($request->expectsJson()) {
-            // Return a compact success document for API clients that initiate checkout via AJAX.
-            return response()->json([
-                'success' => true,
-                'message' => __('Order placed successfully.'),
-                'order'   => [
-                    'id'       => $order->getKey(),
-                    'number'   => $order->number,
-                    'status'   => $order->status,
-                    'total'    => (float) $order->total,
-                    'currency' => $order->currency,
-                ],
-            ], 201);
-        }
-
-        return redirect()->route('frontend.checkout.success')->with('status', __('Order placed successfully.'));
+        return redirect()->route('frontend.checkout.success');
     }
 
-    public function success(Request $request): View|RedirectResponse
+    public function success(): View
     {
-        $orderId = $request->session()->pull('checkout.last_order_id');
-        if (! $orderId) {
-            return redirect()->route('frontend.cart.index')->with('info', __('No recent checkout found.'));
-        }
+        $receipt = Session::get('checkout.receipt');
 
-        $order = Order::withoutGlobalScopes()->with('items')->findOrFail($orderId);
+        abort_if(empty($receipt), 404);
 
         return view('frontend.checkout.success', [
-            'order' => $order,
+            'receipt' => $receipt,
         ]);
     }
 
-    public function cancel(Request $request, CartLifecycleService $cartLifecycleService): View
+    public function cancel(): View
     {
-        $cartLifecycleService->clearForAbandonedCheckout($request->user()?->id, $request->session()->getId());
-
         return view('frontend.checkout.cancel');
     }
 
-    private function getCartItems(Request $request): Collection
+    private function buildCartSummary(): array
     {
-        $sessionId = (string) $request->session()->getId();
-        $userId = $request->user()?->getAuthIdentifier();
+        $items = collect(Session::get('cart', []))->map(function (array $item) {
+            $quantity = (int) ($item['quantity'] ?? 0);
+            $price = (float) ($item['price'] ?? 0);
 
-        return CartItem::query()
-            ->where(function ($query) use ($sessionId, $userId): void {
-                $hasCondition = false;
+            return [
+                'id' => $item['id'] ?? null,
+                'product_id' => $item['product_id'] ?? null,
+                'name' => $item['name'] ?? '',
+                'price' => $price,
+                'quantity' => $quantity,
+                'total' => round($price * $quantity, 2),
+                'slug' => $item['slug'] ?? null,
+            ];
+        });
 
-                if ($sessionId !== '') {
-                    $query->where('session_id', $sessionId);
-                    $hasCondition = true;
-                }
+        $subtotal = $items->sum('total');
+        $taxRate = (float) config('shared.tax.default_rate', 0.21);
+        $tax = round($subtotal * $taxRate, 2);
+        $shipping = $subtotal > 50 ? 0.0 : 5.99;
+        $discount = (float) Session::get('cart_discount', 0);
+        $total = max(0, round($subtotal + $tax + $shipping - $discount, 2));
 
-                if ($userId !== null) {
-                    if ($hasCondition) {
-                        $query->orWhere('user_id', (int) $userId);
-                    } else {
-                        $query->where('user_id', (int) $userId);
-                        $hasCondition = true;
-                    }
-                }
-
-                if (! $hasCondition) {
-                    // Prevent accidental full scans when no ownership context is available.
-                    $query->whereRaw('1 = 0');
-                }
-            })
-            ->orderBy('created_at')
-            ->get();
-    }
-
-    private function summarize(Collection $items): array
-    {
-        $subtotal = (float) $items->sum(fn (CartItem $item) => $item->calculateSubtotal());
-        $breakdown = app(PriceCalculator::class)->breakdown($subtotal);
-
-        return ['item_count' => (int) $items->sum('quantity')] + $breakdown->toSummary();
+        return [
+            'items' => $items,
+            'subtotal' => round($subtotal, 2),
+            'tax' => $tax,
+            'shipping' => round($shipping, 2),
+            'discount' => round($discount, 2),
+            'total' => $total,
+        ];
     }
 }
