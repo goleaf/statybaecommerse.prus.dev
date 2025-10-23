@@ -28,8 +28,10 @@ final class VariantAnalyticsFactory extends Factory
         $productFactory = Product::factory();
 
         return [
-            'variant_id' => ProductVariant::factory(),
-            'date' => fake()->dateTimeBetween('-30 days', 'now')->format('Y-m-d'),
+            'product_id' => $productFactory,
+            'variant_id' => ProductVariant::factory()->for($productFactory, 'product'),
+            'date' => $bucketDate->toDateString(),
+            'date_bucket' => sprintf('%s:%s', VariantAnalytics::BUCKET_DAILY, $bucketDate->toDateString()),
             'views' => $views,
             'clicks' => $clicks,
             'add_to_cart' => $addToCart,
@@ -87,8 +89,13 @@ final class VariantAnalyticsFactory extends Factory
 
     public function forDate(string $date): static
     {
-        return $this->state(fn (array $attributes) => [
-            'date' => Carbon::parse($date)->toDateString(),
-        ]);
+        return $this->state(function (array $attributes) use ($date) {
+            $normalized = Carbon::parse($date)->toDateString();
+
+            return [
+                'date' => $normalized,
+                'date_bucket' => sprintf('%s:%s', VariantAnalytics::BUCKET_DAILY, $normalized),
+            ];
+        });
     }
 }

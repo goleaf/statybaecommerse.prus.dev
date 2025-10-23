@@ -264,10 +264,44 @@ final class VariantAnalyticsTest extends TestCase
 
         // Assert
         $this->assertEquals($existingAnalytics->id, $analytics->id);
-        $this->assertEquals(150, $analytics->views);
+        $this->assertEquals(200, $analytics->views);
         $this->assertEquals($variant->id, $analytics->variant_id);
+        $this->assertEquals('daily:'.$date, $analytics->date_bucket);
 
         // Verify the record was actually updated, not created new
+        $this->assertDatabaseCount('variant_analytics', 1);
+    }
+
+    public function test_record_analytics_tracks_weekly_bucket(): void
+    {
+        // Arrange
+        $variant = ProductVariant::factory()->create();
+        $today = now();
+        $date = $today->toDateString();
+        $startOfWeek = $today->copy()->startOfWeek()->toDateString();
+
+        // Act
+        $analytics = VariantAnalytics::recordAnalytics(
+            $variant->id,
+            $date,
+            ['views' => 10],
+            VariantAnalytics::BUCKET_WEEKLY
+        );
+
+        // Assert
+        $this->assertEquals($variant->product_id, $analytics->product_id);
+        $this->assertEquals('weekly:'.$startOfWeek, $analytics->date_bucket);
+        $this->assertEquals(10, $analytics->views);
+
+        // Calling again should increment rather than create a new row
+        $analytics = VariantAnalytics::recordAnalytics(
+            $variant->id,
+            $date,
+            ['views' => 5],
+            VariantAnalytics::BUCKET_WEEKLY
+        );
+
+        $this->assertEquals(15, $analytics->views);
         $this->assertDatabaseCount('variant_analytics', 1);
     }
 

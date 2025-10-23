@@ -8,9 +8,10 @@ use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Arr;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use InvalidArgumentException;
 
 /**
  * VariantAnalytics
@@ -21,19 +22,11 @@ final class VariantAnalytics extends Model
 {
     use HasFactory;
 
-    /**
-     * Metrics that can be recorded for analytics entries.
-     *
-     * @var array<int, string>
-     */
-    private const METRIC_FIELDS = [
-        'views',
-        'clicks',
-        'add_to_cart',
-        'purchases',
-        'revenue',
-        'conversion_rate',
-    ];
+    public const BUCKET_DAILY = 'daily';
+
+    public const BUCKET_WEEKLY = 'weekly';
+
+    private const SUPPORTED_GRANULARITIES = [self::BUCKET_DAILY, self::BUCKET_WEEKLY];
 
     protected $fillable = [
         'product_id',
@@ -190,38 +183,52 @@ final class VariantAnalytics extends Model
      */
     public static function recordAnalytics(
         int $variantId,
-        string|\DateTimeInterface $date,
-        array $data = []
+        string|DateTimeInterface $date,
+        array $data = [],
+        string $granularity = self::BUCKET_DAILY,
+        ?int $productId = null
     ): self {
-        $dateKey = Carbon::parse($date)->toDateString();
+        $granularity = strtolower($granularity);
+        self::ensureValidGranularity($granularity);
 
-        return DB::transaction(
-            static function () use ($variantId, $dateKey, $data): self {
-                $metrics = Arr::only($data, self::METRIC_FIELDS);
+        $productId ??= self::resolveProductId($variantId);
+        $normalizedDate = self::normalizeDate($date, $granularity);
+        $bucket = self::buildDateBucket($granularity, $normalizedDate);
+        $now = now();
 
-                $analytics = self::query()
-                    ->lockForUpdate()
-                    ->firstOrNew([
-                        'variant_id' => $variantId,
-                        'date' => $dateKey,
-                    ]);
+        $payload = [
+            'product_id' => $productId,
+            'variant_id' => $variantId,
+            'date' => $normalizedDate,
+            'date_bucket' => $bucket,
+            'views' => (int) ($data['views'] ?? 0),
+            'clicks' => (int) ($data['clicks'] ?? 0),
+            'add_to_cart' => (int) ($data['add_to_cart'] ?? 0),
+            'purchases' => (int) ($data['purchases'] ?? 0),
+            'revenue' => (float) ($data['revenue'] ?? 0),
+            'conversion_rate' => $data['conversion_rate'] ?? null,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ];
 
-                if (! $analytics->exists) {
-                    foreach (self::METRIC_FIELDS as $field) {
-                        $analytics->{$field} = $analytics->{$field} ?? 0;
-                    }
-                }
+        $updates = [
+            'updated_at' => $now,
+            'date' => $normalizedDate,
+            'views' => self::incrementExpression('views'),
+            'clicks' => self::incrementExpression('clicks'),
+            'add_to_cart' => self::incrementExpression('add_to_cart'),
+            'purchases' => self::incrementExpression('purchases'),
+            'revenue' => self::incrementExpression('revenue'),
+        ];
 
-                foreach ($metrics as $field => $value) {
-                    $analytics->{$field} = $value;
-                }
+        if (array_key_exists('conversion_rate', $data)) {
+            $updates['conversion_rate'] = self::replacementExpression('conversion_rate');
+        }
 
-                $analytics->variant_id = $variantId;
-                $analytics->date = $dateKey;
-                $analytics->save();
-
-                return $analytics;
-            }
+        self::query()->upsert(
+            [$payload],
+            ['product_id', 'variant_id', 'date_bucket'],
+            $updates
         );
 
         return self::query()
@@ -284,25 +291,6 @@ final class VariantAnalytics extends Model
     private static function connectionDriver(): string
     {
         return self::query()->getConnection()->getDriverName();
-    }
-
-    private static function normalizeDate(string|DateTimeInterface|int|float|null $date): string
-    {
-        $timezone = config('app.timezone');
-
-        if ($date instanceof DateTimeInterface) {
-            return Carbon::instance($date)->setTimezone($timezone)->toDateString();
-        }
-
-        if (is_numeric($date)) {
-            return Carbon::createFromTimestamp((int) $date, $timezone)->toDateString();
-        }
-
-        if (is_string($date) && trim($date) !== '') {
-            return Carbon::parse($date, $timezone)->toDateString();
-        }
-
-        return now()->setTimezone($timezone)->toDateString();
     }
 
     /**
