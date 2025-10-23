@@ -39,6 +39,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 -### Latest updates
+- Discount redemption listings now surface pending, redeemed, expired, and cancelled records again after widening the shared status scope, so Filament CRUD workflows and seeders operate on the full data set.
 - Recently viewed storefront API calls now bypass visibility scopes and return session-ordered product IDs, keeping wishlist toggles and customer history widgets consistent even when draft catalogue entries populate the session during automated tests.
 - Campaign schedule management now surfaces inactive entries in Filament by removing the global active scope and providing a reusable `active()` query helper, letting administrators audit, filter, and trigger every schedule without hitting missing-record issues during regression tests.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
