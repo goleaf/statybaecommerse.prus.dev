@@ -12,7 +12,7 @@ use Log;
 final class Kernel extends ConsoleKernel
 {
     /**
-     * @var array<int, class-string>
+     * @var array<int, class-string<\Illuminate\Console\Command>>
      */
     protected $commands = [
         \App\Console\Commands\BackupPrepareCommand::class,
@@ -24,9 +24,7 @@ final class Kernel extends ConsoleKernel
         \App\Console\Commands\GenerateApiSpecCommand::class,
         \App\Console\Commands\GenerateReportsCommand::class,
         \App\Console\Commands\CheckRefreshDatabaseCommand::class,
-        \App\Console\Commands\BackupPrepareCommand::class,
-        \App\Console\Commands\BackupVerifyCommand::class,
-        \App\Console\Commands\I18nAuditCommand::class,
+        \App\Console\Commands\DbAuditIndexesCommand::class,
     ];
 
     protected function schedule(Schedule $schedule): void
