@@ -6,25 +6,41 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
-use App\Support\Frontend\DataProviders\CategoryCatalogueDataProvider;
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\Request;
+
+use function now;
 
 final class CategoryController extends Controller
 {
-    public function __construct(private readonly CategoryCatalogueDataProvider $dataProvider) {}
-
-    public function index(Request $request): View
+    public function index(): View
     {
-        $data = $this->dataProvider->index();
+        $categories = Category::query()
+            ->withoutGlobalScopes()
+            ->where('is_visible', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'slug', 'description']);
 
-        return view('frontend.categories.index', $data);
+        return view('frontend.categories.index', [
+            'categories' => $categories,
+        ]);
     }
 
-    public function show(Category $category, Request $request): View
+    public function show(Category $category): View
     {
-        $data = $this->dataProvider->show($category, $request->all());
+        $category->load(['media', 'translations', 'children']);
 
-        return view('frontend.categories.show', $data);
+        $products = $category->products()
+            ->withoutGlobalScopes()
+            ->where('is_visible', true)
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->with(['media', 'prices.currency', 'brand'])
+            ->paginate(12);
+
+        return view('frontend.categories.show', [
+            'category' => $category,
+            'childCategories' => $category->children,
+            'products' => $products,
+        ]);
     }
 }

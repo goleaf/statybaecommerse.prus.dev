@@ -248,9 +248,9 @@ final class VariantAnalyticsTest extends TestCase
 
     public function test_record_analytics_updates_existing_record(): void
     {
-        // Arrange
         $variant = ProductVariant::factory()->create();
-        $date = '2025-12-25'; // Use a fixed unique date
+        $date = '2025-12-25';
+
         $existingAnalytics = VariantAnalytics::factory()
             ->withVariant($variant)
             ->forDate($date)
@@ -258,15 +258,12 @@ final class VariantAnalyticsTest extends TestCase
 
         $data = ['views' => 150];
 
-        // Act - Use the same variant and date to test update functionality
         $analytics = VariantAnalytics::recordAnalytics($variant->id, $date, $data);
 
-        // Assert
         $this->assertEquals($existingAnalytics->id, $analytics->id);
         $this->assertEquals(150, $analytics->views);
         $this->assertEquals($variant->id, $analytics->variant_id);
 
-        // Verify the record was actually updated, not created new
         $this->assertDatabaseCount('variant_analytics', 1);
     }
 

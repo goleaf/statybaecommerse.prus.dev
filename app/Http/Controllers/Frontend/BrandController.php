@@ -6,25 +6,40 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
-use App\Support\Frontend\DataProviders\BrandCatalogueDataProvider;
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\Request;
+
+use function now;
 
 final class BrandController extends Controller
 {
-    public function __construct(private readonly BrandCatalogueDataProvider $dataProvider) {}
-
-    public function index(Request $request): View
+    public function index(): View
     {
-        $data = $this->dataProvider->index();
+        $brands = Brand::query()
+            ->withoutGlobalScopes()
+            ->where('is_enabled', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'slug', 'description']);
 
-        return view('frontend.brands.index', $data);
+        return view('frontend.brands.index', [
+            'brands' => $brands,
+        ]);
     }
 
-    public function show(Brand $brand, Request $request): View
+    public function show(Brand $brand): View
     {
-        $data = $this->dataProvider->show($brand, $request->all());
+        $brand->load(['media', 'translations']);
 
-        return view('frontend.brands.show', $data);
+        $products = $brand->products()
+            ->withoutGlobalScopes()
+            ->where('is_visible', true)
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->with(['media', 'prices.currency', 'categories'])
+            ->paginate(12);
+
+        return view('frontend.brands.show', [
+            'brand' => $brand,
+            'products' => $products,
+        ]);
     }
 }

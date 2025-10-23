@@ -5,66 +5,71 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ApplyCouponRequest;
-use App\Services\Discounts\CouponApplicationService;
-use App\Services\Discounts\DiscountContextBuilder;
-use Illuminate\Http\JsonResponse;
+use App\Models\Discount;
+use App\Models\DiscountCode;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
+use Illuminate\Support\Facades\Session;
 
 final class DiscountController extends Controller
 {
-    public function __construct(
-        private readonly CouponApplicationService $couponService,
-        private readonly DiscountContextBuilder $contextBuilder,
-    ) {}
-
-    public function index(Request $request): JsonResponse
+    public function index(): View
     {
-        $context = $this->contextBuilder->fromRequest($request);
+        $discounts = Discount::query()
+            ->withoutGlobalScopes()
+            ->active()
+            ->orderByDesc('priority')
+            ->get(['id', 'name', 'description', 'type', 'value', 'starts_at', 'ends_at']);
 
-        return response()->json([
-            'coupons' => $this->couponService->getAvailableCoupons($context),
+        return view('frontend.discounts.index', [
+            'discounts' => $discounts,
         ]);
     }
 
-    public function coupons(Request $request): View|JsonResponse
+    public function coupons(): View
     {
-        $context = $this->contextBuilder->fromRequest($request);
-        $coupons = $this->couponService->getAvailableCoupons($context);
-
-        if ($request->wantsJson()) {
-            return response()->json(['coupons' => $coupons]);
-        }
+        $coupons = DiscountCode::query()
+            ->withoutGlobalScopes()
+            ->where('is_active', true)
+            ->orderByDesc('created_at')
+            ->limit(50)
+            ->get(['id', 'code', 'name', 'description', 'type', 'value', 'expires_at']);
 
         return view('frontend.discounts.coupons', [
             'coupons' => $coupons,
-            'hasAppliedCoupon' => $request->session()->has('checkout.coupon.code'),
         ]);
     }
 
-    public function applyCoupon(ApplyCouponRequest $request): JsonResponse
+    public function applyCoupon(Request $request): RedirectResponse
     {
-        $context = $this->contextBuilder->fromRequest($request, $request->validated('code'));
-        $result = $this->couponService->apply($request->validated('code'), $context);
+        $data = $request->validate([
+            'code' => ['required', 'string', 'max:255'],
+        ]);
 
-        return response()->json($result, $result['success'] ? 200 : 422);
+        $coupon = DiscountCode::query()
+            ->withoutGlobalScopes()
+            ->whereRaw('LOWER(code) = ?', [strtolower($data['code'])])
+            ->where('is_active', true)
+            ->first();
+
+        if (! $coupon) {
+            return redirect()->route('frontend.discounts.coupons')->withErrors([
+                'code' => __('The provided coupon is not valid.'),
+            ]);
+        }
+
+        Session::put('applied_coupon', $coupon->code);
+        Session::put('cart_discount', (float) $coupon->value);
+
+        return redirect()->route('frontend.cart.index')->with('status', __('Coupon applied successfully.'));
     }
 
-    public function removeCoupon(Request $request): JsonResponse
+    public function removeCoupon(): RedirectResponse
     {
-        $context = $this->contextBuilder->fromRequest($request);
+        Session::forget('applied_coupon');
+        Session::forget('cart_discount');
 
-        return response()->json($this->couponService->remove($context));
-    }
-
-    public function show(string $id): JsonResponse
-    {
-        return response()->json(['message' => 'Discount details not implemented yet', 'id' => $id]);
-    }
-
-    public function validate(Request $request): JsonResponse
-    {
-        return response()->json(['message' => 'Discount validation not implemented yet']);
+        return redirect()->route('frontend.cart.index')->with('status', __('Coupon removed.'));
     }
 }
