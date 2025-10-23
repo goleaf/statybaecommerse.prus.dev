@@ -1,5 +1,7 @@
-# Feature Highlights
+# Features & Recent Enhancements
 
-## Automated Code Quality Safeguards
-- Added a Rector dry-run stage to CI so pull requests surface refactor suggestions before tests execute.
-- Tuned Rector for PHP 8.2 and Laravel 12 with prepared sets covering dead code, quality, and type declarations.
+## Developer Experience
+- Restored the Husky bootstrap shim so local Git hooks once again run with the repository-provided Node toolchain while still displaying the upstream deprecation notice for future Husky releases.
+
+## Reference
+- Review `.husky/_/husky.sh` for the shim implementation and hook execution comments that explain how the toolchain hand-off works.
