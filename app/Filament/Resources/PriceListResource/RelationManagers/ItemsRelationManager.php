@@ -4,23 +4,23 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\PriceListResource\RelationManagers;
 
-use App\Forms\Components\Flatpickr;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Forms\Form;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use App\Support\Filament\Components\Flatpickr;
+use Illuminate\Database\Eloquent\Model;
 
 final class ItemsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'items';
 
-    public static function getTitle(): ?string
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
         return __('price_lists.relation_managers.items.title');
     }
