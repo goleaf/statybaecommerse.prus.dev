@@ -213,9 +213,11 @@ final class VariantImageResource extends Resource
                     ->circular(false)
                     ->square()
                     ->grow(false)
-                    ->getStateUsing(fn (VariantImage $record): ?string => $record->image_path
-                        ? SecureStorage::temporarySignedUrl($record->image_path)
-                        : null),
+                    ->getStateUsing(
+                        fn ($record) => $record->image_path
+                            ? SecureStorage::temporarySignedUrl($record->image_path)
+                            : null
+                    ),
                 TextColumn::make('variant.name')
                     ->label(__('admin.variant_images.variant'))
                     ->sortable()
