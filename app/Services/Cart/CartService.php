@@ -51,19 +51,57 @@ final class CartService
     {
         Session::put('cart_session_id', $sessionId);
 
+        if ($userId !== null) {
+            // Prioritise persisted records for authenticated customers so stale session
+            // payloads from previous guests do not override the canonical database state.
+            $databaseSummary = $this->buildSummaryFromDatabase($userId, $sessionId);
+
+            if ($this->summaryHasLineItems($databaseSummary)) {
+                return $databaseSummary;
+            }
+
+            // Fall back to transient sources only when the database is empty, allowing
+            // the caller to surface any guest cart items that still need to be merged.
+            $facadeSummary = $this->buildSummaryFromFacade($sessionId);
+
+            if ($this->summaryHasLineItems($facadeSummary)) {
+                return $facadeSummary;
+            }
+
+            $sessionSummary = $this->buildSummaryFromSession();
+
+            if ($this->summaryHasLineItems($sessionSummary)) {
+                return $sessionSummary;
+            }
+
+            // Return the empty database payload so downstream consumers receive the
+            // normalized structure expected by the caller when nothing was found.
+            return $databaseSummary;
+        }
+
         $summary = $this->buildSummaryFromFacade($sessionId);
 
-        if ($summary['count'] > 0 || ! empty($summary['items'])) {
+        if ($this->summaryHasLineItems($summary)) {
             return $summary;
         }
 
         $summary = $this->buildSummaryFromSession();
 
-        if ($summary['count'] > 0 || ! empty($summary['items'])) {
+        if ($this->summaryHasLineItems($summary)) {
             return $summary;
         }
 
         return $this->buildSummaryFromDatabase($userId, $sessionId);
+    }
+
+    /**
+     * Determine whether the provided summary contains any cart line items.
+     */
+    private function summaryHasLineItems(array $summary): bool
+    {
+        // Inspect both the precomputed count and the raw items array so partially
+        // hydrated payloads remain eligible even if a caller forgot to propagate the count.
+        return ($summary['count'] ?? 0) > 0 || ! empty($summary['items'] ?? []);
     }
 
     public function getCount(?int $userId, string $sessionId): int
