@@ -45,7 +45,7 @@ final class NewsCategoryResource extends Resource
         return 'heroicon-o-tag';
     }
 
-    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
+    public static function getNavigationGroup(): \UnitEnum|string|null
     {
         // Leverage the enum label to keep the group consistent across locales.
         return NavigationGroup::Content->label();

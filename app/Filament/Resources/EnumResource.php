@@ -49,11 +49,11 @@ final class EnumResource extends Resource
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
 
     /** @var string|BackedEnum|null Anchor the resource to the System navigation area. */
-    protected static \Filament\Navigation\NavigationGroup|array|string|null $navigationGroup = NavigationGroup::System->value;
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::System->value;
 
     protected static ?int $navigationSort = 2;
 
-    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
+    public static function getNavigationGroup(): \UnitEnum|string|null
     {
         // Use the centralized enum label to avoid duplicated translations.
         $group = self::$navigationGroup;

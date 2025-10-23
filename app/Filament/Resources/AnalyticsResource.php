@@ -24,8 +24,6 @@ use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
-use UnitEnum;
-
 final class AnalyticsResource extends Resource
 {
     use SpatieTranslatableResource; // Align translation support with other resources.
@@ -36,10 +34,9 @@ final class AnalyticsResource extends Resource
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
     /**
-     * Preserve the typed navigation group union to keep enum-backed grouping working across PHP upgrades.
+     * Keep the union aligned with the Filament base so enum-backed groups resolve correctly.
      */
-    /** @var \Filament\Navigation\NavigationGroup|array|string|null */
-    protected static \Filament\Navigation\NavigationGroup|array|string|null $navigationGroup = NavigationGroup::Analytics->value;
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Analytics;
 
     public static function getNavigationLabel(): string
     {

@@ -50,7 +50,7 @@ final class CollectionRuleResource extends Resource
         return 'heroicon-o-cog-6-tooth';
     }
 
-    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
+    public static function getNavigationGroup(): \UnitEnum|string|null
     {
         // Keep the resource collocated with product configuration utilities for quicker discovery.
         return 'Products';

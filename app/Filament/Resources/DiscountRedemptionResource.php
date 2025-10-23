@@ -39,7 +39,7 @@ final class DiscountRedemptionResource extends Resource
 {
     protected static ?string $model = DiscountRedemption::class;
 
-    protected static string|UnitEnum|null $navigationGroup = 'Discounts';
+    protected static \UnitEnum|string|null $navigationGroup = 'Discounts';
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-receipt-percent';
 

@@ -46,9 +46,9 @@ final class EnumValueResource extends Resource
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
 
     /** @var string|BackedEnum|null Keep enum value tools inside the System cluster. */
-    protected static \Filament\Navigation\NavigationGroup|array|string|null $navigationGroup = NavigationGroup::System->value;
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::System->value;
 
-    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
+    public static function getNavigationGroup(): \UnitEnum|string|null
     {
         // Resolve the translated label from the shared navigation enum.
         $group = self::$navigationGroup;

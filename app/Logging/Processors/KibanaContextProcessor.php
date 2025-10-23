@@ -42,18 +42,17 @@ final class KibanaContextProcessor
         // Capture the current PHP process identifier so log aggregators can
         // group events reliably, while guarding against hosting environments
         // that disable getmypid().
-        if (function_exists('getmypid')) {
-            $pid = getmypid();
+        $pid = function_exists('getmypid') ? getmypid() : false;
 
-            if (is_int($pid) && $pid > 0) {
-                $processContext = $record->extra['process'] ?? [];
-                if (! is_array($processContext)) {
-                    $processContext = [];
-                }
+        if (is_int($pid) && $pid > 0) {
+            $processContext = $record->extra['process'] ?? [];
 
-                $processContext['pid'] = $pid;
-                $record->extra['process'] = $processContext;
+            if (! is_array($processContext)) {
+                $processContext = [];
             }
+
+            $processContext['pid'] = $pid;
+            $record->extra['process'] = $processContext;
         }
 
         return $record;

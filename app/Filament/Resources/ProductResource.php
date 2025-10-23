@@ -127,7 +127,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
         return 'heroicon-o-cube';
     }
 
-    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
+    public static function getNavigationGroup(): \UnitEnum|string|null
     {
         return 'Products';
     }

@@ -12,10 +12,15 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ListCampaignViews extends BaseListRecords
 {
-        use HasWidgetTabs;
+    use HasWidgetTabs;
 
     protected static string $resource = CampaignViewResource::class;
 
+    /**
+     * Provide quick metrics for key campaign view segments using the canonical resource query.
+     *
+     * @return array<string, WidgetTab>
+     */
     public function getWidgetTabs(): array
     {
         return [

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Console\Commands\ProfiledSeedCommand;
+use App\Database\Connectors\GracefulSQLiteConnector;
 use App\Contracts\DocumentServiceContract;
 use App\Contracts\HealthReporter as HealthReporterContract;
 use App\Domain\Product\Repositories\ProductRepositoryInterface;
@@ -100,6 +101,9 @@ class AppServiceProvider extends ServiceProvider
         // Replace the default filesystem binding with the graceful shim for deterministic backup tests.
         $this->app->singleton(Filesystem::class, static fn (): Filesystem => new GracefulFilesystem);
         $this->app->alias(Filesystem::class, 'files');
+
+        // Ensure SQLite connections eagerly prepare database files for test reliability.
+        $this->app->bind('db.connector.sqlite', static fn (): GracefulSQLiteConnector => new GracefulSQLiteConnector);
 
         if ($this->app->runningInConsole()) {
             // Register import utilities and override the core db:seed command with a profiled variant.
