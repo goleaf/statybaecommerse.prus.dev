@@ -83,14 +83,9 @@ final class ReferralRewardLogResource extends Resource
 
                                 Select::make('action')
                                     ->label(__('admin.referral_reward_logs.action'))
-                                    ->options([
-                                        'earned'    => __('admin.referral_reward_logs.actions.earned'),
-                                        'redeemed'  => __('admin.referral_reward_logs.actions.redeemed'),
-                                        'expired'   => __('admin.referral_reward_logs.actions.expired'),
-                                        'cancelled' => __('admin.referral_reward_logs.actions.cancelled'),
-                                    ])
+                                    ->options(self::getActionOptions())
                                     ->required()
-                                    ->default('earned'),
+                                    ->default(ReferralRewardLog::ACTION_EARNED),
 
                                 TextInput::make('ip_address')
                                     ->label(__('admin.referral_reward_logs.ip_address'))
@@ -128,11 +123,11 @@ final class ReferralRewardLogResource extends Resource
                     ->label(__('admin.referral_reward_logs.action'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'earned'    => 'success',
-                        'redeemed'  => 'info',
-                        'expired'   => 'warning',
-                        'cancelled' => 'danger',
-                        default     => 'gray',
+                        ReferralRewardLog::ACTION_EARNED => 'success',
+                        ReferralRewardLog::ACTION_REDEEMED => 'info',
+                        ReferralRewardLog::ACTION_EXPIRED => 'warning',
+                        ReferralRewardLog::ACTION_CANCELLED => 'danger',
+                        default => 'gray',
                     }),
 
                 TextColumn::make('ip_address')
@@ -172,12 +167,7 @@ final class ReferralRewardLogResource extends Resource
 
                 SelectFilter::make('action')
                     ->label(__('admin.referral_reward_logs.action'))
-                    ->options([
-                        'earned'    => __('admin.referral_reward_logs.actions.earned'),
-                        'redeemed'  => __('admin.referral_reward_logs.actions.redeemed'),
-                        'expired'   => __('admin.referral_reward_logs.actions.expired'),
-                        'cancelled' => __('admin.referral_reward_logs.actions.cancelled'),
-                    ]),
+                    ->options(self::getActionOptions()),
             ])
             ->recordActions([
                 ViewAction::make(),
@@ -189,6 +179,17 @@ final class ReferralRewardLogResource extends Resource
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    private static function getActionOptions(): array
+    {
+        return array_combine(
+            ReferralRewardLog::ACTIONS,
+            array_map(
+                fn (string $action): string => __('admin.referral_reward_logs.actions.' . $action),
+                ReferralRewardLog::ACTIONS,
+            ),
+        );
     }
 
     public static function getRelations(): array
