@@ -44,13 +44,11 @@ class AuthServiceProvider extends ServiceProvider
                 return null;
             }
 
-            if (! method_exists($user, 'hasRole')) {
-                return null;
+            if (property_exists($user, 'is_admin') && (bool) $user->is_admin) {
+                return true;
             }
 
-            return $user->hasAnyRole(['administrator', 'super_admin'])
-                ? true
-                : null;
+            return null;
         });
 
         $permissions = (array) config('dashboard.permissions');
