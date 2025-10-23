@@ -1,7 +1,8 @@
 <?php
 
 return array (
-  'navigation' => 
+  'plural' => 'Kampanijų konversijos',
+  'navigation' =>
   array (
     'label' => 'Kampanijų konversijos',
     'group' => 'Marketingas',

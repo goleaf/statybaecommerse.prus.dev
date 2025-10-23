@@ -1,9 +1,12 @@
 <?php
 
 return [
-    'navigation' => 'Campaign Product Targets',
+    // Provide a nested navigation label so Filament resources can prefer it
+    // while keeping backwards compatibility fallbacks in place.
+    'navigation' => [
+        'label' => 'Campaign Targets',
+    ],
     'plural' => 'Campaign Product Targets',
-    'navigation' => 'Product Targets',
     'tab_label' => 'Tabs',
     'tabs' => [
         'all' => 'All Targets',
