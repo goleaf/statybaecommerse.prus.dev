@@ -225,10 +225,10 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@modelcontextprotocol/sdk@^1.0.0":
-  version "1.18.1"
-  resolved "https://registry.npmmirror.com/@modelcontextprotocol/sdk/-/sdk-1.18.1.tgz#cdc7e0809319b0466599b93fbf655dafa9f49ceb"
-  integrity sha512-d//GE8/Yh7aC3e7p+kZG8JqqEAwwDUmAfvH1quogtbk+ksS6E0RR6toKKESPYYZVre0meqkJb27zb+dhqE9Sgw==
+"@modelcontextprotocol/sdk@^1.20.1":
+  version "1.20.1"
+  resolved "https://registry.yarnpkg.com/@modelcontextprotocol/sdk/-/sdk-1.20.1.tgz#f3d8cf2ac438e9761d736941177f7f00cadd94aa"
+  integrity sha512-j/P+yuxXfgxb+mW7OEoRCM3G47zCTDqUPivJo/VzpjbG8I9csTXtOprCf5FfOfHK4whOJny0aHuBEON+kS7CCA==
   dependencies:
     ajv "^6.12.6"
     content-type "^1.0.5"
