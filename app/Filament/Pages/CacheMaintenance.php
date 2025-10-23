@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Services\Shared\ComponentPerformanceService;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
@@ -20,9 +19,18 @@ use Throwable;
 use UnitEnum;
 final class CacheMaintenance extends Page
 {
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-server-stack';
+    /**
+     * @var string|\BackedEnum|null
+     */
+    protected static ?string $navigationIcon = 'heroicon-o-server-stack';
 
-    protected static UnitEnum|string|null $navigationGroup = 'System';
+    /**
+     * @return string|UnitEnum|null
+     */
+    public static function getNavigationGroup(): ?string
+    {
+        return 'System';
+    }
 
     protected static ?string $title = 'Cache Maintenance';
 

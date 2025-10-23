@@ -27,7 +27,8 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Collection;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use LaraZeus\SpatieTranslatable\SpatieTranslatablePlugin;
+use pxlrbt\FilamentExcel\FilamentExport;
+use function class_exists;
 
 final class AdminPanelProvider extends PanelProvider
 {
@@ -146,11 +147,7 @@ final class AdminPanelProvider extends PanelProvider
                 fn (Panel $p) => $p->plugins([]),
                 fn (Panel $p) => $p->plugins([
                     FilamentShieldPlugin::make(),
-                    FilamentFullCalendarPlugin::make()
-                        ->selectable(true)
-                        ->editable(true)
-                        ->timezone('Europe/Vilnius')
-                        ->locale('lt'),
+                    $this->makeFullCalendarPlugin(),
                     TableLayoutTogglePlugin::make()
                         ->setDefaultLayout('grid')
                         ->persistLayoutUsing(
@@ -208,221 +205,20 @@ final class AdminPanelProvider extends PanelProvider
     }
 
     /**
-     * Normalise configured class lists into unique string arrays.
-     *
-     * @return array<int, class-string>
+     * @return \Filament\Contracts\Plugin|null
      */
-    private function stringClassList(string $key): array
+    private function makeFullCalendarPlugin(): ?\Filament\Contracts\Plugin
     {
-        $items = $this->configValue($key, []);
+        $pluginClass = 'Saade\\FilamentFullCalendar\\FilamentFullCalendarPlugin';
 
-        if (! is_array($items)) {
-            return [];
-        }
-
-        $filtered = array_filter($items, static fn ($item): bool => is_string($item) && $item !== '' && class_exists($item));
-
-        /** @var array<int, class-string> $normalized */
-        $normalized = array_values(array_unique($filtered));
-
-        return $normalized;
-    }
-
-    private function isTestingEnvironment(): bool
-    {
-        $application = $this->application();
-
-        if (! $application) {
-            return false;
-        }
-
-        try {
-            return $application->environment('testing');
-        } catch (Throwable) {
-            return false;
-        }
-    }
-
-    private function assetUrl(string $path): string
-    {
-        if (function_exists('asset')) {
-            try {
-                return asset($path);
-            } catch (Throwable) {
-                // ignore and fall back
-            }
-        }
-
-        return '/'.ltrim($path, '/');
-    }
-
-    private function appPath(string $path): string
-    {
-        if (function_exists('app_path')) {
-            try {
-                return app_path($path);
-            } catch (Throwable) {
-                // ignore and fall back
-            }
-        }
-
-        return rtrim(dirname(__DIR__, 2).'/'.$path, '/');
-    }
-
-    /**
-     * @param  array<string, mixed>  $parameters
-     */
-    private function routeUrl(string $name, array $parameters = [], string $default = '#'): string
-    {
-        if (function_exists('route')) {
-            try {
-                return route($name, $parameters);
-            } catch (Throwable) {
-                return $default;
-            }
-        }
-
-        return $default;
-    }
-
-    private function currentLocale(): string
-    {
-        $application = $this->application();
-
-        if ($application) {
-            try {
-                return (string) $application->getLocale();
-            } catch (Throwable) {
-                // ignore and fall back
-            }
-        }
-
-        $translator = $this->translator();
-
-        if ($translator) {
-            try {
-                return (string) $translator->getLocale();
-            } catch (Throwable) {
-                // ignore and fall back
-            }
-        }
-
-        return 'en';
-    }
-
-    private function translate(?string $key, string $default = ''): string
-    {
-        if ($key === null || $key === '') {
-            return $default;
-        }
-
-        $translator = $this->translator();
-
-        if (! $translator) {
-            return $key;
-        }
-
-        try {
-            $translated = $translator->get($key);
-
-            return is_string($translated) ? $translated : $key;
-        } catch (Throwable) {
-            return $key;
-        }
-    }
-
-    private function configValue(string $key, mixed $default = null): mixed
-    {
-        $repository = $this->configRepository();
-
-        if ($repository) {
-            return $repository->get($key, $default);
-        }
-
-        if (! str_starts_with($key, 'filament.')) {
-            return $default;
-        }
-
-        $relativeKey = substr($key, strlen('filament.'));
-        $config = $this->filamentConfig();
-
-        foreach (explode('.', $relativeKey) as $segment) {
-            if (! is_array($config) || ! array_key_exists($segment, $config)) {
-                return $default;
-            }
-
-            $config = $config[$segment];
-        }
-
-        return $config;
-    }
-
-    private function configRepository(): ?ConfigRepository
-    {
-        $application = $this->application();
-
-        if (! $application || ! $application->bound('config')) {
+        if (! class_exists($pluginClass)) {
             return null;
         }
 
-        try {
-            $repository = $application->make('config');
-        } catch (Throwable) {
-            return null;
-        }
-
-        if (! $repository instanceof ConfigRepository) {
-            return null;
-        }
-
-        return $repository;
-    }
-
-    private function filamentConfig(): array
-    {
-        if (self::$filamentConfigCache !== null) {
-            return self::$filamentConfigCache;
-        }
-
-        $path = dirname(__DIR__, 3).'/config/filament.php';
-
-        if (is_file($path)) {
-            $config = require $path;
-
-            if (is_array($config)) {
-                /** @var array<string, mixed> $config */
-                return self::$filamentConfigCache = $config;
-            }
-        }
-
-        return self::$filamentConfigCache = [];
-    }
-
-    private function application(): ?Application
-    {
-        $container = Container::getInstance();
-
-        return $container instanceof Application ? $container : null;
-    }
-
-    private function translator(): ?Translator
-    {
-        $application = $this->application();
-
-        if (! $application || ! $application->bound('translator')) {
-            return null;
-        }
-
-        try {
-            $translator = $application->make('translator');
-        } catch (Throwable) {
-            return null;
-        }
-
-        if (! $translator instanceof Translator) {
-            return null;
-        }
-
-        return $translator;
+        return $pluginClass::make()
+            ->selectable(true)
+            ->editable(true)
+            ->timezone('Europe/Vilnius')
+            ->locale('lt');
     }
 }

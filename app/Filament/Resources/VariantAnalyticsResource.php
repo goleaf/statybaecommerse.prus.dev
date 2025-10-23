@@ -9,7 +9,7 @@ use App\Support\DateRange;
 use App\Filament\Resources\VariantAnalyticsResource\Pages;
 use App\Models\ProductVariant;
 use App\Models\VariantAnalytics;
-use BackedEnum;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -59,11 +59,14 @@ final class VariantAnalyticsResource extends Resource
     protected static ?string $model = VariantAnalytics::class;
 
     /**
-     * Navigation icon identifier displayed in the Filament sidebar (string or BackedEnum).
+     * @var string|\BackedEnum|null
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static ?string $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Inventory';
+    /**
+     * @var string|UnitEnum|null
+     */
+    protected static ?string $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 2;
 
