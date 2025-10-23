@@ -13,7 +13,7 @@ use App\Filament\Resources\ProductResource\RelationManagers\DocumentsRelationMan
 use App\Filament\Resources\ProductResource\RelationManagers\ImagesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\ReviewsRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
-use App\Filament\Widgets\InlineCharts\ProductSalesSparkline;
+use App\Filament\Widgets\InlineCharts\ProductSales30DaysChart;
 use App\Models\Product;
 use App\Services\Export\ExportColumn;
 use App\Services\Export\Exporters\ProductExport;
@@ -64,7 +64,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use LaraZeus\Quantity\Components\Quantity;
+use LaraZeus\InlineChart\Tables\Columns\InlineChart as InlineChartColumn;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
@@ -505,13 +505,13 @@ final class ProductResource extends Resource implements DefinesExportColumns
                     ->label(__('products.fields.price'))
                     ->money('EUR')
                     ->sortable(),
-                // Inline revenue sparkline powered by the cached product series helper.
-                InlineChart::make('sales_sparkline')
-                    ->label(__('products.fields.sales_trend'))
-                    ->chart(ProductSalesSparkline::class)
-                    ->maxWidth(160)
-                    ->maxHeight(48)
-                    ->icon('heroicon-o-chart-bar'),
+                InlineChartColumn::make('sales_30d')
+                    ->label(__('Sales (30d)'))
+                    ->chart(ProductSales30DaysChart::class)
+                    ->maxWidth(300)
+                    ->maxHeight(60)
+                    ->description(__('Last 30 days of sold units'))
+                    ->toggleable(),
                 TextColumn::make('stock_quantity')
                     ->label(__('products.fields.stock'))
                     ->sortable()
