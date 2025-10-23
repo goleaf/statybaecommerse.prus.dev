@@ -97,7 +97,6 @@ final class SystemSettingHistoriesTable
                             'type' => 'string',
                             'value' => $record->old_value,
                         ]);
-
                         Notification::make()
                             ->title(__('admin.system_setting_histories.value_restored_successfully'))
                             ->success()
