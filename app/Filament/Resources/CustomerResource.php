@@ -7,6 +7,7 @@ namespace App\Filament\Resources;
 use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\CustomerResource\Pages;
+use App\Filament\Widgets\InlineCharts\CustomerLtv12MonthsChart;
 use App\Models\City;
 use App\Models\Customer;
 use App\Models\Scopes\ActiveScope;
@@ -27,7 +28,6 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get as SchemaGet;
 use Filament\Schemas\Components\Utilities\Set as SchemaSet;
-use Filament\Support\Enums\Size;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -41,7 +41,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
+use LaraZeus\InlineChart\Tables\Columns\InlineChart as InlineChartColumn;
 use UnitEnum;
 
 final class CustomerResource extends Resource
@@ -287,13 +287,13 @@ final class CustomerResource extends Resource
                     ->label(__('customers.orders_count'))
                     ->counts('orders')
                     ->sortable(),
-                // Inline orders sparkline to visualize recent activity without leaving the table.
-                InlineChart::make('orders_sparkline')
-                    ->label(__('customers.orders_trend'))
-                    ->chart(CustomerOrdersSparkline::class)
-                    ->maxWidth(160)
-                    ->maxHeight(48)
-                    ->icon('heroicon-o-chart-bar'),
+                InlineChartColumn::make('ltv_12m')
+                    ->label(__('LTV (12m)'))
+                    ->chart(CustomerLtv12MonthsChart::class)
+                    ->maxWidth(320)
+                    ->maxHeight(60)
+                    ->description(__('Monthly revenue (12m)'))
+                    ->toggleable(),
                 TextColumn::make('created_at')
                     ->label(__('customers.created_at'))
                     ->dateTime()
