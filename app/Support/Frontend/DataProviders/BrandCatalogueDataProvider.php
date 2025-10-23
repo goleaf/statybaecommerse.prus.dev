@@ -5,48 +5,44 @@ declare(strict_types=1);
 namespace App\Support\Frontend\DataProviders;
 
 use App\Models\Brand;
-use App\Support\Frontend\DataProviders\Concerns\BuildsProductCatalogueQuery;
+use App\Models\Category;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 final class BrandCatalogueDataProvider
 {
-    use BuildsProductCatalogueQuery;
-
     public function __construct(private readonly ProductCatalogueDataProvider $products)
     {
     }
 
-    public function index(): array
+    public function show(Brand $brand, array $filters = []): array
     {
-        $brands = Brand::query()
-            ->withCount([
-                'products as visible_products_count' => static function (Builder $query): void {
-                    $query->where('is_visible', true)
-                        ->whereNotNull('published_at')
-                        ->where('published_at', '<=', now());
-                },
-            ])
-            ->orderBy('name')
-            ->get();
+        $brand->loadCount(['products' => fn (Builder $query) => $query->published()]);
+
+        $products = $this->products->getProductsForBrand($brand, $filters);
 
         return [
-            'brands' => $brands,
+            'brand' => $brand,
+            'products' => $products,
+            'availableSorts' => $this->products->sortOptions(),
+            'availableFilters' => $this->products->filterOptions(),
+            'activeSort' => $this->products->resolveSortKey($filters['sort'] ?? null),
+            'activeFilter' => $filters['filter'] ?? null,
+            'relatedCategories' => $this->resolveBrandCategories($brand),
         ];
     }
 
-    public function show(Brand $brand, array $filters = []): array
+    private function resolveBrandCategories(Brand $brand): Collection
     {
-        $brand->loadMissing(['products']);
-
-        $listing = $this->products->listing(
-            $filters,
-            static function (Builder $query) use ($brand): void {
-                $query->where('brand_id', $brand->getKey());
-            }
-        );
-
-        return array_merge($listing, [
-            'brand' => $brand,
-        ]);
+        return Category::query()
+            ->whereHas('products', function (Builder $query) use ($brand): void {
+                $query->published()->where('brand_id', $brand->getKey());
+            })
+            ->withCount(['products as published_products_count' => function (Builder $builder) use ($brand): void {
+                $builder->published()->where('brand_id', $brand->getKey());
+            }])
+            ->orderByDesc('published_products_count')
+            ->limit(6)
+            ->get();
     }
 }
