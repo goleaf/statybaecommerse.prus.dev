@@ -7,6 +7,7 @@ namespace App\Filament\Resources;
 use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\VariantPricingRuleResource\Pages;
 use App\Models\VariantPricingRule;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -29,8 +30,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Number;
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
+use UnitEnum;
 
 /**
  * VariantPricingRuleResource
@@ -217,15 +217,15 @@ final class VariantPricingRuleResource extends Resource
                 TextColumn::make('value')
                     ->label(__('variant_pricing_rules.value'))
                     ->numeric()
-                    ->formatStateUsing(function (float|int|string|null $state, VariantPricingRule $record): string {
-                        // Clarify percentage formatting versus fixed-amount presentation for administrators.
+                    ->formatStateUsing(function ($state, VariantPricingRule $record): string {
                         if ($record->type === 'percentage') {
                             $value = is_numeric($state) ? (float) $state : 0.0;
 
                             return Number::format($value, 2).'%';
                         }
 
-                        return Number::currency((float) ($state ?? 0), 'EUR');
+                        // Provide a predictable locale-aware currency string for administrators.
+                        return Number::currency((float) $state, 'EUR', locale: app()->getLocale());
                     }),
                 TextColumn::make('min_quantity')
                     ->label(__('variant_pricing_rules.min_quantity'))

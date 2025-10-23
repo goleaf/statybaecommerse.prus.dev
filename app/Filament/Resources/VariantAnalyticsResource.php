@@ -46,8 +46,7 @@ final class VariantAnalyticsResource extends Resource
     protected static ?string $model = VariantAnalytics::class;
 
     /**
-     * Filament expects a string identifier for the navigation icon.
-     * Using the typed property keeps static analysis accurate while satisfying Filament's contract.
+     * @var string|\BackedEnum|null Ensure Filament interprets the icon while supporting enums without forcing an import.
      */
     protected static ?string $navigationIcon = 'heroicon-o-chart-bar-square';
 
