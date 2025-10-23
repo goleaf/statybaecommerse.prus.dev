@@ -1,6 +1,8 @@
 # Platform Features
 
 ## Fulfilment & Logistics
+- Orders and zones now rely on first-class shipping option relationships, so factories and regression tests can link carriers
+  without hand-setting foreign keys.
 - Stock reservation migrations now create their tables before wiring foreign keys, so full database refreshes finish cleanly while live environments keep cascading deletes for products and variant inventories.
 - Shipping option delivery ranges in the Filament admin now display a precise window even when carriers promise same-day (0 day) service or when only one bound is stored, helping staff quickly spot incomplete data.
 
