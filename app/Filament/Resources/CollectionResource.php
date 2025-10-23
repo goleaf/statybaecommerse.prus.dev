@@ -9,14 +9,10 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\CollectionResource\Pages;
 use App\Models\Collection;
 use BackedEnum;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
@@ -25,8 +21,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -38,10 +32,8 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Novadaemon\FilamentCombobox\Combobox;
-use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 final class CollectionResource extends Resource
@@ -50,9 +42,9 @@ final class CollectionResource extends Resource
 
     protected static ?string $model = Collection::class;
 
-    
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-folder';
 
-    
+    protected static UnitEnum|string|null $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 2;
 
@@ -79,34 +71,23 @@ final class CollectionResource extends Resource
     {
         return $form->components([
             Section::make(__('collections.basic_information'))
-                ->components([
-                    LanguageTabs::make([
-                        TextInput::make('name')
-                            ->label(__('collections.name'))
-                            ->required()
-                            ->maxLength(255),
-                        TextInput::make('slug')
-                            ->label(__('collections.slug'))
-                            ->rules(['alpha_dash'])
-                            ->helperText(__('collections.help.slug')),
-                        Textarea::make('description')
-                            ->label(__('collections.description'))
-                            ->rows(4),
-                    ]),
-                ]),
-            Section::make(__('collections.business_info'))
-                ->components([
-                    Grid::make(3)
-                        ->components([
-                            Toggle::make('is_visible')
-                                ->label(__('collections.is_visible'))
-                                ->default(true),
-                            Toggle::make('is_active')
-                                ->label(__('collections.is_active'))
-                                ->default(true),
-                            Toggle::make('is_automatic')
-                                ->label(__('collections.is_automatic'))
-                                ->default(false),
+                ->schema([
+                    Grid::make(2)
+                        ->schema([
+                            TextInput::make('name')
+                                ->label(__('collections.name'))
+                                ->required()
+                                ->maxLength(255)
+                                ->live(onBlur: true)
+                                ->afterStateUpdated(function ($state, Forms\Set $set, $operation): void {
+                                    if ($operation === 'create' && filled($state)) {
+                                        $set('slug', Str::slug($state));
+                                    }
+                                }),
+                            TextInput::make('slug')
+                                ->label(__('collections.slug'))
+                                ->unique(ignoreRecord: true)
+                                ->rules(['alpha_dash']),
                         ]),
                     Grid::make(3)
                         ->components([
@@ -187,25 +168,38 @@ final class CollectionResource extends Resource
                         ->height('350px')
                         ->preload(),
                 ]),
-            Section::make(__('collections.seo_info'))
-                ->components([
-                    LanguageTabs::make([
-                        TextInput::make('seo_title')
-                            ->label(__('collections.seo_title'))
-                            ->maxLength(255),
-                        Textarea::make('seo_description')
-                            ->label(__('collections.seo_description'))
-                            ->rows(2),
-                        TextInput::make('meta_title')
-                            ->label(__('collections.meta_title'))
-                            ->maxLength(255),
-                        Textarea::make('meta_description')
-                            ->label(__('collections.meta_description'))
-                            ->rows(2),
-                        TextInput::make('meta_keywords')
-                            ->label(__('collections.meta_keywords'))
-                            ->helperText(__('collections.help.meta_keywords')),
-                    ]),
+            Section::make(__('collections.seo'))
+                ->schema([
+                    TextInput::make('seo_title')
+                        ->label(__('collections.seo_title'))
+                        ->maxLength(255),
+                    Textarea::make('seo_description')
+                        ->label(__('collections.seo_description'))
+                        ->rows(2)
+                        ->maxLength(500),
+                ]),
+            Section::make(__('collections.settings'))
+                ->schema([
+                    Toggle::make('is_active')
+                        ->label(__('collections.is_active'))
+                        ->default(true),
+                    Toggle::make('is_featured')
+                        ->label(__('collections.is_featured')),
+                    Select::make('sort_order')
+                        ->label(__('collections.sort_order'))
+                        ->options([
+                            'manual'       => __('collections.sort_orders.manual'),
+                            'name_asc'     => __('collections.sort_orders.name_asc'),
+                            'name_desc'    => __('collections.sort_orders.name_desc'),
+                            'price_asc'    => __('collections.sort_orders.price_asc'),
+                            'price_desc'   => __('collections.sort_orders.price_desc'),
+                            'created_asc'  => __('collections.sort_orders.created_asc'),
+                            'created_desc' => __('collections.sort_orders.created_desc'),
+                        ])
+                        ->default('manual'),
+                    Toggle::make('auto_update')
+                        ->label(__('collections.auto_update'))
+                        ->default(false),
                 ]),
         ]);
     }
@@ -237,13 +231,9 @@ final class CollectionResource extends Resource
                     ->sortable(),
                 TextColumn::make('sort_order')
                     ->label(__('collections.sort_order'))
-                    ->sortable(),
-                TextColumn::make('display_type')
-                    ->label(__('collections.display_type'))
-                    ->formatStateUsing(fn (?string $state): string => $state ? __('collections.display_types.' . $state) : '-'),
-                IconColumn::make('is_visible')
-                    ->label(__('collections.is_visible'))
-                    ->boolean(),
+                    ->formatStateUsing(fn (?string $state): string => $state
+                        ? __('collections.sort_orders.' . $state)
+                        : __('collections.sort_orders.manual')),
                 IconColumn::make('is_active')
                     ->label(__('collections.is_active'))
                     ->boolean(),
