@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Campaign;
 use App\Models\Translations\CampaignConversionTranslation;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Builder;
@@ -48,17 +49,26 @@ final class CampaignConversion extends Model
         self::creating(static function (self $conversion): void {
             // Tests and reporting expect a value, so seed a sensible default.
             $conversion->converted_at ??= now();
+
+            // Ensure campaign level reporting has a friendly label even for factory data.
+            if (empty($conversion->campaign_name) && $conversion->campaign_id) {
+                $campaign = Campaign::find($conversion->campaign_id);
+
+                if ($campaign instanceof Campaign) {
+                    $conversion->campaign_name = $campaign->name;
+                }
+            }
         });
     }
 
-    protected $fillable = ['campaign_id', 'click_id', 'order_id', 'customer_id', 'conversion_type', 'conversion_value', 'session_id', 'conversion_data', 'converted_at', 'status', 'source', 'medium', 'campaign_name', 'utm_content', 'utm_term', 'referrer', 'ip_address', 'user_agent', 'device_type', 'browser', 'os', 'country', 'city', 'is_mobile', 'is_tablet', 'is_desktop', 'conversion_duration', 'page_views', 'time_on_site', 'bounce_rate', 'exit_page', 'landing_page', 'funnel_step', 'attribution_model', 'conversion_path', 'touchpoints', 'last_click_attribution', 'first_click_attribution', 'linear_attribution', 'time_decay_attribution', 'position_based_attribution', 'data_driven_attribution', 'conversion_window', 'lookback_window', 'assisted_conversions', 'assisted_conversion_value', 'total_conversions', 'total_conversion_value', 'conversion_rate', 'cost_per_conversion', 'roi', 'roas', 'lifetime_value', 'customer_acquisition_cost', 'payback_period', 'notes', 'tags', 'custom_attributes'];
+    protected $fillable = ['campaign_id', 'click_id', 'order_id', 'customer_id', 'conversion_type', 'conversion_value', 'session_id', 'conversion_data', 'converted_at', 'status', 'source', 'medium', 'campaign_name', 'utm_content', 'utm_term', 'referrer', 'ip_address', 'user_agent', 'device_type', 'browser', 'os', 'country', 'city', 'is_mobile', 'is_tablet', 'is_desktop', 'is_verified', 'is_attributed', 'conversion_duration', 'page_views', 'time_on_site', 'bounce_rate', 'exit_page', 'landing_page', 'funnel_step', 'attribution_model', 'conversion_path', 'touchpoints', 'last_click_attribution', 'first_click_attribution', 'linear_attribution', 'time_decay_attribution', 'position_based_attribution', 'data_driven_attribution', 'conversion_window', 'lookback_window', 'assisted_conversions', 'assisted_conversion_value', 'total_conversions', 'total_conversion_value', 'conversion_rate', 'cost_per_conversion', 'roi', 'roas', 'lifetime_value', 'customer_acquisition_cost', 'payback_period', 'notes', 'tags', 'custom_attributes'];
 
     /**
      * Handle casts functionality with proper error handling.
      */
     protected function casts(): array
     {
-        return ['conversion_value' => 'decimal:2', 'conversion_data' => 'array', 'converted_at' => 'datetime', 'is_mobile' => 'boolean', 'is_tablet' => 'boolean', 'is_desktop' => 'boolean', 'conversion_duration' => 'integer', 'page_views' => 'integer', 'time_on_site' => 'integer', 'bounce_rate' => 'decimal:2', 'assisted_conversion_value' => 'decimal:2', 'total_conversion_value' => 'decimal:2', 'conversion_rate' => 'decimal:4', 'cost_per_conversion' => 'decimal:2', 'roi' => 'decimal:4', 'roas' => 'decimal:4', 'lifetime_value' => 'decimal:2', 'customer_acquisition_cost' => 'decimal:2', 'payback_period' => 'integer', 'tags' => 'array', 'custom_attributes' => 'array', 'touchpoints' => 'array', 'conversion_path' => 'array'];
+        return ['conversion_value' => 'decimal:2', 'conversion_data' => 'array', 'converted_at' => 'datetime', 'is_mobile' => 'boolean', 'is_tablet' => 'boolean', 'is_desktop' => 'boolean', 'is_verified' => 'boolean', 'is_attributed' => 'boolean', 'conversion_duration' => 'integer', 'page_views' => 'integer', 'time_on_site' => 'integer', 'bounce_rate' => 'decimal:2', 'assisted_conversion_value' => 'decimal:2', 'total_conversion_value' => 'decimal:2', 'conversion_rate' => 'decimal:4', 'cost_per_conversion' => 'decimal:2', 'roi' => 'decimal:4', 'roas' => 'decimal:4', 'lifetime_value' => 'decimal:2', 'customer_acquisition_cost' => 'decimal:2', 'payback_period' => 'integer', 'tags' => 'array', 'custom_attributes' => 'array', 'touchpoints' => 'array', 'conversion_path' => 'array'];
     }
 
     protected static function booted(): void
