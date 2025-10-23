@@ -48,6 +48,8 @@ use UnitEnum;
 
 final class EnumManagementResource extends Resource
 {
+    protected static ?string $model = EnumValue::class;
+
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
 
     protected static ?int $navigationSort = 2;
