@@ -22,8 +22,8 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
-use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
@@ -103,9 +103,9 @@ final class AddressResource extends Resource
     }
 
     /**
-     * Configure the Filament schema using the Filament v4 Schema API.
+     * Configure the Filament form schema using the Schema API introduced in Filament v4.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         return $schema->schema([

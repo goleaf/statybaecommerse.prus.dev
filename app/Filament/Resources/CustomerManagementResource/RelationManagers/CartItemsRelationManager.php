@@ -26,7 +26,7 @@ class CartItemsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'cartItems';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $form): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         return $schema
@@ -40,7 +40,7 @@ class CartItemsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function infolist(Schema $schema): Schema
+    public function infolist(Schema $infolist): Schema
     {
         // Configure the Filament infolist schema using the v4 Schema API.
         return $infolist

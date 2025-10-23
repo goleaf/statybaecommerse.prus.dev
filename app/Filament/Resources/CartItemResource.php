@@ -47,7 +47,7 @@ final class CartItemResource extends Resource
     /**
      * Define the navigation icon in a docblock to keep compatibility with Filament's autoloading.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static ?string $model = CartItem::class;
 
@@ -74,7 +74,7 @@ final class CartItemResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         return $schema->schema([

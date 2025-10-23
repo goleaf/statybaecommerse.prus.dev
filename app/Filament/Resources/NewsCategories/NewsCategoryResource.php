@@ -46,7 +46,7 @@ final class NewsCategoryResource extends Resource
         return $group instanceof NavigationGroup ? $group->label() : $group;
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         return NewsCategoryForm::configure($form);

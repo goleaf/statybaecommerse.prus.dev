@@ -47,10 +47,10 @@ final class EnumResource extends Resource
     protected static ?string $model = EnumValue::class;
 
     /** @var string|\BackedEnum|null Align navigation metadata with BackedEnum compatibility. */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-squares-2x2';
 
     /** @var string|\BackedEnum|null Anchor the resource to the System navigation area. */
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::System;
+    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 2;
 
@@ -77,7 +77,7 @@ final class EnumResource extends Resource
         return trans('admin.enums.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         return $schema->schema([

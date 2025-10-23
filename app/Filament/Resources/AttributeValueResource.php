@@ -83,7 +83,7 @@ final class AttributeValueResource extends Resource
         return __('attribute_values.plural');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         return $schema->schema([

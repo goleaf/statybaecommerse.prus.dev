@@ -67,7 +67,7 @@ final class PriceListResource extends Resource
         return __('price_lists.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         return $schema->schema([

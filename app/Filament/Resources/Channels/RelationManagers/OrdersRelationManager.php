@@ -25,7 +25,7 @@ class OrdersRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'orders';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $form): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         return $schema

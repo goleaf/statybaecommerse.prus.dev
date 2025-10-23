@@ -56,7 +56,7 @@ final class SystemSettingCategoryResource extends Resource
     /**
      * @var string|BackedEnum|null Keep navigation grouping aligned with the shared enum helper.
      */
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::System;
+    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::System;
 
     public static function getNavigationGroup(): ?string
     {
@@ -99,7 +99,7 @@ final class SystemSettingCategoryResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         return $schema

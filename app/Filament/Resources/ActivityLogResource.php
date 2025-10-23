@@ -27,10 +27,9 @@ final class ActivityLogResource extends Resource
     protected static ?string $model = ActivityLog::class;
 
     /**
-     * @var string|\BackedEnum|null Icon used in the navigation menu to help operators
-     * keep the activity feed grouped with other system tools.
+     * Icon used in the navigation menu. Type: string|\BackedEnum|null.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
     protected static ?int $navigationSort = 9;
 

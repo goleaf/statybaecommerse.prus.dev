@@ -64,7 +64,7 @@ final class NormalSettingTranslationResource extends Resource
         return __('admin.normal_setting_translations.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         return $schema

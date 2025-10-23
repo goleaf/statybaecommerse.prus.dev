@@ -166,7 +166,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
         return AuthorizationMatrix::check('orders', 'update');
     }
 
-    public static function getNavigationIcon(): string|BackedEnum|\UnitEnum|null
+    public static function getNavigationIcon(): string|\BackedEnum|null
     {
         return 'heroicon-o-shopping-bag';
     }
@@ -200,7 +200,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
     /**
      * Configure the comprehensive form schema with advanced features.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         return $schema->schema([

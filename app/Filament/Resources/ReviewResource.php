@@ -48,7 +48,7 @@ final class ReviewResource extends Resource
     /**
      * @var string|BackedEnum|null Normalize Filament icon typing for consistency.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-star';
 
     protected static ?int $navigationSort = 4;
 
@@ -57,7 +57,7 @@ final class ReviewResource extends Resource
     /**
      * @var string|BackedEnum|null Allow enum-backed navigation grouping.
      */
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::ContentManagement;
+    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::ContentManagement;
 
     public static function getNavigationGroup(): ?string
     {
@@ -82,7 +82,7 @@ final class ReviewResource extends Resource
         return __('reviews.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         return $schema

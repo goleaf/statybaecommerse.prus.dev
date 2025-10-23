@@ -9,7 +9,7 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\PartnerResource\Pages;
 use App\Models\Partner;
 use Filament\Forms;
-use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -35,7 +35,7 @@ final class PartnerResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         // Build the Partner form using the Section helper to keep layouts consistent.

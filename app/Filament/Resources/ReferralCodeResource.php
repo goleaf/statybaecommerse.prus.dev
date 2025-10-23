@@ -42,7 +42,7 @@ final class ReferralCodeResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'Referral';
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         return $schema

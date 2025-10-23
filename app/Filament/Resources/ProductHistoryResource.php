@@ -35,7 +35,7 @@ final class ProductHistoryResource extends Resource
 
     protected static ?string $model = ProductHistory::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-clock';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clock';
 
     protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Products;
 
@@ -56,7 +56,7 @@ final class ProductHistoryResource extends Resource
         return __('product_history.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         return $schema->schema([

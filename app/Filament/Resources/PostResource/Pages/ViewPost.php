@@ -9,6 +9,7 @@ use App\Filament\Resources\UserResource;
 use App\Models\Post;
 use App\Models\PostApproval;
 use Filament\Actions;
+use Filament\Schemas\Schema;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Schema;
 use LaraZeus\ListGroup\Entries\ListItem;
@@ -26,7 +27,7 @@ final class ViewPost extends ViewRecord
         ];
     }
 
-    public function infolist(Schema $schema): Schema
+    public function infolist(Schema $infolist): Schema
     {
         // Configure the Filament infolist schema using the v4 Schema API.
         return $schema->schema([
