@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
 
+use Filament\Schemas\Schema;
 use App\Filament\Resources\SliderTranslationResource\Pages;
 use App\Models\SliderTranslation;
 use Filament\Actions\BulkActionGroup;
@@ -24,22 +24,8 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use UnitEnum;
-use Filament\Schemas\Schema;
-
-use Filament\Schemas\Schema;
-/**
- * SliderTranslationResource
- *
- * Filament v4 resource for SliderTranslation management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class SliderTranslationResource extends Resource
-{
-    use HasNav;
-
-    protected static ?string $model = SliderTranslation::class;
-
     /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?int $navigationSort = 3;
 
@@ -63,7 +49,7 @@ final class SliderTranslationResource extends Resource
         return __('admin.slider_translations.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
             SchemaSection::make(__('admin.slider_translations.basic_information'))
@@ -103,7 +89,7 @@ final class SliderTranslationResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

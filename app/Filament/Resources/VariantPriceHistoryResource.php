@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use UnitEnum;
-use BackedEnum;
+
+use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use BackedEnum;
 use UnitEnum;
@@ -32,9 +32,8 @@ final class VariantPriceHistoryResource extends Resource
     use HasNav;
 
     protected static ?string $model = VariantPriceHistory::class;
-
     /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-currency-euro';
+    protected static $navigationIcon = 'heroicon-o-currency-euro';
 
     /** @var string|\UnitEnum|null */
     protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::System;
@@ -49,7 +48,7 @@ final class VariantPriceHistoryResource extends Resource
         return $group instanceof NavigationGroup ? $group->label() : $group;
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $schema): Schema   
     {
         return $schema
             ->schema([
@@ -104,7 +103,7 @@ final class VariantPriceHistoryResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

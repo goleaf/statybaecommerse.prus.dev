@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\Pages;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\DiscountRedemptionResource;
 use App\Filament\Resources\DocumentResource;
 use App\Filament\Resources\OrderResource;
@@ -41,7 +43,7 @@ final class ViewOrder extends ViewRecord
         ];
     }
 
-    public function infolist(Infolist $infolist): Infolist
+    public function infolist(Schema $schema): Schema   
     {
         return $schema->schema([
             ListEntry::make('orderQuickLinks')

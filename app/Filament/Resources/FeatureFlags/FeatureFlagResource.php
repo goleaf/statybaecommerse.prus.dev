@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources\FeatureFlags;
 use App\Support\Concerns\HasNav;
 
-use BackedEnum;
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\FeatureFlags\Pages\CreateFeatureFlag;
 use App\Filament\Resources\FeatureFlags\Pages\EditFeatureFlag;
 use App\Filament\Resources\FeatureFlags\Pages\ListFeatureFlags;
@@ -24,16 +25,15 @@ class FeatureFlagResource extends Resource
     use HasNav;
 
     protected static ?string $model = FeatureFlag::class;
-
     /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return FeatureFlagForm::configure($schema);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return FeatureFlagsTable::configure($table);

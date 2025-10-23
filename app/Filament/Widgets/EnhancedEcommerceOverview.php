@@ -19,7 +19,7 @@ use UnitEnum;
 final class EnhancedEcommerceOverview extends StatsOverviewWidget
 {
     /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-presentation-chart-line';
+    protected static $navigationIcon = 'heroicon-o-presentation-chart-line';
 
     /** @var string|\UnitEnum|null */
     protected static \UnitEnum|string|null $navigationGroup = 'Dashboard';

@@ -56,7 +56,7 @@ final class NewsCategoryResource extends Resource
 
     protected static ?string $pluralModelLabel = 'News Categories';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
             Section::make(__('news_categories.sections.category_information'))
@@ -141,7 +141,7 @@ final class NewsCategoryResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -271,7 +271,7 @@ final class NewsCategoryResource extends Resource
             ->paginationPageOptions([10, 25, 50, 100]);
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Schema $schema): Schema   
     {
         // Provide the infolist schema using the Filament v4 return type.
         return $schema

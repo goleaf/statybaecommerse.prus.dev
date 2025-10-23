@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use UnitEnum;
-use BackedEnum;
+
+use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use BackedEnum;
 use UnitEnum;
@@ -52,9 +52,8 @@ use UnitEnum;
 final class EnumManagementResource extends Resource
 {
     protected static ?string $model = EnumValue::class;
-
     /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static $navigationIcon = 'heroicon-o-squares-2x2';
 
     /** @var string|\UnitEnum|null */
     protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::System;
@@ -84,7 +83,7 @@ final class EnumManagementResource extends Resource
         return trans('admin.enums.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
             Tabs::make('enum_management_tabs')
@@ -168,7 +167,7 @@ final class EnumManagementResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

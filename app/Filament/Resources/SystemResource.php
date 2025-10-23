@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Forms\Components\Flatpickr;
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\SystemResource\Pages;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
@@ -45,39 +46,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
-
-use Filament\Schemas\Schema;
-/**
- * System Resource - Comprehensive System Management
- *
- * Features:
- * - System settings management with categories
- * - Real-time system monitoring
- * - Cache management
- * - Database optimization
- * - System health checks
- * - Backup management
- * - Performance monitoring
- * - Multi-language support
- * - Advanced filtering and search
- * - Bulk operations
- * - Export capabilities
- * - Audit trail
- */
-final class SystemResource extends Resource
-{
-    use HasNav;
-
-    protected static ?string $model = SystemSetting::class;
-
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = 'System';
-
-    protected static ?int $navigationSort = 1;
-
     /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-cog-6-tooth';
+    protected static $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     protected static ?string $navigationLabel = null;
 
@@ -122,7 +92,7 @@ final class SystemResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return $schema
             ->schema([
@@ -521,7 +491,7 @@ final class SystemResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

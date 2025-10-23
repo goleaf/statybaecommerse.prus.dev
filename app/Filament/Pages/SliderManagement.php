@@ -42,10 +42,7 @@ use BackedEnum;
 class SliderManagement extends Page implements HasActions, HasForms
 {
     use InteractsWithActions, InteractsWithForms;
-
-    /**
-     * @var string|\BackedEnum|null Navigation icon override documented to support enums without extra imports.
-     */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationLabel = 'Slider Management';

@@ -27,7 +27,7 @@ class ViewLegal extends ViewRecord
         ];
     }
 
-    public function infolist(Schema $schema): Schema
+    public function infolist(Schema $schema): Schema   
     {
         // Provide the infolist schema using the Filament v4 return type.
         return $schema

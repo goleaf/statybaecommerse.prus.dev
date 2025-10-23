@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Forms\Components\Flatpickr;
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\EmailCampaignResource\Pages;
 use App\Models\EmailCampaign;
 use App\Support\Filament\Components\Flatpickr;
@@ -36,9 +37,8 @@ final class EmailCampaignResource extends Resource
     protected static ?string $model = EmailCampaign::class;
 
     protected static ?int $navigationSort = 4;
-
     /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-envelope';
+    protected static $navigationIcon = 'heroicon-o-envelope';
 
     public static function getNavigationLabel(): string
     {
@@ -55,7 +55,7 @@ final class EmailCampaignResource extends Resource
         return __('admin.email_campaigns.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
             Section::make(__('admin.email_campaigns.basic_information'))
@@ -103,7 +103,7 @@ final class EmailCampaignResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

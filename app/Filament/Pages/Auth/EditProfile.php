@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Auth;
 
-use App\Support\Filament\Components\Flatpickr;
+
+use Filament\Schemas\Schema;
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use Filament\Forms\Components\FileUpload;
 use Filament\Schemas\Components\Grid;
@@ -19,7 +20,7 @@ use Filament\Schemas\Schema;
 use Filament\Schemas\Schema;
 class EditProfile extends BaseEditProfile
 {
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema   
     {
         return $schema
             ->components([

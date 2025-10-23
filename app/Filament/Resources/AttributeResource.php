@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
 
+use Filament\Schemas\Schema;
 use App\Filament\Resources\AttributeResource\Pages;
 use App\Models\Attribute;
 use Filament\Actions;
@@ -35,9 +35,8 @@ final class AttributeResource extends Resource
     use HasNav;
 
     protected static ?string $model = Attribute::class;
-
     /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
+    protected static $navigationIcon = 'heroicon-o-tag';
 
     public static function getNavigationGroup(): string|UnitEnum|null
     {
@@ -63,7 +62,7 @@ final class AttributeResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
             Section::make(__('attributes.basic_information'))
@@ -277,7 +276,7 @@ final class AttributeResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

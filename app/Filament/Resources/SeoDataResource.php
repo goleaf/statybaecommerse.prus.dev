@@ -70,7 +70,7 @@ final class SeoDataResource extends Resource
         return __('seo_data.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $schema): Schema   
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         return $schema
@@ -228,7 +228,7 @@ final class SeoDataResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -416,7 +416,7 @@ final class SeoDataResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Schema $schema): Schema   
     {
         // Provide the infolist schema using the Filament v4 return type.
         return $schema

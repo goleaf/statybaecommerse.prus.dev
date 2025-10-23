@@ -25,10 +25,7 @@ final class UserImpersonation extends Page implements HasTable
     use ConfiguresToggleableTableLayout;
     use HasToggleableTable;
     use InteractsWithTable;
-
-    /**
-     * @var string|\BackedEnum|null Navigation icon override documented to keep BackedEnum usage inline.
-     */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-user';
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-user';
@@ -44,7 +41,7 @@ final class UserImpersonation extends Page implements HasTable
 
     protected string $view = 'filament.pages.user-impersonation';
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
         // Configure the Filament table definition for the resource.
         $table = $table

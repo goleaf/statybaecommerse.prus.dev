@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
 
+use Filament\Schemas\Schema;
 use App\Filament\Resources\NewsCommentResource\Pages;
 use App\Models\NewsComment;
 use App\Models\Scopes\ActiveScope;
@@ -44,9 +44,8 @@ final class NewsCommentResource extends Resource
     use HasNav;
 
     protected static ?string $model = NewsComment::class;
-
     /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-chat-bubble-left-ellipsis';
+    protected static $navigationIcon = 'heroicon-o-chat-bubble-left-ellipsis';
 
     public static function getNavigationGroup(): UnitEnum|string|null
     {
@@ -70,7 +69,7 @@ final class NewsCommentResource extends Resource
         return __('admin.news_comments.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
             Section::make(__('admin.news_comments.basic_information'))
@@ -151,7 +150,7 @@ final class NewsCommentResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Enums\DocumentTemplateCategory;
 use App\Enums\DocumentTemplateType;
 use App\Filament\Resources\DocumentTemplateResource\Pages;
@@ -35,18 +37,8 @@ use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
-use Filament\Schemas\Schema;
-
-use Filament\Schemas\Schema;
-/**
- * DocumentTemplateResource
- *
- * Filament v4 resource for DocumentTemplate management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class DocumentTemplateResource extends Resource
-{
     /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
+    protected static $navigationIcon = 'heroicon-o-document-text';
 
     public static function getNavigationGroup(): string|UnitEnum|null
     {
@@ -86,7 +78,7 @@ final class DocumentTemplateResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
             Tabs::make('document_template_form')
@@ -196,7 +188,7 @@ final class DocumentTemplateResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

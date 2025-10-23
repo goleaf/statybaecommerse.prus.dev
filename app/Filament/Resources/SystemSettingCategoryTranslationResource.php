@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
 
+use Filament\Schemas\Schema;
 use App\Filament\Resources\SystemSettingCategoryTranslationResource\Pages;
 use App\Models\SystemSettingCategory;
 use App\Models\SystemSettingCategoryTranslation;
@@ -29,26 +29,7 @@ use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-
-use Filament\Schemas\Schema;
-/**
- * SystemSettingCategoryTranslationResource
- *
- * Filament v4 resource for SystemSettingCategoryTranslation management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class SystemSettingCategoryTranslationResource extends Resource
-{
-    use HasNav;
-
-    protected static ?string $model = SystemSettingCategoryTranslation::class;
-
-    protected static ?int $navigationSort = 15;
-
-    protected static ?string $recordTitleAttribute = 'name';
-
-    /**
-     * @var string|\BackedEnum|null Navigation icon override retained as docblock for Filament compatibility.
-     */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-language';
 
     /**
@@ -73,7 +54,7 @@ final class SystemSettingCategoryTranslationResource extends Resource
         return __('admin.system_setting_category_translations.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
             Section::make(__('admin.system_setting_category_translations.basic_information'))
@@ -117,7 +98,7 @@ final class SystemSettingCategoryTranslationResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

@@ -24,10 +24,7 @@ final class InventoryManagement extends Page implements HasTable
     use ConfiguresToggleableTableLayout;
     use HasToggleableTable;
     use InteractsWithTable;
-
-    /**
-     * @var string|\BackedEnum|null Navigation icon override documented to avoid redundant enum imports.
-     */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-archive-box';
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-archive-box';
@@ -47,7 +44,7 @@ final class InventoryManagement extends Page implements HasTable
         return 'Inventory Management';
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
         // Configure the Filament table definition for the resource.
         $table = $table

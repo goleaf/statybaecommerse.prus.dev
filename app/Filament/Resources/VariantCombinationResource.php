@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
 
+use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantCombinationResource\Pages;
 use App\Models\Product;
 use App\Models\VariantCombination;
@@ -35,22 +35,8 @@ use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-use Filament\Schemas\Schema;
-
-use Filament\Schemas\Schema;
-/**
- * VariantCombinationResource
- *
- * Filament v4 resource for VariantCombination management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class VariantCombinationResource extends Resource
-{
-    use HasNav;
-
-    protected static ?string $model = VariantCombination::class;
-
     /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static $navigationIcon = 'heroicon-o-squares-2x2';
 
     /** @var string|\UnitEnum|null */
     protected static \UnitEnum|string|null $navigationGroup = 'Inventory';
@@ -72,7 +58,7 @@ final class VariantCombinationResource extends Resource
         return __('admin.variant_combinations.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return $schema
             ->components([
@@ -151,7 +137,7 @@ final class VariantCombinationResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

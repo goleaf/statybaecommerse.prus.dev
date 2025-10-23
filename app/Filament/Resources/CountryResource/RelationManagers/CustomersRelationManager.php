@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CountryResource\RelationManagers;
 
+
+use Filament\Schemas\Schema;
 use Filament\Forms;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Forms;
@@ -21,7 +23,7 @@ final class CustomersRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Customers';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema   
     {
         return $schema
             ->schema([
@@ -73,7 +75,7 @@ final class CustomersRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
         // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table

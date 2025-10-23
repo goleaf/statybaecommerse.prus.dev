@@ -15,19 +15,7 @@ use Filament\Pages\Dashboard\Actions\FilterAction;
 use Filament\Pages\Dashboard\Concerns\HasFiltersAction;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Illuminate\Database\Eloquent\Builder;
-
-class SliderAnalytics extends BaseDashboard
-{
-    use HasFiltersAction;
-    use InteractsWithPageFilters;
-
-    protected static ?string $title = 'Slider Analytics';
-
-    protected static ?string $navigationLabel = 'Slider Analytics';
-
-    /**
-     * @var string|\BackedEnum|null Navigation icon override documented for Filament compatibility.
-     */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?int $navigationSort = 3;
