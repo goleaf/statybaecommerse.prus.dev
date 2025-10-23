@@ -26,7 +26,7 @@ use Filament\Forms\Form;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkAction as TableBulkAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -36,6 +36,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Number;
 
 final class CouponUsageResource extends Resource
 {
@@ -177,7 +178,13 @@ final class CouponUsageResource extends Resource
                                         ->content(fn (?Model $record) => $record?->user?->email ?? '-'),
                                     Placeholder::make('order_total')
                                         ->label(__('admin.coupon_usages.form.fields.order_total'))
-                                        ->content(fn (?Model $record) => $record?->order ? '€' . number_format($record->order->total_amount, 2) : '-'),
+                                        ->content(fn (?Model $record): string => $record?->order
+                                            ? Number::currency(
+                                                (float) $record->order->total,
+                                                $record->order->currency ?? 'EUR',
+                                                locale: app()->getLocale(),
+                                            )
+                                            : '-'),
                                     Textarea::make('notes')
                                         ->label(__('admin.coupon_usages.form.fields.notes'))
                                         ->rows(3),
@@ -215,9 +222,9 @@ final class CouponUsageResource extends Resource
                     ->label(__('admin.coupon_usages.form.fields.usage_period'))
                     ->state(fn (CouponUsage $record): string => $record->usage_period)
                     ->colors([
-                        'success' => fn ($state) => in_array($state, [__('admin.coupon_usages.periods.today'), __('admin.coupon_usages.periods.this_week')], true),
-                        'warning' => fn ($state) => $state === __('admin.coupon_usages.periods.this_month'),
-                        'danger'  => fn ($state) => $state === __('admin.coupon_usages.periods.older'),
+                        'success' => fn (?string $state): bool => in_array($state, [__('admin.coupon_usages.periods.today'), __('admin.coupon_usages.periods.this_week')], true),
+                        'warning' => fn (?string $state): bool => $state === __('admin.coupon_usages.periods.this_month'),
+                        'danger'  => fn (?string $state): bool => $state === __('admin.coupon_usages.periods.older'),
                     ]),
             ])
             ->filters([
