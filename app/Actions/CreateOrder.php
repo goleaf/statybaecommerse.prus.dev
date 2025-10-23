@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions;
 
-use App\Mail\OrderPlaced;
+use App\Mail\OrderConfirmationMail;
 use App\Models\Country;
 use App\Models\Order;
 use App\Services\Pricing\PriceCalculator;
@@ -157,7 +157,7 @@ class CreateOrder
             );
             // Queue order confirmation email with user's preferred locale
             try {
-                $mailable = new OrderPlaced($order);
+                $mailable = new OrderConfirmationMail($order);
                 if (! empty($customer->preferred_locale)) {
                     $mailable->locale($customer->preferred_locale);
                 }
