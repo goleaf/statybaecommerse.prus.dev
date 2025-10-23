@@ -9,18 +9,17 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\PriceResource\Pages;
 use App\Models\Price;
 use App\Models\Product;
-use App\Models\ProductVariant;
-use Filament\Forms\Components\DateTimePicker;
+use App\Support\Search\ProductSearch;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\MorphToSelect;
 use Filament\Forms\Components\MorphToSelect\Type as MorphToSelectType;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
@@ -66,16 +65,50 @@ final class PriceResource extends Resource
                             ->required(),
                         Grid::make(2)
                             ->schema([
-                                Select::make('currency_id')
-                                    ->label(__('admin.prices.fields.currency'))
-                                    ->relationship('currency', 'code')
-                                    ->searchable()
-                                    ->preload()
-                                    ->required(),
-                                Select::make('type')
-                                    ->label(__('admin.prices.fields.type'))
-                                    ->options(self::getPriceTypeOptions())
-                                    ->default('retail')
+                                SearchableInput::make('product_id')
+                                    ->label(__('admin.prices.product'))
+                                    ->placeholder('SKU / EAN / name')
+                                    ->required()
+                                    ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
+                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
+                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                        if ($state === null) {
+                                            return;
+                                        }
+
+                                        $product = Product::query()
+                                            ->select(['id', 'sku', 'name'])
+                                            ->find($state);
+
+                                        if (! $product instanceof Product) {
+                                            return;
+                                        }
+
+                                        $component
+                                            ->state((string) $state)
+                                            ->options([
+                                                (string) $product->getKey() => ProductSearch::label($product),
+                                            ]);
+                                    })
+                                    ->afterStateUpdated(function (?string $state, Set $set): void {
+                                        if ($state === null || $state === '') {
+                                            return;
+                                        }
+
+                                        $product = Product::query()
+                                            ->select(['id'])
+                                            ->find((int) $state);
+
+                                        if (! $product instanceof Product) {
+                                            return;
+                                        }
+
+                                        $set('product_id', $product->getKey());
+                                    }),
+                                TextInput::make('amount')
+                                    ->label(__('admin.prices.amount'))
+                                    ->numeric()
+                                    ->prefix('€')
                                     ->required(),
                             ]),
                         Toggle::make('is_enabled')

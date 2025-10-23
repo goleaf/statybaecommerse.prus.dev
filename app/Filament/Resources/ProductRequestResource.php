@@ -9,9 +9,8 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\ProductRequestResource\Pages;
 use App\Models\Product;
 use App\Models\ProductRequest;
-use App\Support\Filament\Components\Flatpickr;
-use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use BackedEnum;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -20,6 +19,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -69,30 +69,26 @@ final class ProductRequestResource extends Resource
                     ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
                     ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
                     ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?ProductRequest $record): void {
-                        // Hydrate via helper so metadata lifecycle mirrors docs/forms/SEARCHABLE_INPUT_METADATA.md.
-                        SearchableInputHelper::hydrate(
-                            $component,
-                            $state,
-                            static function (int $value) use ($record): ?array {
-                                $product = $record?->product ?? Product::query()
-                                    ->select(['id', 'sku', 'name'])
-                                    ->find($value);
+                        if ($state === null) {
+                            return;
+                        }
 
-                                if (! $product instanceof Product) {
-                                    return null;
-                                }
+                        $product = $record?->product ?? Product::query()
+                            ->select(['id', 'sku', 'name'])
+                            ->find($state);
 
-                                return [
-                                    'value' => $product->getKey(),
-                                    'label' => ProductSearch::label($product),
-                                ];
-                            },
-                        );
+                        if (! $product instanceof Product) {
+                            return;
+                        }
+
+                        $component
+                            ->state((string) $state)
+                            ->options([
+                                (string) $product->getKey() => ProductSearch::label($product),
+                            ]);
                     })
                     ->afterStateUpdated(function (?string $state, Set $set): void {
                         if ($state === null || $state === '') {
-                            SearchableInputHelper::clear($set, ['product_id' => null]);
-
                             return;
                         }
 
