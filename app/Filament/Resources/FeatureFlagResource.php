@@ -8,9 +8,7 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\FeatureFlagResource\Pages;
 use App\Models\FeatureFlag;
-use App\Models\Scopes\ActiveScope;
-use App\Models\Scopes\EnabledScope;
-use Filament\Actions\DeleteAction;
+use BackedEnum;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
@@ -48,7 +46,11 @@ final class FeatureFlagResource extends Resource
 
     protected static ?string $model = FeatureFlag::class;
 
-    // /** @var UnitEnum|string|null */
+    /**
+     * @var string|BackedEnum|null Navigation icon identifier for the resource navigation menu.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-flag';
+
     protected static ?int $navigationSort = 5;
 
     protected static ?string $recordTitleAttribute = 'name';
@@ -233,7 +235,7 @@ final class FeatureFlagResource extends Resource
                 TextColumn::make('category')
                     ->label(__('feature_flags.category'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn (?string $state): string => match ($state) {
                         'ui'          => 'info',
                         'performance' => 'success',
                         'security'    => 'danger',
@@ -245,7 +247,7 @@ final class FeatureFlagResource extends Resource
                 TextColumn::make('environment')
                     ->label(__('feature_flags.environment'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn (?string $state): string => match ($state) {
                         'local'      => 'gray',
                         'staging'    => 'warning',
                         'production' => 'success',
