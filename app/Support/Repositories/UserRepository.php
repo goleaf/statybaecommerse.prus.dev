@@ -10,6 +10,15 @@ final class UserRepository
 {
     public function count(?string $connection = null): int
     {
-        return (int) DB::connection($connection)->table('users')->count();
+        $configuredDefault = config('database.default', 'sqlite');
+        $defaultConnection = is_string($configuredDefault) && $configuredDefault !== ''
+            ? $configuredDefault
+            : 'sqlite';
+
+        $connectionName = $connection !== null && $connection !== ''
+            ? $connection
+            : $defaultConnection;
+
+        return (int) DB::connection($connectionName)->table('users')->count();
     }
 }
