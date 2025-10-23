@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Resources\Channels\RelationManagers;
-
 use Filament\Actions\AssociateAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 declare(strict_types=1);
 
+declare(strict_types=1);
+
 use App\Models\Inventory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;

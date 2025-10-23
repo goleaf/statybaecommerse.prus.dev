@@ -15,6 +15,24 @@ final class BrandCatalogueDataProvider
 
     public function __construct(private readonly ProductCatalogueDataProvider $products) {}
 
+    public function index(): array
+    {
+        $brands = Brand::query()
+            ->withCount([
+                'products as visible_products_count' => static function (Builder $query): void {
+                    $query->where('is_visible', true)
+                        ->whereNotNull('published_at')
+                        ->where('published_at', '<=', now());
+                },
+            ])
+            ->orderBy('name')
+            ->get();
+
+        return [
+            'brands' => $brands,
+        ];
+    }
+
     public function show(Brand $brand, array $filters = []): array
     {
         $brand->loadCount(['products' => fn (Builder $query) => $query->published()]);
