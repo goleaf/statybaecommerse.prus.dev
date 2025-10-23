@@ -8,7 +8,7 @@ use App\Models\Product;
 use App\Models\RecommendationBlock;
 use App\Models\RecommendationConfig;
 use App\Models\User;
-use App\Support\Filament\Components\Flatpickr;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -56,7 +56,7 @@ final class RecommendationAnalyticsForm
                                     ])
                                     ->required()
                                     ->default('view'),
-                                Flatpickr::makeDate('date')
+                                DatePicker::make('date')
                                     ->label(__('recommendation_analytics.date'))
                                     ->required()
                                     ->default(now()),
