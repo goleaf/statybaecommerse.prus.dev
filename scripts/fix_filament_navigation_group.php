@@ -94,7 +94,7 @@ class FilamentNavigationGroupFixer
             // Check if file has navigationGroup property
             if (strpos($content, '$navigationGroup') !== false) {
                 // Add UnitEnum import if not present
-                if (strpos($content, self::UNIT_ENUM_IMPORT) === false) {
+                if (strpos($content, NavigationGroupConstants::UNIT_ENUM_USE) === false) {
                     $content = $this->addUnitEnumImport($content);
                     $modified = true;
                 }
@@ -143,7 +143,7 @@ class FilamentNavigationGroupFixer
         }
 
         if ($lastUseIndex !== -1) {
-            array_splice($lines, $lastUseIndex + 1, 0, [self::UNIT_ENUM_IMPORT]);
+            array_splice($lines, $lastUseIndex + 1, 0, [NavigationGroupConstants::UNIT_ENUM_USE]);
             $content = implode("\n", $lines);
         }
 
@@ -218,13 +218,13 @@ class FilamentNavigationGroupFixer
 
     private function dedupeUnitEnumImport(string $content): string
     {
-        // Keep only the first occurrence of the UnitEnum import and remove the rest
+        // Keep only the first occurrence of the shared UnitEnum import and remove the rest
         $lines = explode("\n", $content);
         $seen = false;
         $out = [];
 
         foreach ($lines as $line) {
-            if (trim($line) === self::UNIT_ENUM_IMPORT) {
+            if (trim($line) === NavigationGroupConstants::UNIT_ENUM_USE) {
                 if ($seen) {
                     // Skip duplicates
                     continue;

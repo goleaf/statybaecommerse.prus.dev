@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-// Normalised UnitEnum import literal keeps duplicate statements out of generated resources.
-const UNIT_ENUM_IMPORT_STATEMENT = 'use UnitEnum;';
+require_once __DIR__.'/../vendor/autoload.php';
+
+use App\Support\Filament\Constants\NavigationGroupConstants;
 
 $baseDir = __DIR__.'/../app/Filament/Resources';
 
@@ -31,10 +32,10 @@ foreach ($rii as $file) {
 
     // Ensure UnitEnum import if method will be added
     if ($navGroupValue !== null && strpos($code, 'getNavigationGroup(): UnitEnum|string|null') === false) {
-        if (strpos($code, UNIT_ENUM_IMPORT_STATEMENT) === false) {
+        if (strpos($code, NavigationGroupConstants::UNIT_ENUM_USE) === false) {
             // Insert after last use statement
             if (preg_match('/^(.*?namespace[^;]+;\s*)((?:use[^;]+;\s*)*)/s', $code, $mm)) {
-                $code = preg_replace('/^(.*?namespace[^;]+;\s*)((?:use[^;]+;\s*)*)/s', '$1$2'.UNIT_ENUM_IMPORT_STATEMENT."\n", $code, 1);
+                $code = preg_replace('/^(.*?namespace[^;]+;\s*)((?:use[^;]+;\s*)*)/s', '$1$2'.NavigationGroupConstants::UNIT_ENUM_USE."\n", $code, 1);
             }
         }
         // Insert method after class opening brace
