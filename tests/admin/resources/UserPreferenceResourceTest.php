@@ -292,9 +292,9 @@ final class UserPreferenceResourceTest extends TestCase
 
     public function test_user_preference_resource_navigation_labels(): void
     {
-        $this->assertEquals('admin.user_preferences.navigation_label', UserPreferenceResource::getNavigationLabel());
-        $this->assertEquals('admin.user_preferences.plural_model_label', UserPreferenceResource::getPluralModelLabel());
-        $this->assertEquals('admin.user_preferences.model_label', UserPreferenceResource::getModelLabel());
+        $this->assertEquals(__('admin/user_preferences.navigation_label'), UserPreferenceResource::getNavigationLabel());
+        $this->assertEquals(__('admin/user_preferences.plural_model_label'), UserPreferenceResource::getPluralModelLabel());
+        $this->assertEquals(__('admin/user_preferences.model_label'), UserPreferenceResource::getModelLabel());
     }
 
     public function test_user_preference_resource_navigation_group(): void
