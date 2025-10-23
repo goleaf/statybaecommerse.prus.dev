@@ -24,10 +24,9 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
   analytics widgets build customer journeys without missing foreign keys during PHPUnit runs.
 - SearchableInput payload macros are registered lazily with safer fallbacks, and the SQLite testing harness now spins up one
   database per parallel worker so hydrate/clear flows avoid TypeErrors and filesystem locks during `php artisan test --parallel`.
-- User-product interaction analytics regained stability after tightening the
-  model's fillable/cast definitions, skipping storefront product scopes on the
-  relationship, and constraining factory timestamps to predictable recent
-  windows for deterministic test data.
+- Order analytics scopes now hint the standalone created-at index, the orders table ships with that index on fresh installs, and
+  the shared active scope no longer hides seeded processing orders so diagnostics coverage stays green.
+- System setting translation records can once again be soft deleted, restored, and replicated thanks to the relaxed locale index and leaner fillable list that align with the documented API expectations.
 - Campaign conversion analytics now keep their translation model, timestamps, and
   scope filters aligned so ROI/ROAS dashboards and PHPUnit coverage see the same
   completed conversions without fighting `is_active` guards.

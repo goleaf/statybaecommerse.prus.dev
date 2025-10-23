@@ -63,12 +63,28 @@ final class ActiveScope implements Scope
 
         if ($hasIsVisible) {
             $builder->where('is_visible', true);
+        } elseif ($schema->hasColumn($table, 'status')) {
+            // Defer to model-specific allowlists instead of defaulting to a hard-coded
+            // "active" value so enums such as orders remain queryable in diagnostics.
+            $defaultStatuses = $this->getDefaultStatuses($model);
 
-            return;
+            if ($defaultStatuses !== []) {
+                $builder->whereIn('status', $defaultStatuses);
+            }
         }
+    }
 
-        if ($hasStatus) {
-            $builder->where('status', 'active');
-        }
+    /**
+     * Surface default status filters on a per-model basis to avoid applying
+     * incompatible hard-coded values (e.g. the orders enum has no "active").
+     *
+     * @return array<int, string>
+     */
+    private function getDefaultStatuses(Model $model): array
+    {
+        return match ($model::class) {
+            \App\Models\Order::class => [],
+            default                  => ['active'],
+        };
     }
 }
