@@ -35,6 +35,7 @@
 
 ## Caching & performance
 - Cache invalidation conflicts from PR #120 are closed: navigation/menu caches now rely on the shared tag helper, model events invoke the invalidation service automatically, and new storefront/dashboard regression tests confirm cached payloads refresh right after catalogue updates.
+- Storefront autocomplete reuses injected cache and highlighting services, trims whitespace-only queries, and sanitizes highlight payloads so results load faster without leaking `<mark>` tags into the suggestion UI.
 
 ## Content safety and compliance
 - Established an allow-listed HTML sanitizer that runs on product descriptions, translations, and legal documents to prevent script injection.
