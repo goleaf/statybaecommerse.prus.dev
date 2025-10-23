@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Exceptions\Domain;
 
-use App\Support\ErrorCodes;
 use Exception;
 
 /**
@@ -25,8 +24,6 @@ abstract class DomainException extends Exception
         private readonly int $status = 400,
         ?Exception $previous = null,
     ) {
-        ErrorCodes::assertValid($errorCode);
-
         parent::__construct($translationKey, $status, $previous);
     }
 
