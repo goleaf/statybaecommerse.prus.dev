@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'menu_items' => require __DIR__.'/admin/menu_items.php',
     'settings' => [
         'navigation_label' => 'Settings',
         'plural_model_label' => 'Settings',

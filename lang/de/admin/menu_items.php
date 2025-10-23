@@ -1,19 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 return [
-    'navigation_label' => 'Menüeinträge',
-    'plural_model_label' => 'Menüeinträge',
-    'model_label' => 'Menüeintrag',
-    'basic_information' => 'Grundlegende Informationen',
+    // Navigation & Bezeichnungen
+    'navigation_label' => 'Menüelemente',
+    'plural_model_label' => 'Menüelemente',
+    'model_label' => 'Menüelement',
+
+    // Formularabschnitte
+    'basic_information' => 'Grundinformationen',
+    'status' => 'Status',
+
+    // Felder
     'menu' => 'Menü',
-    'parent' => 'Übergeordneter Eintrag',
+    'parent' => 'Übergeordnetes Element',
     'label' => 'Bezeichnung',
     'url' => 'URL',
     'route_name' => 'Routenname',
-    'route_name_help' => 'Optional den internen Routen-Namen angeben.',
-    'icon' => 'Symbol',
-    'icon_help' => 'Geben Sie die zu verwendende Symbolklasse oder Kennung an.',
+    'icon' => 'Icon',
     'sort_order' => 'Sortierreihenfolge',
-    'status' => 'Status',
     'is_visible' => 'Sichtbar',
+
+    // Hilfetexte
+    'route_name_help' => 'Geben Sie einen Routennamen an, um den Link automatisch zu erzeugen.',
+    'icon_help' => 'Geben Sie einen Heroicon-Bezeichner oder eine Icon-Klasse an.',
 ];
