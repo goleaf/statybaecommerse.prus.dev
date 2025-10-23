@@ -1,5 +1,10 @@
+/**
+ * Shared flat ESLint configuration used by CI and local tooling to guarantee
+ * consistent linting across Vite entrypoints, scripts, and utility files.
+ */
 export default [
   {
+    // Ignore generated assets and vendor directories that should never be linted.
     ignores: [
       'vendor/**',
       'storage/**',
@@ -35,16 +40,17 @@ export default [
         Notification: 'readonly',
         localStorage: 'readonly',
         Event: 'readonly',
-        module: 'readonly'
+        module: 'readonly',
+        HTMLElement: 'readonly'
       }
     },
     rules: {
       'no-unused-vars': [
         'error',
         {
-          'args': 'after-used',
-          'argsIgnorePattern': '^(?:_|e$|event$|observer$|.*Element$)',
-          'varsIgnorePattern': '(^_|Element$|observer$)'
+          args: 'after-used',
+          argsIgnorePattern: '^(?:_|e$|event$|observer$|.*Element$)',
+          varsIgnorePattern: '(^_|Element$|observer$)'
         }
       ],
       'no-undef': 'error'
@@ -68,9 +74,9 @@ export default [
       'no-unused-vars': [
         'error',
         {
-          'args': 'after-used',
-          'argsIgnorePattern': '^(?:_|e$|event$|observer$|.*Element$)',
-          'varsIgnorePattern': '(^_|Element$|observer$)'
+          args: 'after-used',
+          argsIgnorePattern: '^(?:_|e$|event$|observer$|.*Element$)',
+          varsIgnorePattern: '(^_|Element$|observer$)'
         }
       ],
       'no-undef': 'error'

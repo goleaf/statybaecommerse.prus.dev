@@ -17,7 +17,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 ### Latest updates
-- Developer tooling now reinstates the Husky bootstrap shim after it was overwritten by the upstream deprecation banner, restoring executable permissions and guaranteeing local Git hooks keep using the repository toolchain.
+- Continuous Integration now runs a PHP 8.2/8.3 matrix with shared Composer caching, coverage uploads, and a flat ESLint config so every pull request validates backend and frontend tooling in one pass.
 - Filament admin resources, relation managers, and bespoke pages now return `Filament\\Schemas\\Schema` instances with documented icon docblocks, aligning every form/table/infolist signature to the v4 API so upstream navigation traits continue to resolve enum-aware metadata without collisions.
 - Product API endpoints now resolve via dedicated application use cases, an Eloquent-backed repository, and a presenter that preserves the public contract while filtering non-displayable catalogue entries.
 - Activity Log admin navigation now declares its icon using the BackedEnum-aware union type expected by Filament v4, eliminating the fatal error encountered during resource bootstrapping.

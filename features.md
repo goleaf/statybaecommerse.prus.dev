@@ -28,7 +28,7 @@
 - Request-scoped CSP nonces now propagate through middleware, helpers, Livewire, and Vite so every inline Blade script/style satisfies the stricter nonce-based CSP and updated HSTS/permissions policy headers.
 
 ## Tooling polish
-- Husky Git hook bootstrap regained its full shim after the deprecation banner replacement, keeping the executable wrapper in place so local hooks continue to run with the repository binaries.
+- GitHub Actions CI now executes a PHP 8.2/8.3 matrix with cached Composer installs, coverage uploads, and a reusable ESLint flat config so frontend and backend checks run together.
 - `scripts/upgrade_filament_schema.php` now updates navigation icon docblocks automatically while refactoring `form`, `infolist`, and `table` signatures, making repeated schema migrations safe for the entire Filament tree.
 - The `data:import` Artisan command now documents its signature and description directly on the command class, improving discoverability via `php artisan list`.
 - Legacy diagnostics artisan commands were retired in favour of PHPUnit suites guarded by a configurable coverage extension and Paratest-aware composer scripts, making quality checks part of every test run.
