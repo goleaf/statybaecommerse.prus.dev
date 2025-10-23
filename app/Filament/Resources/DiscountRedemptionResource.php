@@ -9,152 +9,115 @@ use App\Filament\Resources\DiscountRedemptionResource\RelationManagers\CodeRelat
 use App\Filament\Resources\DiscountRedemptionResource\RelationManagers\DiscountRelationManager;
 use App\Filament\Resources\DiscountRedemptionResource\RelationManagers\UserRelationManager;
 use App\Models\DiscountRedemption;
-use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
+use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Str;
 use UnitEnum;
 
 final class DiscountRedemptionResource extends Resource
 {
     protected static ?string $model = DiscountRedemption::class;
 
-    /**
-     * Explicitly declare the marketing navigation group for this resource.
-     */
-    protected static string|UnitEnum|null $navigationGroup = 'Marketing';
-
-    // Retain the ticket icon so administrators can spot the redemption resource quickly.
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-ticket';
-
-    // Position the resource prominently within the marketing navigation cluster.
-    protected static ?int $navigationSort = 2;
-
-    public static function getNavigationBadgeColor(): string
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
-        // Highlight the badge with a warning tone to draw attention to pending discount redemptions.
-        return 'warning';
+        return 'heroicon-o-receipt-refund';
+    }
+
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Discounts';
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.discount_redemptions.plural');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('discount_redemptions.plural');
+        return __('admin.discount_redemptions.plural');
     }
 
     public static function getModelLabel(): string
     {
-        return __('discount_redemptions.single');
+        return __('admin.discount_redemptions.single');
     }
 
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Section::make(__('discount_redemptions.sections.associations'))
+            Forms\Components\Section::make(__('admin.discount_redemptions.form.sections.basic_information'))
+                ->columns(2)
                 ->schema([
-                    Grid::make(2)
-                        ->schema([
-                            Select::make('discount_id')
-                                ->label(__('discount_redemptions.fields.discount'))
-                                ->relationship('discount', 'name')
-                                ->searchable()
-                                ->preload()
-                                ->required(),
-                            Select::make('code_id')
-                                ->label(__('discount_redemptions.fields.code'))
-                                ->relationship('code', 'code')
-                                ->searchable()
-                                ->preload()
-                                ->required(),
-                        ]),
-                    Grid::make(2)
-                        ->schema([
-                            Select::make('user_id')
-                                ->label(__('discount_redemptions.fields.user'))
-                                ->relationship('user', 'name')
-                                ->searchable()
-                                ->preload(),
-                            Select::make('order_id')
-                                ->label(__('discount_redemptions.fields.order'))
-                                ->relationship('order', 'number')
-                                ->searchable()
-                                ->preload(),
-                        ]),
-                ]),
-            Section::make(__('discount_redemptions.sections.redemption_details'))
-                ->schema([
-                    Grid::make(3)
-                        ->schema([
-                            TextInput::make('amount_saved')
-                                ->label(__('discount_redemptions.fields.amount_saved'))
-                                ->numeric()
-                                ->minValue(0)
-                                ->required()
-                                ->prefix('€'),
-                            TextInput::make('currency_code')
-                                ->label(__('discount_redemptions.fields.currency_code'))
-                                ->length(3)
-                                ->default('EUR')
-                                ->required(),
-                            Select::make('status')
-                                ->label(__('discount_redemptions.fields.status'))
-                                ->options([
-                                    'pending'   => __('discount_redemptions.statuses.pending'),
-                                    'redeemed'  => __('discount_redemptions.statuses.redeemed'),
-                                    'expired'   => __('discount_redemptions.statuses.expired'),
-                                    'cancelled' => __('discount_redemptions.statuses.cancelled'),
-                                ])
-                                ->default('pending')
-                                ->required(),
-                        ]),
-                    Flatpickr::makeDateTime('redeemed_at')
-                        ->label(__('discount_redemptions.fields.redeemed_at'))
-                        ->seconds(false)
-                        ->displayFormat('Y-m-d H:i')
+                    Forms\Components\Select::make('discount_id')
+                        ->label('Discount')
+                        ->relationship('discount', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->required(),
+                    Forms\Components\Select::make('code_id')
+                        ->label(__('admin.discount_redemptions.form.fields.discount_code'))
+                        ->relationship('code', 'code')
+                        ->searchable()
+                        ->preload()
+                        ->required(),
+                    Forms\Components\Select::make('user_id')
+                        ->label(__('admin.discount_redemptions.form.fields.user'))
+                        ->relationship('user', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->required(),
+                    Forms\Components\Select::make('order_id')
+                        ->label(__('admin.discount_redemptions.form.fields.order'))
+                        ->relationship('order', 'number')
+                        ->searchable()
+                        ->preload()
+                        ->nullable(),
+                    Forms\Components\TextInput::make('amount_saved')
+                        ->label(__('admin.discount_redemptions.form.fields.discount_amount'))
+                        ->numeric()
+                        ->required()
+                        ->minValue(0)
+                        ->step(0.01),
+                    Forms\Components\TextInput::make('currency_code')
+                        ->label('Currency')
+                        ->maxLength(3)
+                        ->default('EUR')
+                        ->required(),
+                    Forms\Components\Select::make('status')
+                        ->label('Status')
+                        ->options([
+                            'pending' => 'Pending',
+                            'redeemed' => 'Redeemed',
+                            'cancelled' => 'Cancelled',
+                            'refunded' => 'Refunded',
+                            'expired' => 'Expired',
+                        ])
+                        ->default('pending'),
+                    Forms\Components\DateTimePicker::make('redeemed_at')
+                        ->label(__('admin.discount_redemptions.form.fields.redeemed_at'))
                         ->default(now())
                         ->required(),
-                    Grid::make(2)
-                        ->schema([
-                            TextInput::make('ip_address')
-                                ->label(__('discount_redemptions.fields.ip_address'))
-                                ->ip()
-                                ->nullable(),
-                            TextInput::make('user_agent')
-                                ->label(__('discount_redemptions.fields.user_agent'))
-                                ->maxLength(255)
-                                ->nullable(),
-                        ]),
-                ]),
-            Section::make(__('discount_redemptions.sections.additional_information'))
-                ->schema([
-                    Textarea::make('notes')
-                        ->label(__('discount_redemptions.fields.notes'))
-                        ->rows(3)
-                        ->nullable(),
-                    KeyValue::make('metadata')
-                        ->label(__('discount_redemptions.fields.metadata'))
-                        ->keyLabel(__('discount_redemptions.fields.metadata_key'))
-                        ->valueLabel(__('discount_redemptions.fields.metadata_value'))
+                    Forms\Components\Textarea::make('notes')
+                        ->label('Notes')
                         ->columnSpanFull(),
-                ])
-                ->collapsible(),
+                    Forms\Components\KeyValue::make('metadata')
+                        ->label('Metadata')
+                        ->columnSpanFull(),
+                    Forms\Components\TextInput::make('ip_address')
+                        ->label('IP Address')
+                        ->maxLength(45)
+                        ->columnSpan(1),
+                    Forms\Components\TextInput::make('user_agent')
+                        ->label('User Agent')
+                        ->columnSpan(1),
+                ]),
         ]);
     }
 
@@ -162,97 +125,91 @@ final class DiscountRedemptionResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('code.code')
-                    ->label(__('discount_redemptions.fields.code'))
+                Tables\Columns\TextColumn::make('discount.name')
+                    ->label('Discount')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('discount.name')
-                    ->label(__('discount_redemptions.fields.discount'))
+                Tables\Columns\TextColumn::make('code.code')
+                    ->label(__('admin.discount_redemptions.table.discount_code'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('user.name')
-                    ->label(__('discount_redemptions.fields.user'))
+                Tables\Columns\TextColumn::make('user.name')
+                    ->label(__('admin.discount_redemptions.table.user'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('order.number')
-                    ->label(__('discount_redemptions.fields.order'))
-                    ->formatStateUsing(fn (?string $state) => $state ? Str::upper($state) : '-')
-                    ->toggleable()
-                    ->sortable(),
-                TextColumn::make('amount_saved')
-                    ->label(__('discount_redemptions.fields.amount_saved'))
-                    ->money(fn (DiscountRedemption $record) => $record->currency_code ?? 'EUR')
-                    ->sortable(),
-                TextColumn::make('status')
-                    ->label(__('discount_redemptions.fields.status'))
-                    // Use the badge helper to stay compatible with Filament v4 while keeping the visual treatment.
+                Tables\Columns\TextColumn::make('order.number')
+                    ->label(__('admin.discount_redemptions.table.order'))
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('amount_saved')
+                    ->label(__('admin.discount_redemptions.table.discount_amount'))
+                    ->sortable()
+                    ->formatStateUsing(fn ($state, DiscountRedemption $record): string => $state === null
+                        ? '-' : number_format((float) $state, 2).' '.($record->currency_code ?? 'EUR')),
+                Tables\Columns\TextColumn::make('status')
+                    ->label('Status')
                     ->badge()
-                    ->color(fn (?string $state): string => match ($state) {
-                        'redeemed'  => 'success',
-                        'pending'   => 'warning',
-                        'expired'   => 'danger',
-                        'cancelled' => 'gray',
-                        default     => 'primary',
-                    })
-                    ->icon(fn (?string $state): ?string => match ($state) {
-                        'redeemed'  => 'heroicon-m-check-circle',
-                        'pending'   => 'heroicon-m-clock',
-                        'cancelled' => 'heroicon-m-x-mark',
-                        'expired'   => 'heroicon-m-exclamation-triangle',
-                        default     => null,
-                    })
-                    ->sortable(),
-                TextColumn::make('redeemed_at')
-                    ->label(__('discount_redemptions.fields.redeemed_at'))
+                    ->colors([
+                        'warning' => 'pending',
+                        'success' => 'redeemed',
+                        'secondary' => 'refunded',
+                        'danger' => 'cancelled',
+                        'gray' => 'expired',
+                    ]),
+                Tables\Columns\TextColumn::make('redeemed_at')
+                    ->label(__('admin.discount_redemptions.table.redeemed_at'))
                     ->dateTime()
                     ->sortable(),
-                TextColumn::make('currency_code')
-                    ->label(__('discount_redemptions.fields.currency_code'))
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('admin.discount_redemptions.table.created_at'))
+                    ->dateTime()
+                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('status')
-                    ->label(__('discount_redemptions.fields.status'))
+                Tables\Filters\SelectFilter::make('discount_id')
+                    ->label('Discount')
+                    ->relationship('discount', 'name'),
+                Tables\Filters\SelectFilter::make('code_id')
+                    ->label(__('admin.discount_redemptions.filters.discount_code'))
+                    ->relationship('code', 'code'),
+                Tables\Filters\SelectFilter::make('user_id')
+                    ->label(__('admin.discount_redemptions.filters.user'))
+                    ->relationship('user', 'name'),
+                Tables\Filters\SelectFilter::make('status')
+                    ->label('Status')
                     ->options([
-                        'pending'   => __('discount_redemptions.statuses.pending'),
-                        'redeemed'  => __('discount_redemptions.statuses.redeemed'),
-                        'expired'   => __('discount_redemptions.statuses.expired'),
-                        'cancelled' => __('discount_redemptions.statuses.cancelled'),
+                        'pending' => 'Pending',
+                        'redeemed' => 'Redeemed',
+                        'cancelled' => 'Cancelled',
+                        'refunded' => 'Refunded',
+                        'expired' => 'Expired',
                     ]),
-                SelectFilter::make('currency_code')
-                    ->label(__('discount_redemptions.fields.currency_code'))
-                    ->options([
-                        'EUR' => 'EUR',
-                        'USD' => 'USD',
-                        'GBP' => 'GBP',
-                    ]),
-                Filter::make('redeemed_range')
+                Tables\Filters\Filter::make('redeemed_between')
+                    ->label(__('admin.discount_redemptions.filters.redeemed_at'))
                     ->form([
-                        Flatpickr::makeDateTime('from')
-                            ->label(__('discount_redemptions.filters.redeemed_from')),
-                        Flatpickr::makeDateTime('until')
-                            ->label(__('discount_redemptions.filters.redeemed_until')),
+                        DatePicker::make('from'),
+                        DatePicker::make('until'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
-                            ->when($data['from'] ?? null, fn (Builder $q, $date): Builder => $q->where('redeemed_at', '>=', $date))
-                            ->when($data['until'] ?? null, fn (Builder $q, $date): Builder => $q->where('redeemed_at', '<=', $date));
+                            ->when($data['from'] ?? null, fn (Builder $query, string $date): Builder => $query->whereDate('redeemed_at', '>=', $date))
+                            ->when($data['until'] ?? null, fn (Builder $query, string $date): Builder => $query->whereDate('redeemed_at', '<=', $date));
                     }),
-                TernaryFilter::make('has_order')
-                    ->label(__('discount_redemptions.filters.has_order'))
-                    ->queries(
-                        true: fn (Builder $query): Builder => $query->whereNotNull('order_id'),
-                        false: fn (Builder $query): Builder => $query->whereNull('order_id'),
-                    ),
+                Tables\Filters\Filter::make('recent')
+                    ->label(__('admin.discount_redemptions.filters.recent'))
+                    ->query(fn (Builder $query): Builder => $query->where('redeemed_at', '>=', now()->subDays(7))),
+            ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-                ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('redeemed_at', 'desc');
@@ -267,13 +224,21 @@ final class DiscountRedemptionResource extends Resource
         ];
     }
 
+    /**
+     * @return array<string, array{route: string}>
+     */
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListDiscountRedemptions::route('/'),
+            'index' => Pages\ListDiscountRedemptions::route('/'),
             'create' => Pages\CreateDiscountRedemption::route('/create'),
-            'view'   => Pages\ViewDiscountRedemption::route('/{record}'),
-            'edit'   => Pages\EditDiscountRedemption::route('/{record}/edit'),
+            'view' => Pages\ViewDiscountRedemption::route('/{record}'),
+            'edit' => Pages\EditDiscountRedemption::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with(['discount', 'code', 'user', 'order']);
     }
 }
