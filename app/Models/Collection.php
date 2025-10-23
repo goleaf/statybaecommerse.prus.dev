@@ -7,7 +7,9 @@ namespace App\Models;
 use App\Contracts\TranslatableRecord;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\VisibleScope;
+use App\Observers\CollectionObserver;
 use App\Traits\HasTranslations;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -36,6 +38,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  *
  * @mixin \Eloquent
  */
+// Attach the observer that keeps storefront collection caches up to date.
+#[ObservedBy([CollectionObserver::class])]
 #[ScopedBy([ActiveScope::class, VisibleScope::class])]
 final class Collection extends Model implements HasMedia, TranslatableRecord
 {
