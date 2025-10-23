@@ -9,15 +9,16 @@ use App\Models\Campaign;
 use App\Models\Scopes\ActiveCampaignScope;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\StatusScope;
-use App\Support\Filament\Components\Flatpickr;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use DateTimeInterface;
 use Filament\Forms;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -27,7 +28,7 @@ use Saade\FilamentFullCalendar\Widgets\FullCalendarWidget;
 
 final class CalendarWidget extends FullCalendarWidget
 {
-    public Model|string|null $model = Campaign::class;
+    public Model | string | null $model = Campaign::class;
 
     public function fetchEvents(array $fetchInfo): array
     {
@@ -43,7 +44,7 @@ final class CalendarWidget extends FullCalendarWidget
             ->with('channel')
             ->whereNotNull('starts_at')
             ->where('starts_at', '<=', $end)
-            ->where(function ($query) use ($start): void {
+            ->where(function ($query) use ($start) {
                 $query
                     ->whereNull('ends_at')
                     ->orWhere('ends_at', '>=', $start);
@@ -61,11 +62,11 @@ final class CalendarWidget extends FullCalendarWidget
                     ->start(optional($campaign->starts_at)->toIso8601String())
                     ->url(CampaignResource::getUrl('view', ['record' => $campaign]))
                     ->extendedProps([
-                        'status'    => $campaign->status,
+                        'status' => $campaign->status,
                         'is_active' => (bool) $campaign->is_active,
-                        'channel'   => $campaign->channel?->name,
-                        'color'     => $color,
-                        'tooltip'   => $this->buildTooltip($campaign),
+                        'channel' => $campaign->channel?->name,
+                        'color' => $color,
+                        'tooltip' => $this->buildTooltip($campaign),
                     ]);
 
                 if ($campaign->ends_at) {
@@ -86,34 +87,34 @@ final class CalendarWidget extends FullCalendarWidget
     public function config(): array
     {
         return [
-            'initialView'             => 'dayGridMonth',
-            'firstDay'                => 1,
-            'locale'                  => app()->getLocale(),
-            'selectable'              => true,
-            'selectMirror'            => true,
-            'editable'                => true,
+            'initialView' => 'dayGridMonth',
+            'firstDay' => 1,
+            'locale' => app()->getLocale(),
+            'selectable' => true,
+            'selectMirror' => true,
+            'editable' => true,
             'eventResizableFromStart' => true,
-            'navLinks'                => true,
-            'dayMaxEvents'            => true,
-            'headerToolbar'           => [
-                'start'  => 'prev,next today',
+            'navLinks' => true,
+            'dayMaxEvents' => true,
+            'headerToolbar' => [
+                'start' => 'prev,next today',
                 'center' => 'title',
-                'end'    => 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
+                'end' => 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
             ],
             'buttonText' => [
                 'today' => __('Today'),
                 'month' => __('Month'),
-                'week'  => __('Week'),
-                'day'   => __('Day'),
-                'list'  => __('List'),
+                'week' => __('Week'),
+                'day' => __('Day'),
+                'list' => __('List'),
             ],
             'eventTimeFormat' => [
-                'hour'   => '2-digit',
+                'hour' => '2-digit',
                 'minute' => '2-digit',
                 'hour12' => false,
             ],
             'slotLabelFormat' => [
-                'hour'   => '2-digit',
+                'hour' => '2-digit',
                 'minute' => '2-digit',
                 'hour12' => false,
             ],
@@ -146,10 +147,10 @@ final class CalendarWidget extends FullCalendarWidget
             Select::make('status')
                 ->label($this->translate('campaigns.fields.status', 'Status'))
                 ->options([
-                    'draft'     => $this->translate('campaigns.status.draft', 'Draft'),
-                    'active'    => $this->translate('campaigns.status.active', 'Active'),
+                    'draft' => $this->translate('campaigns.status.draft', 'Draft'),
+                    'active' => $this->translate('campaigns.status.active', 'Active'),
                     'scheduled' => $this->translate('campaigns.status.scheduled', 'Scheduled'),
-                    'paused'    => $this->translate('campaigns.status.paused', 'Paused'),
+                    'paused' => $this->translate('campaigns.status.paused', 'Paused'),
                     'completed' => $this->translate('campaigns.status.completed', 'Completed'),
                     'cancelled' => $this->translate('campaigns.status.cancelled', 'Cancelled'),
                 ])
@@ -161,10 +162,10 @@ final class CalendarWidget extends FullCalendarWidget
             Toggle::make('is_featured')
                 ->label($this->translate('campaigns.fields.is_featured', 'Featured'))
                 ->default(false),
-            Flatpickr::makeDateTime('starts_at')
+            DateTimePicker::make('starts_at')
                 ->label($this->translate('campaigns.fields.start_date', 'Start date'))
                 ->seconds(false),
-            Flatpickr::makeDateTime('ends_at')
+            DateTimePicker::make('ends_at')
                 ->label($this->translate('campaigns.fields.end_date', 'End date'))
                 ->seconds(false),
         ];
@@ -230,7 +231,7 @@ final class CalendarWidget extends FullCalendarWidget
 
     public function eventDidMount(): string
     {
-        return <<<'JS'
+        return <<<JS
             function(info) {
                 const tooltip = info.event.extendedProps?.tooltip;
                 if (tooltip) {
@@ -247,7 +248,7 @@ final class CalendarWidget extends FullCalendarWidget
     }
 
     /**
-     * @param  array<string, mixed> $state
+     * @param  array<string, mixed>  $state
      * @return array<string, mixed>
      */
     private function prepareStateWithDateRange(array $state, mixed $start, mixed $end, bool $shouldClearEnd = false): array
@@ -316,7 +317,7 @@ final class CalendarWidget extends FullCalendarWidget
     }
 
     /**
-     * @param  array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      * @return array<string, mixed>
      */
     private function ensureSlug(array $data): array
@@ -345,12 +346,12 @@ final class CalendarWidget extends FullCalendarWidget
     private function resolveStatusColor(?string $status): ?string
     {
         return match ($status) {
-            'active'    => '#16a34a',
+            'active' => '#16a34a',
             'scheduled' => '#0ea5e9',
-            'paused'    => '#f59e0b',
+            'paused' => '#f59e0b',
             'completed' => '#6366f1',
             'cancelled' => '#ef4444',
-            default     => null,
+            default => null,
         };
     }
 
