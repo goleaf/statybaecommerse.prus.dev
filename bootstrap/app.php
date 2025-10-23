@@ -18,6 +18,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
@@ -27,6 +28,22 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Throwable;
 
 require_once __DIR__ . '/../app/Support/filament_compat.php';
+
+$appEnvironment = (string) env('APP_ENV', 'production');
+$queueConnection = (string) env('QUEUE_CONNECTION', 'sync');
+
+$providers = [
+    App\Providers\AuthServiceProvider::class,
+    App\Providers\ApiServiceProvider::class,
+];
+
+if ($appEnvironment !== 'local' || $queueConnection !== 'sync') {
+    $providers[] = App\Providers\HorizonServiceProvider::class;
+}
+
+$providers[] = App\Providers\LocaleServiceProvider::class;
+$providers[] = App\Providers\Filament\AdminPanelProvider::class;
+$providers[] = SecurityServiceProvider::class;
 
 $providers = [
     App\Providers\AuthServiceProvider::class,
@@ -138,13 +155,16 @@ $application = Application::configure(basePath: dirname(__DIR__))
                 'trace_id'       => $traceId,
                 'correlation_id' => $traceId,
                 'locale'         => $locale,
+                'error_code'     => $exception->errorCode(),
                 'request_path'   => $request->path(),
                 'request_method' => $request->method(),
             ]);
 
-            Log::error('Unhandled exception rendered.', [
-                'exception' => $throwable::class,
-                'message'   => $throwable->getMessage(),
+            Log::warning('Domain exception rendered.', [
+                'exception'       => $exception::class,
+                'status'          => $exception->status(),
+                'translation_key' => $exception->translationKey(),
+                'context'         => $exception->context(),
             ]);
 
             $message = TranslationService::get($exception->translationKey(), $exception->context(), $locale);
@@ -403,12 +423,53 @@ $application = Application::configure(basePath: dirname(__DIR__))
                 ->header('Content-Language', $locale);
         });
     })
-    ->withProviders($providers);
+    ->withSingletons([
+        Request::class => static fn (): Request => Request::capture(),
+        'request'      => static fn (): Request => Request::capture(),
+    ])
+    ->registered(function (Application $app) use ($providers): void {
+        if (! $app->bound('request')) {
+            $app->instance('request', Request::capture());
+        }
 
-$app = $application->create();
+        $app->make('request');
 
-if ($app->runningInConsole()) {
-    $app->instance('request', Request::create('/', 'GET'));
-}
+        $app->singleton('url', function ($app): UrlGenerator {
+            $routes = $app['router']->getRoutes();
 
-return $app;
+            $request = $app->bound('request')
+                ? $app->make('request')
+                : Request::capture();
+
+            if (! $app->bound('request')) {
+                $app->instance('request', $request);
+            }
+
+            $url = new UrlGenerator(
+                $routes,
+                $request,
+                $app['config']['app.asset_url']
+            );
+
+            $url->setSessionResolver(static function () use ($app) {
+                return $app['session'] ?? null;
+            });
+
+            $url->setKeyResolver(static function () use ($app) {
+                $config = $app->make('config');
+
+                return [$config->get('app.key'), ...($config->get('app.previous_keys') ?? [])];
+            });
+
+            $app->rebinding('routes', static function ($app, $routes): void {
+                $app['url']->setRoutes($routes);
+            });
+
+            return $url;
+        });
+
+        foreach ($providers as $provider) {
+            $app->register($provider);
+        }
+    })
+    ->create();

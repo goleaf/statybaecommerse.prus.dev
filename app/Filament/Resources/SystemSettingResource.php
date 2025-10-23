@@ -29,9 +29,8 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Gate;
-use UnitEnum;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 /**
  * SystemSettingResource
@@ -48,38 +47,11 @@ final class SystemSettingResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'key';
 
-    public static function canViewAny(): bool
-    {
-        return Gate::allows('viewAny', SystemSetting::class);
-    }
-
-    public static function canView(SystemSetting $record): bool
-    {
-        return Gate::allows('view', $record);
-    }
-
-    public static function canCreate(): bool
-    {
-        return Gate::allows('create', SystemSetting::class);
-    }
-
-    public static function canEdit(SystemSetting $record): bool
-    {
-        return Gate::allows('update', $record);
-    }
-
-    public static function canDelete(SystemSetting $record): bool
-    {
-        return Gate::allows('delete', $record);
-    }
-
-    /** @var string|\BackedEnum|null */
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-cog-6-tooth';
 
-    /**
-     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
-     */
-    protected static UnitEnum|string|null $navigationGroup = 'Settings';
+    /** @var string|UnitEnum|null */
+    protected static $navigationGroup = 'Settings';
 
     public static function getNavigationLabel(): string
     {
@@ -316,7 +288,23 @@ final class SystemSettingResource extends Resource
                     }),
                 TextColumn::make('category')
                     ->label(__('system_settings.category'))
-                    ->formatStateUsing(fn (?string $state): string => $state !== null ? __("system_settings.categories.{$state}") : __('system_settings.category'))
+                    ->formatStateUsing(function (?string $state): string {
+                        if (blank($state)) {
+                            return __('system_settings.category_unassigned');
+                        }
+
+                        $translationKey = "system_settings.categories.{$state}";
+                        $translation = __($translationKey);
+
+                        if ($translation !== $translationKey) {
+                            return $translation;
+                        }
+
+                        return Str::of($state)
+                            ->replace('_', ' ')
+                            ->title()
+                            ->toString();
+                    })
                     ->badge()
                     ->color(fn (?string $state): string => match ($state) {
                         'general'     => 'gray',
@@ -445,7 +433,7 @@ final class SystemSettingResource extends Resource
                         $record->type = 'string';
                         $record->update(['value' => $record->default_value]);
                         Notification::make()
-                            ->title(__('system_settings.reset_to_default_success'))
+                            ->title(__('system_settings.reset_successfully'))
                             ->success()
                             ->send();
                     })
