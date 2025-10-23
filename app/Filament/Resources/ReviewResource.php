@@ -185,8 +185,7 @@ final class ReviewResource extends Resource
                     ->label(__('reviews.fields.rating'))
                     ->sortable()
                     ->alignCenter()
-                    // Provide a translated fallback whenever the rating is missing to avoid formatting crashes.
-                    ->formatStateUsing(fn (?int $state): string => $state !== null && $state > 0 ? str_repeat('⭐', $state) : __('reviews.placeholders.no_rating')),
+                    ->formatStateUsing(fn (?int $state): string => str_repeat('⭐', max(0, (int) $state))),
                 BadgeColumn::make('status')
                     ->label(__('reviews.fields.status'))
                     ->getStateUsing(fn (Review $record): string => $record->getStatus())
@@ -424,8 +423,7 @@ final class ReviewResource extends Resource
                                 4, 5 => 'success',
                                 default => 'gray',
                             })
-                            // Mirror the table fallback so infolists never attempt to repeat a star with a null value.
-                            ->formatStateUsing(fn (?int $state): string => $state !== null && $state > 0 ? str_repeat('⭐', $state) : __('reviews.placeholders.no_rating')),
+                            ->formatStateUsing(fn (?int $state): string => str_repeat('⭐', max(0, (int) $state))),
                     ])
                     ->columns(2),
                 InfolistSection::make(__('reviews.sections.content'))
