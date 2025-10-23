@@ -87,9 +87,27 @@ final class AnalyticsEvent extends Model
         'event_data' => 'array',
         'is_important' => 'boolean',
         'is_conversion' => 'boolean',
-        'conversion_value' => 'decimal:2',
+        'conversion_value' => 'float',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+    ];
+
+    private const EVENT_TYPES = [
+        'page_view',
+        'product_view',
+        'add_to_cart',
+        'remove_from_cart',
+        'purchase',
+        'search',
+        'user_register',
+        'user_login',
+        'user_logout',
+        'newsletter_signup',
+        'contact_form',
+        'download',
+        'video_play',
+        'social_share',
+        'click',
     ];
 
     protected $dates = ['created_at', 'updated_at'];
@@ -248,15 +266,14 @@ final class AnalyticsEvent extends Model
      */
     public function getEventTypeLabelAttribute(): string
     {
-        $translationKey = 'admin.analytics.event_types.'.$this->event_type;
+        $key = 'admin.analytics.event_types.'.$this->event_type;
+        $translation = __($key);
 
-        // Allow gracefully falling back to the raw event type when the translation
-        // string is missing instead of triggering translator argument exceptions.
-        $translated = __($translationKey);
+        if ($translation !== $key) {
+            return $translation;
+        }
 
-        return $translated === $translationKey
-            ? Str::of($this->event_type)->replace('_', ' ')->title()->toString()
-            : $translated;
+        return Str::of($this->event_type)->replace('_', ' ')->title()->toString();
     }
 
     /**
@@ -308,7 +325,11 @@ final class AnalyticsEvent extends Model
      */
     public static function getEventTypes(): array
     {
-        return ['page_view' => __('admin.analytics.event_types.page_view'), 'product_view' => __('admin.analytics.event_types.product_view'), 'add_to_cart' => __('admin.analytics.event_types.add_to_cart'), 'remove_from_cart' => __('admin.analytics.event_types.remove_from_cart'), 'purchase' => __('admin.analytics.event_types.purchase'), 'search' => __('admin.analytics.event_types.search'), 'click' => __('admin.analytics.event_types.click'), 'user_register' => __('admin.analytics.event_types.user_register'), 'user_login' => __('admin.analytics.event_types.user_login'), 'user_logout' => __('admin.analytics.event_types.user_logout'), 'newsletter_signup' => __('admin.analytics.event_types.newsletter_signup'), 'contact_form' => __('admin.analytics.event_types.contact_form'), 'download' => __('admin.analytics.event_types.download'), 'video_play' => __('admin.analytics.event_types.video_play'), 'social_share' => __('admin.analytics.event_types.social_share')];
+        return collect(self::EVENT_TYPES)
+            ->mapWithKeys(fn(string $eventType): array => [
+                $eventType => __('admin.analytics.event_types.'.$eventType),
+            ])
+            ->all();
     }
 
     /**
@@ -373,31 +394,14 @@ final class AnalyticsEvent extends Model
      */
     public static function getRevenueStats(): array
     {
-        return static::queryForAdmin()
-            ->whereNotNull('value')
+        return self::whereNotNull('value')
             ->selectRaw('DATE(created_at) as date, SUM(value) as revenue')
             ->groupBy('date')
             ->orderBy('date', 'desc')
             ->limit(30)
             ->pluck('revenue', 'date')
-            ->map(fn ($revenue) => (float) $revenue)
+            ->map(fn($revenue) => (float) $revenue)
             ->toArray();
-    }
-
-    /**
-     * Cast the conversion value to a float for consistent numeric comparisons.
-     */
-    public function getConversionValueAttribute($value): ?float
-    {
-        return $value === null ? null : (float) $value;
-    }
-
-    /**
-     * Build a query suitable for admin-only aggregate helpers.
-     */
-    protected static function queryForAdmin(): Builder
-    {
-        return static::query()->withoutGlobalScope(UserOwnedScope::class);
     }
 
     /**

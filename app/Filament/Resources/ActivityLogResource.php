@@ -16,6 +16,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 use UnitEnum;
 
 final class ActivityLogResource extends Resource
@@ -27,8 +28,6 @@ final class ActivityLogResource extends Resource
     protected static ?int $navigationSort = 9;
 
     protected static ?string $recordTitleAttribute = 'description';
-
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
     protected static ?string $navigationLabel = null;
 
@@ -97,7 +96,7 @@ final class ActivityLogResource extends Resource
             ->filters([
                 SelectFilter::make('log_name')
                     ->label(__('Log Name'))
-                    ->options(fn (): array => \Spatie\Activitylog\Models\Activity::query()
+                    ->options(fn(): array => ActivityLog::query()
                         ->select('log_name')
                         ->whereNotNull('log_name')
                         ->distinct()
@@ -105,7 +104,7 @@ final class ActivityLogResource extends Resource
                         ->toArray()),
                 SelectFilter::make('subject_type')
                     ->label(__('Subject Type'))
-                    ->options(fn (): array => \Spatie\Activitylog\Models\Activity::query()
+                    ->options(fn(): array => ActivityLog::query()
                         ->select('subject_type')
                         ->whereNotNull('subject_type')
                         ->distinct()
@@ -128,15 +127,9 @@ final class ActivityLogResource extends Resource
             ->actions([
                 Action::make('view_details')
                     ->label(__('View details'))
-                    ->modalHeading(fn (\Spatie\Activitylog\Models\Activity $record): string => (string) ($record->description ?? __('Activity details')))
-                    ->modalSubheading(function (\Spatie\Activitylog\Models\Activity $record): string {
-                        $name = data_get($record->causer, 'name');
-
-                        return is_string($name) && $name !== ''
-                            ? $name
-                            : __('System');
-                    })
-                    ->modalContent(fn (\Spatie\Activitylog\Models\Activity $record) => view(
+                    ->modalHeading(fn(ActivityLog $record) => (string) ($record->description ?? __('Activity details')))
+                    ->modalSubheading(fn(ActivityLog $record) => (string) ($record->causer?->name ?? __('System')))
+                    ->modalContent(fn(ActivityLog $record) => view(
                         'filament.resources.activity-log-resource.components.activity-details',
                         ['activity' => $record->loadMissing('causer', 'subject')]
                     ))
