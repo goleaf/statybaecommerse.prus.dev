@@ -173,7 +173,7 @@ composer run dev
 ## Configuration notes
 - Environment defaults live in `.env.example`; copy it to `.env` to tweak database/queue/mail settings.
 - SQLite is enabled by default for fast onboarding—switch `DB_CONNECTION` in `.env` if you need MySQL/PostgreSQL.
-- PHPUnit and Pest now point to `database/testing.sqlite`; delete the file if you want a clean slate between manual runs.
+- PHPUnit test runs now target the shared `database/database.sqlite` file by default for persistent schema reuse; override `DB_DATABASE` locally if you prefer transient in-memory databases.
 - Storage symlink (`public/storage`) is created by `make setup`; re-run `php artisan storage:link` if you remove it.
 - Horizon, Scout, and media-processing queues expect Redis; fall back to the sync driver for local smoke testing by setting `QUEUE_CONNECTION=sync`.
 - Rebuild search indexes for Scout with `php artisan search:index --fresh` or schedule zero-downtime refreshes through `php artisan search:index:rebuild`.
