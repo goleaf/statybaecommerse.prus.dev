@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use UnitEnum;
+
+use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
@@ -42,7 +43,7 @@ use UnitEnum;
 final class CategoryResource extends Resource
 {
     /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
+    protected static $navigationIcon = 'heroicon-o-tag';
 
     /** @var string|\UnitEnum|null */
     protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
@@ -103,7 +104,7 @@ final class CategoryResource extends Resource
         return __('categories.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
             Section::make(__('categories.basic_information'))
@@ -200,7 +201,7 @@ final class CategoryResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

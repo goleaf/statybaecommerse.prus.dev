@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+
+use Filament\Schemas\Schema;
 use App\Services\ImportExport\ProviderRegistry;
 use App\Support\Storage\SecureStorage;
 use Filament\Actions\Action;
@@ -20,9 +22,8 @@ use Filament\Schemas\Schema;
 final class DataImportExport extends Page
 {
     protected string $view = 'filament.pages.data-import-export';
-
     /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-arrow-down-tray';
+    protected static $navigationIcon = 'heroicon-o-arrow-down-tray';
 
     public ?string $provider = 'xml';
 
@@ -34,7 +35,7 @@ final class DataImportExport extends Page
 
     public array|string|null $file = null;
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema   
     {
         return $schema
             ->schema([

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingCategoryResource\RelationManagers;
 
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -34,7 +36,7 @@ final class SettingsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Settings';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema   
     {
         return $schema->schema([
             Section::make(__('system_setting_categories.settings.basic_information'))
@@ -126,7 +128,7 @@ final class SettingsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
         // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table

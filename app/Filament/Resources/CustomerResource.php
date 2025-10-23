@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
 
+use Filament\Schemas\Schema;
 use App\Filament\Resources\CustomerResource\Pages;
 use App\Filament\Widgets\InlineCharts\CustomerOrdersSparkline;
 use App\Models\City;
@@ -100,7 +100,7 @@ final class CustomerResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
             Section::make(__('customers.basic_information'))
@@ -199,7 +199,7 @@ final class CustomerResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

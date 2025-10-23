@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Forms\Components\Flatpickr;
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\LocationResource\Pages;
 use App\Models\Location;
 use Filament\Actions\Action;
@@ -61,7 +62,7 @@ final class LocationResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
             Section::make(__('locations.basic_information'))
@@ -272,7 +273,7 @@ final class LocationResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

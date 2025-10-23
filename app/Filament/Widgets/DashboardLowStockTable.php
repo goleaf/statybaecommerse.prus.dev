@@ -34,7 +34,7 @@ final class DashboardLowStockTable extends BaseTableWidget
         return trans('admin/dashboard.tables.low_stock');
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
         // Configure the widget table to meet the Filament v4 return type contract.
         return $table

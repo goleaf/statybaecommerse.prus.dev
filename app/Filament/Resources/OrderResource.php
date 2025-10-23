@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Forms\Components\Flatpickr;
-use App\Data\ExportRequestData;
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
@@ -201,7 +201,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
     /**
      * Configure the comprehensive form schema with advanced features.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
             Section::make(__('orders.sections.order_details'))
@@ -646,7 +646,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
     /**
      * Configure the comprehensive table with advanced features.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

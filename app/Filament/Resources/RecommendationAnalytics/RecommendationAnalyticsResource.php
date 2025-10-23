@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources\RecommendationAnalytics;
 use App\Support\Concerns\HasNav;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\RecommendationAnalytics\Pages\CreateRecommendationAnalytics;
 use App\Filament\Resources\RecommendationAnalytics\Pages\EditRecommendationAnalytics;
 use App\Filament\Resources\RecommendationAnalytics\Pages\ListRecommendationAnalytics;
@@ -24,9 +26,8 @@ final class RecommendationAnalyticsResource extends Resource
     use HasNav;
 
     protected static ?string $model = RecommendationAnalytics::class;
-
     /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
+    protected static $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?int $navigationSort = 8;
 
@@ -52,12 +53,12 @@ final class RecommendationAnalyticsResource extends Resource
         return __('recommendation_analytics.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return RecommendationAnalyticsForm::configure($schema);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return RecommendationAnalyticsTable::configure($table);

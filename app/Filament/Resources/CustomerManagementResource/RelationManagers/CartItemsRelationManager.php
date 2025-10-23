@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CustomerManagementResource\RelationManagers;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\AssociateAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -26,7 +28,7 @@ class CartItemsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'cartItems';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $schema): Schema   
     {
         return $schema
             ->schema([
@@ -39,7 +41,7 @@ class CartItemsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function infolist(Schema $infolist): Schema
+    public function infolist(Schema $schema): Schema   
     {
         return $schema
             ->schema([
@@ -47,7 +49,7 @@ class CartItemsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
         // Configure the Filament table definition for the resource.
         return $table

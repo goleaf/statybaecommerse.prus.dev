@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
 
+use Filament\Schemas\Schema;
 use App\Filament\Resources\MenuItemResource\Pages;
 use App\Models\Menu;
 use App\Models\MenuItem;
@@ -30,25 +30,8 @@ use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-use Filament\Schemas\Schema;
-
-use Filament\Schemas\Schema;
-/**
- * MenuItemResource
- *
- * Filament v4 resource for MenuItem management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class MenuItemResource extends Resource
-{
-    use HasNav;
-
-    protected static ?string $model = MenuItem::class;
-
-    /** @var string|\UnitEnum|null */
-    protected static \UnitEnum|string|null $navigationGroup = 'Content';
-
     /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?int $navigationSort = 5;
 
@@ -69,7 +52,7 @@ final class MenuItemResource extends Resource
         return __('admin.menu_items.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return $schema
             ->schema([
@@ -142,7 +125,7 @@ final class MenuItemResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Forms\Components\Flatpickr;
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers\AttributesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\CategoriesRelationManager;
@@ -179,7 +180,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
         return __('products.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return $schema
             ->components([
@@ -449,7 +450,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

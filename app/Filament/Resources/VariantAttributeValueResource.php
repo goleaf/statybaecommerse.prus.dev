@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
 
+use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantAttributeValueResource\Pages;
 use App\Models\Attribute;
 use App\Models\ProductVariant;
@@ -39,22 +39,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 use UnitEnum;
-use Filament\Schemas\Schema;
-
-use Filament\Schemas\Schema;
-/**
- * VariantAttributeValueResource
- *
- * Filament v4 resource for VariantAttributeValue management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class VariantAttributeValueResource extends Resource
-{
-    use HasNav;
-
-    protected static ?string $model = VariantAttributeValue::class;
-
     /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
+    protected static $navigationIcon = 'heroicon-o-tag';
 
     /** @var string|\UnitEnum|null */
     protected static \UnitEnum|string|null $navigationGroup = 'Inventory';
@@ -76,7 +62,7 @@ final class VariantAttributeValueResource extends Resource
         return __('admin.variant_attribute_values.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
             Section::make(__('admin.variant_attribute_values.basic_information'))
@@ -186,7 +172,7 @@ final class VariantAttributeValueResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

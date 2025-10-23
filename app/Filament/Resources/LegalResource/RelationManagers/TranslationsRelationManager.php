@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\LegalResource\RelationManagers;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Support\Html\HtmlSanitizer;
 use Filament\Forms\Components\Grid;
@@ -44,7 +46,7 @@ class TranslationsRelationManager extends BaseRelationManager
         return $this->sanitizePayload($data);
     }
 
-    public function form(Form $form): Form|array
+    public function form(Schema $schema): Schema   
     {
         return $schema
             ->schema([
@@ -127,7 +129,7 @@ class TranslationsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
         // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table

@@ -5,7 +5,13 @@ declare(strict_types=1);
 namespace App\Filament\Resources\UserProductInteractions;
 use App\Support\Concerns\HasNav;
 
-use App\Filament\Resources\UserProductInteractionResource as LegacyUserProductInteractionResource;
+
+use Filament\Schemas\Schema;
+use App\Filament\Resources\UserProductInteractions\Pages\CreateUserProductInteraction;
+use App\Filament\Resources\UserProductInteractions\Pages\EditUserProductInteraction;
+use App\Filament\Resources\UserProductInteractions\Pages\ListUserProductInteractions;
+use App\Filament\Resources\UserProductInteractions\Schemas\UserProductInteractionForm;
+use App\Filament\Resources\UserProductInteractions\Tables\UserProductInteractionsTable;
 use App\Models\UserProductInteraction;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -28,12 +34,12 @@ class UserProductInteractionResource extends Resource
         return LegacyUserProductInteractionResource::getNavigationGroup();
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return UserProductInteractionForm::configure($schema);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return UserProductInteractionsTable::configure($table);

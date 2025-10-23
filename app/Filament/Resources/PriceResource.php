@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
 
+use Filament\Schemas\Schema;
 use App\Filament\Resources\PriceResource\Pages;
 use App\Models\Price;
 use App\Models\Product;
@@ -39,7 +39,7 @@ final class PriceResource extends Resource
 
     protected static ?int $navigationSort = 12;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return $schema
             ->schema([
@@ -235,7 +235,7 @@ final class PriceResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

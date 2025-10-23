@@ -10,10 +10,7 @@ use Illuminate\Support\Facades\Gate;
 class Dashboard extends BaseDashboard
 {
     protected static ?int $navigationSort = 1;
-
-    /**
-     * @var string|\BackedEnum|null Navigation icon override kept docblocked for enum compatibility.
-     */
+    /** @var string|\BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-home';
 
     protected static ?string $title = 'Dashboard';

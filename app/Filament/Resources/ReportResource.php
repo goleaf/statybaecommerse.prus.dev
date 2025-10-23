@@ -77,7 +77,7 @@ final class ReportResource extends Resource
         return __('reports.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return $schema
             ->columns(3)
@@ -219,7 +219,7 @@ final class ReportResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -474,7 +474,7 @@ final class ReportResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Schema $schema): Schema   
     {
         // Provide the infolist schema using the Filament v4 return type.
         return $schema

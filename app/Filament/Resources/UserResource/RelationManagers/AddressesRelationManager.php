@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\UserResource\RelationManagers;
 
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+
+use Filament\Schemas\Schema;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -33,7 +34,7 @@ class AddressesRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Addresses';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema   
     {
         return $schema
             ->components([
@@ -75,7 +76,7 @@ class AddressesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
         // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table

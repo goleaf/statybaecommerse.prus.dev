@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\OrderItem;
 use App\Support\Filament\ProductVariantFieldHelper;
@@ -61,7 +63,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
     /**
      * Configure the form schema for order items.
      */
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema   
     {
         return $schema
             ->schema([
@@ -182,7 +184,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
     /**
      * Configure the table for order items.
      */
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
         // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table

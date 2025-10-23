@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Forms\Components\Flatpickr;
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantStockResource\Pages;
 use App\Models\Location;
 use App\Models\VariantInventory;
@@ -43,14 +44,13 @@ final class VariantStockResource extends Resource
     use HasNav;
 
     protected static ?string $model = VariantInventory::class;
-
     /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
+    protected static $navigationIcon = 'heroicon-o-archive-box';
 
     /** @var string|\UnitEnum|null */
     protected static \UnitEnum|string|null $navigationGroup = 'Inventory';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
             Section::make('Stock Details')
@@ -125,7 +125,7 @@ final class VariantStockResource extends Resource
         return parent::getEloquentQuery()->withoutGlobalScopes();
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

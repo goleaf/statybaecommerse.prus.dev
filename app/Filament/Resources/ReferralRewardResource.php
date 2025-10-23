@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\ReferralRewardResource\Pages;
 use App\Models\ReferralReward;
 use App\Support\Filament\Components\Flatpickr;
@@ -41,9 +42,8 @@ final class ReferralRewardResource extends Resource
     use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
 
     protected static ?string $model = ReferralReward::class;
-
     /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-gift';
+    protected static $navigationIcon = 'heroicon-o-gift';
 
     protected static ?int $navigationSort = 15;
 
@@ -52,7 +52,7 @@ final class ReferralRewardResource extends Resource
     /** @var string|\UnitEnum|null */
     protected static \UnitEnum|string|null $navigationGroup = 'Referral';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return $schema
             ->schema([
@@ -165,7 +165,7 @@ final class ReferralRewardResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -285,7 +285,7 @@ final class ReferralRewardResource extends Resource
             ]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema   
     {
         return $schema
             ->schema([

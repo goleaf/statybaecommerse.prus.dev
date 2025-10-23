@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Channels\RelationManagers;
 
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+
+use Filament\Schemas\Schema;
 use Filament\Actions\AssociateAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -25,7 +26,7 @@ class OrdersRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'orders';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema   
     {
         return $schema
             ->schema([
@@ -35,7 +36,7 @@ class OrdersRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
         // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table

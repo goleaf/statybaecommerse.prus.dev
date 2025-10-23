@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
 
+use Filament\Schemas\Schema;
 use App\Filament\Resources\MenuResource\Pages;
 use App\Filament\Resources\MenuResource\RelationManagers\MenuItemsRelationManager;
 use App\Models\Menu;
@@ -42,9 +42,8 @@ final class MenuResource extends Resource
     use HasNav;
 
     protected static ?string $model = Menu::class;
-
     /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
 
     /** @var string|\UnitEnum|null */
     protected static \UnitEnum|string|null $navigationGroup = 'Content';
@@ -68,7 +67,7 @@ final class MenuResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         $locationOptions = [
@@ -117,7 +116,7 @@ final class MenuResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

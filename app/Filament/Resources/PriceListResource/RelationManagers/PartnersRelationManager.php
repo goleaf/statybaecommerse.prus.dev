@@ -21,7 +21,7 @@ final class PartnersRelationManager extends BaseRelationManager
         return __('price_lists.relation_managers.partners.title');
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
         // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table

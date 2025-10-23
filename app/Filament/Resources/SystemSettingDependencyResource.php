@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Forms\Components\Flatpickr;
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\SystemSettingDependencyResource\Pages;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingDependency;
@@ -72,7 +73,7 @@ final class SystemSettingDependencyResource extends Resource
         return __('admin.system_setting_dependencies.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
             Section::make(__('admin.system_setting_dependencies.basic_information'))
@@ -156,7 +157,7 @@ final class SystemSettingDependencyResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

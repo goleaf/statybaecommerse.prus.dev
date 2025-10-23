@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Forms\Components\Flatpickr;
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\StockMovementResource\Pages;
 use App\Models\StockMovement;
 use App\Support\Filament\Components\Flatpickr;
@@ -28,18 +29,8 @@ use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
-
-use Filament\Schemas\Schema;
-/**
- * StockMovementResource
- *
- * Filament v4 resource for StockMovement management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class StockMovementResource extends Resource
-{
     /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
+    protected static $navigationIcon = 'heroicon-o-archive-box';
 
     /** @var string|\UnitEnum|null */
     protected static \UnitEnum|string|null $navigationGroup = 'Inventory';
@@ -68,7 +59,7 @@ final class StockMovementResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
             Section::make(__('stock_movement.sections.basic_information'))
@@ -132,7 +123,7 @@ final class StockMovementResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

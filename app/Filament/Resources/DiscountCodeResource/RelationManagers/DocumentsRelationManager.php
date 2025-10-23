@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountCodeResource\RelationManagers;
 
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+
+use Filament\Schemas\Schema;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -22,7 +23,7 @@ final class DocumentsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'documents';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema   
     {
         return $schema
             ->components([
@@ -54,7 +55,7 @@ final class DocumentsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
         // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table

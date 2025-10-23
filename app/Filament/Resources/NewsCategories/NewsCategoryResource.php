@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources\NewsCategories;
 use App\Support\Concerns\HasNav;
 
-use App\Enums\NavigationGroup;
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\NewsCategories\Pages\CreateNewsCategory;
 use App\Filament\Resources\NewsCategories\Pages\EditNewsCategory;
 use App\Filament\Resources\NewsCategories\Pages\ListNewsCategories;
@@ -26,9 +27,8 @@ final class NewsCategoryResource extends Resource
     use HasNav;
 
     protected static ?string $model = NewsCategory::class;
-
     /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
 
     /**
      * @var string|BackedEnum|null Keep the resource grouped with other news modules.
@@ -43,12 +43,12 @@ final class NewsCategoryResource extends Resource
         return $group instanceof NavigationGroup ? $group->label() : $group;
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return NewsCategoryForm::configure($schema);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return NewsCategoriesTable::configure($table);

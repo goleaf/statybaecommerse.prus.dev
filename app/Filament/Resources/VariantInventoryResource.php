@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Forms\Components\Flatpickr;
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantInventoryResource\Pages;
 use App\Models\Location;
 use App\Models\Product;
@@ -46,26 +47,8 @@ use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-use Filament\Schemas\Schema;
-
-use Filament\Schemas\Schema;
-/**
- * VariantInventoryResource
- *
- * Filament v4 resource for VariantInventory management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class VariantInventoryResource extends Resource
-{
-    use HasNav;
-
-    protected static ?string $model = VariantInventory::class;
-
-    protected static ?int $navigationSort = 2;
-
-    protected static ?string $recordTitleAttribute = 'variant_id';
-
     /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
+    protected static $navigationIcon = 'heroicon-o-archive-box';
 
     /** @var string|\UnitEnum|null */
     protected static \UnitEnum|string|null $navigationGroup = 'Inventory';
@@ -88,7 +71,7 @@ final class VariantInventoryResource extends Resource
     /**
      * Configure the Variant Inventory form schema for Filament administrators.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $schema): Schema   
     {
         return $schema
             ->schema([
@@ -394,7 +377,7 @@ final class VariantInventoryResource extends Resource
         ];
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

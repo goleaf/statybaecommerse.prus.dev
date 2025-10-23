@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources\MenuItems;
 use App\Support\Concerns\HasNav;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\MenuItems\Pages\CreateMenuItem;
 use App\Filament\Resources\MenuItems\Pages\EditMenuItem;
 use App\Filament\Resources\MenuItems\Pages\ListMenuItems;
@@ -24,16 +26,15 @@ class MenuItemResource extends Resource
     use HasNav;
 
     protected static ?string $model = MenuItem::class;
-
     /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return MenuItemForm::configure($schema);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return MenuItemsTable::configure($table);

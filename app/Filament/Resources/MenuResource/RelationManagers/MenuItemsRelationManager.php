@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\MenuResource\RelationManagers;
 
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+
+use Filament\Schemas\Schema;
 use App\Models\MenuItem;
 use App\Models\Scopes\VisibleScope;
 use Filament\Schemas\Components\Grid;
@@ -27,7 +28,7 @@ final class MenuItemsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'allItems';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema   
     {
         return $schema->schema([
             Grid::make(2)
@@ -66,7 +67,7 @@ final class MenuItemsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
         // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table

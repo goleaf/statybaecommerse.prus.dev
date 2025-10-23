@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Forms\Components\Flatpickr;
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\CampaignViewResource\Pages;
 use App\Models\CampaignView;
 use App\Support\Filament\Components\Flatpickr;
@@ -50,7 +51,7 @@ final class CampaignViewResource extends Resource
         return __('campaign_views.navigation');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return $schema
             ->schema([
@@ -95,7 +96,7 @@ final class CampaignViewResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

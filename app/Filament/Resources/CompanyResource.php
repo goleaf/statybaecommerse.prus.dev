@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
 
+use Filament\Schemas\Schema;
 use App\Filament\Resources\CompanyResource\Pages;
 use App\Models\Company;
 use Filament\Forms;
@@ -52,7 +52,7 @@ final class CompanyResource extends Resource
     /**
      * Build the form schema for creating and editing companies.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
             Forms\Components\Section::make(__('companies.basic_information'))
@@ -111,7 +111,7 @@ final class CompanyResource extends Resource
     /**
      * Configure the table for listing company records in the admin panel.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

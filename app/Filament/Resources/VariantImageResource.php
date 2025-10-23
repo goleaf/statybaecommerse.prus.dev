@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
 
+use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantImageResource\Pages;
 use App\Models\ProductVariant;
 use App\Models\VariantImage;
@@ -38,22 +38,8 @@ use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Filament\Schemas\Schema;
-
-use Filament\Schemas\Schema;
-/**
- * VariantImageResource
- *
- * Filament v4 resource for VariantImage management in the admin panel with comprehensive CRUD operations, filters, and actions.
- */
-final class VariantImageResource extends Resource
-{
-    use HasNav;
-
-    protected static ?string $model = VariantImage::class;
-
     /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-photo';
+    protected static $navigationIcon = 'heroicon-o-photo';
 
     public static function getNavigationGroup(): ?string
     {
@@ -77,7 +63,7 @@ final class VariantImageResource extends Resource
         return __('admin.variant_images.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return $schema->components([
             Section::make(__('admin.variant_images.basic_information'))
@@ -205,7 +191,7 @@ final class VariantImageResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

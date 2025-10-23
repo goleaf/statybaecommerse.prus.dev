@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
 
+use Filament\Schemas\Schema;
 use App\Filament\Resources\DocumentResource\Pages;
 use App\Models\Document;
 use Filament\Actions\BulkActionGroup;
@@ -32,7 +32,7 @@ use Filament\Schemas\Schema;
 final class DocumentResource extends Resource
 {
     /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-document';
+    protected static $navigationIcon = 'heroicon-o-document';
 
     protected static ?string $model = Document::class;
 
@@ -60,7 +60,7 @@ final class DocumentResource extends Resource
         return __('admin.documents.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return $schema
             ->schema([
@@ -134,7 +134,7 @@ final class DocumentResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

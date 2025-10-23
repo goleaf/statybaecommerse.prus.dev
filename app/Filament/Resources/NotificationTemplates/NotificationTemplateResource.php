@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources\NotificationTemplates;
 use App\Support\Concerns\HasNav;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\NotificationTemplates\Pages\CreateNotificationTemplate;
 use App\Filament\Resources\NotificationTemplates\Pages\EditNotificationTemplate;
 use App\Filament\Resources\NotificationTemplates\Pages\ListNotificationTemplates;
@@ -24,16 +26,15 @@ class NotificationTemplateResource extends Resource
     use HasNav;
 
     protected static ?string $model = NotificationTemplate::class;
-
     /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return NotificationTemplateForm::configure($schema);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return NotificationTemplatesTable::configure($table);

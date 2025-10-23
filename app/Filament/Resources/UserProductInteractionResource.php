@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\UserProductInteractionResource\Pages;
 use App\Models\Product;
 use App\Models\User;
@@ -66,7 +68,7 @@ final class UserProductInteractionResource extends Resource
     /**
      * Ensure Filament v4 receives a concrete Form instance for schema binding.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return $schema
             ->schema([
@@ -234,7 +236,7 @@ final class UserProductInteractionResource extends Resource
     /**
      * Return a Table instance to satisfy Filament v4 table expectations.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

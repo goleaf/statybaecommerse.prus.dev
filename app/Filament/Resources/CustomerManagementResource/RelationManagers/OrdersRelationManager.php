@@ -42,7 +42,7 @@ class OrdersRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'orders';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema   
     {
         return $schema
             ->components([
@@ -222,7 +222,7 @@ class OrdersRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function infolist(Schema $schema): Schema
+    public function infolist(Schema $schema): Schema   
     {
         // Provide the infolist schema using the Filament v4 return type.
         return $schema
@@ -284,7 +284,7 @@ class OrdersRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
         // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table

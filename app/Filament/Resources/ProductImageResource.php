@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
 
+use Filament\Schemas\Schema;
 use App\Filament\Resources\ProductImageResource\Pages;
 use App\Models\ProductImage;
 use BackedEnum;
@@ -36,7 +36,7 @@ final class ProductImageResource extends Resource
 
     protected static ?int $navigationSort = 14;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return $schema
             ->schema([
@@ -63,7 +63,7 @@ final class ProductImageResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

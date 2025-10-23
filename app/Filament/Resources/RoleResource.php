@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
+use App\Support\Forms\MatrixFactory;
 use App\Filament\Resources\RoleResource\Pages;
 use App\Models\Role;
 use App\Support\Authorization\AuthorizationMatrix;
@@ -32,9 +35,8 @@ final class RoleResource extends Resource
     protected static ?int $navigationSort = 19;
 
     protected static ?string $recordTitleAttribute = 'name';
-
     /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-shield-check';
+    protected static $navigationIcon = 'heroicon-o-shield-check';
 
     /** @var string|\UnitEnum|null */
     protected static \UnitEnum|string|null $navigationGroup = 'System';
@@ -94,7 +96,7 @@ final class RoleResource extends Resource
         return __('roles.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         return $schema
             ->schema([
@@ -123,7 +125,7 @@ final class RoleResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
