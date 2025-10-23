@@ -7,11 +7,9 @@ namespace App\Filament\Resources;
 use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\LocationResource\Pages;
 use App\Models\Location;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Forms;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
@@ -19,12 +17,9 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
-use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
@@ -38,8 +33,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
 
 final class LocationResource extends Resource
 {
@@ -66,9 +59,11 @@ final class LocationResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->schema([
             Section::make(__('locations.basic_information'))
                 ->components([
@@ -99,10 +94,12 @@ final class LocationResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->afterStateUpdated(static function (int|string|null $state, Set $set): void {
-                                    // Use Filament's Set helper so dependent fields stay in sync when the country changes.
-                                    if ($state === null || $state === '') {
-                                        return;
+                                ->afterStateUpdated(function ($state, Forms\Set $set): void {
+                                    if ($state) {
+                                        $country = Country::find($state);
+                                        if ($country) {
+                                            $set('country_code', $country->code);
+                                        }
                                     }
 
                                     $country = Country::find($state);
@@ -118,10 +115,12 @@ final class LocationResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->afterStateUpdated(static function (int|string|null $state, Set $set): void {
-                                    // Ensure the linked city code reflects the currently selected city via Set helper updates.
-                                    if ($state === null || $state === '') {
-                                        return;
+                                ->afterStateUpdated(function ($state, Forms\Set $set): void {
+                                    if ($state) {
+                                        $city = City::find($state);
+                                        if ($city) {
+                                            $set('city_code', $city->code);
+                                        }
                                     }
 
                                     $city = City::find($state);
@@ -212,13 +211,13 @@ final class LocationResource extends Resource
                             Select::make('day')
                                 ->label(__('locations.fields.day'))
                                 ->options([
-                                    'monday' => __('locations.monday'),
-                                    'tuesday' => __('locations.tuesday'),
+                                    'monday'    => __('locations.monday'),
+                                    'tuesday'   => __('locations.tuesday'),
                                     'wednesday' => __('locations.wednesday'),
-                                    'thursday' => __('locations.thursday'),
-                                    'friday' => __('locations.friday'),
-                                    'saturday' => __('locations.saturday'),
-                                    'sunday' => __('locations.sunday'),
+                                    'thursday'  => __('locations.thursday'),
+                                    'friday'    => __('locations.friday'),
+                                    'saturday'  => __('locations.saturday'),
+                                    'sunday'    => __('locations.sunday'),
                                 ])
                                 ->required(),
                             Toggle::make('is_closed')
@@ -259,11 +258,11 @@ final class LocationResource extends Resource
                             Select::make('type')
                                 ->label(__('locations.fields.type'))
                                 ->options([
-                                    'warehouse' => __('locations.type_warehouse'),
-                                    'store' => __('locations.type_store'),
-                                    'office' => __('locations.type_office'),
+                                    'warehouse'           => __('locations.type_warehouse'),
+                                    'store'               => __('locations.type_store'),
+                                    'office'              => __('locations.type_office'),
                                     'distribution_center' => __('locations.type_distribution_center'),
-                                    'pickup_point' => __('locations.type_pickup_point'),
+                                    'pickup_point'        => __('locations.type_pickup_point'),
                                 ])
                                 ->default('warehouse'),
                         ]),
@@ -351,11 +350,11 @@ final class LocationResource extends Resource
                     ->preload(),
                 SelectFilter::make('type')
                     ->options([
-                        'warehouse' => __('locations.type_warehouse'),
-                        'store' => __('locations.type_store'),
-                        'office' => __('locations.type_office'),
+                        'warehouse'           => __('locations.type_warehouse'),
+                        'store'               => __('locations.type_store'),
+                        'office'              => __('locations.type_office'),
                         'distribution_center' => __('locations.type_distribution_center'),
-                        'pickup_point' => __('locations.type_pickup_point'),
+                        'pickup_point'        => __('locations.type_pickup_point'),
                     ]),
                 TernaryFilter::make('is_active')
                     ->trueLabel(__('locations.filters.active_only'))
@@ -369,14 +368,14 @@ final class LocationResource extends Resource
                     ->label(__('locations.filters.has_coordinates'))
                     ->options([
                         'yes' => __('locations.filters.with_coordinates'),
-                        'no' => __('locations.filters.without_coordinates'),
+                        'no'  => __('locations.filters.without_coordinates'),
                     ])
                     ->query(function (Builder $query, array $data): void {
                         $value = $data['value'] ?? null;
 
                         if ($value === 'yes') {
                             $query->whereNotNull('latitude')->whereNotNull('longitude');
-                        } elseif ($data['value'] === 'no') {
+                        } elseif ($value === 'no') {
                             $query->where(function ($q): void {
                                 $q->whereNull('latitude')->orWhereNull('longitude');
                             });
@@ -386,7 +385,7 @@ final class LocationResource extends Resource
                     ->label(__('locations.filters.has_opening_hours'))
                     ->options([
                         'yes' => __('locations.filters.with_opening_hours'),
-                        'no' => __('locations.filters.without_opening_hours'),
+                        'no'  => __('locations.filters.without_opening_hours'),
                     ])
                     ->query(function (Builder $query, array $data): void {
                         $value = $data['value'] ?? null;

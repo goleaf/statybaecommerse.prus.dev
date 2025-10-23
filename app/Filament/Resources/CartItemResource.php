@@ -12,6 +12,7 @@ use App\Models\ProductVariant;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;
+use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -25,6 +26,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
@@ -42,10 +44,8 @@ final class CartItemResource extends Resource
 {
     /**
      * Define the navigation icon in a docblock to keep compatibility with Filament's autoloading.
-     *
-     * @var string|\BackedEnum|null
      */
-    protected static $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static ?string $model = CartItem::class;
 
@@ -72,9 +72,11 @@ final class CartItemResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->schema([
             Section::make(__('cart_items.basic_information'))
                 ->schema([
@@ -153,7 +155,7 @@ final class CartItemResource extends Resource
                         ->searchable()
                         ->preload()
                         ->live()
-                        ->afterStateUpdated(function ($state, Set $set) {
+                        ->afterStateUpdated(function ($state, Forms\Set $set): void {
                             if ($state) {
                                 $variant = ProductVariant::find($state);
                                 if ($variant) {
@@ -183,8 +185,7 @@ final class CartItemResource extends Resource
                                 ->steps(1)
                                 ->default(1)
                                 ->required()
-                                ->live()
-                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
+                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set): void {
                                     $unitPrice = (float) $get('unit_price');
                                     $quantity = (int) $state;
                                     $total = $unitPrice * $quantity;
@@ -215,7 +216,7 @@ final class CartItemResource extends Resource
                                 ->numeric()
                                 ->required()
                                 ->live()
-                                ->afterStateUpdated(function ($state, Get $get, Set $set) {
+                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set): void {
                                     $unitPrice = (float) $state;
                                     $quantity = (int) $get('quantity');
                                     $total = $unitPrice * $quantity;
@@ -227,7 +228,7 @@ final class CartItemResource extends Resource
                                 ->numeric()
                                 ->default(0)
                                 ->live()
-                                ->afterStateUpdated(function ($state, Get $get, Set $set) {
+                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set): void {
                                     $unitPrice = (float) $get('unit_price');
                                     $quantity = (int) $get('quantity');
                                     $discount = (float) $state;

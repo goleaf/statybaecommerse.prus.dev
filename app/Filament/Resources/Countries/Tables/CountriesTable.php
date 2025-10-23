@@ -209,7 +209,7 @@ final class CountriesTable
                         ->label(__('countries.activate_selected'))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->action(function (Collection $records): void {
+                        ->action(function ($records): void {
                             $records->each->update(['is_active' => true]);
                             Notification::make()
                                 ->title(__('countries.activated_successfully'))
@@ -221,7 +221,7 @@ final class CountriesTable
                         ->label(__('countries.deactivate_selected'))
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
-                        ->action(function (Collection $records): void {
+                        ->action(function ($records): void {
                             $records->each->update(['is_active' => false]);
                             Notification::make()
                                 ->title(__('countries.deactivated_successfully'))

@@ -12,8 +12,9 @@ use App\Filament\Resources\NewsTags\Pages\ViewNewsTag;
 use App\Filament\Resources\NewsTags\Schemas\NewsTagForm;
 use App\Filament\Resources\NewsTags\Tables\NewsTagsTable;
 use App\Models\NewsTag;
-use Filament\Forms\Form;
+use BackedEnum;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
@@ -31,9 +32,11 @@ class NewsTagResource extends Resource
      */
     protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return NewsTagForm::configure($form);
     }
 
@@ -55,8 +58,8 @@ class NewsTagResource extends Resource
         return [
             'index'  => ListNewsTags::route('/'),
             'create' => CreateNewsTag::route('/create'),
-            'view' => ViewNewsTag::route('/{record}'),
-            'edit' => EditNewsTag::route('/{record}/edit'),
+            'view'   => ViewNewsTag::route('/{record}'),
+            'edit'   => EditNewsTag::route('/{record}/edit'),
         ];
     }
 }

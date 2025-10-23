@@ -12,8 +12,9 @@ use App\Filament\Resources\NewsCategories\Pages\ListNewsCategories;
 use App\Filament\Resources\NewsCategories\Schemas\NewsCategoryForm;
 use App\Filament\Resources\NewsCategories\Tables\NewsCategoriesTable;
 use App\Models\NewsCategory;
-use Filament\Forms\Form;
+use BackedEnum;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
 final class NewsCategoryResource extends Resource
@@ -42,9 +43,11 @@ final class NewsCategoryResource extends Resource
         return $group instanceof NavigationGroup ? $group->label() : $group;
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return NewsCategoryForm::configure($form);
     }
 

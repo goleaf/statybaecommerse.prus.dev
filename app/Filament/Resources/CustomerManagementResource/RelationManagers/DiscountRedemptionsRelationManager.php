@@ -26,9 +26,11 @@ class DiscountRedemptionsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'discountRedemptions';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->components([
                 TextInput::make('id')
@@ -37,8 +39,11 @@ class DiscountRedemptionsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function infolist(Schema $schema): Schema|array
+    public function infolist(Schema $schema): Schema
     {
+
+        $infolist = $schema; // Maintain legacy naming for infolist builders while using the Schema abstraction.
+
         return $schema
             ->components([
                 TextEntry::make('id'),

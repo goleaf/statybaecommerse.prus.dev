@@ -13,10 +13,11 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\UserWishlist;
 use App\Models\WishlistItem;
-use App\Support\Filament\SearchableInputHelper;
+use App\Support\Filament\Components\Flatpickr;
 use App\Support\Search\ProductSearch;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Exception;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction as TableBulkAction;
@@ -33,13 +34,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\BulkAction as TableBulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -50,9 +45,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use RuntimeException;
+use Str;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
 
 /**
  * WishlistItemResource
@@ -111,9 +105,11 @@ final class WishlistItemResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->schema([
                 FormSection::make(__('admin.wishlist_items.sections.basic_info'))
@@ -682,30 +678,30 @@ final class WishlistItemResource extends Resource
         $snapshotName = $variant?->name ?? $product->name;
 
         if (! empty($variantAttributes)) {
-            $snapshotName .= ' ('.collect($variantAttributes)
+            $snapshotName .= ' (' . collect($variantAttributes)
                 ->map(fn ($value, $key) => sprintf('%s: %s', $key, $value))
-                ->implode(', ').')';
+                ->implode(', ') . ')';
         }
 
         $productSnapshot = array_filter([
-            'name' => $snapshotName,
-            'sku' => $variant?->sku ?? $product->sku,
-            'price' => $unitPrice,
-            'variant_id' => $variant?->getKey(),
+            'name'               => $snapshotName,
+            'sku'                => $variant?->sku ?? $product->sku,
+            'price'              => $unitPrice,
+            'variant_id'         => $variant?->getKey(),
             'variant_attributes' => ! empty($variantAttributes) ? $variantAttributes : null,
         ], static fn ($value) => $value !== null);
 
         return [
-            'user_id' => $record->wishlist->user_id,
-            'product_id' => $product->getKey(),
-            'variant_id' => $variant?->getKey(),
+            'user_id'            => $record->wishlist->user_id,
+            'product_id'         => $product->getKey(),
+            'variant_id'         => $variant?->getKey(),
             'product_variant_id' => $variant?->getKey(),
-            'quantity' => $quantity,
-            'minimum_quantity' => $product->getMinimumQuantity(),
-            'unit_price' => $unitPrice,
-            'total_price' => $totalPrice,
-            'price' => $unitPrice,
-            'product_snapshot' => $productSnapshot,
+            'quantity'           => $quantity,
+            'minimum_quantity'   => $product->getMinimumQuantity(),
+            'unit_price'         => $unitPrice,
+            'total_price'        => $totalPrice,
+            'price'              => $unitPrice,
+            'product_snapshot'   => $productSnapshot,
         ];
     }
 

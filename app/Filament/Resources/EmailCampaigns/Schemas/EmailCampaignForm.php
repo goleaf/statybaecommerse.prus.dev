@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\EmailCampaigns\Schemas;
 
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
-use App\Support\Filament\Components\Flatpickr;
+use Filament\Forms\Form;
 
 class EmailCampaignForm
 {

@@ -18,6 +18,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
@@ -31,14 +32,15 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
+use UnitEnum;
 
 final class CategoryResource extends Resource
 {
     /** @var string|BackedEnum|null Keep compatibility with Filament v4 navigation icon expectations. */
-    protected static $navigationIcon = 'heroicon-o-tag';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
     /** @var string|BackedEnum|null Align the resource under the Products navigation section. */
-    protected static $navigationGroup = NavigationGroup::Products;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 3;
 
@@ -96,8 +98,11 @@ final class CategoryResource extends Resource
         return __('categories.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->schema([
             Section::make(__('categories.basic_information'))
                 ->schema([

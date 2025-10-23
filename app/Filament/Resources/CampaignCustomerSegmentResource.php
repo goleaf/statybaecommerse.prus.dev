@@ -15,6 +15,7 @@ use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\KeyValueEntry;
 use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
@@ -70,9 +71,11 @@ final class CampaignCustomerSegmentResource extends Resource
         return __('campaign_customer_segments.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->schema([
             Section::make(__('campaign_customer_segments.tabs.basic_information'))
                 ->schema([
@@ -248,9 +251,12 @@ final class CampaignCustomerSegmentResource extends Resource
             ->paginated([10, 25, 50, 100]);
     }
 
-    public static function infolist(Schema $schema): Schema|array
+    public static function infolist(Schema $schema): Schema
     {
-        return $schema->schema([
+
+        $infolist = $schema; // Maintain legacy naming for infolist builders while using the Schema abstraction.
+
+        return $infolist->schema([
             InfolistSection::make(__('campaign_customer_segments.tabs.basic_information'))
                 ->schema([
                     TextEntry::make('campaign.name')

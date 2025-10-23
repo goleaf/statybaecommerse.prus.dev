@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Resources\PostResource\RelationManagers;
 
 use App\Filament\RelationManagers\Support\BaseRelationManager;
-use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 

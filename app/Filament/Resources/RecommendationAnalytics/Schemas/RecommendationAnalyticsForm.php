@@ -9,13 +9,13 @@ use App\Models\Product;
 use App\Models\RecommendationBlock;
 use App\Models\RecommendationConfig;
 use App\Models\User;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
-use App\Support\Filament\Components\Flatpickr;
 
 final class RecommendationAnalyticsForm
 {

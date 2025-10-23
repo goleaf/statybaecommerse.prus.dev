@@ -6,8 +6,7 @@ namespace App\Filament\Resources\DiscountResource\RelationManagers;
 
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Forms;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
@@ -22,9 +21,11 @@ final class ConditionsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Conditions';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->schema([
                 Forms\Components\Select::make('type')

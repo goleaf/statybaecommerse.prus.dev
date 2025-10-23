@@ -12,7 +12,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -20,7 +20,6 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 class StockMovementsRelationManager extends BaseRelationManager
 {
@@ -32,9 +31,11 @@ class StockMovementsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Stock Movements';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->components([
                 TextInput::make('quantity')

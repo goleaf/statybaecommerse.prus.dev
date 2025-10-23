@@ -11,6 +11,7 @@ use App\Filament\Resources\CountryResource\RelationManagers\CitiesRelationManage
 use App\Filament\Resources\CountryResource\RelationManagers\CustomersRelationManager;
 use App\Filament\Resources\CountryResource\RelationManagers\UsersRelationManager;
 use App\Models\Country;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
@@ -21,6 +22,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup as TableBulkActionGroup;
@@ -38,8 +40,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Throwable;
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
 
 final class CountryResource extends Resource
 {
@@ -72,9 +72,11 @@ final class CountryResource extends Resource
         return __('countries.models.countries');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->schema([
                 Section::make(__('countries.sections.basic_info'))

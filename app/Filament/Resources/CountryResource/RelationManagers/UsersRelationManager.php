@@ -7,8 +7,7 @@ namespace App\Filament\Resources\CountryResource\RelationManagers;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\User;
 use Filament\Forms;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -20,9 +19,11 @@ final class UsersRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Users';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->schema([
                 Forms\Components\Section::make(__('users.title'))

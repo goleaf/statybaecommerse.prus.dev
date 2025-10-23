@@ -16,11 +16,14 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Novadaemon\FilamentCombobox\Combobox;
+use UnitEnum;
 
 final class RecommendationConfigResource extends Resource
 {
@@ -54,9 +57,11 @@ final class RecommendationConfigResource extends Resource
         return __('recommendation_configs.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->schema([
             Section::make(__('recommendation_config.sections.basic_info'))
                 ->schema([

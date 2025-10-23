@@ -4,19 +4,18 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CampaignResource\RelationManagers;
 
-use App\Forms\Components\Flatpickr;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
 
 final class ConversionsRelationManager extends BaseRelationManager
 {
@@ -24,9 +23,11 @@ final class ConversionsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Campaign Conversions';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->schema([
             Select::make('conversion_type')
                 ->label('Conversion Type')

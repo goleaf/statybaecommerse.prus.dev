@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Auth;
 
-use App\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
@@ -13,14 +13,15 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use App\Support\Filament\Components\Flatpickr;
 use Filament\Schemas\Schema;
 
 class EditProfile extends BaseEditProfile
 {
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->components([
                 Section::make(__('admin.profile.personal_information'))

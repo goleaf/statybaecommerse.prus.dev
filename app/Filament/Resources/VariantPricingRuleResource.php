@@ -16,6 +16,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -87,9 +88,11 @@ final class VariantPricingRuleResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->schema([
                 Section::make(__('variant_pricing_rules.basic_information'))
@@ -219,9 +222,7 @@ final class VariantPricingRuleResource extends Resource
                     ->numeric()
                     ->formatStateUsing(function ($state, VariantPricingRule $record): string {
                         if ($record->type === 'percentage') {
-                            $value = is_numeric($state) ? (float) $state : 0.0;
-
-                            return Number::format($value, 2).'%';
+                            return $state . '%';
                         }
 
                         // Provide a predictable locale-aware currency string for administrators.

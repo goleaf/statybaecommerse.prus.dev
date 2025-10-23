@@ -12,15 +12,18 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
-use Filament\Forms\Set;
-use Filament\Tables;
+use Filament\Schemas\Schema;
+use Filament\Tables\Actions\CreateAction;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
+use Str;
 
 final class SettingsRelationManager extends BaseRelationManager
 {
@@ -32,9 +35,11 @@ final class SettingsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Settings';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->schema([
             Section::make(__('system_setting_categories.settings.basic_information'))
                 ->schema([
@@ -45,14 +50,7 @@ final class SettingsRelationManager extends BaseRelationManager
                                 ->required()
                                 ->maxLength(255)
                                 ->live()
-                                ->afterStateUpdated(static function (?string $state, Set $set): void {
-                                    // Synchronize the slug to avoid manual cleanup after typing mistakes.
-                                    if ($state === null || $state === '') {
-                                        return;
-                                    }
-
-                                    $set('slug', Str::slug($state));
-                                })
+                                ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state)))
                                 ->helperText(__('system_setting_categories.settings.key_help')),
 
                             TextInput::make('slug')

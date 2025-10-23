@@ -28,7 +28,7 @@ class NewsTagForm
                             ->required()
                             ->maxLength(255)
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn ($state, callable $set) => $set('slug', \Str::slug($state))),
+                            ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
                         TextInput::make('slug')
                             ->label(__('admin.news_tags.form.fields.slug'))
                             ->required()

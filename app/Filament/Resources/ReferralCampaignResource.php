@@ -20,6 +20,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -30,6 +31,7 @@ use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTransla
 final class ReferralCampaignResource extends Resource
 {
     use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
+
     protected static ?string $model = ReferralCampaign::class;
 
     /**
@@ -63,9 +65,11 @@ final class ReferralCampaignResource extends Resource
         return __('admin.referral_campaigns.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->schema([
                 Section::make(__('admin.referral_campaigns.basic_information'))

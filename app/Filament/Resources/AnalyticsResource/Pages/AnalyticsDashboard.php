@@ -8,8 +8,6 @@ use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\AnalyticsResource;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
-use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable as TranslatableListRecords;
 
 final class AnalyticsDashboard extends BaseListRecords
 {

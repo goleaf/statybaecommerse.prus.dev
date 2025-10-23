@@ -7,16 +7,10 @@ namespace App\Filament\Resources;
 use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\NewsImageResource\Pages;
-use App\Filament\Resources\NewsResource;
 use App\Models\News;
 use App\Models\NewsImage;
 use App\Support\Storage\SecureStorage;
 use BackedEnum;
-use Filament\Actions\Action;
-use Filament\Actions\ActionGroup;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
@@ -28,10 +22,12 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
+use Filament\Schemas\Schema;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
@@ -78,9 +74,11 @@ final class NewsImageResource extends Resource
         return __('admin.news_images.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->schema([
                 Tabs::make(__('admin.news_images.tabs'))
@@ -139,7 +137,7 @@ final class NewsImageResource extends Resource
                                                 '1:1',
                                             ])
                                             ->live()
-                                            ->afterStateUpdated(function ($state, callable $set) {
+                                            ->afterStateUpdated(function ($state, callable $set, callable $get): void {
                                                 if (! $state) {
                                                     return;
                                                 }
@@ -549,10 +547,10 @@ final class NewsImageResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListNewsImages::route('/panel'),
-            'create' => Pages\CreateNewsImage::route('/panel/create'),
-            'view'   => Pages\ViewNewsImage::route('/panel/{record}'),
-            'edit'   => Pages\EditNewsImage::route('/panel/{record}/edit'),
+            'index'  => Pages\ListNewsImages::route('/'),
+            'create' => Pages\CreateNewsImage::route('/create'),
+            'view'   => Pages\ViewNewsImage::route('/{record}'),
+            'edit'   => Pages\EditNewsImage::route('/{record}/edit'),
         ];
     }
 }

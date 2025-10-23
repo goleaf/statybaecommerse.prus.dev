@@ -8,8 +8,6 @@ use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\CouponResource\Pages;
 use App\Models\Coupon;
 use App\Support\Filament\Components\Flatpickr;
-use Awcodes\BadgeableColumn\Components\Badge;
-use Awcodes\BadgeableColumn\Components\BadgeableColumn;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -18,7 +16,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Support\Enums\Size;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -64,9 +62,11 @@ final class CouponResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->schema([
             Section::make(__('coupons.basic_information'))
                 ->schema([
@@ -423,48 +423,6 @@ final class CouponResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->with(['customerGroup:id,name']);
-    }
-
-    /**
-     * @return array<int, ExcelExport>
-     */
-    private static function getCouponExportPresets(): array
-    {
-        return [
-            ExcelExport::make('coupon_report')
-                ->fromTable()
-                ->queue()
-                ->withChunkSize(500)
-                ->withColumns([
-                    Column::make('code')
-                        ->heading(__('coupons.code')),
-                    Column::make('type')
-                        ->heading(__('coupons.type')),
-                    Column::make('value')
-                        ->heading(__('coupons.value'))
-                        ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE)
-                        ->formatStateUsing(
-                            fn ($state, Coupon $record): string => match ($record->type) {
-                                'percentage'    => $state === null ? '' : sprintf('%s%%', $state),
-                                'free_shipping' => __('coupons.free_shipping'),
-                                default         => $state === null ? '' : (string) $state,
-                            }
-                        ),
-                    Column::make('starts_at')
-                        ->heading(__('coupons.starts_at')),
-                    Column::make('expires_at')
-                        ->heading(__('coupons.ends_at')),
-                ]),
-        ];
-    }
-
-    /**
-     * @return Builder<Coupon>
-     */
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()
-            ->with(['customerGroup:id,name']);
     }
 
     /**

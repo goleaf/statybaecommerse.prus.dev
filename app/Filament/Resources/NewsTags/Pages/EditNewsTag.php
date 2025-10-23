@@ -33,10 +33,10 @@ class EditNewsTag extends EditRecord
 
         $translations = $this->record->translations
             ->map(fn ($translation) => [
-                'id' => $translation->getKey(),
-                'locale' => $translation->locale,
-                'name' => $translation->name,
-                'slug' => $translation->slug,
+                'id'          => $translation->getKey(),
+                'locale'      => $translation->locale,
+                'name'        => $translation->name,
+                'slug'        => $translation->slug,
                 'description' => $translation->description,
             ])
             ->values()

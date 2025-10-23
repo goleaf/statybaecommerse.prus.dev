@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsImageResource\Pages;
 
-use App\Filament\Concerns\HasResizableColumns;
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\NewsImageResource;
 use Filament\Actions;
-use App\Filament\Pages\Support\BaseListRecords;
 
 class ListNewsImages extends BaseListRecords
 {

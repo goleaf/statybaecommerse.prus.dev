@@ -11,8 +11,9 @@ use App\Filament\Resources\NewsComments\Pages\ListNewsComments;
 use App\Filament\Resources\NewsComments\Schemas\NewsCommentForm;
 use App\Filament\Resources\NewsComments\Tables\NewsCommentsTable;
 use App\Models\NewsComment;
-use Filament\Forms\Form;
+use BackedEnum;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
@@ -30,9 +31,11 @@ class NewsCommentResource extends Resource
      */
     protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return NewsCommentForm::configure($form);
     }
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CountryResource\Pages;
 
-use App\Filament\Concerns\HasResizableColumns;
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\CountryResource;
 use App\Filament\Resources\CountryResource\Widgets\CountriesByRegionWidget;
 use App\Filament\Resources\CountryResource\Widgets\CountriesOverviewWidget;
@@ -15,8 +15,6 @@ use App\Filament\Resources\CountryResource\Widgets\EuMembersWidget;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use App\Filament\WidgetTabs\Enums\WidgetTabTheme;
-use Filament\Actions;
-use App\Filament\Pages\Support\BaseListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListCountries extends BaseListRecords

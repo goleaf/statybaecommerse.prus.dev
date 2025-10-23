@@ -25,6 +25,9 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -63,9 +66,11 @@ final class AnalyticsEventResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->components([
             Section::make(__('analytics_events.basic_information'))
                 ->schema([
@@ -118,7 +123,7 @@ final class AnalyticsEventResource extends Resource
                         ->searchable()
                         ->preload()
                         ->live()
-                        ->afterStateUpdated(function ($state, Set $set): void {
+                        ->afterStateUpdated(function ($state, \Filament\Schemas\Components\Utilities\Set $set): void {
                             if ($state) {
                                 $user = User::find($state);
                                 if ($user) {

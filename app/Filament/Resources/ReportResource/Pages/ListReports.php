@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ReportResource\Pages;
 
-use App\Filament\Concerns\HasResizableColumns;
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\ReportResource;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
-use App\Filament\Pages\Support\BaseListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListReports extends BaseListRecords

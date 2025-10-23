@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Novadaemon\FilamentCombobox\Combobox;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 use RuntimeException;
 
@@ -47,9 +48,11 @@ class NewsResource extends Resource
 
     protected static ?string $pluralModelLabel = 'News Articles';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->components([
             Forms\Components\Section::make('Article Information')
                 ->components([
@@ -392,8 +395,11 @@ class NewsResource extends Resource
             ->defaultSort('published_at', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema|array
+    public static function infolist(Schema $schema): Schema
     {
+
+        $infolist = $schema; // Maintain legacy naming for infolist builders while using the Schema abstraction.
+
         return $schema
             ->components([
                 Infolists\Components\Section::make('Article Details')

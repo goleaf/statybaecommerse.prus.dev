@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingHistoryResource\Pages;
 
-use App\Filament\Concerns\HasResizableColumns;
+use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\SystemSettingHistoryResource;
 use Filament\Actions\CreateAction;
-use App\Filament\Pages\Support\BaseListRecords;
 
 final class ListSystemSettingHistories extends BaseListRecords
 {

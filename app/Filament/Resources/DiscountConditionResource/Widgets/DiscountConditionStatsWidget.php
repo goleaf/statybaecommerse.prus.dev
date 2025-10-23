@@ -16,18 +16,11 @@ final class DiscountConditionStatsWidget extends BaseWidget
     {
         $totalConditions = DiscountCondition::count();
         $activeConditions = DiscountCondition::where('is_active', true)->count();
-        $inactiveConditions = DiscountCondition::where('is_active', false)->count();
-
-        $topType = DiscountCondition::select('type', DB::raw('count(*) as aggregate'))
-            ->groupBy('type')
-            ->orderByDesc('aggregate')
-            ->first();
-
-        $topTypeLabel = $topType?->type
-            ? __('discount_conditions.types.' . Str::slug((string) $topType->type, '_'))
-            : __('discount_conditions.stats.no_data');
-
-        $topTypeCount = (int) ($topType->aggregate ?? 0);
+        $currentConditions = DiscountCondition::where('valid_from', '<=', now())
+            ->where(function ($query): void {
+                $query->whereNull('valid_until')->orWhere('valid_until', '>=', now());
+            })->count();
+        $expiredConditions = DiscountCondition::where('valid_until', '<', now())->count();
 
         return [
             Stat::make(__('discount_conditions.stats.total_conditions'), $totalConditions)

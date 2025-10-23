@@ -7,6 +7,7 @@ namespace App\Filament\Resources;
 use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\ReportResource\Pages;
 use App\Models\Report;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -38,7 +39,8 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use App\Support\Filament\Components\Flatpickr;
+use Str;
+use Throwable;
 
 final class ReportResource extends Resource
 {
@@ -50,7 +52,7 @@ final class ReportResource extends Resource
     protected static ?string $model = Report::class;
 
     /**
-     * @var string|\BackedEnum|\UnitEnum|null
+     * @var string|BackedEnum|null
      */
     public static function getNavigationIcon(): BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
     {
@@ -76,9 +78,11 @@ final class ReportResource extends Resource
         return __('reports.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->columns(3)
             ->schema([
@@ -235,13 +239,13 @@ final class ReportResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->colors([
-                        'sales'     => 'success',
-                        'inventory' => 'info',
-                        'customer'  => 'warning',
-                        'product'   => 'primary',
-                        'financial' => 'danger',
-                        'analytics' => 'secondary',
-                        'custom'    => 'gray',
+                        'success'   => ['sales'],
+                        'info'      => ['inventory'],
+                        'warning'   => ['customer'],
+                        'primary'   => ['product'],
+                        'danger'    => ['financial'],
+                        'secondary' => ['analytics'],
+                        'gray'      => ['custom'],
                     ])
                     ->formatStateUsing(fn (string $state): string => __("reports.types.{$state}")),
                 BadgeColumn::make('category')
@@ -249,13 +253,13 @@ final class ReportResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->colors([
-                        'sales'            => 'success',
-                        'marketing'        => 'info',
-                        'operations'       => 'warning',
-                        'finance'          => 'danger',
-                        'customer_service' => 'primary',
-                        'inventory'        => 'secondary',
-                        'analytics'        => 'gray',
+                        'success'   => ['sales'],
+                        'info'      => ['marketing'],
+                        'warning'   => ['operations'],
+                        'danger'    => ['finance'],
+                        'primary'   => ['customer_service'],
+                        'secondary' => ['inventory'],
+                        'gray'      => ['analytics'],
                     ])
                     ->formatStateUsing(fn (string $state): string => __("reports.categories.{$state}")),
                 TextColumn::make('generator.name')
@@ -408,7 +412,7 @@ final class ReportResource extends Resource
                                     $action->reportBulkProcessingSuccessfulRecordsCount(
                                         $action->getSelectedRecordsQuery()->forceDelete(),
                                     );
-                                } catch (\Throwable $exception) {
+                                } catch (Throwable $exception) {
                                     $action->reportCompleteBulkProcessingFailure();
 
                                     report($exception);
@@ -422,7 +426,7 @@ final class ReportResource extends Resource
                             $records->each(function (Report $record) use ($action, &$isFirstException): void {
                                 try {
                                     $record->forceDelete() || $action->reportBulkProcessingFailure();
-                                } catch (\Throwable $exception) {
+                                } catch (Throwable $exception) {
                                     $action->reportBulkProcessingFailure();
 
                                     if ($isFirstException) {
@@ -474,8 +478,11 @@ final class ReportResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema|array
+    public static function infolist(Schema $schema): Schema
     {
+
+        $infolist = $schema; // Maintain legacy naming for infolist builders while using the Schema abstraction.
+
         return $schema
             ->schema([
                 Section::make(__('reports.sections.basic_info'))

@@ -92,6 +92,7 @@
 - Removed deprecated components and imports
 - Added proper type hints and documentation
 - Standardized resource structure
+- Harmonized Filament resource, page, and widget signatures with the new Schema-based API and typed navigation metadata.
 
 ### Performance
 - Optimized test execution time

@@ -19,6 +19,7 @@ use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -32,13 +33,13 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
-use UnitEnum;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
+use UnitEnum;
 
 final class ReferralRewardResource extends Resource
 {
     use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
+
     protected static ?string $model = ReferralReward::class;
 
     /**
@@ -59,9 +60,11 @@ final class ReferralRewardResource extends Resource
      */
     protected static $navigationGroup = 'Referral';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->schema([
                 Forms\Components\Section::make(__('referral_rewards.sections.reward_details'))
@@ -293,8 +296,11 @@ final class ReferralRewardResource extends Resource
             ]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist|array
+    public static function infolist(Schema $schema): Schema
     {
+
+        $infolist = $schema; // Preserve legacy infolist variable naming for clarity.
+
         return $infolist
             ->schema([
                 Infolists\Components\Section::make(__('referral_rewards.sections.reward_details'))

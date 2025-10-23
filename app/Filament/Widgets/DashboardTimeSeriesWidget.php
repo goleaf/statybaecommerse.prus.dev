@@ -47,29 +47,29 @@ final class DashboardTimeSeriesWidget extends ChartWidget
     protected function getOptions(): array
     {
         return [
-            'responsive' => true,
+            'responsive'          => true,
             'maintainAspectRatio' => false,
-            'interaction' => [
-                'mode' => 'index',
+            'interaction'         => [
+                'mode'      => 'index',
                 'intersect' => false,
             ],
             'scales' => [
                 'y' => [
-                    'type' => 'linear',
-                    'display' => true,
+                    'type'     => 'linear',
+                    'display'  => true,
                     'position' => 'left',
-                    'title' => [
+                    'title'    => [
                         'display' => true,
-                        'text' => trans('admin/dashboard.charts.orders_axis'),
+                        'text'    => trans('admin/dashboard.charts.orders_axis'),
                     ],
                 ],
                 'y1' => [
-                    'type' => 'linear',
-                    'display' => true,
+                    'type'     => 'linear',
+                    'display'  => true,
                     'position' => 'right',
-                    'title' => [
+                    'title'    => [
                         'display' => true,
-                        'text' => trans('admin/dashboard.charts.revenue_axis'),
+                        'text'    => trans('admin/dashboard.charts.revenue_axis'),
                     ],
                     'grid' => [
                         'drawOnChartArea' => false,
@@ -78,7 +78,7 @@ final class DashboardTimeSeriesWidget extends ChartWidget
             ],
             'plugins' => [
                 'legend' => [
-                    'display' => true,
+                    'display'  => true,
                     'position' => 'bottom',
                 ],
                 'tooltip' => [

@@ -94,7 +94,8 @@ final class AddressResource extends Resource
     }
 
     /**
-     * Configure the Filament schema using the dedicated Schema contract to avoid v3 regressions.
+     * Configure the Filament form schema using the Schema abstraction introduced in Filament v4.
+     * The method keeps the same layout definition while matching the new parent signature.
      */
     public static function form(Schema $schema): Schema
     {
@@ -324,7 +325,7 @@ final class AddressResource extends Resource
     }
 
     /**
-     * Configure the Filament table while returning the Table instance for fluent chaining.
+     * Configure the Filament table definition while aligning with the v4 return type.
      */
     public static function table(Table $table): Table
     {

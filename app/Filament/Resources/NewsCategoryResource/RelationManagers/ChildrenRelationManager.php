@@ -7,8 +7,7 @@ namespace App\Filament\Resources\NewsCategoryResource\RelationManagers;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\NewsCategory;
 use Filament\Forms;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
@@ -23,9 +22,11 @@ final class ChildrenRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Sub Categories';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->schema([
                 Forms\Components\Section::make('Category Information')

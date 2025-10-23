@@ -11,8 +11,9 @@ use App\Filament\Resources\SystemSettingCategories\Pages\ListSystemSettingCatego
 use App\Filament\Resources\SystemSettingCategories\Schemas\SystemSettingCategoryForm;
 use App\Filament\Resources\SystemSettingCategories\Tables\SystemSettingCategoriesTable;
 use App\Models\SystemSettingCategory;
-use Filament\Forms\Form;
+use BackedEnum;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -32,9 +33,11 @@ class SystemSettingCategoryResource extends Resource
      */
     protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return SystemSettingCategoryForm::configure($form);
     }
 

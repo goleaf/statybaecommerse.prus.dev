@@ -8,6 +8,8 @@ use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\SystemResource\Pages;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
+use App\Support\Filament\Components\Flatpickr;
+use BackedEnum;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
@@ -22,6 +24,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action as TableAction;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -40,8 +43,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
+use UnitEnum;
 
 /**
  * System Resource - Comprehensive System Management
@@ -125,9 +127,11 @@ final class SystemResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->schema([
                 Tabs::make('System Configuration')

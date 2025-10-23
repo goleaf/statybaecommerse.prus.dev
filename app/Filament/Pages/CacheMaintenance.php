@@ -10,7 +10,7 @@ use Filament\Forms;
 use Filament\Forms\Components\Section;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use UnitEnum;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
@@ -83,8 +83,11 @@ final class CacheMaintenance extends Page
         return (bool) ($user->is_admin ?? false);
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         // Embrace the Filament v4 return contract so downstream tooling can rely on a `Form` instance.
         return $form
             ->schema([

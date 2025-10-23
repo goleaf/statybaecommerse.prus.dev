@@ -44,10 +44,12 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
+use UnitEnum;
 
 final class SeoDataResource extends Resource
 {
     use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
+
     protected static ?string $model = SeoData::class;
 
     /**
@@ -417,8 +419,11 @@ final class SeoDataResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema|array
+    public static function infolist(Schema $schema): Schema
     {
+
+        $infolist = $schema; // Maintain legacy naming for infolist builders while using the Schema abstraction.
+
         return $schema
             ->components([
                 Section::make(__('seo_data.sections.basic_info'))

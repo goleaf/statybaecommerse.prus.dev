@@ -56,9 +56,11 @@ final class NewsCategoryResource extends Resource
 
     protected static ?string $pluralModelLabel = 'News Categories';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->schema([
             Section::make(__('news_categories.sections.category_information'))
                 ->schema([
@@ -272,8 +274,11 @@ final class NewsCategoryResource extends Resource
             ->paginationPageOptions([10, 25, 50, 100]);
     }
 
-    public static function infolist(Schema $schema): Schema|array
+    public static function infolist(Schema $schema): Schema
     {
+
+        $infolist = $schema; // Maintain legacy naming for infolist builders while using the Schema abstraction.
+
         return $schema
             ->schema([
                 Section::make(__('news_categories.sections.category_details'))

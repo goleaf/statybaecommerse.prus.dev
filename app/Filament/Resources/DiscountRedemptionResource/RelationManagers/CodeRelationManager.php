@@ -7,12 +7,10 @@ namespace App\Filament\Resources\DiscountRedemptionResource\RelationManagers;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 class CodeRelationManager extends BaseRelationManager
 {
@@ -24,9 +22,11 @@ class CodeRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Codes';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->schema([
                 Forms\Components\Section::make('Code Information')

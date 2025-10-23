@@ -9,12 +9,10 @@ use App\Support\Concerns\HasNav;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ProductFeatureResource\Pages;
 use App\Models\ProductFeature;
-use Filament\Tables\Actions\BulkActionGroup as TablesBulkActionGroup;
-use Filament\Tables\Actions\DeleteAction as TablesDeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction as TablesDeleteBulkAction;
-use Filament\Tables\Actions\EditAction as TablesEditAction;
+use BackedEnum;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Actions\BulkActionGroup as TablesBulkActionGroup;
 use Filament\Tables\Actions\DeleteAction as TablesDeleteAction;
@@ -53,9 +51,11 @@ final class ProductFeatureResource extends Resource
 
     protected static ?int $navigationSort = 17;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->schema([
             Forms\Components\Select::make('product_id')
                 ->label('Product')
@@ -171,6 +171,20 @@ final class ProductFeatureResource extends Resource
             'index'  => Pages\ListProductFeatures::route('/'),
             'create' => Pages\CreateProductFeature::route('/create'),
             'edit'   => Pages\EditProductFeature::route('/{record}/edit'),
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function getFeatureTypeOptions(): array
+    {
+        return [
+            'specification' => 'Specification',
+            'benefit'       => 'Benefit',
+            'feature'       => 'Feature',
+            'technical'     => 'Technical',
+            'performance'   => 'Performance',
         ];
     }
 }

@@ -17,6 +17,7 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -24,6 +25,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -68,10 +70,15 @@ final class CampaignClickResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
+     *
+     * @param  Forms\Form $schema
+     * @return Forms\Form
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->schema([
             Section::make(__('campaign_clicks.basic_information'))
                 ->schema([
@@ -84,9 +91,13 @@ final class CampaignClickResource extends Resource
                                 ->preload()
                                 ->required()
                                 ->live()
-                                ->afterStateUpdated(function (?int $state, Set $set): void {
-                                    if (! $state) {
-                                        return;
+                                ->afterStateUpdated(function ($state, Forms\Set $set): void {
+                                    if ($state) {
+                                        $campaign = Campaign::find($state);
+                                        if ($campaign) {
+                                            $set('campaign_name', $campaign->name);
+                                            $set('campaign_code', $campaign->code);
+                                        }
                                     }
 
                                     $campaign = Campaign::find($state);
@@ -110,9 +121,13 @@ final class CampaignClickResource extends Resource
                         ->searchable()
                         ->preload()
                         ->live()
-                        ->afterStateUpdated(function (?int $state, Set $set): void {
-                            if (! $state) {
-                                return;
+                        ->afterStateUpdated(function ($state, Forms\Set $set): void {
+                            if ($state) {
+                                $user = User::find($state);
+                                if ($user) {
+                                    $set('customer_name', $user->name);
+                                    $set('customer_email', $user->email);
+                                }
                             }
 
                             $user = User::find($state);

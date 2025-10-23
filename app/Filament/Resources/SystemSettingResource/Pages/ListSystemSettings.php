@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingResource\Pages;
 
-use App\Filament\Concerns\HasResizableColumns;
-use App\Filament\Resources\SystemSettingResource;
-use Filament\Actions;
 use App\Filament\Pages\Support\BaseListRecords;
+use App\Filament\Resources\SystemSettingResource;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListSystemSettings extends BaseListRecords

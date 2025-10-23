@@ -8,11 +8,11 @@ use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\ProductRequestResource\Pages;
 use App\Models\Product;
 use App\Models\ProductRequest;
-use App\Support\Filament\SearchableInputHelper;
+use App\Support\Filament\Components\Flatpickr;
 use App\Support\Search\ProductSearch;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use BackedEnum;
-use Filament\Tables\Actions\BulkActionGroup;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -20,10 +20,10 @@ use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
+use UnitEnum;
 
 final class ProductRequestResource extends Resource
 {
@@ -60,9 +60,11 @@ final class ProductRequestResource extends Resource
         return __('product_requests.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form
             ->schema([
                 SearchableInput::make('product_id')

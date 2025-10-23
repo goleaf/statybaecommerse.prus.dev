@@ -11,6 +11,7 @@ use App\Models\Company;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -48,9 +49,14 @@ final class CompanyResource extends Resource
         return __('companies.single');
     }
 
-    public static function form(Form $form): Form
+    /**
+     * Build the form schema for creating and editing companies.
+     */
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
+
+        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+
         return $form->schema([
             Forms\Components\Section::make(__('companies.basic_information'))
                 ->schema([
