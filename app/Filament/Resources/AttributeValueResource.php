@@ -11,6 +11,9 @@ use App\Filament\Resources\AttributeValueResource\Pages;
 use App\Filament\Resources\AttributeValueResource\Relations\ProductsRelationManager as AttributeValueProductsRelationManager;
 use App\Filament\Resources\AttributeValueResource\Relations\VariantsRelationManager as AttributeValueVariantsRelationManager;
 use App\Models\AttributeValue;
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\EnabledScope;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -83,7 +86,19 @@ final class AttributeValueResource extends Resource
         return __('attribute_values.plural');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function getEloquentQuery(): Builder
+    {
+        // Allow administrators to manage inactive and disabled records without
+        // temporarily dropping global scopes that primarily serve storefront
+        // queries.
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                ActiveScope::class,
+                EnabledScope::class,
+            ]);
+    }
+
+    public static function form(Form $form): Form
     {
         return $schema->schema([
             Section::make(__('attribute_values.basic_information'))
@@ -405,12 +420,25 @@ final class AttributeValueResource extends Resource
 
     public static function toggleActiveState(AttributeValue $record): void
     {
-        $record->update([
-            'is_active' => ! $record->is_active,
-        ]);
+        // Refresh the record via an unscoped query so we can safely flip the
+        // active flag even when the global scopes would normally hide it.
+        $unscopedRecord = AttributeValue::withoutGlobalScopes([
+            ActiveScope::class,
+            EnabledScope::class,
+        ])->findOrFail($record->getKey());
+
+        $newActiveState = ! $unscopedRecord->is_active;
+
+        $unscopedRecord->forceFill([
+            'is_active' => $newActiveState,
+        ])->save();
+
+        // Mirror the in-memory instance so callers immediately see the
+        // updated state without waiting for a manual refresh.
+        $record->is_active = $newActiveState;
 
         Notification::make()
-            ->title($record->is_active
+            ->title($newActiveState
                 ? __('attribute_values.activated_successfully')
                 : __('attribute_values.deactivated_successfully'))
             ->success()
@@ -419,16 +447,30 @@ final class AttributeValueResource extends Resource
 
     public static function setAsDefault(AttributeValue $record): void
     {
-        AttributeValue::query()
+        // Clear the default flag on sibling records without the storefront
+        // scopes so previously inactive defaults are also reset.
+        AttributeValue::withoutGlobalScopes([
+            ActiveScope::class,
+            EnabledScope::class,
+        ])
             ->where('attribute_id', $record->attribute_id)
             ->whereKeyNot($record->getKey())
             ->update([
                 'is_default' => false,
             ]);
 
-        $record->update([
-            'is_default' => true,
-        ]);
+        AttributeValue::withoutGlobalScopes([
+            ActiveScope::class,
+            EnabledScope::class,
+        ])
+            ->whereKey($record->getKey())
+            ->update([
+                'is_default' => true,
+            ]);
+
+        // Keep the current instance in sync with the persisted value so
+        // assertions and UI refreshes see the toggle immediately.
+        $record->is_default = true;
 
         Notification::make()
             ->title(__('attribute_values.set_as_default_successfully'))
@@ -438,10 +480,15 @@ final class AttributeValueResource extends Resource
 
     public static function duplicateAttributeValue(AttributeValue $record, bool $notify = true): AttributeValue
     {
-        $duplicate = $record->replicate([
-            'products_count',
-            'variants_count',
-        ]);
+        $duplicate = AttributeValue::withoutGlobalScopes([
+            ActiveScope::class,
+            EnabledScope::class,
+        ])
+            ->findOrFail($record->getKey())
+            ->replicate([
+                'products_count',
+                'variants_count',
+            ]);
 
         $duplicate->value = $record->value . ' (Copy)';
         $duplicate->slug = Str::slug($duplicate->value . '-' . Str::random(6));
@@ -460,9 +507,22 @@ final class AttributeValueResource extends Resource
 
     public static function activateRecords(Collection $records): void
     {
-        $records->each->update([
-            'is_active' => true,
-        ]);
+        // Operate on a fresh query so even currently hidden records receive the
+        // activation flag update in bulk.
+        AttributeValue::withoutGlobalScopes([
+            ActiveScope::class,
+            EnabledScope::class,
+        ])
+            ->whereIn('id', $records->modelKeys())
+            ->update([
+                'is_active' => true,
+            ]);
+
+        // Sync in-memory models so Filament bulk actions don't require a full
+        // table refresh to display the new state.
+        $records->each(function (AttributeValue $value): void {
+            $value->is_active = true;
+        });
 
         Notification::make()
             ->title(__('attribute_values.bulk_activated_success'))

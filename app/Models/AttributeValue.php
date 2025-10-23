@@ -199,6 +199,32 @@ final class AttributeValue extends Model
         return $query->where('is_active', true);
     }
 
+    public function refresh(): static
+    {
+        if (! $this->exists) {
+            return $this;
+        }
+
+        // Reload the model without the storefront-only scopes so records that
+        // were just deactivated or disabled can still be rehydrated in tests
+        // and Filament callbacks.
+        $fresh = static::withoutGlobalScopes([
+            ActiveScope::class,
+            EnabledScope::class,
+            SoftDeletingScope::class,
+        ])->find($this->getKey());
+
+        if ($fresh === null) {
+            throw (new ModelNotFoundException())->setModel(static::class, [$this->getKey()]);
+        }
+
+        $this->setRawAttributes($fresh->getAttributes(), true);
+        $this->setRelations($fresh->getRelations());
+        $this->syncOriginal();
+
+        return $this;
+    }
+
     protected function metadata(): EloquentAttribute
     {
         return EloquentAttribute::make(

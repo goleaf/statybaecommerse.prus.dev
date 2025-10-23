@@ -42,6 +42,10 @@
 - Wishlist Item management now uses the Filament static navigation icon property with an explicit sidebar sort comment so customer tooling stays grouped predictably in the admin.
 - Activity Log monitoring now declares its navigation icon with the BackedEnum-friendly union type mandated by Filament v4, keeping the admin panel boot sequence stable.
 - Feature Flag listings now bypass the active and enabled scopes so administrators can review inactive toggles alongside live ones without temporary scope adjustments.
+- Attribute Value management now ignores the active/enabled global scopes in
+  the Filament resource, letting administrators toggle availability, set
+  defaults, and bulk-activate options without reaching for raw database
+  queries.
 - Test bootstrapping now adds both JSON translation directories so Filament's commerce navigation label renders localized copy during PHPUnit runs.
 - The PHPUnit harness now seeds a dedicated SQLite testing database and directs Telescope/Activity Log to that connection before migrations execute, so catalog integrity and other schema-heavy suites run without missing table errors.
 - Filament navigation icons once again use docblock overrides so enum-aware navigation metadata loads without typed property collisions introduced in PR #1098.
