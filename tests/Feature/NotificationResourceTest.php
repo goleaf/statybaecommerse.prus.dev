@@ -206,7 +206,7 @@ final class NotificationResourceTest extends TestCase
         ]);
 
         Livewire::test(\App\Filament\Resources\NotificationResource\Pages\ListNotifications::class)
-            ->filterTable(TernaryFilter::make('is_read'), true)
+            ->filterTable('read_state', true)
             ->assertCanSeeTableRecords([$readNotification])
             ->assertCanNotSeeTableRecords([$unreadNotification]);
     }
@@ -228,8 +228,9 @@ final class NotificationResourceTest extends TestCase
 
         $notification->refresh();
 
-        expect($notification->is_read)->toBeTrue();
-        expect($notification->read_at)->not->toBeNull();
+        $this->assertEquals(Carbon::now(), $notification->read_at);
+
+        Carbon::setTestNow();
     }
 
     public function test_can_mark_notification_as_unread(): void
@@ -247,8 +248,7 @@ final class NotificationResourceTest extends TestCase
 
         $notification->refresh();
 
-        expect($notification->is_read)->toBeFalse();
-        expect($notification->read_at)->toBeNull();
+        $this->assertNull($notification->read_at);
     }
 
     public function test_can_bulk_mark_as_read(): void

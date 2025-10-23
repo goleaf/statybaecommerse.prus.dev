@@ -20,22 +20,12 @@ final class EditNotification extends EditRecord
         ];
     }
 
+    /**
+     * @param  array<string, mixed> $data
+     * @return array<string, mixed>
+     */
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        return $this->syncReadState($data);
-    }
-
-    private function syncReadState(array $data): array
-    {
-        $isRead = (bool) ($data['is_read'] ?? false);
-
-        if ($isRead) {
-            $data['read_at'] = $data['read_at'] ?? now();
-        } else {
-            $data['read_at'] = null;
-            $data['is_read'] = false;
-        }
-
-        return $data;
+        return NotificationResource::mutateReadState($data);
     }
 }

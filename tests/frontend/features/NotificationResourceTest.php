@@ -101,14 +101,14 @@ describe('NotificationResource', function () {
 
         it('can filter notifications by type', function () {
             livewire(NotificationResource\Pages\ListNotifications::class)
-                ->filterTable(SelectFilter::make('notification_type'), 'order')
+                ->filterTable('notification_type', ['value' => 'order'])
                 ->assertCanSeeTableRecord($this->notifications->first())
                 ->assertCanNotSeeTableRecord($this->notifications->last());
         });
 
         it('can filter notifications by read status', function () {
             livewire(NotificationResource\Pages\ListNotifications::class)
-                ->filterTable(TernaryFilter::make('is_read'), true)
+                ->filterTable('read_state', true)
                 ->assertCanSeeTableRecord($this->notifications->get(1))
                 ->assertCanNotSeeTableRecord($this->notifications->first());
         });
