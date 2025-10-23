@@ -1,51 +1,102 @@
 # Documentation Index
 
-A curated map of the most useful documents for day-to-day development and operations. Start here after reading the project README.
+Use this page to discover the project's internal documentation. The content is organized into three domains—analysis, runbooks, and contracts—so you can find implementation history, operational procedures, and formal deliverables without combing through the repository root.
 
-## Curated Path
+## Directory Overview
+- [Analysis](analysis/) – research notes, implementation summaries, health reports, and historical memory bank files.
+- [Runbooks](runbooks/) – actionable guides, checklists, and supporting assets for repeatable operational tasks.
+- [Contracts](contracts/) – formal project deliverables, closure packets, and partner-facing specifications.
 
-### 1. Set Up Your Environment
-- [ARCHITECTURE_OVERVIEW](ARCHITECTURE_OVERVIEW.md) – orient yourself across backend, storefront, and automation systems.
-- [IMPLEMENTATION_STATUS](analysis/IMPLEMENTATION_STATUS.md) – confirm which subsystems are ready before provisioning services.
-- [AUTOFIX_SETUP](runbooks/AUTOFIX_SETUP.md) & [REALTIME_AUTOFIX_GUIDE](runbooks/REALTIME_AUTOFIX_GUIDE.md) – install the optional automation helpers that speed up local workflows.
-- [Documentation style guide](STYLE_GUIDE.md) – conventions for naming, linking, and structuring future contributions.
+## Analysis Highlights
+### Implementation Summaries & Deep Dives
+- [Admin plugins overview](analysis/ADMIN_PLUGINS.md)
+- [Component architecture review](analysis/COMPONENTS_ANALYSIS_SUMMARY.md)
+- [Can be one-of-many implementation](analysis/CAN_BE_ONE_OF_MANY_IMPLEMENTATION.md)
+- [City database expansion](analysis/CITY_DATABASE_EXPANSION_REPORT.md)
+- [City seeders project summary](analysis/CITY_SEEDERS_PROJECT_SUMMARY.md)
+- [Company resource analysis](analysis/COMPANY_RESOURCE_ANALYSIS.md)
+- [Comprehensive admin enhancement summary](analysis/COMPREHENSIVE_ADMIN_ENHANCEMENT_SUMMARY.md)
+- [Comprehensive global scopes summary](analysis/COMPREHENSIVE_GLOBAL_SCOPES_SUMMARY.md)
+- [Comprehensive system health report](analysis/COMPREHENSIVE_SYSTEM_HEALTH_REPORT.md)
+- [Global scopes implementation summary](analysis/GLOBAL_SCOPES_IMPLEMENTATION_SUMMARY.md)
+- [Seeder factory conversion summary](analysis/SEEDER_FACTORY_CONVERSION_SUMMARY.md)
+- [SplitIn integration summary](analysis/SPLITIN_IMPLEMENTATION_SUMMARY.md)
+- [Ultimate global scopes implementation summary](analysis/ULTIMATE_GLOBAL_SCOPES_IMPLEMENTATION_SUMMARY.md)
 
-### 2. Prepare for Deployment
-- [DEPLOYMENT_GUIDE](runbooks/DEPLOYMENT_GUIDE.md) – infrastructure prerequisites, environment variables, and queue/cache expectations.
-- [DEPLOYMENT_READINESS_CHECKLIST](runbooks/DEPLOYMENT_READINESS_CHECKLIST.md) – preflight checks to validate staging and production readiness.
-- [PRODUCTION_DEPLOYMENT_CHECKLIST](runbooks/PRODUCTION_DEPLOYMENT_CHECKLIST.md) – runbook for final launch sequencing and verification.
+### Product & Feature Rollouts
+- [Filament v4 implementation](analysis/FILAMENT_V4_IMPLEMENTATION_SUMMARY.md)
+- [News resource implementation](analysis/NEWS_RESOURCE_IMPLEMENTATION_SUMMARY.md)
+- [Product variants implementation](analysis/PRODUCT_VARIANTS_IMPLEMENTATION_SUMMARY.md)
+- [Product variants summary](analysis/PRODUCT_VARIANTS_SUMMARY.md)
+- [Recommendation system implementation](analysis/RECOMMENDATION_SYSTEM_IMPLEMENTATION.md)
+- [Referral system implementation](analysis/REFERRAL_SYSTEM_IMPLEMENTATION.md)
+- [Smart recommendation system complete](analysis/SMART_RECOMMENDATION_SYSTEM_COMPLETE.md)
+- [Widget testing summary](analysis/WIDGET_TESTING_SUMMARY.md)
 
-### 3. Understand the Data Model
-- [MIGRATION_SUMMARY](analysis/MIGRATION_SUMMARY.md) – history of schema changes and domain-specific data notes.
-- [PRODUCT_VARIANTS_IMPLEMENTATION_SUMMARY](analysis/PRODUCT_VARIANTS_IMPLEMENTATION_SUMMARY.md) & [PRODUCT_VARIANTS_SUMMARY](analysis/PRODUCT_VARIANTS_SUMMARY.md) – catalogue relationships, pricing logic, and attribute usage.
-- [RECOMMENDATION_SYSTEM_IMPLEMENTATION](analysis/RECOMMENDATION_SYSTEM_IMPLEMENTATION.md) – outlines data flows powering personalised suggestions.
+### Finalized Scope Reports
+- [Complete global scopes implementation summary](analysis/COMPLETE_GLOBAL_SCOPES_IMPLEMENTATION_SUMMARY.md)
+- [Final company email campaign SEO data summary](analysis/FINAL_COMPANY_EMAIL_CAMPAIGN_SEO_DATA_GLOBAL_SCOPES_IMPLEMENTATION_SUMMARY.md)
+- [Final discount price global scopes summary](analysis/FINAL_DISCOUNT_PRICE_GLOBAL_SCOPES_IMPLEMENTATION_SUMMARY.md)
+- [Final document/legal location global scopes summary](analysis/FINAL_DOCUMENT_LEGAL_LOCATION_GLOBAL_SCOPES_IMPLEMENTATION_SUMMARY.md)
+- [Final global scopes implementation summary](analysis/FINAL_GLOBAL_SCOPES_IMPLEMENTATION_SUMMARY.md)
+- [Final implementation summary](analysis/FINAL_IMPLEMENTATION_SUMMARY.md)
+- [Final location global scopes summary](analysis/FINAL_LOCATION_GLOBAL_SCOPES_IMPLEMENTATION_SUMMARY.md)
+- [Final news global scopes summary](analysis/FINAL_NEWS_GLOBAL_SCOPES_IMPLEMENTATION_SUMMARY.md)
+- [Final referral recommendation global scopes summary](analysis/FINAL_REFERRAL_RECOMMENDATION_GLOBAL_SCOPES_IMPLEMENTATION_SUMMARY.md)
+- [Final system restoration complete](analysis/FINAL_SYSTEM_RESTORATION_COMPLETE.md)
+- [Final system settings global scopes summary](analysis/FINAL_SYSTEM_SETTINGS_GLOBAL_SCOPES_IMPLEMENTATION_SUMMARY.md)
+- [Final system status report](analysis/FINAL_SYSTEM_STATUS_REPORT.md)
+- [Ultimate project completion archive](analysis/COMPLETE_PROJECT_ARCHIVE_INDEX.md)
 
-### 4. Master the Admin Experience
-- [FILAMENT_V4_IMPLEMENTATION_SUMMARY](analysis/FILAMENT_V4_IMPLEMENTATION_SUMMARY.md) – component patterns and conventions for building admin UI.
-- [NEWS_RESOURCE_IMPLEMENTATION_SUMMARY](analysis/NEWS_RESOURCE_IMPLEMENTATION_SUMMARY.md) & [COMPANY_RESOURCE_ANALYSIS](analysis/COMPANY_RESOURCE_ANALYSIS.md) – worked examples of resources and permissions in action.
-- [Combobox field reference](forms/COMBOBOX.md) – where the dual-list picker is enabled, configuration knobs, and localisation tips.
-- [Searchable input metadata lifecycle](forms/SEARCHABLE_INPUT_METADATA.md) – the canonical `SearchResult` payload, helper APIs, and how forms hydrate dependent fields.
-- [Matrix choice permission grids](forms/MATRIX_CHOICE.md) – which Filament resources consult the permission matrix, how rows/columns are mapped, and how to extend the config safely.
-- [REFERRAL_SYSTEM_IMPLEMENTATION](analysis/REFERRAL_SYSTEM_IMPLEMENTATION.md) – loyalty and referral programme operations for support teams.
-- [Table Column Resizing](ui/RESIZED_COLUMNS.md) – how column width adjustments are saved, reset, and recovered when troubleshooting.
-- [Admin Translations Guide](analysis/FILAMENT_V4_IMPLEMENTATION_SUMMARY.md#spatie-translatable) – covers plugin registration, persisted locale behaviour, and required traits for locale-aware resources/pages.
+### Operational Reports & Status Pages
+- [Current system status](analysis/CURRENT_SYSTEM_STATUS.md)
+- [Deployment success summary](analysis/DEPLOYMENT_SUCCESS_SUMMARY.md)
+- [Implementation status tracker](analysis/IMPLEMENTATION_STATUS.md)
+- [Migration summary](analysis/MIGRATION_SUMMARY.md)
+- [Performance report](analysis/PERFORMANCE_REPORT.md)
+- [PHPDoc implementation summary](analysis/PHPDOC_IMPLEMENTATION_SUMMARY.md)
+- [Post-handover verification report](analysis/POST_HANDOVER_VERIFICATION_REPORT.md)
+- [Test organization summary](analysis/TEST_ORGANIZATION_SUMMARY.md)
+- [European datetime implementation](analysis/european-datetime-implementation.md)
+- [Filament navigation structure](analysis/filament-navigation-structure.md)
 
-### 5. Troubleshoot & Maintain
-- [TERMINAL_FREEZING_FIXES](runbooks/TERMINAL_FREEZING_FIXES.md) – remedies for common local environment hiccups.
-- [Cache Policy](runbooks/CachePolicy.md) – cache key conventions, TTLs, and when to refresh derived data.
-- [Collection Timeout Macros](runbooks/TIMEOUT_COLLECTION_MACROS.md) – explains how the shared `takeUntilTimeout` helper guards long running loops.
-- [CURRENT_SYSTEM_STATUS](analysis/CURRENT_SYSTEM_STATUS.md) – snapshot of live issues, mitigations, and follow-up owners.
-- [Dependency automation schedule](operations/RENOVATE_OVERVIEW.md) – explains the Renovate rollup cadence and CI expectations.
-- [PR Branch Cleanup Workflow](../.github/workflows/pr-branch-cleanup.yml) – documents the automation that deletes local branches when pull requests close without merging; the job now ignores already-removed branches after validating the reference.
-- [Husky hook maintenance tips](../.husky/README.md) – outlines the shim script structure to keep Git hooks healthy and compatible with Husky v10 deprecation changes.
+### Reference Archives
+- [COMPLETE HTML export index](analysis/html/FINAL_PROJECT_MASTER_SUMMARY.md)
+- Browse additional HTML exports inside [`analysis/html/`](analysis/html/).
+- Historical working notes in [`analysis/memory-bank/`](analysis/memory-bank/) (active context, product brief, tech context, and more).
 
-## Explore Further
-- [Analysis & Summary Index](analysis/INDEX.md) – master index to deep-dive research, audits, and rollout recaps.
-- [PROJECT_HANDOVER_DOCUMENTATION](analysis/PROJECT_HANDOVER_DOCUMENTATION.md) – business context and administrative handover notes.
-- [COMPLETE_PROJECT_ARCHIVE_INDEX](analysis/COMPLETE_PROJECT_ARCHIVE_INDEX.md) – historical artefacts for auditors and new maintainers.
-- [CHANGELOG](analysis/CHANGELOG.md) – high-level log of significant migrations and releases.
-- [PERFORMANCE_REPORT](analysis/PERFORMANCE_REPORT.md) – benchmarks and performance tuning recommendations.
-- [tests/README](../tests/README.md) – tour of automated test coverage for backend and UI.
-- [Public Collections API schema](openapi/collections.public.yaml) – contract exercised by automated OpenAPI validation for storefront collection endpoints.
+## Runbooks & Operational Playbooks
+- [Auto-fix setup](runbooks/AUTOFIX_SETUP.md)
+- [Deployment guide](runbooks/DEPLOYMENT_GUIDE.md)
+- [Deployment readiness checklist](runbooks/DEPLOYMENT_READINESS_CHECKLIST.md)
+- [Production deployment checklist](runbooks/PRODUCTION_DEPLOYMENT_CHECKLIST.md)
+- [Realtime auto-fix guide](runbooks/REALTIME_AUTOFIX_GUIDE.md)
+- [Realtime auto-fix quick start](runbooks/START_REALTIME_AUTOFIX.md)
+- [Auto-fix README](runbooks/README_AUTOFIX.md)
+- [Recommendation system usage guide](runbooks/RECOMMENDATION_SYSTEM_USAGE_GUIDE.md)
+- [Terminal freezing fixes](runbooks/TERMINAL_FREEZING_FIXES.md)
+- [Filament v4 navigation group compatibility rule](runbooks/filament-v4-navigation-group-rule.md)
+- [XML importer/exporter commands](runbooks/importer-exporter.md)
+- Import assets and data samples in [`runbooks/import/`](runbooks/import/)
+- Test import guides in [`runbooks/test-import/`](runbooks/test-import/)
 
-Need another guide? Search the `docs/` directory for keywords or open a summary above to continue exploring the knowledge base.
+## Contracts & Formal Deliverables
+- [Project apotheosis document](contracts/PROJECT_APOTHEOSIS_DOCUMENT.md)
+- [Project ascension document](contracts/PROJECT_ASCENSION_DOCUMENT.md)
+- [Project closure document](contracts/PROJECT_CLOSURE_DOCUMENT.md)
+- [Project completion certificate](contracts/PROJECT_COMPLETION_CERTIFICATE.md)
+- [Project completion summary](contracts/PROJECT_COMPLETION_SUMMARY.md)
+- [Project gospel document](contracts/PROJECT_GOSPEL_DOCUMENT.md)
+- [Project handover documentation](contracts/PROJECT_HANDOVER_DOCUMENTATION.md)
+- [Project legacy document](contracts/PROJECT_LEGACY_DOCUMENT.md)
+- [Project monument document](contracts/PROJECT_MONUMENT_DOCUMENT.md)
+- [Project revelation document](contracts/PROJECT_REVELATION_DOCUMENT.md)
+- [Project testament document](contracts/PROJECT_TESTAMENT_DOCUMENT.md)
+- [Catalog XML specification](contracts/catalog-xml-spec.md)
+- [Final project handover summary](contracts/FINAL_PROJECT_HANDOVER_SUMMARY.md)
+- [Final project master summary](contracts/FINAL_PROJECT_MASTER_SUMMARY.md)
+- [Final project summary](contracts/FINAL_PROJECT_SUMMARY.md)
+- [Ultimate project completion report](contracts/ULTIMATE_PROJECT_COMPLETION_REPORT.md)
+
+## Contributing to Documentation
+Review the [Documentation Style Guide](CONTRIBUTING_DOCS.md) before adding or updating any files in this directory. It captures the preferred heading hierarchy, code block conventions, file naming standards, and review cadence for keeping these resources evergreen.
