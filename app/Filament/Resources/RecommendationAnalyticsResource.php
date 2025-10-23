@@ -8,11 +8,9 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\RecommendationAnalyticsResource\Pages;
 use App\Models\RecommendationAnalytics;
-use App\Models\RecommendationBlock;
-use App\Models\RecommendationConfig;
-use App\Models\User;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
+use BackedEnum;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
@@ -25,6 +23,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 /**
@@ -38,7 +37,10 @@ final class RecommendationAnalyticsResource extends Resource
 
     protected static ?string $model = RecommendationAnalytics::class;
 
-    
+    public static function getNavigationIcon(): BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
+    {
+        return 'heroicon-o-chart-bar';
+    }
 
     protected static ?int $navigationSort = 8;
 
@@ -89,8 +91,13 @@ final class RecommendationAnalyticsResource extends Resource
                                     ->preload(),
                                 Select::make('product_id')
                                     ->label(__('admin.recommendation_analytics.product'))
-                                    ->options(fn (): array => Product::withoutGlobalScopes()->pluck('name', 'id')->all())
+                                    ->relationship(
+                                        'product',
+                                        'name',
+                                        fn (Builder $query): Builder => $query->withoutGlobalScopes()
+                                    )
                                     ->searchable()
+                                    ->preload()
                                     ->nullable(),
                                 Select::make('action')
                                     ->label(__('admin.recommendation_analytics.action'))
@@ -165,8 +172,8 @@ final class RecommendationAnalyticsResource extends Resource
                     ->label(__('admin.recommendation_analytics.action'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'view' => 'info',
-                        'click' => 'success',
+                        'view'        => 'info',
+                        'click'       => 'success',
                         'add_to_cart' => 'warning',
                         'purchase'    => 'danger',
                         default       => 'gray',
@@ -209,8 +216,13 @@ final class RecommendationAnalyticsResource extends Resource
                     ->preload(),
                 SelectFilter::make('product_id')
                     ->label(__('admin.recommendation_analytics.product'))
-                    ->options(fn (): array => Product::withoutGlobalScopes()->pluck('name', 'id')->all())
-                    ->searchable(),
+                    ->relationship(
+                        'product',
+                        'name',
+                        fn (Builder $query): Builder => $query->withoutGlobalScopes()
+                    )
+                    ->searchable()
+                    ->preload(),
                 SelectFilter::make('action')
                     ->label(__('admin.recommendation_analytics.action'))
                     ->options([
