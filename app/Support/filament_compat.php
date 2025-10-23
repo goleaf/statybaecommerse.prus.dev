@@ -59,3 +59,67 @@ namespace {
         class_alias(\Filament\Schemas\Schema::class, \Filament\Infolists\Infolist::class);
     }
 }
+
+namespace Hydrat\TableLayoutToggle\Concerns {
+    if (! trait_exists(HasToggleableTable::class)) {
+        trait HasToggleableTable
+        {
+            public ?string $layoutView = null;
+
+            public function initializeHasToggleableTable(): void
+            {
+                // No-op fallback when the Table Layout Toggle plugin is unavailable.
+            }
+
+            public function updatedLayoutView(mixed $value): void
+            {
+                // No-op fallback when the Table Layout Toggle plugin is unavailable.
+            }
+
+            public function bootHasToggleableTable(): void
+            {
+                // No-op fallback when the Table Layout Toggle plugin is unavailable.
+            }
+
+            public function configurePersister(): void
+            {
+                // No-op fallback when the Table Layout Toggle plugin is unavailable.
+            }
+
+            public function bootedHasToggleableTable(): void
+            {
+                // No-op fallback when the Table Layout Toggle plugin is unavailable.
+            }
+
+            public function getDefaultLayoutView(): string
+            {
+                return 'list';
+            }
+
+            public function isGridLayout(): bool
+            {
+                return false;
+            }
+
+            public function isListLayout(): bool
+            {
+                return true;
+            }
+
+            public function getLayoutView(): string
+            {
+                return $this->layoutView ?? $this->getDefaultLayoutView();
+            }
+
+            protected function registerLayoutViewToogleActionHook(string $filamentHook): void
+            {
+                // No-op fallback when the Table Layout Toggle plugin is unavailable.
+            }
+
+            public function changeLayoutView(): void
+            {
+                $this->layoutView = $this->isListLayout() ? 'grid' : 'list';
+            }
+        }
+    }
+}

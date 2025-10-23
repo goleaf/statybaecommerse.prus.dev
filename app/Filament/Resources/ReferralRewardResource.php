@@ -4,23 +4,32 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Forms\Components\Flatpickr;
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\ReferralRewardResource\Pages;
 use App\Models\ReferralReward;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Forms;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
-use Filament\Infolists;
+use Filament\Infolists\Components\Section as InfolistSection;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -33,18 +42,23 @@ final class ReferralRewardResource extends Resource
 
     protected static ?string $model = ReferralReward::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-gift';
+    /** @var string|BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-gift';
 
     protected static ?int $navigationSort = 15;
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    /**
-     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
-     */
-    protected static UnitEnum|string|null $navigationGroup = 'Referral';
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Referral;
 
-    public static function form(Schema $schema): Schema
+    public static function getNavigationGroup(): ?string
+    {
+        return self::$navigationGroup instanceof NavigationGroup
+            ? self::$navigationGroup->label()
+            : self::$navigationGroup;
+    }
+
+    public static function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -53,31 +67,19 @@ final class ReferralRewardResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('referral_id')
                             ->label(__('referral_rewards.fields.referral'))
-                            ->relationship(
-                                name: 'referral',
-                                titleAttribute: 'referral_code',
-                                modifyQueryUsing: static fn (Builder $query): Builder => $query->withoutGlobalScopes(),
-                            )
+                            ->relationship('referral', 'referral_code', fn (Builder $query): Builder => $query->withoutGlobalScopes())
                             ->searchable()
                             ->preload()
                             ->nullable(),
                         Forms\Components\Select::make('user_id')
                             ->label(__('referral_rewards.fields.user'))
-                            ->relationship(
-                                name: 'user',
-                                titleAttribute: 'name',
-                                modifyQueryUsing: static fn (Builder $query): Builder => $query->withoutGlobalScopes(),
-                            )
+                            ->relationship('user', 'name', fn (Builder $query): Builder => $query->withoutGlobalScopes())
                             ->searchable()
                             ->preload()
                             ->required(),
                         Forms\Components\Select::make('order_id')
                             ->label(__('referral_rewards.fields.order'))
-                            ->relationship(
-                                name: 'order',
-                                titleAttribute: 'id',
-                                modifyQueryUsing: static fn (Builder $query): Builder => $query->withoutGlobalScopes(),
-                            )
+                            ->relationship('order', 'id', fn (Builder $query): Builder => $query->withoutGlobalScopes())
                             ->searchable()
                             ->preload()
                             ->nullable(),
@@ -177,7 +179,7 @@ final class ReferralRewardResource extends Resource
                     ->label(__('referral_rewards.fields.type'))
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('amount')
+                TextColumn::make('amount')
                     ->money(fn (ReferralReward $record): string => $record->currency_code)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
@@ -282,17 +284,17 @@ final class ReferralRewardResource extends Resource
             ->schema([
                 Infolists\Components\Section::make(__('referral_rewards.sections.reward_details'))
                     ->schema([
-                        Infolists\Components\TextEntry::make('title')
+                        TextEntry::make('title')
                             ->label(__('referral_rewards.fields.title')),
-                        Infolists\Components\TextEntry::make('description')
+                        TextEntry::make('description')
                             ->label(__('referral_rewards.fields.description')),
-                        Infolists\Components\TextEntry::make('user.name')
+                        TextEntry::make('user.name')
                             ->label(__('referral_rewards.fields.user_name')),
-                        Infolists\Components\TextEntry::make('referral_code')
+                        TextEntry::make('referral_code')
                             ->label(__('referral_rewards.fields.referral_code'))
-                            ->state(static fn (ReferralReward $record): ?string => $record->referral?->referral_code)
-                            ->visible(static fn (ReferralReward $record): bool => filled($record->referral?->referral_code)),
-                        Infolists\Components\TextEntry::make('order.id')
+                            ->state(fn (ReferralReward $record): ?string => $record->referral?->referral_code)
+                            ->visible(fn (ReferralReward $record): bool => filled($record->referral?->referral_code)),
+                        TextEntry::make('order.id')
                             ->label(__('referral_rewards.fields.order')),
                     ])
                     ->columns(1),
