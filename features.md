@@ -27,6 +27,9 @@
 - User and author foreign keys on rebuilt discount tables now attach after verifying the `users` table compatibility, ensuring MySQL restores with mixed storage engines keep migrating without tripping the `discount_codes_created_by_foreign` system-table check.
 - Campaign click fixtures now exercise the same routes and timestamps across environments thanks to deterministic UTC formatting, ability-aware profile responses, and factory slugs that remain unique under SQLite.
 
+## Testing updates
+- Livewire resource tests now preload the custom widget tab components and alias Filament schema classes, eliminating missing component errors during the campaign product target suite.
+
 ## Discounts & promotions
 
 - Coupon migrations now provision maximum discount caps, per-user usage limits, and product/category scoping columns so factories, admin forms, and API tests share the same schema snapshot during refreshes.
