@@ -5,136 +5,147 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Data\Notifications\NotificationFilterData;
+use App\Data\Notifications\NotificationPageData;
 use App\Data\Notifications\NotificationPaginationData;
-use App\Data\Notifications\NotificationPaginationOptions;
 use App\Data\Notifications\NotificationPayloadData;
-use App\Data\Notifications\NotificationSearchParameters;
+use App\Data\Notifications\NotificationSearchParametersData;
 use App\Data\Notifications\NotificationStatsData;
 use App\Models\Notification;
 use App\Models\User;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 final class NotificationService
 {
-    /**
-     * Persist a notification for the given notifiable model.
-     */
-    public function createNotification(Model $notifiable, NotificationPayloadData $payload): NotificationPayloadData
-    {
-        $notification = Notification::create([
-            'type' => $payload->notificationClass,
-            'notifiable_type' => $notifiable::class,
-            'notifiable_id' => $notifiable->getKey(),
-            'data' => $payload->toStoredData(),
+    public function createNotification(
+        Model $notifiable,
+        string $type,
+        array $data = [],
+        bool $urgent = false,
+        ?string $color = null,
+        array $tags = []
+    ): Notification {
+        $notificationData = array_merge(
+            [
+                'type' => $type,
+                'urgent' => $urgent,
+                'color' => $color,
+                'tags' => $tags,
+            ],
+            $data,
+        );
+
+        return Notification::create([
+            'type' => $type,
+            'notifiable_type' => get_class($notifiable),
+            'notifiable_id' => $notifiable->id,
+            'data' => $notificationData,
         ]);
-
-        return NotificationPayloadData::fromModel($notification);
     }
 
-    /**
-     * Create an order notification with translated content and metadata.
-     */
-    public function createOrderNotification(User $user, string $action, array $orderData = [], bool $urgent = false): NotificationPayloadData
+    public function createOrderNotification(User $user, string $action, array $orderData = [], bool $urgent = false): Notification
     {
-        $payload = NotificationPayloadData::make(
-            'App\\Notifications\\OrderNotification',
-            'order',
-            __('notifications.order.'.$action),
-            $this->getOrderMessage($action, $orderData),
-            $urgent,
-            context: array_merge(
-                ['action' => $action],
-                array_filter([
-                    'order_id' => $orderData['id'] ?? null,
-                    'order_number' => $orderData['number'] ?? null,
-                ], static fn ($value) => $value !== null),
-            ),
-        );
+        $data = [
+            'title' => __('notifications.order.'.$action),
+            'message' => $this->getOrderMessage($action, $orderData),
+            'type' => 'order',
+            'order_id' => $orderData['id'] ?? null,
+            'order_number' => $orderData['number'] ?? null,
+        ];
 
-        return $this->createNotification($user, $payload);
+        return $this->createNotification($user, 'App\\Notifications\\OrderNotification', $data, $urgent);
     }
 
-    /**
-     * Create a product notification with translated content and metadata.
-     */
-    public function createProductNotification(User $user, string $action, array $productData = [], bool $urgent = false): NotificationPayloadData
+    public function createProductNotification(User $user, string $action, array $productData = [], bool $urgent = false): Notification
     {
-        $payload = NotificationPayloadData::make(
-            'App\\Notifications\\ProductNotification',
-            'product',
-            __('notifications.product.'.$action),
-            $this->getProductMessage($action, $productData),
-            $urgent,
-            context: array_merge(
-                ['action' => $action],
-                array_filter([
-                    'product_id' => $productData['id'] ?? null,
-                    'product_name' => $productData['name'] ?? null,
-                ], static fn ($value) => $value !== null),
-            ),
-        );
+        $data = [
+            'title' => __('notifications.product.'.$action),
+            'message' => $this->getProductMessage($action, $productData),
+            'type' => 'product',
+            'product_id' => $productData['id'] ?? null,
+            'product_name' => $productData['name'] ?? null,
+        ];
 
-        return $this->createNotification($user, $payload);
+        return $this->createNotification($user, 'App\\Notifications\\ProductNotification', $data, $urgent);
     }
 
-    /**
-     * Mark a notification as read and return the updated payload representation.
-     */
-    public function markAsRead(Notification $notification): NotificationPayloadData
+    public function markAsReadForUser(User $user, Notification $notification): NotificationPayloadData
     {
+        $this->guardNotificationOwnership($notification, $user);
         $notification->markAsRead();
 
         return NotificationPayloadData::fromModel($notification->fresh());
     }
 
-    /**
-     * Mark a notification as unread and return the updated payload representation.
-     */
-    public function markAsUnread(Notification $notification): NotificationPayloadData
+    public function markAsUnreadForUser(User $user, Notification $notification): NotificationPayloadData
+    {
+        $this->guardNotificationOwnership($notification, $user);
+        $notification->markAsUnread();
+
+        return NotificationPayloadData::fromModel($notification->fresh());
+    }
+
+    public function deleteForUser(User $user, Notification $notification): void
+    {
+        $this->guardNotificationOwnership($notification, $user);
+        $notification->delete();
+    }
+
+    public function markAllAsReadForUser(User $user): int
     {
         $notification->markAsUnread();
 
         return NotificationPayloadData::fromModel($notification->fresh());
     }
 
-    /**
-     * Mark all notifications as read for the given user.
-     */
-    public function markAllAsReadForUser(User $user): NotificationBulkActionResult
+    public function markAllAsUnreadForUser(User $user): int
     {
-        $count = Notification::markAllAsReadForUser($user->id);
-
-        return new NotificationBulkActionResult($count);
+        return Notification::markAllAsUnreadForUser($user->id);
     }
 
-    /**
-     * Handle markAllAsUnreadForUser functionality with proper error handling.
-     */
-    public function markAllAsUnreadForUser(User $user): NotificationBulkActionResult
-    {
-        $count = Notification::markAllAsUnreadForUser($user->id);
+    public function getUserNotifications(
+        User $user,
+        NotificationFilterData $filters,
+        NotificationPaginationData $pagination
+    ): NotificationPageData {
+        $query = $this->baseQueryForUser($user);
+        $filters->apply($query);
+        $pagination->apply($query);
 
-        return new NotificationBulkActionResult($count);
+        $paginator = $this->paginate($query, $pagination);
+        $items = array_map(
+            static fn (Notification $notification): NotificationPayloadData => NotificationPayloadData::fromModel($notification),
+            $paginator->items(),
+        );
+
+        return NotificationPageData::fromPaginator($paginator, $pagination, $filters, null, $items);
     }
 
-    /**
-     * Aggregate paginated notifications for a user using the provided filters.
-     */
-    public function getUserNotifications(User $user, NotificationFilterData $filters, NotificationPaginationOptions $pagination): NotificationPaginationData
-    {
-        $query = $this->applyFilters(Notification::forUser($user->id), $filters);
+    public function searchNotifications(
+        User $user,
+        NotificationSearchParametersData $search,
+        NotificationPaginationData $pagination
+    ): NotificationPageData {
+        $query = $this->baseQueryForUser($user);
+        $search->apply($query);
+        $pagination->apply($query);
 
-        return NotificationPaginationData::fromPaginator($query->latest()->paginate($pagination->perPage));
+        $paginator = $this->paginate($query, $pagination);
+        $items = array_map(
+            static fn (Notification $notification): NotificationPayloadData => NotificationPayloadData::fromModel($notification),
+            $paginator->items(),
+        );
+
+        return NotificationPageData::fromPaginator($paginator, $pagination, $search->filters(), $search, $items);
     }
 
-    /**
-     * Aggregate statistics for the authenticated user's notifications.
-     */
     public function getUserNotificationStats(User $user): NotificationStatsData
     {
-        $baseQuery = Notification::forUser($user->id);
+        $baseQuery = $this->baseQueryForUser($user);
 
-        return new NotificationStatsData(
+        return NotificationStatsData::fromCounts(
             (clone $baseQuery)->count(),
             (clone $baseQuery)->read()->count(),
             (clone $baseQuery)->unread()->count(),
@@ -142,47 +153,38 @@ final class NotificationService
         );
     }
 
-    /**
-     * Mark all notifications as unread for the given user.
-     */
-    public function markAllAsUnreadForUser(User $user): int
+    public function show(User $user, Notification $notification): NotificationPayloadData
     {
-        return Notification::markAllAsUnreadForUser($user->id);
+        $this->guardNotificationOwnership($notification, $user);
+
+        return NotificationPayloadData::fromModel($notification);
     }
 
-    /**
-     * Search notifications for the authenticated user using the provided parameters.
-     */
-    public function searchNotifications(User $user, NotificationSearchParameters $parameters): NotificationPaginationData
+    private function baseQueryForUser(User $user): Builder
     {
-        $builder = $this->applyFilters(Notification::forUser($user->id), $parameters->filters)
-            ->where(function (Builder $searchQuery) use ($parameters): void {
-                $searchQuery->where('data->title', 'like', '%'.$parameters->query.'%')
-                    ->orWhere('data->message', 'like', '%'.$parameters->query.'%')
-                    ->orWhere('data->type', 'like', '%'.$parameters->query.'%');
-            });
+        return Notification::query()->forUser($user->id)->latest('created_at');
+    }
 
-        return NotificationPaginationData::fromPaginator(
-            $builder->latest()->paginate($parameters->pagination->perPage),
+    private function paginate(Builder $builder, NotificationPaginationData $pagination): LengthAwarePaginator
+    {
+        return $builder->paginate(
+            $pagination->perPage(),
+            ['*'],
+            'page',
+            $pagination->page(),
         );
     }
 
-    private function applyFilters(Builder $query, NotificationFilterData $filters): Builder
+    private function guardNotificationOwnership(Notification $notification, User $user): void
     {
-        if ($filters->type) {
-            $query->byType($filters->type);
-        }
+        if ($notification->notifiable_id !== $user->id || $notification->notifiable_type !== User::class) {
+            $exception = new ModelNotFoundException('Notification not found for the authenticated user.');
+            $exception->setModel(Notification::class, [$notification->id]);
 
-        if ($filters->read !== null) {
-            $query = $filters->read ? $query->read() : $query->unread();
+            throw $exception;
         }
-
-        return $query;
     }
 
-    /**
-     * Handle getOrderMessage functionality with proper error handling.
-     */
     private function getOrderMessage(string $action, array $orderData): string
     {
         return match ($action) {
