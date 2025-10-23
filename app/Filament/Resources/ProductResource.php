@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers\AttributesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\CategoriesRelationManager;
@@ -27,7 +28,6 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\CheckboxList;
-
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
@@ -364,11 +364,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                                 Toggle::make('allow_backorder')
                                                     ->label(__('products.fields.allow_backorder')),
                                             ]),
-                                        Flatpickr::make('published_at')
-                                            ->time(true)
-                                            ->time24hr(true)
-                                            ->seconds(false)
-                                            ->format('Y-m-d H:i')
+                                        Flatpickr::make('published_at')->dateTimePicker()
                                             ->label(__('products.fields.published_at'))
                                             ->default(now()),
                                     ]),
@@ -664,19 +660,9 @@ final class ProductResource extends Resource implements DefinesExportColumns
                     ->query(fn (Builder $query): Builder => $query->where('stock_quantity', '<=', 0)),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::make('created_from')
-                            ->time(true)
-                            ->time24hr(true)
-                            ->seconds(false)
-                            ->format('Y-m-d H:i')
-                            ->rangePicker()
+                        Flatpickr::make('created_from')->dateTimePicker()
                             ->label(__('products.filters.created_from')),
-                        Flatpickr::make('created_until')
-                            ->time(true)
-                            ->time24hr(true)
-                            ->seconds(false)
-                            ->format('Y-m-d H:i')
-                            ->rangePicker()
+                        Flatpickr::make('created_until')->dateTimePicker()
                             ->label(__('products.filters.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

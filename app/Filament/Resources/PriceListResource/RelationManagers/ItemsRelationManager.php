@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\PriceListResource\RelationManagers;
 
+use App\Forms\Components\Flatpickr;
 use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -71,21 +72,11 @@ final class ItemsRelationManager extends BaseRelationManager
                     ->numeric()
                     ->minValue(1),
 
-                Flatpickr::make('valid_from')
-                    ->time(true)
-                    ->time24hr(true)
-                    ->seconds(false)
-                    ->format('Y-m-d H:i')
-                    ->rangePicker()
+                Flatpickr::make('valid_from')->dateTimePicker()
                     ->label(__('price_list_items.valid_from'))
                     ->default(now()),
 
-                Flatpickr::make('valid_until')
-                    ->time(true)
-                    ->time24hr(true)
-                    ->seconds(false)
-                    ->format('Y-m-d H:i')
-                    ->rangePicker()
+                Flatpickr::make('valid_until')->dateTimePicker()
                     ->label(__('price_list_items.valid_until'))
                     ->after('valid_from'),
 

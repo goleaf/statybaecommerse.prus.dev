@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ReferralCodeStatistics\Schemas;
 
+use App\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -17,9 +18,7 @@ class ReferralCodeStatisticsForm
                 Select::make('referral_code_id')
                     ->relationship('referralCode', 'title')
                     ->required(),
-                Flatpickr::make('date')
-                    ->time(false)
-                    ->format('Y-m-d')
+                Flatpickr::make('date')->datePicker()
                     ->required(),
                 TextInput::make('total_views')
                     ->required()

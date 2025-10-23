@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\WishlistItemResource\Pages;
 use App\Models\Brand;
 use App\Models\CartItem;
@@ -24,7 +23,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-
 use Filament\Forms\Components\Grid as FormGrid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section as FormSection;
@@ -493,19 +491,9 @@ final class WishlistItemResource extends Resource
                     ),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::make('created_from')
-                            ->time(true)
-                            ->time24hr(true)
-                            ->seconds(false)
-                            ->format('Y-m-d H:i')
-                            ->rangePicker()
+                        Flatpickr::make('created_from')->dateTimePicker()
                             ->label(__('admin.wishlist_items.filters.created_from')),
-                        Flatpickr::make('created_until')
-                            ->time(true)
-                            ->time24hr(true)
-                            ->seconds(false)
-                            ->format('Y-m-d H:i')
-                            ->rangePicker()
+                        Flatpickr::make('created_until')->dateTimePicker()
                             ->label(__('admin.wishlist_items.filters.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

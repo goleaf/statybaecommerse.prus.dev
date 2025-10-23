@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\PriceListResource\Pages;
 use App\Models\PriceList;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -106,19 +104,9 @@ final class PriceListResource extends Resource
                         ->label(__('price_lists.is_default')),
                     Toggle::make('auto_apply')
                         ->label(__('price_lists.auto_apply')),
-                    Flatpickr::make('starts_at')
-                        ->time(true)
-                        ->time24hr(true)
-                        ->seconds(false)
-                        ->format('Y-m-d H:i')
-                        ->rangePicker()
+                    Flatpickr::make('starts_at')->dateTimePicker()
                         ->label(__('price_lists.starts_at')),
-                    Flatpickr::make('ends_at')
-                        ->time(true)
-                        ->time24hr(true)
-                        ->seconds(false)
-                        ->format('Y-m-d H:i')
-                        ->rangePicker()
+                    Flatpickr::make('ends_at')->dateTimePicker()
                         ->label(__('price_lists.ends_at')),
                     TextInput::make('min_order_amount')
                         ->label(__('price_lists.min_order_amount'))
@@ -237,19 +225,9 @@ final class PriceListResource extends Resource
                 Filter::make('starts_at')
                     ->label(__('price_lists.valid_from'))
                     ->form([
-                        Flatpickr::make('starts_from')
-                            ->time(true)
-                            ->time24hr(true)
-                            ->seconds(false)
-                            ->format('Y-m-d H:i')
-                            ->rangePicker()
+                        Flatpickr::make('starts_from')->dateTimePicker()
                             ->label(__('price_lists.starts_at_from')),
-                        Flatpickr::make('starts_until')
-                            ->time(true)
-                            ->time24hr(true)
-                            ->seconds(false)
-                            ->format('Y-m-d H:i')
-                            ->rangePicker()
+                        Flatpickr::make('starts_until')->dateTimePicker()
                             ->label(__('price_lists.starts_at_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
@@ -266,19 +244,9 @@ final class PriceListResource extends Resource
                 Filter::make('ends_at')
                     ->label(__('price_lists.ends_at'))
                     ->form([
-                        Flatpickr::make('ends_from')
-                            ->time(true)
-                            ->time24hr(true)
-                            ->seconds(false)
-                            ->format('Y-m-d H:i')
-                            ->rangePicker()
+                        Flatpickr::make('ends_from')->dateTimePicker()
                             ->label(__('price_lists.ends_at_from')),
-                        Flatpickr::make('ends_until')
-                            ->time(true)
-                            ->time24hr(true)
-                            ->seconds(false)
-                            ->format('Y-m-d H:i')
-                            ->rangePicker()
+                        Flatpickr::make('ends_until')->dateTimePicker()
                             ->label(__('price_lists.ends_at_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

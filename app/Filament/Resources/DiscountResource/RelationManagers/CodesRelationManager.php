@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountResource\RelationManagers;
 
+use App\Forms\Components\Flatpickr;
 use App\Models\DiscountCode;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms;
@@ -43,11 +44,7 @@ final class CodesRelationManager extends BaseRelationManager
                     ->default(0)
                     ->disabled()
                     ->helperText('How many times this code has been used'),
-                Flatpickr::make('expires_at')
-                    ->time(true)
-                    ->time24hr(true)
-                    ->seconds(false)
-                    ->format('Y-m-d H:i')
+                Flatpickr::make('expires_at')->dateTimePicker()
                     ->label('Expires At')
                     ->helperText('When this specific code expires'),
                 Forms\Components\Toggle::make('is_active')

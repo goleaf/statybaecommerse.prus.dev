@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\CartItemResource\Pages;
 use App\Models\CartItem;
 use App\Models\Product;
@@ -392,15 +391,9 @@ final class CartItemResource extends Resource
                     }),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::make('created_from')
-                            ->time(false)
-                            ->format('Y-m-d')
-                            ->rangePicker()
+                        Flatpickr::make('created_from')->datePicker()
                             ->label(__('cart_items.created_from')),
-                        Flatpickr::make('created_until')
-                            ->time(false)
-                            ->format('Y-m-d')
-                            ->rangePicker()
+                        Flatpickr::make('created_until')->datePicker()
                             ->label(__('cart_items.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

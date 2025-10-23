@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\SystemSettingTranslationResource\Pages;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingTranslation;
@@ -18,7 +17,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
@@ -361,16 +359,8 @@ final class SystemSettingTranslationResource extends Resource
                 Filter::make('created_at')
                     ->label(__('admin.common.created_at'))
                     ->form([
-                        Flatpickr::make('from')
-                            ->time(false)
-                            ->format('Y-m-d')
-                            ->rangePicker()
-                            ->label(__('admin.common.from')),
-                        Flatpickr::make('until')
-                            ->time(false)
-                            ->format('Y-m-d')
-                            ->rangePicker()
-                            ->label(__('admin.common.until')),
+                        Flatpickr::make('from')->datePicker()->label(__('admin.common.from')),
+                        Flatpickr::make('until')->datePicker()->label(__('admin.common.until')),
                     ])
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];

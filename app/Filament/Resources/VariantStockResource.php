@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\VariantStockResource\Pages;
 use App\Models\Location;
 use App\Models\VariantInventory;
@@ -17,7 +16,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -98,9 +96,7 @@ final class VariantStockResource extends Resource
                         ]),
                     Grid::make(2)
                         ->schema([
-                            Flatpickr::make('expiry_date')
-                                ->time(false)
-                                ->format('Y-m-d'),
+                            Flatpickr::make('expiry_date')->datePicker(),
                             Select::make('status')
                                 ->options([
                                     'active'       => 'active',

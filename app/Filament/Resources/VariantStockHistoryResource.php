@@ -4,13 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\VariantStockHistoryResource\Pages;
 use App\Models\VariantStockHistory;
-use App\Support\Filament\Filters\DateRangeFilter;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -203,11 +199,10 @@ final class VariantStockHistoryResource extends Resource
                 Filter::make('created_at')
                     ->label(__('admin.variant_stock_histories.filters.created_at'))
                     ->form([
-                        Flatpickr::make('range')
-                            ->label(__('admin.variant_stock_histories.filters.created_at'))
-                            ->rangePicker()
-                            ->format('Y-m-d')
-                            ->displayFormat('Y-m-d'),
+                        Flatpickr::make('created_from')->datePicker()
+                            ->label(__('admin.variant_stock_histories.filters.created_from')),
+                        Flatpickr::make('created_until')->datePicker()
+                            ->label(__('admin.variant_stock_histories.filters.created_until')),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,

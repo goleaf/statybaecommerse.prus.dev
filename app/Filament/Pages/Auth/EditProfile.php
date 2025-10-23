@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Auth;
 
+use App\Forms\Components\Flatpickr;
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
-
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -56,9 +56,7 @@ class EditProfile extends BaseEditProfile
                                 'other'  => __('admin.gender.other'),
                             ])
                             ->native(false),
-                        Flatpickr::make('birth_date')
-                            ->time(false)
-                            ->format('Y-m-d')
+                        Flatpickr::make('birth_date')->datePicker()
                             ->label(__('admin.profile.birth_date'))
                             ->displayFormat('Y-m-d')
                             ->maxDate(now()),

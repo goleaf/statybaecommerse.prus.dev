@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CampaignResource\RelationManagers;
 
+use App\Forms\Components\Flatpickr;
 use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
@@ -41,11 +41,7 @@ final class ViewsRelationManager extends BaseRelationManager
             TextInput::make('customer_id')
                 ->label('Customer ID')
                 ->numeric(),
-            Flatpickr::make('viewed_at')
-                ->time(true)
-                ->time24hr(true)
-                ->seconds(false)
-                ->format('Y-m-d H:i')
+            Flatpickr::make('viewed_at')->dateTimePicker()
                 ->label('Viewed At')
                 ->required(),
         ]);

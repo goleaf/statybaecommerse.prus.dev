@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Forms\Components\Flatpickr;
+use App\Support\DateRange;
 use App\Filament\Resources\ReferralStatisticsResource\Pages;
 use App\Models\ReferralStatistics;
 use BackedEnum;
@@ -16,7 +16,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -80,9 +79,7 @@ final class ReferralStatisticsResource extends Resource
                             ->searchable()
                             ->preload()
                             ->required(),
-                        Flatpickr::make('date')
-                            ->time(false)
-                            ->format('Y-m-d')
+                        Flatpickr::make('date')->datePicker()
                             ->label(__('referral_statistics.fields.date'))
                             ->required()
                             ->default(now()),
@@ -216,25 +213,19 @@ final class ReferralStatisticsResource extends Resource
                 Filter::make('date_range')
                     ->label(__('referral_statistics.filters.date_range'))
                     ->form([
-                        Flatpickr::make('from')
-                            ->time(false)
-                            ->format('Y-m-d')
-                            ->rangePicker()
-                            ->label(__('referral_statistics.filters.from_date')),
-                        Flatpickr::make('until')
-                            ->time(false)
-                            ->format('Y-m-d')
-                            ->rangePicker()
-                            ->label(__('referral_statistics.filters.until_date')),
+                        Flatpickr::make('from')->dateRangePicker()
+                            ->label(__('referral_statistics.filters.date_range')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
+                        [$from, $until] = DateRange::extract($data, 'from', 'until');
+
                         return $query
                             ->when(
-                                $data['from'] ?? null,
+                                $from,
                                 fn (Builder $query, $date): Builder => $query->whereDate('date', '>=', $date),
                             )
                             ->when(
-                                $data['until'] ?? null,
+                                $until,
                                 fn (Builder $query, $date): Builder => $query->whereDate('date', '<=', $date),
                             );
                     }),

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderShippings\Schemas;
 
+use App\Forms\Components\Flatpickr;
 use App\Models\Order;
-
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -53,21 +53,9 @@ class OrderShippingForm
                 TextInput::make('tracking_url')
                     ->url()
                     ->maxLength(500),
-                Flatpickr::make('shipped_at')
-                    ->time(true)
-                    ->time24hr(true)
-                    ->seconds(false)
-                    ->format('Y-m-d H:i'),
-                Flatpickr::make('estimated_delivery')
-                    ->time(true)
-                    ->time24hr(true)
-                    ->seconds(false)
-                    ->format('Y-m-d H:i'),
-                Flatpickr::make('delivered_at')
-                    ->time(true)
-                    ->time24hr(true)
-                    ->seconds(false)
-                    ->format('Y-m-d H:i'),
+                Flatpickr::make('shipped_at')->dateTimePicker(),
+                Flatpickr::make('estimated_delivery')->dateTimePicker(),
+                Flatpickr::make('delivered_at')->dateTimePicker(),
                 TextInput::make('weight')
                     ->numeric()
                     ->step(0.001)

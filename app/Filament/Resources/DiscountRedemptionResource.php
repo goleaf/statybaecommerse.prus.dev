@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\DiscountRedemptionResource\Pages;
 use App\Filament\Resources\DiscountRedemptionResource\RelationManagers\CodeRelationManager;
 use App\Filament\Resources\DiscountRedemptionResource\RelationManagers\DiscountRelationManager;
@@ -14,7 +15,6 @@ use Filament\Actions\Action as TableAction;
 use Filament\Actions\BulkAction as TableBulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
@@ -127,11 +127,7 @@ final class DiscountRedemptionResource extends Resource
                                 ->default(now())
                                 ->required(),
                         ]),
-                    Flatpickr::make('redeemed_at')
-                        ->time(true)
-                        ->time24hr(true)
-                        ->seconds(false)
-                        ->format('Y-m-d H:i')
+                    Flatpickr::make('redeemed_at')->dateTimePicker()
                         ->label(__('discount_redemptions.fields.redeemed_at'))
                         ->seconds(false)
                         ->displayFormat('Y-m-d H:i')
@@ -215,19 +211,9 @@ final class DiscountRedemptionResource extends Resource
                 Filter::make('redeemed_at')
                     ->label(__('admin.discount_redemptions.filters.redeemed_at'))
                     ->form([
-                        Flatpickr::make('from')
-                            ->time(true)
-                            ->time24hr(true)
-                            ->seconds(false)
-                            ->format('Y-m-d H:i')
-                            ->rangePicker()
+                        Flatpickr::make('from')->dateTimePicker()
                             ->label(__('discount_redemptions.filters.redeemed_from')),
-                        Flatpickr::make('until')
-                            ->time(true)
-                            ->time24hr(true)
-                            ->seconds(false)
-                            ->format('Y-m-d H:i')
-                            ->rangePicker()
+                        Flatpickr::make('until')->dateTimePicker()
                             ->label(__('discount_redemptions.filters.redeemed_until')),
                     ])
                     ->query(static function (Builder $query, array $data): Builder {

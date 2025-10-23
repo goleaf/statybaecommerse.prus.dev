@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\UserBehaviorResource\Pages;
 use App\Models\UserBehavior;
 use App\Support\Filament\Components\Flatpickr;
@@ -17,8 +16,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
@@ -135,11 +132,7 @@ final class UserBehaviorResource extends Resource
                             ->options(self::behaviorTypeOptions())
                             ->required()
                             ->searchable(),
-                        Flatpickr::make('created_at')
-                            ->time(true)
-                            ->time24hr(true)
-                            ->seconds(false)
-                            ->format('Y-m-d H:i')
+                        Flatpickr::make('created_at')->dateTimePicker()
                             ->label(__('admin.user_behaviors.created_at'))
                             ->default(now())
                             ->displayFormat('d/m/Y H:i:s'),
@@ -288,11 +281,10 @@ final class UserBehaviorResource extends Resource
                     ]),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::make('range')
-                            ->label(__('admin.user_behaviors.created_at'))
-                            ->rangePicker()
-                            ->format('Y-m-d')
-                            ->displayFormat('Y-m-d'),
+                        Flatpickr::make('created_from')->datePicker()
+                            ->label(__('admin.user_behaviors.created_from')),
+                        Flatpickr::make('created_until')->datePicker()
+                            ->label(__('admin.user_behaviors.created_until')),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\FeatureFlags\Schemas;
 
+use App\Forms\Components\Flatpickr;
 use App\Models\FeatureFlag;
-
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -35,34 +35,14 @@ class FeatureFlagForm
                 Textarea::make('rollout_percentage')
                     ->columnSpanFull(),
                 TextInput::make('environment'),
-                Flatpickr::make('starts_at')
-                    ->time(true)
-                    ->time24hr(true)
-                    ->seconds(false)
-                    ->format('Y-m-d H:i')
-                    ->rangePicker(),
-                Flatpickr::make('ends_at')
-                    ->time(true)
-                    ->time24hr(true)
-                    ->seconds(false)
-                    ->format('Y-m-d H:i')
-                    ->rangePicker(),
+                Flatpickr::make('starts_at')->dateTimePicker(),
+                Flatpickr::make('ends_at')->dateTimePicker(),
                 Toggle::make('is_enabled')
                     ->required(),
                 Toggle::make('is_global')
                     ->required(),
-                Flatpickr::make('start_date')
-                    ->time(true)
-                    ->time24hr(true)
-                    ->seconds(false)
-                    ->format('Y-m-d H:i')
-                    ->rangePicker(),
-                Flatpickr::make('end_date')
-                    ->time(true)
-                    ->time24hr(true)
-                    ->seconds(false)
-                    ->format('Y-m-d H:i')
-                    ->rangePicker(),
+                Flatpickr::make('start_date')->dateTimePicker(),
+                Flatpickr::make('end_date')->dateTimePicker(),
                 Textarea::make('metadata')
                     ->columnSpanFull(),
                 TextInput::make('priority'),
@@ -86,16 +66,8 @@ class FeatureFlagForm
                     ->content(fn (?FeatureFlag $record): string => $record === null ? '—' : ($record->updated_by_display ?? '—'))
                     ->visible(fn (?FeatureFlag $record): bool => $record !== null)
                     ->columnSpanFull(),
-                Flatpickr::make('last_activated')
-                    ->time(true)
-                    ->time24hr(true)
-                    ->seconds(false)
-                    ->format('Y-m-d H:i'),
-                Flatpickr::make('last_deactivated')
-                    ->time(true)
-                    ->time24hr(true)
-                    ->seconds(false)
-                    ->format('Y-m-d H:i'),
+                Flatpickr::make('last_activated')->dateTimePicker(),
+                Flatpickr::make('last_deactivated')->dateTimePicker(),
             ]);
     }
 }

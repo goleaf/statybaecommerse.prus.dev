@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
+use App\Forms\Components\Flatpickr;
 use App\Models\OrderShipping;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -119,26 +119,14 @@ final class OrderShippingRelationManager extends BaseRelationManager
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                                Flatpickr::make('shipped_at')
-                                    ->time(true)
-                                    ->time24hr(true)
-                                    ->seconds(false)
-                                    ->format('Y-m-d H:i')
+                                Flatpickr::make('shipped_at')->dateTimePicker()
                                     ->label(__('orders.shipped_at')),
-                                Flatpickr::make('estimated_delivery')
-                                    ->time(true)
-                                    ->time24hr(true)
-                                    ->seconds(false)
-                                    ->format('Y-m-d H:i')
+                                Flatpickr::make('estimated_delivery')->dateTimePicker()
                                     ->label(__('orders.estimated_delivery')),
                             ]),
                         Grid::make(2)
                             ->schema([
-                                Flatpickr::make('delivered_at')
-                                    ->time(true)
-                                    ->time24hr(true)
-                                    ->seconds(false)
-                                    ->format('Y-m-d H:i')
+                                Flatpickr::make('delivered_at')->dateTimePicker()
                                     ->label(__('orders.delivered_at')),
                                 TextInput::make('delivery_notes')
                                     ->label(__('orders.fields.delivery_notes'))

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\UserProductInteractions\Schemas;
 
+use App\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -27,17 +28,9 @@ class UserProductInteractionForm
                     ->required()
                     ->numeric()
                     ->default(1),
-                Flatpickr::make('first_interaction')
-                    ->time(true)
-                    ->time24hr(true)
-                    ->seconds(false)
-                    ->format('Y-m-d H:i')
+                Flatpickr::make('first_interaction')->dateTimePicker()
                     ->required(),
-                Flatpickr::make('last_interaction')
-                    ->time(true)
-                    ->time24hr(true)
-                    ->seconds(false)
-                    ->format('Y-m-d H:i')
+                Flatpickr::make('last_interaction')->dateTimePicker()
                     ->required(),
             ]);
     }

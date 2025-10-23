@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
+use App\Support\DateRange;
 use App\Filament\Resources\VariantPriceHistoryResource\Pages;
 use App\Models\VariantPriceHistory;
 use Filament\Forms;
@@ -75,20 +77,10 @@ final class VariantPriceHistoryResource extends Resource
                     ->relationship('changedBy', 'name')
                     ->searchable()
                     ->preload(),
-                Flatpickr::make('effective_from')
-                    ->time(true)
-                    ->time24hr(true)
-                    ->seconds(false)
-                    ->format('Y-m-d H:i')
-                    ->rangePicker()
+                Flatpickr::make('effective_from')->dateTimePicker()
                     ->label('Effective From')
                     ->required(),
-                Flatpickr::make('effective_until')
-                    ->time(true)
-                    ->time24hr(true)
-                    ->seconds(false)
-                    ->format('Y-m-d H:i')
-                    ->rangePicker()
+                Flatpickr::make('effective_until')->dateTimePicker()
                     ->label('Effective Until')
                     ->after('effective_from'),
             ]);
@@ -209,25 +201,19 @@ final class VariantPriceHistoryResource extends Resource
                     ->preload(),
                 Tables\Filters\Filter::make('effective_date_range')
                     ->form([
-                        Flatpickr::make('effective_from')
-                            ->time(false)
-                            ->format('Y-m-d')
-                            ->rangePicker()
-                            ->label('Effective From'),
-                        Flatpickr::make('effective_until')
-                            ->time(false)
-                            ->format('Y-m-d')
-                            ->rangePicker()
-                            ->label('Effective Until'),
+                        Flatpickr::make('effective_from')->dateRangePicker()
+                            ->label('Effective Date Range'),
                     ])
-                    ->query(function (Builder $query, array $data): Builder {
+                    ->query(function ($query, array $data) {
+                        [$effectiveFrom, $effectiveUntil] = DateRange::extract($data, 'effective_from', 'effective_until');
+
                         return $query
                             ->when(
-                                $data['effective_from'],
+                                $effectiveFrom,
                                 fn ($query, $date) => $query->whereDate('effective_from', '>=', $date),
                             )
                             ->when(
-                                $data['effective_until'],
+                                $effectiveUntil,
                                 fn ($query, $date) => $query->whereDate('effective_until', '<=', $date),
                             );
                     }),

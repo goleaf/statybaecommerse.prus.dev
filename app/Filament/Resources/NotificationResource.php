@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\NotificationResource\Pages;
 use App\Models\Notification;
 use App\Support\Concerns\HasNav;
@@ -15,8 +14,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -110,11 +107,7 @@ final class NotificationResource extends Resource
                                 ->dehydrated(false)
                                 ->default(false)
                                 ->columnSpan(1),
-                            Flatpickr::make('read_at')
-                                ->time(true)
-                                ->time24hr(true)
-                                ->seconds(false)
-                                ->format('Y-m-d H:i')
+                            Flatpickr::make('read_at')->dateTimePicker()
                                 ->label(__('admin.notifications.form.fields.read_at'))
                                 ->seconds(false)
                                 ->native(false)

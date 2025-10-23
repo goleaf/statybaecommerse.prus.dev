@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\SubscriberResource\Pages;
 use App\Models\Subscriber;
 use Filament\Forms;
-
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -158,11 +156,7 @@ final class SubscriberResource extends Resource
                                     ->label(__('subscribers.newsletter_subscription'))
                                     ->default(true),
                             ]),
-                        Flatpickr::make('subscribed_at')
-                            ->time(true)
-                            ->time24hr(true)
-                            ->seconds(false)
-                            ->format('Y-m-d H:i')
+                        Flatpickr::make('subscribed_at')->dateTimePicker()
                             ->label(__('subscribers.subscribed_at'))
                             ->default(fn () => now()),
                     ]),
@@ -269,15 +263,9 @@ final class SubscriberResource extends Resource
                     ->native(false),
                 Filter::make('subscribed_at')
                     ->form([
-                        Flatpickr::make('subscribed_from')
-                            ->time(false)
-                            ->format('Y-m-d')
-                            ->rangePicker()
+                        Flatpickr::make('subscribed_from')->datePicker()
                             ->label(__('subscribers.subscribed_from')),
-                        Flatpickr::make('subscribed_until')
-                            ->time(false)
-                            ->format('Y-m-d')
-                            ->rangePicker()
+                        Flatpickr::make('subscribed_until')->datePicker()
                             ->label(__('subscribers.subscribed_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

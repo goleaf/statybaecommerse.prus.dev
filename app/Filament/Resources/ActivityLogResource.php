@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\ActivityLogResource\Pages;
 use App\Models\ActivityLog;
 use BackedEnum;
@@ -131,11 +131,8 @@ final class ActivityLogResource extends Resource
                         ->toArray()),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::make('range')
-                            ->label(__('Created At'))
-                            ->rangePicker()
-                            ->format('Y-m-d')
-                            ->displayFormat('Y-m-d'),
+                        Flatpickr::make('created_from')->datePicker()->label(__('From')),
+                        Flatpickr::make('created_until')->datePicker()->label(__('Until')),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,

@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Forms\Components\Flatpickr;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ProductHistoryResource\Pages;
 use App\Filament\Resources\ProductHistoryResource\Widgets\ProductHistoryStatsWidget;
@@ -15,7 +14,6 @@ use BackedEnum;
 use DateTimeInterface;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\Select as SelectInput;
-
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
@@ -175,15 +173,9 @@ final class ProductHistoryResource extends Resource
                 Filter::make('date')
                     ->label(__('product_history.date'))
                     ->form([
-                        Flatpickr::make('from')
-                            ->time(false)
-                            ->format('Y-m-d')
-                            ->rangePicker()
+                        Flatpickr::make('from')->datePicker()
                             ->label(__('product_history.from')),
-                        Flatpickr::make('until')
-                            ->time(false)
-                            ->format('Y-m-d')
-                            ->rangePicker()
+                        Flatpickr::make('until')->datePicker()
                             ->label(__('product_history.until')),
                     ])
                     ->indicateUsing(function (array $data): array {

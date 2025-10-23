@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\VariantPricingRuleResource\Pages;
 use App\Models\VariantPricingRule;
 use Filament\Actions\Action;
@@ -13,7 +12,6 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -170,19 +168,9 @@ final class VariantPricingRuleResource extends Resource
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                                Flatpickr::make('valid_from')
-                                    ->time(true)
-                                    ->time24hr(true)
-                                    ->seconds(false)
-                                    ->format('Y-m-d H:i')
-                                    ->rangePicker()
+                                Flatpickr::make('valid_from')->dateTimePicker()
                                     ->label(__('variant_pricing_rules.valid_from')),
-                                Flatpickr::make('valid_until')
-                                    ->time(true)
-                                    ->time24hr(true)
-                                    ->seconds(false)
-                                    ->format('Y-m-d H:i')
-                                    ->rangePicker()
+                                Flatpickr::make('valid_until')->dateTimePicker()
                                     ->label(__('variant_pricing_rules.valid_until')),
                             ]),
                     ]),

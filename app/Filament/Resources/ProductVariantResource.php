@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\ProductVariantResource\Pages;
 use App\Filament\Support\MatrixFactory;
 use App\Models\Attribute;
@@ -20,7 +21,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
@@ -237,19 +237,9 @@ final class ProductVariantResource extends Resource
                                             ]),
                                         Grid::make(2)
                                             ->schema([
-                                                Flatpickr::make('sale_start_date')
-                                                    ->time(true)
-                                                    ->time24hr(true)
-                                                    ->seconds(false)
-                                                    ->format('Y-m-d H:i')
-                                                    ->rangePicker()
+                                                Flatpickr::make('sale_start_date')->dateTimePicker()
                                                     ->label(__('product_variants.fields.sale_start_date')),
-                                                Flatpickr::make('sale_end_date')
-                                                    ->time(true)
-                                                    ->time24hr(true)
-                                                    ->seconds(false)
-                                                    ->format('Y-m-d H:i')
-                                                    ->rangePicker()
+                                                Flatpickr::make('sale_end_date')->dateTimePicker()
                                                     ->label(__('product_variants.fields.sale_end_date')),
                                             ]),
                                     ]),

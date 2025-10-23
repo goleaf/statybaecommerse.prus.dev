@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\EmailCampaignResource\Pages;
 use App\Models\EmailCampaign;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
-
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
@@ -97,11 +95,7 @@ final class EmailCampaignResource extends Resource
                         ]),
                     Grid::make(2)
                         ->schema([
-                            Flatpickr::make('scheduled_at')
-                                ->time(true)
-                                ->time24hr(true)
-                                ->seconds(false)
-                                ->format('Y-m-d H:i')
+                            Flatpickr::make('scheduled_at')->dateTimePicker()
                                 ->label(__('admin.email_campaigns.scheduled_at')),
                             Toggle::make('is_active')
                                 ->label(__('admin.email_campaigns.is_active'))
