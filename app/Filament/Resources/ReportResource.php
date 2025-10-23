@@ -549,13 +549,9 @@ final class ReportResource extends Resource
                         TextEntry::make('schedule_frequency')
                             ->label(__('reports.fields.schedule_frequency'))
                             ->formatStateUsing(
-                                function (?string $state): ?string {
-                                    if (blank($state)) {
-                                        return null;
-                                    }
-
-                                    return __("reports.frequencies.{$state}");
-                                }
+                                fn (?string $state): ?string => blank($state)
+                                    ? null
+                                    : __("reports.frequencies.{$state}")
                             )
                             ->placeholder(__('reports.placeholders.no_schedule')),
                     ])
