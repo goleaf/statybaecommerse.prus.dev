@@ -8,13 +8,6 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\VariantAnalyticsResource\Pages;
 use App\Models\VariantAnalytics;
-use BackedEnum;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
@@ -27,8 +20,18 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Support\Facades\FilamentNumber;
-use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\DateFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -45,22 +48,17 @@ final class VariantAnalyticsResource extends Resource
 
     protected static ?string $model = VariantAnalytics::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static ?int $navigationSort = 2;
 
-    /**
-     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
-     */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Inventory;
-
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationIcon(): \BackedEnum|string|null
     {
-        // Centralize the NavigationGroup handling to leverage enum labels.
-        $group = self::$navigationGroup;
-
-        return $group instanceof NavigationGroup ? $group->label() : $group;
+        return 'heroicon-o-chart-bar-square';
     }
 
-    protected static ?int $navigationSort = 2;
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Inventory';
+    }
 
     public static function getNavigationLabel(): string
     {
