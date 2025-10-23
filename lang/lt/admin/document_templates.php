@@ -54,9 +54,9 @@ return [
         'other'    => 'Kitas',
     ],
     'categories' => [
-        'business' => 'Verslas',
-        'sales' => 'Pardavimai',
-        'legal' => 'Teisinė',
+        'business'  => 'Verslas',
+        'sales'     => 'Pardavimai',
+        'legal'     => 'Teisinė',
         'financial' => 'Finansinė',
         'marketing' => 'Rinkodara',
         'technical' => 'Techninė',
