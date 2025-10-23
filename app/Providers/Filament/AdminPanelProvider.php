@@ -136,12 +136,11 @@ final class AdminPanelProvider extends PanelProvider
             ])
             ->when(app()->environment('testing'),
                 fn (Panel $p) => $p->plugins([
-                    FilamentSpatieLaravelMediaLibraryPlugin::make(),
+                    ResizedColumnPlugin::make()->preserveOnDB(),
                 ]),
                 fn (Panel $p) => $p->plugins([
                     FilamentShieldPlugin::make(),
-                    ResizedColumnPlugin::make()
-                        ->preserveOnDB(),
+                    ResizedColumnPlugin::make()->preserveOnDB(),
                 ]))
             // Load the enhanced theme so third-party component styles (e.g. searchable inputs) compile correctly.
             ->viteTheme('resources/css/filament-enhancements.css')

@@ -6,16 +6,16 @@ namespace App\Filament\Resources\EnumValueResource\Pages;
 
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\EnumValueResource;
-use App\Models\EnumValue;
-use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
+use Filament\Actions;
+use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListEnumValues extends BaseListRecords
 {
     use HasResizableColumns;
+    use HasWidgetTabs;
 
     protected static string $resource = EnumValueResource::class;
 

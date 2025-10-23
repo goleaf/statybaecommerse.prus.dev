@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 final class ListProductVariants extends BaseListRecords
 {
     use HasResizableColumns;
+    use HasWidgetTabs;
 
     protected static string $resource = ProductVariantResource::class;
 

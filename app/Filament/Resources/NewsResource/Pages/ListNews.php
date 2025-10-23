@@ -7,19 +7,16 @@ namespace App\Filament\Resources\NewsResource\Pages;
 use App\Enums\ModerationState;
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\NewsResource;
-use App\Filament\Resources\NewsResource\Widgets\NewsPerformanceChart;
-use App\Filament\Resources\NewsResource\Widgets\NewsResourceStats;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use App\Filament\WidgetTabs\Components\WidgetTab;
-use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListNews extends BaseListRecords
 {
     use HasResizableColumns;
+    use HasWidgetTabs;
 
     protected static string $resource = NewsResource::class;
 

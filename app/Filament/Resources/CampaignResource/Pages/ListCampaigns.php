@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 final class ListCampaigns extends BaseListRecords
 {
     use HasResizableColumns;
+    use HasWidgetTabs;
 
     protected static string $resource = CampaignResource::class;
 

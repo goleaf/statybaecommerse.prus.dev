@@ -6,19 +6,16 @@ namespace App\Filament\Resources\DiscountConditionResource\Pages;
 
 use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\DiscountConditionResource;
-use App\Filament\Resources\DiscountConditionResource\Widgets\DiscountConditionChartWidget;
-use App\Filament\Resources\DiscountConditionResource\Widgets\DiscountConditionStatsWidget;
-use App\Filament\Resources\DiscountConditionResource\Widgets\DiscountConditionTableWidget;
-use App\Models\DiscountCondition;
-use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
+use Filament\Actions;
+use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListDiscountConditions extends BaseListRecords
 {
     use HasResizableColumns;
+    use HasWidgetTabs;
 
     protected static string $resource = DiscountConditionResource::class;
 
