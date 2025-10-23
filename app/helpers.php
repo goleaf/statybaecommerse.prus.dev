@@ -36,6 +36,27 @@ if (! function_exists('app_setting')) {
     }
 }
 
+if (! function_exists('csp_nonce')) {
+    function csp_nonce(): string
+    {
+        $request = app()->bound('request') ? request() : null;
+
+        if ($request instanceof \Illuminate\Http\Request) {
+            return \App\Support\Security\CspNonce::resolve($request);
+        }
+
+        $current = \App\Support\Security\CspNonce::current();
+        if (is_string($current) && $current !== '') {
+            return $current;
+        }
+
+        $nonce = \App\Support\Security\CspNonce::generate();
+        \App\Support\Security\CspNonce::storeGlobally($nonce);
+
+        return $nonce;
+    }
+}
+
 // Removed legacy shopper_setting - use app_setting instead
 
 use Illuminate\Support\Arr;

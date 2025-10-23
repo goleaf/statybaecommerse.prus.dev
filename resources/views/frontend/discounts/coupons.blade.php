@@ -21,4 +21,18 @@
             {{ $coupons->links() }}
         </div>
     </div>
-</x-layouts.base>
+
+    <script nonce="{{ csp_nonce() }}">
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.copy-coupon').forEach((button) => {
+                button.addEventListener('click', () => {
+                    navigator.clipboard.writeText(button.dataset.code || '');
+                    button.classList.add('bg-blue-600', 'text-white');
+                    window.setTimeout(() => {
+                        button.classList.remove('bg-blue-600', 'text-white');
+                    }, 1200);
+                });
+            });
+        });
+    </script>
+@endsection

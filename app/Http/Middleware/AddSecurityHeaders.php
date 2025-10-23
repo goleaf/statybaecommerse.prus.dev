@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Support\Security\CspNonce;
 use Closure;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Http\Request;
@@ -15,6 +16,8 @@ final class AddSecurityHeaders
 
     public function handle(Request $request, Closure $next): Response
     {
+        $nonce = CspNonce::resolve($request);
+
         /** @var Response $response */
         $response = $next($request);
 
@@ -23,7 +26,8 @@ final class AddSecurityHeaders
         }
 
         $this->applyStaticHeaders($response);
-        $this->applyContentSecurityPolicy($response);
+        $this->applyStrictTransportSecurity($request, $response);
+        $this->applyContentSecurityPolicy($response, $nonce);
 
         return $response;
     }
@@ -50,7 +54,35 @@ final class AddSecurityHeaders
         }
     }
 
-    private function applyContentSecurityPolicy(Response $response): void
+    private function applyStrictTransportSecurity(Request $request, Response $response): void
+    {
+        $config = (array) $this->config->get('security.headers.hsts', []);
+
+        $enabled = (bool) ($config['enabled'] ?? true);
+        if (! $enabled) {
+            return;
+        }
+
+        $forceOnHttp = (bool) ($config['enforce_on_http'] ?? false);
+        if (! $request->isSecure() && ! $forceOnHttp) {
+            return;
+        }
+
+        $maxAge = max(0, (int) ($config['max_age'] ?? 31536000));
+        $directives = ['max-age='.$maxAge];
+
+        if (! empty($config['include_subdomains'])) {
+            $directives[] = 'includeSubDomains';
+        }
+
+        if (! empty($config['preload'])) {
+            $directives[] = 'preload';
+        }
+
+        $response->headers->set('Strict-Transport-Security', implode('; ', $directives), true);
+    }
+
+    private function applyContentSecurityPolicy(Response $response, string $nonce): void
     {
         $directives = $this->config->get('security.headers.content_security_policy', []);
         if (! is_array($directives) || $directives === []) {
@@ -68,7 +100,7 @@ final class AddSecurityHeaders
                 continue;
             }
 
-            $sources = $this->normaliseSources($values);
+            $sources = $this->normaliseSources($values, $nonce);
             if ($sources === []) {
                 continue;
             }
@@ -80,14 +112,14 @@ final class AddSecurityHeaders
             return;
         }
 
-        $response->headers->set('Content-Security-Policy', implode('; ', $compiled));
+        $response->headers->set('Content-Security-Policy', implode('; ', $compiled), true);
     }
 
     /**
      * @param  array<mixed, mixed>|string  $values
      * @return array<int, string>
      */
-    private function normaliseSources(array|string $values): array
+    private function normaliseSources(array|string $values, string $nonce): array
     {
         if (is_string($values)) {
             $values = [$values];
@@ -97,6 +129,11 @@ final class AddSecurityHeaders
 
         foreach ($values as $value) {
             if (! is_string($value) || $value === '') {
+                continue;
+            }
+
+            if ($value === '{{nonce}}') {
+                $sources[] = "'nonce-{$nonce}'";
                 continue;
             }
 
