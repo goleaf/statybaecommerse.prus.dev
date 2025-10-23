@@ -4,88 +4,166 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $key
+ * @property string|null $secret
+ * @property array|null $permissions
+ * @property array|null $rate_limits
+ * @property int|null $user_id
+ * @property \Illuminate\Support\Carbon|null $last_used_at
+ * @property \Illuminate\Support\Carbon|null $expires_at
+ * @property bool $is_active
+ */
 final class ApiKey extends Model
 {
     use HasFactory;
 
-    protected $table = 'api_keys';
+    /**
+     * Default max attempts for partner API requests when no custom limit is provided.
+     */
+    private const DEFAULT_MAX_ATTEMPTS = 60;
 
-    protected $guarded = ['id'];
+    /**
+     * Default decay window (in seconds) for partner API requests when no custom limit is provided.
+     */
+    private const DEFAULT_DECAY_SECONDS = 60;
 
-    protected $fillable = [
-        'key',
-        'name',
-        'scopes',
-        'rate_limit',
-        'active',
-        'last_used_at',
-    ];
-
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
-        'scopes' => 'array',
-        'rate_limit' => 'integer',
-        'active' => 'boolean',
+        'permissions' => 'array',
+        'rate_limits' => 'array',
         'last_used_at' => 'datetime',
+        'expires_at' => 'datetime',
+        'is_active' => 'boolean',
     ];
 
     /**
-     * Determine if the API key has the given scope.
+     * @var array<int, string>
      */
-    public function hasScope(string $scope): bool
+    protected $fillable = [
+        'name',
+        'key',
+        'secret',
+        'permissions',
+        'rate_limits',
+        'user_id',
+        'last_used_at',
+        'expires_at',
+        'is_active',
+    ];
+
+    public function user(): BelongsTo
     {
-        $scopes = $this->scopes ?? [];
+        return $this->belongsTo(User::class);
+    }
 
-        if ($scope === '*') {
-            return true;
-        }
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query
+            ->where('is_active', true)
+            ->where(function (Builder $query): void {
+                $query
+                    ->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            });
+    }
 
-        return \in_array('*', $scopes, true) || \in_array($scope, $scopes, true);
+    public function markAsUsed(): void
+    {
+        $this->forceFill([
+            'last_used_at' => Carbon::now(),
+        ])->save();
+    }
+
+    public function isExpired(): bool
+    {
+        return $this->expires_at instanceof Carbon && $this->expires_at->isPast();
     }
 
     /**
-     * Determine if the API key has any of the provided scopes.
-     *
-     * @param array<int, string> $scopes
+     * @return array<int, string>
      */
-    public function hasAnyScope(array $scopes): bool
+    public function resolvedAbilities(): array
     {
-        if ($scopes === []) {
-            return true;
-        }
+        $abilities = \is_array($this->permissions) ? $this->permissions : [];
 
-        $assignedScopes = $this->scopes ?? [];
+        return array_values(array_filter(
+            array_map(
+                static fn ($ability) => \is_string($ability) ? trim($ability) : null,
+                $abilities,
+            ),
+        ));
+    }
 
-        if (\in_array('*', $assignedScopes, true)) {
-            return true;
-        }
+    public function hasAbility(string $ability): bool
+    {
+        $abilities = $this->resolvedAbilities();
 
-        return [] !== \array_intersect($assignedScopes, $scopes);
+        return \in_array('*', $abilities, true) || \in_array($ability, $abilities, true);
     }
 
     /**
-     * Determine if the API key meets its configured rate limit for the given request count.
+     * Resolve the rate limiter definition for this API key.
      */
-    public function withinRateLimit(int $requestedCalls = 1): bool
+    public function toRateLimit(): Limit
     {
-        $limit = $this->rate_limit;
+        $maxAttempts = (int) ($this->resolveRateLimitValue([
+            'max_attempts',
+            'requests_per_minute',
+            'per_minute',
+            'limit',
+        ]) ?? self::DEFAULT_MAX_ATTEMPTS);
 
-        if ($limit === null || $limit <= 0) {
-            return true;
+        $decaySeconds = (int) ($this->resolveRateLimitValue([
+            'decay_seconds',
+            'period',
+            'window',
+        ]) ?? self::DEFAULT_DECAY_SECONDS);
+
+        if ($decaySeconds <= 0) {
+            $decaySeconds = self::DEFAULT_DECAY_SECONDS;
         }
 
-        return $requestedCalls <= $limit;
+        if ($maxAttempts <= 0) {
+            $maxAttempts = self::DEFAULT_MAX_ATTEMPTS;
+        }
+
+        $decayMinutes = (int) max(1, (int) ceil($decaySeconds / 60));
+
+        return Limit::perMinutes($decayMinutes, $maxAttempts);
     }
 
     /**
-     * Determine if the API key has a finite rate limit configured.
+     * @param array<int, string> $keys
      */
-    public function hasRateLimit(): bool
+    private function resolveRateLimitValue(array $keys): ?int
     {
-        $limit = $this->rate_limit;
+        $limits = $this->rate_limits;
 
-        return $limit !== null && $limit > 0;
+        if (! \is_array($limits)) {
+            return null;
+        }
+
+        foreach ($keys as $key) {
+            $value = Arr::get($limits, $key);
+
+            if ($value !== null) {
+                return (int) $value;
+            }
+        }
+
+        return null;
     }
 }
