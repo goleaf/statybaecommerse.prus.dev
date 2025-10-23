@@ -20,7 +20,7 @@ final class DiscountConditionTableWidget extends BaseWidget
 
     public function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->query(
                 DiscountCondition::query()->latest('created_at')->limit(10)
@@ -81,40 +81,5 @@ final class DiscountConditionTableWidget extends BaseWidget
                 EditAction::make(),
             ])
             ->defaultSort('created_at', 'desc');
-    }
-
-    private function formatValue(mixed $value): string
-    {
-        if ($value === null) {
-            return '—';
-        }
-
-        if (is_array($value)) {
-            return implode(', ', Arr::flatten($value));
-        }
-
-        if (is_bool($value)) {
-            return $value ? __('discount_conditions.boolean_yes') : __('discount_conditions.boolean_no');
-        }
-
-        return (string) $value;
-    }
-
-    private function typeColor(string $type): string
-    {
-        return match ($type) {
-            'cart_total' => 'primary',
-            'item_qty'   => 'success',
-            'product', 'attribute_value' => 'info',
-            'category', 'collection' => 'warning',
-            'brand' => 'purple',
-            'channel', 'currency' => 'indigo',
-            'customer_group', 'partner_tier' => 'cyan',
-            'user'          => 'teal',
-            'first_order'   => 'emerald',
-            'day_time'      => 'amber',
-            'custom_script' => 'pink',
-            default         => 'gray',
-        };
     }
 }

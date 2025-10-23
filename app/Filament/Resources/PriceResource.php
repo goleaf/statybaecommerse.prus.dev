@@ -12,13 +12,10 @@ use App\Models\Product;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\MorphToSelect;
-use Filament\Forms\Components\MorphToSelect\Type;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Schema;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -36,21 +33,14 @@ final class PriceResource extends Resource
 
     protected static ?string $model = Price::class;
 
-    /**
-     * Navigation group for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static $navigationGroup = 'Products';
+    protected static string|UnitEnum|null $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 12;
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema
             ->schema([
                 Section::make(__('admin.prices.priceable_association'))
                     ->description(__('admin.prices.priceable_association_description'))
@@ -246,7 +236,7 @@ final class PriceResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('priceable_display')
@@ -406,37 +396,5 @@ final class PriceResource extends Resource
             'view'   => Pages\ViewPrice::route('/{record}'),
             'edit'   => Pages\EditPrice::route('/{record}/edit'),
         ];
-    }
-
-    /**
-     * Build a human-readable label for the related priceable entity.
-     */
-    private static function formatPriceableLabel(Price $record): string
-    {
-        $priceable = $record->priceable;
-
-        if ($priceable instanceof ProductVariant) {
-            return trim(sprintf('%s • %s', $priceable->sku ?? __('admin.prices.sku_missing'), $priceable->name ?? ''));
-        }
-
-        if ($priceable instanceof Product) {
-            return trim(sprintf('%s • %s', $priceable->sku ?? __('admin.prices.sku_missing'), $priceable->name ?? ''));
-        }
-
-        return __('admin.prices.unknown_priceable');
-    }
-
-    /**
-     * Surface the translated priceable type label alongside the primary column value.
-     */
-    private static function formatPriceableType(Price $record): string
-    {
-        $priceable = $record->priceable;
-
-        return match (true) {
-            $priceable instanceof ProductVariant => __('admin.prices.priceable_types.variant'),
-            $priceable instanceof Product => __('admin.prices.priceable_types.product'),
-            default => __('admin.prices.priceable_types.unknown'),
-        };
     }
 }

@@ -13,6 +13,7 @@ use App\Filament\Resources\RecommendationAnalytics\Schemas\RecommendationAnalyti
 use App\Filament\Resources\RecommendationAnalytics\Tables\RecommendationAnalyticsTable;
 use App\Models\RecommendationAnalytics;
 use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
@@ -55,17 +56,15 @@ final class RecommendationAnalyticsResource extends Resource
         return __('recommendation_analytics.model_label');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
+        // Configure the Filament resource form schema using the v4 Schema API.
         return RecommendationAnalyticsForm::configure($form);
     }
 
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return RecommendationAnalyticsTable::configure($table);
     }
 

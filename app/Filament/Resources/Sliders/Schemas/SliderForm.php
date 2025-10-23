@@ -12,19 +12,18 @@ use function collect;
 
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
-use Filament\Forms\Set;
+use Filament\Schemas\Schema;
 
 final class SliderForm
 {
     public static function configure(Schema $form): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.sliders.basic_information'))
                     ->description(__('admin.sliders.basic_information_description'))

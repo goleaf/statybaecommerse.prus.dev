@@ -15,7 +15,7 @@ final class NewsCategoryForm
 {
     public static function configure(Schema $form): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Toggle::make('is_visible')
                     ->label('Is Visible')

@@ -10,11 +10,12 @@ use App\Models\ReferralCampaign;
 use App\Models\ReferralCode;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
@@ -39,19 +40,12 @@ final class ReferralCodeResource extends Resource
 
     protected static ?string $model = ReferralCode::class;
 
-    /**
-     * Navigation group for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static $navigationGroup = 'Referral';
+    protected static string|UnitEnum|null $navigationGroup = 'Referral';
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema
             ->components([
                 Section::make(__('referral.resource.referral_code.section.code_details'))
                     ->columns(2)
@@ -141,7 +135,7 @@ final class ReferralCodeResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->query(ReferralCode::query()->withoutGlobalScopes())
             ->columns([

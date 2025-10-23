@@ -9,11 +9,12 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\NormalSettingResource\Pages;
 use App\Models\NormalSetting;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
@@ -30,12 +31,7 @@ final class NormalSettingResource extends Resource
 
     protected static ?string $model = NormalSetting::class;
 
-    /**
-     * Navigation group for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static $navigationGroup = 'System';
+    protected static string|UnitEnum|null $navigationGroup = 'System';
 
     protected static ?int $navigationSort = 8;
 
@@ -56,13 +52,11 @@ final class NormalSettingResource extends Resource
         return __('admin.normal_settings.navigation');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form->schema([
-            Tabs::make(__('admin.normal_settings.tabs.label'))
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema->schema([
+            Tabs::make(__('normal_settings.tabs.label'))
                 ->tabs([
                     Tab::make(__('admin.normal_settings.basic_information'))
                         ->icon('heroicon-o-information-circle')
@@ -112,7 +106,7 @@ final class NormalSettingResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('key')
@@ -204,19 +198,5 @@ final class NormalSettingResource extends Resource
             'create' => Pages\CreateNormalSetting::route('/create'),
             'edit'   => Pages\EditNormalSetting::route('/{record}/edit'),
         ];
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private static function typeOptions(): array
-    {
-        $options = [];
-
-        foreach (NormalSetting::CANONICAL_TYPES as $type) {
-            $options[$type] = __('normal_settings.types.' . $type);
-        }
-
-        return $options;
     }
 }

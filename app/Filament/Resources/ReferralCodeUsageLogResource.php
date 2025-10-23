@@ -8,6 +8,7 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\ReferralCodeUsageLogResource\Pages;
 use App\Models\ReferralCodeUsageLog;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
@@ -29,12 +30,7 @@ final class ReferralCodeUsageLogResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'ip_address';
 
-    /**
-     * Navigation group for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static $navigationGroup = 'Analytics';
+    protected static string|UnitEnum|null $navigationGroup = 'Analytics';
 
     public static function getNavigationLabel(): string
     {
@@ -51,17 +47,15 @@ final class ReferralCodeUsageLogResource extends Resource
         return __('admin.referral_code_usage_logs.model_label');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
+        // Configure the Filament resource form schema using the v4 Schema API.
         return ReferralCodeUsageLogFormSchema::configure($form);
     }
 
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return ReferralCodeUsageLogsTableSchema::configure($table);
     }
 

@@ -8,13 +8,14 @@ use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
+use App\Support\Filament\Components\Flatpickr;
 
 class ReferralStatisticsForm
 {
     public static function configure(Schema $form): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Select::make('user_id')
                     ->relationship('user', 'name')

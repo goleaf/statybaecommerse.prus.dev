@@ -15,10 +15,11 @@ use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -68,10 +69,10 @@ final class AdminUserResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation on the provided Form instance for v4 compliance.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
-            // Returning the Form instance maintains Filament's schema pipeline for admin user management.
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema->schema([
             Section::make(__('admin.admin_users.form.sections.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -145,7 +146,7 @@ final class AdminUserResource extends Resource
      */
     public static function table(Table $table): Table
     {
-        // Return the configured Table instance so the resource honours the stricter v4 contract.
+        // Configure the Filament table definition for the resource.
         return $table
             // Returning the configured Table keeps action and bulk workflows type-safe in Filament v4.
             ->columns([

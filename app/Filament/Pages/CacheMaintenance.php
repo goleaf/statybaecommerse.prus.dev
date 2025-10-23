@@ -8,6 +8,7 @@ use App\Services\Shared\ComponentPerformanceService;
 use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
@@ -83,13 +84,11 @@ final class CacheMaintenance extends Page
         return (bool) ($user->is_admin ?? false);
     }
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
+        // Configure the Filament resource form schema using the v4 Schema API.
         // Embrace the Filament v4 return contract so downstream tooling can rely on a `Form` instance.
-        return $form
+        return $schema
             ->schema([
                 Section::make('Targeted Cache Operations')
                     ->description('Use scoped operations before clearing broad cache areas to follow CachePolicy guidance.')

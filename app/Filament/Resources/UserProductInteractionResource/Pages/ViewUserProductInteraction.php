@@ -30,7 +30,7 @@ final class ViewUserProductInteraction extends ViewRecord implements HasTable
 
     public function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         $table = $table
             ->deferLoading(false)
             ->query(UserProductInteraction::query()->whereKey($this->record->getKey()))

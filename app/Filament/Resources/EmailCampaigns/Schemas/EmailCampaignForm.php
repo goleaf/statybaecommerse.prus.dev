@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\EmailCampaigns\Schemas;
 
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
+use App\Support\Filament\Components\Flatpickr;
 
 class EmailCampaignForm
 {
     public static function configure(Schema $form): Schema
     {
-        return $form
+        return $schema
             ->components([
                 Section::make('Email campaign details')
                     ->schema([

@@ -13,6 +13,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -41,12 +42,7 @@ final class UserWishlistResource extends Resource
         return 'heroicon-o-heart';
     }
 
-    /**
-     * Navigation group for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static $navigationGroup = 'Users';
+    protected static string|UnitEnum|null $navigationGroup = 'Users';
 
     protected static ?int $navigationSort = 8;
 
@@ -65,12 +61,10 @@ final class UserWishlistResource extends Resource
         return __('admin.user_wishlists.model_label');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema
             ->components([
                 Select::make('user_id')
                     ->label(__('admin.user_wishlists.user'))
@@ -97,7 +91,7 @@ final class UserWishlistResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Define table columns, filters, and actions for wishlist management.
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('user.name')

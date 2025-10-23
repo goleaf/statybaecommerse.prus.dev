@@ -21,14 +21,14 @@ use Filament\Actions\DissociateAction;
 use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Schema;
+use Filament\Forms\Set;
 use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -43,12 +43,10 @@ class OrdersRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'orders';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema
             ->components([
                 Section::make(__('orders.basic_information'))
                     ->schema([
@@ -228,9 +226,7 @@ class OrdersRelationManager extends BaseRelationManager
 
     public function infolist(Schema $schema): Schema
     {
-
-        $infolist = $schema; // Maintain legacy naming for infolist builders while using the Schema abstraction.
-
+        // Configure the Filament infolist schema using the v4 Schema API.
         return $schema
             ->components([
                 InfolistSection::make(__('orders.basic_information'))
@@ -292,7 +288,7 @@ class OrdersRelationManager extends BaseRelationManager
 
     public function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->recordTitleAttribute('order_number')
             ->columns([
@@ -464,34 +460,5 @@ class OrdersRelationManager extends BaseRelationManager
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private static function addressPayload(Address $address): array
-    {
-        $payload = [
-            'id'             => (string) $address->getKey(),
-            'first_name'     => (string) ($address->getAttribute('first_name') ?? ''),
-            'last_name'      => (string) ($address->getAttribute('last_name') ?? ''),
-            'company'        => (string) ($address->getAttribute('company') ?? ''),
-            'address_line_1' => (string) ($address->getAttribute('address_line_1') ?? ''),
-            'address_line_2' => (string) ($address->getAttribute('address_line_2') ?? ''),
-            'city'           => (string) ($address->getAttribute('city') ?? ''),
-            'state'          => (string) ($address->getAttribute('state') ?? ''),
-            'postal_code'    => (string) ($address->getAttribute('postal_code') ?? ''),
-            'country_code'   => (string) ($address->getAttribute('country_code') ?? ''),
-            'phone'          => (string) ($address->getAttribute('phone') ?? ''),
-            'email'          => (string) ($address->getAttribute('email') ?? ''),
-        ];
-
-        foreach ($payload as $key => $value) {
-            if (trim($value) === '') {
-                unset($payload[$key]);
-            }
-        }
-
-        return $payload;
     }
 }

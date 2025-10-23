@@ -24,6 +24,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -71,12 +72,10 @@ final class NewsTagResource extends Resource
         return __('admin.news_tags.single');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form->schema([
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema->schema([
             FormSection::make(__('admin.news_tags.form.sections.basic_information'))
                 ->schema([
                     TextInput::make('name')
@@ -161,7 +160,7 @@ final class NewsTagResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('name')
@@ -352,68 +351,5 @@ final class NewsTagResource extends Resource
             'view'   => Pages\ViewNewsTag::route('/{record}'),
             'edit'   => Pages\EditNewsTag::route('/{record}/edit'),
         ];
-    }
-
-    private static function duplicateRecord(NewsTag $record): NewsTag
-    {
-        $record->loadMissing('translations');
-
-        $duplicate = $record->replicate();
-        $duplicate->name = self::generateDuplicateName($record->name);
-        $duplicate->slug = self::generateDuplicateSlug($record->slug);
-        $duplicate->save();
-
-        foreach ($record->translations as $translation) {
-            $duplicate->translations()->create([
-                'locale' => $translation->locale,
-                'name' => self::generateDuplicateName($translation->name),
-                'slug' => self::generateDuplicateSlug($translation->slug, $translation->locale),
-                'description' => $translation->description,
-            ]);
-        }
-
-        return $duplicate;
-    }
-
-    private static function generateDuplicateName(?string $name): string
-    {
-        $base = $name ?: __('admin.news_tags.single');
-        $pattern = '/\s*\(Copy(?: (\d+))?\)$/i';
-        $baseName = preg_replace($pattern, '', $base) ?: $base;
-
-        $candidate = $baseName.' (Copy)';
-        $index = 2;
-
-        while (NewsTag::where('name', $candidate)->exists()) {
-            $candidate = $baseName.' (Copy '.$index.')';
-            $index++;
-        }
-
-        return $candidate;
-    }
-
-    private static function generateDuplicateSlug(?string $slug, ?string $locale = null): string
-    {
-        $base = $slug ? preg_replace('/-copy(?:-\d+)?$/i', '', $slug) : 'news-tag';
-        $base = $base ? Str::slug($base) : 'news-tag';
-
-        $candidate = $base.'-copy';
-        $index = 2;
-
-        $exists = function (string $value) use ($locale): bool {
-            $translationQuery = NewsTagTranslation::query()->where('slug', $value);
-            if ($locale !== null) {
-                $translationQuery->where('locale', $locale);
-            }
-
-            return NewsTag::where('slug', $value)->exists() || $translationQuery->exists();
-        };
-
-        while ($exists($candidate)) {
-            $candidate = $base.'-copy-'.$index;
-            $index++;
-        }
-
-        return $candidate;
     }
 }

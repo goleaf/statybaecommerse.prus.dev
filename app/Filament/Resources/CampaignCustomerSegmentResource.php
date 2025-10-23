@@ -7,20 +7,21 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CampaignCustomerSegmentResource\Pages;
 use App\Models\CampaignCustomerSegment;
 use App\Models\Scopes\ActiveScope;
-use Filament\Forms\Components\Grid;
+use BackedEnum;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Schema;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\KeyValueEntry;
 use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -71,12 +72,10 @@ final class CampaignCustomerSegmentResource extends Resource
         return __('campaign_customer_segments.single');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form->schema([
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema->schema([
             Section::make(__('campaign_customer_segments.tabs.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -147,7 +146,7 @@ final class CampaignCustomerSegmentResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('campaign.name')
@@ -253,10 +252,8 @@ final class CampaignCustomerSegmentResource extends Resource
 
     public static function infolist(Schema $schema): Schema
     {
-
-        $infolist = $schema; // Maintain legacy naming for infolist builders while using the Schema abstraction.
-
-        return $infolist->schema([
+        // Configure the Filament infolist schema using the v4 Schema API.
+        return $schema->schema([
             InfolistSection::make(__('campaign_customer_segments.tabs.basic_information'))
                 ->schema([
                     TextEntry::make('campaign.name')

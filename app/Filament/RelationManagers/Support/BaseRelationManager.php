@@ -18,25 +18,9 @@ abstract class BaseRelationManager extends RelationManager
 
     public function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the shared relation manager table, ensuring toggleable layouts remain applied.
         $table = parent::table($table);
 
         return $this->applyToggleableTableLayout($table);
-    }
-
-    /**
-     * Build a schema for quick-edit repeaters that mirrors the relation form.
-     *
-     * @return array<int, Forms\Components\Component>
-     */
-    protected function getQuickEditSchema(): array
-    {
-        $form = $this->form(app(Form::class));
-
-        $components = $form instanceof Form ? $form->getComponents() : $form;
-
-        return array_merge([
-            Forms\Components\Hidden::make('id'),
-        ], $components);
     }
 }

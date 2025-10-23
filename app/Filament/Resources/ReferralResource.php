@@ -14,10 +14,11 @@ use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -44,17 +45,17 @@ final class ReferralResource extends Resource
      *
      * @var UnitEnum|string|null
      */
-    protected static $navigationGroup = NavigationGroup::Marketing; // Keep referrals with other marketing touchpoints.
+    protected static string|UnitEnum|null $navigationGroup = 'Marketing';
 
     protected static ?int $navigationSort = 17;
 
     protected static ?string $recordTitleAttribute = 'referral_code';
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Use the schema-based configuration to stay aligned with Filament v4 resource expectations.
-        return $form
-            ->schema([
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema
+            ->components([
                 Section::make('Referral Details')
                     ->columns(2)
                     ->components([
@@ -142,7 +143,7 @@ final class ReferralResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Configure table columns using the fluent Table API for Filament v4 compliance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('referral_code')

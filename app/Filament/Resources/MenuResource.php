@@ -10,13 +10,14 @@ use App\Filament\Resources\MenuResource\Pages;
 use App\Filament\Resources\MenuResource\RelationManagers\MenuItemsRelationManager;
 use App\Models\Menu;
 use App\Models\Scopes\ActiveScope;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
+use BackedEnum;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -34,7 +35,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Filament\Schemas\Schema;
+use UnitEnum;
 
 final class MenuResource extends Resource
 {
@@ -49,7 +50,7 @@ final class MenuResource extends Resource
      */
     protected static $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Content';
+    protected static string|UnitEnum|null $navigationGroup = 'Content';
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -70,10 +71,9 @@ final class MenuResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
+        // Configure the Filament resource form schema using the v4 Schema API.
         $locationOptions = [
             'header'  => __('menus.locations.header'),
             'footer'  => __('menus.locations.footer'),
@@ -81,7 +81,7 @@ final class MenuResource extends Resource
             'mobile'  => __('menus.locations.mobile'),
         ];
 
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('menus.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -122,7 +122,7 @@ final class MenuResource extends Resource
      */
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('name')

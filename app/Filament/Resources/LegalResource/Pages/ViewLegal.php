@@ -29,9 +29,7 @@ class ViewLegal extends ViewRecord
 
     public function infolist(Schema $schema): Schema
     {
-
-        $infolist = $schema; // Maintain legacy naming for infolist builders while using the Schema abstraction.
-
+        // Configure the Filament infolist schema using the v4 Schema API.
         return $schema
             ->components([
                 Section::make(__('legal.basic_information'))

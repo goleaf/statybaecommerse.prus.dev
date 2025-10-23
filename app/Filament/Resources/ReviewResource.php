@@ -20,13 +20,13 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Schema;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Section as InfolistSection;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -36,6 +36,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use BackedEnum;
 use UnitEnum;
 
 final class ReviewResource extends Resource
@@ -47,7 +48,7 @@ final class ReviewResource extends Resource
     /**
      * @var string|BackedEnum|null Normalize Filament icon typing for consistency.
      */
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-star';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
 
     protected static ?int $navigationSort = 4;
 
@@ -56,7 +57,7 @@ final class ReviewResource extends Resource
     /**
      * @var string|BackedEnum|null Allow enum-backed navigation grouping.
      */
-    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::ContentManagement;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::ContentManagement;
 
     public static function getNavigationGroup(): ?string
     {
@@ -81,12 +82,10 @@ final class ReviewResource extends Resource
         return __('reviews.single');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema
             ->schema([
                 Section::make(__('reviews.sections.basic_info'))
                     ->description(__('reviews.sections.basic_info_description'))
@@ -159,7 +158,7 @@ final class ReviewResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('title')
@@ -402,9 +401,7 @@ final class ReviewResource extends Resource
 
     public static function infolist(Schema $schema): Schema
     {
-
-        $infolist = $schema; // Maintain legacy naming for infolist builders while using the Schema abstraction.
-
+        // Configure the Filament infolist schema using the v4 Schema API.
         return $schema
             ->components([
                 InfolistSection::make(__('reviews.sections.basic_info'))

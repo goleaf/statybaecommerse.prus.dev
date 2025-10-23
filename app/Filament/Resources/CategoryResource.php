@@ -10,12 +10,13 @@ use App\Models\Category;
 use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -32,15 +33,15 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
-use Filament\Schemas\Schema;
+use UnitEnum;
 
 final class CategoryResource extends Resource
 {
     /** @var string|BackedEnum|null Keep compatibility with Filament v4 navigation icon expectations. */
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-tag';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
     /** @var string|BackedEnum|null Align the resource under the Products navigation section. */
-    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::Products;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 3;
 
@@ -98,12 +99,10 @@ final class CategoryResource extends Resource
         return __('categories.single');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form->schema([
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema->schema([
             Section::make(__('categories.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -200,7 +199,7 @@ final class CategoryResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 ImageColumn::make('image')
@@ -379,18 +378,5 @@ final class CategoryResource extends Resource
             'view'   => Pages\ViewCategory::route('/{record}'),
             'edit'   => Pages\EditCategory::route('/{record}/edit'),
         ];
-    }
-
-    private static function authorizeCategory(?Category $category, string $ability): bool
-    {
-        $user = auth()->user();
-
-        if (! $user) {
-            return false;
-        }
-
-        return $category instanceof Category
-            ? $user->can($ability, $category)
-            : $user->can($ability, Category::class);
     }
 }
