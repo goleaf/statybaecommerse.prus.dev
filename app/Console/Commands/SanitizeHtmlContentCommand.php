@@ -127,7 +127,7 @@ final class SanitizeHtmlContentCommand extends Command
         $this->components->info('HTML sanitization run finished.');
 
         foreach ($counters as $label => $count) {
-            // Provide the style argument explicitly now that the component API expects it in Laravel 12.
+            // Provide the style argument explicitly (style first, message second) so the component API receives the expected payload.
             $this->components->line('info', Str::headline($label) . ": {$count} updated");
         }
 
