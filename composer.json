@@ -217,13 +217,13 @@
             "@php artisan filament:fix-simple-issues"
         ],
         "app:test-analytics": [
-            "@php vendor/bin/phpunit --testsuite=Unit --filter=AnalyticsEventDiagnosticsTest"
+            "@php artisan app:test-analytics-simple"
         ],
         "app:test-brand": [
-            "@php vendor/bin/phpunit --testsuite=Unit --filter=BrandResourceMetadataTest"
+            "@php artisan app:test-brand-resource"
         ],
         "app:test-seeders": [
-            "@php vendor/bin/phpunit --testsuite=Feature --filter=DiagnosticsSeedersTest"
+            "@php artisan app:test-seeders"
         ]
     },
     "extra": {
