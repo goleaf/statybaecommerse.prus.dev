@@ -39,6 +39,8 @@ final class DatabaseSeeder extends Seeder
 
         $this->call([
             CurrencySeeder::class,
+            AttributeSeeder::class,
+            AttributeValueSeeder::class,
             AdminAuthorizationSeeder::class,
             RolesAndPermissionsSeeder::class,
             AdminUserSeeder::class,
