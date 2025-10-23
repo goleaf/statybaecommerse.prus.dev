@@ -54,7 +54,10 @@ final class VariantAnalyticsResource extends Resource
 {
     use HasNav;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
+    public static function getNavigationIcon(): BackedEnum|string|null
+    {
+        return 'heroicon-o-chart-bar-square';
+    }
 
     protected static BackedEnum|UnitEnum|string|null $navigationGroup = 'Inventory';
 
