@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
 use App\Support\Cache\CacheKeys;
+use App\Support\Cache\CacheTags;
 use Carbon\Carbon;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -22,8 +23,6 @@ class SimplifiedStatsWidget extends BaseWidget
     protected int|string|array $columnSpan = 'full';
 
     /**
-     * Cached chart payload for the current request lifecycle.
-     *
      * @var array{revenue: array<int, float>, orders: array<int, int>}|null
      */
     protected ?array $chartData = null;
@@ -140,27 +139,31 @@ class SimplifiedStatsWidget extends BaseWidget
             $endDate->toDateString()
         );
 
-        // Tagging keeps the cache easy to purge from Filament's maintenance tools.
-        $chartData = $this->rememberDashboardCache(
-            [CacheTags::dashboard(), CacheTags::orders()],
-            $cacheKey,
-            now()->addSeconds(180),
-            function () use ($startDate, $endDate, $now): array {
-                $dateKeys = [];
-                for ($i = 6; $i >= 0; $i--) {
-                    $dateKeys[] = $now->copy()->subDays($i)->toDateString();
-                }
+        $chartData = Cache::tags([
+            CacheTags::dashboard(),
+            CacheTags::orders(),
+            CacheTags::products(),
+        ])->remember($cacheKey, now()->addSeconds(180), function () use ($startDate, $endDate, $now) {
+            $dateKeys = [];
+            for ($i = 6; $i >= 0; $i--) {
+                $dateKeys[] = $now->copy()->subDays($i)->toDateString();
+            }
 
             $orderStats = Order::query()
                 ->createdBetween($startDate, $endDate)
                 ->selectRaw('DATE(created_at) as date, SUM(CASE WHEN status != ? THEN total ELSE 0 END) as revenue, COUNT(*) as total_orders', ['cancelled'])
                 ->groupBy('date')
+                ->toBase()
                 ->get()
-                ->mapWithKeys(static function ($row) {
+                ->mapWithKeys(static function (object $row): array {
+                    $data = (array) $row;
+
+                    $date = isset($data['date']) ? (string) $data['date'] : '';
+
                     return [
-                        $row->date => [
-                            'revenue' => (float) $row->revenue,
-                            'orders' => (int) $row->total_orders,
+                        $date => [
+                            'revenue' => isset($data['revenue']) ? (float) $data['revenue'] : 0.0,
+                            'orders' => isset($data['total_orders']) ? (int) $data['total_orders'] : 0,
                         ],
                     ];
                 })
@@ -207,8 +210,24 @@ class SimplifiedStatsWidget extends BaseWidget
         $now = $this->getReferenceTime();
         $lastMonth = $now->copy()->subMonth();
 
-        return Cache::remember('dashboard.simplified-stats.summary', 60, function () use ($lastMonth) {
-            $nonCancelledOrders = static fn () => Order::query()->where('status', '!=', 'cancelled');
+        return Cache::tags([
+            CacheTags::dashboard(),
+            CacheTags::orders(),
+            CacheTags::users(),
+            CacheTags::products(),
+            CacheTags::categories(),
+            CacheTags::brands(),
+            CacheTags::reviews(),
+        ])->remember(CacheKeys::dashboardSimplifiedSummary(), now()->addSeconds(300), function () use ($lastMonth) {
+            $orderStats = Order::query()
+                ->selectRaw('
+                    SUM(CASE WHEN status != ? THEN total ELSE 0 END) as total_revenue,
+                    SUM(CASE WHEN status != ? AND created_at >= ? THEN total ELSE 0 END) as last_month_revenue,
+                    COUNT(*) as total_orders,
+                    SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) as last_month_orders
+                ', ['cancelled', 'cancelled', $lastMonth, $lastMonth])
+                ->toBase()
+                ->first();
 
             $totalRevenue = (float) ($nonCancelledOrders()->sum('total') ?? 0.0);
             $lastMonthRevenue = (float) ($nonCancelledOrders()->createdSince($lastMonth)->sum('total') ?? 0.0);

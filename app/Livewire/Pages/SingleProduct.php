@@ -76,11 +76,10 @@ final class SingleProduct extends Component
             [CacheTags::categories(), CacheTags::brands()]
         );
 
-        // Cache the heavy product aggregate to avoid repeating the eager-loading work.
         $this->product = Cache::tags($productTags)->remember(
             CacheKeys::productDetail($productId, $locale),
             now()->addSeconds(180),
-            static function () use ($product): Product {
+            static function () use ($product) {
                 return Product::query()
                     ->whereKey($product)
                     ->with([
@@ -112,7 +111,7 @@ final class SingleProduct extends Component
         $this->recentHistoriesCollection = Cache::tags($productTags)->remember(
             CacheKeys::productRecentHistories($productId),
             now()->addSeconds(120),
-            function (): SupportCollection {
+            function () {
                 return $this->product
                     ->recentHistories()
                     ->orderByDesc('created_at')
@@ -129,7 +128,7 @@ final class SingleProduct extends Component
         ])->remember(
             CacheKeys::productRecentReviews($productId),
             now()->addSeconds(120),
-            function (): SupportCollection {
+            function () {
                 return $this->product
                     ->reviews()
                     ->latest('id')

@@ -11,6 +11,8 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Review;
 use App\Support\Cache\CacheKeys;
+use App\Support\Cache\CacheTags;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
@@ -35,7 +37,14 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return Cache::remember(CacheKeys::homeStats($locale), CacheKeys::TTL_MINUTE, function (): array {
+        return Cache::tags([
+            CacheTags::home(),
+            CacheTags::locale($locale),
+            CacheTags::products(),
+            CacheTags::categories(),
+            CacheTags::brands(),
+            CacheTags::reviews(),
+        ])->remember(CacheKeys::homeStats($locale), now()->addSeconds(60), function (): array {
             return [
                 'products_count' => Product::query()->where('is_visible', true)->count(),
                 'categories_count' => Category::query()->where('is_visible', true)->count(),
@@ -54,7 +63,13 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return Cache::remember(CacheKeys::homeFeaturedProducts($locale), CacheKeys::TTL_MINUTE, static function (): Collection {
+        return Cache::tags([
+            CacheTags::home(),
+            CacheTags::locale($locale),
+            CacheTags::products(),
+            CacheTags::brands(),
+            CacheTags::categories(),
+        ])->remember(CacheKeys::homeFeaturedProducts($locale), now()->addSeconds(60), static function (): Collection {
             return Product::query()
                 ->withoutGlobalScopes()
                 ->where('is_visible', true)
@@ -73,7 +88,13 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return Cache::remember(CacheKeys::homeLatestProducts($locale), CacheKeys::TTL_MINUTE, static function (): Collection {
+        return Cache::tags([
+            CacheTags::home(),
+            CacheTags::locale($locale),
+            CacheTags::products(),
+            CacheTags::brands(),
+            CacheTags::categories(),
+        ])->remember(CacheKeys::homeLatestProducts($locale), now()->addSeconds(60), static function (): Collection {
             return Product::query()
                 ->withoutGlobalScopes()
                 ->where('is_visible', true)
@@ -91,7 +112,12 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return Cache::remember(CacheKeys::homeLatestReviews($locale), CacheKeys::TTL_MINUTE, static function (): Collection {
+        return Cache::tags([
+            CacheTags::home(),
+            CacheTags::locale($locale),
+            CacheTags::reviews(),
+            CacheTags::products(),
+        ])->remember(CacheKeys::homeLatestReviews($locale), now()->addSeconds(60), static function (): Collection {
             return Review::query()
                 ->where('is_approved', true)
                 ->with(['product' => static fn ($query) => $query->select('id', 'name', 'slug')])
@@ -141,7 +167,7 @@ final class Home extends Component
             'latestProducts' => $this->latestProducts,
             'latestReviews' => $this->latestReviews,
         ])->layout('components.layouts.base', [
-            'title' => __('frontend.navigation.home').' - '.(is_string($appName) ? $appName : ''),
+            'title' => __('Home').' - '.(is_string($appName) ? $appName : ''),
         ]);
     }
 }
