@@ -47,11 +47,10 @@ final class VariantAnalyticsResource extends Resource
 {
     protected static ?string $model = VariantAnalytics::class;
 
-    public static function getNavigationIcon(): string
-    {
-        // Explicit method keeps compatibility with PHP 8.4 autoload expectations.
-        return 'heroicon-o-chart-bar-square';
-    }
+    /**
+     * @var string|\BackedEnum|null Ensure Filament interprets the icon while supporting enums.
+     */
+    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
     /** @var UnitEnum|string|null Ensure inventory analytics stay grouped centrally. */
     protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Inventory;
