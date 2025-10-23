@@ -10,11 +10,9 @@ use UnitEnum;
 final class AdvancedReports extends Page
 {
     /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     * @var string|\BackedEnum|null Navigation icon override documented for enum compatibility.
      */
-    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static ?string $navigationIcon = 'heroicon-o-chart-bar-square';
 
     public static function getNavigationGroup(): BackedEnum|string|null
     {

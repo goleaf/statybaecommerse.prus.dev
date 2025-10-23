@@ -42,11 +42,9 @@ class SliderManagement extends Page implements HasActions, HasForms
     use InteractsWithActions, InteractsWithForms;
 
     /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     * @var string|\BackedEnum|null Navigation icon override documented to support enums without extra imports.
      */
-    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationLabel = 'Slider Management';
 
