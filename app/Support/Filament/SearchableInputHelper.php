@@ -56,6 +56,9 @@ final class SearchableInputHelper
         }
     }
 
+    /**
+     * Reset the UI component so Livewire forgets any stale selections.
+     */
     private static function resetComponent(SearchableInput $component): void
     {
         $component
