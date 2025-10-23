@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\NotificationResource\Pages;
 use App\Models\Notification;
+use App\Support\Concerns\HasNav;
 use App\Support\Filament\Filters\SingleDateFilter;
 use App\Support\Concerns\HasNav;
 use Filament\Actions\Action;
@@ -45,7 +44,7 @@ use Filament\Schemas\Schema;
 use Filament\Schemas\Schema;
 final class NotificationResource extends Resource
 {
-    use HasNav;
+    use HasNav; // Proxy navigation metadata to the centralized Nav registry for consistency.
 
     private const READ_STATE_READ = 'read';
 
@@ -53,27 +52,12 @@ final class NotificationResource extends Resource
 
     protected static ?string $model = Notification::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-bell';
+    /** @var string|BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-bell';
 
-    /**
-     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
-     */
-    protected static UnitEnum|string|null $navigationGroup = 'System';
+    protected static ?string $navigationGroup = 'System';
 
     protected static bool $shouldRegisterNavigation = false;
-
-    /**
-     * Persist the icon so the shared navigation helper can reflect on it.
-     */
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-bell';
-
-    /**
-     * Persist the navigation group for consistent lookups across the codebase.
-     */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 3;
 
@@ -87,7 +71,7 @@ final class NotificationResource extends Resource
         return __('admin.notifications.single');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             Section::make(__('admin.notifications.form.sections.basic_information'))
@@ -173,7 +157,7 @@ final class NotificationResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

@@ -101,10 +101,12 @@ final class AddressResource extends Resource
     }
 
     /**
-     * Configure the Filament form schema using the Schema contract shipped in v4 so
-     * the resource stays compatible with the upstream signature expectations.
+     * Configure the Filament form schema using the v4 `Schema` contract so downstream
+     * consumers resolve the same container pipeline that powers `Schema::components([...])`
+     * definitions. Returning the schema keeps the resource compatible with Filament's
+     * stricter signature expectations while documenting the component wiring strategy.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             Section::make(__('translations.address_information'))
@@ -335,7 +337,7 @@ final class AddressResource extends Resource
      * Configure the Filament table while returning the provided Table instance so the
      * resource method signature aligns with Filament v4's stricter contract.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
