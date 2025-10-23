@@ -34,6 +34,7 @@ return [
         'name' => 'Name',
         'slug' => 'Slug',
         'carrier_name' => 'Carrier Name',
+        'zone' => 'Zone',
         'service_type' => 'Service Type',
         'service_types' => [
             'standard' => 'Standard',
