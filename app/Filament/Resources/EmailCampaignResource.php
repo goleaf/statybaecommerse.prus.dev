@@ -35,7 +35,12 @@ final class EmailCampaignResource extends Resource
 
     protected static ?int $navigationSort = 4;
 
-    
+    /**
+     * Navigation icon displayed in the Filament sidebar.
+     *
+     * @var string|BackedEnum|null Navigation icon identifier.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-envelope';
 
     public static function getNavigationLabel(): string
     {
