@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\ReferralCampaignResource\Pages;
 use App\Models\ReferralCampaign;
 use App\Support\Filament\Components\Flatpickr;
@@ -30,7 +32,7 @@ use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTransla
 
 final class ReferralCampaignResource extends Resource
 {
-    use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
+    use HasNav;
 
     protected static ?string $model = ReferralCampaign::class;
 
@@ -43,10 +45,7 @@ final class ReferralCampaignResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function getNavigationGroup(): ?string
-    {
-        return 'System';
-    }
+    
 
     public static function getNavigationLabel(): string
     {

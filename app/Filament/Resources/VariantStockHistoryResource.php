@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\VariantStockHistoryResource\Pages;
 use App\Models\VariantStockHistory;
 use App\Support\Filament\Components\Flatpickr;
@@ -29,10 +31,9 @@ use UnitEnum;
 
 final class VariantStockHistoryResource extends Resource
 {
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'System';
-    }
+    use HasNav;
+
+    
 
     protected static ?string $model = VariantStockHistory::class;
 

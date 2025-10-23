@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\FeatureFlagResource\Pages;
 use App\Models\FeatureFlag;
 use App\Models\Scopes\ActiveScope;
@@ -39,10 +41,9 @@ use UnitEnum;
  */
 final class FeatureFlagResource extends Resource
 {
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'System';
-    }
+    use HasNav;
+
+    
 
     protected static ?string $model = FeatureFlag::class;
 

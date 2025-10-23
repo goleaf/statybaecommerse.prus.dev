@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\VariantPriceHistoryResource\Pages;
 use App\Models\VariantPriceHistory;
 use App\Support\Filament\Components\Flatpickr;
@@ -19,6 +20,8 @@ use UnitEnum;
 
 final class VariantPriceHistoryResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = VariantPriceHistory::class;
 
     /**
@@ -31,13 +34,7 @@ final class VariantPriceHistoryResource extends Resource
 
     protected static ?int $navigationSort = 20;
 
-    public static function getNavigationGroup(): ?string
-    {
-        // Resolve enum-backed navigation label so the sidebar remains localized.
-        $group = self::$navigationGroup;
-
-        return $group instanceof NavigationGroup ? $group->label() : $group;
-    }
+    
 
     public static function form(Form $form): Form
     {

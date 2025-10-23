@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\ShippingOptions;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\ShippingOptions\Pages\CreateShippingOption;
 use App\Filament\Resources\ShippingOptions\Pages\EditShippingOption;
@@ -18,6 +19,8 @@ use Filament\Tables\Table;
 
 class ShippingOptionResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = ShippingOption::class;
 
     /**

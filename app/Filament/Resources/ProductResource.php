@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers\AttributesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\CategoriesRelationManager;
@@ -73,57 +75,13 @@ use UnitEnum;
  */
 final class ProductResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Product::class;
 
-    public static function shouldRegisterNavigation(): bool
-    {
-        return AuthorizationMatrix::check('products', 'viewAny');
-    }
+    
 
-    public static function canViewAny(): bool
-    {
-        return AuthorizationMatrix::check('products', 'viewAny');
-    }
-
-    public static function canView(Model $record): bool
-    {
-        return AuthorizationMatrix::check('products', 'view');
-    }
-
-    public static function canCreate(): bool
-    {
-        return AuthorizationMatrix::check('products', 'create');
-    }
-
-    public static function canEdit(Model $record): bool
-    {
-        return AuthorizationMatrix::check('products', 'update');
-    }
-
-    public static function canDelete(Model $record): bool
-    {
-        return AuthorizationMatrix::check('products', 'delete');
-    }
-
-    public static function canForceDelete(Model $record): bool
-    {
-        return AuthorizationMatrix::check('products', 'delete');
-    }
-
-    public static function canRestore(Model $record): bool
-    {
-        return AuthorizationMatrix::check('products', 'update');
-    }
-
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-cube';
-    }
-
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Products';
-    }
+    
 
     protected static ?int $navigationSort = 1;
 

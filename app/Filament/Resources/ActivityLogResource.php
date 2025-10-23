@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\ActivityLogResource\Pages;
 use App\Models\ActivityLog;
 use App\Support\Filament\Components\Flatpickr;
@@ -21,7 +23,9 @@ use Illuminate\Database\Eloquent\Model;
 
 final class ActivityLogResource extends Resource
 {
-    protected static ?string $model = ActivityLog::class;
+    use HasNav;
+
+    
 
     /**
      * Use the explicit union type required by Filament v4 so the resource remains compatible with the
@@ -37,12 +41,7 @@ final class ActivityLogResource extends Resource
 
     protected static ?string $pluralModelLabel = null;
 
-    protected static ?string $recordTitleAttribute = 'description';
-
-    public static function getNavigationGroup(): string
-    {
-        return __('navigation.groups.system');
-    }
+    
 
     public static function getNavigationLabel(): string
     {

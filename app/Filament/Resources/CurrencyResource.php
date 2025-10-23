@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\CurrencyResource\Pages;
 use App\Models\Currency;
 use Filament\Actions\Action;
@@ -30,7 +32,7 @@ use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTransla
 
 final class CurrencyResource extends Resource
 {
-    use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
+    use HasNav;
 
     protected static ?string $model = Currency::class;
 

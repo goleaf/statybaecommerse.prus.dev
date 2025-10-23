@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsTags;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\NewsTags\Pages\CreateNewsTag;
 use App\Filament\Resources\NewsTags\Pages\EditNewsTag;
@@ -19,6 +20,8 @@ use Filament\Tables\Table;
 
 class NewsTagResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = NewsTag::class;
 
     /**

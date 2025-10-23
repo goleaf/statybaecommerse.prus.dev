@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\NormalSettingTranslationResource\Pages;
 use App\Models\NormalSetting;
 use App\Models\NormalSettingTranslation;
@@ -33,6 +34,10 @@ use UnitEnum;
  */
 final class NormalSettingTranslationResource extends Resource
 {
+    use HasNav;
+
+    
+
     protected static ?string $model = NormalSettingTranslation::class;
 
     /**

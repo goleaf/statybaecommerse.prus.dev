@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\CampaignResource\Pages;
 use App\Filament\Resources\CampaignResource\RelationManagers\TranslationsRelationManager;
 use App\Models\Campaign;
@@ -35,6 +37,8 @@ use Novadaemon\FilamentCombobox\Combobox;
 
 final class CampaignResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Campaign::class;
 
     protected static ?int $navigationSort = 7;
@@ -46,10 +50,7 @@ final class CampaignResource extends Resource
         return __('campaigns.navigation.campaigns');
     }
 
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Marketing';
-    }
+    
 
     public static function getPluralModelLabel(): string
     {

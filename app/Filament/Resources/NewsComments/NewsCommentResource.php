@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsComments;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\NewsComments\Pages\CreateNewsComment;
 use App\Filament\Resources\NewsComments\Pages\EditNewsComment;
@@ -18,6 +19,8 @@ use Filament\Tables\Table;
 
 class NewsCommentResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = NewsComment::class;
 
     /**

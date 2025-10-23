@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Filament\Resources\UserResource;
+use App\Support\Nav;
 use App\Models\User;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
@@ -107,7 +108,10 @@ class UserResourceTest extends TestCase
 
     public function test_user_resource_navigation_group(): void
     {
-        $this->assertEquals('Users', UserResource::getNavigationGroup());
+        $this->assertEquals(
+            Nav::groupForResource(UserResource::class),
+            UserResource::getNavigationGroup(),
+        );
     }
 
     public function test_user_resource_navigation_label(): void

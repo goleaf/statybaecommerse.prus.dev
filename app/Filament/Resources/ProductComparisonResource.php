@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ProductComparisonResource\Pages;
 use App\Models\ProductComparison;
@@ -33,12 +35,11 @@ use UnitEnum;
  */
 final class ProductComparisonResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $slug = 'product-comparisons';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return NavigationGroup::Products;
-    }
+    
 
     protected static ?string $model = ProductComparison::class;
 

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\SystemSettingHistoryResource\Pages;
 use App\Models\SystemSettingHistory;
 use BackedEnum;
@@ -30,21 +32,17 @@ use UnitEnum;
 
 final class SystemSettingHistoryResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = SystemSettingHistory::class;
 
     protected static ?int $navigationSort = 13;
 
     protected static ?string $recordTitleAttribute = 'change_reason';
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-clock';
-    }
+    
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Settings';
-    }
+    
 
     public static function getNavigationLabel(): string
     {

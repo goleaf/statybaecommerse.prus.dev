@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\WishlistItemResource\Pages;
 use App\Models\Brand;
 use App\Models\CartItem;
@@ -55,22 +57,18 @@ use UnitEnum;
  */
 final class WishlistItemResource extends Resource
 {
+    use HasNav;
+
+    
+
     protected static ?string $model = WishlistItem::class;
 
-    /**
-     * @var string|BackedEnum|null Navigation icon used for the sidebar entry.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-heart';
+    
 
     /**
-     * @var int|null Sidebar order to keep wishlist management near other customer tooling.
+     * @var UnitEnum|string|null
      */
     protected static ?int $navigationSort = 10;
-
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Customers';
-    }
 
     protected static ?string $recordTitleAttribute = 'product.name';
 
@@ -85,10 +83,7 @@ final class WishlistItemResource extends Resource
     /**
      * Handle getNavigationGroup functionality with proper error handling.
      */
-    public static function getNavigationGroupLabel(): string
-    {
-        return 'Customers';
-    }
+    
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

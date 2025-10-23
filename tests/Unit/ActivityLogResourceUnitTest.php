@@ -6,6 +6,7 @@ namespace Tests\Unit;
 
 use App\Filament\Resources\ActivityLogResource;
 use App\Models\ActivityLog;
+use App\Support\Nav;
 use Tests\TestCase;
 
 class ActivityLogResourceUnitTest extends TestCase
@@ -17,12 +18,18 @@ class ActivityLogResourceUnitTest extends TestCase
 
     public function test_activity_log_resource_has_navigation_group(): void
     {
-        $this->assertNotNull(ActivityLogResource::getNavigationGroup());
+        $this->assertEquals(
+            Nav::groupForResource(ActivityLogResource::class),
+            ActivityLogResource::getNavigationGroup(),
+        );
     }
 
     public function test_activity_log_resource_has_navigation_sort(): void
     {
-        $this->assertEquals(9, ActivityLogResource::getNavigationSort());
+        $this->assertEquals(
+            Nav::sortForResource(ActivityLogResource::class),
+            ActivityLogResource::getNavigationSort(),
+        );
     }
 
     public function test_activity_log_resource_has_record_title_attribute(): void

@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
 use App\Support\Authorization\AuthorizationMatrix;
@@ -37,59 +38,13 @@ use UnitEnum;
 
 final class CategoryResource extends Resource
 {
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
-
-    /** @var string|BackedEnum|null Align the resource under the Products navigation section. */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
-
-    protected static ?int $navigationSort = 3;
-
-    protected static ?string $recordTitleAttribute = 'name';
+    use HasNav;
 
     protected static ?string $model = Category::class;
 
-    public static function shouldRegisterNavigation(): bool
-    {
-        return AuthorizationMatrix::check('categories', 'viewAny');
-    }
+    
 
-    public static function canViewAny(): bool
-    {
-        return AuthorizationMatrix::check('categories', 'viewAny');
-    }
-
-    public static function canView(Model $record): bool
-    {
-        return AuthorizationMatrix::check('categories', 'view');
-    }
-
-    public static function canCreate(): bool
-    {
-        return AuthorizationMatrix::check('categories', 'create');
-    }
-
-    public static function canEdit(Model $record): bool
-    {
-        return AuthorizationMatrix::check('categories', 'update');
-    }
-
-    public static function canDelete(Model $record): bool
-    {
-        return AuthorizationMatrix::check('categories', 'delete');
-    }
-
-    public static function canForceDelete(Model $record): bool
-    {
-        return AuthorizationMatrix::check('categories', 'delete');
-    }
-
-    public static function canRestore(Model $record): bool
-    {
-        return AuthorizationMatrix::check('categories', 'update');
-    }
+    
 
     public static function getPluralModelLabel(): string
     {

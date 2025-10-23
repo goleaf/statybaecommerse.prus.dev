@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\SystemSettingDependencyResource\Pages;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingDependency;
@@ -38,17 +40,11 @@ use UnitEnum;
 
 final class SystemSettingDependencyResource extends Resource
 {
-    protected static ?string $model = SystemSettingDependency::class;
+    use HasNav;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-link';
-    }
+    
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Settings';
-    }
+    
 
     public static function getNavigationLabel(): string
     {

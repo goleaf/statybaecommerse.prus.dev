@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\OrderItemResource\Pages;
 use App\Models\OrderItem;
 use App\Models\Product;
@@ -41,10 +43,9 @@ use UnitEnum;
  */
 final class OrderItemResource extends Resource
 {
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Orders';
-    }
+    use HasNav;
+
+    
 
     protected static ?string $model = OrderItem::class;
 

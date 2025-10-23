@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\CampaignScheduleResource\Pages;
 use App\Models\CampaignSchedule;
 use App\Support\Filament\Components\Flatpickr;
@@ -37,6 +39,8 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 final class CampaignScheduleResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = CampaignSchedule::class;
 
     /**

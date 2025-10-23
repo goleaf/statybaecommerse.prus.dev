@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\ReferralResource\Pages;
 use App\Models\Referral;
 use App\Support\Filament\Components\Flatpickr;
@@ -28,7 +29,7 @@ use UnitEnum;
 
 final class ReferralResource extends Resource
 {
-    use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
+    use HasNav;
 
     protected static ?string $model = Referral::class;
 

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\CityResource\Pages;
 use App\Models\City;
 use App\Models\Country;
@@ -33,6 +35,8 @@ use Illuminate\Support\Str;
 
 final class CityResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = City::class;
 
     protected static ?string $navigationLabel = 'Cities';

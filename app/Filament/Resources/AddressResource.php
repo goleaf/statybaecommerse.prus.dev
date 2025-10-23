@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Enums\AddressType;
 use App\Filament\Resources\AddressResource\Pages;
 use App\Models\Address;
@@ -53,7 +55,7 @@ use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTransla
  */
 final class AddressResource extends Resource
 {
-    use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
+    use HasNav;
 
     protected static ?string $model = Address::class;
 
@@ -70,10 +72,7 @@ final class AddressResource extends Resource
     /**
      * Get navigation group
      */
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Orders';
-    }
+    
 
     /**
      * Get model label

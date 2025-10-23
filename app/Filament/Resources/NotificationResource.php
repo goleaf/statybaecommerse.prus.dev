@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\NotificationResource\Pages;
 use App\Models\Notification;
 use App\Support\Concerns\HasNav;
@@ -42,11 +44,7 @@ use UnitEnum;
 
 final class NotificationResource extends Resource
 {
-    use HasNav; // Proxy navigation metadata to the centralized Nav registry for consistency.
-
-    private const READ_STATE_READ = 'read';
-
-    private const READ_STATE_UNREAD = 'unread';
+    use HasNav;
 
     protected static ?string $model = Notification::class;
 
@@ -61,6 +59,10 @@ final class NotificationResource extends Resource
     protected static UnitEnum|string|null $navigationGroup = 'System';
 
     protected static bool $shouldRegisterNavigation = false;
+
+    
+
+    
 
     protected static ?int $navigationSort = 3;
 

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\UserProductInteractions;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\UserProductInteractions\Pages\CreateUserProductInteraction;
 use App\Filament\Resources\UserProductInteractions\Pages\EditUserProductInteraction;
@@ -19,12 +20,11 @@ use Illuminate\Contracts\Support\Htmlable;
 
 class UserProductInteractionResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = UserProductInteraction::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return Heroicon::OutlinedRectangleStack;
-    }
+    
 
     public static function form(Form $form): Form
     {

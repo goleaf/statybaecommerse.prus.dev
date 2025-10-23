@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\CampaignClickResource\Pages;
 use App\Models\Campaign;
 use App\Models\CampaignClick;
@@ -36,17 +38,13 @@ use UnitEnum;
 
 final class CampaignClickResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = CampaignClick::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-chart-bar';
-    }
+    
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Marketing';
-    }
+    
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

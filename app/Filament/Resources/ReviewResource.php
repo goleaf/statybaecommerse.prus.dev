@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\ReviewResource\Pages;
 use App\Models\Review;
 use BackedEnum;
@@ -41,6 +42,8 @@ use UnitEnum;
 
 final class ReviewResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Review::class;
 
     /**

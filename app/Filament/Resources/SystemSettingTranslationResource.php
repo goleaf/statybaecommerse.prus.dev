@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\SystemSettingTranslationResource\Pages;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingTranslation;
@@ -44,7 +46,9 @@ use UnitEnum;
 
 final class SystemSettingTranslationResource extends Resource
 {
-    protected static ?string $model = \App\Models\SystemSettingTranslation::class;
+    use HasNav;
+
+    protected static ?string $model = SystemSettingTranslation::class;
 
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.

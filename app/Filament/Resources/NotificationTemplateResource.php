@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\NotificationTemplateResource\Pages;
 use App\Models\NotificationTemplate;
@@ -34,6 +36,8 @@ use UnitEnum;
  */
 final class NotificationTemplateResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = NotificationTemplate::class;
 
     protected static ?int $navigationSort = 6;

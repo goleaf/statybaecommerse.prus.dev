@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ProductHistoryResource\Pages;
 use App\Filament\Resources\ProductHistoryResource\Widgets\ProductHistoryStatsWidget;
@@ -29,6 +31,8 @@ use UnitEnum;
 
 final class ProductHistoryResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = ProductHistory::class;
 
     /**

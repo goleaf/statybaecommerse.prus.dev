@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\CampaignConversionResource\Pages;
 use App\Models\Campaign;
@@ -30,7 +32,9 @@ use UnitEnum;
 
 final class CampaignConversionResource extends Resource
 {
-    protected static ?string $model = \App\Models\CampaignConversion::class;
+    use HasNav;
+
+    protected static ?string $model = CampaignConversion::class;
 
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
@@ -47,12 +51,7 @@ final class CampaignConversionResource extends Resource
         return __('campaign_conversions.title');
     }
 
-    public static function getNavigationGroup(): ?string
-    {
-        return self::$navigationGroup instanceof NavigationGroup
-            ? self::$navigationGroup->label()
-            : self::$navigationGroup;
-    }
+    
 
     public static function getPluralModelLabel(): string
     {

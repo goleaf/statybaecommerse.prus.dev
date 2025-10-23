@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderShippings;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\OrderShippings\Pages\CreateOrderShipping;
 use App\Filament\Resources\OrderShippings\Pages\EditOrderShipping;
@@ -19,12 +20,11 @@ use Illuminate\Contracts\Support\Htmlable;
 
 class OrderShippingResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = OrderShipping::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return Heroicon::OutlinedRectangleStack;
-    }
+    
 
     public static function form(Form $form): Form
     {

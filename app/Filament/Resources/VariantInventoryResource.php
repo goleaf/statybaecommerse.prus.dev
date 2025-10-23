@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\VariantInventoryResource\Pages;
 use App\Models\Location;
 use App\Models\Product;
@@ -47,7 +49,9 @@ use UnitEnum;
 
 final class VariantInventoryResource extends Resource
 {
-    protected static ?string $model = \App\Models\VariantInventory::class;
+    use HasNav;
+
+    protected static ?string $model = VariantInventory::class;
 
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.

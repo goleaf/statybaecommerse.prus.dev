@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\DiscountResource\Pages;
 use App\Filament\Resources\DiscountResource\RelationManagers\CodesRelationManager;
 use App\Filament\Resources\DiscountResource\RelationManagers\ConditionsRelationManager;
@@ -17,17 +19,13 @@ use UnitEnum;
 
 final class DiscountResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Discount::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-tag';
-    }
+    
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Discounts';
-    }
+    
 
     protected static ?int $navigationSort = 1;
 

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\BrandResource\Pages;
 use App\Models\Brand;
 use App\Models\Scopes\ActiveScope;
@@ -43,6 +45,8 @@ use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 
 final class BrandResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Brand::class;
 
     public static function canAccess(): bool

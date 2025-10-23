@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\VariantImageResource\Pages;
 use App\Models\ProductVariant;
 use App\Models\VariantImage;
@@ -40,17 +42,16 @@ use Illuminate\Database\Eloquent\Collection;
 
 final class VariantImageResource extends Resource
 {
-    protected static ?string $model = \App\Models\VariantImage::class;
+    use HasNav;
+
+    protected static ?string $model = VariantImage::class;
 
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-photo';
 
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Inventory';
-    }
+    
 
     protected static ?int $navigationSort = 15;
 

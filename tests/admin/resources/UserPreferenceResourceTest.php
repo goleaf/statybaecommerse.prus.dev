@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Admin\Resources;
 
 use App\Filament\Resources\UserPreferenceResource;
+use App\Support\Nav;
 use App\Models\User;
 use App\Models\UserPreference;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -298,8 +299,14 @@ final class UserPreferenceResourceTest extends TestCase
 
     public function test_user_preference_resource_navigation_group(): void
     {
-        $this->assertEquals('Users', UserPreferenceResource::getNavigationGroup());
-        $this->assertEquals(6, UserPreferenceResource::getNavigationSort());
+        $this->assertEquals(
+            Nav::groupForResource(UserPreferenceResource::class),
+            UserPreferenceResource::getNavigationGroup(),
+        );
+        $this->assertEquals(
+            Nav::sortForResource(UserPreferenceResource::class),
+            UserPreferenceResource::getNavigationSort(),
+        );
     }
 
     public function test_user_preference_resource_model_relationship(): void

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\NotificationTemplates;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\NotificationTemplates\Pages\CreateNotificationTemplate;
 use App\Filament\Resources\NotificationTemplates\Pages\EditNotificationTemplate;
@@ -18,12 +19,11 @@ use Filament\Tables\Table;
 
 class NotificationTemplateResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = NotificationTemplate::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    
 
     public static function form(Form $form): Form
     {

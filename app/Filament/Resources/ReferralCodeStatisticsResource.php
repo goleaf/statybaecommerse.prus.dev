@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\ReferralCodeStatisticsResource\Pages;
 use App\Models\ReferralCode;
 use App\Models\ReferralCodeStatistics;
@@ -31,6 +33,8 @@ use UnitEnum;
  */
 final class ReferralCodeStatisticsResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = ReferralCodeStatistics::class;
 
     protected static ?int $navigationSort = 9;

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\AnalyticsEventResource\Pages;
 use App\Models\AnalyticsEvent;
 use App\Models\User;
@@ -34,14 +36,13 @@ use UnitEnum;
 
 final class AnalyticsEventResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = AnalyticsEvent::class;
 
     protected static ?int $navigationSort = 1;
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Analytics';
-    }
+    
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

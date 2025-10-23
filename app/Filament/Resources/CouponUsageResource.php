@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\CouponUsageResource\Pages;
 use App\Models\Coupon;
 use App\Models\CouponUsage;
@@ -44,6 +46,8 @@ use Illuminate\Database\Eloquent\Model;
 
 final class CouponUsageResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = CouponUsage::class;
 
     public static function getPluralModelLabel(): string

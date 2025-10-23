@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\UserWishlistResource\Pages;
 use App\Models\UserWishlist;
 use BackedEnum;
@@ -35,12 +37,11 @@ use UnitEnum;
  */
 final class UserWishlistResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = UserWishlist::class;
 
-    public static function getNavigationIcon(): BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
-    {
-        return 'heroicon-o-heart';
-    }
+    
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.

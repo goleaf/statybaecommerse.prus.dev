@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\NewsCategoryResource\Pages;
 use App\Models\NewsCategory;
 use BackedEnum;
@@ -36,17 +38,13 @@ use UnitEnum;
 
 final class NewsCategoryResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = NewsCategory::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-tag';
-    }
+    
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Content';
-    }
+    
 
     protected static ?int $navigationSort = 2;
 

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductSimilarities;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\ProductSimilarities\Pages\CreateProductSimilarity;
 use App\Filament\Resources\ProductSimilarities\Pages\EditProductSimilarity;
@@ -18,6 +19,8 @@ use Filament\Tables\Table;
 
 class ProductSimilarityResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = ProductSimilarity::class;
 
     /**

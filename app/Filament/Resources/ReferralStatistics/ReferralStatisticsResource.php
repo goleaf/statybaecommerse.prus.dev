@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\ReferralStatistics;
+use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\ReferralStatistics\Pages\CreateReferralStatistics;
 use App\Filament\Resources\ReferralStatistics\Pages\EditReferralStatistics;
@@ -18,6 +19,8 @@ use Filament\Tables\Table;
 
 class ReferralStatisticsResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = ReferralStatistics::class;
 
     /**

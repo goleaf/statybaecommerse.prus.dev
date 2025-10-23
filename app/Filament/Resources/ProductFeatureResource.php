@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ProductFeatureResource\Pages;
 use App\Models\ProductFeature;
@@ -21,6 +23,8 @@ use UnitEnum;
 
 final class ProductFeatureResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = ProductFeature::class;
 
     /**

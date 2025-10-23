@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\CouponResource\Pages;
 use App\Models\Coupon;
 use App\Support\Filament\Components\Flatpickr;
@@ -39,6 +41,8 @@ use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 
 final class CouponResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Coupon::class;
 
     /**

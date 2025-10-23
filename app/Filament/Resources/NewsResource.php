@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\ModerationState;
+use App\Support\Concerns\HasNav;
+
 use App\Filament\Resources\NewsResource\Pages;
 use App\Filament\Resources\NewsResource\RelationManagers;
 use App\Models\News;
@@ -28,12 +29,11 @@ use RuntimeException;
 
 class NewsResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = News::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-newspaper';
+    
 
     protected static ?int $navigationSort = 1;
 
