@@ -22,23 +22,24 @@ final class CouponFactory extends Factory
     public function definition(): array
     {
         return [
-            'code' => $this->faker->unique()->regexify('[A-Z0-9]{8}'),
-            'name' => $this->faker->words(3, true),
-            'description' => $this->faker->sentence(),
-            'type' => $this->faker->randomElement(['percentage', 'fixed']),
-            'value' => $this->faker->randomFloat(2, 5, 50),
-            'minimum_amount' => null,
-            'maximum_discount' => null,
-            'usage_limit' => $this->faker->numberBetween(10, 1000),
+            'code'                 => $this->faker->unique()->regexify('[A-Z0-9]{8}'),
+            'name'                 => $this->faker->words(3, true),
+            'description'          => $this->faker->sentence(),
+            'type'                 => $this->faker->randomElement(['percentage', 'fixed']),
+            'value'                => $this->faker->randomFloat(2, 5, 50),
+            'minimum_amount'       => null,
+            'maximum_discount'     => null,
+            'usage_limit'          => $this->faker->numberBetween(10, 1000),
             'usage_limit_per_user' => $this->faker->numberBetween(1, 5),
-            'used_count' => 0,
-            'is_active' => true,
-            'is_public' => false,
-            'is_auto_apply' => false,
-            'is_stackable' => false,
-            'starts_at' => $this->faker->dateTimeBetween('-1 month', '+1 month'),
-            'expires_at' => $this->faker->dateTimeBetween('+1 month', '+6 months'),
-            'applicable_products' => null,
+            'used_count'           => 0,
+            'is_active'            => true,
+            'is_public'            => false,
+            'is_auto_apply'        => false,
+            'is_stackable'         => false,
+            // Default validity window keeps generated coupons immediately usable for tests and seed data.
+            'starts_at'             => now()->subWeek(),
+            'expires_at'            => now()->addMonths(3),
+            'applicable_products'   => null,
             'applicable_categories' => null,
         ];
     }
@@ -69,7 +70,7 @@ final class CouponFactory extends Factory
     public function percentage(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'percentage',
+            'type'  => 'percentage',
             'value' => $this->faker->numberBetween(5, 50),
         ]);
     }
@@ -80,7 +81,7 @@ final class CouponFactory extends Factory
     public function fixed(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'fixed',
+            'type'  => 'fixed',
             'value' => $this->faker->randomFloat(2, 5, 100),
         ]);
     }
@@ -114,7 +115,7 @@ final class CouponFactory extends Factory
 
         return $this->state(fn (array $attributes) => [
             'usage_limit' => $usageLimit,
-            'used_count' => $usageLimit,
+            'used_count'  => $usageLimit,
         ]);
     }
 }

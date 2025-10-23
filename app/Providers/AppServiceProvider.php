@@ -140,6 +140,15 @@ class AppServiceProvider extends ServiceProvider
             });
         }
 
+        if (! Testable::hasMacro('assertCanSeeText')) {
+            // Provide a backwards-compatible assertion alias expected by legacy Filament tests.
+            Testable::macro('assertCanSeeText', function (string $text): Testable {
+                $this->assertSee($text, escape: false);
+
+                return $this;
+            });
+        }
+
         if (! class_exists(\Filament\Forms\Form::class) && class_exists(\Filament\Schemas\Schema::class)) {
             class_alias(\Filament\Schemas\Schema::class, \Filament\Forms\Form::class);
         }

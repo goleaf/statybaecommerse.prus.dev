@@ -25,6 +25,7 @@
 ## Discounts & promotions
 - Coupon migrations now provision maximum discount caps, per-user usage limits, and product/category scoping columns so factories, admin forms, and API tests share the same schema snapshot during refreshes.
 - Coupon application responses now round computed totals instead of calling `Number::parseFloat` on floats, keeping the discount API stable across PHP 8.3 test runs.
+- Coupon Filament resource now bypasses the global active scope, surfaces read-only infolist entries, and stabilizes toggle, bulk, and duplicate actions so coupon CRUD, filtering, and discount calculations stay reliable in admin tests.
 
 ## Storefront discovery
 - Brands directory was redesigned with a light-themed layout, shared card components, and refreshed translations for English and Lithuanian so partner browsing feels polished across locales.
