@@ -15,6 +15,7 @@ class MenuItemsTable
 {
     public static function configure(Table $table): Table
     {
+        // Shared table configuration keeps the columns uniform between standalone and relation managers.
         return $table
             ->columns([
                 TextColumn::make('menu.name')
