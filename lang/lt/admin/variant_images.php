@@ -15,6 +15,7 @@ return [
     // Form Fields
     'variant' => 'Produkto Variantas',
     'variant_info' => 'Varianto Informacija',
+    'variant_sku' => 'SKU: :sku',
     'image' => 'Nuotrauka',
     'alt_text' => 'Alternatyvus Tekstas',
     'description' => 'Aprašymas',
