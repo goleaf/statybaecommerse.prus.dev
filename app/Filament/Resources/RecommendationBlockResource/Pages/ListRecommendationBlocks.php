@@ -12,6 +12,7 @@ use App\Support\Recommendations\RecommendationBlockOptions;
 use Filament\Actions;
 use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Resources\Pages\ListRecords\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListRecommendationBlocks extends BaseListRecords
@@ -32,7 +33,8 @@ final class ListRecommendationBlocks extends BaseListRecords
         $resource = $this->getResource();
 
         return [
-            'all' => Tab::make(__('recommendation_blocks.tabs.all')),
+            'all' => Tab::make(__('recommendation_blocks.tabs.all'))
+                ->badge(fn () => $resource::getEloquentQuery()->count()),
 
         $tabs = [
             'all' => WidgetTab::make(__('recommendation_blocks.tabs.all'))

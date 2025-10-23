@@ -1,43 +1,50 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'title' => 'Recommendation Blocks',
-    'plural' => 'Recommendation Blocks',
     'single' => 'Recommendation Block',
+    'plural' => 'Recommendation Blocks',
 
-    'basic_information' => 'Basic Information',
-    'name' => 'Name',
-    'block_title' => 'Title',
-    'description' => 'Description',
-    'type' => 'Type',
-    'position' => 'Position',
-
-    'types' => [
-        'featured' => 'Featured',
-        'related' => 'Related',
-        'similar' => 'Similar',
-        'trending' => 'Trending',
-        'recent' => 'Recent',
+    'sections' => [
+        'basic_information' => 'Basic Information',
+        'products' => 'Products',
+        'settings' => 'Display Settings',
     ],
 
-    'positions' => [
-        'top' => 'Top',
-        'bottom' => 'Bottom',
-        'sidebar' => 'Sidebar',
-        'inline' => 'Inline',
+    'fields' => [
+        'name' => 'Name',
+        'title' => 'Title',
+        'description' => 'Description',
+        'type' => 'Type',
+        'position' => 'Position',
+        'products' => 'Products',
+        'max_products' => 'Maximum Products',
+        'is_active' => 'Active',
+        'show_title' => 'Show Title',
+        'show_description' => 'Show Description',
+        'sort_order' => 'Sort Order',
+        'products_count' => 'Products Count',
+        'created_at' => 'Created At',
+        'updated_at' => 'Updated At',
     ],
 
-    'products' => 'Products',
-    'max_products' => 'Max Products',
-    'products_count' => 'Products Count',
-
-    'settings' => 'Settings',
-    'is_active' => 'Is Active',
-    'show_title' => 'Show Title',
-    'show_description' => 'Show Description',
-    'sort_order' => 'Sort Order',
-    'created_at' => 'Created At',
-    'updated_at' => 'Updated At',
+    'options' => [
+        'types' => [
+            'featured' => 'Featured',
+            'related' => 'Related',
+            'similar' => 'Similar',
+            'trending' => 'Trending',
+            'recent' => 'Recent',
+        ],
+        'positions' => [
+            'top' => 'Top',
+            'bottom' => 'Bottom',
+            'sidebar' => 'Sidebar',
+            'inline' => 'Inline',
+        ],
+    ],
 
     'filters' => [
         'all_records' => 'All Records',
@@ -56,17 +63,8 @@ return [
     ],
 
     'actions' => [
-        'activate' => 'Activate',
-        'deactivate' => 'Deactivate',
+        'toggle_active' => 'Toggle Active',
         'set_default' => 'Set as Default',
-        'toggle_active' => 'Toggle active status',
-        'activated_successfully' => 'Activated successfully',
-        'deactivated_successfully' => 'Deactivated successfully',
-        'set_as_default_successfully' => 'Set as default successfully',
-        'bulk_activated_success' => 'Selected items activated successfully',
-        'bulk_deactivated_success' => 'Selected items deactivated successfully',
-        'activate_selected' => 'Activate Selected',
-        'deactivate_selected' => 'Deactivate Selected',
     ],
 
     'tabs' => [
