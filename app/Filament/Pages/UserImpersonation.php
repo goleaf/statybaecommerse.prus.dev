@@ -15,21 +15,15 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
-use UnitEnum;
+
 final class UserImpersonation extends Page implements HasTable
 {
     use ConfiguresToggleableTableLayout;
     use HasToggleableTable;
     use InteractsWithTable;
 
-    /**
-     * @var string|\BackedEnum|null
-     */
     protected static ?string $navigationIcon = 'heroicon-o-user';
 
-    /**
-     * @return string|UnitEnum|null
-     */
     public static function getNavigationGroup(): ?string
     {
         return 'System';

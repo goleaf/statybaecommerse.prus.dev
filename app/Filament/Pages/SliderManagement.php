@@ -32,15 +32,11 @@ use Filament\Support\Enums\Width;
 use UnitEnum;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
-use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
+
 class SliderManagement extends Page implements HasActions, HasForms
 {
     use InteractsWithActions, InteractsWithForms;
 
-    /**
-     * @var string|\BackedEnum|null
-     */
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationLabel = 'Slider Management';
@@ -51,9 +47,6 @@ class SliderManagement extends Page implements HasActions, HasForms
 
     protected static ?int $navigationSort = 1;
 
-    /**
-     * @return string|UnitEnum|null
-     */
     public static function getNavigationGroup(): ?string
     {
         return 'Content';
