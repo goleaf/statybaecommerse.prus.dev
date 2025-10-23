@@ -48,6 +48,74 @@ namespace Filament\Infolists\Components {
     }
 }
 
+namespace Icetalker\FilamentTableRepeatableEntry\Infolists\Components {
+
+    use Filament\Infolists\Components\RepeatableEntry;
+
+    if (! class_exists(TableRepeatableEntry::class) && class_exists(RepeatableEntry::class)) {
+        class TableRepeatableEntry extends RepeatableEntry
+        {
+            public static function make(?string $name = null): static
+            {
+                return parent::make($name);
+            }
+        }
+    }
+}
+
+namespace SolutionForest\TabLayoutPlugin\Components {
+
+    if (! class_exists(Tabs::class) && class_exists(\Filament\Forms\Components\Tabs::class)) {
+        class Tabs extends \Filament\Forms\Components\Tabs {}
+    }
+}
+
+namespace SolutionForest\TabLayoutPlugin\Components\Tabs {
+
+    if (! class_exists(Tab::class) && class_exists(\Filament\Forms\Components\Tabs\Tab::class)) {
+        class Tab extends \Filament\Forms\Components\Tabs\Tab {}
+    }
+}
+
+namespace SolutionForest\TabLayoutPlugin\Widgets {
+
+    if (! class_exists(TabsWidget::class)) {
+        if (class_exists(\Filament\Widgets\Widget::class)) {
+            abstract class TabsWidget extends \Filament\Widgets\Widget {}
+        } else {
+            abstract class TabsWidget {}
+        }
+    }
+}
+
+namespace SolutionForest\TabLayoutPlugin\Schemas {
+
+    if (! class_exists(SimpleTabSchema::class)) {
+        class SimpleTabSchema
+        {
+            public static function make(?string $label = null, ?string $id = null): self
+            {
+                return new self;
+            }
+
+            public function livewireComponent(string $component, array $data = []): self
+            {
+                return $this;
+            }
+
+            public function icon(?string $icon): self
+            {
+                return $this;
+            }
+
+            public function badge(?string $badge): self
+            {
+                return $this;
+            }
+        }
+    }
+}
+
 namespace Asmit\ResizedColumn {
     if (! trait_exists(HasResizableColumn::class) && trait_exists(\App\Support\FilamentCompat\HasResizableColumn::class)) {
         class_alias(\App\Support\FilamentCompat\HasResizableColumn::class, HasResizableColumn::class);

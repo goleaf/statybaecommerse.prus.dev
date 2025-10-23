@@ -44,5 +44,5 @@ Route::prefix('partner')
     ->middleware(['partner.api.auth', 'partner.api.rate_limit'])
     ->name('api.partner.')
     ->group(function (): void {
-        require __DIR__.'/api/partner.php';
+        require __DIR__ . '/api/partner.php';
     });

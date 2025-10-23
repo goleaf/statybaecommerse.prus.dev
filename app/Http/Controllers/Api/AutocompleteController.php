@@ -6,12 +6,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Services\AutocompleteService;
-use App\Services\SearchAnalyticsService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
-use Log;
 use OpenApi\Attributes as OA;
 
 /**
@@ -27,6 +26,41 @@ final class AutocompleteController extends Controller
      */
     public function __construct(private readonly AutocompleteService $autocompleteService) {}
 
+    #[OA\Get(
+        path: '/autocomplete/search',
+        summary: 'Autocomplete across multiple resources',
+        description: 'Return mixed autocomplete suggestions for the provided query. Results can be constrained by type and capped with a limit.',
+        tags: ['Autocomplete'],
+        parameters: [
+            new OA\QueryParameter(name: 'q', description: 'Search query (minimum 2 characters).', required: true, in: 'query', schema: new OA\Schema(type: 'string', minLength: 2, maxLength: 255)),
+            new OA\QueryParameter(name: 'limit', description: 'Maximum number of results to return.', in: 'query', schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 50)),
+            new OA\QueryParameter(
+                name: 'types[]',
+                description: 'Optional resource types to search (products, categories, brands, collections, attributes).',
+                in: 'query',
+                schema: new OA\Schema(type: 'array', items: new OA\Items(type: 'string')),
+                style: 'form',
+                explode: true
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Autocomplete results returned successfully.',
+                content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteResponse')
+            ),
+            new OA\Response(
+                response: 422,
+                description: 'Validation failed.',
+                content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')
+            ),
+            new OA\Response(
+                response: 500,
+                description: 'The search backend reported an error.',
+                content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')
+            ),
+        ]
+    )]
     /**
      * Handle search functionality with proper error handling.
      */
@@ -84,6 +118,21 @@ final class AutocompleteController extends Controller
         }
     }
 
+    #[OA\Get(
+        path: '/autocomplete/products',
+        summary: 'Autocomplete product results',
+        description: 'Return product suggestions filtered by the provided query.',
+        tags: ['Autocomplete'],
+        parameters: [
+            new OA\QueryParameter(name: 'q', in: 'query', required: true, description: 'Product search query.', schema: new OA\Schema(type: 'string', minLength: 2, maxLength: 255)),
+            new OA\QueryParameter(name: 'limit', in: 'query', description: 'Maximum number of products.', schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 50)),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Product autocomplete results.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteResponse')),
+            new OA\Response(response: 422, description: 'Validation failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+            new OA\Response(response: 500, description: 'Search failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+        ]
+    )]
     /**
      * Handle products functionality with proper error handling.
      */
@@ -129,6 +178,20 @@ final class AutocompleteController extends Controller
         }
     }
 
+    #[OA\Get(
+        path: '/autocomplete/categories',
+        summary: 'Autocomplete category results',
+        tags: ['Autocomplete'],
+        parameters: [
+            new OA\QueryParameter(name: 'q', in: 'query', required: true, description: 'Category search query.', schema: new OA\Schema(type: 'string', minLength: 2, maxLength: 255)),
+            new OA\QueryParameter(name: 'limit', in: 'query', description: 'Maximum number of categories.', schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 50)),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Category autocomplete results.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteResponse')),
+            new OA\Response(response: 422, description: 'Validation failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+            new OA\Response(response: 500, description: 'Category search failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+        ]
+    )]
     /**
      * Handle categories functionality with proper error handling.
      */
@@ -172,6 +235,20 @@ final class AutocompleteController extends Controller
         }
     }
 
+    #[OA\Get(
+        path: '/autocomplete/brands',
+        summary: 'Autocomplete brand results',
+        tags: ['Autocomplete'],
+        parameters: [
+            new OA\QueryParameter(name: 'q', in: 'query', required: true, description: 'Brand search query.', schema: new OA\Schema(type: 'string', minLength: 2, maxLength: 255)),
+            new OA\QueryParameter(name: 'limit', in: 'query', description: 'Maximum number of brands.', schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 50)),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Brand autocomplete results.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteResponse')),
+            new OA\Response(response: 422, description: 'Validation failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+            new OA\Response(response: 500, description: 'Brand search failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+        ]
+    )]
     /**
      * Handle brands functionality with proper error handling.
      */
@@ -215,6 +292,20 @@ final class AutocompleteController extends Controller
         }
     }
 
+    #[OA\Get(
+        path: '/autocomplete/collections',
+        summary: 'Autocomplete collection results',
+        tags: ['Autocomplete'],
+        parameters: [
+            new OA\QueryParameter(name: 'q', in: 'query', required: true, description: 'Collection search query.', schema: new OA\Schema(type: 'string', minLength: 2, maxLength: 255)),
+            new OA\QueryParameter(name: 'limit', in: 'query', description: 'Maximum number of collections.', schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 50)),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Collection autocomplete results.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteResponse')),
+            new OA\Response(response: 422, description: 'Validation failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+            new OA\Response(response: 500, description: 'Collection search failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+        ]
+    )]
     /**
      * Handle collections functionality with proper error handling.
      */
@@ -258,6 +349,20 @@ final class AutocompleteController extends Controller
         }
     }
 
+    #[OA\Get(
+        path: '/autocomplete/attributes',
+        summary: 'Autocomplete attribute results',
+        tags: ['Autocomplete'],
+        parameters: [
+            new OA\QueryParameter(name: 'q', in: 'query', required: true, description: 'Attribute search query.', schema: new OA\Schema(type: 'string', minLength: 2, maxLength: 255)),
+            new OA\QueryParameter(name: 'limit', in: 'query', description: 'Maximum number of attributes.', schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 50)),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Attribute autocomplete results.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteResponse')),
+            new OA\Response(response: 422, description: 'Validation failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+            new OA\Response(response: 500, description: 'Attribute search failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+        ]
+    )]
     /**
      * Handle attributes functionality with proper error handling.
      */
@@ -301,6 +406,19 @@ final class AutocompleteController extends Controller
         }
     }
 
+    #[OA\Get(
+        path: '/autocomplete/popular',
+        summary: 'Popular autocomplete suggestions',
+        tags: ['Autocomplete'],
+        parameters: [
+            new OA\QueryParameter(name: 'limit', in: 'query', description: 'Maximum suggestions to return.', schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 20)),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Popular search suggestions.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteResponse')),
+            new OA\Response(response: 422, description: 'Validation failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+            new OA\Response(response: 500, description: 'Failed to load popular suggestions.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+        ]
+    )]
     /**
      * Handle popular functionality with proper error handling.
      */
@@ -337,6 +455,19 @@ final class AutocompleteController extends Controller
         }
     }
 
+    #[OA\Get(
+        path: '/autocomplete/recent',
+        summary: 'Recently used search terms',
+        tags: ['Autocomplete'],
+        parameters: [
+            new OA\QueryParameter(name: 'limit', in: 'query', description: 'Maximum recent entries to return.', schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 10)),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Recent search suggestions.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteResponse')),
+            new OA\Response(response: 422, description: 'Validation failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+            new OA\Response(response: 500, description: 'Failed to load recent suggestions.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+        ]
+    )]
     /**
      * Handle recent functionality with proper error handling.
      */
@@ -373,6 +504,15 @@ final class AutocompleteController extends Controller
         }
     }
 
+    #[OA\Delete(
+        path: '/autocomplete/recent',
+        summary: 'Clear stored recent searches',
+        tags: ['Autocomplete'],
+        responses: [
+            new OA\Response(response: 200, description: 'Recent searches cleared.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+            new OA\Response(response: 500, description: 'Failed to clear recent searches.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+        ]
+    )]
     /**
      * Handle clearRecent functionality with proper error handling.
      */
@@ -396,6 +536,19 @@ final class AutocompleteController extends Controller
         }
     }
 
+    #[OA\Get(
+        path: '/autocomplete/suggestions',
+        summary: 'Combine popular and recent suggestions',
+        tags: ['Autocomplete'],
+        parameters: [
+            new OA\QueryParameter(name: 'limit', in: 'query', description: 'Maximum suggestions to include.', schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 20)),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Combined suggestions.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteSuggestionsResponse')),
+            new OA\Response(response: 422, description: 'Validation failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+            new OA\Response(response: 500, description: 'Failed to load suggestions.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+        ]
+    )]
     /**
      * Handle suggestions functionality with proper error handling.
      */
@@ -435,6 +588,22 @@ final class AutocompleteController extends Controller
         }
     }
 
+    #[OA\Get(
+        path: '/autocomplete/fuzzy-search',
+        summary: 'Fuzzy autocomplete results',
+        description: 'Perform a fuzzy search across supported autocomplete resources.',
+        tags: ['Autocomplete'],
+        parameters: [
+            new OA\QueryParameter(name: 'q', in: 'query', required: true, description: 'Search query.', schema: new OA\Schema(type: 'string', minLength: 2, maxLength: 255)),
+            new OA\QueryParameter(name: 'limit', in: 'query', description: 'Maximum number of results.', schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 50)),
+            new OA\QueryParameter(name: 'types[]', in: 'query', description: 'Resource types to include.', schema: new OA\Schema(type: 'array', items: new OA\Items(type: 'string')), style: 'form', explode: true),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Fuzzy autocomplete results.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteResponse')),
+            new OA\Response(response: 422, description: 'Validation failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+            new OA\Response(response: 500, description: 'Fuzzy search failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+        ]
+    )]
     /**
      * Handle fuzzySearch functionality with proper error handling.
      */
@@ -492,6 +661,22 @@ final class AutocompleteController extends Controller
         }
     }
 
+    #[OA\Get(
+        path: '/autocomplete/personalized',
+        summary: 'Personalized autocomplete suggestions',
+        description: 'Return personalized autocomplete suggestions for the authenticated user.',
+        tags: ['Autocomplete'],
+        security: [['sanctum' => []]],
+        parameters: [
+            new OA\QueryParameter(name: 'limit', in: 'query', description: 'Maximum number of personalized suggestions.', schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 20)),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Personalized suggestions.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteResponse')),
+            new OA\Response(response: 401, description: 'Authentication required.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+            new OA\Response(response: 422, description: 'Validation failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+            new OA\Response(response: 500, description: 'Failed to resolve personalized suggestions.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+        ]
+    )]
     /**
      * Handle personalized functionality with proper error handling.
      */
@@ -536,6 +721,20 @@ final class AutocompleteController extends Controller
         }
     }
 
+    #[OA\Get(
+        path: '/autocomplete/customers',
+        summary: 'Autocomplete customers',
+        tags: ['Autocomplete'],
+        parameters: [
+            new OA\QueryParameter(name: 'q', in: 'query', required: true, description: 'Customer search query.', schema: new OA\Schema(type: 'string', minLength: 2, maxLength: 255)),
+            new OA\QueryParameter(name: 'limit', in: 'query', description: 'Maximum number of customers.', schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 50)),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Customer autocomplete results.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteResponse')),
+            new OA\Response(response: 422, description: 'Validation failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+            new OA\Response(response: 500, description: 'Customer search failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+        ]
+    )]
     /**
      * Handle customers functionality with proper error handling.
      */
@@ -579,6 +778,20 @@ final class AutocompleteController extends Controller
         }
     }
 
+    #[OA\Get(
+        path: '/autocomplete/addresses',
+        summary: 'Autocomplete addresses',
+        tags: ['Autocomplete'],
+        parameters: [
+            new OA\QueryParameter(name: 'q', in: 'query', required: true, description: 'Address search query.', schema: new OA\Schema(type: 'string', minLength: 2, maxLength: 255)),
+            new OA\QueryParameter(name: 'limit', in: 'query', description: 'Maximum number of addresses.', schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 50)),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Address autocomplete results.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteResponse')),
+            new OA\Response(response: 422, description: 'Validation failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+            new OA\Response(response: 500, description: 'Address search failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+        ]
+    )]
     /**
      * Handle addresses functionality with proper error handling.
      */
@@ -622,6 +835,20 @@ final class AutocompleteController extends Controller
         }
     }
 
+    #[OA\Get(
+        path: '/autocomplete/locations',
+        summary: 'Autocomplete locations',
+        tags: ['Autocomplete'],
+        parameters: [
+            new OA\QueryParameter(name: 'q', in: 'query', required: true, description: 'Location search query.', schema: new OA\Schema(type: 'string', minLength: 2, maxLength: 255)),
+            new OA\QueryParameter(name: 'limit', in: 'query', description: 'Maximum number of locations.', schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 50)),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Location autocomplete results.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteResponse')),
+            new OA\Response(response: 422, description: 'Validation failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+            new OA\Response(response: 500, description: 'Location search failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+        ]
+    )]
     /**
      * Handle locations functionality with proper error handling.
      */
@@ -665,6 +892,20 @@ final class AutocompleteController extends Controller
         }
     }
 
+    #[OA\Get(
+        path: '/autocomplete/countries',
+        summary: 'Autocomplete countries',
+        tags: ['Autocomplete'],
+        parameters: [
+            new OA\QueryParameter(name: 'q', in: 'query', required: true, description: 'Country search query.', schema: new OA\Schema(type: 'string', minLength: 2, maxLength: 255)),
+            new OA\QueryParameter(name: 'limit', in: 'query', description: 'Maximum number of countries.', schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 50)),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Country autocomplete results.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteResponse')),
+            new OA\Response(response: 422, description: 'Validation failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+            new OA\Response(response: 500, description: 'Country search failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+        ]
+    )]
     /**
      * Handle countries functionality with proper error handling.
      */
@@ -708,6 +949,20 @@ final class AutocompleteController extends Controller
         }
     }
 
+    #[OA\Get(
+        path: '/autocomplete/cities',
+        summary: 'Autocomplete cities',
+        tags: ['Autocomplete'],
+        parameters: [
+            new OA\QueryParameter(name: 'q', in: 'query', required: true, description: 'City search query.', schema: new OA\Schema(type: 'string', minLength: 2, maxLength: 255)),
+            new OA\QueryParameter(name: 'limit', in: 'query', description: 'Maximum number of cities.', schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 50)),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'City autocomplete results.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteResponse')),
+            new OA\Response(response: 422, description: 'Validation failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+            new OA\Response(response: 500, description: 'City search failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+        ]
+    )]
     /**
      * Handle cities functionality with proper error handling.
      */
@@ -751,6 +1006,20 @@ final class AutocompleteController extends Controller
         }
     }
 
+    #[OA\Get(
+        path: '/autocomplete/orders',
+        summary: 'Autocomplete orders',
+        tags: ['Autocomplete'],
+        parameters: [
+            new OA\QueryParameter(name: 'q', in: 'query', required: true, description: 'Order search query.', schema: new OA\Schema(type: 'string', minLength: 2, maxLength: 255)),
+            new OA\QueryParameter(name: 'limit', in: 'query', description: 'Maximum number of orders.', schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 50)),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Order autocomplete results.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteResponse')),
+            new OA\Response(response: 422, description: 'Validation failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+            new OA\Response(response: 500, description: 'Order search failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+        ]
+    )]
     /**
      * Handle orders functionality with proper error handling.
      */
@@ -794,6 +1063,37 @@ final class AutocompleteController extends Controller
         }
     }
 
+    #[OA\Get(
+        path: '/autocomplete/paginated-search',
+        summary: 'Paginated autocomplete search',
+        description: 'Perform a paginated search that returns paging metadata and optional filters.',
+        tags: ['Autocomplete'],
+        parameters: [
+            new OA\QueryParameter(name: 'q', in: 'query', required: true, description: 'Search query.', schema: new OA\Schema(type: 'string', minLength: 2, maxLength: 255)),
+            new OA\QueryParameter(name: 'page', in: 'query', schema: new OA\Schema(type: 'integer', minimum: 1)),
+            new OA\QueryParameter(name: 'per_page', in: 'query', schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 100)),
+            new OA\QueryParameter(name: 'types[]', in: 'query', description: 'Resource types to include.', schema: new OA\Schema(type: 'array', items: new OA\Items(type: 'string')), style: 'form', explode: true),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Paginated autocomplete payload.',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'success', type: 'boolean'),
+                        new OA\Property(property: 'data', type: 'array', items: new OA\Items(type: 'object')),
+                        new OA\Property(property: 'pagination', type: 'object'),
+                        new OA\Property(property: 'infinite_scroll', type: 'object'),
+                        new OA\Property(property: 'filters', type: 'object'),
+                        new OA\Property(property: 'query', type: 'string'),
+                    ]
+                )
+            ),
+            new OA\Response(response: 422, description: 'Validation failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+            new OA\Response(response: 500, description: 'Paginated search failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+        ]
+    )]
     /**
      * Handle paginatedSearch functionality with proper error handling.
      */
@@ -882,6 +1182,30 @@ final class AutocompleteController extends Controller
         }
     }
 
+    #[OA\Post(
+        path: '/autocomplete/export',
+        summary: 'Export autocomplete search results',
+        description: 'Generate an export of the search results in the requested format.',
+        tags: ['Autocomplete'],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: 'object',
+                required: ['q'],
+                properties: [
+                    new OA\Property(property: 'q', type: 'string', minLength: 2, maxLength: 255),
+                    new OA\Property(property: 'format', type: 'string', enum: ['json', 'csv', 'xml', 'xlsx']),
+                    new OA\Property(property: 'types', type: 'array', items: new OA\Items(type: 'string')),
+                    new OA\Property(property: 'options', type: 'object'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'Export queued or generated.', content: new OA\JsonContent(type: 'object')),
+            new OA\Response(response: 422, description: 'Validation failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+            new OA\Response(response: 500, description: 'Export failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+        ]
+    )]
     /**
      * Handle exportSearch functionality with proper error handling.
      */
@@ -943,10 +1267,21 @@ final class AutocompleteController extends Controller
         }
     }
 
+    #[OA\Get(
+        path: '/autocomplete/export/{exportId}',
+        summary: 'Download a prepared autocomplete export',
+        tags: ['Autocomplete'],
+        parameters: [
+            new OA\Parameter(name: 'exportId', in: 'path', required: true, description: 'Identifier returned from the export endpoint.', schema: new OA\Schema(type: 'string')),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Export file stream.', content: new OA\MediaType(mediaType: 'application/octet-stream')),
+            new OA\Response(response: 404, description: 'Export not found.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+            new OA\Response(response: 500, description: 'Failed to download export.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+        ]
+    )]
     /**
      * Handle downloadExport functionality with proper error handling.
-     *
-     * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
     #[OA\Get(
         path: '/api/autocomplete/export/{exportId}',
@@ -996,6 +1331,28 @@ final class AutocompleteController extends Controller
         }
     }
 
+    #[OA\Post(
+        path: '/autocomplete/share',
+        summary: 'Create a shareable autocomplete result set',
+        tags: ['Autocomplete'],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: 'object',
+                required: ['q'],
+                properties: [
+                    new OA\Property(property: 'q', type: 'string', minLength: 2, maxLength: 255),
+                    new OA\Property(property: 'types', type: 'array', items: new OA\Items(type: 'string')),
+                    new OA\Property(property: 'options', type: 'object'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'Share link created.', content: new OA\JsonContent(type: 'object')),
+            new OA\Response(response: 422, description: 'Validation failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+            new OA\Response(response: 500, description: 'Share failed.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+        ]
+    )]
     /**
      * Handle shareSearch functionality with proper error handling.
      */
@@ -1054,6 +1411,19 @@ final class AutocompleteController extends Controller
         }
     }
 
+    #[OA\Get(
+        path: '/autocomplete/share/{shareId}',
+        summary: 'Retrieve a shared autocomplete search',
+        tags: ['Autocomplete'],
+        parameters: [
+            new OA\Parameter(name: 'shareId', in: 'path', required: true, description: 'Share identifier returned from the share endpoint.', schema: new OA\Schema(type: 'string')),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Shared search payload.', content: new OA\JsonContent(type: 'object')),
+            new OA\Response(response: 404, description: 'Shared search not found.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+            new OA\Response(response: 500, description: 'Failed to load shared search.', content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteErrorResponse')),
+        ]
+    )]
     /**
      * Handle viewSharedSearch functionality with proper error handling.
      */
