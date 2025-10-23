@@ -14,6 +14,11 @@ use LaraZeus\InlineChart\InlineChartWidget;
 final class ProductSalesSparkline extends InlineChartWidget
 {
     /**
+     * The product record that powers the sparkline widget instance.
+     */
+    public ?Product $record = null;
+
+    /**
      * Hide the heading so the widget renders as a pure sparkline.
      */
     protected ?string $heading = null;
@@ -24,23 +29,47 @@ final class ProductSalesSparkline extends InlineChartWidget
     protected ?string $maxHeight = '48';
 
     /**
+     * Cache the resolved dataset across renders so Livewire avoids recomputing the helper output.
+     *
+     * @var array<string, mixed>
+     */
+    private array $cachedDataset = [];
+
+    /**
+     * Hash of the dataset passed to the frontend, used by tests and the Blade view for diffing.
+     */
+    public string $dataChecksum = '';
+
+    /**
+     * Capture the optional product record and seed the dataset cache during component boot.
+     */
+    public function mount(?Product $record = null): void
+    {
+        $this->record = $record;
+        $this->refreshDataset();
+    }
+
+    /**
+     * Recompute the dataset whenever Livewire mutates the bound product record.
+     */
+    public function updatedRecord(?Product $record): void
+    {
+        $this->record = $record;
+        $this->refreshDataset();
+    }
+
+    /**
      * Build the Chart.js payload using the cached product sales series helper.
      *
      * @return array<string, mixed>
      */
     protected function getData(): array
     {
-        if (! $this->record instanceof Product) {
-            return $this->formatDataset([], [], __('products.sparkline.revenue_label', ['days' => 0]));
+        if ($this->cachedDataset === []) {
+            $this->refreshDataset();
         }
 
-        $series = ProductSeries::dailySales($this->record);
-
-        return $this->formatDataset(
-            $series['labels'],
-            $series['revenue'],
-            __('products.sparkline.revenue_label', ['days' => count($series['labels'])])
-        );
+        return $this->cachedDataset;
     }
 
     /**
@@ -66,5 +95,34 @@ final class ProductSalesSparkline extends InlineChartWidget
             ],
             'labels' => $labels,
         ];
+    }
+
+    /**
+     * Refresh the cached dataset and checksum so both backend tests and the view stay aligned.
+     */
+    private function refreshDataset(): void
+    {
+        $this->cachedDataset = $this->resolveDataset();
+        $this->dataChecksum = md5(json_encode($this->cachedDataset));
+    }
+
+    /**
+     * Resolve the helper output into the structure required by the InlineChart widget contract.
+     *
+     * @return array<string, mixed>
+     */
+    private function resolveDataset(): array
+    {
+        if (! $this->record instanceof Product) {
+            return $this->formatDataset([], [], __('products.sparkline.revenue_label', ['days' => 0]));
+        }
+
+        $series = ProductSeries::dailySales($this->record);
+
+        return $this->formatDataset(
+            $series['labels'],
+            $series['revenue'],
+            __('products.sparkline.revenue_label', ['days' => count($series['labels'])])
+        );
     }
 }
