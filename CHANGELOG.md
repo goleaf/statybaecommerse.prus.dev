@@ -10,6 +10,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Introduced operator-aware system setting dependencies with explicit condition values, refreshed Filament forms, and resilient evaluation helpers for richer admin automation.
 
 ### Maintenance
+* Added granular rate limiting configuration scopes and partner-friendly throttling helpers while wiring CSP nonces into helper utilities and admin providers.
 * Normalized HTTP 429 API responses to the new shared `error.rate_limited` problem code and refreshed the contract docs so client throttling logic stays consistent.
 * Resolved the cache tagging conflicts from PR #120 by wiring `CacheInvalidationService` into model events, aligning navigation/menu repositories with locale-aware tags, and extending regression tests that exercise storefront widgets and dashboard stats.
 * Introduced a cache invalidation service with tag-aware fallbacks and updated storefront widgets to honour locale-aware cache tags while adding regression coverage for cart and dashboard flows.
@@ -27,6 +28,9 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ### Bug Fixes
 * Corrected shipping option delivery window formatting so zero-day estimates and partially filled ranges no longer collapse to a placeholder dash in admin tables.
 * Ensured the test bootstrap reloads JSON translation directories so Filament commerce navigation labels resolve to localized values instead of falling back to raw keys during regression runs.
+
+### Security
+* Introduced a request-scoped CSP nonce service with middleware, Livewire, and Vite integration, hardened permissions/HSTS headers, and refreshed inline Blade assets to comply with nonce-based CSP directives.
 
 ## [0.1.0] - 2025-10-20
 

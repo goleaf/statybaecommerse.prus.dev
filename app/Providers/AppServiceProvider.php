@@ -19,9 +19,9 @@ use App\Models\SystemSetting;
 use App\Observers\UserAttributionObserver;
 use App\Services\CacheInvalidationService;
 use App\Services\DocumentService;
-use App\Services\CacheInvalidationService;
 use App\Support\Health\HealthReporter;
 use App\Support\Html\HtmlSanitizer;
+use App\Support\Security\CspNonce;
 use App\Support\Storage\SecureStorage;
 use App\Support\Tracing\Trace;
 use App\Support\Tracing\TraceContext;
@@ -54,6 +54,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
@@ -76,7 +77,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(DocumentServiceContract::class, DocumentService::class);
 
         // Share a single sanitizer instance so every consumer reuses the same allow-list configuration.
-        $this->app->singleton(HtmlSanitizer::class, static fn (): HtmlSanitizer => new HtmlSanitizer());
+        $this->app->singleton(HtmlSanitizer::class, static fn (): HtmlSanitizer => new HtmlSanitizer);
+
+        // Scope CSP nonces per request so all downstream consumers reference the same token.
+        $this->app->scoped(CspNonce::class, static fn (): CspNonce => new CspNonce);
 
         if ($this->app->runningInConsole()) {
             // Register import utilities and override the core db:seed command with a profiled variant.
@@ -118,6 +122,16 @@ class AppServiceProvider extends ServiceProvider
 
         // Register Livewire components
         Livewire::component('live-notification-feed', LiveNotificationFeed::class);
+
+        if (method_exists(Livewire::class, 'useCspNonce')) {
+            // Provide the same nonce helper to Livewire so inline hooks honour the CSP.
+            Livewire::useCspNonce(static fn (): string => csp_nonce());
+        }
+
+        if (method_exists(Vite::class, 'useCspNonce')) {
+            // Ensure generated asset tags from Vite inherit the request-specific nonce value.
+            Vite::useCspNonce(static fn (): string => csp_nonce());
+        }
 
         if (! Testable::hasMacro('assertCanSeeFormData')) {
             Testable::macro('assertCanSeeFormData', function (array $data): Testable {

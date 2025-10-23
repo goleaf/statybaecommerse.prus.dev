@@ -20,7 +20,8 @@ final class AddSecurityHeaders
 
     public function handle(Request $request, Closure $next): Response
     {
-        $nonce = $this->prepareNonce($request);
+        // Resolve (or create) the nonce before the request proceeds so downstream handlers share the same value.
+        $nonce = $this->resolveNonce($request);
 
         /** @var Response $response */
         $response = $next($request);
@@ -32,28 +33,31 @@ final class AddSecurityHeaders
         $this->applyStaticHeaders($response);
         $this->applyPermissionsPolicy($response);
         $this->applyStrictTransportSecurity($response);
-        $this->applyContentSecurityPolicy($response);
+        $this->applyContentSecurityPolicy($response, $nonce);
+        $this->injectNonceIntoResponse($response, $nonce);
 
         return $response;
     }
 
-    private function prepareNonce(Request $request): string
+    private function resolveNonce(Request $request): CspNonce
     {
         $nonce = $request->attributes->get('csp_nonce');
 
-        if (! is_string($nonce) || $nonce === '') {
-            $nonce = $this->generateNonce();
-            $request->attributes->set('csp_nonce', $nonce);
+        if ($nonce instanceof CspNonce) {
+            View::share('cspNonce', $nonce->value());
+
+            return $nonce;
         }
 
-        View::share('cspNonce', $nonce);
+        $resolved = is_string($nonce) && $nonce !== ''
+            ? new CspNonce($nonce)
+            : app(CspNonce::class);
 
-        return $nonce;
-    }
+        // Share the nonce with both the current request context and Blade templates for compatibility.
+        $request->attributes->set('csp_nonce', $resolved);
+        View::share('cspNonce', $resolved->value());
 
-    private function generateNonce(): string
-    {
-        return rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
+        return $resolved;
     }
 
     private function applyStaticHeaders(Response $response): void
@@ -74,6 +78,7 @@ final class AddSecurityHeaders
                 continue;
             }
 
+            // Always merge headers so existing security values are replaced atomically.
             $response->headers->set($header, $stringValue, true);
         }
     }
@@ -97,7 +102,7 @@ final class AddSecurityHeaders
                 continue;
             }
 
-            $compiled[] = $feature.'='.$sources;
+            $compiled[] = $feature . '=' . $sources;
         }
 
         if ($compiled === []) {
@@ -132,7 +137,7 @@ final class AddSecurityHeaders
         $response->headers->set('Strict-Transport-Security', implode('; ', $parts), true);
     }
 
-    private function applyContentSecurityPolicy(Response $response): void
+    private function applyContentSecurityPolicy(Response $response, ?CspNonce $nonce): void
     {
         $directives = $this->config->get('security.headers.content_security_policy.directives', []);
         if (! is_array($directives) || $directives === []) {
@@ -140,7 +145,7 @@ final class AddSecurityHeaders
         }
 
         $useNonce = (bool) $this->config->get('security.headers.content_security_policy.use_nonce', true);
-        $nonce = $useNonce ? app(CspNonce::class) : null;
+        $nonce = $useNonce ? $nonce : null;
         $compiled = [];
 
         foreach ($directives as $directive => $values) {
@@ -155,10 +160,11 @@ final class AddSecurityHeaders
 
             if ($sources === []) {
                 $compiled[] = $directive;
+
                 continue;
             }
 
-            $compiled[] = $directive.' '.implode(' ', $sources);
+            $compiled[] = $directive . ' ' . implode(' ', $sources);
         }
 
         if ($compiled === []) {
@@ -166,6 +172,44 @@ final class AddSecurityHeaders
         }
 
         $response->headers->set('Content-Security-Policy', implode('; ', $compiled), true);
+    }
+
+    private function injectNonceIntoResponse(Response $response, ?CspNonce $nonce): void
+    {
+        if ($response instanceof BinaryFileResponse || $response instanceof StreamedResponse) {
+            return;
+        }
+
+        $contentType = $response->headers->get('Content-Type');
+        if (! is_string($contentType) || ! Str::contains(Str::lower($contentType), 'text/html')) {
+            return;
+        }
+
+        $content = $response->getContent();
+        if (! is_string($content) || $content === '') {
+            return;
+        }
+
+        $nonceValue = $nonce?->value();
+        if (! is_string($nonceValue) || $nonceValue === '') {
+            return;
+        }
+
+        // Inject nonces into inline scripts and styles so they satisfy strict CSP directives.
+        $scriptPattern = '/<script(?![^>]*\\bsrc=)(?![^>]*\\bnonce=)([^>]*)>/i';
+        $stylePattern = '/<style(?![^>]*\\bnonce=)([^>]*)>/i';
+
+        $updated = preg_replace($scriptPattern, '<script$1 nonce="' . $nonceValue . '">', $content);
+        if ($updated === null) {
+            return;
+        }
+
+        $updated = preg_replace($stylePattern, '<style$1 nonce="' . $nonceValue . '">', $updated);
+        if ($updated === null) {
+            return;
+        }
+
+        $response->setContent($updated);
     }
 
     private function normalisePermissionSources(mixed $values): ?string
@@ -201,11 +245,11 @@ final class AddSecurityHeaders
             return '()';
         }
 
-        return '('.implode(' ', array_values(array_unique($sources))).')';
+        return '(' . implode(' ', array_values(array_unique($sources))) . ')';
     }
 
     /**
-     * @param  array<mixed, mixed>|string|null  $values
+     * @param  array<mixed, mixed>|string|null $values
      * @return array<int, string>|null
      */
     private function normaliseSources(array|string|null $values, ?CspNonce $nonce): ?array
