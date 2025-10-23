@@ -304,8 +304,8 @@ PY
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          extensions: mbstring, intl, gd, exif, pcntl, bcmath, pdo_sqlite, sqlite3
-          coverage: none
+          extensions: mbstring, intl, pdo_sqlite
+          coverage: xdebug
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -358,13 +358,33 @@ PY
           touch "${DB_PATH}"
           php artisan key:generate
 
-      - name: Bootstrap storage directories
+      - name: Prepare directories
         run: |
-          php artisan storage:link
-          mkdir -p storage/app/public
-          mkdir -p storage/framework/cache
-          mkdir -p storage/framework/sessions
-          mkdir -p storage/framework/views
+          mkdir -p build
+          mkdir -p storage/app/coverage
+
+      - name: Run test suite
+        run: composer test:ci
+
+      - name: Publish unit test results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: build/junit.xml
+
+      - name: Upload junit report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phpunit-junit
+          path: build/junit.xml
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phpunit-coverage
+          path: build/coverage.xml
 
       - name: Run database migrations with seeders
         run: php artisan migrate:fresh --seed --force

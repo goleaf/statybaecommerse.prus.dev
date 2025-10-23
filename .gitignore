@@ -20,7 +20,6 @@ composer.lock
 /public/storage
 /storage/*.key
 /storage/app/coverage/
-/storage/app/backups/
 /storage/pail
 /vendor
 database/testing.sqlite
