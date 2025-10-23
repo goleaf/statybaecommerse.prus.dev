@@ -38,7 +38,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as TranslatableResource;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
 
@@ -49,7 +49,7 @@ use App\Support\Filament\Components\Flatpickr;
  */
 final class PriceListItemResource extends Resource
 {
-    use Translatable;
+    use TranslatableResource;
 
     protected static ?string $model = PriceListItem::class;
 

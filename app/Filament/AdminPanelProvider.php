@@ -13,6 +13,7 @@ use Filament\Support\Colors\Color;
 use Filament\Widgets\StatsOverviewWidget;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use InvalidArgumentException;
+use LaraZeus\SpatieTranslatable\SpatieTranslatablePlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -45,6 +46,9 @@ class AdminPanelProvider extends PanelProvider
                 ->userMenu(position: UserMenuPosition::Sidebar)
                 ->colors([
                     'primary' => Color::Blue,
+                ])
+                ->plugins([
+                    $this->makeSpatieTranslatablePlugin(),
                 ])
                 ->resources([
                     \App\Filament\Resources\ApiKeyResource::class,
@@ -88,13 +92,10 @@ class AdminPanelProvider extends PanelProvider
             ->userMenu(position: UserMenuPosition::Sidebar)
             ->colors([
                 'primary' => Color::Blue,
-            ]);
-
-        if ($this->isTestingEnvironment()) {
-            return $panel;
-        }
-
-        return $panel
+            ])
+            ->plugins([
+                $this->makeSpatieTranslatablePlugin(),
+            ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             // ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
@@ -169,5 +170,57 @@ class AdminPanelProvider extends PanelProvider
         }
 
         return $application->environment('testing');
+    }
+
+    private function makeSpatieTranslatablePlugin(): SpatieTranslatablePlugin
+    {
+        $plugin = SpatieTranslatablePlugin::make()
+            ->persist();
+
+        $locales = $this->resolveSupportedLocales();
+
+        if ($locales !== []) {
+            $plugin->defaultLocales($locales);
+        }
+
+        return $plugin;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function resolveSupportedLocales(): array
+    {
+        $configured = config('app.supported_locales', []);
+
+        if (is_string($configured)) {
+            $configured = array_map('trim', explode(',', $configured));
+        } elseif (! is_array($configured)) {
+            $configured = [];
+        }
+
+        $locales = array_filter(array_map(
+            static fn ($locale): string => (string) $locale,
+            $configured,
+        ));
+
+        $fallbackLocale = (string) config('app.fallback_locale', '');
+        $defaultLocale = (string) config('app.locale', 'en');
+
+        if ($fallbackLocale !== '') {
+            $locales[] = $fallbackLocale;
+        }
+
+        if ($defaultLocale !== '') {
+            $locales[] = $defaultLocale;
+        }
+
+        $locales = array_values(array_unique(array_filter($locales)));
+
+        if ($locales === []) {
+            return [$defaultLocale !== '' ? $defaultLocale : 'en'];
+        }
+
+        return $locales;
     }
 }

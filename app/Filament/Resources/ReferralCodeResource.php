@@ -29,13 +29,13 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
-use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as TranslatableResource;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
 
 final class ReferralCodeResource extends Resource
 {
-    use Translatable;
+    use TranslatableResource;
 
     protected static ?string $model = ReferralCode::class;
 

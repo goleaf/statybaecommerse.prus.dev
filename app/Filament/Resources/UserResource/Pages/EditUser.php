@@ -9,11 +9,11 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\EditRecord\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Resources\Pages\EditRecord\Concerns\Translatable as TranslatableEditRecord;
 
 class EditUser extends EditRecord
 {
-    use Translatable;
+    use TranslatableEditRecord;
 
     protected static string $resource = UserResource::class;
 

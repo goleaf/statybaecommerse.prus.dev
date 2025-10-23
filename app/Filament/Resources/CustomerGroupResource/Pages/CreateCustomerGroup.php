@@ -7,11 +7,11 @@ namespace App\Filament\Resources\CustomerGroupResource\Pages;
 use App\Filament\Resources\CustomerGroupResource;
 use Filament\Resources\Pages\CreateRecord;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatable as TranslatableCreateRecord;
 
 final class CreateCustomerGroup extends CreateRecord
 {
-    use Translatable;
+    use TranslatableCreateRecord;
 
     protected static string $resource = CustomerGroupResource::class;
 
@@ -19,7 +19,6 @@ final class CreateCustomerGroup extends CreateRecord
     {
         return [
             LocaleSwitcher::make(),
-            ...parent::getHeaderActions(),
         ];
     }
 }

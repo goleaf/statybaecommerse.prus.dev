@@ -8,11 +8,11 @@ use App\Filament\Resources\CustomerGroupResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\ViewRecord\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Resources\Pages\ViewRecord\Concerns\Translatable as TranslatableViewRecord;
 
 final class ViewCustomerGroup extends ViewRecord
 {
-    use Translatable;
+    use TranslatableViewRecord;
 
     protected static string $resource = CustomerGroupResource::class;
 

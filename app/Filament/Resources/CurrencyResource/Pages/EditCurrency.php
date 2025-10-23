@@ -8,11 +8,11 @@ use App\Filament\Resources\CurrencyResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\EditRecord\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Resources\Pages\EditRecord\Concerns\Translatable as TranslatableEditRecord;
 
 final class EditCurrency extends EditRecord
 {
-    use Translatable;
+    use TranslatableEditRecord;
 
     protected static string $resource = CurrencyResource::class;
 

@@ -11,11 +11,11 @@ use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\ViewRecord\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Resources\Pages\ViewRecord\Concerns\Translatable as TranslatableViewRecord;
 
 final class ViewReferralReward extends ViewRecord
 {
-    use Translatable;
+    use TranslatableViewRecord;
 
     protected static string $resource = ReferralRewardResource::class;
 

@@ -7,11 +7,11 @@ namespace App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource;
 use Filament\Resources\Pages\CreateRecord;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatable as TranslatableCreateRecord;
 
 final class CreateOrder extends CreateRecord
 {
-    use Translatable;
+    use TranslatableCreateRecord;
 
     protected static string $resource = OrderResource::class;
 
@@ -19,7 +19,6 @@ final class CreateOrder extends CreateRecord
     {
         return [
             LocaleSwitcher::make(),
-            ...parent::getHeaderActions(),
         ];
     }
 }

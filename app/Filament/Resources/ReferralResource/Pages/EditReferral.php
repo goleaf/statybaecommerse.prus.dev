@@ -8,11 +8,11 @@ use App\Filament\Resources\ReferralResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\EditRecord\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Resources\Pages\EditRecord\Concerns\Translatable as TranslatableEditRecord;
 
 final class EditReferral extends EditRecord
 {
-    use Translatable;
+    use TranslatableEditRecord;
 
     protected static string $resource = ReferralResource::class;
 

@@ -7,11 +7,11 @@ namespace App\Filament\Resources\ReferralResource\Pages;
 use App\Filament\Resources\ReferralResource;
 use Filament\Resources\Pages\CreateRecord;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatable as TranslatableCreateRecord;
 
 final class CreateReferral extends CreateRecord
 {
-    use Translatable;
+    use TranslatableCreateRecord;
 
     protected static string $resource = ReferralResource::class;
 
@@ -19,7 +19,6 @@ final class CreateReferral extends CreateRecord
     {
         return [
             LocaleSwitcher::make(),
-            ...parent::getHeaderActions(),
         ];
     }
 }

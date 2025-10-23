@@ -8,24 +8,27 @@ use App\Forms\Components\Flatpickr;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\AnalyticsResource\Pages;
 use App\Models\Order;
+use App\Support\Filament\Filters\DateRangeFilter;
+use BackedEnum;
+use Filament\Forms\Components\Flatpickr;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\Summaries\Average;
 use Filament\Tables\Columns\Summaries\Sum;
 use Filament\Tables\Columns\TextColumn;
-use App\Support\Filament\Filters\DateRangeFilter;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as TranslatableResource;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
 
 final class AnalyticsResource extends Resource
 {
-    use HasNav;
+    use TranslatableResource;
 
     protected static ?string $model = Order::class;
 
@@ -142,13 +145,10 @@ final class AnalyticsResource extends Resource
                 SelectFilter::make('status')
                     ->label(__('analytics.status'))
                     ->options([
-                        'pending' => __('analytics.pending'),
-                        'processing' => __('analytics.processing'),
-                        'shipped' => __('analytics.shipped'),
-                        'completed' => __('analytics.completed'),
-                        'delivered' => __('analytics.delivered'),
-                        'cancelled' => __('analytics.cancelled'),
-                        'refunded' => __('analytics.refunded'),
+                        'pending'    => 'Pending',
+                        'processing' => 'Processing',
+                        'completed'  => 'Completed',
+                        'cancelled'  => 'Cancelled',
                     ]),
                 Filter::make('created_at')
                     ->label(__('analytics.order_date_range'))
