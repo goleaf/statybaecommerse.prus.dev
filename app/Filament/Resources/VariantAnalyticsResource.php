@@ -11,6 +11,8 @@ use App\Filament\Resources\VariantAnalyticsResource\Pages;
 use App\Models\ProductVariant;
 use App\Models\VariantAnalytics;
 use App\Support\Filament\Components\Flatpickr;
+use BackedEnum;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
@@ -47,8 +49,10 @@ final class VariantAnalyticsResource extends Resource
 {
     protected static ?string $model = VariantAnalytics::class;
 
-    /** @var string|\BackedEnum|null Typed navigation icon ensures analytics menus stay compatible with enum overrides. */
-    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
+    /**
+     * Typed navigation icon ensures the analytics section resolves enum-backed overrides cleanly.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
     /** @var UnitEnum|string|null Ensure inventory analytics stay grouped centrally. */
     protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Inventory;

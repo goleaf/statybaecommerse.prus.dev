@@ -16,8 +16,6 @@ use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use UnitEnum;
-use Filament\Schemas\Schema;
 
 final class RecommendationCacheResource extends Resource
 {
@@ -31,8 +29,9 @@ final class RecommendationCacheResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'cache_key';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): \UnitEnum|string|null
     {
+        // Fully qualify UnitEnum to eliminate redundant imports across mirrored admin resources.
         return 'Analytics';
     }
 
