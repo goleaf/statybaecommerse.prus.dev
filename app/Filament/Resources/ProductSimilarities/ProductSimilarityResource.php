@@ -11,10 +11,11 @@ use App\Filament\Resources\ProductSimilarities\Pages\ListProductSimilarities;
 use App\Filament\Resources\ProductSimilarities\Schemas\ProductSimilarityForm;
 use App\Filament\Resources\ProductSimilarities\Tables\ProductSimilaritiesTable;
 use App\Models\ProductSimilarity;
-use Filament\Forms\Form;
+use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 class ProductSimilarityResource extends Resource
 {
@@ -24,7 +25,7 @@ class ProductSimilarityResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return ProductSimilarityForm::configure($form);
     }

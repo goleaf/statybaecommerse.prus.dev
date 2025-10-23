@@ -8,11 +8,10 @@ use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
+use Filament\Schemas\Schema;
 
 final class WishlistRelationManager extends BaseRelationManager
 {
@@ -20,7 +19,7 @@ final class WishlistRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Wishlist';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $schema
             ->components([

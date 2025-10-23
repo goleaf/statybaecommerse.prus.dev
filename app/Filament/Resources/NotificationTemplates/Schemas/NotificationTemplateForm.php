@@ -7,11 +7,11 @@ namespace App\Filament\Resources\NotificationTemplates\Schemas;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 
 class NotificationTemplateForm
 {
-    public static function configure(Form $form): Form
+    public static function configure(Schema $form): Schema
     {
         return $form
             ->components([

@@ -13,12 +13,12 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 class EditProfile extends BaseEditProfile
 {
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $schema
             ->components([

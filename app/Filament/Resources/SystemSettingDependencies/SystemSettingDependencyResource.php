@@ -11,10 +11,11 @@ use App\Filament\Resources\SystemSettingDependencies\Pages\ListSystemSettingDepe
 use App\Filament\Resources\SystemSettingDependencies\Schemas\SystemSettingDependencyForm;
 use App\Filament\Resources\SystemSettingDependencies\Tables\SystemSettingDependenciesTable;
 use App\Models\SystemSettingDependency;
-use Filament\Forms\Form;
+use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 class SystemSettingDependencyResource extends Resource
 {
@@ -24,7 +25,7 @@ class SystemSettingDependencyResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return SystemSettingDependencyForm::configure($form);
     }

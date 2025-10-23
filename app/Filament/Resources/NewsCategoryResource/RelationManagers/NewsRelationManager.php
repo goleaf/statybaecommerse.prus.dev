@@ -8,13 +8,13 @@ use App\Forms\Components\Flatpickr;
 use App\Models\News;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms;
-use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 final class NewsRelationManager extends BaseRelationManager
 {
@@ -26,7 +26,7 @@ final class NewsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'News';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $schema
             ->schema([

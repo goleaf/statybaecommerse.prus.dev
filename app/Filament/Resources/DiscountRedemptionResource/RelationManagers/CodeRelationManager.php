@@ -6,12 +6,12 @@ namespace App\Filament\Resources\DiscountRedemptionResource\RelationManagers;
 
 use App\Forms\Components\Flatpickr;
 use Filament\Forms;
-use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
 use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 class CodeRelationManager extends BaseRelationManager
 {
@@ -23,7 +23,7 @@ class CodeRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Codes';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $schema
             ->schema([

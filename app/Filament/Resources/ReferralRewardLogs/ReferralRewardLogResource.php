@@ -11,10 +11,11 @@ use App\Filament\Resources\ReferralRewardLogs\Pages\ListReferralRewardLogs;
 use App\Filament\Resources\ReferralRewardLogs\Schemas\ReferralRewardLogForm;
 use App\Filament\Resources\ReferralRewardLogs\Tables\ReferralRewardLogsTable;
 use App\Models\ReferralRewardLog;
-use Filament\Forms\Form;
+use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 class ReferralRewardLogResource extends Resource
 {
@@ -24,7 +25,7 @@ class ReferralRewardLogResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form|array
+    public static function form(Schema $form): Schema
     {
         return ReferralRewardLogForm::configure($form);
     }

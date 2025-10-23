@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Filament\Resources\AttributeValueResource\Relations;
 
 use Filament\Forms;
-use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Schemas\Schema;
 
 class VariantsRelationManager extends BaseRelationManager
 {
@@ -22,7 +22,7 @@ class VariantsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Variants';
 
-    public function form(Form $form): Form|array
+    public function form(Schema $form): Schema
     {
         return $schema
             ->schema([

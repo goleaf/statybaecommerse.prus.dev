@@ -8,11 +8,11 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\UserProductInteractionResource as LegacyUserProductInteractionResource;
 use App\Models\UserProductInteraction;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
+use Filament\Schemas\Schema;
 
 class UserProductInteractionResource extends Resource
 {
@@ -27,7 +27,7 @@ class UserProductInteractionResource extends Resource
         return LegacyUserProductInteractionResource::getNavigationGroup();
     }
 
-    public static function getNavigationLabel(): string
+    public static function form(Schema $form): Schema
     {
         return LegacyUserProductInteractionResource::getNavigationLabel();
     }
