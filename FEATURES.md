@@ -1,10 +1,20 @@
-# Feature Highlights
+# Platform Features & Highlights
 
-## System Setting Dependency Enhancements
-- Admin users can now choose explicit comparison operators (equals, not equals, contains, etc.) and supply dedicated condition values when linking dependent settings.
-- Operator-only rules such as "is empty" or "is true" automatically hide the value input, keeping forms clear while preventing invalid submissions.
-- Backend evaluation normalizes numeric, string, list, and boolean comparisons to ensure dependencies trigger consistently across translations and seed data.
-- Migration tooling converts legacy JSON-based conditions into the new operator/value columns so existing rules continue to work without manual edits.
+This snapshot complements the changelog by listing functional capabilities that ship with the storefront and admin panel.
 
-## Localization & UX Touches
-- English and Lithuanian admin translations now include readable labels for every supported dependency operator and the new condition value field.
+## Core Commerce Platform
+- Laravel 12 + Filament v4 admin with multilingual product, pricing, discount, and order management flows.
+- Customer loyalty, referral tracking, and recommendation engines with configurable targeting rules.
+- Automated media processing, queue orchestration, and analytics dashboards for store operators.
+
+## Storefront Experience
+- Livewire-powered storefront pages with localisation, SEO metadata, and responsive catalogue browsing.
+- Checkout, cart persistence, and account management journeys wired to the same aggregates used in the admin UI.
+
+## Operational Tooling
+- Queue, cache, and deployment runbooks collected under [`docs/runbooks/`](docs/runbooks/) for production readiness.
+- API contracts, payload samples, and integration notes organised in [`docs/contracts/`](docs/contracts/).
+- Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
+
+## Latest Update
+- Reorganised historical documents into the dedicated analysis, runbook, and contract directories, refreshed the global index, and introduced a [documentation style guide](docs/STYLE_GUIDE.md) to standardise future contributions.

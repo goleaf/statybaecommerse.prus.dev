@@ -51,6 +51,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Centralized documentation into a dedicated analysis hub, quickstart guide, system requirements, collaboration standards, and deployment runbooks (#225, #208, #205, #210, #204).
 * Expanded the operational knowledge base with onboarding tooling, API error catalogues, backup and restore guidance, architecture notes, and composer helper references (#179, #182, #189, #190, #198).
 * Recorded dependency review status and contribution templates to support project governance (#136, #193).
+* Consolidated legacy reports into `docs/analysis/`, moved operational playbooks to `docs/runbooks/`, refreshed the navigation index, and introduced a documentation style guide to keep future contributions consistent.
 
 ### Tooling, CI & Maintenance
 * Automated releases and QA with release linting, Pint normalization, Husky enforcement, and PHP QA improvements (#251, #245, #232, #217).
@@ -58,3 +59,4 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Standardized toolchains by pinning Node and Filament dependencies, aligning composer requirements, and expanding Tailwind content globs (#206, #188, #209, #207, #153).
 * Cleaned repository state by purging runtime artifacts, stopping tracked builds, removing archived assets and placeholder docs, and replacing environment, cookie, and PHP INI files with templates (#222, #221, #218, #212, #203, #201, #200, #195).
 * Enabled security scanning and strengthened automated test coverage with schema mocks and targeted resource tests (#197, #185, #164).
+* Added a documentation size guard to CI so oversized Markdown files are caught before merges.

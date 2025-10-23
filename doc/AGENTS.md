@@ -6,11 +6,11 @@ This repository mixes Laravel 12 and Filament v4 code. Use the following guardra
 
 - **Primary domains**: construction-product catalogues, marketing/news content, recommendation & referral systems, and multilingual storefront flows.
 - **Key directories**: `app/Filament` (admin resources/widgets), `app/Services` (business logic), `app/Data` (DTOs), `database/seeders` (multilingual fixtures), `resources/views` (Blade + Volt storefront), and `scripts/*.mjs` (Playwright/e2e diagnostics).
-- **Getting unstuck**: skim `README.md`, `docs/ARCHITECTURE_OVERVIEW.md`, and `docs/INDEX.md` for entry points; queue and cache nuances live in `docs/CachePolicy.md`.
+- **Getting unstuck**: skim `README.md`, `docs/ARCHITECTURE_OVERVIEW.md`, and `docs/INDEX.md` for entry points; queue and cache nuances live in `docs/runbooks/CachePolicy.md`.
 
 ## 2025 baseline after merged PRs
 
-- Treat the repository as feature-complete: the closure artefacts in `docs/PROJECT_CLOSURE_DOCUMENT.md`, `docs/COMPLETE_PROJECT_ARCHIVE_INDEX.md`, and the roll-up status in `memory-bank/progress.md` reflect the fully delivered Laravel + Filament programme.
+- Treat the repository as feature-complete: the closure artefacts in `docs/analysis/PROJECT_CLOSURE_DOCUMENT.md`, `docs/analysis/COMPLETE_PROJECT_ARCHIVE_INDEX.md`, and the roll-up status in `memory-bank/progress.md` reflect the fully delivered Laravel + Filament programme.
 - All Filament resources now follow the Schema-based APIs introduced in the compatibility PRs. Any reintroduction of legacy `Form` classes, mismatched method signatures, or navigation property types should be considered regressions and blocked in review.
 - Enum management, discount engines, legal content, and advanced merchandising panels are online. When adding to these domains, keep logic in their dedicated namespaces (`app/Enums/**`, `app/Services/Discounts/**`, `app/Filament/Resources/Legal/**`, `app/Filament/Resources/Collection*`) and extend existing policies/tests instead of duplicating behaviour.
 - The storefront Livewire flows (cart, checkout, recommendations) ship with production-ready translations and SEO defaults. Preserve LT/EN parity by updating both `resources/lang/lt` and `resources/lang/en` whenever adding copy.
