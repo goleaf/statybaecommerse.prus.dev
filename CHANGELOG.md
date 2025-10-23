@@ -130,6 +130,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Consolidated legacy reports into `docs/analysis/`, moved operational playbooks to `docs/runbooks/`, refreshed the navigation index, and introduced a documentation style guide to keep future contributions consistent.
 
 ### Tooling, CI & Maintenance
+* Hardened Filament Livewire tests by aliasing schema classes and proxying widget tab Blade components so campaign product target suites pass without manual stubs.
 * Automated releases and QA with release linting, Pint normalization, Husky enforcement, and PHP QA improvements (#251, #245, #232, #217).
 * Enhanced CI coverage with Lighthouse audits, comprehensive workflows, seeded test runs, and refined Laravel test sequencing (#250, #199, #162, #170).
 * Standardized toolchains by pinning Node and Filament dependencies, aligning composer requirements, and expanding Tailwind content globs (#206, #188, #209, #207, #153).
