@@ -6,7 +6,7 @@
                 href="{{ route('frontend.search.index', array_filter(['q' => $query])) }}"
                 class="text-sm font-medium text-blue-600 hover:text-blue-500"
             >
-                {{ __('shared.reset') }}
+                {{ __('frontend.search.reset_filters') }}
             </a>
         @endif
     </div>
