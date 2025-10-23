@@ -33,7 +33,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 
 final class LocationResource extends Resource
 {
@@ -221,10 +221,10 @@ final class LocationResource extends Resource
                             Toggle::make('is_closed')
                                 ->label(__('locations.fields.is_closed'))
                                 ->live(),
-                            Flatpickr::makeTime('open_time')
+                            SupportFlatpickr::makeTime('open_time')
                                 ->label(__('locations.fields.open_time'))
                                 ->visible(fn ($get) => ! $get('is_closed')),
-                            Flatpickr::makeTime('close_time')
+                            SupportFlatpickr::makeTime('close_time')
                                 ->label(__('locations.fields.close_time'))
                                 ->visible(fn ($get) => ! $get('is_closed')),
                         ])
@@ -483,8 +483,8 @@ final class LocationResource extends Resource
                         ->action(function (Collection $records): void {
                             // Remove default from other locations
                             Location::where('is_default', true)->update(['is_default' => false]);
-                            // Set first selected as default
-                            $records->first()->update(['is_default' => true]);
+                            // Set first selected as default (null-safe)
+                            $records->first()?->update(['is_default' => true]);
                             Notification::make()
                                 ->title(__('locations.messages.bulk_set_default_success'))
                                 ->success()

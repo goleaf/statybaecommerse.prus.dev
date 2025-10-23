@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Schema;
 use JsonSerializable;
 
 /**
@@ -71,9 +72,7 @@ final class NormalSetting extends Model
                     try {
                         $decrypted = decrypt($value);
                         if (in_array($this->attributes['type'] ?? '', ['json', 'array']) && is_string($decrypted)) {
-                            $decoded = json_decode($decrypted, true);
-
-                            return $decoded !== null ? $decoded : [];
+                            return safe_json_decode_array($decrypted);
                         }
 
                         return $decrypted;
@@ -82,13 +81,7 @@ final class NormalSetting extends Model
                 }
             }
             if (in_array($this->attributes['type'] ?? '', [self::TYPE_JSON, self::TYPE_ARRAY], true)) {
-                if (is_string($value)) {
-                    $decoded = json_decode($value, true);
-
-                    return $decoded !== null ? $decoded : [];
-                }
-
-                return is_array($value) ? $value : [];
+                return is_string($value) ? safe_json_decode_array($value) : (is_array($value) ? $value : []);
             }
             // Handle boolean type
             if (($this->attributes['type'] ?? '') === self::TYPE_BOOLEAN) {
@@ -144,9 +137,7 @@ final class NormalSetting extends Model
                 return [];
             }
             if (is_string($value)) {
-                $decoded = json_decode($value, true);
-
-                return $decoded !== null ? $decoded : [];
+                return safe_json_decode_array($value);
             }
 
             return $value;
@@ -206,8 +197,14 @@ final class NormalSetting extends Model
      */
     public static function getValue(string $key, $default = null, ?string $locale = null)
     {
-        $locale = $locale ?? app()->getLocale();
-        $setting = self::where('key', $key)->where('locale', $locale)->first();
+        $query = self::where('key', $key);
+
+        if (self::localeColumnExists()) {
+            $locale = $locale ?? app()->getLocale();
+            $query->where('locale', $locale);
+        }
+
+        $setting = $query->first();
 
         return $setting ? $setting->value : $default;
     }
@@ -219,19 +216,29 @@ final class NormalSetting extends Model
      */
     public static function setValue(string $key, $value, string $group = 'general', ?string $locale = null): void
     {
-        $locale = $locale ?? app()->getLocale();
         $type = self::inferTypeFromValue($value);
+        $supportsLocale = self::localeColumnExists();
+        $resolvedLocale = $supportsLocale ? ($locale ?? app()->getLocale()) : null;
+
+        $attributes = ['key' => $key];
+
+        if ($supportsLocale) {
+            $attributes['locale'] = $resolvedLocale;
+        }
+
+        $values = [
+            'group' => $group,
+            'type'  => $type,
+            'value' => self::normalizeValueForStorage($value, $type),
+        ];
+
+        if ($supportsLocale) {
+            $values['locale'] = $resolvedLocale;
+        }
 
         for ($attempt = 0; $attempt < 5; $attempt++) {
             try {
-                self::updateOrCreate(
-                    ['key' => $key, 'locale' => $locale],
-                    [
-                        'group' => $group,
-                        'type'  => $type,
-                        'value' => self::normalizeValueForStorage($value, $type),
-                    ],
-                );
+                self::updateOrCreate($attributes, $values);
 
                 return;
             } catch (DeadlockException|QueryException $exception) {
@@ -386,6 +393,10 @@ final class NormalSetting extends Model
      */
     public function scopeForLocale($query, ?string $locale = null)
     {
+        if (! self::localeColumnExists()) {
+            return $query;
+        }
+
         $locale = $locale ?? app()->getLocale();
 
         return $query->where('locale', $locale);
@@ -406,5 +417,14 @@ final class NormalSetting extends Model
                 $setting->attributes['value'] = encrypt($setting->value);
             }
         });
+    }
+
+    private static function localeColumnExists(): bool
+    {
+        try {
+            return Schema::hasColumn((new self())->getTable(), 'locale');
+        } catch (Exception) {
+            return false;
+        }
     }
 }

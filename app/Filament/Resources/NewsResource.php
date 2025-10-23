@@ -10,7 +10,7 @@ use App\Filament\Components\Combobox;
 use App\Filament\Resources\NewsResource\Pages;
 use App\Filament\Resources\NewsResource\RelationManagers;
 use App\Models\News;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Infolists;
@@ -73,7 +73,7 @@ class NewsResource extends Resource
                 ->columns(1),
             Forms\Components\SchemaSection::make('Publishing')
                 ->components([
-                    Flatpickr::makeDateTime('published_at')
+                    SupportFlatpickr::makeDateTime('published_at')
                         ->label(__('news.fields.published_at'))
                         ->default(now()),
                     Forms\Components\TextInput::make('author_name')
@@ -232,9 +232,9 @@ class NewsResource extends Resource
                     ->label(__('news.fields.is_breaking')),
                 Tables\Filters\Filter::make('published_at')
                     ->form([
-                        Flatpickr::makeDate('published_from')
+                        SupportFlatpickr::makeDate('published_from')
                             ->label(__('news.filters.published_from')),
-                        Flatpickr::makeDate('published_until')
+                        SupportFlatpickr::makeDate('published_until')
                             ->label(__('news.filters.published_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

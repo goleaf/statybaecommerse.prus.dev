@@ -24,12 +24,12 @@ return [
         'avif',
     ],
     'curation_presets' => [
-        \Awcodes\Curator\Curations\ThumbnailPreset::class,
+        'Awcodes\\Curator\\Curations\\ThumbnailPreset',
     ],
     'directory' => 'media',
     'disk' => env('FILAMENT_FILESYSTEM_DISK', 'public'),
     'glide' => [
-        'server' => \Awcodes\Curator\Glide\DefaultServerFactory::class,
+        'server' => 'Awcodes\\Curator\\Glide\\DefaultServerFactory',
         'fallbacks' => [],
         'route_path' => 'curator',
     ],
@@ -41,7 +41,7 @@ return [
     'is_tenant_aware' => true,
     'tenant_ownership_relationship_name' => 'tenant',
     'max_size' => 5000,
-    'model' => \Awcodes\Curator\Models\Media::class,
+    'model' => 'Awcodes\\Curator\\Models\\Media',
     'min_size' => 0,
     'path_generator' => null,
     'resources' => [
@@ -53,7 +53,7 @@ return [
         'navigation_icon' => 'heroicon-o-photo',
         'navigation_sort' => null,
         'navigation_count_badge' => false,
-        'resource' => \Awcodes\Curator\Resources\MediaResource::class,
+        'resource' => 'Awcodes\\Curator\\Resources\\MediaResource',
     ],
     'should_preserve_filenames' => false,
     'should_register_navigation' => true,

@@ -116,7 +116,7 @@ abstract class BasePageComponent extends Component
     public function addToCompare(int $productId): void
     {
         $compareProducts = session('compare_products', []);
-        if (count($compareProducts) >= 4) {
+        if ((is_countable($compareProducts) ? count($compareProducts) : 0) >= 4) {
             $this->notifyWarning($this->trans('shared.compare_limit_reached', ['max' => 4]));
 
             return;

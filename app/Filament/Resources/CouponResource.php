@@ -11,7 +11,7 @@ use App\Filament\Resources\CouponResource\Pages;
 use App\Models\Coupon;
 use App\Filament\Forms\Components\Quantity;
 use App\Models\Scopes\ActiveScope;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\DeleteAction;
@@ -182,11 +182,11 @@ final class CouponResource extends Resource
                     SchemaGrid::make(2)
                         ->schema([
                             // Bind to starts_at so form submissions map directly to the persisted columns that power scopes.
-                            Flatpickr::makeDateTime('starts_at')
+                            SupportFlatpickr::makeDateTime('starts_at')
                                 ->label(__('coupons.valid_from'))
                                 ->default(now())
                                 ->displayFormat('d/m/Y H:i'),
-                            Flatpickr::makeDateTime('expires_at')
+                            SupportFlatpickr::makeDateTime('expires_at')
                                 ->label(__('coupons.valid_until'))
                                 ->displayFormat('d/m/Y H:i'),
                         ]),

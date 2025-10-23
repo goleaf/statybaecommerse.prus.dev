@@ -682,5 +682,207 @@ return [
         'required' => 'Privalomas',
         'last_updated' => 'Paskutinį kartą atnaujinta',
         'document_unavailable' => 'Šis dokumentas šiuo metu nepasiekiamas. Dėl pagalbos susisiekite su mumis.',
+        'terms_of_service' => 'Naudojimo sąlygos',
+        'privacy_policy' => 'Privatumo politika',
+        'cookie_policy' => 'Slapukų politika',
+        'return_policy' => 'Grąžinimo ir kompensavimo taisyklės',
+        'register_agreement_intro' => 'Kurdami paskyrą sutinkate su mūsų',
+        'login_agreement_intro' => 'Prisijungdami patvirtinate, kad sutinkate su mūsų',
+        'and' => 'ir',
+        'descriptions' => [
+            'privacy' => 'Sužinokite, kaip renkame, naudojame ir saugome jūsų asmens duomenis.',
+            'terms' => 'Perskaitykite sąlygas, kurios galioja naudojantis mūsų parduotuve.',
+            'cookies' => 'Sužinokite, kaip naudojame slapukus ir panašias technologijas, kad pagerintume jūsų apsipirkimo patirtį.',
+            'shipping' => 'Peržiūrėkite pristatymo būdus, terminus ir užsakymų sekimo galimybes.',
+            'returns' => 'Sužinokite, kaip tvarkomi jūsų užsakymų grąžinimai, keitimai ir kompensacijos.',
+        ],
+        'defaults' => [
+            'privacy' => [
+                'sections' => [
+                    [
+                        'title' => '1. Kokius duomenis renkame',
+                        'paragraphs' => [
+                            'Kurdami paskyrą pateikiate savo vardą, pavardę, el. pašto adresą, telefono numerį, pristatymo informaciją ir saugų slaptažodį.',
+                            'Taip pat saugome užsakymų istoriją, pagalbos užklausas, norų sąrašus ir naršymo nuostatas, kad galėtume įvykdyti jūsų užklausas ir tobulinti parduotuvę.',
+                        ],
+                    ],
+                    [
+                        'title' => '2. Kaip naudojame informaciją',
+                        'paragraphs' => [
+                            'Duomenys padeda mums apdoroti užsakymus, organizuoti pristatymą, tvarkyti grąžinimus ir pateikti rekomendacijas, kurios tinka jūsų projektams.',
+                            'Analizuojame apibendrintus naudojimo duomenis, kad palaikytume sistemos stabilumą, užkirstume kelią sukčiavimui ir užtikrintume greitą bei saugią paslaugą.',
+                        ],
+                    ],
+                    [
+                        'title' => '3. Kada dalijamės duomenimis',
+                        'paragraphs' => [
+                            'Su patikimais mokėjimų tvarkytojais, logistikos partneriais ir paslaugų teikėjais dalijamės tik būtina informacija, kad jie galėtų įvykdyti jūsų pasirinktus veiksmus.',
+                            'Mes neparduodame jūsų asmens duomenų. Į išorę perduodamos analizės yra anonimizuotos ir neleidžia tiesiogiai nustatyti jūsų tapatybės.',
+                        ],
+                    ],
+                    [
+                        'title' => '4. Jūsų pasirinkimai ir teisės',
+                        'paragraphs' => [
+                            'Savo profilio duomenis, komunikacijos nuostatas ir išsaugotus adresus galite bet kada peržiūrėti ar atnaujinti paskyros valdymo skiltyje.',
+                            'Jei norite gauti duomenų kopiją arba paprašyti juos ištrinti, susisiekite su pagalbos komanda – atsakysime per teisės aktuose numatytus terminus.',
+                        ],
+                    ],
+                    [
+                        'title' => '5. Susisiekite su mumis',
+                        'paragraphs' => [
+                            'Turite klausimų dėl privatumo? Rašykite mums el. paštu support@statybae.com – mūsų komanda padės.',
+                        ],
+                    ],
+                ],
+            ],
+            'terms' => [
+                'sections' => [
+                    [
+                        'title' => '1. Kaip naudotis StatyBae Commerce',
+                        'paragraphs' => [
+                            'Šios sąlygos paaiškina, kaip galite naudotis StatyBae Commerce parduotuve, pateikti užsakymus ir gauti mūsų paslaugas.',
+                            'Prisijungdami patvirtinate, kad jums yra bent 18 metų (arba turite tėvų ar globėjų sutikimą) ir laikotės taikomų teisės aktų.',
+                        ],
+                    ],
+                    [
+                        'title' => '2. Paskyros ir saugumas',
+                        'paragraphs' => [
+                            'Esate atsakingi už prisijungimo duomenų apsaugą ir veiksmus, atliekamus jūsų paskyroje.',
+                            'Jei įtariate neteisėtą prieigą, nedelsdami praneškite mums, kad galėtume apsaugoti jūsų paskyrą.',
+                        ],
+                    ],
+                    [
+                        'title' => '3. Užsakymai ir kainos',
+                        'paragraphs' => [
+                            'Kainos, pasiūlymai ir prekių likučiai gali keistis be išankstinio įspėjimo iki kol užsakymas patvirtinamas atsiskaitymo metu.',
+                            'Pasirenkame teisę atsisakyti ar atšaukti užsakymus, jei nustatomi kainų neatitikimai, įtariamas sukčiavimas ar tiekimo ribojimai. Atšaukus užsakymą, sumokėtos lėšos grąžinamos.',
+                        ],
+                    ],
+                    [
+                        'title' => '4. Pristatymas ir grąžinimai',
+                        'paragraphs' => [
+                            'Numatomas pristatymo terminas pateikiamas atsiskaitymo lange. Įsipareigojate pateikti tikslius adresus ir priimti siuntą sutartu laiku.',
+                            'Grąžinimo taisyklės, pateiktos mūsų grąžinimų politikoje, nurodo, kaip kreiptis dėl grąžinimo ar keitimo. Prekės turi būti nenaudotos ir originalioje pakuotėje, nebent nurodyta kitaip.',
+                        ],
+                    ],
+                    [
+                        'title' => '5. Atsakomybė ir pagalba',
+                        'paragraphs' => [
+                            'Įstatymų leidžiamose ribose neatsakome už netiesioginius ar paseknius nuostolius, atsiradusius naudojantis parduotuve.',
+                            'Reikia pagalbos? Parašykite support@statybae.com – mielai padėsime.',
+                        ],
+                    ],
+                ],
+            ],
+            'cookies' => [
+                'sections' => [
+                    [
+                        'title' => '1. Būtini slapukai',
+                        'paragraphs' => [
+                            'Būtini slapukai užtikrina svarbiausias parduotuvės funkcijas: saugų prisijungimą, krepšelio išsaugojimą, atsiskaitymo žingsnius ir mokėjimų apdorojimą.',
+                            'Šie slapukai reikalingi paslaugoms, kurias pasirinkote, todėl jų išjungimas gali sutrikdyti pagrindines funkcijas.',
+                        ],
+                    ],
+                    [
+                        'title' => '2. Našumo ir analitiniai slapukai',
+                        'paragraphs' => [
+                            'Analitiniai slapukai padeda suprasti, kaip lankytojai naršo katalogą, ieško produktų ir naudojasi navigacija, kad galėtume tobulinti parduotuvę.',
+                            'Renkami duomenys yra apibendrinti ir neleidžia tiesiogiai nustatyti jūsų tapatybės. Analitiką galite išjungti naršyklės nustatymuose arba susisiekę su mumis.',
+                        ],
+                    ],
+                    [
+                        'title' => '3. Personalizavimo slapukai',
+                        'paragraphs' => [
+                            'Personalizavimo slapukai įsimena jūsų kalbą, neseniai peržiūrėtas prekes ir išsaugotus filtrus, kad grįžę apsipirktumėte greičiau.',
+                            'Bet kada galite ištrinti šiuos slapukus naršyklėje. Tai panaikins išsaugotas nuostatas visoje parduotuvėje.',
+                        ],
+                    ],
+                    [
+                        'title' => '4. Slapukų valdymas',
+                        'paragraphs' => [
+                            'Dauguma naršyklių leidžia blokuoti ar ištrinti slapukus, tačiau žinokite, kad išjungus būtinus slapukus gali neveikti atsiskaitymo procesas ar prisijungimas prie paskyros.',
+                            'Išsamesnius nurodymus rasite savo naršyklės pagalbos centre arba susisiekę su mumis el. paštu support@statybae.com.',
+                        ],
+                    ],
+                ],
+            ],
+            'shipping' => [
+                'sections' => [
+                    [
+                        'title' => '1. Pristatymo galimybės',
+                        'paragraphs' => [
+                            'Pasirinkite kurjerio, padėklinio arba atsiėmimo punkto pristatymą pagal užsakymo svorį ir gabaritus.',
+                            'Standartinis kurjerių pristatymas galimas visoje Lietuvoje, o kasoje galite pasirinkti pristatymą šeštadienį ar skubų pristatymą.',
+                        ],
+                    ],
+                    [
+                        'title' => '2. Išsiuntimo terminai',
+                        'paragraphs' => [
+                            'Užsakymai, patvirtinti iki 14:00 val., dažniausiai išsiunčiami tą pačią dieną iš mūsų regioninių sandėlių.',
+                            'Prekės, pažymėtos kaip specialus užsakymas, prieš įdedant į krepšelį rodo numatomą tiekimo terminą.',
+                        ],
+                    ],
+                    [
+                        'title' => '3. Sekimas ir pranešimai',
+                        'paragraphs' => [
+                            'Kai tik siunta palieka mūsų sandėlį, el. paštu gaunate sekimo nuorodą ir pagrindinę informaciją.',
+                            'Užsakymo būseną 24/7 galite stebėti paskyros valdymo skiltyje, kur taip pat matomi visi pristatymo atnaujinimai.',
+                        ],
+                    ],
+                    [
+                        'title' => '4. Negabaritinės siuntos',
+                        'paragraphs' => [
+                            'Stambūs ar nestandartiniai kroviniai pristatomi specializuotų vežėjų. Prieš pristatymą susisiekiame, kad suderintume privažiavimo ir iškrovimo sąlygas.',
+                            'Jei iškrovimui reikalinga papildoma technika, prašome tai suplanuoti iš anksto arba informuoti mus – padėsime parinkti tinkamą sprendimą.',
+                        ],
+                    ],
+                    [
+                        'title' => '5. Pristatymo pagalba',
+                        'paragraphs' => [
+                            'Jei keičiasi pristatymo laikas ar adresas, parašykite logistics@statybae.com ir nurodykite užsakymo numerį bei naujas instrukcijas.',
+                            'Aktyviai stebime siuntas ir informuojame apie bet kokius galimus vėlavimus, kad rastume tinkamiausią alternatyvą.',
+                        ],
+                    ],
+                ],
+            ],
+            'returns' => [
+                'sections' => [
+                    [
+                        'title' => '1. Grąžinimo terminas',
+                        'paragraphs' => [
+                            'Pateikti prašymą grąžinti prekę galite per 30 dienų nuo pristatymo. Prekė turi būti nenaudota, originalioje pakuotėje ir su visomis etiketėmis.',
+                            'Individualūs užsakymai, pagal išmatavimus gaminami ar išpardavimo produktai gali būti negrąžinami. Tiksli informacija nurodyta užsakymo patvirtinime.',
+                        ],
+                    ],
+                    [
+                        'title' => '2. Kaip pradėti grąžinimą',
+                        'paragraphs' => [
+                            'Grąžinimą inicijuokite paskyros valdymo skiltyje arba susisiekite su klientų aptarnavimu ir nurodykite užsakymo numerį, prekę bei grąžinimo priežastį.',
+                            'Patvirtinus grąžinimą, atsiųsime instrukcijas ir, jei reikia, iš anksto apmokėtą grąžinimo etiketę arba suderinsime siuntos paėmimą.',
+                        ],
+                    ],
+                    [
+                        'title' => '3. Kompensacijos ir keitimai',
+                        'paragraphs' => [
+                            'Kompensacijos grąžinamos tuo pačiu mokėjimo būdu po to, kai prekė patikrinama mūsų sandėlyje. Tai gali užtrukti iki 10 darbo dienų nuo gavimo.',
+                            'Jei norite prekę pakeisti, praneškite apie tai teikdami grąžinimo prašymą – suorganizuojame pakaitinį produktą arba suteikiame kredito sumą.',
+                        ],
+                    ],
+                    [
+                        'title' => '4. Sugadintos ar brokuotos prekės',
+                        'paragraphs' => [
+                            'Jei gavote pažeistą ar trūkstamų dalių turintį užsakymą, praneškite per 5 dienas nuo pristatymo ir pridėkite nuotraukų, kad galėtume greitai išspręsti situaciją.',
+                            'Organizuosime pakeitimą arba kompensaciją ir pasirūpinsime grąžinimo siunta savo sąskaita.',
+                        ],
+                    ],
+                    [
+                        'title' => '5. Pagalba',
+                        'paragraphs' => [
+                            'Reikia pagalbos dėl grąžinimo? Parašykite mums adresu support@statybae.com – mūsų logistika pasirūpins visomis detalėmis.',
+                        ],
+                    ],
+                ],
+            ],
+        ],
     ],
 ];

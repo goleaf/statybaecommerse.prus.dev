@@ -591,8 +591,8 @@ class PHPDocUpgradeVisitorV2 extends NodeVisitorAbstract
             if ($comment instanceof Node\Comment\Doc) {
                 $text = $comment->getText();
 
-                return strpos($text, '/**') === 0 &&
-                       (strpos($text, '@param') !== false || strpos($text, '@return') !== false);
+                return strpos((string) $text, '/**') === 0 &&
+                       (strpos((string) $text, '@param') !== false || strpos((string) $text, '@return') !== false);
             }
         }
 

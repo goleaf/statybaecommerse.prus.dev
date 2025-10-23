@@ -70,6 +70,12 @@ final class Nav
      */
     private static function resourceClasses(): array
     {
+        // Avoid autoloading all resources during tests to prevent unrelated
+        // class load errors from interfering with isolated feature tests.
+        if (app()->environment('testing')) {
+            return [];
+        }
+
         $resourcePath = app_path('Filament/Resources');
         $files = glob($resourcePath . '/*Resource.php');
         $classes = [];

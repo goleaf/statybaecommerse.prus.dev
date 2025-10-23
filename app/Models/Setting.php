@@ -46,7 +46,7 @@ final class Setting extends Model
             return is_numeric($value) ? (float) $value : 0;
         }
         if (in_array($this->type, ['json', 'array'])) {
-            return json_decode($value, true);
+            return safe_json_decode_array($value);
         }
 
         return $value;

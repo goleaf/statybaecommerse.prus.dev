@@ -9,9 +9,9 @@ use App\Domain\Product\Entities\Product;
 /**
  * DTO wrapping a full product view derived from the domain model.
  */
-final class ProductDetailsDto
+final readonly class ProductDetailsDto
 {
-    public function __construct(private readonly ProductSummaryDto $summary)
+    public function __construct(private ProductSummaryDto $summary)
     {
         // The heavy lifting happens when we build the summary from the domain entity.
     }

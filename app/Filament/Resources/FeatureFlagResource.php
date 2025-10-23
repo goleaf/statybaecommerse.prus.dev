@@ -12,7 +12,7 @@ use App\Filament\Resources\FeatureFlagResource\Pages;
 use App\Models\FeatureFlag;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -119,10 +119,10 @@ final class FeatureFlagResource extends Resource
                 ->components([
                     SchemaGrid::make(2)
                         ->components([
-                            Flatpickr::makeDateTime('starts_at')
+                            SupportFlatpickr::makeDateTime('starts_at')
                                 ->label(__('feature_flags.starts_at'))
                                 ->nullable(),
-                            Flatpickr::makeDateTime('ends_at')
+                            SupportFlatpickr::makeDateTime('ends_at')
                                 ->label(__('feature_flags.ends_at'))
                                 ->nullable(),
                         ]),

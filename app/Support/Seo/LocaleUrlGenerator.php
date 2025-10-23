@@ -17,7 +17,7 @@ final class LocaleUrlGenerator
     public function __construct()
     {
         $configured = config('app.supported_locales', []);
-        $locales = is_string($configured) ? explode(',', $configured) : $configured;
+        $locales = is_string($configured) ? explode(',', (string) $configured) : $configured;
         $this->supportedLocales = collect($locales)
             ->map(static fn ($locale) => trim((string) $locale))
             ->filter()

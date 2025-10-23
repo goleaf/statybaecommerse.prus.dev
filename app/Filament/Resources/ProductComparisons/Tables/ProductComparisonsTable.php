@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductComparisons\Tables;
 
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -55,7 +55,7 @@ class ProductComparisonsTable
                     ->relationship('product', 'name'),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::makeRange('range')
+                        SupportFlatpickr::makeRange('range')
                             ->label(__('product_comparisons.created_at'))
 
                             ->format('Y-m-d')

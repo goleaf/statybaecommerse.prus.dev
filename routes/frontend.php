@@ -19,6 +19,9 @@ Route::middleware(['web'])->group(function () {
     // Homepage
     Route::get('/', [App\Http\Controllers\Frontend\HomeController::class, 'index'])->name('home');
 
+    // About page
+    Route::view('/about', 'frontend.about.index')->name('frontend.about.index');
+
     // Products
     Route::prefix('products')->name('frontend.products.')->group(function () {
         Route::get('/', [App\Http\Controllers\Frontend\ProductController::class, 'index'])->name('index');
@@ -121,6 +124,7 @@ Route::middleware(['web'])->group(function () {
         Route::get('/privacy', [App\Http\Controllers\Frontend\LegalController::class, 'privacy'])->name('privacy');
         Route::get('/terms', [App\Http\Controllers\Frontend\LegalController::class, 'terms'])->name('terms');
         Route::get('/cookies', [App\Http\Controllers\Frontend\LegalController::class, 'cookies'])->name('cookies');
+        Route::get('/shipping', [App\Http\Controllers\Frontend\LegalController::class, 'shipping'])->name('shipping');
         Route::get('/returns', [App\Http\Controllers\Frontend\LegalController::class, 'returns'])->name('returns');
     });
 

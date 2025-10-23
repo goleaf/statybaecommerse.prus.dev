@@ -8,7 +8,7 @@ namespace App\Filament\Resources\DiscountRedemptionResource\RelationManagers;
 use Filament\Schemas\Schema;
 use Filament\Forms;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -39,9 +39,9 @@ class CodeRelationManager extends BaseRelationManager
                         Forms\Components\Textarea::make('description_en')
                             ->label('Description (EN)')
                             ->columnSpanFull(),
-                        Flatpickr::makeDateTime('starts_at')
+                        SupportFlatpickr::makeDateTime('starts_at')
                             ->label('Starts At'),
-                        Flatpickr::makeDateTime('expires_at')
+                        SupportFlatpickr::makeDateTime('expires_at')
                             ->label('Expires At'),
                         Forms\Components\TextInput::make('usage_limit')
                             ->label('Usage Limit')
@@ -140,9 +140,9 @@ class CodeRelationManager extends BaseRelationManager
                     ->label('Active'),
                 Tables\Filters\Filter::make('expires_at')
                     ->form([
-                        Flatpickr::makeDate('expires_from')
+                        SupportFlatpickr::makeDate('expires_from')
                             ->label('Expires From'),
-                        Flatpickr::makeDate('expires_until')
+                        SupportFlatpickr::makeDate('expires_until')
                             ->label('Expires Until'),
                     ])
                     ->query(function ($query, array $data) {

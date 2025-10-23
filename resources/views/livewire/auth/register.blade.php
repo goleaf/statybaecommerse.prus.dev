@@ -32,33 +32,27 @@
                         </p>
                     </div>
 
+                    @php
+                        $registerBenefits = [
+                            [
+                                'icon' => 'rewards',
+                                'message' => __('Earn points and surprise rewards every time you shop.'),
+                            ],
+                            [
+                                'icon' => 'checkout',
+                                'message' => __('Save multiple addresses and payment preferences for instant checkout.'),
+                            ],
+                            [
+                                'icon' => 'records',
+                                'message' => __('Keep order history, invoices, and returns tidy within your dashboard.'),
+                            ],
+                        ];
+                    @endphp
+
                     <ul class="space-y-4 text-sm text-white/80">
-                        <li class="flex items-start gap-3">
-                            <div class="mt-1 flex h-7 w-7 items-center justify-center rounded-full bg-white/15">
-                                <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                </svg>
-                            </div>
-                            <span>{{ __('Earn points and surprise rewards every time you shop.') }}</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <div class="mt-1 flex h-7 w-7 items-center justify-center rounded-full bg-white/15">
-                                <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l3 2" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 22a10 10 0 100-20 10 10 0 000 20z" />
-                                </svg>
-                            </div>
-                            <span>{{ __('Save multiple addresses and payment preferences for instant checkout.') }}</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <div class="mt-1 flex h-7 w-7 items-center justify-center rounded-full bg-white/15">
-                                <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h12M9 3v2m6 14h2a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 9h12M7 21H5a2 2 0 01-2-2V9" />
-                                </svg>
-                            </div>
-                            <span>{{ __('Keep order history, invoices, and returns tidy within your dashboard.') }}</span>
-                        </li>
+                        @foreach ($registerBenefits as $benefit)
+                            <x-auth.register-benefit :icon="$benefit['icon']" :message="$benefit['message']" />
+                        @endforeach
                     </ul>
                 </div>
             </div>
@@ -212,10 +206,14 @@
         </div>
 
         <p class="text-center text-xs text-slate-400">
-            {{ __('By creating an account you agree to our') }}
-            <x-link href="#" class="text-indigo-500 hover:text-indigo-600">{{ __('Terms of Service') }}</x-link>
-            {{ __('and') }}
-            <x-link href="#" class="text-indigo-500 hover:text-indigo-600">{{ __('Privacy Policy') }}</x-link>.
+            {{ __('frontend.legal.register_agreement_intro') }}
+            <x-link href="{{ route('frontend.legal.terms') }}" class="text-indigo-500 hover:text-indigo-600">
+                {{ __('frontend.legal.terms_of_service') }}
+            </x-link>
+            {{ __('frontend.legal.and') }}
+            <x-link href="{{ route('frontend.legal.privacy') }}" class="text-indigo-500 hover:text-indigo-600">
+                {{ __('frontend.legal.privacy_policy') }}
+            </x-link>.
         </p>
     </div>
 </x-auth-page>

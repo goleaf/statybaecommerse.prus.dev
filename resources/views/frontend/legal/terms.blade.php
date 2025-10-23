@@ -1,9 +1,9 @@
 @extends('frontend.layouts.app')
 
 @php
-    $defaultTitle = __('Terms & Conditions');
+    $defaultTitle = __('frontend.legal.terms_of_service');
     $pageTitle = $legal?->getTranslatedSeoTitle() ?? $legal?->getTranslatedTitle() ?? $defaultTitle;
-    $pageDescription = $legal?->getTranslatedSeoDescription() ?? __('Review the terms and conditions that govern your use of our storefront.');
+    $pageDescription = $legal?->getTranslatedSeoDescription() ?? __('frontend.legal.descriptions.terms');
 @endphp
 
 @section('title', $pageTitle)
@@ -19,7 +19,8 @@
                 'legal' => $legal,
                 'heading' => $legal?->getTranslatedTitle() ?? $defaultTitle,
                 'description' => $pageDescription,
-                'emptyMessage' => __('Our terms are currently unavailable. Please contact support if you need assistance.'),
+                'emptyMessage' => __('frontend.legal.document_unavailable'),
+                'fallbackKey' => 'terms',
             ])
         </div>
     </section>

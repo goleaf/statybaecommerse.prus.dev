@@ -442,6 +442,173 @@ return [
         'ru' => 'RU',
         'de' => 'DE',
     ],
+    'legal' => [
+        'required' => 'Erforderlich',
+        'last_updated' => 'Zuletzt aktualisiert',
+        'document_unavailable' => 'Dieses Dokument ist derzeit nicht verfügbar. Bitte kontaktieren Sie uns für Unterstützung.',
+        'terms_of_service' => 'Allgemeine Geschäftsbedingungen',
+        'privacy_policy' => 'Datenschutzerklärung',
+        'cookie_policy' => 'Cookie-Richtlinie',
+        'return_policy' => 'Rückgabe- & Erstattungsrichtlinie',
+        'register_agreement_intro' => 'Durch das Erstellen eines Kontos stimmen Sie unseren',
+        'login_agreement_intro' => 'Mit Ihrer Anmeldung akzeptieren Sie unsere',
+        'and' => 'und',
+        'descriptions' => [
+            'privacy' => 'Erfahren Sie, wie wir Ihre personenbezogenen Daten erfassen, nutzen und schützen.',
+            'terms' => 'Lesen Sie die Bedingungen, die für die Nutzung unseres Shops gelten.',
+            'cookies' => 'Erfahren Sie, wie wir Cookies und ähnliche Technologien einsetzen, um Ihr Erlebnis zu verbessern.',
+            'returns' => 'Informieren Sie sich, wie Rückgaben, Umtausch und Erstattungen für Ihre Bestellungen ablaufen.',
+        ],
+        'defaults' => [
+            'privacy' => [
+                'sections' => [
+                    [
+                        'title' => '1. Welche Daten wir erfassen',
+                        'paragraphs' => [
+                            'Wir erfassen Kontodaten wie Ihren Namen, Ihre E-Mail-Adresse, Telefonnummer, Lieferinformationen sowie ein sicheres Passwort, wenn Sie ein Konto anlegen.',
+                            'Außerdem speichern wir Bestellverläufe, Support-Anfragen, Wunschlisten und Browsing-Einstellungen, um Ihre Anfragen zu erfüllen und das Einkaufserlebnis zu verbessern.',
+                        ],
+                    ],
+                    [
+                        'title' => '2. Wie wir Ihre Informationen nutzen',
+                        'paragraphs' => [
+                            'Ihre Daten helfen uns, Bestellungen zu bearbeiten, Lieferungen zu organisieren, Rücksendungen abzuwickeln und Empfehlungen abzustimmen, die zu Ihren Projekten passen.',
+                            'Wir analysieren aggregierte Nutzungsdaten, um die Plattform stabil zu halten, Betrug zu verhindern und unsere Dienste schnell und sicher zu betreiben.',
+                        ],
+                    ],
+                    [
+                        'title' => '3. Wann wir Daten teilen',
+                        'paragraphs' => [
+                            'Wir geben nur die notwendigsten Informationen an vertrauenswürdige Zahlungsdienstleister, Logistikpartner und technische Anbieter weiter, damit diese die von Ihnen angeforderten Leistungen erbringen können.',
+                            'Wir verkaufen Ihre personenbezogenen Daten niemals. Analysen, die unser System verlassen, werden anonymisiert und lassen keinen direkten Rückschluss auf Ihre Person zu.',
+                        ],
+                    ],
+                    [
+                        'title' => '4. Ihre Wahlmöglichkeiten und Rechte',
+                        'paragraphs' => [
+                            'Sie können Ihre Profildaten, Kommunikationspräferenzen und gespeicherten Adressen jederzeit in Ihrem Konto einsehen oder aktualisieren.',
+                            'Wenn Sie eine Datenkopie erhalten oder die Löschung Ihrer personenbezogenen Daten verlangen möchten, kontaktieren Sie bitte unser Support-Team. Wir reagieren innerhalb der gesetzlich vorgegebenen Fristen.',
+                        ],
+                    ],
+                    [
+                        'title' => '5. Kontakt',
+                        'paragraphs' => [
+                            'Fragen zum Datenschutz? Schreiben Sie uns an support@statybae.com – unser Datenschutz-Team hilft Ihnen gerne weiter.',
+                        ],
+                    ],
+                ],
+            ],
+            'terms' => [
+                'sections' => [
+                    [
+                        'title' => '1. Nutzung von StatyBae Commerce',
+                        'paragraphs' => [
+                            'Diese Bedingungen erklären, wie Sie den StatyBae-Commerce-Shop nutzen, Bestellungen aufgeben und unsere Dienstleistungen in Anspruch nehmen können.',
+                            'Durch den Zugriff auf die Website bestätigen Sie, dass Sie mindestens 18 Jahre alt sind (oder eine elterliche Zustimmung besitzen) und alle geltenden Gesetze einhalten.',
+                        ],
+                    ],
+                    [
+                        'title' => '2. Konten und Sicherheit',
+                        'paragraphs' => [
+                            'Sie sind dafür verantwortlich, Ihre Zugangsdaten vertraulich zu behandeln und sämtliche Aktivitäten in Ihrem Konto zu überwachen.',
+                            'Bitte benachrichtigen Sie uns umgehend, wenn Sie einen unbefugten Zugriff vermuten, damit wir Ihr Konto absichern können.',
+                        ],
+                    ],
+                    [
+                        'title' => '3. Bestellungen und Preise',
+                        'paragraphs' => [
+                            'Preise, Verfügbarkeiten und Aktionen können sich bis zur Bestellbestätigung im Checkout ohne Vorankündigung ändern.',
+                            'Wir behalten uns das Recht vor, Bestellungen abzulehnen oder zu stornieren, wenn Preisfehler, Betrugsverdacht oder Lieferbeschränkungen vorliegen. Bereits geleistete Zahlungen werden in diesen Fällen erstattet.',
+                        ],
+                    ],
+                    [
+                        'title' => '4. Lieferungen und Rücksendungen',
+                        'paragraphs' => [
+                            'Liefertermine werden im Checkout angegeben. Sie verpflichten sich, korrekte Adressdaten bereitzustellen und die Lieferung im genannten Zeitfenster entgegenzunehmen.',
+                            'Unsere Rückgaberichtlinien beschreiben, wie Sie eine Rückgabe oder einen Umtausch anfragen können. Waren müssen unbenutzt und in der Originalverpackung zurückgesendet werden, sofern nichts anderes angegeben ist.',
+                        ],
+                    ],
+                    [
+                        'title' => '5. Haftung und Kontakt',
+                        'paragraphs' => [
+                            'Soweit gesetzlich zulässig, haften wir nicht für indirekte oder Folgeschäden, die aus der Nutzung des Shops entstehen.',
+                            'Benötigen Sie Unterstützung? Schreiben Sie an support@statybae.com – wir helfen Ihnen gerne weiter.',
+                        ],
+                    ],
+                ],
+            ],
+            'cookies' => [
+                'sections' => [
+                    [
+                        'title' => '1. Unverzichtbare Cookies',
+                        'paragraphs' => [
+                            'Unverzichtbare Cookies sorgen dafür, dass wichtige Shop-Funktionen wie der sichere Login, die Warenkorb-Speicherung, Checkout-Schritte und Zahlungsabläufe einwandfrei funktionieren.',
+                            'Diese Cookies sind notwendig, um die von Ihnen angeforderten Leistungen bereitzustellen, und können nicht deaktiviert werden, ohne grundlegende Funktionen zu beeinträchtigen.',
+                        ],
+                    ],
+                    [
+                        'title' => '2. Leistungs- und Analyse-Cookies',
+                        'paragraphs' => [
+                            'Analyse-Cookies helfen uns zu verstehen, wie Besucher unseren Katalog durchsuchen, Produkte finden und die Navigation nutzen, damit wir das Erlebnis verbessern können.',
+                            'Die gesammelten Daten werden aggregiert und erlauben keine direkte Identifizierung. Sie können das Tracking in Ihren Browser-Einstellungen deaktivieren oder unseren Support kontaktieren.',
+                        ],
+                    ],
+                    [
+                        'title' => '3. Personalisierung',
+                        'paragraphs' => [
+                            'Personalisierungs-Cookies merken sich Ihre Einstellungen wie Sprache, zuletzt angesehene Artikel und gespeicherte Filter, damit zukünftige Besuche schneller verlaufen.',
+                            'Sie können diese Cookies jederzeit über Ihren Browser löschen. Dadurch werden jedoch gespeicherte Einstellungen im Shop zurückgesetzt.',
+                        ],
+                    ],
+                    [
+                        'title' => '4. Verwaltung von Cookies',
+                        'paragraphs' => [
+                            'Die meisten Browser ermöglichen das Blockieren oder Löschen von Cookies. Bitte beachten Sie, dass wesentliche Funktionen wie Checkout oder Kontozugriff beeinträchtigt sein können, wenn unverzichtbare Cookies deaktiviert werden.',
+                            'Ausführliche Anleitungen finden Sie im Hilfebereich Ihres Browsers oder bei unserem Support-Team unter support@statybae.com.',
+                        ],
+                    ],
+                ],
+            ],
+            'returns' => [
+                'sections' => [
+                    [
+                        'title' => '1. Rückgabefrist',
+                        'paragraphs' => [
+                            'Sie können innerhalb von 30 Tagen nach Zustellung eine Rückgabe anfragen. Der Artikel muss unbenutzt und in der Originalverpackung mit allen Etiketten zurückgeschickt werden.',
+                            'Sonderanfertigungen, Zuschnitte oder Abverkaufsartikel können von der Rückgabe ausgeschlossen sein. Details finden Sie in Ihrer Auftragsbestätigung.',
+                        ],
+                    ],
+                    [
+                        'title' => '2. Rückgabe starten',
+                        'paragraphs' => [
+                            'Reichen Sie Ihre Rückgabe über das Kundenkonto ein oder kontaktieren Sie unseren Support mit Bestellnummer, Artikelangaben und Rücksendegrund.',
+                            'Nach Freigabe erhalten Sie Anweisungen und gegebenenfalls ein vorfrankiertes Rücksendeetikett oder einen Abholtermin.',
+                        ],
+                    ],
+                    [
+                        'title' => '3. Erstattungen und Umtausch',
+                        'paragraphs' => [
+                            'Erstattungen erfolgen auf die ursprüngliche Zahlungsart, sobald der Artikel in unserem Lager geprüft wurde. Rechnen Sie mit bis zu 10 Werktagen nach Wareneingang.',
+                            'Wenn Sie einen Umtausch wünschen, geben Sie dies bitte bei der Rückgabeanfrage an. Wir organisieren dann eine Ersatzlieferung oder stellen Guthaben aus.',
+                        ],
+                    ],
+                    [
+                        'title' => '4. Beschädigte oder fehlerhafte Waren',
+                        'paragraphs' => [
+                            'Melden Sie Transportschäden oder fehlende Teile innerhalb von fünf Tagen nach Zustellung. Bitte fügen Sie Fotos bei, damit wir schnell helfen können.',
+                            'Wir veranlassen eine Ersatzlieferung oder Erstattung und übernehmen die Rücksendekosten.',
+                        ],
+                    ],
+                    [
+                        'title' => '5. Kontakt',
+                        'paragraphs' => [
+                            'Benötigen Sie Unterstützung bei einer Rückgabe? Schreiben Sie uns an support@statybae.com – unser Logistik-Team hilft Ihnen gerne weiter.',
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ],
     // Exports
     'exports' => 'Exporte',
 ];

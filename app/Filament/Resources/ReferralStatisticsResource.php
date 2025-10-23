@@ -7,7 +7,7 @@ namespace App\Filament\Resources;
 use App\Support\DateRange;
 use App\Filament\Resources\ReferralStatisticsResource\Pages;
 use App\Models\ReferralStatistics;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -80,7 +80,7 @@ final class ReferralStatisticsResource extends Resource
                             ->searchable()
                             ->preload()
                             ->required(),
-                        Flatpickr::makeDate('date')
+                        SupportFlatpickr::makeDate('date')
                             ->label(__('referral_statistics.fields.date'))
                             ->required()
                             ->default(now()),
@@ -215,9 +215,9 @@ final class ReferralStatisticsResource extends Resource
                 Filter::make('date_range')
                     ->label(__('referral_statistics.filters.date_range'))
                     ->form([
-                        Flatpickr::makeDate('from')
+                        SupportFlatpickr::makeDate('from')
                             ->label(__('referral_statistics.filters.from_date')),
-                        Flatpickr::makeDate('until')
+                        SupportFlatpickr::makeDate('until')
                             ->label(__('referral_statistics.filters.until_date')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

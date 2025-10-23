@@ -9,7 +9,7 @@ use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\RecommendationAnalyticsResource\Pages;
 use App\Models\RecommendationAnalytics;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -112,7 +112,7 @@ final class RecommendationAnalyticsResource extends Resource
                                     ])
                                     ->required()
                                     ->default('view'),
-                                Flatpickr::makeDate('date')
+                                SupportFlatpickr::makeDate('date')
                                     ->label(__('admin.recommendation_analytics.date'))
                                     ->required()
                                     ->default(now()),
@@ -235,8 +235,15 @@ final class RecommendationAnalyticsResource extends Resource
                         'add_to_cart' => __('admin.recommendation_analytics.actions.add_to_cart'),
                         'purchase'    => __('admin.recommendation_analytics.actions.purchase'),
                     ]),
-                DateFilter::make('date')
-                    ->label(__('admin.recommendation_analytics.date')),
+                Filter::make('date')
+                    ->label(__('admin.recommendation_analytics.date'))
+                    ->form([
+                        SupportSupportFlatpickr::makeDate('value')->label(__('admin.recommendation_analytics.date')),
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => $query->when(
+                        $data['value'] ?? null,
+                        fn (Builder $q, $date): Builder => $q->whereDate('date', '=', $date),
+                    )),
             ])
             ->actions([
                 ViewAction::make(),

@@ -15,9 +15,10 @@ use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -25,7 +26,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Forms\Form;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -59,13 +59,13 @@ final class AnalyticsEventResource extends Resource
         return __('analytics_events.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
-            Section::make(__('analytics_events.basic_information'))
-                ->schema([
-                    Grid::make(2)
-                        ->schema([
+        return $schema->components([
+            SchemaSection::make(__('analytics_events.basic_information'))
+                ->components([
+                    SchemaGrid::make(2)
+                        ->components([
                             TextInput::make('event_name')
                                 ->label(__('analytics_events.event_name'))
                                 ->required()
@@ -106,8 +106,8 @@ final class AnalyticsEventResource extends Resource
                         ->helperText(__('analytics_events.description_help'))
                         ->columnSpanFull(),
                 ]),
-            Section::make(__('analytics_events.user_information'))
-                ->schema([
+            SchemaSection::make(__('analytics_events.user_information'))
+                ->components([
                     Select::make('user_id')
                         ->label(__('analytics_events.user'))
                         ->relationship('user', 'name')
@@ -135,16 +135,16 @@ final class AnalyticsEventResource extends Resource
                         ->maxLength(500)
                         ->helperText(__('analytics_events.user_agent_help')),
                 ]),
-            Section::make(__('analytics_events.event_data'))
-                ->schema([
+            SchemaSection::make(__('analytics_events.event_data'))
+                ->components([
                     KeyValue::make('event_data')
                         ->label(__('analytics_events.event_data'))
                         ->keyLabel(__('analytics_events.event_data_key'))
                         ->valueLabel(__('analytics_events.event_data_value'))
                         ->addActionLabel(__('analytics_events.add_event_data_field')),
                 ]),
-            Section::make(__('analytics_events.context_information'))
-                ->schema([
+            SchemaSection::make(__('analytics_events.context_information'))
+                ->components([
                     TextInput::make('ip_address')
                         ->label(__('analytics_events.ip_address'))
                         ->maxLength(45)
@@ -167,8 +167,8 @@ final class AnalyticsEventResource extends Resource
                         ->label(__('analytics_events.city'))
                         ->helperText(__('analytics_events.city_help')),
                 ]),
-            Section::make(__('analytics_events.referral_information'))
-                ->schema([
+            SchemaSection::make(__('analytics_events.referral_information'))
+                ->components([
                     TextInput::make('referrer_url')
                         ->label(__('analytics_events.referrer_url'))
                         ->url()
@@ -189,8 +189,8 @@ final class AnalyticsEventResource extends Resource
                         ->label(__('analytics_events.utm_content'))
                         ->helperText(__('analytics_events.utm_content_help')),
                 ]),
-            Section::make(__('analytics_events.settings'))
-                ->schema([
+            SchemaSection::make(__('analytics_events.settings'))
+                ->components([
                     Toggle::make('is_important')
                         ->label(__('analytics_events.is_important'))
                         ->default(false),

@@ -1,9 +1,9 @@
 @extends('frontend.layouts.app')
 
 @php
-    $defaultTitle = __('Cookie Policy');
+    $defaultTitle = __('frontend.legal.cookie_policy');
     $pageTitle = $legal?->getTranslatedSeoTitle() ?? $legal?->getTranslatedTitle() ?? $defaultTitle;
-    $pageDescription = $legal?->getTranslatedSeoDescription() ?? __('Learn how we use cookies and similar technologies to improve your experience.');
+    $pageDescription = $legal?->getTranslatedSeoDescription() ?? __('frontend.legal.descriptions.cookies');
 @endphp
 
 @section('title', $pageTitle)
@@ -19,7 +19,8 @@
                 'legal' => $legal,
                 'heading' => $legal?->getTranslatedTitle() ?? $defaultTitle,
                 'description' => $pageDescription,
-                'emptyMessage' => __('Our cookie policy is currently unavailable. Please contact support if you have any questions.'),
+                'emptyMessage' => __('frontend.legal.document_unavailable'),
+                'fallbackKey' => 'cookies',
             ])
         </div>
     </section>

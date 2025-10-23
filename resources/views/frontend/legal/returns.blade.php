@@ -1,9 +1,9 @@
 @extends('frontend.layouts.app')
 
 @php
-    $defaultTitle = __('Return & Refund Policy');
+    $defaultTitle = __('frontend.legal.return_policy');
     $pageTitle = $legal?->getTranslatedSeoTitle() ?? $legal?->getTranslatedTitle() ?? $defaultTitle;
-    $pageDescription = $legal?->getTranslatedSeoDescription() ?? __('Find out how returns, exchanges, and refunds are handled for your orders.');
+    $pageDescription = $legal?->getTranslatedSeoDescription() ?? __('frontend.legal.descriptions.returns');
 @endphp
 
 @section('title', $pageTitle)
@@ -19,7 +19,8 @@
                 'legal' => $legal,
                 'heading' => $legal?->getTranslatedTitle() ?? $defaultTitle,
                 'description' => $pageDescription,
-                'emptyMessage' => __('Our return policy is currently unavailable. Please contact support for assistance.'),
+                'emptyMessage' => __('frontend.legal.document_unavailable'),
+                'fallbackKey' => 'returns',
             ])
         </div>
     </section>

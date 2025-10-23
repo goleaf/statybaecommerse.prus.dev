@@ -25,7 +25,7 @@ final class FailedJob extends Model
 
     public function getJobNameAttribute(): string
     {
-        $payload = json_decode($this->payload ?? '', true) ?: [];
+        $payload = safe_json_decode_array($this->payload ?? '');
 
         return (string) ($payload['displayName'] ?? 'unknown');
     }

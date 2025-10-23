@@ -10,7 +10,9 @@ use App\Models\ProductVariant;
 use App\Observers\Concerns\ResolvesSupportedLocales;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 
 final class CacheInvalidator
 {
@@ -102,13 +104,45 @@ final class CacheInvalidator
             return $this->mapCategoryIds($categoryIds);
         }
 
+        if (! $this->categoriesTablesPresent()) {
+            return [];
+        }
+
         /** @var BelongsToMany<Category, Product> $categoriesRelation */
         $categoriesRelation = $product->categories();
 
-        /** @var array<int, mixed> $categoryIds */
-        $categoryIds = $categoriesRelation->pluck('categories.id')->all();
+        try {
+            /** @var array<int, mixed> $categoryIds */
+            $categoryIds = $categoriesRelation->pluck('categories.id')->all();
+        } catch (QueryException $exception) {
+            if ($this->causedByMissingCategoryTables($exception)) {
+                return [];
+            }
+
+            throw $exception;
+        }
 
         return $this->mapCategoryIds($categoryIds);
+    }
+
+    private function categoriesTablesPresent(): bool
+    {
+        try {
+            return Schema::hasTable('categories') && Schema::hasTable('product_categories');
+        } catch (\Throwable $exception) {
+            return false;
+        }
+    }
+
+    private function causedByMissingCategoryTables(QueryException $exception): bool
+    {
+        $previousMessage = $exception->getPrevious() ? $exception->getPrevious()->getMessage() : '';
+        $message = strtolower($exception->getMessage() . ' ' . $previousMessage);
+
+        return str_contains($message, 'no such table')
+            || str_contains($message, 'does not exist')
+            || str_contains($message, 'doesn\'t exist')
+            || str_contains($message, 'base table or view not found');
     }
 
     /**

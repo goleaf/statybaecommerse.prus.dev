@@ -9,12 +9,12 @@ use App\Domain\Product\Entities\ProductImage;
 /**
  * DTO representing a single product image for API responses.
  */
-final class ProductImageDto
+final readonly class ProductImageDto
 {
     public function __construct(
-        private readonly string $url,
-        private readonly ?string $thumbnailUrl,
-        private readonly ?string $altText,
+        private string $url,
+        private ?string $thumbnailUrl,
+        private ?string $altText,
     ) {
         // Constructor assignment keeps the DTO immutable and predictable.
     }

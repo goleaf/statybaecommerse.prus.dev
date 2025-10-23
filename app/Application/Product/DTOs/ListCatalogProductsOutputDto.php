@@ -7,11 +7,11 @@ namespace App\Application\Product\DTOs;
 /**
  * DTO describing the results of a catalog listing call.
  */
-final class ListCatalogProductsOutputDto
+final readonly class ListCatalogProductsOutputDto
 {
     public function __construct(
-        private readonly ProductSummaryCollectionDto $products,
-        private readonly PaginationDto $pagination,
+        private ProductSummaryCollectionDto $products,
+        private PaginationDto $pagination,
     ) {
         // Intentionally left blank; promoted properties hold the payload.
     }

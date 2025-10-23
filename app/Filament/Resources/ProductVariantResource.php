@@ -13,7 +13,7 @@ use App\Models\AttributeValue;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Services\ProductVariantAttributeMatrixService;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Forms\MatrixFactory;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
@@ -241,9 +241,9 @@ final class ProductVariantResource extends Resource
                                             ]),
                                         SchemaGrid::make(2)
                                             ->schema([
-                                                Flatpickr::makeDateTime('sale_start_date')
+                                                SupportFlatpickr::makeDateTime('sale_start_date')
                                                     ->label(__('product_variants.fields.sale_start_date')),
-                                                Flatpickr::makeDateTime('sale_end_date')
+                                                SupportFlatpickr::makeDateTime('sale_end_date')
                                                     ->label(__('product_variants.fields.sale_end_date')),
                                             ]),
                                     ]),

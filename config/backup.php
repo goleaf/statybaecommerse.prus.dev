@@ -104,7 +104,4 @@ return [
         ],
     ],
 
-    'verify' => [
-        'connection' => env('BACKUP_VERIFY_CONNECTION', 'sqlite'),
-    ],
 ];

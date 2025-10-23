@@ -124,4 +124,12 @@ final class NewsletterSubscription extends Component
     {
         return view('livewire.newsletter-subscription');
     }
+
+    /**
+     * Provide compatibility with Filament test helpers that expect the method to exist.
+     */
+    public function getDefaultTestingSchemaName(): ?string
+    {
+        return null;
+    }
 }

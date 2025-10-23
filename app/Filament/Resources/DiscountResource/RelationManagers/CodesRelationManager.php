@@ -9,7 +9,7 @@ use Filament\Schemas\Schema;
 use App\Models\DiscountCode;
 use Filament\Forms;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -43,7 +43,7 @@ final class CodesRelationManager extends BaseRelationManager
                     ->default(0)
                     ->disabled()
                     ->helperText('How many times this code has been used'),
-                Flatpickr::makeDateTime('expires_at')
+                SupportFlatpickr::makeDateTime('expires_at')
                     ->label('Expires At')
                     ->helperText('When this specific code expires'),
                 Forms\Components\Toggle::make('is_active')

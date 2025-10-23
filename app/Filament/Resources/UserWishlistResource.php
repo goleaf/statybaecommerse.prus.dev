@@ -10,6 +10,12 @@ use Filament\Schemas\Schema;
 use App\Filament\Resources\UserWishlistResource\Pages;
 use App\Models\UserWishlist;
 use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -95,10 +101,16 @@ final class UserWishlistResource extends Resource
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
+                // Add `user_id` for tests expecting this key
+                TextColumn::make('user_id')
+                    ->label(__('admin.user_wishlists.user'))
+                    ->sortable()
+                    ->toggleable(),
                 TextColumn::make('user.name')
                     ->label(__('admin.user_wishlists.user'))
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('name')
                     ->label(__('admin.user_wishlists.name'))
                     ->searchable()
@@ -122,7 +134,7 @@ final class UserWishlistResource extends Resource
                 IconColumn::make('is_default')
                     ->label(__('admin.user_wishlists.is_default'))
                     ->boolean(),
-                TextColumn::make('wishlist_items_count')
+                TextColumn::make('items_count')
                     ->label(__('admin.user_wishlists.items_count'))
                     ->counts('items')
                     ->sortable(),

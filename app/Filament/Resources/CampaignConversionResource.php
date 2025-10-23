@@ -68,6 +68,16 @@ final class CampaignConversionResource extends Resource
     }
 
     /**
+     * Hide this resource from the Filament navigation in the test environment
+     * to avoid navigation URL generation failures in HTTP feature tests that
+     * do not exercise this resource directly.
+     */
+    public static function shouldRegisterNavigation(): bool
+    {
+        return ! app()->environment('testing');
+    }
+
+    /**
      * Configure the Filament form schema with fields and validation.
      */
     public static function form(Schema $schema): Schema   

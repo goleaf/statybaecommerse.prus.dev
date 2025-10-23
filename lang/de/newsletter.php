@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'title' => 'Newsletter abonnieren',
+    'subtitle' => 'Erhalten Sie Benachrichtigungen über neue Produkte und Sonderangebote',
     'email_address' => 'E-Mail-Adresse',
     'email_placeholder' => 'Geben Sie Ihre E-Mail-Adresse ein',
     'first_name' => 'Vorname',
@@ -18,7 +20,7 @@ return [
     'interests_technical' => 'Technische Updates',
     'interests_business' => 'Business-News',
     'interests_support' => 'Support & Hilfe',
-    'subscribe_button' => 'Jetzt abonnieren',
+    'subscribe_button' => 'Abonnieren',
     'subscribing' => 'Wird abonniert...',
     'privacy_notice' => 'Wir respektieren Ihre Privatsphäre. Abmeldung jederzeit möglich.',
     'subscription_success_title' => 'Erfolgreich abonniert!',

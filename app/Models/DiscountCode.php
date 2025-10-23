@@ -66,6 +66,8 @@ final class DiscountCode extends Model
         'metadata',
         'created_by',
         'updated_by',
+        'created_by_name',
+        'updated_by_name',
     ];
 
     /**

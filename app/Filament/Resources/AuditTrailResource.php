@@ -7,7 +7,6 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\AuditTrailResource\Pages;
 use App\Models\AuditTrail;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Component;
@@ -26,9 +25,9 @@ final class AuditTrailResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-clipboard-document-check';
 
-    public static function form(Form $form): Form
+    public static function form(\Filament\Schemas\Schema $schema): \Filament\Schemas\Schema
     {
-        return $form;
+        return $schema;
     }
 
     public static function table(Table $table): Table

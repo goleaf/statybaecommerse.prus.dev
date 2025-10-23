@@ -6,7 +6,7 @@ namespace App\Filament\Pages;
 
 use BackedEnum;
 use App\Models\Slider;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ContentLinkSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
@@ -258,10 +258,10 @@ class SliderManagement extends Page implements HasActions, HasForms
                 Section::make(__('translations.scheduling'))
                     ->components([
                         Grid::make(2)->components([
-                            Flatpickr::makeDateTime('start_date')
+                            SupportFlatpickr::makeDateTime('start_date')
                                 ->label(__('translations.start_date'))
                                 ->default(now()),
-                            Flatpickr::makeDateTime('end_date')
+                            SupportFlatpickr::makeDateTime('end_date')
                                 ->label(__('translations.end_date'))
                                 ->after('start_date'),
                         ]),

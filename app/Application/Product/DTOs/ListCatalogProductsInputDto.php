@@ -7,15 +7,15 @@ namespace App\Application\Product\DTOs;
 /**
  * Immutable DTO capturing filters and pagination for the catalog listing.
  */
-final class ListCatalogProductsInputDto
+final readonly class ListCatalogProductsInputDto
 {
     public function __construct(
-        private readonly int $perPage,
-        private readonly int $page,
-        private readonly ?string $categorySlug,
-        private readonly ?string $brandSlug,
-        private readonly string $sortBy,
-        private readonly string $sortOrder,
+        private int $perPage,
+        private int $page,
+        private ?string $categorySlug,
+        private ?string $brandSlug,
+        private string $sortBy,
+        private string $sortOrder,
     ) {
         // Normalise pagination to always be within a sensible range.
         if ($this->perPage < 1) {

@@ -6,15 +6,14 @@ namespace Tests\Unit;
 
 use App\Models\Campaign;
 use App\Models\CampaignCustomerSegment;
+use App\Models\Channel;
 use App\Models\CustomerGroup;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 
 final class CampaignCustomerSegmentTest extends TestCase
 {
-    use RefreshDatabase;
-
     private Campaign $campaign;
 
     private CustomerGroup $customerGroup;
@@ -24,6 +23,8 @@ final class CampaignCustomerSegmentTest extends TestCase
         parent::setUp();
 
         Config::set('factory.seed_campaign_relations', false);
+
+        $this->resetCampaignRelatedTables();
 
         $this->campaign = Campaign::factory()->create();
         $this->customerGroup = CustomerGroup::factory()->create();
@@ -363,5 +364,19 @@ final class CampaignCustomerSegmentTest extends TestCase
 
         $segment->refresh();
         $this->assertNull($segment->custom_conditions);
+    }
+
+    private function resetCampaignRelatedTables(): void
+    {
+        DB::statement('PRAGMA foreign_keys = OFF');
+
+        try {
+            CampaignCustomerSegment::query()->withTrashed()->forceDelete();
+            Campaign::query()->withoutGlobalScopes()->withTrashed()->forceDelete();
+            CustomerGroup::query()->withoutGlobalScopes()->withTrashed()->forceDelete();
+            Channel::query()->withoutGlobalScopes()->withTrashed()->forceDelete();
+        } finally {
+            DB::statement('PRAGMA foreign_keys = ON');
+        }
     }
 }

@@ -36,7 +36,7 @@ class LanguageSwitcher extends Component
         $path = parse_url($full, PHP_URL_PATH) ?? '/';
         $qs = parse_url($full, PHP_URL_QUERY);
         $query = $qs ? '?'.$qs : '';
-        $parts = explode('/', ltrim($path, '/'));
+        $parts = explode('/', ltrim((string) $path, '/'));
         if (isset($parts[0]) && in_array($parts[0], $this->locales, true)) {
             array_shift($parts);
         }

@@ -8,7 +8,7 @@ namespace App\Filament\Resources\DiscountRedemptionResource\RelationManagers;
 use Filament\Schemas\Schema;
 use Filament\Forms;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -39,7 +39,7 @@ class UserRelationManager extends BaseRelationManager
                         Forms\Components\TextInput::make('phone')
                             ->tel()
                             ->maxLength(255),
-                        Flatpickr::makeDateTime('email_verified_at')
+                        SupportFlatpickr::makeDateTime('email_verified_at')
                             ->label('Email Verified At'),
                         Forms\Components\Select::make('status')
                             ->options([

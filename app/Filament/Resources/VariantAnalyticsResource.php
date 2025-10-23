@@ -12,8 +12,9 @@ use UnitEnum;
 use App\Filament\Resources\VariantAnalyticsResource\Pages;
 use App\Models\ProductVariant;
 use App\Models\VariantAnalytics;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Forms;
+use App\Support\DateRange;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Facades\FilamentNumber;
@@ -87,7 +88,7 @@ final class VariantAnalyticsResource extends Resource
                                                     ->searchable()
                                                     ->preload()
                                                     ->live(),
-                                                Flatpickr::makeDate('date')
+                                                SupportFlatpickr::makeDate('date')
                                                     ->label(__('admin.variant_analytics.date'))
                                                     ->required()
                                                     ->default(now())
@@ -479,13 +480,24 @@ final class VariantAnalyticsResource extends Resource
                     ->searchable()
                     ->preload()
                     ->multiple(),
-                Tables\Filters\DateFilter::make('date')
-                    ->label(__('admin.variant_analytics.date')),
+                Tables\Filters\Filter::make('date')
+                    ->form([
+                        SupportFlatpickr::makeDate('value')
+                            ->label(__('admin.variant_analytics.date')),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        $date = $data['value'] ?? null;
+
+                        return $query->when(
+                            $date,
+                            fn (Builder $query, $date): Builder => $query->whereDate('date', '=', $date),
+                        );
+                    }),
                 Tables\Filters\Filter::make('date_range')
                     ->form([
-                        Flatpickr::makeDate('date_from')
+                        SupportFlatpickr::makeDate('date_from')
                             ->label(__('admin.variant_analytics.date_from')),
-                        Flatpickr::makeDate('date_until')
+                        SupportFlatpickr::makeDate('date_until')
                             ->label(__('admin.variant_analytics.date_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
@@ -578,11 +590,9 @@ final class VariantAnalyticsResource extends Resource
                         false: static fn (Builder $query): Builder => $query->where('date', '<', now()->subDays(7)),
                     ),
             ])
-            // Leverage the Tables\Actions namespace to stay aligned with Filament v4 conventions during table configuration.
+            // Use Filament\Actions v4 classes for table actions.
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('regenerate_metrics')
+                \Filament\Actions\Action::make('regenerate_metrics')
                     ->label(__('admin.variant_analytics.regenerate_metrics'))
                     ->icon('heroicon-o-arrow-path')
                     ->color('warning')
@@ -595,7 +605,7 @@ final class VariantAnalyticsResource extends Resource
                             ->send();
                     })
                     ->requiresConfirmation(),
-                Tables\Actions\Action::make('duplicate')
+                \Filament\Actions\Action::make('duplicate')
                     ->label(__('admin.variant_analytics.duplicate'))
                     ->icon('heroicon-o-document-duplicate')
                     ->color('info')
@@ -608,7 +618,7 @@ final class VariantAnalyticsResource extends Resource
                             ->success()
                             ->send();
                     }),
-                Tables\Actions\Action::make('export_single')
+                \Filament\Actions\Action::make('export_single')
                     ->label(__('admin.variant_analytics.export_single'))
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('gray')
@@ -621,9 +631,9 @@ final class VariantAnalyticsResource extends Resource
                     }),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\BulkAction::make('export_analytics')
+                \Filament\Actions\BulkActionGroup::make([
+                    \Filament\Actions\DeleteBulkAction::make(),
+                    \Filament\Actions\BulkAction::make('export_analytics')
                         ->label(__('admin.variant_analytics.export_analytics'))
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('info')
@@ -635,7 +645,7 @@ final class VariantAnalyticsResource extends Resource
                                 ->success()
                                 ->send();
                         }),
-                    Tables\Actions\BulkAction::make('regenerate_metrics_bulk')
+                    \Filament\Actions\BulkAction::make('regenerate_metrics_bulk')
                         ->label(__('admin.variant_analytics.regenerate_metrics_bulk'))
                         ->icon('heroicon-o-arrow-path')
                         ->color('warning')
@@ -652,7 +662,7 @@ final class VariantAnalyticsResource extends Resource
                                 ->send();
                         })
                         ->requiresConfirmation(),
-                    Tables\Actions\BulkAction::make('duplicate_records')
+                    \Filament\Actions\BulkAction::make('duplicate_records')
                         ->label(__('admin.variant_analytics.duplicate_records'))
                         ->icon('heroicon-o-document-duplicate')
                         ->color('gray')
@@ -671,7 +681,7 @@ final class VariantAnalyticsResource extends Resource
                                 ->send();
                         })
                         ->requiresConfirmation(),
-                    Tables\Actions\BulkAction::make('reset_metrics')
+                    \Filament\Actions\BulkAction::make('reset_metrics')
                         ->label(__('admin.variant_analytics.reset_metrics'))
                         ->icon('heroicon-o-arrow-uturn-left')
                         ->color('danger')

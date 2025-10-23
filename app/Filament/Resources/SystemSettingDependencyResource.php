@@ -9,7 +9,7 @@ use Filament\Schemas\Schema;
 use App\Filament\Resources\SystemSettingDependencyResource\Pages;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingDependency;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -138,7 +138,7 @@ final class SystemSettingDependencyResource extends Resource
                                 ->label(__('admin.system_setting_dependencies.is_active'))
                                 ->default(true)
                                 ->helperText(__('admin.system_setting_dependencies.is_active_help')),
-                            Flatpickr::makeDateTime('created_at')
+                            SupportFlatpickr::makeDateTime('created_at')
                                 ->label(__('admin.common.created_at'))
                                 ->disabled()
                                 ->dehydrated(false)
@@ -260,9 +260,9 @@ final class SystemSettingDependencyResource extends Resource
                     ->label(__('admin.system_setting_dependencies.is_active')),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::makeDateTime('created_from')
+                        SupportFlatpickr::makeDateTime('created_from')
                             ->label(__('admin.common.created_from')),
-                        Flatpickr::makeDateTime('created_until')
+                        SupportFlatpickr::makeDateTime('created_until')
                             ->label(__('admin.common.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
@@ -278,9 +278,9 @@ final class SystemSettingDependencyResource extends Resource
                     }),
                 Filter::make('updated_at')
                     ->form([
-                        Flatpickr::makeDateTime('updated_from')
+                        SupportFlatpickr::makeDateTime('updated_from')
                             ->label(__('admin.common.updated_from')),
-                        Flatpickr::makeDateTime('updated_until')
+                        SupportFlatpickr::makeDateTime('updated_until')
                             ->label(__('admin.common.updated_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

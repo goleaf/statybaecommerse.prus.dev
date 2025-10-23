@@ -11,7 +11,7 @@ use App\Enums\ModerationState;
 use App\Filament\Resources\PostResource\Pages;
 use App\Filament\Resources\PostResource\RelationManagers;
 use App\Models\Post;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Seo\LocaleUrlGenerator;
 use Awcodes\BadgeableColumn\Components\Badge;
 use Awcodes\BadgeableColumn\Components\BadgeableColumn;
@@ -199,7 +199,7 @@ final class PostResource extends Resource
                                     ->required()
                                     ->disableOptionWhen(fn (string $value): bool => $value === 'published')
                                     ->helperText(__('posts.status_managed_by_workflow')),
-                                Flatpickr::makeDateTime('published_at')
+                                SupportFlatpickr::makeDateTime('published_at')
                                     ->label(__('posts.fields.published_at'))
                                     ->default(now()),
                             ]),
@@ -402,9 +402,9 @@ final class PostResource extends Resource
                     ->falseLabel(__('posts.filters.not_pinned')),
                 Filter::make('published_at')
                     ->form([
-                        Flatpickr::makeDateTime('published_from')
+                        SupportFlatpickr::makeDateTime('published_from')
                             ->label(__('posts.filters.published_from')),
-                        Flatpickr::makeDateTime('published_until')
+                        SupportFlatpickr::makeDateTime('published_until')
                             ->label(__('posts.filters.published_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

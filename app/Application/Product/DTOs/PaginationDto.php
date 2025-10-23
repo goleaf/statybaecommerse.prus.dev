@@ -7,12 +7,12 @@ namespace App\Application\Product\DTOs;
 /**
  * Value object exposing pagination metadata in a transport-friendly format.
  */
-final class PaginationDto
+final readonly class PaginationDto
 {
     public function __construct(
-        private readonly int $total,
-        private readonly int $perPage,
-        private readonly int $currentPage,
+        private int $total,
+        private int $perPage,
+        private int $currentPage,
     ) {
         // Constructors remain lightweight to keep the DTO immutable.
     }

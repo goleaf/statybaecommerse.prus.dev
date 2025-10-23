@@ -10,7 +10,7 @@ use Filament\Schemas\Schema;
 use App\Filament\Resources\CampaignResource\Pages;
 use App\Filament\Resources\CampaignResource\RelationManagers\TranslationsRelationManager;
 use App\Models\Campaign;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
 use Filament\Forms;
 use Filament\Schemas\Components\Grid as SchemaGrid;
@@ -117,10 +117,10 @@ final class CampaignResource extends Resource
                 ->schema([
                     SchemaGrid::make(2)
                         ->schema([
-                            Flatpickr::makeDateTime('starts_at')
+                            SupportFlatpickr::makeDateTime('starts_at')
                                 ->label(self::label('campaigns.fields.start_date', 'Start date'))
                                 ->seconds(false),
-                            Flatpickr::makeDateTime('ends_at')
+                            SupportFlatpickr::makeDateTime('ends_at')
                                 ->label(self::label('campaigns.fields.end_date', 'End date'))
                                 ->seconds(false),
                             TextInput::make('max_uses')
@@ -317,7 +317,7 @@ final class CampaignResource extends Resource
                     ->relationship('channel', 'name'),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::makeRange('range')
+                        SupportFlatpickr::makeRange('range')
                             ->label(self::label('campaigns.fields.created_at', 'Created at'))
 
                             ->format('Y-m-d')

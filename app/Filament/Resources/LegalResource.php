@@ -9,7 +9,7 @@ use Filament\Schemas\Schema;
 use App\Filament\Resources\LegalResource\Pages;
 use App\Filament\Resources\LegalResource\RelationManagers\TranslationsRelationManager;
 use App\Models\Legal;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -91,7 +91,7 @@ final class LegalResource extends Resource
                                     ->label(__('legal.sort_order'))
                                     ->numeric()
                                     ->default(0),
-                                Flatpickr::makeDateTime('published_at')
+                                SupportFlatpickr::makeDateTime('published_at')
                                     ->label(__('legal.published_at'))
                                     ->seconds(false)
                                     ->timezone(config('app.timezone')),

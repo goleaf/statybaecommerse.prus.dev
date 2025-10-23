@@ -27,7 +27,14 @@ class UserProductInteractionResource extends Resource
 
     public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
-        return LegacyUserProductInteractionResource::getNavigationGroup();
+        // Defer to the legacy resource for consistent icon configuration, if available.
+        return \App\Filament\Resources\UserProductInteractionResource::getNavigationGroup();
+    }
+
+    public static function getSlug(): string
+    {
+        // Avoid clashing with the legacy resource's routes/slug.
+        return 'user-product-interactions-v4';
     }
 
     public static function form(Schema $schema): Schema   

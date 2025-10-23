@@ -15,7 +15,7 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
@@ -56,9 +56,9 @@ final class ProductSimilarityResource extends Resource
         return __('product_similarities.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->components([
             SchemaSection::make(__('product_similarities.basic_information'))
                 ->schema([
                     SchemaGrid::make(2)

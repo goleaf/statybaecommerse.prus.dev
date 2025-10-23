@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Arr;
 
 /**
  * CartItem
@@ -213,7 +214,7 @@ final class CartItem extends Model
     public function getProductNameAttribute(): ?string
     {
         // Attempt to read the live relationship first, falling back to the stored snapshot for resiliency.
-        return $this->product?->name ?? ($this->product_snapshot['name'] ?? null);
+        return $this->product?->name ?? Arr::get($this->product_snapshot, 'name');
     }
 
     /**
@@ -222,6 +223,6 @@ final class CartItem extends Model
     public function getProductSkuAttribute(): ?string
     {
         // Attempt to read the live relationship first, falling back to the stored snapshot for resiliency.
-        return $this->product?->sku ?? ($this->product_snapshot['sku'] ?? null);
+        return $this->product?->sku ?? Arr::get($this->product_snapshot, 'sku');
     }
 }

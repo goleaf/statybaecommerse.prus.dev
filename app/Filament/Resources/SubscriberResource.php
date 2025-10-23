@@ -9,7 +9,7 @@ use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\SubscriberResource\Pages;
 use App\Models\Subscriber;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -164,7 +164,7 @@ final class SubscriberResource extends Resource
                                     ->label(__('subscribers.newsletter_subscription'))
                                     ->default(true),
                             ]),
-                        Flatpickr::makeDateTime('subscribed_at')
+                        SupportFlatpickr::makeDateTime('subscribed_at')
                             ->label(__('subscribers.subscribed_at'))
                             ->default(fn () => now()),
                     ]),
@@ -272,9 +272,9 @@ final class SubscriberResource extends Resource
                     ->native(false),
                 Filter::make('subscribed_at')
                     ->form([
-                        Flatpickr::makeDate('subscribed_from')
+                        SupportFlatpickr::makeDate('subscribed_from')
                             ->label(__('subscribers.subscribed_from')),
-                        Flatpickr::makeDate('subscribed_until')
+                        SupportFlatpickr::makeDate('subscribed_until')
                             ->label(__('subscribers.subscribed_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

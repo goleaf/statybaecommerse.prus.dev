@@ -16,7 +16,7 @@ use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 
 final class ConversionsRelationManager extends BaseRelationManager
 {
@@ -46,7 +46,7 @@ final class ConversionsRelationManager extends BaseRelationManager
             TextInput::make('customer_id')
                 ->label('Customer ID')
                 ->numeric(),
-            Flatpickr::makeDateTime('converted_at')
+            SupportFlatpickr::makeDateTime('converted_at')
                 ->label('Converted At')
                 ->required(),
         ]);

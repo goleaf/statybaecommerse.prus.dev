@@ -12,7 +12,7 @@ use App\Models\Product;
 use App\Models\RecommendationBlock;
 use App\Models\RecommendationCache;
 use App\Models\User;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -102,7 +102,7 @@ final class RecommendationCacheResource extends Resource
                                     ->default([])
                                     ->columnSpanFull(),
                             ]),
-                        Flatpickr::makeDateTime('expires_at')
+                        SupportFlatpickr::makeDateTime('expires_at')
                             ->label(__('admin.recommendation_caches.expires_at'))
                             ->required()
                             ->default(now()->addHours(24)),

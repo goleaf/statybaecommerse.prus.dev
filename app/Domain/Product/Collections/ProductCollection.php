@@ -33,7 +33,7 @@ final class ProductCollection implements IteratorAggregate, Countable
 
     public function count(): int
     {
-        return count($this->items);
+        return is_countable($this->items) ? count($this->items) : 0;
     }
 
     public function filter(callable $callback): self

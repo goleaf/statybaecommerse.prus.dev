@@ -66,18 +66,18 @@ final class VariantStockController extends Controller
     /**
      * Handle checkAvailability functionality with proper error handling.
      */
-    public function checkAvailability(Request $request): JsonResponse
+    public function checkAvailability(\App\Http\Requests\Frontend\VariantStockCheckAvailabilityRequest $request): JsonResponse
     {
-        $request->validate(['variant_id' => 'required|exists:product_variants,id', 'location_id' => 'nullable|exists:locations,id', 'quantity' => 'required|integer|min:1']);
-        $query = VariantInventory::where('variant_id', $request->variant_id);
-        if ($request->filled('location_id')) {
-            $query->where('location_id', $request->location_id);
+        $validated = $request->validated();
+        $query = VariantInventory::where('variant_id', $validated['variant_id']);
+        if (! empty($validated['location_id'])) {
+            $query->where('location_id', $validated['location_id']);
         }
         $inventory = $query->first();
         if (! $inventory) {
             return response()->json(['available' => false, 'message' => __('inventory.not_available_at_location')]);
         }
-        $available = $inventory->canReserve((int) $request->quantity);
+        $available = $inventory->canReserve((int) $validated['quantity']);
 
         return response()->json(['available' => $available, 'available_stock' => $inventory->available_stock, 'message' => $available ? __('inventory.available_for_reservation') : __('inventory.insufficient_stock')]);
     }

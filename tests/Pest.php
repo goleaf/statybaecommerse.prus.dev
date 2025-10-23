@@ -33,8 +33,10 @@ beforeAll(function () {
     config()->set('database.connections.sqlite.database', $testingDatabasePath);
     \Illuminate\Foundation\Testing\RefreshDatabaseState::$migrated = false;
 
-    // Ensure Filament uses the web guard for tests
-    config()->set('filament.auth.guard', 'web');
+    // Ensure Filament uses the web guard for tests (unless explicitly skipped)
+    if (! getenv('SKIP_FILAMENT_BOOT')) {
+        config()->set('filament.auth.guard', 'web');
+    }
 
     $manifestPath = public_path('build/manifest.json');
     if (! is_dir(dirname($manifestPath))) {
@@ -60,16 +62,32 @@ beforeAll(function () {
         Route::get('/__stub/system-settings', fn () => 'ok')
             ->name('filament.admin.resources.system-settings.index');
     }
+
+    $variantAttributeValueRoutes = [
+        'index'  => '/__stub/variant-attribute-values',
+        'create' => '/__stub/variant-attribute-values/create',
+        'view'   => '/__stub/variant-attribute-values/{record}',
+        'edit'   => '/__stub/variant-attribute-values/{record}/edit',
+    ];
+
+    foreach ($variantAttributeValueRoutes as $name => $uri) {
+        $routeName = "filament.admin.resources.variant-attribute-values." . $name;
+        if (! Route::has($routeName)) {
+            Route::get($uri, fn () => 'ok')->name($routeName);
+        }
+    }
 });
 
 beforeEach(function () {
-    Filament::setCurrentPanel('admin');
+    if (! getenv('SKIP_FILAMENT_BOOT')) {
+        Filament::setCurrentPanel('admin');
 
-    app(PermissionRegistrar::class)->forgetCachedPermissions();
-    $guard = config('auth.defaults.guard', 'web');
-    foreach (['admin', 'super_admin', 'Admin', 'administrator'] as $role) {
-        if (! Role::where('name', $role)->where('guard_name', $guard)->exists()) {
-            Role::findOrCreate($role, $guard);
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        $guard = config('auth.defaults.guard', 'web');
+        foreach (['admin', 'super_admin', 'Admin', 'administrator'] as $role) {
+            if (! Role::where('name', $role)->where('guard_name', $guard)->exists()) {
+                Role::findOrCreate($role, $guard);
+            }
         }
     }
 });

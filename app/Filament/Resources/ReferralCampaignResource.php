@@ -9,7 +9,7 @@ use BackedEnum;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\ReferralCampaignResource\Pages;
 use App\Models\ReferralCampaign;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -89,10 +89,10 @@ final class ReferralCampaignResource extends Resource
                                     ->label(__('admin.referral_campaigns.is_active'))
                                     ->inline(false)
                                     ->default(true),
-                                Flatpickr::makeDate('start_date')
+                                SupportFlatpickr::makeDate('start_date')
                                     ->label(__('admin.referral_campaigns.start_date'))
                                     ->nullable(),
-                                Flatpickr::makeDate('end_date')
+                                SupportFlatpickr::makeDate('end_date')
                                     ->label(__('admin.referral_campaigns.end_date'))
                                     ->nullable(),
                             ]),

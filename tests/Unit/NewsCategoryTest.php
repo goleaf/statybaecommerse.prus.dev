@@ -7,11 +7,18 @@ namespace Tests\Unit;
 use App\Models\News;
 use App\Models\NewsCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\InteractsWithFilamentPivotTables;
 use Tests\TestCase;
 
 final class NewsCategoryTest extends TestCase
 {
     use RefreshDatabase;
+    use InteractsWithFilamentPivotTables;
+
+    protected function afterRefreshingDatabase(): void
+    {
+        $this->ensureFilamentPivotTablesMigrated();
+    }
 
     public function test_can_create_news_category(): void
     {

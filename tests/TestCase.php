@@ -14,6 +14,7 @@ use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Throwable;
 use Tests\Support\TestingDatabase;
@@ -45,6 +46,9 @@ abstract class TestCase extends BaseTestCase
 
         parent::setUp();
 
+        // Re-resolve the SQLite path in case TestingDatabase rotated it during migrate
+        $this->sqliteDatabasePath = TestingDatabase::path();
+
         $appBasePath = dirname(__DIR__);
         $envFile = $appBasePath.'/.env';
 
@@ -61,7 +65,7 @@ abstract class TestCase extends BaseTestCase
         Config::set('database.connections.sqlite.database', $this->sqliteDatabasePath);
         Config::set('database.connections.sqlite.foreign_key_constraints', true);
         Config::set('database.connections.sqlite.journal_mode', null);
-        Config::set('database.connections.sqlite.busy_timeout', 5000);
+        Config::set('database.connections.sqlite.busy_timeout', 30000);
         Config::set('cache.default', 'array');
         Config::set('app.key', 'base64:' . base64_encode(random_bytes(32)));
         Config::set('app.debug', false);
@@ -129,10 +133,62 @@ abstract class TestCase extends BaseTestCase
     {
         $this->beforeRefreshingDatabase();
 
-        TestingDatabase::migrate();
+        $ensureMigrations = function (): void {
+            $attempts = 0;
+
+            while ($attempts < 3) {
+                $attempts++;
+                $shouldRetry = false;
+
+                try {
+                    TestingDatabase::ensureExists();
+                    TestingDatabase::migrate();
+
+                    try {
+                        if (! Schema::connection('sqlite')->hasTable('users')) {
+                            $shouldRetry = true;
+                        }
+                    } catch (\Throwable $schemaException) {
+                        $message = strtolower($schemaException->getMessage());
+
+                        if (! str_contains($message, 'database disk image is malformed') && ! str_contains($message, 'database is locked')) {
+                            throw $schemaException;
+                        }
+
+                        $shouldRetry = true;
+                    }
+                } catch (\Throwable $exception) {
+                    $message = strtolower($exception->getMessage());
+
+                    if (! str_contains($message, 'database disk image is malformed') && ! str_contains($message, 'database is locked')) {
+                        throw $exception;
+                    }
+
+                    $shouldRetry = true;
+                }
+
+                if (! $shouldRetry) {
+                    return;
+                }
+
+                TestingDatabase::teardown();
+            }
+
+            throw new \RuntimeException('Unable to prepare the testing database after multiple attempts.');
+        };
+
+        $ensureMigrations();
+
+        try {
+            $connection = DB::connection('sqlite');
+
+            $connection->getPdo()?->exec('PRAGMA busy_timeout = 30000;');
+            $connection->getPdo()?->exec('PRAGMA journal_mode = WAL;');
+        } catch (\Throwable $exception) {
+            // Ignore failures when the SQLite connection has not been initialised yet.
+        }
 
         $this->beginDatabaseTransaction();
-
         $this->afterRefreshingDatabase();
     }
 
@@ -172,7 +228,7 @@ abstract class TestCase extends BaseTestCase
         Config::set('database.connections.sqlite.database', $databasePath);
         Config::set('database.connections.sqlite.foreign_key_constraints', true);
         Config::set('database.connections.sqlite.journal_mode', null);
-        Config::set('database.connections.sqlite.busy_timeout', 5000);
+        Config::set('database.connections.sqlite.busy_timeout', 30000);
     }
 
     /**

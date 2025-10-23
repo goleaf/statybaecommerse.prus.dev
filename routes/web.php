@@ -747,6 +747,9 @@ Route::prefix('{locale}')
         // Localized home route (e.g., /lt)
         Route::get('/', Pages\Home::class)->name('localized.home');
 
+        // About page
+        Route::view('/about', 'frontend.about.index')->name('localized.about');
+
         // Category index
         Route::get('/categories', \App\Livewire\Pages\Category\Index::class)->name('localized.categories.index');
 

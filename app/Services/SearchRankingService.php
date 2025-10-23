@@ -115,9 +115,9 @@ final class SearchRankingService
             foreach ($textWords as $textWord) {
                 if ($textWord === $queryWord) {
                     $score += 1.0; // Exact match
-                } elseif (strpos($textWord, $queryWord) === 0) {
+                } elseif (strpos((string) $textWord, $queryWord) === 0) {
                     $score += 0.8; // Starts with
-                } elseif (strpos($textWord, $queryWord) !== false) {
+                } elseif (strpos((string) $textWord, $queryWord) !== false) {
                     $score += 0.6; // Contains
                 }
             }

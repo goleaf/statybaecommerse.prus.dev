@@ -60,10 +60,10 @@ final class DiscountCodeController extends Controller
     /**
      * Handle apply functionality with proper error handling.
      */
-    public function apply(Request $request): JsonResponse
+    public function apply(\App\Http\Requests\Frontend\DiscountCodeApplyRequest $request): JsonResponse
     {
-        $request->validate(['code' => 'required|string|max:50', 'order_id' => 'nullable|exists:orders,id']);
-        $code = DiscountCode::where('code', $request->code)->first();
+        $validated = $request->validated();
+        $code = DiscountCode::where('code', $validated['code'])->first();
         if (! $code || ! $code->isValid()) {
             return response()->json(['success' => false, 'message' => __('discount_code_invalid')], 422);
         }
@@ -73,7 +73,7 @@ final class DiscountCodeController extends Controller
             $redemption = DiscountRedemption::create([
                 'discount_id' => $code->discount_id,
                 'code_id' => $code->id,
-                'order_id' => $request->order_id,
+                'order_id' => $validated['order_id'] ?? null,
                 'user_id' => Auth::id(),
                 'amount_saved' => 0,
                 // Will be calculated based on order
@@ -95,10 +95,10 @@ final class DiscountCodeController extends Controller
     /**
      * Handle remove functionality with proper error handling.
      */
-    public function remove(Request $request): JsonResponse
+    public function remove(\App\Http\Requests\Frontend\DiscountCodeRemoveRequest $request): JsonResponse
     {
-        $request->validate(['code' => 'required|string|max:50']);
-        $code = DiscountCode::where('code', $request->code)->first();
+        $validated = $request->validated();
+        $code = DiscountCode::where('code', $validated['code'])->first();
         if (! $code) {
             return response()->json(['success' => false, 'message' => __('discount_code_invalid')], 422);
         }
@@ -144,12 +144,12 @@ final class DiscountCodeController extends Controller
     /**
      * Handle generateDocument functionality with proper error handling.
      */
-    public function generateDocument(Request $request, DiscountCode $discountCode): Response
+    public function generateDocument(\App\Http\Requests\Frontend\DiscountCodeGenerateDocumentRequest $request, DiscountCode $discountCode): Response
     {
-        $request->validate(['template_id' => 'required|exists:document_templates,id', 'format' => 'required|in:html,pdf']);
+        $validated = $request->validated();
         try {
-            $document = $this->documentService->generateDocument(templateId: $request->template_id, documentable: $discountCode, variables: ['DISCOUNT_CODE' => $discountCode->code, 'DISCOUNT_NAME' => $discountCode->discount->name, 'DISCOUNT_DESCRIPTION' => $discountCode->description, 'DISCOUNT_VALUE' => $discountCode->discount->value, 'DISCOUNT_TYPE' => $discountCode->discount->type, 'USAGE_LIMIT' => $discountCode->usage_limit ?? 'Unlimited', 'USAGE_COUNT' => $discountCode->usage_count, 'REMAINING_USES' => $discountCode->remaining_uses ?? 'Unlimited', 'STARTS_AT' => $discountCode->starts_at?->format('d/m/Y H:i') ?? 'Immediately', 'EXPIRES_AT' => $discountCode->expires_at?->format('d/m/Y H:i') ?? 'Never', 'STATUS' => $discountCode->status, 'IS_ACTIVE' => $discountCode->is_active ? 'Yes' : 'No'], format: $request->format);
-            if ($request->format === 'pdf') {
+            $document = $this->documentService->generateDocument(templateId: $validated['template_id'], documentable: $discountCode, variables: ['DISCOUNT_CODE' => $discountCode->code, 'DISCOUNT_NAME' => $discountCode->discount->name, 'DISCOUNT_DESCRIPTION' => $discountCode->description, 'DISCOUNT_VALUE' => $discountCode->discount->value, 'DISCOUNT_TYPE' => $discountCode->discount->type, 'USAGE_LIMIT' => $discountCode->usage_limit ?? 'Unlimited', 'USAGE_COUNT' => $discountCode->usage_count, 'REMAINING_USES' => $discountCode->remaining_uses ?? 'Unlimited', 'STARTS_AT' => $discountCode->starts_at?->format('d/m/Y H:i') ?? 'Immediately', 'EXPIRES_AT' => $discountCode->expires_at?->format('d/m/Y H:i') ?? 'Never', 'STATUS' => $discountCode->status, 'IS_ACTIVE' => $discountCode->is_active ? 'Yes' : 'No'], format: $validated['format']);
+            if ($validated['format'] === 'pdf') {
                 return response()->download($document->file_path, $document->title.'.pdf');
             }
 

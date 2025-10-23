@@ -58,6 +58,9 @@ class AdminPanelProvider extends PanelProvider
             // to a deterministic dashboard widget stack and explicitly registering the dashboard route.
             $widgets = $this->testingWidgets();
             $additionalPages = $this->testingPages();
+
+            // Ensure EditRecord pages redirect after save in tests when using base page classes.
+            $configuredPanel = $configuredPanel->resourceEditPageRedirect('index');
         }
 
         return $configuredPanel

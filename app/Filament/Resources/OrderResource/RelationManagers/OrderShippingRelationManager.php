@@ -8,7 +8,7 @@ namespace App\Filament\Resources\OrderResource\RelationManagers;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Schema;
 use App\Models\OrderShipping;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -119,14 +119,14 @@ final class OrderShippingRelationManager extends BaseRelationManager
                     ->schema([
                         SchemaGrid::make(2)
                             ->schema([
-                                Flatpickr::makeDateTime('shipped_at')
+                                SupportFlatpickr::makeDateTime('shipped_at')
                                     ->label(__('orders.shipped_at')),
-                                Flatpickr::makeDateTime('estimated_delivery')
+                                SupportFlatpickr::makeDateTime('estimated_delivery')
                                     ->label(__('orders.estimated_delivery')),
                             ]),
                         SchemaGrid::make(2)
                             ->schema([
-                                Flatpickr::makeDateTime('delivered_at')
+                                SupportFlatpickr::makeDateTime('delivered_at')
                                     ->label(__('orders.delivered_at')),
                                 TextInput::make('delivery_notes')
                                     ->label(__('orders.fields.delivery_notes'))

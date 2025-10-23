@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Enums;
 
 use Illuminate\Support\Collection;
+use Throwable;
 
 /**
  * AddressType
@@ -19,26 +20,46 @@ enum AddressType: string
     case WORK = 'work';
     case OTHER = 'other';
 
+    private const LABEL_DEFAULTS = [
+        'shipping' => 'Shipping',
+        'billing'  => 'Billing',
+        'home'     => 'Home',
+        'work'     => 'Work',
+        'other'    => 'Other',
+    ];
+
+    private const DESCRIPTION_DEFAULTS = [
+        'shipping' => 'Primary shipping address',
+        'billing'  => 'Primary billing address',
+        'home'     => 'Residential address',
+        'work'     => 'Workplace address',
+        'other'    => 'Additional address',
+    ];
+
     public function label(): string
     {
-        return match ($this) {
-            self::SHIPPING => __('translations.address_type_shipping'),
-            self::BILLING => __('translations.address_type_billing'),
-            self::HOME => __('translations.address_type_home'),
-            self::WORK => __('translations.address_type_work'),
-            self::OTHER => __('translations.address_type_other'),
+        $key = match ($this) {
+            self::SHIPPING => 'translations.address_type_shipping',
+            self::BILLING  => 'translations.address_type_billing',
+            self::HOME     => 'translations.address_type_home',
+            self::WORK     => 'translations.address_type_work',
+            self::OTHER    => 'translations.address_type_other',
         };
+
+        return self::translate($key, self::LABEL_DEFAULTS[$this->value] ?? $this->value);
     }
 
     public function description(): string
     {
-        return match ($this) {
-            self::SHIPPING => __('translations.address_type_shipping_description'),
-            self::BILLING => __('translations.address_type_billing_description'),
-            self::HOME => __('translations.address_type_home_description'),
-            self::WORK => __('translations.address_type_work_description'),
-            self::OTHER => __('translations.address_type_other_description'),
+        $key = match ($this) {
+            self::SHIPPING => 'translations.address_type_shipping_description',
+            self::BILLING  => 'translations.address_type_billing_description',
+            self::HOME     => 'translations.address_type_home_description',
+            self::WORK     => 'translations.address_type_work_description',
+            self::OTHER    => 'translations.address_type_other_description',
         };
+
+        return self::translate($key, self::DESCRIPTION_DEFAULTS[$this->value] ?? $this->value);
     }
 
     public function icon(): string
@@ -67,7 +88,7 @@ enum AddressType: string
     {
         return match ($this) {
             self::SHIPPING, self::BILLING => true,
-            default => false,
+            default                       => false,
         };
     }
 
@@ -75,7 +96,7 @@ enum AddressType: string
     {
         return match ($this) {
             self::SHIPPING, self::BILLING => true,
-            default => false,
+            default                       => false,
         };
     }
 
@@ -92,37 +113,52 @@ enum AddressType: string
 
     public static function options(): array
     {
-        return collect(self::cases())->sortBy('priority')->mapWithKeys(fn ($case) => [$case->value => $case->label()])->toArray();
+        return Collection::make(self::cases())
+            ->sortBy(fn (self $case): int => $case->priority())
+            ->mapWithKeys(fn (self $case): array => [$case->value => $case->label()])
+            ->toArray();
     }
 
     public static function optionsWithDescriptions(): array
     {
-        return collect(self::cases())->sortBy('priority')->mapWithKeys(fn ($case) => [$case->value => ['label' => $case->label(), 'description' => $case->description(), 'icon' => $case->icon(), 'color' => $case->color(), 'is_primary' => $case->isPrimary(), 'is_required' => $case->isRequired()]])->toArray();
+        return Collection::make(self::cases())
+            ->sortBy(fn (self $case): int => $case->priority())
+            ->mapWithKeys(fn (self $case): array => [
+                $case->value => [
+                    'label'       => $case->label(),
+                    'description' => $case->description(),
+                    'icon'        => $case->icon(),
+                    'color'       => $case->color(),
+                    'is_primary'  => $case->isPrimary(),
+                    'is_required' => $case->isRequired(),
+                ],
+            ])
+            ->toArray();
     }
 
     public static function primary(): Collection
     {
-        return collect(self::cases())->filter(fn ($case) => $case->isPrimary());
+        return Collection::make(self::cases())->filter(static fn (self $case): bool => $case->isPrimary());
     }
 
     public static function required(): Collection
     {
-        return collect(self::cases())->filter(fn ($case) => $case->isRequired());
+        return Collection::make(self::cases())->filter(static fn (self $case): bool => $case->isRequired());
     }
 
     public static function optional(): Collection
     {
-        return collect(self::cases())->filter(fn ($case) => ! $case->isRequired());
+        return Collection::make(self::cases())->filter(static fn (self $case): bool => ! $case->isRequired());
     }
 
     public static function ordered(): Collection
     {
-        return collect(self::cases())->sortBy('priority');
+        return Collection::make(self::cases())->sortBy(fn (self $case): int => $case->priority());
     }
 
     public static function fromLabel(string $label): ?self
     {
-        return collect(self::cases())->first(fn ($case) => $case->label() === $label);
+        return Collection::make(self::cases())->first(static fn (self $case): bool => $case->label() === $label);
     }
 
     public static function values(): array
@@ -132,11 +168,41 @@ enum AddressType: string
 
     public static function labels(): array
     {
-        return collect(self::cases())->map(fn ($case) => $case->label())->toArray();
+        return Collection::make(self::cases())
+            ->map(static fn (self $case): string => $case->label())
+            ->toArray();
     }
 
     public function toArray(): array
     {
-        return ['value' => $this->value, 'label' => $this->label(), 'description' => $this->description(), 'icon' => $this->icon(), 'color' => $this->color(), 'is_primary' => $this->isPrimary(), 'is_required' => $this->isRequired(), 'priority' => $this->priority()];
+        return [
+            'value'       => $this->value,
+            'label'       => $this->label(),
+            'description' => $this->description(),
+            'icon'        => $this->icon(),
+            'color'       => $this->color(),
+            'is_primary'  => $this->isPrimary(),
+            'is_required' => $this->isRequired(),
+            'priority'    => $this->priority(),
+        ];
+    }
+
+    private static function translate(string $key, string $default): string
+    {
+        if (! function_exists('__')) {
+            return $default;
+        }
+
+        try {
+            $translated = __($key);
+        } catch (Throwable) {
+            return $default;
+        }
+
+        if (! is_string($translated) || $translated === $key) {
+            return $default;
+        }
+
+        return $translated;
     }
 }

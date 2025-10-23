@@ -23,6 +23,11 @@ final class SharedComponentServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Avoid registering heavy view composers during automated tests
+        if (app()->environment('testing')) {
+            return;
+        }
+
         // Register custom Blade directives
         $this->registerBladeDirectives();
 

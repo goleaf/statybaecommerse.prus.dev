@@ -6,7 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReportResource\Pages;
 use App\Models\Report;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -178,14 +178,14 @@ final class ReportResource extends Resource
                     ->description(__('reports.sections.date_range_description'))
                     ->columns(2)
                     ->schema([
-                        Flatpickr::makeDate('start_date')
+                        SupportFlatpickr::makeDate('start_date')
                             ->label(__('reports.fields.start_date'))
                             ->nullable(),
-                        Flatpickr::makeDate('end_date')
+                        SupportFlatpickr::makeDate('end_date')
                             ->label(__('reports.fields.end_date'))
                             ->nullable()
                             ->after('start_date'),
-                        Flatpickr::makeDateTime('last_generated_at')
+                        SupportFlatpickr::makeDateTime('last_generated_at')
                             ->label(__('reports.fields.last_generated_at'))
                             ->nullable()
                             ->disabled(),

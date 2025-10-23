@@ -7,12 +7,12 @@ namespace App\Application\Product\DTOs;
 /**
  * Input DTO for keyword-based product search.
  */
-final class SearchProductsInputDto
+final readonly class SearchProductsInputDto
 {
     public function __construct(
-        private readonly string $query,
-        private readonly int $limit,
-        private readonly int $timeoutSeconds,
+        private string $query,
+        private int $limit,
+        private int $timeoutSeconds,
     ) {
         if ($this->limit < 1) {
             throw new \InvalidArgumentException('Search limit must be at least 1.');

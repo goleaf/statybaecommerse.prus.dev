@@ -8,7 +8,7 @@ namespace App\Filament\Resources\OrderResource\RelationManagers;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Schema;
 use App\Models\Document;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -154,7 +154,7 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
                                     ->label(__('orders.access_password'))
                                     ->password()
                                     ->maxLength(255),
-                                Flatpickr::makeDateTime('expires_at')
+                                SupportFlatpickr::makeDateTime('expires_at')
                                     ->label(__('orders.expires_at')),
                             ]),
                     ])

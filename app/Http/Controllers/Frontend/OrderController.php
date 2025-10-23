@@ -86,12 +86,12 @@ final class OrderController extends Controller
     /**
      * Store a newly created resource in storage with validation.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(\App\Http\Requests\Frontend\OrderStoreRequest $request): RedirectResponse
     {
         $this->authorize('create', Order::class);
         $user = Auth::user();
 
-        $validated = $request->validate(['items' => 'required|array|min:1', 'items.*.product_id' => 'required|exists:products,id', 'items.*.product_variant_id' => 'nullable|exists:product_variants,id', 'items.*.quantity' => 'required|integer|min:1', 'billing_address' => 'required|array', 'shipping_address' => 'required|array', 'notes' => 'nullable|string|max:1000', 'payment_method' => 'nullable|string|max:255']);
+        $validated = $request->validated();
         try {
             DB::beginTransaction();
             // Calculate totals
@@ -160,14 +160,14 @@ final class OrderController extends Controller
     /**
      * Update the specified resource in storage with validation.
      */
-    public function update(Request $request, Order $order): RedirectResponse
+    public function update(\App\Http\Requests\Frontend\OrderUpdateRequest $request, Order $order): RedirectResponse
     {
         $this->authorize('update', $order);
 
         if (! $order->canBeCancelled()) {
             abort(403, __('orders.messages.cannot_edit'));
         }
-        $validated = $request->validate(['items' => 'required|array|min:1', 'items.*.product_id' => 'required|exists:products,id', 'items.*.product_variant_id' => 'nullable|exists:product_variants,id', 'items.*.quantity' => 'required|integer|min:1', 'billing_address' => 'required|array', 'shipping_address' => 'required|array', 'notes' => 'nullable|string|max:1000', 'payment_method' => 'nullable|string|max:255']);
+        $validated = $request->validated();
         try {
             DB::beginTransaction();
             // Delete existing items

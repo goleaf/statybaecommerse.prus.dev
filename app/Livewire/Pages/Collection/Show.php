@@ -228,7 +228,17 @@ class Show extends Component
         }
         $products = $builder->with(['variants.values.attribute'])->limit(100)->get();
 
-        return $products->pluck('variants')->flatten()->pluck('values')->flatten()->unique('id')->groupBy('attribute_id')->map(fn ($values) => ['attribute' => $values->first()->attribute, 'values' => $values->sortBy('position')->values()]);
+        return $products
+            ->pluck('variants')
+            ->flatten()
+            ->pluck('values')
+            ->flatten()
+            ->unique('id')
+            ->groupBy('attribute_id')
+            ->map(fn ($values) => [
+                'attribute' => $values->first()?->attribute,
+                'values' => $values->sortBy('position')->values(),
+            ]);
     }
 
     /**

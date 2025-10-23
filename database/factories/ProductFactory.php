@@ -103,7 +103,7 @@ class ProductFactory extends Factory
         $basePrice = $this->faker->randomFloat(2, 5, 2000);
         $salePrice = $this->faker->boolean(25) ? $basePrice * 0.8 : null;
 
-        $attributes = [
+        return $this->guardForMissingColumns([
             'type'                => 'simple',
             'name'                => $name,
             'slug'                => Str::slug($name . '-' . $this->faker->unique()->randomNumber()),
@@ -130,15 +130,7 @@ class ProductFactory extends Factory
             'seo_title'       => $name . ' - Profesionalūs statybos įrankiai',
             'seo_description' => 'Pirkite ' . strtolower($name) . ' geriausia kaina Lietuvoje. Greitas pristatymas visoje šalyje.',
             'published_at'    => now()->subDays(3),
-        ];
-
-        // Guard optional columns so ad-hoc schemas declared within isolated tests can
-        // reuse the product factory without needing to mirror every production field.
-        if (! Schema::hasColumn((new Product)->getTable(), 'is_enabled')) {
-            unset($attributes['is_enabled']);
-        }
-
-        return $attributes;
+        ]);
     }
 
     private function generateLithuanianDescription(string $productName): string
@@ -224,7 +216,7 @@ class ProductFactory extends Factory
     {
         $preset = self::PRESET_PRODUCTS[$key] ?? [];
 
-        return array_merge([
+        return $this->guardForMissingColumns(array_merge([
             'description'         => $this->generateLithuanianDescription($preset['name'] ?? 'Produktas'),
             'weight'              => 1.0,
             'length'              => 10.0,
@@ -233,7 +225,7 @@ class ProductFactory extends Factory
             'manage_stock'        => true,
             'stock_quantity'      => 25,
             'low_stock_threshold' => 5,
-        ], $preset);
+        ], $preset));
     }
 
     private function createTranslations(Product $product): void
@@ -299,5 +291,28 @@ class ProductFactory extends Factory
             ->unique()
             ->values()
             ->all();
+    }
+
+    /**
+     * Strip attributes that don't exist on the products table for lightweight test schemas.
+     *
+     * @param  array<string, mixed>  $attributes
+     * @return array<string, mixed>
+     */
+    private function guardForMissingColumns(array $attributes): array
+    {
+        $table = (new Product())->getTable();
+
+        if (! Schema::hasTable($table)) {
+            return $attributes;
+        }
+
+        foreach (array_keys($attributes) as $column) {
+            if (! Schema::hasColumn($table, $column)) {
+                unset($attributes[$column]);
+            }
+        }
+
+        return $attributes;
     }
 }

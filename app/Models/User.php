@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\ApprovedScope;
 use App\Observers\UserObserver;
 use App\Support\Storage\SecureStorage;
 use App\Traits\HasSafeSerialization;
@@ -26,6 +27,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
+use JsonException;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -71,7 +73,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
         });
     }
 
-    public array $translatable = ['name', 'first_name', 'last_name', 'bio', 'company', 'position', 'website'];
+    public array $translatable = ['first_name', 'last_name', 'bio', 'company', 'position', 'website'];
 
     protected $fillable = ['name', 'email', 'password', 'preferred_locale', 'preferred_currency', 'newsletter_subscription', 'sms_notifications', 'email_verified_at', 'first_name', 'last_name', 'gender', 'phone_number', 'birth_date', 'timezone', 'opt_in', 'phone', 'date_of_birth', 'is_active', 'accepts_marketing', 'two_factor_enabled', 'last_login_at', 'preferences', 'avatar_url', 'last_login_ip', 'is_admin', 'is_verified', 'company', 'job_title', 'bio', 'company', 'position', 'website', 'social_links', 'notification_preferences', 'privacy_settings', 'marketing_preferences', 'permissions_matrix', 'login_count', 'last_activity_at', 'email_verified_at', 'phone_verified_at', 'two_factor_secret', 'two_factor_recovery_codes', 'two_factor_confirmed_at', 'remember_token', 'api_token', 'stripe_customer_id', 'stripe_account_id', 'subscription_status', 'subscription_plan', 'subscription_ends_at', 'trial_ends_at', 'status', 'verification_token', 'password_reset_token', 'password_reset_expires_at', 'referral_code', 'referral_code_generated_at', 'referral_settings'];
 
@@ -89,7 +91,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
      */
     protected function casts(): array
     {
-        return ['email_verified_at' => 'datetime', 'phone_verified_at' => 'datetime', 'two_factor_confirmed_at' => 'datetime', 'password' => 'hashed', 'is_active' => 'boolean', 'is_verified' => 'boolean', 'accepts_marketing' => 'boolean', 'two_factor_enabled' => 'boolean', 'is_admin' => 'boolean', 'last_login_at' => 'datetime', 'last_activity_at' => 'datetime', 'preferences' => 'array', 'social_links' => 'array', 'notification_preferences' => 'array', 'privacy_settings' => 'array', 'marketing_preferences' => 'array', 'permissions_matrix' => 'array', 'two_factor_recovery_codes' => 'array', 'subscription_ends_at' => 'datetime', 'trial_ends_at' => 'datetime', 'password_reset_expires_at' => 'datetime', 'birth_date' => 'date', 'date_of_birth' => 'date'];
+        return ['email_verified_at' => 'datetime', 'phone_verified_at' => 'datetime', 'two_factor_confirmed_at' => 'datetime', 'password' => 'hashed', 'is_active' => 'boolean', 'is_verified' => 'boolean', 'accepts_marketing' => 'boolean', 'two_factor_enabled' => 'boolean', 'is_admin' => 'boolean', 'last_login_at' => 'datetime', 'last_activity_at' => 'datetime', 'social_links' => 'array', 'privacy_settings' => 'array', 'marketing_preferences' => 'array', 'permissions_matrix' => 'array', 'two_factor_recovery_codes' => 'array', 'subscription_ends_at' => 'datetime', 'trial_ends_at' => 'datetime', 'password_reset_expires_at' => 'datetime', 'birth_date' => 'date', 'date_of_birth' => 'date'];
     }
 
     protected function preferredCurrency(): Attribute
@@ -105,7 +107,53 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
                     Arr::set($preferences, 'preferred_currency', $value);
                 }
 
-                return ['preferences' => $preferences];
+                try {
+                    $encoded = json_encode($preferences, JSON_THROW_ON_ERROR);
+                } catch (JsonException) {
+                    $encoded = json_encode($preferences);
+                }
+
+                return ['preferences' => $encoded];
+            }
+        );
+    }
+
+    protected function preferences(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value): array {
+                if (is_array($value)) {
+                    return $value;
+                }
+
+                if (is_string($value) && $value !== '') {
+                    try {
+                        $decoded = json_decode($value, true, 512, JSON_THROW_ON_ERROR);
+                    } catch (JsonException) {
+                        $decoded = json_decode($value, true);
+                    }
+
+                    return is_array($decoded) ? $decoded : [];
+                }
+
+                return [];
+            },
+            set: function ($value): array {
+                if ($value === null) {
+                    return ['preferences' => null];
+                }
+
+                if (is_array($value)) {
+                    try {
+                        $encoded = json_encode($value, JSON_THROW_ON_ERROR);
+                    } catch (JsonException) {
+                        $encoded = json_encode($value);
+                    }
+
+                    return ['preferences' => $encoded];
+                }
+
+                return ['preferences' => $value];
             }
         );
     }
@@ -124,6 +172,46 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
                 }
 
                 return ['notification_preferences' => $preferences];
+            }
+        );
+    }
+
+    protected function notificationPreferences(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value): array {
+                if (is_array($value)) {
+                    return $value;
+                }
+
+                if (is_string($value) && $value !== '') {
+                    try {
+                        $decoded = json_decode($value, true, 512, JSON_THROW_ON_ERROR);
+                    } catch (JsonException) {
+                        $decoded = json_decode($value, true);
+                    }
+
+                    return is_array($decoded) ? $decoded : [];
+                }
+
+                return [];
+            },
+            set: function ($value): array {
+                if ($value === null) {
+                    return ['notification_preferences' => null];
+                }
+
+                if (is_array($value)) {
+                    try {
+                        $encoded = json_encode($value, JSON_THROW_ON_ERROR);
+                    } catch (JsonException) {
+                        $encoded = json_encode($value);
+                    }
+
+                    return ['notification_preferences' => $encoded];
+                }
+
+                return ['notification_preferences' => $value];
             }
         );
     }
@@ -291,7 +379,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
      */
     public function reviews(): HasMany
     {
-        return $this->hasMany(Review::class);
+        return $this->hasMany(Review::class)->withoutGlobalScopes([ApprovedScope::class, ActiveScope::class]);
     }
 
     public function productHistories(): HasMany
@@ -346,7 +434,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
      */
     public function customerGroups(): BelongsToMany
     {
-        return $this->belongsToMany(CustomerGroup::class, 'customer_group_user', 'user_id', 'customer_group_id');
+        return $this->belongsToMany(CustomerGroup::class, 'customer_group_user', 'user_id', 'customer_group_id')->withoutGlobalScopes();
     }
 
     /**
@@ -354,7 +442,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
      */
     public function discountRedemptions(): HasMany
     {
-        return $this->hasMany(DiscountRedemption::class);
+        return $this->hasMany(DiscountRedemption::class)->withoutGlobalScopes();
     }
 
     /**
@@ -1067,7 +1155,17 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     {
         $preferences = $this->attributes['notification_preferences'] ?? [];
 
-        return is_array($preferences) ? $preferences : [];
+        if (is_array($preferences)) {
+            return $preferences;
+        }
+
+        if (is_string($preferences) && $preferences !== '') {
+            $decoded = json_decode($preferences, true);
+
+            return is_array($decoded) ? $decoded : [];
+        }
+
+        return [];
     }
 
     /**

@@ -6,7 +6,7 @@ namespace App\Filament\Pages;
 
 use App\Support\DateRange;
 use App\Models\Slider;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Pages\Dashboard as BaseDashboard;
@@ -40,12 +40,12 @@ class SliderAnalytics extends BaseDashboard
                 ->label('Filter Analytics')
                 ->icon('heroicon-o-funnel')
                 ->components([
-                    Flatpickr::makeDate('startDate')
+                    SupportFlatpickr::makeDate('startDate')
                         ->label('Start Date')
                         ->default(now()->subDays(30))
                         ->displayFormat('Y-m-d')
                         ->helperText('Select the start date for analytics'),
-                    Flatpickr::makeDate('endDate')
+                    SupportFlatpickr::makeDate('endDate')
                         ->label('End Date')
                         ->default(now())
                         ->displayFormat('Y-m-d')

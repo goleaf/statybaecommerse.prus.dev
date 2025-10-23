@@ -67,9 +67,7 @@ final class SystemSetting extends Model implements HasMedia
                     ) ?? (bool) json_decode($value ?? 'false'),
                     'integer' => is_null($value) ? null : (int) $value,
                     'float' => is_null($value) ? null : (float) $value,
-                    'array', 'json' => is_string($value)
-                        ? json_decode($value ?: '[]', true) ?? []
-                        : (array) ($value ?? []),
+                    'array', 'json' => safe_json_decode_array($value ?: '[]'),
                     'file' => $this->getFirstMediaUrl('files'),
                     'image' => $this->getFirstMediaUrl('images'),
                     default => $value,
@@ -108,9 +106,7 @@ final class SystemSetting extends Model implements HasMedia
                 return [];
             }
             if (is_string($value)) {
-                $decoded = json_decode($value, true);
-
-                return $decoded !== null ? $decoded : [];
+                return safe_json_decode_array($value);
             }
 
             return $value;
@@ -133,9 +129,7 @@ final class SystemSetting extends Model implements HasMedia
                 return [];
             }
             if (is_string($value)) {
-                $decoded = json_decode($value, true);
-
-                return $decoded !== null ? $decoded : [];
+                return safe_json_decode_array($value);
             }
 
             return $value;

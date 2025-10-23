@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\OrderStatus;
+use App\Enums\PaymentMethod;
+use App\Enums\PaymentStatus;
 use App\Models\Scopes\StatusScope;
 use App\Observers\OrderObserver;
 use Carbon\CarbonImmutable;
@@ -64,6 +67,9 @@ final class Order extends Model
     protected function casts(): array
     {
         return [
+            'status' => OrderStatus::class,
+            'payment_status' => PaymentStatus::class,
+            'payment_method' => PaymentMethod::class,
             'subtotal' => 'decimal:2',
             'tax_amount' => 'decimal:2',
             'shipping_amount' => 'decimal:2',
@@ -397,7 +403,19 @@ final class Order extends Model
      */
     public function isShippable(): bool
     {
-        return in_array($this->status, ['processing', 'confirmed']);
+        $status = $this->status;
+
+        if ($status instanceof OrderStatus) {
+            return in_array($status, [OrderStatus::PROCESSING, OrderStatus::CONFIRMED], true);
+        }
+
+        try {
+            $enum = OrderStatus::from((string) $status);
+        } catch (\ValueError) {
+            return false;
+        }
+
+        return in_array($enum, [OrderStatus::PROCESSING, OrderStatus::CONFIRMED], true);
     }
 
     /**
@@ -405,7 +423,19 @@ final class Order extends Model
      */
     public function canBeCancelled(): bool
     {
-        return in_array($this->status, ['pending', 'confirmed']);
+        $status = $this->status;
+
+        if ($status instanceof OrderStatus) {
+            return in_array($status, [OrderStatus::PENDING, OrderStatus::CONFIRMED], true);
+        }
+
+        try {
+            $enum = OrderStatus::from((string) $status);
+        } catch (\ValueError) {
+            return false;
+        }
+
+        return in_array($enum, [OrderStatus::PENDING, OrderStatus::CONFIRMED], true);
     }
 
     /**
@@ -413,7 +443,19 @@ final class Order extends Model
      */
     public function canRequestReturn(): bool
     {
-        return in_array($this->status, ['delivered', 'completed']);
+        $status = $this->status;
+
+        if ($status instanceof OrderStatus) {
+            return in_array($status, [OrderStatus::DELIVERED, OrderStatus::COMPLETED], true);
+        }
+
+        try {
+            $enum = OrderStatus::from((string) $status);
+        } catch (\ValueError) {
+            return false;
+        }
+
+        return in_array($enum, [OrderStatus::DELIVERED, OrderStatus::COMPLETED], true);
     }
 
     /**

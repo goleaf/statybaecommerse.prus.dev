@@ -10,7 +10,7 @@ use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantStockResource\Pages;
 use App\Models\Location;
 use App\Models\VariantInventory;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -97,7 +97,7 @@ final class VariantStockResource extends Resource
                         ]),
                     SchemaGrid::make(2)
                         ->schema([
-                            Flatpickr::makeDate('expiry_date'),
+                            SupportFlatpickr::makeDate('expiry_date'),
                             Select::make('status')
                                 ->options([
                                     'active'       => 'active',

@@ -9,7 +9,7 @@ use Filament\Schemas\Schema;
 use App\Models\News;
 use Filament\Forms;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -49,7 +49,7 @@ final class NewsRelationManager extends BaseRelationManager
                             ->default(true),
                         Forms\Components\Toggle::make('is_featured')
                             ->default(false),
-                        Flatpickr::makeDateTime('published_at')
+                        SupportFlatpickr::makeDateTime('published_at')
                             ->default(now()),
                     ])
                     ->columns(2),
@@ -104,8 +104,8 @@ final class NewsRelationManager extends BaseRelationManager
                 Tables\Filters\TernaryFilter::make('is_featured'),
                 Tables\Filters\Filter::make('published_at')
                     ->form([
-                        Flatpickr::makeDate('published_from'),
-                        Flatpickr::makeDate('published_until'),
+                        SupportFlatpickr::makeDate('published_from'),
+                        SupportFlatpickr::makeDate('published_until'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query

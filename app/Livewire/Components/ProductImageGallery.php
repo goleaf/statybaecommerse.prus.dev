@@ -101,7 +101,8 @@ final class ProductImageGallery extends Component
      */
     public function nextImage(): void
     {
-        $this->currentImageIndex = $this->currentImageIndex < count($this->images) - 1 ? $this->currentImageIndex + 1 : 0;
+        $total = is_countable($this->images) ? count($this->images) : 0;
+        $this->currentImageIndex = $this->currentImageIndex < $total - 1 ? $this->currentImageIndex + 1 : 0;
     }
 
     /**
@@ -109,7 +110,8 @@ final class ProductImageGallery extends Component
      */
     public function previousImage(): void
     {
-        $this->currentImageIndex = $this->currentImageIndex > 0 ? $this->currentImageIndex - 1 : count($this->images) - 1;
+        $total = is_countable($this->images) ? count($this->images) : 0;
+        $this->currentImageIndex = $this->currentImageIndex > 0 ? $this->currentImageIndex - 1 : $total - 1;
     }
 
     /**

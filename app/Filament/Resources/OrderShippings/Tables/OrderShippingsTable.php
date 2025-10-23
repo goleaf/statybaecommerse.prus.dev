@@ -6,7 +6,7 @@ namespace App\Filament\Resources\OrderShippings\Tables;
 
 use App\Models\Order;
 use App\Models\OrderShipping;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -137,9 +137,9 @@ class OrderShippingsTable
                 Filter::make('shipped_at')
                     ->label(__('Shipped at'))
                     ->form([
-                        Flatpickr::makeDateTime('shipped_from')
+                        SupportFlatpickr::makeDateTime('shipped_from')
                             ->label(__('Shipped from')),
-                        Flatpickr::makeDateTime('shipped_until')
+                        SupportFlatpickr::makeDateTime('shipped_until')
                             ->label(__('Shipped until')),
                     ])
                     ->query(static function (Builder $query, array $data): Builder {

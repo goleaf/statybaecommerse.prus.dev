@@ -20,7 +20,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 
 class StockMovementsRelationManager extends BaseRelationManager
 {
@@ -65,7 +65,7 @@ class StockMovementsRelationManager extends BaseRelationManager
                 Textarea::make('notes')
                     ->label(__('inventory.notes'))
                     ->rows(3),
-                Flatpickr::makeDateTime('moved_at')
+                SupportFlatpickr::makeDateTime('moved_at')
                     ->label(__('inventory.moved_at'))
                     ->default(now()),
             ]);

@@ -34,6 +34,10 @@ final class SingleProduct extends Component
 
     public ?int $activeVariantId = null;
 
+    public string $stockStatus = 'unavailable';
+
+    public string $stockMessage = '';
+
     /**
      * Structured pricing summary for the currently selected context (product or variant).
      *
@@ -573,6 +577,34 @@ final class SingleProduct extends Component
 
         $this->stockStatus = $this->resolveStockStatus();
         $this->stockMessage = $this->resolveStockMessage();
+    }
+
+    protected function resolveStockStatus(): string
+    {
+        $status = $this->product->getStockStatus();
+
+        return $status === 'not_tracked' ? 'in_stock' : $status;
+    }
+
+    protected function resolveStockMessage(): string
+    {
+        if (! $this->product->manage_stock) {
+            return __('translations.in_stock');
+        }
+
+        $available = $this->product->availableQuantity();
+
+        if ($available <= 0) {
+            return __('translations.out_of_stock');
+        }
+
+        $threshold = (int) ($this->product->low_stock_threshold ?? 0);
+
+        if ($threshold > 0 && $this->product->isLowStock()) {
+            return __('product_variants.messages.low_stock', ['quantity' => $available]);
+        }
+
+        return __('product_variants.messages.in_stock', ['quantity' => $available]);
     }
 
     #[Computed]

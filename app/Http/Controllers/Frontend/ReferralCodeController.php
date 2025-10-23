@@ -56,10 +56,10 @@ final class ReferralCodeController extends Controller
     /**
      * Store a newly created resource in storage with validation.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(\App\Http\Requests\Frontend\ReferralCodeStoreRequest $request): RedirectResponse
     {
         $this->authorize('create', ReferralCode::class);
-        $validated = $request->validate(['title' => 'required|array', 'title.lt' => 'required|string|max:255', 'title.en' => 'required|string|max:255', 'description' => 'nullable|array', 'description.lt' => 'nullable|string', 'description.en' => 'nullable|string', 'usage_limit' => 'nullable|integer|min:1', 'reward_amount' => 'nullable|numeric|min:0', 'reward_type' => 'nullable|in:percentage,fixed,points', 'campaign_id' => 'nullable|exists:referral_campaigns,id', 'tags' => 'nullable|array', 'tags.*' => 'string|max:50', 'expires_at' => 'nullable|date|after:now']);
+        $validated = $request->validated();
         $validated['user_id'] = auth()->id();
         $validated['code'] = ReferralCode::generateUniqueCode();
         $validated['is_active'] = true;
@@ -84,10 +84,10 @@ final class ReferralCodeController extends Controller
     /**
      * Update the specified resource in storage with validation.
      */
-    public function update(Request $request, ReferralCode $referralCode): RedirectResponse
+    public function update(\App\Http\Requests\Frontend\ReferralCodeUpdateRequest $request, ReferralCode $referralCode): RedirectResponse
     {
         $this->authorize('update', $referralCode);
-        $validated = $request->validate(['title' => 'required|array', 'title.lt' => 'required|string|max:255', 'title.en' => 'required|string|max:255', 'description' => 'nullable|array', 'description.lt' => 'nullable|string', 'description.en' => 'nullable|string', 'usage_limit' => 'nullable|integer|min:1', 'reward_amount' => 'nullable|numeric|min:0', 'reward_type' => 'nullable|in:percentage,fixed,points', 'campaign_id' => 'nullable|exists:referral_campaigns,id', 'tags' => 'nullable|array', 'tags.*' => 'string|max:50', 'expires_at' => 'nullable|date|after:now']);
+        $validated = $request->validated();
         $referralCode->update($validated);
 
         return redirect()->route('frontend.referral-codes.show', $referralCode)->with('success', __('referral_codes.messages.updated_successfully'));

@@ -39,7 +39,7 @@ final class CheckoutController extends Controller
         ]);
     }
 
-    public function process(Request $request, CartLifecycleService $cartLifecycleService): RedirectResponse|JsonResponse
+    public function process(\App\Http\Requests\Frontend\CheckoutProcessRequest $request, CartLifecycleService $cartLifecycleService): RedirectResponse|JsonResponse
     {
         $throttleKey = $this->checkoutThrottleKey($request);
         $maxAttempts = (int) (Config::get('checkout.rate_limit.attempts', 3) ?? 3);
@@ -87,10 +87,7 @@ final class CheckoutController extends Controller
             );
         }
 
-        $validated = $request->validate([
-            'payment_method' => ['required', 'string', 'max:255'],
-            'confirm'        => ['nullable', 'accepted'],
-        ]);
+        $validated = $request->validated();
 
         try {
             $order = DB::transaction(function () use ($items, $request, $validated) {

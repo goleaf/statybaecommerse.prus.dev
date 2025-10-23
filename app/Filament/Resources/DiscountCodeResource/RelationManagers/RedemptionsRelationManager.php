@@ -15,7 +15,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 
 final class RedemptionsRelationManager extends BaseRelationManager
 {
@@ -40,7 +40,7 @@ final class RedemptionsRelationManager extends BaseRelationManager
                     ->numeric()
                     ->prefix('€')
                     ->required(),
-                Flatpickr::makeDateTime('redeemed_at')
+                SupportFlatpickr::makeDateTime('redeemed_at')
                     ->label(__('Redeemed At'))
                     ->default(now())
                     ->required(),

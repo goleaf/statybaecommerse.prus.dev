@@ -155,7 +155,7 @@ final class HtmlSanitizer
 
         if ($tag === 'a' && $element->hasAttribute('href')) {
             $rel = trim($element->getAttribute('rel') . ' noopener noreferrer');
-            $rel = implode(' ', array_unique(array_filter(explode(' ', $rel))));
+            $rel = implode(' ', array_unique(array_filter(explode(' ', (string) $rel))));
             $element->setAttribute('rel', $rel);
         }
 

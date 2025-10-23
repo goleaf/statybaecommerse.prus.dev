@@ -79,12 +79,12 @@ final class StockController extends Controller
     /**
      * Handle adjustStock functionality with proper error handling.
      */
-    public function adjustStock(Request $request, int $stockId): JsonResponse
+    public function adjustStock(\App\Http\Requests\Stock\AdjustStockRequest $request, int $stockId): JsonResponse
     {
         $stock = VariantInventory::findOrFail($stockId);
-        $request->validate(['quantity' => 'required|integer', 'reason' => 'required|string|in:sale,return,adjustment,manual_adjustment,restock,damage,theft,transfer', 'notes' => 'nullable|string|max:1000']);
+        $validated = $request->validated();
         try {
-            $stock->adjustStock($request->quantity, $request->reason);
+            $stock->adjustStock($validated['quantity'], $validated['reason']);
 
             return response()->json(['success' => true, 'message' => __('inventory.stock_adjusted'), 'data' => ['new_stock' => $stock->fresh()->stock, 'available_stock' => $stock->fresh()->available_stock]]);
         } catch (\Exception $e) {
@@ -95,12 +95,12 @@ final class StockController extends Controller
     /**
      * Handle reserveStock functionality with proper error handling.
      */
-    public function reserveStock(Request $request, int $stockId): JsonResponse
+    public function reserveStock(\App\Http\Requests\Stock\ReserveStockRequest $request, int $stockId): JsonResponse
     {
         $stock = VariantInventory::findOrFail($stockId);
-        $request->validate(['quantity' => 'required|integer|min:1|max:'.$stock->available_stock, 'notes' => 'nullable|string|max:1000']);
+        $validated = $request->validated();
         try {
-            if ($stock->reserve($request->quantity)) {
+            if ($stock->reserve($validated['quantity'])) {
                 return response()->json(['success' => true, 'message' => __('inventory.stock_reserved'), 'data' => ['reserved' => $stock->fresh()->reserved, 'available_stock' => $stock->fresh()->available_stock]]);
             } else {
                 return response()->json(['success' => false, 'message' => __('inventory.reserve_failed_message')], 400);
@@ -113,12 +113,12 @@ final class StockController extends Controller
     /**
      * Handle unreserveStock functionality with proper error handling.
      */
-    public function unreserveStock(Request $request, int $stockId): JsonResponse
+    public function unreserveStock(\App\Http\Requests\Stock\UnreserveStockRequest $request, int $stockId): JsonResponse
     {
         $stock = VariantInventory::findOrFail($stockId);
-        $request->validate(['quantity' => 'required|integer|min:1|max:'.$stock->reserved, 'notes' => 'nullable|string|max:1000']);
+        $validated = $request->validated();
         try {
-            $stock->unreserve($request->quantity);
+            $stock->unreserve($validated['quantity']);
 
             return response()->json(['success' => true, 'message' => __('inventory.stock_unreserved'), 'data' => ['reserved' => $stock->fresh()->reserved, 'available_stock' => $stock->fresh()->available_stock]]);
         } catch (\Exception $e) {

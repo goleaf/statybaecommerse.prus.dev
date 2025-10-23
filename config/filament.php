@@ -50,6 +50,7 @@ return [
         ],
         'resources' => [
             App\Filament\Resources\SystemSettingResource::class,
+            App\Filament\Resources\CustomerManagementResource::class,
         ],
         'pages' => [
             App\Filament\Pages\Dashboard::class,

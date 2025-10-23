@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
-use Filament\Schemas\Schema;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers\AttributesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\CategoriesRelationManager;
@@ -17,10 +16,11 @@ use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationMana
 use App\Filament\Widgets\InlineCharts\ProductSalesSparkline;
 use App\Models\Product;
 use App\Support\Authorization\AuthorizationMatrix;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
+use App\Support\Filament\Schemas\TestingSchemaHost;
+use App\Support\Forms\MatrixFactory;
 use App\Support\Seo\LocaleUrlGenerator;
 use App\Filament\Forms\Components\Quantity;
-use App\Support\Forms\MatrixFactory;
 use Awcodes\BadgeableColumn\Components\Badge;
 use Awcodes\BadgeableColumn\Components\BadgeableColumn;
 use BackedEnum;
@@ -48,6 +48,7 @@ use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Components\Tabs as SchemaTabs;
 use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
+use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -149,8 +150,16 @@ final class ProductResource extends Resource implements DefinesExportColumns
         return __('products.single');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
+        $existingLivewire = (function () {
+            return $this->livewire ?? null;
+        })->call($schema);
+
+        if ($existingLivewire === null) {
+            $schema->livewire(app(TestingSchemaHost::class));
+        }
+
         $imagesUpload = FileUpload::make('images')
             ->label(__('products.fields.images'))
             ->image()
@@ -351,7 +360,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                                 Toggle::make('allow_backorder')
                                                     ->label(__('products.fields.allow_backorder')),
                                             ]),
-                                        Flatpickr::makeDateTime('published_at')
+                                        SupportFlatpickr::makeDateTime('published_at')
                                             ->label(__('products.fields.published_at'))
                                             ->default(now()),
                                     ]),
@@ -668,9 +677,9 @@ final class ProductResource extends Resource implements DefinesExportColumns
                     ->query(fn (Builder $query): Builder => $query->where('stock_quantity', '<=', 0)),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::makeDateTime('created_from')
+                        SupportFlatpickr::makeDateTime('created_from')
                             ->label(__('products.filters.created_from')),
-                        Flatpickr::makeDateTime('created_until')
+                        SupportFlatpickr::makeDateTime('created_until')
                             ->label(__('products.filters.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

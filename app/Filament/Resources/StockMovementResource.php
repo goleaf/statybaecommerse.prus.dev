@@ -9,7 +9,7 @@ use Filament\Schemas\Schema;
 use App\Filament\Resources\StockMovementResource\Pages;
 use App\Models\StockMovement;
 use App\Filament\Forms\Components\Quantity;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -117,7 +117,7 @@ final class StockMovementResource extends Resource
                         ->label(__('stock_movement.fields.notes'))
                         ->maxLength(1000)
                         ->rows(3),
-                    Flatpickr::makeDateTime('moved_at')
+                    SupportFlatpickr::makeDateTime('moved_at')
                         ->label(__('stock_movement.fields.moved_at'))
                         ->required()
                         ->default(now()),
@@ -179,10 +179,10 @@ final class StockMovementResource extends Resource
                     ->preload(),
                 Filter::make('moved_at')
                     ->form([
-                        Flatpickr::makeDate('moved_from')
+                        SupportFlatpickr::makeDate('moved_from')
                             ->label(__('stock_movement.fields.moved_at'))
                             ->placeholder(__('stock_movement.filters.from')),
-                        Flatpickr::makeDate('moved_to')
+                        SupportFlatpickr::makeDate('moved_to')
                             ->label(__('stock_movement.fields.moved_at'))
                             ->placeholder(__('stock_movement.filters.to')),
                     ])

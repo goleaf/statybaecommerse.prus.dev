@@ -5,9 +5,12 @@ declare(strict_types=1);
 $defaultLocales = config('shared.localization.supported_locales', []);
 
 if ($defaultLocales === [] || ! is_array($defaultLocales)) {
+    $rawSupported = config('app.supported_locales', 'lt,en');
+    $supported = is_string($rawSupported) ? $rawSupported : 'lt,en';
+
     $defaultLocales = array_filter(array_map(
         static fn (string $locale): string => trim($locale),
-        explode(',', (string) config('app.supported_locales', 'lt,en')),
+        explode(',', $supported),
     ));
 }
 

@@ -9,7 +9,7 @@ use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantStockHistoryResource\Pages;
 use App\Models\VariantStockHistory;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
@@ -202,7 +202,7 @@ final class VariantStockHistoryResource extends Resource
                 Filter::make('created_at')
                     ->label(__('admin.variant_stock_histories.filters.created_at'))
                     ->form([
-                        Flatpickr::makeRange('range')
+                        SupportFlatpickr::makeRange('range')
                             ->label(__('admin.variant_stock_histories.filters.created_at'))
 
                             ->format('Y-m-d')

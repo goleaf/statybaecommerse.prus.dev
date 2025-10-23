@@ -13,7 +13,7 @@ use App\Filament\Resources\ProductHistoryResource\Pages;
 use App\Filament\Resources\ProductHistoryResource\Widgets\ProductHistoryStatsWidget;
 use App\Filament\Resources\ProductHistoryResource\Widgets\RecentProductChangesWidget;
 use App\Models\ProductHistory;
-use App\Support\Filament\Components\Flatpickr; // Custom Flatpickr helper keeps date filters consistent with the admin UI
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr; // Custom Flatpickr helper keeps date filters consistent with the admin UI
 use DateTimeInterface;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\Select as SelectInput;
@@ -175,9 +175,9 @@ final class ProductHistoryResource extends Resource
                 Filter::make('date')
                     ->label(__('product_history.date'))
                     ->form([
-                        Flatpickr::makeDate('from')
+                        SupportFlatpickr::makeDate('from')
                             ->label(__('product_history.from')),
-                        Flatpickr::makeDate('until')
+                        SupportFlatpickr::makeDate('until')
                             ->label(__('product_history.until')),
                     ])
                     ->indicateUsing(function (array $data): array {

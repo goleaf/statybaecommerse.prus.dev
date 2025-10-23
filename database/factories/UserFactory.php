@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Throwable;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -28,30 +29,31 @@ class UserFactory extends Factory
         $firstName = fake()->firstName();
         $lastName = fake()->lastName();
 
-        // Generate unique email
-        $baseEmail = fake()->safeEmail();
-        $email = $baseEmail;
-        $counter = 1;
-        // Avoid querying a table that may not exist yet (e.g. before migrations run in memory) by
-        // ensuring the users table is present before attempting to enforce cross-test uniqueness.
-        if (Schema::hasTable('users')) {
-            while (\App\Models\User::where('email', $email)->exists()) {
-                $emailParts = explode('@', $baseEmail);
-                $email = $emailParts[0].$counter.'@'.$emailParts[1];
-                $counter++;
-            }
-        }
+        // Generate a unique, deterministic email without querying the database to prevent SQLite "database is locked" errors during concurrent factory usage.
+        $email = sprintf(
+            '%s.%s.%s@example.test',
+            Str::slug($firstName),
+            Str::slug($lastName),
+            Str::lower(Str::random(6))
+        );
 
-        return [
+        $state = [
             'name' => $firstName.' '.$lastName,
             'email' => $email,
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'preferred_locale' => fake()->randomElement(['en', 'lt']),
-            'is_active' => true,
             'is_admin' => false,
             'remember_token' => Str::random(10),
         ];
+
+        // Some test runs (e.g. partial migrations, in-memory DBs) may not yet
+        // include recently added columns. Only set optional flags when present.
+        if ($this->tableExists('users') && $this->tableHasColumn('users', 'is_active')) {
+            $state['is_active'] = true;
+        }
+
+        return $state;
     }
 
     /**
@@ -101,5 +103,23 @@ class UserFactory extends Factory
             'address_line_1' => 'Konstitucijos pr. 7',
             'postal_code' => '09308',
         ]);
+    }
+
+    private function tableExists(string $table): bool
+    {
+        try {
+            return Schema::hasTable($table);
+        } catch (Throwable) {
+            return false;
+        }
+    }
+
+    private function tableHasColumn(string $table, string $column): bool
+    {
+        try {
+            return Schema::hasColumn($table, $column);
+        } catch (Throwable) {
+            return false;
+        }
     }
 }
