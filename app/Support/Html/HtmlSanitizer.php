@@ -9,66 +9,145 @@ use DOMElement;
 use DOMNode;
 use DOMText;
 
-/**
- * Small HTML sanitizer tailored for user-generated content coming from rich text editors.
- * The allow-list is intentionally conservative and strips out scripting vectors and inline styles.
- */
 final class HtmlSanitizer
 {
     /**
+     * Elements that are preserved during sanitization.
+     *
      * @var array<int, string>
      */
-    private array $allowedElements;
+    private array $allowedElements = [
+        'a',
+        'abbr',
+        'b',
+        'blockquote',
+        'br',
+        'caption',
+        'code',
+        'div',
+        'em',
+        'figcaption',
+        'figure',
+        'h2',
+        'h3',
+        'h4',
+        'h5',
+        'h6',
+        'hr',
+        'i',
+        'li',
+        'ol',
+        'p',
+        'pre',
+        's',
+        'span',
+        'strong',
+        'sub',
+        'sup',
+        'table',
+        'tbody',
+        'td',
+        'tfoot',
+        'th',
+        'thead',
+        'tr',
+        'u',
+        'ul',
+    ];
 
     /**
+     * Elements that are removed completely together with their content.
+     *
+     * @var array<int, string>
+     */
+    private array $dangerousElements = [
+        'applet',
+        'canvas',
+        'embed',
+        'form',
+        'iframe',
+        'input',
+        'link',
+        'meta',
+        'object',
+        'script',
+        'style',
+    ];
+
+    /**
+     * Allowed attributes grouped by element. "*" applies to all elements.
+     *
      * @var array<string, array<int, string>>
      */
-    private array $allowedAttributes;
+    private array $allowedAttributes = [
+        '*' => ['style'],
+        'a' => ['href', 'title', 'target', 'rel'],
+        'td' => ['colspan', 'rowspan'],
+        'th' => ['colspan', 'rowspan', 'scope'],
+        'table' => ['summary'],
+        'ol' => ['start', 'reversed', 'type'],
+    ];
 
     /**
+     * Allowed URI schemes for href attributes.
+     *
      * @var array<int, string>
      */
-    private array $globalAttributes;
+    private array $allowedSchemes = ['http', 'https', 'mailto', 'tel'];
 
     /**
+     * Allowed CSS properties for inline styles.
+     *
      * @var array<int, string>
      */
-    private array $dangerousElements;
+    private array $allowedCssProperties = [
+        'background-color',
+        'color',
+        'font-style',
+        'font-weight',
+        'text-align',
+        'text-decoration',
+    ];
 
-    public function __construct()
+    /**
+     * Allowed keywords per CSS property.
+     *
+     * @var array<string, array<int, string>>
+     */
+    private array $allowedCssValues = [
+        'font-style' => ['normal', 'italic', 'oblique'],
+        'font-weight' => ['normal', 'bold', 'bolder', 'lighter', '600', '700'],
+        'text-align' => ['left', 'center', 'right', 'justify'],
+        'text-decoration' => ['none', 'underline', 'line-through', 'overline'],
+    ];
+
+    /**
+     * Basic named colors that are considered safe.
+     *
+     * @var array<int, string>
+     */
+    private array $allowedColorKeywords = [
+        'black',
+        'blue',
+        'brown',
+        'gray',
+        'green',
+        'grey',
+        'navy',
+        'olive',
+        'orange',
+        'purple',
+        'red',
+        'silver',
+        'teal',
+        'white',
+        'yellow',
+    ];
+
+    public function sanitize(?string $html): ?string
     {
-        // Allow only semantic elements that are expected inside product descriptions or legal documents.
-        $this->allowedElements = [
-            'a', 'abbr', 'b', 'blockquote', 'br', 'caption', 'code', 'dd', 'del', 'div', 'dl', 'dt',
-            'em', 'figcaption', 'figure', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'i', 'img', 'ins',
-            'li', 'mark', 'ol', 'p', 'pre', 'q', 's', 'small', 'span', 'strong', 'sub', 'sup', 'table',
-            'tbody', 'td', 'tfoot', 'th', 'thead', 'tr', 'u', 'ul',
-        ];
-
-        // Define the attributes that are safe to keep on a per-element basis.
-        $this->allowedAttributes = [
-            'a'          => ['href', 'title', 'target', 'rel'],
-            'img'        => ['src', 'alt', 'title', 'width', 'height', 'loading'],
-            'table'      => ['summary'],
-            'th'         => ['scope', 'colspan', 'rowspan'],
-            'td'         => ['colspan', 'rowspan'],
-            'ol'         => ['start', 'type', 'reversed'],
-            'ul'         => ['type'],
-            'blockquote' => ['cite'],
-            'q'          => ['cite'],
-        ];
-
-        // Allow a minimal global attribute set for accessibility and CSS hooks.
-        $this->globalAttributes = ['class', 'id', 'lang', 'dir', 'title', 'aria-label', 'aria-hidden', 'role'];
-
-        // Mark elements that must be removed entirely instead of keeping their inner HTML.
-        $this->dangerousElements = ['script', 'style', 'template'];
-    }
-
-    public function sanitize(?string $html): string
-    {
-        if (! is_string($html)) {
-            return '';
+        if ($html === null) {
+            return null;
         }
 
         $trimmed = trim($html);
@@ -76,99 +155,74 @@ final class HtmlSanitizer
             return '';
         }
 
-        // Wrap content in a neutral container so DOMDocument can parse fragments safely.
         $document = new DOMDocument('1.0', 'UTF-8');
-        $internalErrors = libxml_use_internal_errors(true);
+        $previousLibxml = libxml_use_internal_errors(true);
 
-        try {
-            $document->loadHTML(
-                '<?xml encoding="utf-8" ?><div>' . $trimmed . '</div>',
-                LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_COMPACT,
-            );
-        } finally {
-            libxml_clear_errors();
-            libxml_use_internal_errors($internalErrors);
-        }
+        $document->loadHTML('<?xml encoding="utf-8"?><div>'.$trimmed.'</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        libxml_clear_errors();
+        libxml_use_internal_errors($previousLibxml);
 
-        $container = $document->getElementsByTagName('div')->item(0);
-        if (! $container instanceof DOMElement) {
+        $wrapper = $document->getElementsByTagName('div')->item(0);
+        if (! $wrapper instanceof DOMElement) {
             return '';
         }
 
-        // Recursively sanitize all descendant nodes before extracting the inner HTML.
-        $this->sanitizeNode($container);
+        $this->sanitizeChildren($wrapper);
 
-        $sanitized = '';
-        foreach (iterator_to_array($container->childNodes) as $child) {
-            $sanitized .= $document->saveHTML($child) ?: '';
+        return $this->getInnerHtml($wrapper);
+    }
+
+    private function sanitizeChildren(DOMNode $node): void
+    {
+        for ($i = $node->childNodes->length - 1; $i >= 0; $i--) {
+            $child = $node->childNodes->item($i);
+            if (! $child instanceof DOMNode) {
+                continue;
+            }
+
+            $this->sanitizeNode($child);
         }
-
-        return trim($sanitized);
     }
 
     private function sanitizeNode(DOMNode $node): void
     {
         if ($node instanceof DOMElement) {
-            $tag = strtolower($node->tagName);
+            $tagName = strtolower($node->tagName);
 
-            foreach (iterator_to_array($node->childNodes) as $child) {
-                $this->sanitizeNode($child);
-            }
-
-            if (! in_array($tag, $this->allowedElements, true)) {
-                if (in_array($tag, $this->dangerousElements, true)) {
-                    // Remove the entire element when it may contain executable payloads.
-                    $this->removeNode($node);
-                } else {
-                    $this->unwrapNode($node);
-                }
+            if (in_array($tagName, $this->dangerousElements, true)) {
+                $node->parentNode?->removeChild($node);
 
                 return;
             }
 
-            $this->sanitizeAttributes($node, $tag);
+            if (! in_array($tagName, $this->allowedElements, true)) {
+                $this->unwrapNode($node);
+
+                return;
+            }
+
+            $this->sanitizeAttributes($node);
+
+            if ($node->hasChildNodes()) {
+                $this->sanitizeChildren($node);
+            }
 
             return;
         }
 
         if ($node instanceof DOMText) {
-            // Text nodes are safe by design, nothing to sanitize here.
             return;
         }
 
-        // Drop everything else (comments, processing instructions, etc.).
         $node->parentNode?->removeChild($node);
-    }
-
-    private function sanitizeAttributes(DOMElement $element, string $tag): void
-    {
-        foreach (iterator_to_array($element->attributes ?? []) as $attribute) {
-            $name = strtolower($attribute->name);
-            $value = $attribute->value;
-
-            if ($this->isAllowedAttribute($tag, $name, $value)) {
-                continue;
-            }
-
-            $element->removeAttributeNode($attribute);
-        }
-
-        if ($tag === 'a' && $element->hasAttribute('href')) {
-            $rel = trim($element->getAttribute('rel') . ' noopener noreferrer');
-            $rel = implode(' ', array_unique(array_filter(explode(' ', $rel))));
-            $element->setAttribute('rel', $rel);
-        }
-
-        if ($tag === 'img' && $element->getAttribute('src') === '') {
-            // Drop orphan images that lost their source attribute during sanitization.
-            $this->unwrapNode($element);
-        }
     }
 
     private function unwrapNode(DOMElement $element): void
     {
         $parent = $element->parentNode;
         if (! $parent instanceof DOMNode) {
+            $element->parentNode?->removeChild($element);
+
             return;
         }
 
@@ -179,98 +233,210 @@ final class HtmlSanitizer
         $parent->removeChild($element);
     }
 
-    private function removeNode(DOMElement $element): void
+    private function sanitizeAttributes(DOMElement $element): void
     {
-        $parent = $element->parentNode;
-        if (! $parent instanceof DOMNode) {
+        if (! $element->hasAttributes()) {
             return;
         }
 
-        // Drop the node completely to avoid executing or rendering malicious payloads.
-        $parent->removeChild($element);
+        $attributes = [];
+        foreach ($element->attributes as $attribute) {
+            $attributes[] = $attribute->name;
+        }
+
+        foreach ($attributes as $attributeName) {
+            $lowerName = strtolower($attributeName);
+
+            if (str_starts_with($lowerName, 'on')) {
+                $element->removeAttribute($attributeName);
+
+                continue;
+            }
+
+            if ($lowerName === 'style') {
+                $sanitizedStyle = $this->sanitizeStyle($element->getAttribute($attributeName));
+                if ($sanitizedStyle === '') {
+                    $element->removeAttribute($attributeName);
+                } else {
+                    $element->setAttribute($attributeName, $sanitizedStyle);
+                }
+
+                continue;
+            }
+
+            if (! $this->isAttributeAllowed($element->tagName, $lowerName)) {
+                $element->removeAttribute($attributeName);
+
+                continue;
+            }
+
+            if ($lowerName === 'href') {
+                $sanitized = $this->sanitizeUrl($element->getAttribute($attributeName));
+                if ($sanitized === null) {
+                    $element->removeAttribute($attributeName);
+                } else {
+                    $element->setAttribute($attributeName, $sanitized);
+                }
+
+                continue;
+            }
+
+            if ($lowerName === 'target') {
+                $value = strtolower($element->getAttribute($attributeName));
+                if ($value !== '_blank') {
+                    $element->removeAttribute($attributeName);
+                } else {
+                    $element->setAttribute($attributeName, '_blank');
+                    $this->ensureRelAttributes($element);
+                }
+
+                continue;
+            }
+
+            if ($lowerName === 'rel') {
+                $this->ensureRelAttributes($element);
+            }
+        }
     }
 
-    private function isAllowedAttribute(string $tag, string $name, string $value): bool
+    private function ensureRelAttributes(DOMElement $element): void
     {
-        if (str_starts_with($name, 'on')) {
-            // Event handler attributes are never allowed.
-            return false;
+        if ($element->tagName !== 'a') {
+            return;
         }
 
-        if (str_starts_with($name, 'data-')) {
-            return true;
+        $rel = strtolower($element->getAttribute('rel'));
+        $tokens = array_filter(array_map('trim', explode(' ', $rel)));
+        $required = ['noopener', 'noreferrer'];
+
+        foreach ($required as $token) {
+            if (! in_array($token, $tokens, true)) {
+                $tokens[] = $token;
+            }
         }
 
-        if (in_array($name, $this->globalAttributes, true)) {
-            return true;
+        if (! empty($tokens)) {
+            $element->setAttribute('rel', implode(' ', $tokens));
         }
-
-        if (! in_array($name, $this->allowedAttributes[$tag] ?? [], true)) {
-            return false;
-        }
-
-        if ($tag === 'a' && $name === 'href') {
-            return $this->isSafeUrl($value);
-        }
-
-        if ($tag === 'img' && $name === 'src') {
-            return $this->isSafeImageUrl($value);
-        }
-
-        if ($tag === 'img' && in_array($name, ['width', 'height'], true)) {
-            return ctype_digit((string) $value);
-        }
-
-        return true;
     }
 
-    private function isSafeUrl(string $value): bool
+    private function isAttributeAllowed(string $tagName, string $attribute): bool
     {
-        $url = trim($value);
-        if ($url === '') {
-            return false;
-        }
+        $tagName = strtolower($tagName);
 
-        if ($url[0] === '#' || str_starts_with($url, '/')) {
-            return true;
-        }
+        $globalAllowed = $this->allowedAttributes['*'] ?? [];
+        $tagAllowed = $this->allowedAttributes[$tagName] ?? [];
 
-        $scheme = parse_url($url, PHP_URL_SCHEME);
-
-        if ($scheme === false || $scheme === null || $scheme === '') {
-            // Treat missing schemes (relative URLs) as safe destinations for anchors.
-            return true;
-        }
-
-        $scheme = strtolower((string) $scheme);
-
-        return in_array($scheme, ['http', 'https', 'mailto', 'tel'], true);
+        return in_array($attribute, $globalAllowed, true) || in_array($attribute, $tagAllowed, true);
     }
 
-    private function isSafeImageUrl(string $value): bool
+    private function sanitizeUrl(string $value): ?string
     {
-        $url = trim($value);
-        if ($url === '') {
-            return false;
+        $value = trim($value);
+        if ($value === '') {
+            return null;
         }
 
-        if (str_starts_with($url, '/')) {
-            return true;
+        $lower = strtolower($value);
+        if (str_starts_with($lower, 'javascript:') || str_starts_with($lower, 'data:')) {
+            return null;
         }
 
-        $scheme = parse_url($url, PHP_URL_SCHEME);
-
-        if ($scheme === false || $scheme === null || $scheme === '') {
-            // Allow scheme-less image paths so relative assets remain valid after sanitization.
-            return true;
+        if ($value[0] === '#') {
+            return $value;
         }
 
-        $scheme = strtolower((string) $scheme);
-
-        if (in_array($scheme, ['http', 'https'], true)) {
-            return true;
+        if ($value[0] === '/') {
+            return $value;
         }
 
-        return str_starts_with($url, 'data:image/');
+        $parsed = parse_url($value);
+        if ($parsed === false) {
+            return null;
+        }
+
+        if (! isset($parsed['scheme'])) {
+            return $value;
+        }
+
+        $scheme = strtolower($parsed['scheme']);
+        if (! in_array($scheme, $this->allowedSchemes, true)) {
+            return null;
+        }
+
+        return $value;
+    }
+
+    private function sanitizeStyle(string $style): string
+    {
+        $declarations = array_filter(array_map('trim', explode(';', $style)));
+        $sanitized = [];
+
+        foreach ($declarations as $declaration) {
+            [$property, $value] = array_map('trim', array_pad(explode(':', $declaration, 2), 2, ''));
+            if ($property === '' || $value === '') {
+                continue;
+            }
+
+            $property = strtolower($property);
+            if (! in_array($property, $this->allowedCssProperties, true)) {
+                continue;
+            }
+
+            $normalizedValue = $this->sanitizeCssValue($property, $value);
+            if ($normalizedValue === null) {
+                continue;
+            }
+
+            $sanitized[] = $property.': '.$normalizedValue;
+        }
+
+        return implode('; ', $sanitized);
+    }
+
+    private function sanitizeCssValue(string $property, string $value): ?string
+    {
+        $value = trim($value);
+        $lower = strtolower($value);
+
+        if (isset($this->allowedCssValues[$property]) && ! in_array($lower, $this->allowedCssValues[$property], true)) {
+            return null;
+        }
+
+        return match ($property) {
+            'color', 'background-color' => $this->sanitizeColor($value),
+            default => $lower,
+        };
+    }
+
+    private function sanitizeColor(string $value): ?string
+    {
+        $value = trim($value);
+        $lower = strtolower($value);
+
+        if (preg_match('/^#([0-9a-f]{3}|[0-9a-f]{6})$/i', $value) === 1) {
+            return $lower;
+        }
+
+        if (preg_match('/^rgba?\((-?\d+\.?\d*%?,\s*){2}-?\d+\.?\d*%?(,\s*(0|1|0?\.\d+))?\)$/i', $value) === 1) {
+            return $lower;
+        }
+
+        if (in_array($lower, $this->allowedColorKeywords, true)) {
+            return $lower;
+        }
+
+        return null;
+    }
+
+    private function getInnerHtml(DOMElement $element): string
+    {
+        $html = '';
+
+        foreach ($element->childNodes as $child) {
+            $html .= $element->ownerDocument->saveHTML($child);
+        }
+
+        return trim($html);
     }
 }

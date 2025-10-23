@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\LegalResource\RelationManagers;
 
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Support\Html\HtmlSanitizer;
+use Filament\Forms\Form;
+
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
@@ -217,20 +218,20 @@ class TranslationsRelationManager extends BaseRelationManager
             ]);
     }
 
-    /**
-     * @param  array<string, mixed> $data
-     * @return array<string, mixed>
-     */
-    private function sanitizePayload(array $data): array
+    protected function mutateFormDataBeforeCreate(array $data): array
     {
         /** @var HtmlSanitizer $sanitizer */
         $sanitizer = app(HtmlSanitizer::class);
+        $data['content'] = $sanitizer->sanitize($data['content'] ?? '');
 
-        $content = $data['content'] ?? null;
-        if (is_string($content) && trim($content) !== '') {
-            // Guarantee that relation-managed updates follow the same sanitization contract.
-            $data['content'] = $sanitizer->sanitize($content);
-        }
+        return $data;
+    }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        /** @var HtmlSanitizer $sanitizer */
+        $sanitizer = app(HtmlSanitizer::class);
+        $data['content'] = $sanitizer->sanitize($data['content'] ?? '');
 
         return $data;
     }
