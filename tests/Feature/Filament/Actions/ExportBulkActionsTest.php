@@ -4,20 +4,21 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Filament\Actions;
 
-use App\Filament\Resources\OrderResource;
 use App\Filament\Resources\OrderResource\Pages\ListOrders;
-use App\Filament\Resources\ProductResource;
 use App\Filament\Resources\ProductResource\Pages\ListProducts;
-use App\Filament\Resources\UserResource;
 use App\Filament\Resources\UserResource\Pages\ListUsers;
 use App\Jobs\ProcessExport;
+use App\Models\Export;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
-use App\Services\Export\ExportFormat;
-use App\Services\Export\ExportStatus;
+use App\Services\Export\Exporters\OrderExport;
+use App\Services\Export\Exporters\ProductExport;
+use App\Services\Export\Exporters\UserExport;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -25,78 +26,92 @@ final class ExportBulkActionsTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_order_bulk_export_dispatches_job(): void
+    private User $admin;
+
+    protected function setUp(): void
     {
-        Queue::fake();
+        parent::setUp();
 
-        $admin = User::factory()->create(['is_admin' => true]);
-        $orders = Order::factory()->count(2)->create();
+        $this->resolveAdminPanel();
 
-        $this->actingAs($admin);
+        config(['app.locale' => 'en', 'app.fallback_locale' => 'en']);
+        app()->setLocale('en');
+
+        config()->set('export.disk', 'public');
+        config()->set('export.formats', [
+            'csv' => \App\Services\Export\Writers\CsvExportWriter::class,
+            'xlsx' => \App\Services\Export\Writers\XlsxExportWriter::class,
+            'pdf' => \App\Services\Export\Writers\PdfExportWriter::class,
+        ]);
+
+        Storage::fake('public');
+        Notification::fake();
+        Bus::fake();
+
+        $this->admin = User::factory()->create([
+            'email' => 'admin@example.com',
+            'is_admin' => true,
+        ]);
+
+        $this->actingAs($this->admin);
+    }
+
+    public function test_orders_bulk_export_dispatches_job_with_selected_columns(): void
+    {
+        $orders = Order::factory()->count(3)->create();
 
         Livewire::test(ListOrders::class)
-            ->callTableBulkAction('export_orders', $orders, [
-                'format' => ExportFormat::Csv->value,
-                'columns' => array_keys(OrderResource::availableExportColumns()),
+            ->call('loadTable')
+            ->callTableBulkAction('export_selected', $orders, [
+                'format' => 'csv',
+                'columns' => ['number', 'status'],
             ])
-            ->assertHasNoTableActionErrors();
+            ->assertHasNoTableBulkActionErrors();
 
-        $this->assertDatabaseHas('exports', [
-            'resource' => OrderResource::class,
-            'user_id' => $admin->id,
-            'status' => ExportStatus::Pending->value,
-        ]);
+        $export = Export::query()->latest()->first();
 
-        Queue::assertPushed(ProcessExport::class);
+        self::assertNotNull($export);
+        self::assertSame(OrderExport::class, $export->exportable_type);
+        self::assertSame(['number', 'status'], $export->columns);
+        self::assertSame($this->admin->getKey(), $export->requested_by);
+
+        Bus::assertDispatched(ProcessExport::class, fn (ProcessExport $job): bool => $job->exportId === $export->getKey());
     }
 
-    public function test_product_bulk_export_dispatches_job(): void
+    public function test_products_bulk_export_uses_selected_format(): void
     {
-        Queue::fake();
-
-        $admin = User::factory()->create(['is_admin' => true]);
-        $products = Product::factory()->count(2)->create();
-
-        $this->actingAs($admin);
+        Product::factory()->count(2)->create();
 
         Livewire::test(ListProducts::class)
-            ->callTableBulkAction('export_products', $products, [
-                'format' => ExportFormat::Pdf->value,
-                'columns' => array_keys(ProductResource::availableExportColumns()),
+            ->call('loadTable')
+            ->callTableBulkAction('export_selected', Product::all(), [
+                'format' => 'xlsx',
+                'columns' => ['sku', 'name'],
             ])
-            ->assertHasNoTableActionErrors();
+            ->assertHasNoTableBulkActionErrors();
 
-        $this->assertDatabaseHas('exports', [
-            'resource' => ProductResource::class,
-            'user_id' => $admin->id,
-            'status' => ExportStatus::Pending->value,
-        ]);
+        $export = Export::query()->latest()->first();
 
-        Queue::assertPushed(ProcessExport::class);
+        self::assertNotNull($export);
+        self::assertSame(ProductExport::class, $export->exportable_type);
+        self::assertSame('xlsx', $export->format);
+        self::assertSame(['sku', 'name'], $export->columns);
     }
 
-    public function test_user_bulk_export_dispatches_job(): void
+    public function test_users_bulk_export_defaults_to_csv_when_no_format_selected(): void
     {
-        Queue::fake();
-
-        $admin = User::factory()->create(['is_admin' => true]);
         $users = User::factory()->count(2)->create();
 
-        $this->actingAs($admin);
-
         Livewire::test(ListUsers::class)
-            ->callTableBulkAction('export_users', $users, [
-                'format' => ExportFormat::Xlsx->value,
-                'columns' => array_keys(UserResource::availableExportColumns()),
-            ])
-            ->assertHasNoTableActionErrors();
+            ->call('loadTable')
+            ->callTableBulkAction('export_selected', $users)
+            ->assertHasNoTableBulkActionErrors();
 
-        $this->assertDatabaseHas('exports', [
-            'resource' => UserResource::class,
-            'user_id' => $admin->id,
-            'status' => ExportStatus::Pending->value,
-        ]);
+        $export = Export::query()->latest()->first();
 
-        Queue::assertPushed(ProcessExport::class);
+        self::assertNotNull($export);
+        self::assertSame(UserExport::class, $export->exportable_type);
+        self::assertSame('csv', $export->format);
+        self::assertNotEmpty($export->columns);
     }
 }

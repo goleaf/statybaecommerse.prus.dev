@@ -27,7 +27,7 @@ final class ExportFactory extends Factory
             'exportable_type' => 'TestExportable',
             'columns' => ['id', 'name'],
             'exportable_options' => ['ids' => [1, 2, 3]],
-            'artifact_disk' => 'public',
+            'artifact_disk' => config('export.disk', 'public'),
             'artifact_path' => null,
             'artifact_filename' => null,
             'requested_at' => now(),

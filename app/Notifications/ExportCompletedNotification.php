@@ -5,17 +5,18 @@ declare(strict_types=1);
 namespace App\Notifications;
 
 use App\Models\Export;
-use App\Services\Export\ExportService;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-final class ExportCompletedNotification extends Notification implements ShouldQueue
+final class ExportCompletedNotification extends Notification
 {
     use Queueable;
 
-    public function __construct(private readonly string $exportId) {}
+    public function __construct(
+        private readonly Export $export,
+        private readonly string $downloadUrl,
+    ) {}
 
     public function via(object $notifiable): array
     {
@@ -24,32 +25,24 @@ final class ExportCompletedNotification extends Notification implements ShouldQu
 
     public function toMail(object $notifiable): MailMessage
     {
-        $export = $this->resolveExport();
-        $url = app(ExportService::class)->makeSignedDownloadUrl($export);
+        $expiresIn = (int) config('export.download_url_ttl', 60);
 
         return (new MailMessage)
-            ->subject(__('exports.notifications.subject', ['name' => $export->name]))
-            ->line(__('exports.notifications.ready', ['name' => $export->name]))
-            ->action(__('exports.notifications.download_action'), $url)
-            ->line(__('exports.notifications.expiration', ['date' => optional($export->available_until)->toDateTimeString()]));
+            ->subject(__('exports.notifications.completed.subject', ['name' => $this->export->name]))
+            ->line(__('exports.notifications.completed.intro'))
+            ->line(__('exports.notifications.completed.format', ['format' => strtoupper($this->export->format)]))
+            ->action(__('exports.notifications.completed.action'), $this->downloadUrl)
+            ->line(__('exports.notifications.completed.expires', ['minutes' => $expiresIn]));
     }
 
     public function toArray(object $notifiable): array
     {
-        $export = $this->resolveExport();
-        $url = app(ExportService::class)->makeSignedDownloadUrl($export);
-
         return [
-            'export_id' => $export->id,
-            'name' => $export->name,
-            'format' => $export->format->value,
-            'download_url' => $url,
-            'available_until' => optional($export->available_until)->toIso8601String(),
+            'export_id' => $this->export->getKey(),
+            'name' => $this->export->name,
+            'format' => $this->export->format,
+            'download_url' => $this->downloadUrl,
+            'expires_in_minutes' => (int) config('export.download_url_ttl', 60),
         ];
-    }
-
-    private function resolveExport(): Export
-    {
-        return Export::query()->findOrFail($this->exportId);
     }
 }
