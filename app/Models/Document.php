@@ -26,7 +26,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  *
  * @phpstan-use HasFactory<\Database\Factories\DocumentFactory>
  *
- * @method static \Database\Factories\DocumentFactory factory($count = null, $state = [])
+ * @method static \Database\Factories\DocumentFactory            factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Document newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Document newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Document query()
@@ -73,8 +73,8 @@ final class Document extends Model
         'expires_at'      => 'datetime',
         'is_public'       => 'bool',
         'is_downloadable' => 'bool',
-        'created_by' => 'int',
-        'updated_by' => 'int',
+        'created_by'      => 'int',
+        'updated_by'      => 'int',
     ];
 
     protected $with = ['creator', 'updater'];
@@ -129,6 +129,16 @@ final class Document extends Model
         $relation = $this->belongsTo(User::class, 'updated_by');
 
         return $relation;
+    }
+
+    /**
+     * Expose a chronological audit trail so the UI and API can surface changes.
+     *
+     * @return MorphMany<AuditLog, Document>
+     */
+    public function auditLogs(): MorphMany
+    {
+        return $this->morphMany(AuditLog::class, 'entity')->latest('created_at');
     }
 
     /**
@@ -200,7 +210,7 @@ final class Document extends Model
     /**
      * Handle scopeByStatus functionality with proper error handling.
      *
-     * @param  Builder<Document>  $query
+     * @param  Builder<Document> $query
      * @return Builder<Document>
      */
     public function scopeByStatus(Builder $query, string $status): Builder
@@ -211,7 +221,7 @@ final class Document extends Model
     /**
      * Handle scopeByFormat functionality with proper error handling.
      *
-     * @param  Builder<Document>  $query
+     * @param  Builder<Document> $query
      * @return Builder<Document>
      */
     public function scopeByFormat(Builder $query, string $format): Builder
@@ -222,7 +232,7 @@ final class Document extends Model
     /**
      * Handle scopeOfStatus functionality with proper error handling.
      *
-     * @param  Builder<Document>  $query
+     * @param  Builder<Document> $query
      * @return Builder<Document>
      */
     public function scopeOfStatus(Builder $query, string $status): Builder
@@ -233,7 +243,7 @@ final class Document extends Model
     /**
      * Handle scopeOfFormat functionality with proper error handling.
      *
-     * @param  Builder<Document>  $query
+     * @param  Builder<Document> $query
      * @return Builder<Document>
      */
     public function scopeOfFormat(Builder $query, string $format): Builder
@@ -244,7 +254,7 @@ final class Document extends Model
     /**
      * Handle scopeForModel functionality with proper error handling.
      *
-     * @param  Builder<Document>  $query
+     * @param  Builder<Document> $query
      * @return Builder<Document>
      */
     public function scopeForModel(Builder $query, Model $model): Builder

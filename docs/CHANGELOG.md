@@ -10,6 +10,7 @@
 - Documented consistent JSON problem responses for the profile and checkout flows, falling back to user-owned carts when sessions rotate.
 - Localized the new customer badge labels (`customers.badges.*`) and surfaced them as email verification and activity chips in the admin customer table.
 - Localized the shared `common.timestamps` label for admin timestamp sections across the EN and LT translation files.
+- Introduced document audit logging with localized admin infolists, API exposure, and persisted attribution metadata for auditable history.
 
 ### Dependencies
 - Added `awcodes/filament-badgeable-column` (^3.0) to power reusable badge styling in Filament table columns while integrating the vendor Blade templates into our Tailwind build pipeline.

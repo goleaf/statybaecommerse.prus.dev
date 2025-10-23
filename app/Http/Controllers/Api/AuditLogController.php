@@ -16,21 +16,26 @@ final class AuditLogController extends Controller
     {
         $validated = $request->validate([
             'entity_type' => ['nullable', 'string'],
-            'entity_id' => ['nullable', 'string'],
-            'action' => ['nullable', 'string'],
-            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'entity_id'   => ['nullable', 'string'],
+            'action'      => ['nullable', 'string'],
+            'per_page'    => ['nullable', 'integer', 'min:1', 'max:100'],
         ]);
 
-        $query = AuditLog::query()->with('user')->latest('created_at');
+        $query = AuditLog::query()
+            ->with('user')
+            ->latest('created_at');
 
+        // Allow callers to scope audit logs to a concrete model type.
         if (! empty($validated['entity_type'])) {
             $query->where('entity_type', $validated['entity_type']);
         }
 
+        // Filter by specific model identifier when needed.
         if (! empty($validated['entity_id'])) {
             $query->where('entity_id', $validated['entity_id']);
         }
 
+        // Support action-specific drill downs (created/updated/etc.).
         if (! empty($validated['action'])) {
             $query->where('action', $validated['action']);
         }
