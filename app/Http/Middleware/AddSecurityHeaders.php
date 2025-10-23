@@ -5,36 +5,104 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 final class AddSecurityHeaders
 {
-    /**
-     * @param  Closure(Request): Response  $next
-     */
+    public function __construct(private readonly ConfigRepository $config) {}
+
     public function handle(Request $request, Closure $next): Response
     {
+        /** @var Response $response */
         $response = $next($request);
 
-        $headers = [
-            'X-Frame-Options' => config('security.headers.x_frame_options', 'DENY'),
-            'X-Content-Type-Options' => config('security.headers.x_content_type_options', 'nosniff'),
-            'Referrer-Policy' => config('security.headers.referrer_policy', 'strict-origin-when-cross-origin'),
-            'Permissions-Policy' => config('security.headers.permissions_policy', "geolocation=(), microphone=(), camera=(), payment=(), usb=()"),
-            'Content-Security-Policy-Report-Only' => config('security.headers.csp_report_only', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; form-action 'self'; base-uri 'self';"),
-        ];
+        if (! $this->config->get('security.headers.enabled', true)) {
+            return $response;
+        }
+
+        $this->applyStaticHeaders($response);
+        $this->applyContentSecurityPolicy($response);
+
+        return $response;
+    }
+
+    private function applyStaticHeaders(Response $response): void
+    {
+        $headers = $this->config->get('security.headers.values', []);
+        if (! is_array($headers)) {
+            return;
+        }
 
         foreach ($headers as $header => $value) {
-            if ($value === null || $value === '') {
+            if (! is_string($header) || $header === '') {
                 continue;
             }
 
-            if (! $response->headers->has($header)) {
-                $response->headers->set($header, $value);
+            $stringValue = is_string($value) ? $value : null;
+
+            if ($stringValue === null || $stringValue === '') {
+                continue;
             }
+
+            $response->headers->set($header, $stringValue, true);
+        }
+    }
+
+    private function applyContentSecurityPolicy(Response $response): void
+    {
+        $directives = $this->config->get('security.headers.content_security_policy', []);
+        if (! is_array($directives) || $directives === []) {
+            return;
         }
 
-        return $response;
+        $compiled = [];
+
+        foreach ($directives as $directive => $values) {
+            if (! is_string($directive) || $directive === '') {
+                continue;
+            }
+
+            if (! is_string($values) && ! is_array($values)) {
+                continue;
+            }
+
+            $sources = $this->normaliseSources($values);
+            if ($sources === []) {
+                continue;
+            }
+
+            $compiled[] = $directive.' '.implode(' ', $sources);
+        }
+
+        if ($compiled === []) {
+            return;
+        }
+
+        $response->headers->set('Content-Security-Policy', implode('; ', $compiled));
+    }
+
+    /**
+     * @param  array<mixed, mixed>|string  $values
+     * @return array<int, string>
+     */
+    private function normaliseSources(array|string $values): array
+    {
+        if (is_string($values)) {
+            $values = [$values];
+        }
+
+        $sources = [];
+
+        foreach ($values as $value) {
+            if (! is_string($value) || $value === '') {
+                continue;
+            }
+
+            $sources[] = $value;
+        }
+
+        return array_values(array_unique($sources));
     }
 }

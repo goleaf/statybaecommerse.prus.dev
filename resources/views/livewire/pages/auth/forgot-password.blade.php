@@ -1,6 +1,4 @@
 <?php
-use App\Support\Security\Captcha\CaptchaManager;
-use App\Support\Security\SuspiciousIpMonitor;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\RateLimiter;
@@ -35,14 +33,8 @@ new #[Layout('components.layouts.base')] class extends Component
 
         $this->ensureIsNotRateLimited();
 
-        $limiterKey = $this->rateLimiterKey();
-        $decaySeconds = (int) config('security.rate_limiting.password_reset.decay_seconds', 600);
+        RateLimiter::hit($this->throttleKey(), $this->decaySeconds());
 
-        RateLimiter::hit($limiterKey, $decaySeconds);
-
-        // We will send the password reset link to this user. Once we have attempted
-        // to send the link, we will examine the response then see the message we
-        // need to show to the user. Finally, we'll send out a proper response.
         $status = Password::sendResetLink($this->only('email'));
 
         if ($status != Password::RESET_LINK_SENT) {
@@ -71,30 +63,38 @@ new #[Layout('components.layouts.base')] class extends Component
 
     private function ensureIsNotRateLimited(): void
     {
-        $key = $this->rateLimiterKey();
-        $maxAttempts = (int) config('security.rate_limiting.password_reset.max_attempts', 3);
-
-        if (! RateLimiter::tooManyAttempts($key, $maxAttempts)) {
+        if (! RateLimiter::tooManyAttempts($this->throttleKey(), $this->maxAttempts())) {
             return;
         }
 
-        $seconds = RateLimiter::availableIn($key);
+        event(new Lockout(request()));
 
-        $exception = ValidationException::withMessages([
+        $seconds = RateLimiter::availableIn($this->throttleKey());
+
+        throw ValidationException::withMessages([
             'email' => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => (int) ceil($seconds / 60),
             ]),
         ]);
-
-        $exception->status = 429;
-
-        throw $exception;
     }
 
-    private function rateLimiterKey(): string
+    private function throttleKey(): string
     {
-        return 'password-reset:'.Str::transliterate(Str::lower($this->email).'|'.request()->ip());
+        $ip = request()->ip();
+        $ipAddress = is_string($ip) && $ip !== '' ? $ip : 'unknown';
+
+        return Str::transliterate('password-reset|'.Str::lower($this->email).'|'.$ipAddress);
+    }
+
+    private function maxAttempts(): int
+    {
+        return max(1, (int) data_get(config('security.rate_limiting.auth.password_reset'), 'max_attempts', 5));
+    }
+
+    private function decaySeconds(): int
+    {
+        return max(1, (int) data_get(config('security.rate_limiting.auth.password_reset'), 'decay_seconds', 300));
     }
 }; ?>
 

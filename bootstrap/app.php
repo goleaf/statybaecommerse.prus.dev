@@ -1,8 +1,9 @@
 <?php
 
 use App\Http\Middleware\AttachCorrelationId;
-use App\Http\Middleware\SecurityHeaders;
-use App\Support\ApiErrorResponse;
+use App\Http\Middleware\AddSecurityHeaders;
+use App\Providers\SecurityServiceProvider;
+use App\Services\TranslationService;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -35,7 +36,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(App\Http\Middleware\SetFilamentLocale::class);
         // Handle user impersonation for admin support
         $middleware->append(App\Http\Middleware\HandleImpersonation::class);
-        $middleware->append(SecurityHeaders::class);
+        $middleware->append(AddSecurityHeaders::class);
         // Register Spatie permission middlewares (Laravel 11+/12 style)
         $middleware->alias([
             'role' => Spatie\Permission\Middleware\RoleMiddleware::class,
@@ -65,6 +66,6 @@ return Application::configure(basePath: dirname(__DIR__))
         App\Providers\LocaleServiceProvider::class,
         App\Providers\SecurityServiceProvider::class,
         App\Providers\Filament\AdminPanelProvider::class,
-        Laravel\Sanctum\SanctumServiceProvider::class,
+        SecurityServiceProvider::class,
     ])
     ->create();
