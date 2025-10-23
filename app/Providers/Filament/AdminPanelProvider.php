@@ -188,11 +188,36 @@ final class AdminPanelProvider extends PanelProvider
             ->when(
                 app()->environment('testing'),
                 fn (Panel $p) => $p->plugins([]),
-                fn (Panel $p) => $p->plugins($plugins))
+                fn (Panel $p) => $p->plugins($this->configuredPlugins()))
             // Enable the custom Filament theme so third-party plugin views (like the searchable input)
             // are compiled with Tailwind during the build step.
             ->viteTheme('resources/css/filament/admin/theme.scss')
             ->spa();
+    }
+
+    /**
+     * @return array<int, FilamentPlugin>
+     */
+    private function configuredPlugins(): array
+    {
+        return array_values(array_filter([
+            FilamentShieldPlugin::make(),
+            $this->makeFullCalendarPlugin(),
+            TableLayoutTogglePlugin::make()
+                ->setDefaultLayout('grid')
+                ->persistLayoutUsing(
+                    persister: LocalStoragePersister::class,
+                    cacheStore: 'redis',
+                    cacheTtl: 60 * 24,
+                )
+                ->shareLayoutBetweenPages(false)
+                ->displayToggleAction()
+                ->toggleActionHook('tables::toolbar.search.after')
+                ->listLayoutButtonIcon('heroicon-o-list-bullet')
+                ->gridLayoutButtonIcon('heroicon-o-squares-2x2'),
+            FilamentNordThemePlugin::make(),
+            ResizedColumnPlugin::make()->preserveOnDB(),
+        ], static fn (?FilamentPlugin $plugin): bool => $plugin instanceof FilamentPlugin));
     }
 
     /**
