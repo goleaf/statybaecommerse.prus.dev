@@ -6,14 +6,12 @@ namespace App\Models;
 
 use App\Models\Scopes\StatusScope;
 use App\Observers\AttributionObserver;
-use App\Support\Storage\SecureStorage;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
@@ -26,7 +24,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  *
  * @phpstan-use HasFactory<\Database\Factories\DocumentFactory>
  *
- * @method static \Database\Factories\DocumentFactory            factory($count = null, $state = [])
+ * @method static \Database\Factories\DocumentFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Document newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Document newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Document query()
@@ -72,8 +70,8 @@ final class Document extends Model
         'expires_at'      => 'datetime',
         'is_public'       => 'bool',
         'is_downloadable' => 'bool',
-        'created_by'      => 'int',
-        'updated_by'      => 'int',
+        'created_by' => 'int',
+        'updated_by' => 'int',
     ];
 
     protected $with = ['creator', 'updater'];
@@ -81,7 +79,9 @@ final class Document extends Model
     /**
      * Handle template functionality with proper error handling.
      *
-     * @return BelongsTo<DocumentTemplate, Document>
+     * @return BelongsTo<DocumentTemplate, static>
+     *
+     * @phpstan-return BelongsTo<DocumentTemplate, Document>
      */
     public function template(): BelongsTo
     {
@@ -94,7 +94,9 @@ final class Document extends Model
     /**
      * Handle documentable functionality with proper error handling.
      *
-     * @return MorphTo<Model, Document>
+     * @return MorphTo<Model, static>
+     *
+     * @phpstan-return MorphTo<Model, Document>
      */
     public function documentable(): MorphTo
     {
@@ -107,7 +109,9 @@ final class Document extends Model
     /**
      * Handle creator functionality with proper error handling.
      *
-     * @return BelongsTo<User, Document>
+     * @return BelongsTo<User, static>
+     *
+     * @phpstan-return BelongsTo<User, Document>
      */
     public function creator(): BelongsTo
     {
@@ -141,6 +145,18 @@ final class Document extends Model
     }
 
     /**
+     * Handle updater functionality with proper error handling.
+     *
+     * @return BelongsTo<User, static>
+     *
+     * @phpstan-return BelongsTo<User, Document>
+     */
+    public function updater(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    /**
      * Handle getVariablesUsed functionality with proper error handling.
      *
      * @return array<string, mixed>
@@ -167,11 +183,7 @@ final class Document extends Model
             return null;
         }
 
-        return SecureStorage::temporarySignedUrl(
-            $this->file_path,
-            now()->addMinutes((int) config('media-security.url_lifetime', 30)),
-            true
-        );
+        return asset('storage/'.$this->file_path);
     }
 
     /**
@@ -209,7 +221,7 @@ final class Document extends Model
     /**
      * Handle scopeByStatus functionality with proper error handling.
      *
-     * @param  Builder<Document> $query
+     * @param  Builder<Document>  $query
      * @return Builder<Document>
      */
     public function scopeByStatus(Builder $query, string $status): Builder
@@ -220,7 +232,7 @@ final class Document extends Model
     /**
      * Handle scopeByFormat functionality with proper error handling.
      *
-     * @param  Builder<Document> $query
+     * @param  Builder<Document>  $query
      * @return Builder<Document>
      */
     public function scopeByFormat(Builder $query, string $format): Builder
@@ -231,7 +243,7 @@ final class Document extends Model
     /**
      * Handle scopeOfStatus functionality with proper error handling.
      *
-     * @param  Builder<Document> $query
+     * @param  Builder<Document>  $query
      * @return Builder<Document>
      */
     public function scopeOfStatus(Builder $query, string $status): Builder
@@ -242,7 +254,7 @@ final class Document extends Model
     /**
      * Handle scopeOfFormat functionality with proper error handling.
      *
-     * @param  Builder<Document> $query
+     * @param  Builder<Document>  $query
      * @return Builder<Document>
      */
     public function scopeOfFormat(Builder $query, string $format): Builder
@@ -253,7 +265,7 @@ final class Document extends Model
     /**
      * Handle scopeForModel functionality with proper error handling.
      *
-     * @param  Builder<Document> $query
+     * @param  Builder<Document>  $query
      * @return Builder<Document>
      */
     public function scopeForModel(Builder $query, Model $model): Builder

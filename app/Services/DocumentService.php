@@ -36,31 +36,7 @@ final class DocumentService implements DocumentServiceContract
         // Sanitize variables
         $variables = $this->sanitizeVariables($variables);
         $processedContent = $this->processTemplate($template->content, $variables);
-        /** @var int|string|null $relatedModelKey */
-        $relatedModelKey = $relatedModel->getKey();
-
-        if ($relatedModelKey === null) {
-            $relatedModelKey = '';
-        }
-
-        /** @var int|string $relatedModelKey */
-        $relatedModelKey = $relatedModelKey;
-
-        $documentTitle = $title ?? sprintf('%s - %s', $template->name, (string) $relatedModelKey);
-
-        $document = Document::create([
-            'document_template_id' => $template->id,
-            'title' => $documentTitle,
-            'content' => $processedContent,
-            'variables' => $variables,
-            'status' => 'draft',
-            'format' => 'html',
-            'documentable_type' => get_class($relatedModel),
-            'documentable_id' => $relatedModelKey,
-            'created_by' => Auth::id(),
-            'updated_by' => Auth::id(),
-            'generated_at' => now(),
-        ]);
+        $document = Document::create(['document_template_id' => $template->id, 'title' => $title ?? $template->name.' - '.$relatedModel->id, 'content' => $processedContent, 'variables' => $variables, 'status' => 'draft', 'format' => 'html', 'documentable_type' => get_class($relatedModel), 'documentable_id' => $relatedModel->id, 'created_by' => Auth::id(), 'updated_by' => Auth::id(), 'generated_at' => now()]);
         // Send notification if requested
         if ($sendNotification && Auth::user()) {
             Auth::user()->notify(new DocumentGenerated($document, false));
