@@ -10,7 +10,6 @@ use App\Support\Storage\SecureStorage;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Set;
-use Filament\Schemas\Schema;
 use Filament\Tables\Actions\AttachAction;
 use Filament\Tables\Actions\DetachAction;
 use Filament\Tables\Actions\EditAction;
@@ -21,11 +20,8 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class ProductsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'products';

@@ -8,6 +8,7 @@ use App\Http\Middleware\AttachCorrelationId;
 use App\Providers\SecurityServiceProvider;
 use App\Services\TranslationService;
 use App\Support\ApiErrorResponse;
+use App\Support\ErrorCode;
 use App\Support\ErrorCodes;
 use App\Support\RequestContext;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -83,6 +84,18 @@ $app = Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        $shouldRenderJson = static function (Request $request): bool {
+            if (RequestContext::isApiRequest($request)) {
+                return true;
+            }
+
+            return $request->expectsJson() || $request->wantsJson();
+        };
+
+        $resolveLocale = static fn (Request $request): string => RequestContext::resolveLocale($request);
+        $resolveTraceId = static fn (Request $request): string => RequestContext::resolveTraceId($request);
+        $resolveCorrelationHeader = static fn (): string => RequestContext::correlationHeader();
+
         $exceptions->render(function (DomainException $exception, Request $request) {
             $locale = RequestContext::resolveLocale($request);
             $traceId = RequestContext::resolveTraceId($request);
@@ -127,43 +140,6 @@ $app = Application::configure(basePath: dirname(__DIR__))
                 ->json($payload, $exception->status())
                 ->header($correlationHeader, $traceId)
                 ->header('Content-Language', $locale);
-        });
-
-        $exceptions->render(function (Throwable $throwable, Request $request) {
-            if ($throwable instanceof DomainException) {
-                return null;
-            }
-
-            $locale = RequestContext::resolveLocale($request);
-            $traceId = RequestContext::resolveTraceId($request);
-
-            Log::withContext([
-                'trace_id'       => $traceId,
-                'correlation_id' => $traceId,
-                'locale'         => $locale,
-                'error_code'     => $exception->errorCode(),
-                'request_path'   => $request->path(),
-                'request_method' => $request->method(),
-            ]);
-
-            Log::warning('Domain exception rendered.', [
-                'exception'       => $exception::class,
-                'status'          => $exception->status(),
-                'translation_key' => $exception->translationKey(),
-                'context'         => $exception->context(),
-            ]);
-
-            $message = TranslationService::get($exception->translationKey(), $exception->context(), $locale);
-
-            return ApiErrorResponse::problem(
-                request: $request,
-                errorCode: $exception->errorCode(),
-                detail: $message,
-                status: $exception->status(),
-                title: ApiErrorResponse::titleFor($exception->errorCode(), $locale),
-                context: $exception->context(),
-                locale: $locale,
-            );
         });
 
         $exceptions->render(function (ValidationException $exception, Request $request) {

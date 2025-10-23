@@ -54,7 +54,7 @@ final class DiscountResource extends Resource
 
     protected static ?string $model = Discount::class;
 
-    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
         return 'heroicon-o-tag';
     }

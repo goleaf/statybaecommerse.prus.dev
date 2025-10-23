@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\ProductVariantResource\Pages;
 use App\Models\Attribute;
@@ -35,7 +36,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Get;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
@@ -44,16 +44,12 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 /**
  * ProductVariantResource
  *
@@ -89,7 +85,7 @@ final class ProductVariantResource extends Resource
         return __('product_variants.single');
     }
 
-    public static function getNavigationIcon(): string|BackedEnum|\UnitEnum|Htmlable|null
+    public static function getNavigationIcon(): string|BackedEnum|Htmlable|null
     {
         return 'heroicon-o-squares-2x2';
     }

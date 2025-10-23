@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\ProductRequestResource\Pages;
 use App\Models\Product;
@@ -21,22 +22,17 @@ use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class ProductRequestResource extends Resource
 {
     use HasNav;
 
     protected static ?string $model = ProductRequest::class;
 
-    public static function getNavigationIcon(): BackedEnum|\UnitEnum|\Illuminate\Contracts\Support\Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
     {
         return 'heroicon-o-clipboard-document-list';
     }
@@ -44,7 +40,7 @@ final class ProductRequestResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static UnitEnum|string|null $navigationGroup = 'Products';
+    protected static \UnitEnum|string|null $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 16;
 

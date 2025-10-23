@@ -95,7 +95,7 @@ final class FixAllNavigationGroupsFinalCommand extends Command
 
             $content = preg_replace_callback(
                 '/(\*\* @var UnitEnum\|string\|null \*\/\s*)?protected static \$navigationGroup = ([^;]+);/',
-                static fn (array $matches): string => '/** @var UnitEnum|string|null */'.PHP_EOL.'    protected static $navigationGroup = '.$matches[2].';',
+                static fn (array $matches): string => '/** @var \UnitEnum|string|null */'.PHP_EOL.'    protected static $navigationGroup = '.$matches[2].';',
                 $content,
             );
 

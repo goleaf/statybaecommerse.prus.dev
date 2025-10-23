@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\RecommendationAnalytics\Schemas;
 
-use App\Forms\Components\Flatpickr;
 use App\Models\Product;
 use App\Models\RecommendationBlock;
 use App\Models\RecommendationConfig;

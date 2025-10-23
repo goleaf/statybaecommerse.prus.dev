@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use BackedEnum;
@@ -12,19 +13,12 @@ use UnitEnum;
 use App\Filament\Resources\VariantPriceHistoryResource\Pages;
 use App\Models\VariantPriceHistory;
 use App\Support\Filament\Components\Flatpickr;
-use BackedEnum;
 use Filament\Forms;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
 
-use Filament\Schemas\Schema;
-use BackedEnum;
-use UnitEnum;
 final class VariantPriceHistoryResource extends Resource
 {
     use HasNav;
@@ -35,7 +29,7 @@ final class VariantPriceHistoryResource extends Resource
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-currency-euro';
 
     /** @var string|BackedEnum|null Navigation grouping centralized via enum. */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 20;
 

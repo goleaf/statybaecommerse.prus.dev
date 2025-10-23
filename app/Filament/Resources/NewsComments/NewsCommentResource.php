@@ -15,12 +15,9 @@ use App\Filament\Resources\NewsComments\Tables\NewsCommentsTable;
 use App\Models\NewsComment;
 use BackedEnum;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 class NewsCommentResource extends Resource
 {
     use HasNav;

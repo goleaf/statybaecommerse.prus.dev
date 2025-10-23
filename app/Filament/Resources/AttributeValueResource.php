@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\AttributeValueResource\Pages;
@@ -30,7 +31,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -45,14 +45,11 @@ use Filament\Tables\Filters\QueryBuilder\Constraints\TextConstraint;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 use UnitEnum;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class AttributeValueResource extends Resource
 {
     use HasNav;
@@ -65,7 +62,7 @@ final class AttributeValueResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 3;
 

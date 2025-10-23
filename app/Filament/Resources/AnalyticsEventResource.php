@@ -3,9 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources;
-
-
-use Filament\Schemas\Schema;
+use App\Support\Concerns\HasNav;
 use App\Filament\Resources\AnalyticsEventResource\Pages;
 use App\Models\AnalyticsEvent;
 use App\Models\User;
@@ -25,20 +23,14 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class AnalyticsEventResource extends Resource
 {
     use HasNav;
@@ -65,12 +57,9 @@ final class AnalyticsEventResource extends Resource
         return __('analytics_events.single');
     }
 
-    /**
-     * Configure the Filament form schema with fields and validation.
-     */
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->components([
+        return $form->schema([
             Section::make(__('analytics_events.basic_information'))
                 ->schema([
                     Grid::make(2)

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\ShippingOptionResource\Pages;
 use App\Models\ShippingOption;
@@ -22,20 +23,16 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Get;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 /**
  * ShippingOptionResource
  *
@@ -45,7 +42,7 @@ final class ShippingOptionResource extends Resource
 {
     use HasNav;
 
-    public static function getNavigationIcon(): BackedEnum|\UnitEnum|string|null
+    public static function getNavigationIcon(): BackedEnum|string|null
     {
         return 'heroicon-o-truck';
     }

@@ -15,21 +15,17 @@ use App\Filament\Resources\ReferralCodeUsageLogs\Tables\ReferralCodeUsageLogsTab
 use App\Models\ReferralCodeUsageLog;
 use BackedEnum;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class ReferralCodeUsageLogResource extends Resource
 {
     use HasNav;
 
     protected static ?string $model = ReferralCodeUsageLog::class;
 
-    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
         return Heroicon::OutlinedRectangleStack;
     }

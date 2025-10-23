@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantStockHistoryResource\Pages;
 use App\Models\VariantStockHistory;
@@ -25,13 +26,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class VariantStockHistoryResource extends Resource
 {
     use HasNav;

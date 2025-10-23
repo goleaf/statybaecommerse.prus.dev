@@ -9,7 +9,6 @@ use App\Models\Slider;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ContentLinkSearch;
-use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
@@ -36,9 +35,7 @@ use Filament\Support\Enums\Width;
 use UnitEnum;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
-use BackedEnum;
 
-use BackedEnum;
 class SliderManagement extends Page implements HasActions, HasForms
 {
     use InteractsWithActions, InteractsWithForms;

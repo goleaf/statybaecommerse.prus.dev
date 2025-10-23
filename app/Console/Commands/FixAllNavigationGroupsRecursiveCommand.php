@@ -31,19 +31,19 @@ final class FixAllNavigationGroupsRecursiveCommand extends Command
 
             $content = preg_replace(
                 '/(protected static \?\w+ \$model = [^;]+;)\s*\*\* @var UnitEnum\|string\|null \*\/\s*protected static \$navigationGroup/',
-                '$1'.PHP_EOL.PHP_EOL.'    protected static string|UnitEnum|null $navigationGroup',
+                '$1'.PHP_EOL.PHP_EOL.'    protected static string|\UnitEnum|null $navigationGroup',
                 $content,
             );
 
             $content = preg_replace(
                 '/protected static \?\w+ \$navigationGroup/',
-                'protected static string|UnitEnum|null $navigationGroup',
+                'protected static string|\UnitEnum|null $navigationGroup',
                 $content,
             );
 
             $content = preg_replace(
                 '/protected static \$navigationGroup/',
-                'protected static string|UnitEnum|null $navigationGroup',
+                'protected static string|\UnitEnum|null $navigationGroup',
                 $content,
             );
 

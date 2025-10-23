@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\RecommendationBlockResource\Pages;
@@ -28,13 +29,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
-use Novadaemon\FilamentCombobox\Combobox;
 use UnitEnum;
 
-use Filament\Schemas\Schema;
-use UnitEnum;
 /**
  * RecommendationBlockResource
  *
@@ -49,7 +46,7 @@ final class RecommendationBlockResource extends Resource
     /**
      * @var string|BackedEnum|null Tracks the navigation group while remaining Filament compatible.
      */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 13;
 

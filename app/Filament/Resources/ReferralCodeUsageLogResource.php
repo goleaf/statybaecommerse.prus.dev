@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\ReferralCodeUsageLogResource\Pages;
 use App\Filament\Resources\ReferralCodeUsageLogs\Schemas\ReferralCodeUsageLogForm as ReferralCodeUsageLogFormSchema;
@@ -13,18 +14,8 @@ use App\Models\ReferralCodeUsageLog;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use UnitEnum;
-use Filament\Schemas\Schema;
 
-use App\Filament\Resources\ReferralCodeUsageLogResource\Pages;
-use App\Models\ReferralCodeUsageLog;
-use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
-use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use UnitEnum;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 /**
  * ReferralCodeUsageLogResource
  *
@@ -43,7 +34,7 @@ final class ReferralCodeUsageLogResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static UnitEnum|string|null $navigationGroup = 'Analytics';
+    protected static \UnitEnum|string|null $navigationGroup = 'Analytics';
 
     public static function getNavigationLabel(): string
     {

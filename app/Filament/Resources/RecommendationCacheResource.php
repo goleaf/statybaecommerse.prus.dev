@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\RecommendationCacheResource\Pages;
 use App\Models\Product;
@@ -27,12 +28,8 @@ use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 /**
  * RecommendationCacheResource
  *

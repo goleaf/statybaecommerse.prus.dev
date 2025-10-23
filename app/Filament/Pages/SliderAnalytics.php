@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
-use App\Forms\Components\Flatpickr;
 use App\Support\DateRange;
 use App\Models\Slider;
 use App\Support\Filament\Components\Flatpickr;

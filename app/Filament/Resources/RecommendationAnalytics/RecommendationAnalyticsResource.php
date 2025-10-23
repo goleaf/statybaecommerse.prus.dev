@@ -16,11 +16,8 @@ use App\Filament\Resources\RecommendationAnalytics\Tables\RecommendationAnalytic
 use App\Models\RecommendationAnalytics;
 use BackedEnum;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class RecommendationAnalyticsResource extends Resource
 {
     use HasNav;

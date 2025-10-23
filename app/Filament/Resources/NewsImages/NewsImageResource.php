@@ -29,14 +29,6 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
-use Filament\Actions\Action;
-use Filament\Actions\ActionGroup;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -44,19 +36,16 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 class NewsImageResource extends Resource
 {
     use HasNav;
 
     protected static ?string $model = NewsImage::class;
 
-    public static function getNavigationIcon(): BackedEnum|\UnitEnum|string|null
+    public static function getNavigationIcon(): BackedEnum|string|null
     {
         return 'heroicon-o-photo';
     }

@@ -26,7 +26,6 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -34,7 +33,6 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Hash;
@@ -42,7 +40,6 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use UnitEnum;
 
-use Filament\Schemas\Schema;
 final class UserProductInteractionResource extends Resource
 {
     protected static ?string $model = UserProductInteraction::class;
@@ -50,7 +47,7 @@ final class UserProductInteractionResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static UnitEnum|string|null $navigationGroup = 'Users';
+    protected static \UnitEnum|string|null $navigationGroup = 'Users';
 
     public static function getNavigationLabel(): string
     {

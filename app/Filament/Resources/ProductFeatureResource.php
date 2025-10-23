@@ -18,11 +18,8 @@ use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use UnitEnum;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class ProductFeatureResource extends Resource
 {
     /**
@@ -44,7 +41,7 @@ final class ProductFeatureResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 17;
 

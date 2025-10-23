@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\CompanyResource\Pages;
 use App\Models\Company;
@@ -22,11 +23,8 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Collection;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class CompanyResource extends Resource
 {
     use HasNav;

@@ -12,8 +12,6 @@ use App\Models\Product;
 use App\Support\Filament\ProductVariantFieldHelper;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Filament\Filters\DateRangeFilter;
-use App\Support\Filament\ProductVariantFieldHelper;
-use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;
 use App\Support\Search\ProductVariantSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
@@ -28,7 +26,6 @@ use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -37,12 +34,9 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 /**
  * OrderItemResource
  *
@@ -50,7 +44,7 @@ use Filament\Schemas\Schema;
  */
 final class OrderItemResource extends Resource
 {
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): \UnitEnum|string|null
     {
         return NavigationGroup::Orders;
     }

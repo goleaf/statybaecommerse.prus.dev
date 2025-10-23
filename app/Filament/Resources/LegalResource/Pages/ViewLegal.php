@@ -14,7 +14,6 @@ use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Schemas\Schema;
 
 class ViewLegal extends ViewRecord
 {

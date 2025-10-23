@@ -18,11 +18,9 @@ use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use UnitEnum;
 
 final class SliderTranslationResource extends Resource
@@ -41,7 +39,7 @@ final class SliderTranslationResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static UnitEnum|string|null $navigationGroup = 'Content Management';
+    protected static \UnitEnum|string|null $navigationGroup = 'Content Management';
 
     public static function getNavigationLabel(): string
     {

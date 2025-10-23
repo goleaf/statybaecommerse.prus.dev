@@ -34,14 +34,12 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use UnitEnum;
 
-use Filament\Schemas\Schema;
 final class NotificationResource extends Resource
 {
     use HasNav; // Proxy navigation metadata to the centralized Nav registry for consistency.
@@ -60,7 +58,7 @@ final class NotificationResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static UnitEnum|string|null $navigationGroup = 'System';
+    protected static \UnitEnum|string|null $navigationGroup = 'System';
 
     protected static bool $shouldRegisterNavigation = false;
 

@@ -35,7 +35,6 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
@@ -43,9 +42,7 @@ use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use UnitEnum;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class InventoryResource extends Resource
 {
     protected static ?string $model = Inventory::class;
@@ -62,7 +59,7 @@ final class InventoryResource extends Resource
         return __('Inventory');
     }
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): \UnitEnum|string|null
     {
         return 'Inventory';
     }

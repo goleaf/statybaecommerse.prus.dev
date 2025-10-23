@@ -33,13 +33,10 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class CampaignClickResource extends Resource
 {
     /** @phpstan-var string|\BackedEnum|null */
@@ -47,12 +44,12 @@ final class CampaignClickResource extends Resource
 
     protected static ?string $model = CampaignClick::class;
 
-    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
         return 'heroicon-o-chart-bar';
     }
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): \UnitEnum|string|null
     {
         return 'Marketing';
     }

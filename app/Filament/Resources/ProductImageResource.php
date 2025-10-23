@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\ProductImageResource\Pages;
 use App\Models\ProductImage;
@@ -15,19 +16,15 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use UnitEnum;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class ProductImageResource extends Resource
 {
     use HasNav;
 
-    public static function getNavigationIcon(): BackedEnum|\UnitEnum|string|null
+    public static function getNavigationIcon(): BackedEnum|string|null
     {
         return 'heroicon-o-photo';
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\EmailCampaignResource\Pages;
 use App\Models\EmailCampaign;
@@ -25,11 +26,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class EmailCampaignResource extends Resource
 {
     use HasNav;

@@ -28,13 +28,10 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use UnitEnum;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class ApiKeyResource extends Resource
 {
     use HandlesApiKeyCredentials;
@@ -51,7 +48,7 @@ final class ApiKeyResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static UnitEnum|string|null $navigationGroup = null;
+    protected static \UnitEnum|string|null $navigationGroup = null;
 
     protected static ?int $navigationSort = 4;
 
@@ -65,7 +62,7 @@ final class ApiKeyResource extends Resource
         return __('api_keys.navigation.label');
     }
 
-    public static function getNavigationGroup(): string|UnitEnum|null
+    public static function getNavigationGroup(): string|\UnitEnum|null
     {
         return __('navigation.groups.system');
     }

@@ -48,15 +48,13 @@ use Illuminate\Support\Str;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 use UnitEnum;
 
-use Filament\Schemas\Schema;
-use UnitEnum;
 final class CategoryResource extends Resource
 {
     /** Aligns the navigation icon with Filament's expectations. */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
     /** Align the resource under the Products navigation section. */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 3;
 

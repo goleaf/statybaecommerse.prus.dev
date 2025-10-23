@@ -48,7 +48,6 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
-use Filament\Schemas\Schema;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -58,7 +57,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -70,11 +68,7 @@ use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
-use App\Support\Filament\Components\Flatpickr;
-use LaraZeus\InlineChart\Tables\Columns\InlineChart;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 /**
  * ProductResource
  *
@@ -126,12 +120,12 @@ final class ProductResource extends Resource implements DefinesExportColumns
         return AuthorizationMatrix::check('products', 'update');
     }
 
-    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
         return 'heroicon-o-cube';
     }
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): \UnitEnum|string|null
     {
         return 'Products';
     }

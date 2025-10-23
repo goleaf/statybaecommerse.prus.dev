@@ -15,12 +15,9 @@ use App\Filament\Resources\NotificationTemplates\Tables\NotificationTemplatesTab
 use App\Models\NotificationTemplate;
 use BackedEnum;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 class NotificationTemplateResource extends Resource
 {
     use HasNav;

@@ -15,21 +15,17 @@ use App\Filament\Resources\OrderShippings\Tables\OrderShippingsTable;
 use App\Models\OrderShipping;
 use BackedEnum;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 class OrderShippingResource extends Resource
 {
     use HasNav;
 
     protected static ?string $model = OrderShipping::class;
 
-    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
         return Heroicon::OutlinedRectangleStack;
     }

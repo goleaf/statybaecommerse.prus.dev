@@ -28,13 +28,10 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 final class ReferralCodeResource extends Resource
 {
     use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
@@ -44,7 +41,7 @@ final class ReferralCodeResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static UnitEnum|string|null $navigationGroup = 'Referral';
+    protected static \UnitEnum|string|null $navigationGroup = 'Referral';
 
     public static function form(Schema $schema): Schema   
     {

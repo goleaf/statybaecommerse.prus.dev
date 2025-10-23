@@ -13,18 +13,14 @@ use App\Filament\Resources\VariantAnalyticsResource\Pages;
 use App\Models\ProductVariant;
 use App\Models\VariantAnalytics;
 use App\Support\Filament\Components\Flatpickr;
-use UnitEnum;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Support\Facades\FilamentNumber;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 final class VariantAnalyticsResource extends Resource
 {
@@ -38,7 +34,7 @@ final class VariantAnalyticsResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Inventory;
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Inventory;
 
     public static function getNavigationGroup(): ?string
     {

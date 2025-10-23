@@ -166,7 +166,7 @@ final class ComprehensiveAnalysisCommand extends Command
                 $this->info('  ✅ Using new Schema class');
             }
 
-            if (Str::contains($content, 'protected static $navigationGroup') && ! Str::contains($content, '/** @var UnitEnum|string|null */')) {
+            if (Str::contains($content, 'protected static $navigationGroup') && ! Str::contains($content, '/** @var \UnitEnum|string|null */')) {
                 $resourcesWithNavigationIssues[] = $resourceFile;
                 $this->warn('  ⚠️  Navigation group type issue');
             }

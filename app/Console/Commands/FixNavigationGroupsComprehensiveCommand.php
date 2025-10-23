@@ -30,9 +30,9 @@ final class FixNavigationGroupsComprehensiveCommand extends Command
             $originalContent = $content;
 
             $patterns = [
-                '/protected static \?\w+ \$navigationGroup = ([^;]+);/' => '/** @var UnitEnum|string|null */'."\n    protected static \$navigationGroup = $1;",
-                '/(\s+)\/\*\* @var UnitEnum\|string\|null \*\/\s*\n(\s+)protected static \$navigationGroup = NavigationGroup::([^;]+);/' => '$1/** @var UnitEnum|string|null */'."\n$2protected static \$navigationGroup = NavigationGroup::$3;",
-                '/(\s+)\/\*\* @var UnitEnum\|string\|null \*\/\s*\n(\s+)protected static \$navigationGroup = \'([^\']+)\';/' => '$1/** @var UnitEnum|string|null */'."\n$2protected static \$navigationGroup = '$3';",
+                '/protected static \?\w+ \$navigationGroup = ([^;]+);/' => '/** @var \UnitEnum|string|null */'."\n    protected static \$navigationGroup = $1;",
+                '/(\s+)\/\*\* @var UnitEnum\|string\|null \*\/\s*\n(\s+)protected static \$navigationGroup = NavigationGroup::([^;]+);/' => '$1/** @var \UnitEnum|string|null */'."\n$2protected static \$navigationGroup = NavigationGroup::$3;",
+                '/(\s+)\/\*\* @var UnitEnum\|string\|null \*\/\s*\n(\s+)protected static \$navigationGroup = \'([^\']+)\';/' => '$1/** @var \UnitEnum|string|null */'."\n$2protected static \$navigationGroup = '$3';",
             ];
 
             foreach ($patterns as $pattern => $replacement) {

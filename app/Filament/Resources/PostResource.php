@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Enums\ModerationState;
 use App\Filament\Resources\PostResource\Pages;
@@ -27,7 +28,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -42,7 +42,6 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -56,10 +55,7 @@ use pxlrbt\FilamentExcel\Columns\Column as ExcelColumn;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use RuntimeException;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 /**
  * PostResource
  *
@@ -80,7 +76,7 @@ final class PostResource extends Resource
     /**
      * @var string|\BackedEnum|null
      */
-    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
         return 'heroicon-o-document-text';
     }

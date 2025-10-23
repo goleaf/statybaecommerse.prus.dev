@@ -168,7 +168,7 @@ final class FilamentDiagnosticsCommand extends Command
             return;
         }
 
-        if (! Str::contains($content, '/** @var UnitEnum|string|null */')) {
+        if (! Str::contains($content, '/** @var \UnitEnum|string|null */')) {
             $resourcesWithNavigationIssues[] = $fileName;
         }
     }

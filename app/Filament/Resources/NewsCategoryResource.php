@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\NewsCategoryResource\Pages;
 use App\Models\NewsCategory;
@@ -39,7 +40,7 @@ final class NewsCategoryResource extends Resource
 
     protected static ?string $model = NewsCategory::class;
 
-    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
         return 'heroicon-o-tag';
     }

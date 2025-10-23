@@ -15,12 +15,9 @@ use App\Filament\Resources\ReferralRewardLogs\Tables\ReferralRewardLogsTable;
 use App\Models\ReferralRewardLog;
 use BackedEnum;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 class ReferralRewardLogResource extends Resource
 {
     use HasNav;

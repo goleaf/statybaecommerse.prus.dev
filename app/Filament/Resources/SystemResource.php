@@ -38,7 +38,6 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Artisan;
@@ -73,7 +72,7 @@ final class SystemResource extends Resource
     /**
      * Handle getNavigationGroup functionality with proper error handling.
      */
-    public static function getNavigationGroup(): string|UnitEnum|null
+    public static function getNavigationGroup(): string|\UnitEnum|null
     {
         return 'System';
     }

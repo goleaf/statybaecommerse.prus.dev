@@ -24,7 +24,6 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables\Actions\BulkActionGroup as TableBulkActionGroup;
 use Filament\Tables\Actions\DeleteAction as TableDeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction as TableDeleteBulkAction;
@@ -35,7 +34,6 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use UnitEnum;
 
 final class SliderResource extends Resource
@@ -50,7 +48,7 @@ final class SliderResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static UnitEnum|string|null $navigationGroup = 'Content';
+    protected static \UnitEnum|string|null $navigationGroup = 'Content';
 
     protected static ?int $navigationSort = 4;
 

@@ -15,14 +15,10 @@ use App\Filament\Resources\Countries\Schemas\CountryForm;
 use App\Filament\Resources\Countries\Tables\CountriesTable;
 use App\Models\Country;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 /**
  * CountryResource
  *
@@ -39,7 +35,7 @@ final class CountryResource extends Resource
         return 'heroicon-o-globe-alt';
     }
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): \UnitEnum|string|null
     {
         return 'Locations';
     }

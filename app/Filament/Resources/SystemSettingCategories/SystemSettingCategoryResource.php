@@ -15,15 +15,11 @@ use App\Filament\Resources\SystemSettingCategories\Tables\SystemSettingCategorie
 use App\Models\SystemSettingCategory;
 use BackedEnum;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
 class SystemSettingCategoryResource extends Resource
 {
     use HasNav;

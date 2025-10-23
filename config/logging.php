@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Logging\CustomizeFormatter;
+use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
@@ -157,16 +158,6 @@ return [
             'formatter'  => env('LOG_STDERR_FORMATTER'),
             'processors' => [PsrLogMessageProcessor::class],
             'tap' => [App\Logging\ConfigureContextProcessors::class],
-        ],
-
-        'sentry' => [
-            'driver' => 'sentry',
-            'level'  => env('SENTRY_LOG_LEVEL', env('LOG_LEVEL', 'error')),
-        ],
-
-        'sentry' => [
-            'driver' => 'sentry',
-            'level' => env('SENTRY_LOG_LEVEL', env('LOG_LEVEL', 'error')),
         ],
 
         'sentry' => [
