@@ -16,20 +16,17 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+use UnitEnum;
+
 final class InventoryManagement extends Page implements HasTable
 {
     use ConfiguresToggleableTableLayout;
     use HasToggleableTable;
     use InteractsWithTable;
 
-    /**
-     * Navigation icon that Filament displays for this page.
-     *
-     * @var string|BackedEnum|null Filament navigation icon identifier.
-     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Products';
+    protected static UnitEnum|string|null $navigationGroup = 'Products';
 
     public static function getSlug(?\Filament\Panel $panel = null): string
     {

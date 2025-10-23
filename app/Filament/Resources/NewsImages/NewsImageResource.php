@@ -55,54 +55,57 @@ class NewsImageResource extends Resource
                 Grid::make(2)
                     ->schema([
                         Select::make('news_id')
+                            ->label('News Item')
                             ->relationship('news', 'title')
-                            ->required()
                             ->searchable()
                             ->preload()
-                            ->helperText('Choose the related news article this image belongs to.'),
+                            ->required()
+                            ->helperText('Select the news article this image belongs to.'),
                         Toggle::make('is_featured')
-                            ->label('Featured')
+                            ->label('Featured Image')
                             ->default(false)
-                            ->helperText('Mark the image as featured to highlight it in listings.'),
-                    ]),
-                FileUpload::make('file_path')
-                    ->label('Image')
-                    ->image()
-                    ->directory('news-images')
-                    ->visibility('private')
-                    ->required()
-                    ->helperText('Only image files are allowed. Uploaded files are stored privately in the news-images directory.'),
-                TextInput::make('alt_text')
-                    ->label('Alt Text')
-                    ->maxLength(255)
-                    ->helperText('Optional descriptive text used for accessibility (max 255 characters).'),
-                Textarea::make('caption')
-                    ->maxLength(500)
-                    ->columnSpanFull()
-                    ->helperText('Optional caption displayed with the image (max 500 characters).'),
-                Grid::make(3)
-                    ->schema([
+                            ->helperText('Mark this image as featured to highlight it in listings.'),
+                        FileUpload::make('file_path')
+                            ->label('Image File')
+                            ->image()
+                            ->directory('news-images')
+                            ->visibility('private')
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
+                            ->required()
+                            ->columnSpanFull()
+                            ->helperText('Upload a JPG, PNG, GIF, or WEBP file. Stored privately.'),
+                        TextInput::make('alt_text')
+                            ->label('Alt Text')
+                            ->maxLength(255)
+                            ->helperText('Describe the image for accessibility (max 255 characters).'),
                         TextInput::make('sort_order')
                             ->label('Sort Order')
                             ->numeric()
-                            ->default(0)
                             ->minValue(0)
-                            ->helperText('Controls display priority. Must be zero or a positive integer.'),
+                            ->default(0)
+                            ->required()
+                            ->helperText('Controls display order; must be a number zero or greater.'),
+                        Textarea::make('caption')
+                            ->label('Caption')
+                            ->rows(3)
+                            ->columnSpanFull()
+                            ->maxLength(500)
+                            ->helperText('Optional caption shown with the image (max 500 characters).'),
                         TextInput::make('file_size')
                             ->label('File Size (bytes)')
                             ->numeric()
                             ->minValue(0)
-                            ->helperText('Stored in bytes. Automatically captured after upload when available.'),
+                            ->helperText('Optional: populate with the file size in bytes if known.'),
                         TextInput::make('mime_type')
                             ->label('MIME Type')
                             ->maxLength(255)
-                            ->helperText('Automatically detected from the uploaded file. You may override if necessary.'),
+                            ->helperText('Optional MIME type value (e.g., image/jpeg).'),
+                        Textarea::make('dimensions')
+                            ->label('Dimensions')
+                            ->rows(2)
+                            ->columnSpanFull()
+                            ->helperText('Optional JSON object storing width/height, e.g., {"width":800,"height":600}.'),
                     ]),
-                Textarea::make('dimensions')
-                    ->label('Dimensions')
-                    ->columnSpanFull()
-                    ->rows(3)
-                    ->helperText('Store width and height as JSON, e.g. {"width": 800, "height": 600}.'),
             ]);
     }
 

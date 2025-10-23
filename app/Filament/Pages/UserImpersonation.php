@@ -15,20 +15,17 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+use UnitEnum;
+
 final class UserImpersonation extends Page implements HasTable
 {
     use ConfiguresToggleableTableLayout;
     use HasToggleableTable;
     use InteractsWithTable;
 
-    /**
-     * Navigation icon that Filament displays for this page.
-     *
-     * @var string|BackedEnum|null Filament navigation icon identifier.
-     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user';
 
-    protected static string|UnitEnum|null $navigationGroup = 'System';
+    protected static UnitEnum|string|null $navigationGroup = 'System';
 
     protected static ?string $title = 'User Impersonation';
 
