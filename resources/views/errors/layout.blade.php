@@ -8,6 +8,11 @@
     $searchTitle = $searchTitle ?? __('Search for what you need');
     $searchPlaceholder = $searchPlaceholder ?? __('Search products...');
     $links = $links ?? [];
+    $topCategoriesTitle = $topCategoriesTitle ?? __('Top Categories');
+    $topCategories = collect($topCategories ?? [])
+        ->filter(static fn ($category) => is_array($category) && filled($category['label'] ?? null) && filled($category['url'] ?? null))
+        ->values();
+    $contactCta = is_array($contactCta ?? null) ? $contactCta : null;
     $locale = app()->getLocale();
     $homeRoute = route('localized.home', ['locale' => $locale]) ?? url('/');
     $searchRoute = route('search', ['locale' => $locale]) ?? '/search';
@@ -158,6 +163,35 @@
                     </div>
                 @endif
 
+                @if($topCategories->isNotEmpty())
+                    <div class="mt-12">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-6 text-center">{{ $topCategoriesTitle }}</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            @foreach($topCategories as $category)
+                                <a href="{{ $category['url'] }}"
+                                   class="p-5 bg-white rounded-2xl border border-gray-200 hover:border-blue-300 hover:shadow-soft transition-all duration-200">
+                                    <div class="flex items-start gap-4">
+                                        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600 font-semibold">
+                                            {{ $category['label'][0] ?? '•' }}
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="flex items-center justify-between gap-2">
+                                                <span class="text-base font-semibold text-gray-900">{{ $category['label'] }}</span>
+                                                @if(!empty($category['product_count']))
+                                                    <span class="text-xs font-medium text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">{{ trans_choice(__('frontend.collections.stats.products'), (int) $category['product_count'], ['count' => (int) $category['product_count']]) }}</span>
+                                                @endif
+                                            </div>
+                                            @if(!empty($category['description']))
+                                                <p class="mt-2 text-sm text-gray-500">{{ $category['description'] }}</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
                 @if(!empty($links))
                     <div class="mt-12">
                         <h3 class="text-lg font-semibold text-gray-700 mb-6">{{ __('Popular Pages') }}</h3>
@@ -169,6 +203,33 @@
                                     <span class="block text-sm font-medium text-gray-700">{{ $link['label'] ?? __('Explore') }}</span>
                                 </a>
                             @endforeach
+                        </div>
+                    </div>
+                @endif
+
+                @if($contactCta)
+                    <div class="mt-12">
+                        <div class="bg-blue-50 border border-blue-100 rounded-3xl p-8 text-left sm:flex sm:items-center sm:justify-between sm:gap-8">
+                            <div class="max-w-xl">
+                                <h3 class="text-2xl font-semibold text-gray-900 mb-3">{{ $contactCta['title'] ?? __('Need more help?') }}</h3>
+                                <p class="text-sm text-gray-600">{{ $contactCta['description'] ?? __('Reach out to our support team and we will guide you to the right place.') }}</p>
+                            </div>
+                            @if(!empty($contactCta['actions']) && is_array($contactCta['actions']))
+                                <div class="mt-6 sm:mt-0 flex flex-col sm:flex-row gap-3">
+                                    @foreach($contactCta['actions'] as $action)
+                                        @continue(!is_array($action) || empty($action['label']) || empty($action['url']))
+                                        @php($style = $action['style'] ?? 'primary')
+                                        <a href="{{ $action['url'] }}"
+                                           @class([
+                                               'px-6 py-3 rounded-xl font-semibold text-center transition-colors duration-200',
+                                               'bg-blue-600 text-white hover:bg-blue-700' => $style === 'primary',
+                                               'border-2 border-blue-200 text-blue-700 hover:border-blue-300 hover:bg-blue-100' => $style !== 'primary',
+                                           ])>
+                                            {{ $action['label'] }}
+                                        </a>
+                                    @endforeach
+                                </div>
+                            @endif
                         </div>
                     </div>
                 @endif
