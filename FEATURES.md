@@ -20,7 +20,8 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
-- Filament attribute value admin flows now load without manifest errors by registering custom widget tab components, relaxing attribute/variant selectors and filters to drop storefront scopes, and skipping Vite theming during tests.
+- Discount redemption management screens now respect their full status lifecycle after widening the shared status scope, ensuring Filament listings, filters, and widgets display pending through cancelled records for administrators.
+- Campaign click tracking screens now provide a configurable click timestamp, zero-default conversion values, and automatic fallbacks so operators can capture marketing signals without manual database edits.
 - Brands page now features a light-themed layout, shared card components, and refreshed translations so the partner directory feels consistent across locales.
 - Product API endpoints now honour eager-loaded review aggregates so cached rating/count metrics stay in sync while
   trimming redundant queries from feature and regression suites.
