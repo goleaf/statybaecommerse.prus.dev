@@ -17,6 +17,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 -### Latest updates
+- Test harness now provisions a shared `database/testing.sqlite` datastore during `createApplication`, runs focused SQLite-only migrations (including Spatie permission and attribute pivots), and registers Filament SearchableInput payload macros so PHPUnit suites reuse the same schema while keeping component helpers v4-compatible.
 - Filament dashboard access now defaults to permissive access when no
   abilities are configured and the inline sparkline widgets honour the
   nullable model contract, keeping admin unit tests green.
@@ -200,7 +201,7 @@ composer run dev
 ## Configuration notes
 - Environment defaults live in `.env.example`; copy it to `.env` to tweak database/queue/mail settings.
 - SQLite is enabled by default for fast onboarding—switch `DB_CONNECTION` in `.env` if you need MySQL/PostgreSQL.
-- PHPUnit test runs now target the shared `database/database.sqlite` file by default for persistent schema reuse; override `DB_DATABASE` locally if you prefer transient in-memory databases.
+- PHPUnit test runs now target the shared `database/testing.sqlite` file by default for persistent schema reuse; override `DB_DATABASE` locally if you prefer transient in-memory databases.
 - Storage symlink (`public/storage`) is created by `make setup`; re-run `php artisan storage:link` if you remove it.
 - Horizon, Scout, and media-processing queues expect Redis; fall back to the sync driver for local smoke testing by setting `QUEUE_CONNECTION=sync`.
 - Rebuild search indexes for Scout with `php artisan search:index --fresh` or schedule zero-downtime refreshes through `php artisan search:index:rebuild`.

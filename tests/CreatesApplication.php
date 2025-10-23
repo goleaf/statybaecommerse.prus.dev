@@ -6,7 +6,7 @@ namespace Tests;
 
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Config;
+use Tests\Support\TestingDatabase;
 
 trait CreatesApplication
 {
@@ -34,24 +34,31 @@ trait CreatesApplication
             });
         }
 
+        // Prime environment variables before Laravel boots so the framework resolves
+        // the correct SQLite connection on its initial pass through configuration.
+        $databasePath = TestingDatabase::path();
+        TestingDatabase::ensureExists();
+
+        putenv('DB_CONNECTION=sqlite');
+        putenv('DB_DATABASE='.$databasePath);
+        $_ENV['DB_CONNECTION'] = 'sqlite';
+        $_ENV['DB_DATABASE'] = $databasePath;
+        $_SERVER['DB_CONNECTION'] = 'sqlite';
+        $_SERVER['DB_DATABASE'] = $databasePath;
+
         $app = require __DIR__ . '/../bootstrap/app.php';
 
         $app->make(Kernel::class)->bootstrap();
 
-        $connection = env('DB_CONNECTION', 'sqlite');
-        $database = env('DB_DATABASE', ':memory:');
+        // Align Laravel's runtime configuration and run migrations once for the
+        // shared SQLite datastore backing the full test suite.
+        TestingDatabase::configure($app);
+        TestingDatabase::migrate();
 
-        // Make the connection configurable so contributors can point tests at a persistent SQLite file when needed.
-        config()->set('database.default', $connection);
-
-        if ($connection === 'sqlite') {
-            // Respect the chosen SQLite database path (":memory:" by default) to avoid schema mismatches between processes.
-            config()->set('database.connections.sqlite.database', $database);
-        }
-
-        // Disable Telescope and ensure it uses the same database connection during automated tests.
+        // Disable heavy debugging services and ensure Telescope persists data to the
+        // same SQLite connection so schema assertions operate on a single database.
         config()->set('telescope.enabled', false);
-        config()->set('telescope.storage.database.connection', $connection);
+        config()->set('telescope.storage.database.connection', 'sqlite');
         config()->set('debugbar.enabled', false);
 
         return $app;
