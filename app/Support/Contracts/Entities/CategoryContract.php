@@ -5,36 +5,99 @@ declare(strict_types=1);
 namespace App\Support\Contracts\Entities;
 
 use App\Models\Category;
-use function array_filter;
-use function array_map;
-use function explode;
-use function trim;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 final class CategoryContract
 {
-    public static function fromModel(Category $category): array
+    public const CONTRACT = 'category';
+    public const VERSION = 'v1';
+
+    public static function schemaPath(): string
     {
-        $category->loadMissing('children');
+        return resource_path('contracts/v1/category.schema.json');
+    }
+
+    public static function examplePath(): string
+    {
+        return resource_path('contracts/v1/examples/category.json');
+    }
+
+    public static function forCategory(Category $category, array $meta = []): array
+    {
+        return self::envelope([
+            'item' => self::mapCategory($category),
+        ], $meta);
+    }
+
+    public static function forCollection(iterable $categories, array $meta = []): array
+    {
+        $paginator = $categories instanceof LengthAwarePaginator ? $categories : null;
+        $items = $paginator?->getCollection() ?? Collection::make($categories);
+        $mapped = $items->map(fn (Category $category): array => self::mapCategory($category))->values()->all();
+
+        $data = ['items' => $mapped];
+
+        if ($paginator instanceof LengthAwarePaginator) {
+            $data['pagination'] = [
+                'current_page' => $paginator->currentPage(),
+                'last_page' => $paginator->lastPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+            ];
+            $meta['total'] = $paginator->total();
+        } else {
+            $meta['total'] = count($mapped);
+        }
+
+        return self::envelope($data, $meta);
+    }
+
+    private static function mapCategory(Category $category): array
+    {
+        $category->loadMissing(['parent', 'children']);
 
         return [
-            'id' => (int) $category->getKey(),
+            'id' => $category->getKey(),
             'slug' => (string) $category->slug,
-            'title' => (string) ($category->name ?? ''),
-            'parent_id' => $category->parent_id ? (int) $category->parent_id : null,
-            'path' => self::buildPath($category),
-            'order' => (int) ($category->sort_order ?? 0),
-            'children' => $category->children->map(static fn (Category $child): array => self::fromModel($child))->values()->toArray(),
+            'name' => (string) $category->name,
+            'description' => $category->description,
+            'parent' => $category->parent?->exists ? [
+                'id' => $category->parent->getKey(),
+                'slug' => (string) $category->parent->slug,
+                'name' => (string) $category->parent->name,
+            ] : null,
+            'children' => $category->children->map(fn (Category $child): array => [
+                'id' => $child->getKey(),
+                'slug' => (string) $child->slug,
+                'name' => (string) $child->name,
+                'description' => $child->description,
+                'links' => [
+                    'self' => route('categories.show', $child->slug),
+                ],
+                'parent' => null,
+                'children' => [],
+                'product_count' => $child->products_count ?? null,
+            ])->all(),
+            'product_count' => $category->products_count ?? null,
+            'links' => [
+                'self' => route('categories.show', $category->slug),
+            ],
         ];
     }
 
-    /**
-     * @return array<int, string>
-     */
-    private static function buildPath(Category $category): array
+    private static function envelope(array $data, array $meta = []): array
     {
-        $fullPath = (string) ($category->full_path ?? $category->slug ?? '');
-        $segments = array_map(static fn (string $value): string => trim($value), explode('/', $fullPath));
+        $meta = array_merge([
+            'generated_at' => now()->toISOString(),
+        ], Arr::whereNotNull($meta));
 
-        return array_values(array_filter($segments, static fn (string $value): bool => $value !== ''));
+        return [
+            'contract' => self::CONTRACT,
+            'version' => self::VERSION,
+            'data' => $data,
+            'meta' => $meta,
+        ];
     }
 }
