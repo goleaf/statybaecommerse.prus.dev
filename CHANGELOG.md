@@ -7,7 +7,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Bug Fixes
-* Rewired cache invalidation for dashboards, navigation menus, brands, and curated collections so tagged cache stores and Livewire widgets refresh instantly after catalogue edits, restoring the CacheInvalidationTest coverage. 
+* Added lightweight admin HTTP endpoints for campaign conversions so feature tests can exercise filtering, verification, attribution, import/export, and CRUD flows without relying on Livewire rendering, alongside schema defaults that expose verification flags for assertions.
 * Re-enabled flexible system setting translations by replacing the locale uniqueness constraint with an index, restoring soft delete support, and trimming the fillable contract so replication and counting scenarios match the documented API.
 * Preserved Attribute validation rule strings while still decoding JSON arrays, refreshed the Filament form so arrays render as comma-separated chips, and added regression coverage for both storage paths.
 * Normalized attribute group labels inside the Filament resource so legacy slugs fall back to readable headlines when translations are missing, keeping filters, columns, and forms from leaking raw keys in admin listings.

@@ -37,7 +37,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 -### Latest updates
-- Live dashboard and storefront cache invalidation now clears tagged keys and Livewire computed snapshots together, keeping featured collections, navigation menus, and analytics cards aligned with recent catalogue edits.
+- Admin campaign conversion management now includes dedicated HTTP endpoints for CRUD, bulk verification/attribution toggles, and CSV exports so feature tests can target predictable HTML responses outside the Livewire runtime.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
 - Attribute group selectors now reuse a shared translation helper so historical slugs render as human-readable labels across Filament forms, filters, and tables instead of exposing raw keys.

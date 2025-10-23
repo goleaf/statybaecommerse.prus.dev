@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Models\NewsImage;
-use App\Support\Storage\SecureStorage;
+use App\Http\Controllers\Admin\CampaignConversionController;
+use App\Models\Inventory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
@@ -341,6 +341,24 @@ Route::middleware('auth')->group(function (): void {
 });
 
 Route::middleware('auth')->prefix('admin')->group(function (): void {
+    Route::prefix('campaign-conversions')->name('admin.campaign-conversions.')->group(function (): void {
+        Route::get('/', [CampaignConversionController::class, 'index'])->name('index');
+        Route::get('/export', [CampaignConversionController::class, 'export'])->name('export');
+        Route::get('/import', [CampaignConversionController::class, 'import'])->name('import');
+        Route::post('/', [CampaignConversionController::class, 'store'])->name('store');
+        Route::get('/{campaignConversion}', [CampaignConversionController::class, 'show'])->name('show');
+        Route::put('/{campaignConversion}', [CampaignConversionController::class, 'update'])->name('update');
+        Route::delete('/{campaignConversion}', [CampaignConversionController::class, 'destroy'])->name('destroy');
+        Route::post('/{campaignConversion}/verify', [CampaignConversionController::class, 'verify'])->name('verify');
+        Route::post('/{campaignConversion}/unverify', [CampaignConversionController::class, 'unverify'])->name('unverify');
+        Route::post('/{campaignConversion}/attribute', [CampaignConversionController::class, 'attribute'])->name('attribute');
+        Route::post('/{campaignConversion}/unattribute', [CampaignConversionController::class, 'unattribute'])->name('unattribute');
+        Route::post('/bulk-verify', [CampaignConversionController::class, 'bulkVerify'])->name('bulk-verify');
+        Route::post('/bulk-unverify', [CampaignConversionController::class, 'bulkUnverify'])->name('bulk-unverify');
+        Route::post('/bulk-attribute', [CampaignConversionController::class, 'bulkAttribute'])->name('bulk-attribute');
+        Route::post('/bulk-unattribute', [CampaignConversionController::class, 'bulkUnattribute'])->name('bulk-unattribute');
+    });
+
     Route::post('/inventories', function (Request $request) {
         $validated = $request->validate([
             'product_id'  => ['required', 'integer', 'exists:products,id'],

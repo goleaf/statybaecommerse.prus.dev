@@ -17,7 +17,7 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
-- Cache invalidation now purges tag-aware storefront widgets and dashboard metrics whenever products, brands, categories, or collections change, adding observers to keep Livewire experiences instantly in sync.
+- Admin campaign conversion endpoints now return lightweight HTML listings, verification toggles, and CSV exports so automated coverage can validate analytics-ready data without booting the Filament Livewire stack.
 - Brands page now features a light-themed layout, shared card components, and refreshed translations so the partner directory feels consistent across locales.
 - Attribute group selectors now rely on a shared translation helper so historical slugs show friendly labels across Filament forms, tables, and filters instead of exposing raw keys.
 - Region-to-city lookups and the dedicated customers table are restored for the SQLite harness, ensuring analytics sparklines, customer factories, and Filament resources can attach geographic metadata without migration errors.
