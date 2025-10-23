@@ -8,7 +8,7 @@ use App\Filament\Resources\NormalSettingResource\Pages\ListNormalSettings;
 use App\Models\NormalSetting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
+use Illuminate\Support\Facades\Lang;
 use Tests\TestCase;
 
 final class NormalSettingResourceTest extends TestCase
@@ -466,5 +466,31 @@ final class NormalSettingResourceTest extends TestCase
 
         // But should be decrypted when accessed
         $this->assertEquals('sensitive_data', $setting->value);
+    }
+
+    public function test_admin_tab_translations_are_strings(): void
+    {
+        $expected = [
+            'en' => [
+                'label'  => 'Tabs',
+                'all'    => 'All',
+                'string' => 'String',
+            ],
+            'lt' => [
+                'label'  => 'Skirtukai',
+                'all'    => 'Visi',
+                'string' => 'Tekstas',
+            ],
+        ];
+
+        foreach ($expected as $locale => $translations) {
+            app()->setLocale($locale);
+
+            foreach ($translations as $key => $value) {
+                $this->assertSame($value, Lang::get("admin.normal_settings.tabs.{$key}"));
+            }
+
+            $this->assertIsString(Lang::get('admin.normal_settings.tabs.integer'));
+        }
     }
 }
