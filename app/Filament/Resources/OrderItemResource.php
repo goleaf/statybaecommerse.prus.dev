@@ -8,14 +8,15 @@ use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\OrderItemResource\Pages;
 use App\Models\OrderItem;
 use App\Models\Product;
-use App\Models\ProductVariant;
+use App\Support\Filament\ProductVariantFieldHelper;
 use App\Support\Filament\Filters\DateRangeFilter;
 use App\Support\Search\ProductSearch;
+use App\Support\Search\ProductVariantSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms;
+use Filament\Forms\Get;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -128,16 +129,9 @@ final class OrderItemResource extends Resource
                                     );
                                 })
                                 // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
-                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                ->afterStateUpdated(function (?string $state, Set $set, Get $get): void {
                                     if ($state === null || $state === '') {
                                         // When the lookup is cleared ensure all derived metadata and totals are reset.
-                                        SearchableInputHelper::clear($set, [
-                                            'product_id'         => null,
-                                            'name'               => null,
-                                            'sku'                => null,
-                                            'unit_price'         => null,
-                                            'product_variant_id' => null,
-                                        ]);
                                         ProductVariantFieldHelper::handleVariantSelection(null, $set, $get);
 
                                         return;
@@ -190,27 +184,9 @@ final class OrderItemResource extends Resource
                                 ->searchUsing(fn (string $value): array => ProductVariantSearch::results($value))
                                 ->dehydrateStateUsing(fn (?string $value): ?int => $value !== null && $value !== '' ? (int) $value : null)
                                 ->reactive()
-                                // Refer to docs/filament/searchable-inputs.md for helper usage guidance and payload expectations.
+                                // Refer to docs/filament/variant-lookup-helpers.md for helper usage guidance.
                                 ->afterStateHydrated(fn (SearchableInput $component, ?int $state) => ProductVariantFieldHelper::hydrateSearchableVariant($component, $state))
-                                ->afterStateUpdated(function (?string $state, Set $set, Get $get): void {
-                                    if ($state === null || $state === '') {
-                                        // Reset dependent fields when the variant lookup clears.
-                                        SearchableInputHelper::clear($set, [
-                                            'product_variant_id' => null,
-                                            'product_id'         => null,
-                                            'name'               => null,
-                                            'sku'                => null,
-                                            'unit_price'         => null,
-                                            'total'              => 0,
-                                        ]);
-
-                                        ProductVariantFieldHelper::handleVariantSelection(null, $set, $get);
-
-                                        return;
-                                    }
-
-                                    ProductVariantFieldHelper::handleVariantSelection($state, $set, $get);
-                                }),
+                                ->afterStateUpdated(fn (?string $state, Set $set, Get $get) => ProductVariantFieldHelper::handleVariantSelection($state, $set, $get)),
                             TextInput::make('name')
                                 ->label(__('order_items.product_name'))
                                 ->maxLength(255),
