@@ -21,9 +21,10 @@ use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
@@ -91,12 +92,43 @@ final class SystemSettingDependencyResource extends Resource
                                 ->preload()
                                 ->helperText(__('admin.system_setting_dependencies.depends_on_setting_help')),
                         ]),
-                    Textarea::make('condition')
-                        ->label(__('admin.system_setting_dependencies.condition'))
-                        ->rows(5)
-                        ->helperText(__('admin.system_setting_dependencies.condition_help'))
-                        ->columnSpanFull()
-                        ->required(),
+                    Grid::make(2)
+                        ->schema([
+                            Select::make('condition')
+                                ->label(__('admin.system_setting_dependencies.condition'))
+                                ->options([
+                                    'equals'       => __('admin.system_settings.equals'),
+                                    'not_equals'   => __('admin.system_settings.not_equals'),
+                                    'greater_than' => __('admin.system_settings.greater_than'),
+                                    'less_than'    => __('admin.system_settings.less_than'),
+                                    'contains'     => __('admin.system_settings.contains'),
+                                    'not_contains' => __('admin.system_settings.not_contains'),
+                                    'is_empty'     => __('admin.system_settings.is_empty'),
+                                    'is_not_empty' => __('admin.system_settings.is_not_empty'),
+                                    'is_true'      => __('admin.system_settings.is_true'),
+                                    'is_false'     => __('admin.system_settings.is_false'),
+                                ])
+                                ->required()
+                                ->native(false)
+                                ->helperText(__('admin.system_setting_dependencies.condition_help')),
+                            TextInput::make('condition_value')
+                                ->label(__('admin.system_settings.condition_value'))
+                                ->maxLength(255)
+                                ->nullable()
+                                ->required(fn (Get $get): bool => $get('condition') !== null && ! in_array($get('condition'), [
+                                    'is_empty',
+                                    'is_not_empty',
+                                    'is_true',
+                                    'is_false',
+                                ], true))
+                                ->hidden(fn (Get $get): bool => in_array($get('condition'), [
+                                    'is_empty',
+                                    'is_not_empty',
+                                    'is_true',
+                                    'is_false',
+                                ], true)),
+                        ])
+                        ->columnSpanFull(),
                     Grid::make(2)
                         ->schema([
                             Toggle::make('is_active')
@@ -156,9 +188,22 @@ final class SystemSettingDependencyResource extends Resource
                     ->limit(30),
                 TextColumn::make('condition')
                     ->label(__('admin.system_setting_dependencies.condition'))
+                    ->badge()
+                    ->formatStateUsing(function (?string $state): string {
+                        if ($state === null) {
+                            return __('admin.common.not_set');
+                        }
+
+                        $translationKey = "admin.system_settings.{$state}";
+
+                        return __($translationKey) !== $translationKey ? __($translationKey) : ucfirst(str_replace('_', ' ', $state));
+                    })
+                    ->sortable(),
+                TextColumn::make('condition_value')
+                    ->label(__('admin.system_settings.condition_value'))
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
-                        $state = $column->getState();
+                        $state = (string) ($column->getState() ?? '');
 
                         if ($state === null) {
                             return null;
@@ -256,7 +301,7 @@ final class SystemSettingDependencyResource extends Resource
                             );
                     }),
             ])
-            ->searchable(['condition', 'setting.key', 'dependsOnSetting.key'])
+            ->searchable(['condition', 'condition_value', 'setting.key', 'dependsOnSetting.key'])
             ->actions([
                 ViewAction::make()
                     ->label(__('admin.common.view'))
@@ -284,7 +329,6 @@ final class SystemSettingDependencyResource extends Resource
                     ->color('info')
                     ->action(function (SystemSettingDependency $record): void {
                         $newRecord = $record->replicate();
-                        $newRecord->condition = $record->condition . ' (Copy)';
                         $newRecord->is_active = false;
                         $newRecord->save();
 
@@ -341,7 +385,6 @@ final class SystemSettingDependencyResource extends Resource
                         ->action(function (Collection $records): void {
                             $records->each(function (SystemSettingDependency $record): void {
                                 $newRecord = $record->replicate();
-                                $newRecord->condition = $record->condition . ' (Copy)';
                                 $newRecord->is_active = false;
                                 $newRecord->save();
                             });
