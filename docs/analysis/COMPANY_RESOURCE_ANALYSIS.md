@@ -6,6 +6,7 @@
 - **Fixed syntax errors**: Corrected missing braces, method signatures, and imports
 - **Updated to Filament v4 compatibility**: 
   - Changed `Schema` to `Form` in method signatures
+  - Updated return types to the concrete `Form` and `Table` classes required by Filament v4 for resource registration
   - Updated form schema structure to use `Forms\Components\*` classes
   - Fixed table configuration with proper `Tables\Actions\*` classes
 - **Fixed navigation group type**: Removed type declaration, used docblock instead
