@@ -31,9 +31,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
-use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
+use Illuminate\Support\Facades\Gate;
 use UnitEnum;
 
 final class CategoryResource extends Resource
@@ -44,7 +42,35 @@ final class CategoryResource extends Resource
 
     
 
-    
+    public static function canViewAny(): bool
+    {
+        return Gate::allows('viewAny', Category::class);
+    }
+
+    public static function canView(Category $record): bool
+    {
+        return Gate::allows('view', $record);
+    }
+
+    public static function canCreate(): bool
+    {
+        return Gate::allows('create', Category::class);
+    }
+
+    public static function canEdit(Category $record): bool
+    {
+        return Gate::allows('update', $record);
+    }
+
+    public static function canDelete(Category $record): bool
+    {
+        return Gate::allows('delete', $record);
+    }
+
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-tag';
+    }
 
     public static function getPluralModelLabel(): string
     {

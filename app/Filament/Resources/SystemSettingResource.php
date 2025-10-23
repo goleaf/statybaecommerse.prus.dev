@@ -30,6 +30,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Gate;
 use UnitEnum;
 
 /**
@@ -47,7 +48,33 @@ final class SystemSettingResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'key';
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
+    public static function canViewAny(): bool
+    {
+        return Gate::allows('viewAny', SystemSetting::class);
+    }
+
+    public static function canView(SystemSetting $record): bool
+    {
+        return Gate::allows('view', $record);
+    }
+
+    public static function canCreate(): bool
+    {
+        return Gate::allows('create', SystemSetting::class);
+    }
+
+    public static function canEdit(SystemSetting $record): bool
+    {
+        return Gate::allows('update', $record);
+    }
+
+    public static function canDelete(SystemSetting $record): bool
+    {
+        return Gate::allows('delete', $record);
+    }
+
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.

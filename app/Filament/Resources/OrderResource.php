@@ -55,15 +55,7 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Route;
-use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
-use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
-use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
-use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
-use pxlrbt\FilamentExcel\Columns\Column;
-use pxlrbt\FilamentExcel\Exports\ExcelExport;
-use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
+use Illuminate\Support\Facades\Gate;
 use UnitEnum;
 
 /**
@@ -89,6 +81,31 @@ final class OrderResource extends Resource
     protected static ?string $recordTitleAttribute = 'number';
 
     protected static ?string $navigationLabel = 'orders.navigation.orders';
+
+    public static function canViewAny(): bool
+    {
+        return Gate::allows('viewAny', Order::class);
+    }
+
+    public static function canView(Order $record): bool
+    {
+        return Gate::allows('view', $record);
+    }
+
+    public static function canCreate(): bool
+    {
+        return Gate::allows('create', Order::class);
+    }
+
+    public static function canEdit(Order $record): bool
+    {
+        return Gate::allows('update', $record);
+    }
+
+    public static function canDelete(Order $record): bool
+    {
+        return Gate::allows('delete', $record);
+    }
 
     protected static ?string $modelLabel = 'orders.models.order';
 

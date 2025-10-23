@@ -38,13 +38,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use LaraZeus\InlineChart\Tables\Columns\InlineChart;
-use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
-use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
-use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
-use pxlrbt\FilamentExcel\Columns\Column;
-use pxlrbt\FilamentExcel\Exports\ExcelExport;
-use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
+use Illuminate\Support\Facades\Gate;
 use UnitEnum;
 
 final class CustomerResource extends Resource
@@ -53,7 +47,35 @@ final class CustomerResource extends Resource
 
     protected static ?string $model = Customer::class;
 
-    
+    public static function canViewAny(): bool
+    {
+        return Gate::allows('viewAny', Customer::class);
+    }
+
+    public static function canView(Customer $record): bool
+    {
+        return Gate::allows('view', $record);
+    }
+
+    public static function canCreate(): bool
+    {
+        return Gate::allows('create', Customer::class);
+    }
+
+    public static function canEdit(Customer $record): bool
+    {
+        return Gate::allows('update', $record);
+    }
+
+    public static function canDelete(Customer $record): bool
+    {
+        return Gate::allows('delete', $record);
+    }
+
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-users';
+    }
 
     
 

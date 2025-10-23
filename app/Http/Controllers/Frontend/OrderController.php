@@ -32,10 +32,9 @@ final class OrderController extends Controller
      */
     public function index(Request $request): JsonResponse|View|Response
     {
+        $this->authorize('viewAny', Order::class);
         $user = Auth::user();
-        if (! $user) {
-            abort(403, 'Unauthorized');
-        }
+
         $query = $user->orders()->with(['items.product', 'shipping']);
         // Apply filters
         if ($request->filled('status')) {
@@ -58,10 +57,8 @@ final class OrderController extends Controller
      */
     public function show(Order $order): View
     {
-        $user = Auth::user();
-        if (! $user || $order->user_id !== $user->id) {
-            abort(403, 'Unauthorized');
-        }
+        $this->authorize('view', $order);
+
         // Optimize relationship loading using Laravel 12.10 relationLoaded dot notation
         if (! $order->relationLoaded('items.product') || ! $order->relationLoaded('items.productVariant') || ! $order->relationLoaded('shipping') || ! $order->relationLoaded('documents')) {
             $order->load(['items.product', 'items.productVariant', 'shipping', 'documents']);
@@ -75,10 +72,9 @@ final class OrderController extends Controller
      */
     public function create(): View
     {
+        $this->authorize('create', Order::class);
         $user = Auth::user();
-        if (! $user) {
-            abort(403, 'Unauthorized');
-        }
+
         $products = Product::with('variants')->where('is_visible', true)->get()->skipWhile(function (Product $product) {
             // Skip products that are not properly configured for order creation
             return empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug) || $product->stock_quantity <= 0;
@@ -92,10 +88,9 @@ final class OrderController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        $this->authorize('create', Order::class);
         $user = Auth::user();
-        if (! $user) {
-            abort(403, 'Unauthorized');
-        }
+
         $validated = $request->validate(['items' => 'required|array|min:1', 'items.*.product_id' => 'required|exists:products,id', 'items.*.product_variant_id' => 'nullable|exists:product_variants,id', 'items.*.quantity' => 'required|integer|min:1', 'billing_address' => 'required|array', 'shipping_address' => 'required|array', 'notes' => 'nullable|string|max:1000', 'payment_method' => 'nullable|string|max:255']);
         try {
             DB::beginTransaction();
@@ -148,10 +143,8 @@ final class OrderController extends Controller
      */
     public function edit(Order $order): View
     {
-        $user = Auth::user();
-        if (! $user || $order->user_id !== $user->id) {
-            abort(403, 'Unauthorized');
-        }
+        $this->authorize('update', $order);
+
         if (! $order->canBeCancelled()) {
             abort(403, __('orders.messages.cannot_edit'));
         }
@@ -169,10 +162,8 @@ final class OrderController extends Controller
      */
     public function update(Request $request, Order $order): RedirectResponse
     {
-        $user = Auth::user();
-        if (! $user || $order->user_id !== $user->id) {
-            abort(403, 'Unauthorized');
-        }
+        $this->authorize('update', $order);
+
         if (! $order->canBeCancelled()) {
             abort(403, __('orders.messages.cannot_edit'));
         }
@@ -226,10 +217,8 @@ final class OrderController extends Controller
      */
     public function destroy(Order $order): RedirectResponse
     {
-        $user = Auth::user();
-        if (! $user || $order->user_id !== $user->id) {
-            abort(403, 'Unauthorized');
-        }
+        $this->authorize('delete', $order);
+
         if (! $order->canBeCancelled()) {
             abort(403, __('orders.messages.cannot_delete'));
         }
@@ -243,10 +232,8 @@ final class OrderController extends Controller
      */
     public function cancel(Order $order): RedirectResponse
     {
-        $user = Auth::user();
-        if (! $user || $order->user_id !== $user->id) {
-            abort(403, 'Unauthorized');
-        }
+        $this->authorize('update', $order);
+
         if (! $order->canBeCancelled()) {
             abort(403, __('orders.messages.cannot_cancel'));
         }

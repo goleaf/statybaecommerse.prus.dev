@@ -7,50 +7,43 @@ namespace App\Policies;
 use App\Models\AdminUser;
 use App\Models\Category;
 use App\Models\User;
-use App\Support\Authorization\AuthorizationMatrix;
 
+/**
+ * Authorization policy for managing categories through permissions.
+ */
 final class CategoryPolicy
 {
-    public function viewAny(AdminUser|User $user): bool
+    public function viewAny(User|AdminUser $user): bool
     {
-        if (! $user instanceof AdminUser) {
+        return $this->hasPermission($user, 'view_categories');
+    }
+
+    public function view(User|AdminUser $user, Category $category): bool
+    {
+        return $this->hasPermission($user, 'view_categories');
+    }
+
+    public function create(User|AdminUser $user): bool
+    {
+        return $this->hasPermission($user, 'create_categories');
+    }
+
+    public function update(User|AdminUser $user, Category $category): bool
+    {
+        return $this->hasPermission($user, 'edit_categories');
+    }
+
+    public function delete(User|AdminUser $user, Category $category): bool
+    {
+        return $this->hasPermission($user, 'delete_categories');
+    }
+
+    private function hasPermission(User|AdminUser $user, string $permission): bool
+    {
+        if (! method_exists($user, 'can')) {
             return false;
         }
 
-        return AuthorizationMatrix::check('categories', 'viewAny', $user);
-    }
-
-    public function view(AdminUser|User $user, Category $category): bool
-    {
-        if (! $user instanceof AdminUser) {
-            return false;
-        }
-
-        return AuthorizationMatrix::check('categories', 'view', $user);
-    }
-
-    public function create(AdminUser $user): bool
-    {
-        return AuthorizationMatrix::check('categories', 'create', $user);
-    }
-
-    public function update(AdminUser $user, Category $category): bool
-    {
-        return AuthorizationMatrix::check('categories', 'update', $user);
-    }
-
-    public function delete(AdminUser $user, Category $category): bool
-    {
-        return AuthorizationMatrix::check('categories', 'delete', $user);
-    }
-
-    public function restore(AdminUser $user, Category $category): bool
-    {
-        return AuthorizationMatrix::check('categories', 'update', $user);
-    }
-
-    public function forceDelete(AdminUser $user, Category $category): bool
-    {
-        return AuthorizationMatrix::check('categories', 'delete', $user);
+        return (bool) $user->can($permission);
     }
 }

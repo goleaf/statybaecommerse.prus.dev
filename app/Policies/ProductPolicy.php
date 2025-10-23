@@ -7,50 +7,58 @@ namespace App\Policies;
 use App\Models\AdminUser;
 use App\Models\Product;
 use App\Models\User;
-use App\Support\Authorization\AuthorizationMatrix;
 
+/**
+ * Authorization policy for managing products through permissions.
+ */
 final class ProductPolicy
 {
-    public function viewAny(AdminUser|User $user): bool
+    /**
+     * Determine whether the user can view any products.
+     */
+    public function viewAny(User|AdminUser $user): bool
     {
-        if (! $user instanceof AdminUser) {
+        return $this->hasPermission($user, 'view_products');
+    }
+
+    /**
+     * Determine whether the user can view the product.
+     */
+    public function view(User|AdminUser $user, Product $product): bool
+    {
+        return $this->hasPermission($user, 'view_products');
+    }
+
+    /**
+     * Determine whether the user can create products.
+     */
+    public function create(User|AdminUser $user): bool
+    {
+        return $this->hasPermission($user, 'create_products');
+    }
+
+    /**
+     * Determine whether the user can update the product.
+     */
+    public function update(User|AdminUser $user, Product $product): bool
+    {
+        return $this->hasPermission($user, 'edit_products');
+    }
+
+    /**
+     * Determine whether the user can delete the product.
+     */
+    public function delete(User|AdminUser $user, Product $product): bool
+    {
+        return $this->hasPermission($user, 'delete_products');
+    }
+
+    private function hasPermission(User|AdminUser $user, string $permission): bool
+    {
+        if (! method_exists($user, 'can')) {
             return false;
         }
 
-        return AuthorizationMatrix::check('products', 'viewAny', $user);
-    }
-
-    public function view(AdminUser|User $user, Product $product): bool
-    {
-        if (! $user instanceof AdminUser) {
-            return false;
-        }
-
-        return AuthorizationMatrix::check('products', 'view', $user);
-    }
-
-    public function create(AdminUser $user): bool
-    {
-        return AuthorizationMatrix::check('products', 'create', $user);
-    }
-
-    public function update(AdminUser $user, Product $product): bool
-    {
-        return AuthorizationMatrix::check('products', 'update', $user);
-    }
-
-    public function delete(AdminUser $user, Product $product): bool
-    {
-        return AuthorizationMatrix::check('products', 'delete', $user);
-    }
-
-    public function restore(AdminUser $user, Product $product): bool
-    {
-        return AuthorizationMatrix::check('products', 'update', $user);
-    }
-
-    public function forceDelete(AdminUser $user, Product $product): bool
-    {
-        return AuthorizationMatrix::check('products', 'delete', $user);
+        return (bool) $user->can($permission);
     }
 }

@@ -7,62 +7,73 @@ namespace App\Policies;
 use App\Models\AdminUser;
 use App\Models\Order;
 use App\Models\User;
-use App\Support\Authorization\AuthorizationMatrix;
 
+/**
+ * Authorization policy for managing orders through permissions while
+ * still allowing customers to manage their own purchases.
+ */
 final class OrderPolicy
 {
-    public function viewAny(AdminUser|User $user): bool
+    public function viewAny(User|AdminUser $user): bool
     {
-        if (! $user instanceof AdminUser) {
+        if ($this->isBackofficeUser($user)) {
+            return $this->hasPermission($user, 'view_orders');
+        }
+
+        return true;
+    }
+
+    public function view(User|AdminUser $user, Order $order): bool
+    {
+        if ($this->isBackofficeUser($user)) {
+            return $this->hasPermission($user, 'view_orders');
+        }
+
+        return $user instanceof User && $order->user_id === $user->id;
+    }
+
+    public function create(User|AdminUser $user): bool
+    {
+        if ($this->isBackofficeUser($user)) {
+            return $this->hasPermission($user, 'create_orders');
+        }
+
+        return true;
+    }
+
+    public function update(User|AdminUser $user, Order $order): bool
+    {
+        if ($this->isBackofficeUser($user)) {
+            return $this->hasPermission($user, 'edit_orders');
+        }
+
+        return $user instanceof User && $order->user_id === $user->id;
+    }
+
+    public function delete(User|AdminUser $user, Order $order): bool
+    {
+        if ($this->isBackofficeUser($user)) {
+            return $this->hasPermission($user, 'delete_orders');
+        }
+
+        return $user instanceof User && $order->user_id === $user->id;
+    }
+
+    private function hasPermission(User|AdminUser $user, string $permission): bool
+    {
+        if (! method_exists($user, 'can')) {
             return false;
         }
 
-        return AuthorizationMatrix::check('orders', 'viewAny', $user);
+        return (bool) $user->can($permission);
     }
 
-    public function view(AdminUser|User $user, Order $order): bool
+    private function isBackofficeUser(User|AdminUser $user): bool
     {
         if ($user instanceof AdminUser) {
-            return AuthorizationMatrix::check('orders', 'view', $user);
-        }
-
-        if (AuthorizationMatrix::check('orders', 'view', $user)) {
             return true;
         }
 
-        return $order->user_id === $user->getKey();
-    }
-
-    public function create(AdminUser $user): bool
-    {
-        return AuthorizationMatrix::check('orders', 'create', $user);
-    }
-
-    public function update(AdminUser|User $user, Order $order): bool
-    {
-        if ($user instanceof AdminUser) {
-            return AuthorizationMatrix::check('orders', 'update', $user);
-        }
-
-        if (AuthorizationMatrix::check('orders', 'update', $user)) {
-            return true;
-        }
-
-        return $order->user_id === $user->getKey();
-    }
-
-    public function delete(AdminUser $user, Order $order): bool
-    {
-        return AuthorizationMatrix::check('orders', 'delete', $user);
-    }
-
-    public function restore(AdminUser $user, Order $order): bool
-    {
-        return AuthorizationMatrix::check('orders', 'update', $user);
-    }
-
-    public function forceDelete(AdminUser $user, Order $order): bool
-    {
-        return AuthorizationMatrix::check('orders', 'delete', $user);
+        return $user instanceof User && (bool) ($user->is_admin ?? false);
     }
 }
