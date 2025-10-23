@@ -26,6 +26,10 @@ return [
     'is_active'   => 'Aktyvus',
     'is_required' => 'Privalomas',
     'metadata'    => 'Metaduomenys',
+    'products_options_label'   => 'Galimi produktai',
+    'products_selected_label'  => 'Pasirinkti produktai',
+    'categories_options_label' => 'Galimos kategorijos',
+    'categories_selected_label' => 'Pasirinktos kategorijos',
 
     'value_help'    => 'Sąlygos reikšmė, priklausomai nuo tipo',
     'priority_help' => 'Sąlygų vykdymo prioritetas (0 = aukščiausias)',
