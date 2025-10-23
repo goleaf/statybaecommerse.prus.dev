@@ -101,10 +101,9 @@ class FilamentNavigationGroupFixer
                 }
             }
 
-            // Always deduplicate UnitEnum imports even if the file lacks a navigation group.
+            // Always deduplicate UnitEnum imports to avoid autoload clashes on pages without navigation metadata.
             $dedupedContent = $this->dedupeUnitEnumImport($content);
             if ($dedupedContent !== $content) {
-                // Record the cleanup to make reporting transparent.
                 $content = $dedupedContent;
                 $modified = true;
             }
