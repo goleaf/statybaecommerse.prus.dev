@@ -96,6 +96,14 @@ final class EloquentProductRepository implements ProductRepositoryInterface
 
     private function mapToDomainProduct(Product $product): DomainProduct
     {
+        // Resolve translated textual fields before building the domain entity so
+        // API consumers always receive locale-appropriate strings instead of
+        // raw translation arrays from the JSON columns.
+        $name = $this->resolveTranslatableString($product, 'name') ?? '';
+        $slug = $this->resolveTranslatableString($product, 'slug') ?? '';
+        $description = $this->resolveTranslatableString($product, 'description');
+        $shortDescription = $this->resolveTranslatableString($product, 'short_description');
+
         $images = new ProductImageCollection(
             $product->getMedia('images')
                 ->map(static fn ($media) => new ProductImage(
@@ -132,8 +140,8 @@ final class EloquentProductRepository implements ProductRepositoryInterface
 
         return new DomainProduct(
             $product->id,
-            (string) $product->name,
-            (string) $product->slug,
+            $name,
+            $slug,
             (string) $product->sku,
             (float) $product->price,
             $product->sale_price !== null ? (float) $product->sale_price : null,
@@ -146,8 +154,49 @@ final class EloquentProductRepository implements ProductRepositoryInterface
             (int) ($product->stock_quantity ?? 0),
             $images,
             $variants,
-            $product->description,
-            $product->short_description,
+            $description,
+            $shortDescription,
         );
+    }
+
+    /**
+     * Extract a translated string from the JSON-backed attributes with sensible fallbacks.
+     */
+    private function resolveTranslatableString(Product $product, string $attribute): ?string
+    {
+        // Access the raw attribute directly to avoid triggering additional queries during hydration.
+        $value = $product->getAttribute($attribute);
+
+        if (is_string($value) && $value !== '') {
+            return $value;
+        }
+
+        if (is_array($value) && $value !== []) {
+            $locale = app()->getLocale();
+            $fallbackLocale = config('app.fallback_locale');
+
+            // Prefer the currently active locale whenever it exists in the payload.
+            if (isset($value[$locale]) && is_string($value[$locale]) && $value[$locale] !== '') {
+                return $value[$locale];
+            }
+
+            // Fall back to the configured fallback locale if that translation exists.
+            if (is_string($fallbackLocale)
+                && isset($value[$fallbackLocale])
+                && is_string($value[$fallbackLocale])
+                && $value[$fallbackLocale] !== '') {
+                return $value[$fallbackLocale];
+            }
+
+            // As a last resort, return the first non-empty string we can find.
+            foreach ($value as $candidate) {
+                if (is_string($candidate) && $candidate !== '') {
+                    return $candidate;
+                }
+            }
+        }
+
+        // When nothing usable exists, signal the absence with null so callers can decide on a default.
+        return null;
     }
 }
