@@ -24,11 +24,9 @@ use Filament\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\Exports\Export;
-use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\ViewAction;
-use Filament\Forms;
-use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -45,8 +43,6 @@ use Filament\Schemas\Components\Section;
 use Filament\Support\Enums\Size;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
-use Filament\Tables\Actions\ExportAction;
-use Filament\Tables\Actions\ExportBulkAction;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
@@ -56,7 +52,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
-use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use pxlrbt\FilamentExcel\Columns\Column;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
 use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
@@ -645,7 +645,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
                     ->dateTime()
                     ->sortable(),
             ])
-            ->filters([ 
+            ->filters([
                 SelectFilter::make('status')
                     ->options([
                         'pending'    => __('orders.statuses.pending'),
@@ -728,19 +728,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
             ->headerActions([
                 ExportAction::make('export')
                     ->label(__('Export'))
-                    ->exports([
-                        Export::make('visible_orders')
-                            ->label(__('orders.exports.visible_orders'))
-                            ->fromTable()
-                            ->queue()
-                            ->withChunkSize(500),
-                        Export::make('exportable_orders')
-                            ->label(__('orders.exports.exportable_orders'))
-                            ->fromTable()
-                            ->modifyQueryUsing(fn (Builder $query): Builder => $query->where('exportable', true))
-                            ->queue()
-                            ->withColumns(self::getExportableOrderColumns()),
-                    ]),
+                    ->exports(self::getExportPresets()),
             ])
             ->actions([
                 ViewAction::make()
@@ -829,19 +817,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
                         ->label(__('Export selected'))
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('success')
-                        ->exports([
-                            Export::make('visible_orders')
-                                ->label(__('orders.exports.visible_orders'))
-                                ->fromTable()
-                                ->queue()
-                                ->withChunkSize(500),
-                            Export::make('exportable_orders')
-                                ->label(__('orders.exports.exportable_orders'))
-                                ->fromTable()
-                                ->modifyQueryUsing(fn (Builder $query): Builder => $query->where('exportable', true))
-                                ->queue()
-                                ->withColumns(self::getExportableOrderColumns()),
-                        ])
+                        ->exports(self::getExportPresets())
                         ->deselectRecordsAfterCompletion()
                         ->visible(fn () => AuthorizationMatrix::check('orders', 'viewAny')),
                     DeleteBulkAction::make()
@@ -1008,45 +984,65 @@ final class OrderResource extends Resource implements DefinesExportColumns
     }
 
     /**
+     * @return array<int, ExcelExport>
+     */
+    protected static function getExportPresets(): array
+    {
+        return [
+            ExcelExport::make('visible_orders')
+                ->label(__('orders.exports.visible_orders'))
+                ->fromTable()
+                ->queue()
+                ->withChunkSize(500),
+            ExcelExport::make('exportable_orders')
+                ->label(__('orders.exports.exportable_orders'))
+                ->fromTable()
+                ->modifyQueryUsing(fn (Builder $query): Builder => $query->where('exportable', true))
+                ->queue()
+                ->withColumns(self::getExportableOrderColumns()),
+        ];
+    }
+
+    /**
      * Columns used for export presets.
      *
-     * @return array<int, ExportColumn>
+     * @return array<int, Column>
      */
     protected static function getExportableOrderColumns(): array
     {
         return [
-            ExportColumn::make('number')
-                ->label(__('orders.fields.order_number')),
-            ExportColumn::make('customer_email')
-                ->label(__('orders.fields.customer_email'))
-                ->state(fn (Order $record): ?string => $record->user?->email),
-            ExportColumn::make('subtotal')
-                ->label(__('orders.fields.subtotal'))
-                ->state(fn (Order $record): float => (float) $record->subtotal)
-                ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE),
-            ExportColumn::make('tax_amount')
-                ->label(__('orders.fields.tax_amount'))
-                ->state(fn (Order $record): float => (float) $record->tax_amount)
-                ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE),
-            ExportColumn::make('shipping_amount')
-                ->label(__('orders.fields.shipping_amount'))
-                ->state(fn (Order $record): float => (float) $record->shipping_amount)
-                ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE),
-            ExportColumn::make('discount_amount')
-                ->label(__('orders.fields.discount_amount'))
-                ->state(fn (Order $record): float => (float) $record->discount_amount)
-                ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE),
-            ExportColumn::make('total')
-                ->label(__('orders.fields.total'))
-                ->state(fn (Order $record): float => (float) $record->total)
-                ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE),
-            ExportColumn::make('status')
-                ->label(__('orders.fields.status'))
-                ->state(fn (Order $record): ?string => $record->status)
+            Column::make('number')
+                ->heading(__('orders.fields.order_number')),
+            Column::make('customer_email')
+                ->heading(__('orders.fields.customer_email'))
+                ->getStateUsing(fn (Order $record): ?string => $record->user?->email),
+            Column::make('subtotal')
+                ->heading(__('orders.fields.subtotal'))
+                ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE)
+                ->getStateUsing(fn (Order $record): float => (float) $record->subtotal),
+            Column::make('tax_amount')
+                ->heading(__('orders.fields.tax_amount'))
+                ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE)
+                ->getStateUsing(fn (Order $record): float => (float) $record->tax_amount),
+            Column::make('shipping_amount')
+                ->heading(__('orders.fields.shipping_amount'))
+                ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE)
+                ->getStateUsing(fn (Order $record): float => (float) $record->shipping_amount),
+            Column::make('discount_amount')
+                ->heading(__('orders.fields.discount_amount'))
+                ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE)
+                ->getStateUsing(fn (Order $record): float => (float) $record->discount_amount),
+            Column::make('total')
+                ->heading(__('orders.fields.total'))
+                ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE)
+                ->getStateUsing(fn (Order $record): float => (float) $record->total),
+            Column::make('status')
+                ->heading(__('orders.fields.status'))
+                ->getStateUsing(fn (Order $record): ?string => $record->status)
                 ->formatStateUsing(fn (?string $state): string => $state ? __("orders.status.{$state}") : ''),
-            ExportColumn::make('payment_status')
-                ->label(__('orders.fields.payment_status'))
-                ->state(fn (Order $record): ?string => $record->payment_status)
+            Column::make('payment_status')
+                ->heading(__('orders.fields.payment_status'))
+                ->getStateUsing(fn (Order $record): ?string => $record->payment_status)
                 ->formatStateUsing(fn (?string $state): string => $state ? __("orders.payment_status.{$state}") : ''),
         ];
     }
