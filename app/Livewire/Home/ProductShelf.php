@@ -16,6 +16,8 @@ use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Cache\TaggableStore;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -54,22 +56,23 @@ final class ProductShelf extends Component implements HasSchemas
     {
         $cacheKey = sprintf('home:shelf:%s:%d:%s', $this->preset, $this->limit, app()->getLocale());
 
-        return app(SharedCacheService::class)->rememberShort(
-            CacheKeys::homeShelf($this->preset, $this->limit, $locale),
-            function () use ($locale): EloquentCollection {
-                $query = Product::query()
-                    ->with(['brand', 'media', 'categories'])
-                    ->with(['translations' => function ($q) use ($locale) {
-                        $q->where('locale', $locale);
-                    }, 'categories.translations' => function ($q) use ($locale) {
-                        $q->where('locale', $locale);
-                    }])
-                    ->withAvg(['reviews as average_rating' => fn ($q) => $q->where('is_approved', true)], 'rating')
-                    ->withCount(['reviews' => fn ($q) => $q->where('is_approved', true)])
-                    ->where('is_visible', true)
-                    ->whereNotNull('published_at')
-                    ->where('published_at', '<=', now())
-                    ->whereNull('deleted_at');
+        $cacheKey = CacheKeys::homeShelf($this->preset, $this->limit, $locale);
+        $store = Cache::getStore();
+
+        $callback = function () use ($locale): EloquentCollection {
+            $query = Product::query()
+                ->with(['brand', 'media', 'categories'])
+                ->with(['translations' => function ($q) use ($locale) {
+                    $q->where('locale', $locale);
+                }, 'categories.translations' => function ($q) use ($locale) {
+                    $q->where('locale', $locale);
+                }])
+                ->withAvg(['reviews as average_rating' => fn ($q) => $q->where('is_approved', true)], 'rating')
+                ->withCount(['reviews' => fn ($q) => $q->where('is_approved', true)])
+                ->where('is_visible', true)
+                ->whereNotNull('published_at')
+                ->where('published_at', '<=', now())
+                ->whereNull('deleted_at');
 
                 $query = match ($this->preset) {
                     'latest' => $query->orderByDesc('published_at'),
@@ -97,11 +100,16 @@ final class ProductShelf extends Component implements HasSchemas
                         ->orderByDesc('published_at'),
                 };
 
-                return $query->limit($this->limit)->get();
-            },
-            CacheKeys::TTL_MINUTE,
-            CacheTagHelper::products(),
-        );
+            return $query->limit($this->limit)->get();
+        };
+
+        if ($store instanceof TaggableStore) {
+            $tags = CacheTagHelper::merge(CacheTagHelper::products(), CacheTagHelper::locale($locale));
+
+            return Cache::tags($tags)->remember($cacheKey, CacheKeys::TTL_MINUTE, $callback);
+        }
+
+        return Cache::remember($cacheKey, CacheKeys::TTL_MINUTE, $callback);
     }
 
     public function productShelf(Schema $schema): Schema

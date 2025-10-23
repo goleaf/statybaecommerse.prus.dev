@@ -17,4 +17,4 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
-- Reorganised historical documents into the dedicated analysis, runbook, and contract directories, refreshed the global index, and introduced a [documentation style guide](docs/STYLE_GUIDE.md) to standardise future contributions.
+- Added a cache invalidation service with locale-aware tag helpers alongside new storefront regression tests so the home widgets, dashboards, and cart/checkout experiences stay consistent release over release.

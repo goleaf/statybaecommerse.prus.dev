@@ -10,6 +10,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Introduced operator-aware system setting dependencies with explicit condition values, refreshed Filament forms, and resilient evaluation helpers for richer admin automation.
 
 ### Maintenance
+* Introduced a cache invalidation service with tag-aware fallbacks and updated storefront widgets to honour locale-aware cache tags while adding regression coverage for cart and dashboard flows.
 * Hardened the Filament schema upgrade script so navigation icon docblocks are normalized automatically and every resource/page/widget reflects the v4 schema signature changes.
 * Aligned Filament variant pricing and analytics resources with stricter action namespaces, clarified currency formatting, and refreshed navigation icon annotations to streamline BackedEnum usage across admin pages.
 * Synced Collection Rule resource signatures, modal reorder UX, and cache maintenance tooling with Filament v4 to retire legacy array fallbacks.
