@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use Exception;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 /**
  * SearchPaginationService
@@ -42,37 +44,37 @@ final class SearchPaginationService
             $paginatedResults = array_slice($results, $offset, $pageSize);
 
             return [
-                'data' => $paginatedResults,
+                'data'       => $paginatedResults,
                 'pagination' => [
-                    'current_page' => $page,
-                    'per_page' => $pageSize,
-                    'total' => $totalResults,
-                    'total_pages' => $totalPages,
+                    'current_page'  => $page,
+                    'per_page'      => $pageSize,
+                    'total'         => $totalResults,
+                    'total_pages'   => $totalPages,
                     'has_next_page' => $page < $totalPages,
                     'has_prev_page' => $page > 1,
-                    'next_page' => $page < $totalPages ? $page + 1 : null,
-                    'prev_page' => $page > 1 ? $page - 1 : null,
+                    'next_page'     => $page < $totalPages ? $page + 1 : null,
+                    'prev_page'     => $page > 1 ? $page - 1 : null,
                 ],
                 'filters' => $filters,
-                'query' => $query,
+                'query'   => $query,
             ];
-        } catch (\Exception $e) {
-            \Log::warning('Search pagination failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Search pagination failed: ' . $e->getMessage());
 
             return [
-                'data' => [],
+                'data'       => [],
                 'pagination' => [
-                    'current_page' => 1,
-                    'per_page' => $pageSize,
-                    'total' => 0,
-                    'total_pages' => 0,
+                    'current_page'  => 1,
+                    'per_page'      => $pageSize,
+                    'total'         => 0,
+                    'total_pages'   => 0,
                     'has_next_page' => false,
                     'has_prev_page' => false,
-                    'next_page' => null,
-                    'prev_page' => null,
+                    'next_page'     => null,
+                    'prev_page'     => null,
                 ],
                 'filters' => $filters,
-                'query' => $query,
+                'query'   => $query,
             ];
         }
     }
@@ -96,35 +98,35 @@ final class SearchPaginationService
 
                 // Add infinite scroll specific data
                 $paginatedData['infinite_scroll'] = [
-                    'has_more' => $paginatedData['pagination']['has_next_page'],
-                    'next_page_url' => $this->generateNextPageUrl($query, $page + 1, $pageSize, $filters, $types),
+                    'has_more'       => $paginatedData['pagination']['has_next_page'],
+                    'next_page_url'  => $this->generateNextPageUrl($query, $page + 1, $pageSize, $filters, $types),
                     'load_more_text' => $this->getLoadMoreText($paginatedData['pagination']),
                 ];
 
                 return $paginatedData;
             });
-        } catch (\Exception $e) {
-            \Log::warning('Infinite scroll data failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Infinite scroll data failed: ' . $e->getMessage());
 
             return [
-                'data' => [],
+                'data'       => [],
                 'pagination' => [
-                    'current_page' => 1,
-                    'per_page' => $pageSize,
-                    'total' => 0,
-                    'total_pages' => 0,
+                    'current_page'  => 1,
+                    'per_page'      => $pageSize,
+                    'total'         => 0,
+                    'total_pages'   => 0,
                     'has_next_page' => false,
                     'has_prev_page' => false,
-                    'next_page' => null,
-                    'prev_page' => null,
+                    'next_page'     => null,
+                    'prev_page'     => null,
                 ],
                 'infinite_scroll' => [
-                    'has_more' => false,
-                    'next_page_url' => null,
+                    'has_more'       => false,
+                    'next_page_url'  => null,
                     'load_more_text' => 'No more results',
                 ],
                 'filters' => $filters,
-                'query' => $query,
+                'query'   => $query,
             ];
         }
     }
@@ -136,28 +138,30 @@ final class SearchPaginationService
     {
         try {
             foreach ($filters as $filterType => $filterValue) {
-                if (empty($filterValue)) {
+                if ($this->isFilterValueConsideredEmpty($filterValue)) {
+                    // Skip filters that are effectively empty while still
+                    // allowing values such as "0" to be processed.
                     continue;
                 }
 
                 $results = match ($filterType) {
-                    'type' => $this->filterByType($results, $filterValue),
-                    'price_min' => $this->filterByPriceMin($results, (float) $filterValue),
-                    'price_max' => $this->filterByPriceMax($results, (float) $filterValue),
-                    'in_stock' => $this->filterByInStock($results, (bool) $filterValue),
-                    'featured' => $this->filterByFeatured($results, (bool) $filterValue),
-                    'category' => $this->filterByCategory($results, $filterValue),
-                    'brand' => $this->filterByBrand($results, $filterValue),
+                    'type'       => $this->filterByType($results, $filterValue),
+                    'price_min'  => $this->filterByPriceMin($results, (float) $filterValue),
+                    'price_max'  => $this->filterByPriceMax($results, (float) $filterValue),
+                    'in_stock'   => $this->filterByBooleanFlag($results, $filterValue, true),
+                    'featured'   => $this->filterByBooleanFlag($results, $filterValue, false),
+                    'category'   => $this->filterByCategory($results, $filterValue),
+                    'brand'      => $this->filterByBrand($results, $filterValue),
                     'rating_min' => $this->filterByRatingMin($results, (float) $filterValue),
-                    'date_from' => $this->filterByDateFrom($results, $filterValue),
-                    'date_to' => $this->filterByDateTo($results, $filterValue),
-                    default => $results,
+                    'date_from'  => $this->filterByDateFrom($results, $filterValue),
+                    'date_to'    => $this->filterByDateTo($results, $filterValue),
+                    default      => $results,
                 };
             }
 
             return $results;
-        } catch (\Exception $e) {
-            \Log::warning('Filter application failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Filter application failed: ' . $e->getMessage());
 
             return $results;
         }
@@ -166,7 +170,7 @@ final class SearchPaginationService
     /**
      * Handle filterByType functionality with proper error handling.
      *
-     * @param  string|array  $type
+     * @param string|array $type
      */
     private function filterByType(array $results, $type): array
     {
@@ -216,6 +220,28 @@ final class SearchPaginationService
     }
 
     /**
+     * Handle filterByBooleanFlag functionality with proper error handling.
+     *
+     * This helper normalizes boolean-like filter values coming from HTTP
+     * requests (e.g. "true", "false", "0", "1") and delegates to the
+     * correct filtering strategy while gracefully skipping invalid values.
+     */
+    private function filterByBooleanFlag(array $results, mixed $value, bool $useInStockFilter): array
+    {
+        $normalized = $this->normalizeBooleanFilterValue($value);
+
+        if ($normalized === null) {
+            // If the value cannot be interpreted as a boolean we simply
+            // return the original result set without applying the filter.
+            return $results;
+        }
+
+        return $useInStockFilter
+            ? $this->filterByInStock($results, $normalized)
+            : $this->filterByFeatured($results, $normalized);
+    }
+
+    /**
      * Handle filterByFeatured functionality with proper error handling.
      */
     private function filterByFeatured(array $results, bool $featured): array
@@ -226,7 +252,7 @@ final class SearchPaginationService
     /**
      * Handle filterByCategory functionality with proper error handling.
      *
-     * @param  string|array  $category
+     * @param string|array $category
      */
     private function filterByCategory(array $results, $category): array
     {
@@ -248,7 +274,7 @@ final class SearchPaginationService
     /**
      * Handle filterByBrand functionality with proper error handling.
      *
-     * @param  string|array  $brand
+     * @param string|array $brand
      */
     private function filterByBrand(array $results, $brand): array
     {
@@ -323,15 +349,15 @@ final class SearchPaginationService
     private function generateCacheKey(string $query, int $page, int $pageSize, array $filters, array $types): string
     {
         $keyData = [
-            'query' => $query,
-            'page' => $page,
+            'query'     => $query,
+            'page'      => $page,
             'page_size' => $pageSize,
-            'filters' => $filters,
-            'types' => $types,
-            'locale' => app()->getLocale(),
+            'filters'   => $filters,
+            'types'     => $types,
+            'locale'    => app()->getLocale(),
         ];
 
-        return self::CACHE_PREFIX.md5(serialize($keyData));
+        return self::CACHE_PREFIX . md5(serialize($keyData));
     }
 
     /**
@@ -340,8 +366,8 @@ final class SearchPaginationService
     private function generateNextPageUrl(string $query, int $nextPage, int $pageSize, array $filters, array $types): string
     {
         $params = [
-            'q' => $query,
-            'page' => $nextPage,
+            'q'        => $query,
+            'page'     => $nextPage,
             'per_page' => $pageSize,
         ];
 
@@ -353,7 +379,7 @@ final class SearchPaginationService
             $params['types'] = $types;
         }
 
-        return route('api.autocomplete.search').'?'.http_build_query($params);
+        return route('api.autocomplete.search') . '?' . http_build_query($params);
     }
 
     /**
@@ -381,11 +407,11 @@ final class SearchPaginationService
     {
         try {
             $filters = [
-                'types' => [],
+                'types'        => [],
                 'price_ranges' => [],
-                'categories' => [],
-                'brands' => [],
-                'ratings' => [],
+                'categories'   => [],
+                'brands'       => [],
+                'ratings'      => [],
             ];
 
             foreach ($results as $result) {
@@ -422,8 +448,8 @@ final class SearchPaginationService
             }
 
             return $filters;
-        } catch (\Exception $e) {
-            \Log::warning('Available filters generation failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Available filters generation failed: ' . $e->getMessage());
 
             return [];
         }
@@ -463,5 +489,55 @@ final class SearchPaginationService
         } else {
             return 'Below 3.0';
         }
+    }
+
+    /**
+     * Determine if a filter value should be treated as empty while keeping
+     * numeric-like zero values available for processing.
+     */
+    private function isFilterValueConsideredEmpty(mixed $value): bool
+    {
+        if ($value === null) {
+            return true;
+        }
+
+        if (is_string($value)) {
+            return trim($value) === '';
+        }
+
+        if (is_array($value)) {
+            return $value === [];
+        }
+
+        return false;
+    }
+
+    /**
+     * Normalize boolean-like values coming from request filters. Returns
+     * null when the input cannot be safely interpreted as a boolean.
+     */
+    private function normalizeBooleanFilterValue(mixed $value): ?bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        if (is_int($value)) {
+            return match ($value) {
+                1       => true,
+                0       => false,
+                default => null,
+            };
+        }
+
+        if (is_string($value)) {
+            $filtered = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
+            if ($filtered !== null) {
+                return $filtered;
+            }
+        }
+
+        return null;
     }
 }
