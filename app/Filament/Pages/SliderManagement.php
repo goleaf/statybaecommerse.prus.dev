@@ -42,10 +42,7 @@ class SliderManagement extends Page implements HasActions, HasForms
 {
     use InteractsWithActions, InteractsWithForms;
 
-    /**
-     * @var string|BackedEnum|null
-     */
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationLabel = 'Slider Management';
 
@@ -55,7 +52,7 @@ class SliderManagement extends Page implements HasActions, HasForms
 
     protected static ?int $navigationSort = 1;
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): string|UnitEnum|null
     {
         return 'Content';
     }
@@ -124,19 +121,10 @@ class SliderManagement extends Page implements HasActions, HasForms
                                 ->maxLength(255),
                             SearchableInput::make('button_url')
                                 ->label(__('translations.button_url'))
-                                ->placeholder(__('translations.slider_link_placeholder'))
-                                ->maxLength(255)
-                                ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
-                                ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
-                                ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                                    if ($state === null || $state === '') {
-                                        return;
-                                    }
-
-                                    $component
-                                        ->state($state)
-                                        ->options([$state => $state]);
-                                }),
+                                ->placeholder(__('translations.button_url_placeholder'))
+                                ->helperText(__('translations.button_url_helper'))
+                                ->searchUsing(fn (string $term): array => ContentLinkSearch::suggest($term))
+                                ->maxLength(255),
                         ]),
                         TextInput::make('button_url')
                             ->label(__('translations.button_url'))
@@ -303,18 +291,10 @@ class SliderManagement extends Page implements HasActions, HasForms
                                     ->directory('sliders/slides'),
                                 SearchableInput::make('link')
                                     ->label(__('translations.slide_link'))
-                                    ->placeholder(__('translations.slider_link_placeholder'))
-                                    ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
-                                    ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
-                                    ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                                        if ($state === null || $state === '') {
-                                            return;
-                                        }
-
-                                        $component
-                                            ->state($state)
-                                            ->options([$state => $state]);
-                                    }),
+                                    ->placeholder(__('translations.button_url_placeholder'))
+                                    ->helperText(__('translations.button_url_helper'))
+                                    ->searchUsing(fn (string $term): array => ContentLinkSearch::suggest($term))
+                                    ->maxLength(255),
                             ])
                             ->collapsible()
                             ->itemLabel(fn (array $state): ?string => $state['title'] ?? null),

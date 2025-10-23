@@ -161,20 +161,17 @@ return [
     'address_value'     => 'Field Value',
     'add_address_field' => 'Add Address Field',
 
-    'lookups' => [
-        'billing_address' => 'Search billing address',
-        'shipping_address' => 'Search shipping address',
-        'address_placeholder' => 'Start typing an address, city, or postal code…',
-        'address_field' => 'Field',
-        'address_value' => 'Value',
-        'channel_placeholder' => 'Search channels by name or code…',
-        'channel_unknown' => 'Unnamed channel',
-        'partner_placeholder' => 'Search partners by name, code, or email…',
-        'partner_unknown' => 'Unnamed partner',
-        'status_placeholder' => 'Search order statuses…',
-        'variant_placeholder' => 'Search variants by SKU or name…',
-        'variant_product' => 'Product: :product',
-        'variant_unknown' => 'Variant',
+    'placeholders' => [
+        'billing_address' => 'Search saved billing addresses',
+        'shipping_address' => 'Search saved shipping addresses',
+        'channel' => 'Search channels by name or code',
+        'partner' => 'Search partners by name or email',
+        'product_variant' => 'Search product variants by name or SKU',
+    ],
+
+    'helpers' => [
+        'billing_address' => 'Selecting a saved address will hydrate the billing fields below.',
+        'shipping_address' => 'Selecting a saved address will hydrate the shipping fields below.',
     ],
 
     // Actions

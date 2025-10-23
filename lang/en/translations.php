@@ -47,6 +47,10 @@ return [
     'price' => 'Price',
     'name' => 'Name',
     'showing' => 'Showing',
+    'button_url' => 'Button URL',
+    'button_url_placeholder' => 'Search for content or paste an URL',
+    'button_url_helper' => 'Select an internal page, product or enter an external URL.',
+    'slide_link' => 'Slide link',
     // Address Types
     'address_type_shipping'             => 'Shipping Address',
     'address_type_billing'              => 'Billing Address',

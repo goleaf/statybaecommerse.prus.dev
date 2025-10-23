@@ -7,6 +7,7 @@ namespace App\Support\Search;
 use App\Models\Partner;
 use DefStudio\SearchableInput\DTO\SearchResult;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 final class PartnerSearch
 {
@@ -15,74 +16,50 @@ final class PartnerSearch
      */
     public static function results(string $term, int $limit = 15): array
     {
-        /** @var \Illuminate\Database\Eloquent\Collection<int, Partner> $partners */
-        $partners = self::query($term)
+        /** @var EloquentCollection<int, Partner> $partners */
+        $partners = Partner::query()
+            ->select(['id', 'name', 'code', 'contact_email'])
+            ->when(trim($term) !== '', function (Builder $builder) use ($term): void {
+                $builder->where(function (Builder $query) use ($term): void {
+                    $query
+                        ->where('name', 'like', "%{$term}%")
+                        ->orWhere('code', 'like', "%{$term}%")
+                        ->orWhere('contact_email', 'like', "%{$term}%");
+                });
+            })
+            ->orderBy('name')
             ->limit($limit)
             ->get();
 
         return $partners
-            ->map(static function (Partner $partner): SearchResult {
-                /** @var int|string|null $identifier */
-                $identifier = $partner->getKey();
+            ->map(function (Partner $partner): SearchResult {
+                $identifier = (string) $partner->getKey();
+                $result = SearchResult::make($identifier, self::label($partner));
 
-                $label = self::label($partner);
-
-                $result = SearchResult::make((string) ($identifier ?? ''), $label);
-
-                $result
+                return $result
                     ->withData('partner_id', $partner->getKey())
-                    ->withData('name', self::stringValue($partner->getAttribute('name')))
-                    ->withData('code', self::stringValue($partner->getAttribute('code')))
-                    ->withData('email', self::stringValue($partner->getAttribute('contact_email')));
-
-                return $result;
+                    ->withData('code', (string) ($partner->getAttribute('code') ?? ''))
+                    ->withData('name', (string) ($partner->getAttribute('name') ?? ''))
+                    ->withData('contact_email', (string) ($partner->getAttribute('contact_email') ?? ''));
             })
             ->all();
     }
 
     public static function label(Partner $partner): string
     {
-        /** @var string|null $rawName */
-        $rawName = $partner->getAttribute('name');
         /** @var string|null $rawCode */
         $rawCode = $partner->getAttribute('code');
+        /** @var string|null $rawName */
+        $rawName = $partner->getAttribute('name');
         /** @var string|null $rawEmail */
         $rawEmail = $partner->getAttribute('contact_email');
 
+        $code = $rawCode ?: '—';
         $name = $rawName ?? '';
-        $code = $rawCode ?? '';
         $email = $rawEmail ?? '';
 
-        return trim(implode(' • ', array_filter([
-            $name !== '' ? $name : __('orders.lookups.partner_unknown'),
-            $code !== '' ? $code : null,
-            $email !== '' ? $email : null,
-        ])));
-    }
+        $suffix = $email !== '' ? sprintf('<%s>', $email) : '';
 
-    /**
-     * @return Builder<Partner>
-     */
-    private static function query(string $term): Builder
-    {
-        $search = trim($term);
-
-        return Partner::query()
-            ->select(['id', 'name', 'code', 'contact_email'])
-            ->when($search !== '', static function (Builder $builder) use ($search): void {
-                $builder->where(static function (Builder $query) use ($search): void {
-                    $query
-                        ->where('name', 'like', "%{$search}%")
-                        ->orWhere('code', 'like', "%{$search}%")
-                        ->orWhere('contact_email', 'like', "%{$search}%");
-                });
-            })
-            ->orderBy('name');
-    }
-
-    private static function stringValue(mixed $value): string
-    {
-        return is_string($value) ? $value : '';
+        return trim(sprintf('[%s] %s %s', $code, $name, $suffix));
     }
 }
-

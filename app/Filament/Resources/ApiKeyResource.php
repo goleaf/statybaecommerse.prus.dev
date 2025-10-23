@@ -59,7 +59,7 @@ final class ApiKeyResource extends Resource
         return __('api_keys.navigation.label');
     }
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): string|UnitEnum|null
     {
         return __('navigation.groups.system');
     }

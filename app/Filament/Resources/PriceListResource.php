@@ -7,8 +7,9 @@ namespace App\Filament\Resources;
 use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\PriceListResource\Pages;
 use App\Models\PriceList;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -25,7 +26,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 /**
  * PriceListResource
@@ -52,7 +52,10 @@ final class PriceListResource extends Resource
         return __('price_lists.title');
     }
 
-    
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return 'Products';
+    }
 
     public static function getPluralModelLabel(): string
     {

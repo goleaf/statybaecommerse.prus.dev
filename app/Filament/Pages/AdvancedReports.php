@@ -9,9 +9,9 @@ use Filament\Pages\Page;
 
 final class AdvancedReports extends Page
 {
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): string|UnitEnum|null
     {
         return 'Analytics';
     }
