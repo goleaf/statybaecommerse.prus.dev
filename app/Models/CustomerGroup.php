@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Scopes\ActiveScope;
-use App\Models\Scopes\EnabledScope;
 use Database\Factories\CustomerGroupFactory;
-use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -191,12 +189,26 @@ final class CustomerGroup extends Model
     }
 
     /**
-     * Present the discount percentage as a floating point value for consistency in tests and UI renders.
+     * Present the discount percentage as a normalised string for consistency in tests and UI renders.
+     *
+     * @return Attribute<string|null, never>
      */
     protected function discountPercentage(): Attribute
     {
         return Attribute::make(
-            get: static fn ($value): ?float => $value === null ? null : (float) $value,
+            // Normalise to a two-decimal string so decimal casts and legacy tests stay in sync.
+            get: static function ($value): ?string {
+                if ($value === null) {
+                    return null;
+                }
+
+                if (! is_numeric($value)) {
+                    // Bail out gracefully when the persisted value is not numeric to avoid type juggling bugs.
+                    return null;
+                }
+
+                return number_format((float) $value, 2, '.', '');
+            },
         );
     }
 
@@ -294,7 +306,14 @@ final class CustomerGroup extends Model
      */
     public function hasDiscountRate(): bool
     {
-        return (float) $this->discount_percentage > 0;
+        $rawDiscount = $this->getAttribute('discount_percentage');
+
+        if (! is_numeric($rawDiscount)) {
+            // Treat missing or malformed discounts as zero so downstream logic stays predictable.
+            return false;
+        }
+
+        return (float) $rawDiscount > 0;
     }
 
     /**
