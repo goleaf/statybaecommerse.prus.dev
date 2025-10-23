@@ -16,6 +16,7 @@ use Filament\Actions\EditAction;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
@@ -24,12 +25,10 @@ class ProductsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'products';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema
             ->schema([
                 TextInput::make('name')
                     ->required()
@@ -39,7 +38,7 @@ class ProductsRelationManager extends BaseRelationManager
 
     public function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->recordTitleAttribute('name')
             ->columns([

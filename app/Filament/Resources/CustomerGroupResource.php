@@ -8,12 +8,13 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\CustomerGroupResource\Pages;
 use App\Models\CustomerGroup;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -39,22 +40,7 @@ final class CustomerGroupResource extends Resource
 
     protected static ?string $model = CustomerGroup::class;
 
-    /**
-     * Navigation group for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static $navigationGroup = null;
-
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return self::$navigationGroup ?? __('navigation.groups.customers');
-    }
-
-    /**
-     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
-     */
-    protected static UnitEnum|string|null $navigationGroup = 'Customers';
+    protected static string|UnitEnum|null $navigationGroup = null;
 
     public static function getNavigationGroup(): UnitEnum|string|null
     {
@@ -80,12 +66,10 @@ final class CustomerGroupResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form->schema([
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema->schema([
             Section::make(__('customer_groups.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -234,7 +218,7 @@ final class CustomerGroupResource extends Resource
      */
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('name')

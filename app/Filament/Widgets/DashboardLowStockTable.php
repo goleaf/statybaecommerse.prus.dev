@@ -36,7 +36,7 @@ final class DashboardLowStockTable extends BaseTableWidget
 
     public function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->query(fn () => $this->tableRepository->lowStockProductsQuery()->limit(10))
             ->columns([

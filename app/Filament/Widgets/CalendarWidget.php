@@ -17,7 +17,8 @@ use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
+use Filament\Forms\Set;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -179,7 +180,7 @@ final class CalendarWidget extends FullCalendarWidget
                         return;
                     }
 
-                    $form->fill();
+                    $schema->fill();
 
                     if (($arguments['type'] ?? null) !== 'select') {
                         return;
@@ -193,7 +194,7 @@ final class CalendarWidget extends FullCalendarWidget
                         array_key_exists('end', $arguments),
                     );
 
-                    $form->fill($state);
+                    $schema->fill($state);
                 })
                 ->mutateFormDataUsing(fn (array $data): array => $this->ensureSlug($data)),
         ];
@@ -208,7 +209,7 @@ final class CalendarWidget extends FullCalendarWidget
                         return;
                     }
 
-                    $form->fill();
+                    $schema->fill();
 
                     $state = $this->normaliseFormState($form);
 
@@ -221,7 +222,7 @@ final class CalendarWidget extends FullCalendarWidget
                         );
                     }
 
-                    $form->fill($state);
+                    $schema->fill($state);
                 })
                 ->mutateFormDataUsing(fn (array $data): array => $this->ensureSlug($data)),
             Actions\DeleteAction::make(),
@@ -306,7 +307,7 @@ final class CalendarWidget extends FullCalendarWidget
      */
     private function normaliseFormState(Schema $form): array
     {
-        $state = $form->getRawState();
+        $state = $schema->getRawState();
 
         if ($state instanceof Arrayable) {
             $state = $state->toArray();

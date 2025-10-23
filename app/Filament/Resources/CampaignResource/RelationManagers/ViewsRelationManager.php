@@ -11,6 +11,7 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -24,12 +25,10 @@ final class ViewsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Campaign Views';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form->schema([
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema->schema([
             TextInput::make('session_id')
                 ->label('Session ID')
                 ->maxLength(255),
@@ -53,7 +52,7 @@ final class ViewsRelationManager extends BaseRelationManager
 
     public function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('session_id')

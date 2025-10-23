@@ -28,9 +28,7 @@ final class ViewVariantAnalytics extends ViewRecord
 
     public function infolist(Schema $schema): Schema
     {
-
-        $infolist = $schema; // Maintain legacy naming for infolist builders while using the Schema abstraction.
-
+        // Configure the Filament infolist schema using the v4 Schema API.
         return $schema
             ->components([
                 Section::make(__('admin.variant_analytics.basic_info'))

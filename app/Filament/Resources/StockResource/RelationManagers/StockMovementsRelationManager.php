@@ -14,6 +14,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -53,12 +54,10 @@ class StockMovementsRelationManager extends BaseRelationManager
         return __('inventory.stock_movements');
     }
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema
             ->components([
                 Quantity::make('quantity')
                     ->label(__('inventory.quantity'))
@@ -106,7 +105,7 @@ class StockMovementsRelationManager extends BaseRelationManager
 
     public function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->recordTitleAttribute('reference')
             ->columns([

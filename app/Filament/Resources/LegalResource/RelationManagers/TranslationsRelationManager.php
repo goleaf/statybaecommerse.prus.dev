@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\LegalResource\RelationManagers;
 
-use App\Filament\RelationManagers\Support\BaseRelationManager;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Repeater;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Actions\DeleteAction;
@@ -33,12 +32,10 @@ class TranslationsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Translations';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema
             ->schema([
                 Section::make('Translation Details')
                     ->schema([
@@ -121,7 +118,7 @@ class TranslationsRelationManager extends BaseRelationManager
 
     public function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->recordTitleAttribute('title')
             ->columns([
@@ -219,23 +216,5 @@ class TranslationsRelationManager extends BaseRelationManager
                     ->label('Add Translation')
                     ->icon('heroicon-o-plus'),
             ]);
-    }
-
-    protected function mutateFormDataBeforeCreate(array $data): array
-    {
-        /** @var HtmlSanitizer $sanitizer */
-        $sanitizer = app(HtmlSanitizer::class);
-        $data['content'] = $sanitizer->sanitize($data['content'] ?? '');
-
-        return $data;
-    }
-
-    protected function mutateFormDataBeforeSave(array $data): array
-    {
-        /** @var HtmlSanitizer $sanitizer */
-        $sanitizer = app(HtmlSanitizer::class);
-        $data['content'] = $sanitizer->sanitize($data['content'] ?? '');
-
-        return $data;
     }
 }

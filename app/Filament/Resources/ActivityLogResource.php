@@ -30,7 +30,7 @@ final class ActivityLogResource extends Resource
      * @var string|\BackedEnum|null Icon used in the navigation menu to help operators
      * keep the activity feed grouped with other system tools.
      */
-    protected static $navigationIcon = 'heroicon-o-document-text';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
 
     protected static ?int $navigationSort = 9;
 
@@ -71,14 +71,13 @@ final class ActivityLogResource extends Resource
      */
     public static function form(Form $form): Form
     {
-        // Keep the form hook ready for future enhancements while explicitly
-        // returning the given Form instance, matching Filament v4 expectations.
-        return $form->schema([]);
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema->schema([]);
     }
 
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('id')
@@ -171,21 +170,5 @@ final class ActivityLogResource extends Resource
         return [
             'index' => Pages\ListActivityLogs::route('/'),
         ];
-    }
-
-    /**
-     * Fetch distinct column values for select filters while keeping the list sorted
-     * alphabetically to provide a predictable operator experience.
-     */
-    private static function getDistinctFilterOptions(string $column): array
-    {
-        return ActivityLog::query()
-            ->select($column)
-            ->whereNotNull($column)
-            ->where($column, '!=', '')
-            ->distinct()
-            ->orderBy($column)
-            ->pluck($column, $column)
-            ->toArray();
     }
 }

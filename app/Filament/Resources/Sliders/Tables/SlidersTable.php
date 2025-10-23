@@ -24,6 +24,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Filament\Schemas\Schema;
 
 final class SlidersTable
 {

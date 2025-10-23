@@ -19,6 +19,7 @@ use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
@@ -47,12 +48,7 @@ final class SubscriberResource extends Resource
 
     protected static ?string $model = Subscriber::class;
 
-    /**
-     * Navigation group for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static $navigationGroup = 'Users';
+    protected static string|UnitEnum|null $navigationGroup = 'Users';
 
     protected static ?int $navigationSort = 1;
 
@@ -90,12 +86,10 @@ final class SubscriberResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema
             ->schema([
                 Section::make(__('subscribers.personal_information'))
                     ->schema([
@@ -192,7 +186,7 @@ final class SubscriberResource extends Resource
      */
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('email')

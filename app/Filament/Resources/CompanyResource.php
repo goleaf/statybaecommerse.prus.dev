@@ -9,6 +9,7 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\CompanyResource\Pages;
 use App\Models\Company;
 use Filament\Forms;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -52,12 +53,10 @@ final class CompanyResource extends Resource
     /**
      * Build the form schema for creating and editing companies.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form->schema([
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema->schema([
             Forms\Components\Section::make(__('companies.basic_information'))
                 ->schema([
                     Forms\Components\Grid::make(2)
@@ -116,7 +115,7 @@ final class CompanyResource extends Resource
      */
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('name')

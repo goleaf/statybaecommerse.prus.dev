@@ -41,7 +41,7 @@ final class ViewRecommendationConfigSimple extends ViewRecord implements HasTabl
 
     public function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         $table = $table
             ->paginated([10])
             ->defaultGroup(null)

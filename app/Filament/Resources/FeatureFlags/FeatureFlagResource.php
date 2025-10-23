@@ -11,12 +11,12 @@ use App\Filament\Resources\FeatureFlags\Pages\ListFeatureFlags;
 use App\Filament\Resources\FeatureFlags\Schemas\FeatureFlagForm;
 use App\Filament\Resources\FeatureFlags\Tables\FeatureFlagsTable;
 use App\Models\FeatureFlag;
-use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
+use BackedEnum;
 
 class FeatureFlagResource extends Resource
 {
@@ -26,17 +26,15 @@ class FeatureFlagResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
+        // Configure the Filament resource form schema using the v4 Schema API.
         return FeatureFlagForm::configure($form);
     }
 
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return FeatureFlagsTable::configure($table);
     }
 

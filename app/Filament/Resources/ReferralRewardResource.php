@@ -10,14 +10,14 @@ use App\Models\ReferralReward;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Schema;
 use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
@@ -53,19 +53,12 @@ final class ReferralRewardResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    /**
-     * Navigation group for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static $navigationGroup = 'Referral';
+    protected static string|UnitEnum|null $navigationGroup = 'Referral';
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema
             ->schema([
                 Forms\Components\Section::make(__('referral_rewards.sections.reward_details'))
                     ->columns(2)
@@ -178,7 +171,7 @@ final class ReferralRewardResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('title')
@@ -296,11 +289,9 @@ final class ReferralRewardResource extends Resource
             ]);
     }
 
-    public static function infolist(Schema $infolist): Schema
+    public static function infolist(Schema $schema): Schema
     {
-
-        $infolist = $schema; // Preserve legacy infolist variable naming for clarity.
-
+        // Configure the Filament infolist schema using the v4 Schema API.
         return $infolist
             ->schema([
                 Infolists\Components\Section::make(__('referral_rewards.sections.reward_details'))

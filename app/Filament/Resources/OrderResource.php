@@ -43,6 +43,7 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Schema;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -199,12 +200,10 @@ final class OrderResource extends Resource implements DefinesExportColumns
     /**
      * Configure the comprehensive form schema with advanced features.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form->schema([
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema->schema([
             Section::make(__('orders.sections.order_details'))
                 ->description(__('orders.sections.customer_information'))
                 ->icon('heroicon-o-information-circle')
@@ -649,7 +648,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
      */
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 BadgeableColumn::make('number')
@@ -1365,18 +1364,5 @@ final class OrderResource extends Resource implements DefinesExportColumns
         }
 
         return $actions;
-    }
-
-    private static function authorizeOrder(?Order $order, string $ability): bool
-    {
-        $user = auth()->user();
-
-        if (! $user) {
-            return false;
-        }
-
-        return $order instanceof Order
-            ? $user->can($ability, $order)
-            : $user->can($ability, Order::class);
     }
 }

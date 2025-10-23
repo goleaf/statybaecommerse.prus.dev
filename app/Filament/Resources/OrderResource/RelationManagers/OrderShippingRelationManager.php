@@ -16,6 +16,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -54,12 +55,10 @@ final class OrderShippingRelationManager extends BaseRelationManager
     /**
      * Configure the form schema for order shipping.
      */
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema
             ->schema([
                 Section::make(__('orders.shipping_information'))
                     ->description(__('orders.shipping_information_description'))
@@ -165,7 +164,7 @@ final class OrderShippingRelationManager extends BaseRelationManager
      */
     public function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('shipping_method')

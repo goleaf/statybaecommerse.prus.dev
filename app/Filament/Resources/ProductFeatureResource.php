@@ -18,6 +18,10 @@ use Filament\Tables\Actions\BulkActionGroup as TablesBulkActionGroup;
 use Filament\Tables\Actions\DeleteAction as TablesDeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction as TablesDeleteBulkAction;
 use Filament\Tables\Actions\EditAction as TablesEditAction;
+use Filament\Forms;
+use Filament\Schemas\Schema;
+use Filament\Resources\Resource;
+use Filament\Tables;
 use Filament\Tables\Table;
 use UnitEnum;
 use Filament\Schemas\Schema;
@@ -44,21 +48,14 @@ final class ProductFeatureResource extends Resource
      */
     protected static $navigationIcon = 'heroicon-o-star';
 
-    /**
-     * Navigation group for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static $navigationGroup = NavigationGroup::Products;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 17;
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form->schema([
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema->schema([
             Forms\Components\Select::make('product_id')
                 ->label('Product')
                 ->relationship('product', 'name')
@@ -96,7 +93,7 @@ final class ProductFeatureResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('product.name')

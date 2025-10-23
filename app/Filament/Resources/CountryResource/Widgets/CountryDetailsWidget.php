@@ -17,7 +17,7 @@ final class CountryDetailsWidget extends BaseWidget
 
     public function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->query(
                 Country::query()

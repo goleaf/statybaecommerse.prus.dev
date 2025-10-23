@@ -13,7 +13,7 @@ class SettingForm
 {
     public static function configure(Schema $form): Schema
     {
-        return $form
+        return $schema
             ->components([
                 TextInput::make('key')
                     ->required(),

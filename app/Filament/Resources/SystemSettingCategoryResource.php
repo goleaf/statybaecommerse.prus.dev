@@ -24,6 +24,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
@@ -39,7 +40,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Filament\Schemas\Schema;
+use UnitEnum;
 
 /**
  * SystemSettingCategoryResource
@@ -55,7 +56,7 @@ final class SystemSettingCategoryResource extends Resource
     /**
      * @var string|BackedEnum|null Keep navigation grouping aligned with the shared enum helper.
      */
-    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::System;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::System;
 
     public static function getNavigationGroup(): ?string
     {
@@ -98,12 +99,10 @@ final class SystemSettingCategoryResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema
             ->schema([
                 Section::make(__('system_setting_categories.basic_information'))
                     ->schema([
@@ -189,7 +188,7 @@ final class SystemSettingCategoryResource extends Resource
      */
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->modifyQueryUsing(static fn (Builder $query): Builder => $query->withoutGlobalScopes([ActiveScope::class]))
             ->deferLoading(false)
@@ -362,28 +361,5 @@ final class SystemSettingCategoryResource extends Resource
             'view'   => Pages\ViewSystemSettingCategory::route('/{record}'),
             'edit'   => Pages\EditSystemSettingCategory::route('/{record}/edit'),
         ];
-    }
-
-    /**
-     * @param  Collection<int, SystemSettingCategory> $records
-     * @return list<int|string>
-     */
-    private static function resolveRecordIds(Collection $records): array
-    {
-        $ids = [];
-
-        foreach ($records as $record) {
-            $key = $record->getKey();
-
-            if ($key === null) {
-                continue;
-            }
-
-            if (is_int($key) || is_string($key)) {
-                $ids[] = $key;
-            }
-        }
-
-        return $ids;
     }
 }

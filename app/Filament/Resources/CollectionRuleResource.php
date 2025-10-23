@@ -9,13 +9,18 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\CollectionRuleResource\Pages;
 use App\Models\CollectionRule;
 use BackedEnum;
-use Filament\Forms\Components\Grid;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -78,13 +83,11 @@ final class CollectionRuleResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
+        // Configure the Filament resource form schema using the v4 Schema API.
         // Expose the schema via the Filament v4 `Form` instance to drop the deprecated array fallback.
-        return $form->schema([
+        return $schema->schema([
             Tabs::make('collection_rule_tabs')
                 ->tabs([
                     Tab::make(__('admin.collection_rules.form.tabs.basic_information'))
@@ -166,6 +169,7 @@ final class CollectionRuleResource extends Resource
      */
     public static function table(Table $table): Table
     {
+        // Configure the Filament table definition for the resource.
         // Publish the full table definition through the Filament v4 `Table` signature for consistency.
         return $table
             ->columns([

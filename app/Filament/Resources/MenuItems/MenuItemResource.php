@@ -11,7 +11,8 @@ use App\Filament\Resources\MenuItems\Pages\ListMenuItems;
 use App\Filament\Resources\MenuItems\Schemas\MenuItemForm;
 use App\Filament\Resources\MenuItems\Tables\MenuItemsTable;
 use App\Models\MenuItem;
-use Filament\Forms\Form;
+use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -29,15 +30,15 @@ class MenuItemResource extends Resource
      */
     protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Delegate the schema composition to the dedicated form configurator.
+        // Configure the Filament resource form schema using the v4 Schema API.
         return MenuItemForm::configure($form);
     }
 
     public static function table(Table $table): Table
     {
-        // Delegate the column and action configuration to the shared table class.
+        // Configure the Filament table definition for the resource.
         return MenuItemsTable::configure($table);
     }
 

@@ -16,7 +16,7 @@ abstract class BaseManageRecords extends ManageRecords
 
     public function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         $table = parent::table($table);
 
         return $this->applyToggleableTableLayout($table);

@@ -16,10 +16,13 @@ use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\AddressSearch;
 use App\Support\Search\CustomerSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Schema;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -104,7 +107,8 @@ final class AddressResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema->schema([
             Section::make(__('translations.address_information'))
                 ->components([
                     Grid::make(2)->components([
@@ -334,7 +338,7 @@ final class AddressResource extends Resource
      */
     public static function table(Table $table): Table
     {
-        // Return the configured Table instance to align with the core Resource contract.
+        // Configure the Filament table definition for the resource.
         return $table
             // Returning the configured Table instance ensures bulk actions remain type-checked by Filament.
             ->columns([

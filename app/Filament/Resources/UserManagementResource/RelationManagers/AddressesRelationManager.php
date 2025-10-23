@@ -10,6 +10,7 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Schemas\Schema;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -27,12 +28,10 @@ final class AddressesRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Addresses';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema
             ->components([
                 Forms\Components\TextInput::make('name')
                     ->required()
@@ -94,7 +93,7 @@ final class AddressesRelationManager extends BaseRelationManager
 
     public function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->recordTitleAttribute('full_name')
             ->columns([

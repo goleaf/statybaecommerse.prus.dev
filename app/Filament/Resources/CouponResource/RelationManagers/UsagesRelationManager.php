@@ -11,6 +11,7 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Schemas\Schema;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -27,12 +28,10 @@ final class UsagesRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Usages';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form->schema([
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema->schema([
             Forms\Components\Select::make('user_id')
                 ->label(__('admin.common.user'))
                 ->relationship('user', 'name')
@@ -57,7 +56,7 @@ final class UsagesRelationManager extends BaseRelationManager
 
     public function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->recordTitleAttribute('used_at')
             ->columns([

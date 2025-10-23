@@ -13,6 +13,7 @@ use App\Filament\Resources\EmailCampaigns\Schemas\EmailCampaignForm;
 use App\Filament\Resources\EmailCampaigns\Tables\EmailCampaignsTable;
 use App\Models\EmailCampaign;
 use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -30,15 +31,15 @@ class EmailCampaignResource extends Resource
      */
     protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Delegate form configuration to the dedicated schema class for consistency across panels.
+        // Configure the Filament resource form schema using the v4 Schema API.
         return EmailCampaignForm::configure($form);
     }
 
     public static function table(Table $table): Table
     {
-        // Centralize table configuration to ensure column definitions remain reusable.
+        // Configure the Filament table definition for the resource.
         return EmailCampaignsTable::configure($table);
     }
 

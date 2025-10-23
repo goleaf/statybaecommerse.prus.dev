@@ -52,12 +52,7 @@ final class SeoDataResource extends Resource
 
     protected static ?string $model = SeoData::class;
 
-    /**
-     * Navigation group for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static $navigationGroup = NavigationGroup::Content;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Content;
 
     public static function getNavigationLabel(): string
     {
@@ -76,6 +71,7 @@ final class SeoDataResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
+        // Configure the Filament resource form schema using the v4 Schema API.
         return $schema
             ->columns(3)
             ->schema([
@@ -233,7 +229,7 @@ final class SeoDataResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('title')
@@ -421,9 +417,7 @@ final class SeoDataResource extends Resource
 
     public static function infolist(Schema $schema): Schema
     {
-
-        $infolist = $schema; // Maintain legacy naming for infolist builders while using the Schema abstraction.
-
+        // Configure the Filament infolist schema using the v4 Schema API.
         return $schema
             ->components([
                 Section::make(__('seo_data.sections.basic_info'))
@@ -587,5 +581,61 @@ final class SeoDataResource extends Resource
         $count = (int) self::getModel()::count();
 
         return $count > 0 ? (string) $count : null;
+    }
+
+    private static function resolveTitleWarning(?string $value): ?string
+    {
+        $length = mb_strlen($value ?? '');
+
+        return match (true) {
+            $length < 30 => (string) __('seo_data.warnings.title_too_short'),
+            $length > 60 => (string) __('seo_data.warnings.title_too_long'),
+            default      => null,
+        };
+    }
+
+    private static function resolveDescriptionWarning(?string $value): ?string
+    {
+        $length = mb_strlen($value ?? '');
+
+        return match (true) {
+            $length < 120 => (string) __('seo_data.warnings.description_too_short'),
+            $length > 160 => (string) __('seo_data.warnings.description_too_long'),
+            default       => null,
+        };
+    }
+
+    private static function normalizeString(mixed $value): string
+    {
+        if (is_string($value)) {
+            return $value;
+        }
+
+        if ($value === null) {
+            return '';
+        }
+
+        if (is_scalar($value)) {
+            return (string) $value;
+        }
+
+        return '';
+    }
+
+    private static function normalizeNullableString(mixed $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        if (is_string($value)) {
+            return $value;
+        }
+
+        if (is_scalar($value)) {
+            return (string) $value;
+        }
+
+        return null;
     }
 }

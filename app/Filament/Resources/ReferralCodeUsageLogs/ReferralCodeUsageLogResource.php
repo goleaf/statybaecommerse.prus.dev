@@ -12,6 +12,7 @@ use App\Filament\Resources\ReferralCodeUsageLogs\Schemas\ReferralCodeUsageLogFor
 use App\Filament\Resources\ReferralCodeUsageLogs\Tables\ReferralCodeUsageLogsTable;
 use App\Models\ReferralCodeUsageLog;
 use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -30,17 +31,15 @@ final class ReferralCodeUsageLogResource extends Resource
         return Heroicon::OutlinedRectangleStack;
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
+        // Configure the Filament resource form schema using the v4 Schema API.
         return ReferralCodeUsageLogForm::configure($form);
     }
 
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return ReferralCodeUsageLogsTable::configure($table);
     }
 

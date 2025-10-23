@@ -17,16 +17,17 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -38,17 +39,18 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Filament\Schemas\Schema;
+use BackedEnum;
+use UnitEnum;
 
 final class EnumResource extends Resource
 {
     protected static ?string $model = EnumValue::class;
 
     /** @var string|\BackedEnum|null Align navigation metadata with BackedEnum compatibility. */
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
 
     /** @var string|\BackedEnum|null Anchor the resource to the System navigation area. */
-    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::System;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 2;
 
@@ -75,12 +77,10 @@ final class EnumResource extends Resource
         return trans('admin.enums.single');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form->schema([
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema->schema([
             Tabs::make('enum_resource_tabs')
                 ->tabs([
                     Tab::make(trans('admin.enums.form.tabs.basic_information'))
@@ -164,7 +164,7 @@ final class EnumResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('type')

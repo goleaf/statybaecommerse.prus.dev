@@ -9,7 +9,8 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\PartnerResource\Pages;
 use App\Models\Partner;
 use Filament\Forms;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
@@ -30,22 +31,15 @@ final class PartnerResource extends Resource
     /** @var string|\BackedEnum|null Navigation icon identifier required by Filament. */
     protected static $navigationIcon = 'heroicon-o-user-group';
 
-    /**
-     * Navigation group for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static $navigationGroup = 'Marketing';
+    protected static string|UnitEnum|null $navigationGroup = 'Marketing';
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
+        // Configure the Filament resource form schema using the v4 Schema API.
         // Build the Partner form using the Section helper to keep layouts consistent.
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.partners.sections.basic_information'))
                     ->schema([
@@ -114,7 +108,7 @@ final class PartnerResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')

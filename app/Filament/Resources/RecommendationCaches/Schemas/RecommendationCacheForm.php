@@ -6,19 +6,19 @@ namespace App\Filament\Resources\RecommendationCaches\Schemas;
 
 use App\Forms\Components\Flatpickr;
 use App\Models\RecommendationCache;
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Forms\Components\Grid;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
+use App\Support\Filament\Components\Flatpickr;
 
 final class RecommendationCacheForm
 {
     public static function configure(Schema $form): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.recommendation_caches.basic_information'))
                     ->schema([

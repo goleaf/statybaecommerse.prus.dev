@@ -18,15 +18,17 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Novadaemon\FilamentCombobox\Combobox;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Schemas\Schema;
+use UnitEnum;
 
 /**
  * RecommendationBlockResource
@@ -44,7 +46,7 @@ final class RecommendationBlockResource extends Resource
      *
      * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::Products;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 13;
 
@@ -86,13 +88,11 @@ final class RecommendationBlockResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form->schema([
-            Section::make(__('recommendation_blocks.sections.basic_information'))
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema->schema([
+            Section::make(__('recommendation_blocks.basic_information'))
                 ->schema([
                     TextInput::make('name')
                         ->label(__('recommendation_blocks.fields.name'))
@@ -167,7 +167,7 @@ final class RecommendationBlockResource extends Resource
      */
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 TextColumn::make('name')
@@ -300,32 +300,5 @@ final class RecommendationBlockResource extends Resource
     {
         return parent::getEloquentQuery()
             ->withoutGlobalScope(ActiveScope::class);
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private static function getTypeOptions(): array
-    {
-        return [
-            'featured' => __('recommendation_blocks.options.types.featured'),
-            'related' => __('recommendation_blocks.options.types.related'),
-            'similar' => __('recommendation_blocks.options.types.similar'),
-            'trending' => __('recommendation_blocks.options.types.trending'),
-            'recent' => __('recommendation_blocks.options.types.recent'),
-        ];
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private static function getPositionOptions(): array
-    {
-        return [
-            'top' => __('recommendation_blocks.options.positions.top'),
-            'bottom' => __('recommendation_blocks.options.positions.bottom'),
-            'sidebar' => __('recommendation_blocks.options.positions.sidebar'),
-            'inline' => __('recommendation_blocks.options.positions.inline'),
-        ];
     }
 }

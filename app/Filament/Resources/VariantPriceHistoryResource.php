@@ -12,12 +12,14 @@ use App\Models\VariantPriceHistory;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Forms;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Schemas\Schema;
+use BackedEnum;
+use UnitEnum;
 
 final class VariantPriceHistoryResource extends Resource
 {
@@ -30,10 +32,10 @@ final class VariantPriceHistoryResource extends Resource
      *
      * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-currency-euro';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-currency-euro';
 
     /** @var string|\BackedEnum|null Navigation grouping centralized via enum. */
-    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::System;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 20;
 
@@ -45,12 +47,10 @@ final class VariantPriceHistoryResource extends Resource
         return $group instanceof NavigationGroup ? $group->label() : $group;
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema
             ->schema([
                 Forms\Components\Select::make('variant_id')
                     ->relationship('variant', 'name')
@@ -105,7 +105,7 @@ final class VariantPriceHistoryResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('variant.name')

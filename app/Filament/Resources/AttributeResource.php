@@ -9,13 +9,14 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\AttributeResource\Pages;
 use App\Models\Attribute;
 use Filament\Actions;
-use Filament\Forms\Components\Grid;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -65,12 +66,10 @@ final class AttributeResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
-        return $form->schema([
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema->schema([
             Section::make(__('attributes.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -284,7 +283,7 @@ final class AttributeResource extends Resource
      */
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition for the resource.
         return $table
             ->query(Attribute::query()->withoutGlobalScopes())
             ->deferLoading(false)
@@ -494,56 +493,5 @@ final class AttributeResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->withoutGlobalScopes();
-    }
-
-    /**
-     * Provide consistent labels for both legacy and modern group names while preserving translations when present.
-     *
-     * @return array<string, string>
-     */
-    private static function getGroupOptions(): array
-    {
-        // Combining legacy slugs with the current UI groups keeps seeded factories and historical data functional.
-        $groups = [
-            'basic_info',
-            'technical_specs',
-            'materials',
-            'features',
-            'compatibility',
-            'warranty',
-            'general',
-            'technical',
-            'appearance',
-            'dimensions',
-            'shipping',
-            'seo',
-            'other',
-        ];
-
-        return collect($groups)
-            ->mapWithKeys(static fn (string $group): array => [
-                $group => self::translateGroupName($group),
-            ])
-            ->all();
-    }
-
-    /**
-     * Translate a group name while gracefully handling null values and missing translations.
-     */
-    private static function translateGroupName(?string $state): string
-    {
-        if ($state === null || $state === '') {
-            return __('attributes.none');
-        }
-
-        $translationKey = "attributes.groups.{$state}";
-        $translated = __($translationKey);
-
-        if ($translated !== $translationKey) {
-            return $translated;
-        }
-
-        // Fallback to a human readable label if no translation exists (legacy factory data uses snake_case values).
-        return Str::of($state)->headline()->value();
     }
 }
