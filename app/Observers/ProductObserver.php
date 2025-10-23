@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Observers;
 
 use App\Models\Product;
-use App\Services\CacheInvalidationService;
+use App\Observers\Concerns\ResolvesSupportedLocales;
 use App\Services\Images\GradientImageService;
-use App\UseCases\Product\InvalidateProductCache;
+use App\Support\Cache\CacheKeys;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -17,16 +18,14 @@ use Illuminate\Support\Facades\Log;
  */
 final class ProductObserver
 {
-    public function __construct(
-        private readonly CacheInvalidationService $cacheInvalidationService,
-    ) {}
+    use ResolvesSupportedLocales;
 
     /**
      * Handle created functionality with proper error handling.
      */
     public function created(Product $product): void
     {
-        $this->invalidateCaches($product);
+        $this->flushProductCaches();
 
         // Skip placeholder image generation during tests to prevent memory issues
         if (app()->environment('testing')) {
@@ -81,5 +80,40 @@ final class ProductObserver
     private function invalidateCaches(Product $product): void
     {
         app(CacheInvalidationService::class)->flushForModel($product);
+    }
+
+    public function updated(Product $product): void
+    {
+        $this->flushProductCaches();
+    }
+
+    public function deleted(Product $product): void
+    {
+        $this->flushProductCaches();
+    }
+
+    public function restored(Product $product): void
+    {
+        $this->flushProductCaches();
+    }
+
+    public function forceDeleted(Product $product): void
+    {
+        $this->flushProductCaches();
+    }
+
+    private function flushProductCaches(): void
+    {
+        if (Cache::supportsTags()) {
+            Cache::tags([CacheKeys::productAggregateTag()])->flush();
+
+            return;
+        }
+
+        Cache::forget(CacheKeys::productTotalCount());
+
+        foreach ($this->supportedLocales() as $locale) {
+            Cache::forget(CacheKeys::dashboardMetric('low_stock_items', $locale));
+        }
     }
 }
