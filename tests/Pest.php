@@ -3,8 +3,12 @@
 declare(strict_types=1);
 
 use Filament\Facades\Filament;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
+use Pest\Expectation;
+use PHPUnit\Framework\Assert;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 
@@ -23,7 +27,7 @@ beforeAll(function () {
             'LOG_CHANNEL=stack',
             'DB_CONNECTION=sqlite',
             'DB_DATABASE=:memory:',
-        ]).PHP_EOL);
+        ]) . PHP_EOL);
     }
 
     config()->set('database.default', 'sqlite');
@@ -49,6 +53,23 @@ beforeEach(function () {
             Role::findOrCreate($role, $guard);
         }
     }
+});
+
+expect()->extend('toContain', function ($expected): Expectation {
+    $value = $this->value;
+
+    if ($value instanceof Collection && $expected instanceof Model) {
+        Assert::assertTrue(
+            $value->contains(static fn ($item): bool => $item instanceof Model && $item->is($expected)),
+            sprintf('Failed asserting that the collection contains model [%s].', $expected->getKey())
+        );
+
+        return $this;
+    }
+
+    Assert::assertContains($expected, $value);
+
+    return $this;
 });
 
 if (! function_exists('login')) {

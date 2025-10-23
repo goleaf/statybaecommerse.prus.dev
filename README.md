@@ -31,7 +31,8 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Feature flag governance** with Filament listings that expose inactive and disabled toggles for quick rollout audits and remediation.
 - **Multilingual experience** across storefront and admin via `spatie/laravel-translatable`, Volt-powered Livewire pages, and localized seed data.
 
--### Latest updates
+### Latest updates
+- Variant combination management now persists deterministic hashes, enables soft deletes, and seeds predictable attribute matrices so catalogue scopes, availability checks, and factories behave consistently across tests.
 - Cart item management in the Filament admin now honours the selected product filter across list views and exports, ensuring QA and debugging sessions see only the intended product rows.
 - Recently viewed storefront API calls now bypass visibility scopes and return session-ordered product IDs, keeping wishlist toggles and customer history widgets consistent even when draft catalogue entries populate the session during automated tests.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates

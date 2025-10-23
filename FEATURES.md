@@ -17,6 +17,7 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
+- Variant combination management now persists deterministic hashes, supports soft deletion, and seeds predictable fallback attribute matrices so catalogue availability scopes and factories stay aligned with the new test coverage.
 - Campaign click tracking screens now provide a configurable click timestamp, zero-default conversion values, and automatic fallbacks so operators can capture marketing signals without manual database edits.
 - Brands page now features a light-themed layout, shared card components, and refreshed translations so the partner directory feels consistent across locales.
 - Attribute group selectors now rely on a shared translation helper so historical slugs show friendly labels across Filament forms, tables, and filters instead of exposing raw keys.

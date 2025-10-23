@@ -7,6 +7,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Bug Fixes
+* Hardened variant combination handling by persisting combination hashes, enabling soft deletes, and tightening scope helpers so product lookups, hash-driven queries, and factory scenarios pass the refreshed unit suite.
 * Ensured the CartItem Filament product filter applies its constraint to the
   base query so admin listings, exports, and tests narrow results down to the
   selected product without requiring manual query tweaks.
