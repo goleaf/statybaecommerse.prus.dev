@@ -75,6 +75,8 @@ Route::middleware(['web'])->group(function () {
         Route::post('/addresses', [App\Http\Controllers\Frontend\ProfileController::class, 'storeAddress'])->name('store-address');
         Route::put('/addresses/{address}', [App\Http\Controllers\Frontend\ProfileController::class, 'updateAddress'])->name('update-address');
         Route::delete('/addresses/{address}', [App\Http\Controllers\Frontend\ProfileController::class, 'deleteAddress'])->name('delete-address');
+        Route::post('/data/export', [App\Http\Controllers\Frontend\DataPrivacyController::class, 'export'])->name('data.export');
+        Route::delete('/data', [App\Http\Controllers\Frontend\DataPrivacyController::class, 'destroy'])->name('data.destroy');
     });
 
     // Campaigns

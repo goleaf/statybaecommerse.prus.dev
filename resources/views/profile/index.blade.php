@@ -11,6 +11,16 @@
                 </div>
             @endif
 
+            @if($errors->any())
+                <div class="rounded-md bg-red-50 p-4 border border-red-200 text-red-800">
+                    <ul class="list-disc list-inside space-y-1">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
@@ -130,6 +140,71 @@
                                 </svg>
                             </a>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
+                <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        {{ __('translations.profile_data_controls_title') }}
+                    </h2>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        {{ __('translations.profile_data_controls_description') }}
+                    </p>
+                </div>
+                <div class="px-6 py-5 space-y-8">
+                    <div class="space-y-3">
+                        <h3 class="text-base font-medium text-gray-900 dark:text-white">
+                            {{ __('translations.profile_export_title') }}
+                        </h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                            {{ __('translations.profile_export_description') }}
+                        </p>
+                        <form method="POST" action="{{ route('frontend.profile.data.export') }}">
+                            @csrf
+                            <button type="submit"
+                                    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                {{ __('translations.profile_export_cta') }}
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="space-y-3">
+                        <h3 class="text-base font-medium text-gray-900 dark:text-white">
+                            {{ __('translations.profile_delete_title') }}
+                        </h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                            {{ __('translations.profile_delete_description') }}
+                        </p>
+                        <form method="POST" action="{{ route('frontend.profile.data.destroy') }}" class="space-y-4">
+                            @csrf
+                            @method('DELETE')
+                            <div>
+                                <label for="delete-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    {{ __('translations.profile_delete_password_label') }}
+                                </label>
+                                <input type="password"
+                                       name="password"
+                                       id="delete-password"
+                                       required
+                                       autocomplete="current-password"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-900 dark:border-gray-700 dark:text-white" />
+                            </div>
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input id="confirm-deletion" name="confirm_deletion" type="checkbox" value="1" required
+                                           class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                </div>
+                                <label for="confirm-deletion" class="ml-3 text-sm text-gray-600 dark:text-gray-300">
+                                    {{ __('translations.profile_delete_checkbox') }}
+                                </label>
+                            </div>
+                            <button type="submit"
+                                    class="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                {{ __('translations.profile_delete_cta') }}
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
