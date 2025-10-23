@@ -25,10 +25,6 @@ Reusable search helpers live in `app/Support/Search/`:
 
 Each service scopes queries, limits results to 15 entries, and returns either plain strings or `SearchResult` DTOs. The `App\Support\Search\SearchResultPayload` helper now ensures every DTO exposes a predictable `{ id, label, payload }` structure so Filament components and Livewire actions only need to read from the nested `payload` array.
 
-### Searchable component helper
-
-The `App\Support\Filament\SearchableComponentHelper` centralises `afterStateHydrated` and `afterStateUpdated` logic so every Filament form clears payloads and Livewire options consistently. Use `hydrate()` to repopulate labels when editing a record and `syncSelectedRecord()` to update related attributes (such as `product_id`) while clearing stale state when the field is emptied. The helper also exposes a `clear()` utility that resets both the selected value and dropdown options, ensuring the plugin does not keep orphaned payload metadata in the form state. Every method normalises the payload into the canonical `{ id, label, ... }` structure so localisation layers receive the same metadata as search results.【F:app/Support/Filament/SearchableComponentHelper.php†L21-L205】
-
 ### Theme requirements
 
 The admin panel registers `resources/css/filament/admin/theme.scss` as its custom theme. This stylesheet sources Filament app files, in-house components, and the plugin blade views so Tailwind can compile all utility classes:

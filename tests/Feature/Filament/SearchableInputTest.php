@@ -68,6 +68,13 @@ it('exposes product search results through the form component', function (string
         ->not()->toBeEmpty()
         ->and($results[0]->value())
         ->toBeString();
+
+    $normalised = SearchResultPayload::hydrate($results[0]);
+
+    expect($normalised['payload'])
+        ->toHaveKey('sku')
+        ->and($normalised['payload']['name'])
+        ->toBeString();
 })->with([
     OrderItemResource::class,
     CartItemResource::class,

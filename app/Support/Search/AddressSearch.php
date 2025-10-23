@@ -86,32 +86,6 @@ final class AddressSearch
     /**
      * @return array<int, SearchResult>
      */
-    public static function addressResults(string $term, int $limit = 15): array
-    {
-        /** @var \Illuminate\Database\Eloquent\Collection<int, Address> $addresses */
-        $addresses = self::addressQuery($term)
-            ->limit($limit)
-            ->get();
-
-        return $addresses
-            ->map(function (Address $address): SearchResult {
-                $label = self::formatAddress($address);
-                /** @var int|string|null $identifier */
-                $identifier = $address->getKey();
-                $result = SearchResult::make((string) ($identifier ?? ''), $label);
-
-                $result
-                    ->withData('address', self::addressPayload($address))
-                    ->withData('address_id', $address->getKey());
-
-                return $result;
-            })
-            ->all();
-    }
-
-    /**
-     * @return array<int, SearchResult>
-     */
     public static function results(string $term, int $limit = 15): array
     {
         /** @var \Illuminate\Database\Eloquent\Collection<int, Address> $addresses */
@@ -120,7 +94,18 @@ final class AddressSearch
             ->get();
 
         return $addresses
-            ->map(static fn (Address $address): SearchResult => self::toResult($address))
+            ->map(static function (Address $address): SearchResult {
+                /** @var int|string|null $identifier */
+                $identifier = $address->getKey();
+                $label = self::formatAddress($address);
+
+                $result = SearchResult::make((string) ($identifier ?? ''), $label);
+
+                // Merge the flattened address fields into the payload alongside the identifier.
+                return SearchResultPayload::normalise($result, array_merge([
+                    'address_id' => $address->getKey(),
+                ], self::payload($address)));
+            })
             ->all();
     }
 

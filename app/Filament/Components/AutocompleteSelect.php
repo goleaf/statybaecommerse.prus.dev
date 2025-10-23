@@ -196,9 +196,17 @@ final class AutocompleteSelect extends Select
                 function (array $item, int|string $_): array {
                     $value = $item['value'];
                     $label = $item['label'];
+                    $data = $item['data'] ?? [];
 
-                    if ($label === '' && array_key_exists('name', $item['data'])) {
-                        $name = $item['data']['name'];
+                    // Support both the normalised payload and legacy flat metadata.
+                    $payload = [];
+
+                    if (is_array($data)) {
+                        $payload = is_array($data['payload'] ?? null) ? $data['payload'] : $data;
+                    }
+
+                    if ($label === '' && array_key_exists('name', $payload)) {
+                        $name = $payload['name'];
 
                         if (is_string($name)) {
                             $label = $name;
