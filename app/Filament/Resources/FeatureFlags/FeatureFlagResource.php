@@ -16,7 +16,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use BackedEnum;
+use Filament\Schemas\Schema;
 
 class FeatureFlagResource extends Resource
 {
@@ -28,13 +28,13 @@ class FeatureFlagResource extends Resource
 
     public static function form(Schema $form): Schema
     {
-        // Configure the Filament resource form schema using the v4 Schema API.
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         return FeatureFlagForm::configure($form);
     }
 
     public static function table(Table $table): Table
     {
-        // Configure the Filament table definition for the resource.
+        // Configure the table definition for the streamlined Filament v4 return type.
         return FeatureFlagsTable::configure($table);
     }
 

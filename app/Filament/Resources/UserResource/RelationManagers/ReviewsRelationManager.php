@@ -22,7 +22,7 @@ class ReviewsRelationManager extends BaseRelationManager
 
     public function table(Table $table): Table
     {
-        // Configure the Filament table definition for the resource.
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->columns([
                 TextColumn::make('product.name')

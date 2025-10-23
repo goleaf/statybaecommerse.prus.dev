@@ -34,13 +34,13 @@ class NotificationTemplateResource extends Resource
 
     public static function form(Schema $form): Schema
     {
-        // Configure the Filament resource form schema using the v4 Schema API.
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         return NotificationTemplateForm::configure($form);
     }
 
     public static function table(Table $table): Table
     {
-        // Configure the Filament table definition for the resource.
+        // Configure the table definition for the streamlined Filament v4 return type.
         return NotificationTemplatesTable::configure($table);
     }
 

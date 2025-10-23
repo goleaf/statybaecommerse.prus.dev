@@ -229,7 +229,7 @@ final class SeoDataResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Configure the Filament table definition for the resource.
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('title')
@@ -417,7 +417,7 @@ final class SeoDataResource extends Resource
 
     public static function infolist(Schema $schema): Schema
     {
-        // Configure the Filament infolist schema using the v4 Schema API.
+        // Provide the infolist schema using the Filament v4 return type.
         return $schema
             ->components([
                 Section::make(__('seo_data.sections.basic_info'))

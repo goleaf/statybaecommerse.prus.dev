@@ -74,8 +74,8 @@ final class CampaignCustomerSegmentResource extends Resource
 
     public static function form(Schema $form): Schema
     {
-        // Configure the Filament resource form schema using the v4 Schema API.
-        return $schema->schema([
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
+        return $form->schema([
             Section::make(__('campaign_customer_segments.tabs.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -146,7 +146,7 @@ final class CampaignCustomerSegmentResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Configure the Filament table definition for the resource.
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('campaign.name')
@@ -252,7 +252,7 @@ final class CampaignCustomerSegmentResource extends Resource
 
     public static function infolist(Schema $schema): Schema
     {
-        // Configure the Filament infolist schema using the v4 Schema API.
+        // Provide the infolist schema using the Filament v4 return type.
         return $schema->schema([
             InfolistSection::make(__('campaign_customer_segments.tabs.basic_information'))
                 ->schema([

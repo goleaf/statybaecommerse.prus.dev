@@ -57,8 +57,8 @@ final class RecommendationConfigResourceSimple extends Resource
      */
     public static function form(Schema $form): Schema
     {
-        // Configure the Filament resource form schema using the v4 Schema API.
-        return $schema->components([
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
+        return $form->components([
             Section::make(__('recommendation_configs_simple.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -272,7 +272,7 @@ final class RecommendationConfigResourceSimple extends Resource
      */
     public static function table(Table $table): Table
     {
-        // Configure the Filament table definition for the resource.
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('name')

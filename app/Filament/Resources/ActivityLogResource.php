@@ -29,7 +29,7 @@ final class ActivityLogResource extends Resource
     /**
      * Icon used in the navigation menu. Type: string|\BackedEnum|null.
      */
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
 
     protected static ?int $navigationSort = 9;
 
@@ -76,7 +76,7 @@ final class ActivityLogResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Configure the Filament table definition for the resource.
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('id')

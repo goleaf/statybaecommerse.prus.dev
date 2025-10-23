@@ -29,8 +29,8 @@ class AddressesRelationManager extends BaseRelationManager
 
     public function form(Schema $form): Schema
     {
-        // Configure the Filament resource form schema using the v4 Schema API.
-        return $schema
+        // Bridge the relation manager form to the Schema-based builder expected by Filament v4.
+        return $form
             ->components([
                 TextInput::make('id')
                     ->required()
@@ -40,7 +40,7 @@ class AddressesRelationManager extends BaseRelationManager
 
     public function infolist(Schema $schema): Schema
     {
-        // Configure the Filament infolist schema using the v4 Schema API.
+        // Provide the infolist schema using the Filament v4 return type.
         return $schema
             ->components([
                 TextEntry::make('id'),
@@ -49,7 +49,7 @@ class AddressesRelationManager extends BaseRelationManager
 
     public function table(Table $table): Table
     {
-        // Configure the Filament table definition for the resource.
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->recordTitleAttribute('id')
             ->columns([

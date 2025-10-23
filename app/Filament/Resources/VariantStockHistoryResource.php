@@ -58,8 +58,8 @@ final class VariantStockHistoryResource extends Resource
 
     public static function form(Schema $form): Schema
     {
-        // Configure the Filament resource form schema using the v4 Schema API.
-        return $schema->schema([
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
+        return $form->schema([
             Section::make(__('admin.variant_stock_histories.sections.basic_info'))
                 ->description(__('admin.variant_stock_histories.sections.basic_info_description'))
                 ->schema([
@@ -136,7 +136,7 @@ final class VariantStockHistoryResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Configure the Filament table definition for the resource.
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('variant.name')

@@ -20,7 +20,7 @@ use Filament\Schemas\Schema;
 
 final class PartnerTierResource extends Resource
 {
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-star';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
 
     protected static string|UnitEnum|null $navigationGroup = 'Marketing';
 
@@ -35,8 +35,8 @@ final class PartnerTierResource extends Resource
 
     public static function form(Schema $form): Schema
     {
-        // Configure the Filament resource form schema using the v4 Schema API.
-        return $schema
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
+        return $form
             ->schema([
                 Forms\Components\Section::make(__('admin.partner_tiers.sections.basic_information'))
                     ->schema([
@@ -94,7 +94,7 @@ final class PartnerTierResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Configure the Filament table definition for the resource.
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
