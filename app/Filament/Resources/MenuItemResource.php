@@ -27,6 +27,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 /**
@@ -82,25 +83,12 @@ final class MenuItemResource extends Resource
                                     ->searchable(),
                                 Select::make('parent_id')
                                     ->label(__('admin.menu_items.parent'))
-                                    ->options(function (Get $get, ?MenuItem $record): array {
-                                        $menuId = $get('menu_id') ?? $record?->menu_id;
-
-                                        if (blank($menuId)) {
-                                            return [];
-                                        }
-
-                                        return MenuItem::withoutGlobalScopes()
-                                            ->where('menu_id', $menuId)
+                                    ->options(
+                                        static fn (): array => MenuItem::withoutGlobalScopes()
                                             ->whereNull('parent_id')
-                                            ->when(
-                                                $record?->exists,
-                                                fn (Builder $query): Builder => $query->whereKeyNot($record),
-                                            )
-                                            ->orderBy('label')
                                             ->pluck('label', 'id')
-                                            ->all();
-                                    })
-                                    ->reactive()
+                                            ->all()
+                                    )
                                     ->searchable()
                                     ->preload(),
                                 TextInput::make('label')
@@ -198,22 +186,12 @@ final class MenuItemResource extends Resource
                     ->searchable(),
                 SelectFilter::make('parent_id')
                     ->label(__('admin.menu_items.parent'))
-                    ->options(function (SelectFilter $filter): array {
-                        $menuFilterState = $filter->getLivewire()?->getTableFilterState('menu_id');
-                        $menuId = $menuFilterState['value'] ?? null;
-
-                        $query = MenuItem::withoutGlobalScopes()
-                            ->whereNull('parent_id');
-
-                        if (filled($menuId)) {
-                            $query->where('menu_id', $menuId);
-                        }
-
-                        return $query
-                            ->orderBy('label')
+                    ->options(
+                        static fn (): array => MenuItem::withoutGlobalScopes()
+                            ->whereNull('parent_id')
                             ->pluck('label', 'id')
-                            ->all();
-                    })
+                            ->all()
+                    )
                     ->searchable(),
                 TernaryFilter::make('is_visible')
                     ->label(__('admin.menu_items.is_visible')),
