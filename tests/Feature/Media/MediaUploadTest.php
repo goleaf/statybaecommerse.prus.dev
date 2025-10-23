@@ -7,7 +7,6 @@ namespace Tests\Feature\Media;
 use App\Jobs\GenerateMediaVariantsJob;
 use App\Models\Product;
 use App\Services\MediaService;
-use App\Support\Storage\SecureStorage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Queue;
@@ -20,8 +19,7 @@ final class MediaUploadTest extends TestCase
 
     public function test_upload_generates_variants(): void
     {
-        $disk = SecureStorage::disk();
-        Storage::fake($disk);
+        Storage::fake('public');
         Queue::fake();
 
         $product = Product::factory()->create();
@@ -46,8 +44,7 @@ final class MediaUploadTest extends TestCase
 
     public function test_delete_media_removes_original_and_variants(): void
     {
-        $disk = SecureStorage::disk();
-        Storage::fake($disk);
+        Storage::fake('public');
 
         $product = Product::factory()->create();
         $service = app(MediaService::class);
@@ -62,7 +59,7 @@ final class MediaUploadTest extends TestCase
         $service->deleteMedia($media);
 
         foreach ($paths as $path) {
-            $this->assertFalse(Storage::disk($disk)->exists($path));
+            $this->assertFalse(Storage::disk('public')->exists($path));
         }
     }
 }

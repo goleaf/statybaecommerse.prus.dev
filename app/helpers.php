@@ -40,6 +40,7 @@ if (! function_exists('app_setting')) {
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
 
 if (! function_exists('current_currency')) {
@@ -408,5 +409,81 @@ if (! function_exists('media_img')) {
             ->implode(' ');
 
         return new HtmlString('<img ' . $attrString . ' />');
+    }
+}
+
+
+if (! function_exists('media_img')) {
+    /**
+     * Render a responsive <img> tag for a Spatie media item.
+     *
+     * @param  array<string, mixed>  $attributes
+     */
+    function media_img(\Spatie\MediaLibrary\MediaCollections\Models\Media $media, array $attributes = []): HtmlString
+    {
+        $variants = $media->getCustomProperty('variants', []);
+        if ($variants === []) {
+            $configured = config('media.variants', []);
+            foreach ($configured as $name => $details) {
+                $url = $media->getUrl($name);
+                if (is_string($url) && $url !== $media->getUrl()) {
+                    $variants[$name] = [
+                        'url' => $url,
+                        'width' => $details['width'] ?? null,
+                    ];
+                }
+            }
+        }
+
+        $original = $media->getCustomProperty('original', []);
+        $src = Arr::get($variants, 'medium.url') ?? ($original['url'] ?? $media->getUrl());
+        $alt = $attributes['alt'] ?? $media->getCustomProperty('alt') ?? $media->name;
+        $loading = $attributes['loading'] ?? 'lazy';
+        $sizes = $attributes['sizes'] ?? '100vw';
+        $dir = \App\Support\Helpers\SharedHelpers::isRtlLocale() ? 'rtl' : 'ltr';
+
+        $srcset = collect($variants)
+            ->filter(fn ($variant) => isset($variant['url']))
+            ->map(function (array $variant) {
+                $descriptor = isset($variant['width']) ? $variant['width'].'w' : null;
+
+                return trim($variant['url'].' '.($descriptor ?? ''));
+            })
+            ->filter()
+            ->implode(', ');
+
+        $attributes = array_merge(
+            [
+                'src' => $src,
+                'alt' => $alt,
+                'loading' => $loading,
+                'decoding' => $attributes['decoding'] ?? 'async',
+                'sizes' => $sizes,
+                'dir' => $dir,
+            ],
+            Arr::except($attributes, ['alt', 'loading', 'sizes', 'decoding'])
+        );
+
+        if ($srcset !== '') {
+            $attributes['srcset'] = $srcset;
+        }
+
+        if (isset($original['width'], $original['height'])) {
+            $attributes['width'] = $attributes['width'] ?? $original['width'];
+            $attributes['height'] = $attributes['height'] ?? $original['height'];
+        }
+
+        $attrString = collect($attributes)
+            ->map(function ($value, $key) {
+                if ($value === null || $value === '') {
+                    return null;
+                }
+
+                return $key.'="'.e((string) $value).'"';
+            })
+            ->filter()
+            ->implode(' ');
+
+        return new HtmlString('<img '.$attrString.' />');
     }
 }
