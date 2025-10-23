@@ -22,32 +22,32 @@ final class CustomerGroupFactory extends Factory
      */
     public function definition(): array
     {
-        $attributes = [
-            'name' => $this->faker->words(2, true),
-            'code' => strtoupper($this->faker->bothify('??##')),
-            'description' => $this->faker->sentence(),
-            'slug' => $this->faker->slug(),
-            'discount_percentage' => $this->faker->randomFloat(2, 0, 50),
-            'is_enabled' => $this->faker->boolean(80),
-            'conditions' => [],
+        return [
+            'name'                 => $this->faker->words(2, true),
+            'code'                 => strtoupper($this->faker->bothify('??##')),
+            'color'                => $this->faker->hexColor(),
+            'icon'                 => $this->faker->randomElement(['users', 'star', 'crown', 'sparkles']),
+            'description'          => $this->faker->sentence(),
+            'slug'                 => $this->faker->slug(),
+            'discount_percentage'  => $this->faker->randomFloat(2, 0, 50),
+            'discount_fixed'       => $this->faker->randomFloat(2, 0, 200),
+            'minimum_order_amount' => $this->faker->randomFloat(2, 0, 5000),
+            'credit_limit'         => $this->faker->randomFloat(2, 0, 20000),
+            'payment_terms'        => $this->faker->randomElement(['due_on_receipt', 'net_15', 'net_30', 'net_45', 'net_60']),
+            'has_special_pricing'  => $this->faker->boolean(30),
+            'has_volume_discounts' => $this->faker->boolean(40),
+            'can_view_prices'      => $this->faker->boolean(80),
+            'can_place_orders'     => $this->faker->boolean(90),
+            'can_view_catalog'     => $this->faker->boolean(85),
+            'can_use_coupons'      => $this->faker->boolean(70),
+            'is_active'            => $this->faker->boolean(90),
+            'is_default'           => false,
+            'sort_order'           => $this->faker->numberBetween(1, 100),
+            'type'                 => $this->faker->randomElement(['regular', 'vip', 'corporate', 'retail', 'wholesale']),
+            'is_enabled'           => $this->faker->boolean(80),
+            'metadata'             => [],
+            'conditions'           => [],
         ];
-
-        // Only include the JSON metadata payload when the backing table exposes the column to
-        // avoid SQLite errors in minimal migration scenarios used during isolated unit tests.
-        if (Schema::hasColumn('customer_groups', 'metadata')) {
-            $attributes['metadata'] = [
-                'type' => $this->faker->randomElement(['regular', 'vip', 'corporate', 'retail']),
-                'has_special_pricing' => $this->faker->boolean(30),
-                'has_volume_discounts' => $this->faker->boolean(40),
-                'can_view_prices' => $this->faker->boolean(80),
-                'can_place_orders' => $this->faker->boolean(90),
-                'can_view_catalog' => $this->faker->boolean(85),
-                'can_use_coupons' => $this->faker->boolean(70),
-                'sort_order' => $this->faker->numberBetween(1, 100),
-            ];
-        }
-
-        return $attributes;
     }
 
     /**
@@ -56,7 +56,7 @@ final class CustomerGroupFactory extends Factory
     public function active(): static
     {
         return $this->state(fn (array $attributes) => [
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
     }
@@ -67,7 +67,7 @@ final class CustomerGroupFactory extends Factory
     public function inactive(): static
     {
         return $this->state(fn (array $attributes) => [
-            'is_active' => false,
+            'is_active'  => false,
             'is_enabled' => false,
         ]);
     }
@@ -79,7 +79,7 @@ final class CustomerGroupFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'is_default' => true,
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
     }
