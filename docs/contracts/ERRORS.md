@@ -1,57 +1,84 @@
-# API Error Contract
+# API Error Responses
 
-All API exceptions are normalized into [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807) "problem details" envelopes by `App\Support\ApiErrorResponse`. The helper ensures every failure response includes a stable error code, a correlation identifier for observability, and structured details that clients can automate against.
+All JSON API errors now follow the [RFC 7807](https://www.rfc-editor.org/rfc/rfc7807) "problem details" format with additional
+metadata so clients can correlate failures and act on structured context. Responses include the header declared by
+`config('app.correlation_header')` (defaults to `X-Correlation-ID`) and are encoded with the
+`application/problem+json` content type.【F:app/Support/ApiErrorResponse.php†L19-L77】【F:bootstrap/app.php†L66-L231】
 
-## Envelope shape
+## Envelope
+
+Every problem payload exposes the following members:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `type` | string | Absolute URI identifying the machine-readable error code. Built from `https://prus.dev/problems/{errorCode}` by default. |
+| `title` | string | Stable, English summary derived from the shared error catalogue (`App\Support\ErrorCodes`). |
+| `status` | integer | HTTP status code attached to the response. |
+| `detail` | string | Localised human-readable explanation of the failure. |
+| `instance` | string | Full URL for the request that triggered the error. |
+| `error.code` | string | Machine-readable error identifier. |
+| `error.context` | object | Optional context describing the failure (domain-specific payload, validation violations, headers, etc.). |
+| `correlation.trace_id` | string | The request correlation identifier (also emitted in the response header). |
+| `correlation.correlation_id` | string | Alias of `trace_id` for compatibility with existing logging. |
+| `meta.locale` | string | Locale selected for translations. |
+| `meta.timestamp` | string | ISO-8601 timestamp when the response was generated. |
+
+Example payload:
 
 ```json
 {
-  "type": "tag:statybaecommerse.prus.dev,2024:error:error.validation",
-  "title": "Validation failed",
+  "type": "https://prus.dev/problems/error.validation",
+  "title": "Provided data failed validation checks.",
   "status": 422,
-  "detail": "The submitted data was invalid.",
-  "instance": "https://example.test/api/example",
-  "correlation_id": "d3f1a5ab-8e90-4f2b-bcb4-2d8bfcf16dd2",
+  "detail": "The given data was invalid.",
+  "instance": "https://api.prus.dev/api/v1/autocomplete-search",
   "error": {
     "code": "error.validation",
-    "locale": "en",
     "context": {
-      "email": ["The email field is required."]
+      "violations": [
+        {
+          "field": "model_class",
+          "reason": "The model class field is required.",
+          "messages": [
+            "The model class field is required."
+          ]
+        }
+      ]
     }
   },
+  "correlation": {
+    "trace_id": "d7c8b9f0-9ad3-4d18-936d-1e4e01bf49d3",
+    "correlation_id": "d7c8b9f0-9ad3-4d18-936d-1e4e01bf49d3"
+  },
   "meta": {
-    "timestamp": "2024-04-16T08:00:00Z"
+    "locale": "en",
+    "timestamp": "2024-04-22T10:35:17+00:00"
   }
 }
 ```
 
-### Field reference
+## Shared Error Codes
 
-| Field | Required | Description |
-| --- | --- | --- |
-| `type` | ✅ | Stable URI constructed as `tag:statybaecommerse.prus.dev,2024:error:{code}` to aid documentation cross-links. |
-| `title` | ✅ | Localised, human-friendly summary of the error. For domain exceptions it maps to the translated message. |
-| `status` | ✅ | HTTP status code mirrored in the response status line. |
-| `detail` | ✅ | Additional information suitable for end users; equals `title` for domain errors and is context-specific for framework exceptions. |
-| `instance` | ✅ | Fully-qualified URL of the request that triggered the problem. |
-| `correlation_id` | ✅ | UUID applied to the request/response lifecycle and echoed via the `X-Correlation-ID` header. |
-| `error.code` | ✅ | Machine-readable identifier sourced from `App\Support\ErrorCodes`. |
-| `error.locale` | ⚠️ | Present when localisation is available (domain exceptions). |
-| `error.context` | ⚠️ | Structured payload carrying validation errors or domain-specific placeholders. |
-| `meta.timestamp` | ✅ | ISO-8601 timestamp indicating when the response was generated. |
+The following baseline codes are enforced across APIs. Feature tests cover these values to guarantee they remain stable for
+integrators.【F:app/Support/ErrorCodes.php†L15-L79】【F:tests/Feature/Api/ExceptionHandlingTest.php†L18-L102】
 
-The correlation identifier is also returned in the `X-Correlation-ID` header. When domain translations are involved, the response includes `Content-Language` with the resolved locale so HTTP caches remain coherent.
-
-## Standard codes
-
-The helper maps common framework exceptions onto the shared error codes registered in [`App\Support\ErrorCodes`](ERROR_CODES.md):
-
-| Exception | HTTP | Error code | Notes |
+| Code | Status | Title | Typical Scenario |
 | --- | --- | --- | --- |
-| `Illuminate\Validation\ValidationException` | 422 | `error.validation` | `error.context` contains the validator message bag. |
-| `Illuminate\Auth\AuthenticationException` | 401 | `error.unauthorized` | Title and detail explain that authentication is required. |
-| `Illuminate\Auth\Access\AuthorizationException` | 403 | `error.forbidden` | Signals missing permissions. |
-| `Symfony\Component\HttpKernel\Exception\NotFoundHttpException` | 404 | `error.not_found` | Used for missing routes and resources. |
-| Any other `Throwable` | 500 | `error.server` | Fallback for uncaught exceptions. |
+| `error.validation` | 422 | Provided data failed validation checks. | Request payload fails Laravel validation; includes `error.context.violations`. |
+| `error.unauthorized` | 401 | Request lacks valid authentication credentials. | Missing/expired tokens, failed authentication guards. |
+| `error.forbidden` | 403 | Authenticated request lacks permission. | Ability/authorization gate denies access. |
+| `error.not_found` | 404 | Resource requested by the client could not be located. | `abort(404)` and other not-found HTTP exceptions. |
+| `error.server` | 500 | Unexpected server exception occurred while handling the request. | Unhandled runtime exceptions bubbled to the renderer. |
 
-Domain-level failures (`App\Exceptions\Domain\DomainException`) retain their specific error codes and translation contexts, while still adopting the same RFC 7807 envelope.
+Domain-specific exceptions (for example `orders.not_found` or `inventory.insufficient`) continue to populate
+`error.context` with relevant fields; the `detail` string remains localised based on the `Accept-Language` header or the
+fallback locale.【F:tests/Feature/DomainExceptionResponseTest.php†L29-L104】
+
+## Correlation & Logging
+
+When rendering API problems the exception handler pushes the trace identifier, request path, HTTP method and detected locale
+into the logging context before writing structured log entries. This ensures the `trace_id` found in the response correlates to
+log entries captured in Horizon, CloudWatch and other sinks.【F:bootstrap/app.php†L88-L231】
+
+Clients **must** propagate the `correlation_id` header value when retrying or escalating incidents. Doing so lets support teams
+join requests to server-side traces without additional metadata.
