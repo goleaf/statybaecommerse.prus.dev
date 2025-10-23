@@ -36,6 +36,7 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Hash;
 use UnitEnum;
 
 /**
@@ -151,8 +152,8 @@ final class UserResource extends Resource implements DefinesExportColumns
                             ->password()
                             ->required(fn (string $context): bool => $context === 'create')
                             ->minLength(8)
-                            ->dehydrated(fn ($state) => filled($state))
-                            ->dehydrateStateUsing(fn ($state) => bcrypt($state)),
+                            ->dehydrated(fn (?string $state): bool => filled($state))
+                            ->dehydrateStateUsing(fn (string $state): string => Hash::make($state)),
                         Select::make('locale')
                             ->label(__('users.fields.locale'))
                             ->options([
