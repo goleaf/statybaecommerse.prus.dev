@@ -73,17 +73,7 @@ return [
         'description' => 'Description',
         'button_text' => 'Button Text',
     ],
-    'prices' => [
-        'navigation_label' => 'Prices',
-        'plural_model_label' => 'Prices',
-        'model_label' => 'Price',
-        'basic_information' => 'Basic Information',
-        'product' => 'Product',
-        'amount' => 'Amount',
-        'audit_section' => 'Change justification',
-        'audit_reason' => 'Reason for change',
-        'audit_reason_help' => 'Explain why this price needs to be updated.',
-    ],
+    'menu_items' => require __DIR__ . '/admin/menu_items.php',
     'variant_combinations' => [
         'navigation_label' => 'Variant Combinations',
         'plural_model_label' => 'Variant Combinations',

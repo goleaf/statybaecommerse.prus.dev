@@ -73,17 +73,7 @@ return [
         'description' => 'Aprašymas',
         'button_text' => 'Mygtuko tekstas',
     ],
-    'prices' => [
-        'navigation_label' => 'Kainos',
-        'plural_model_label' => 'Kainos',
-        'model_label' => 'Kaina',
-        'basic_information' => 'Pagrindinė informacija',
-        'product' => 'Produktas',
-        'amount' => 'Suma',
-        'audit_section' => 'Pakeitimo pagrindimas',
-        'audit_reason' => 'Pakeitimo priežastis',
-        'audit_reason_help' => 'Paaiškinkite, kodėl ši kaina turi būti atnaujinta.',
-    ],
+    'menu_items' => require __DIR__ . '/admin/menu_items.php',
     'variant_combinations' => [
         'navigation_label' => 'Variantų kombinacijos',
         'plural_model_label' => 'Variantų kombinacijos',

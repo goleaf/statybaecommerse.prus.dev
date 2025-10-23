@@ -116,16 +116,4 @@ return [
         'danger' => 'Опасность',
     ],
     'menu_items' => require __DIR__ . '/admin/menu_items.php',
-    'product_history' => require __DIR__ . '/admin/product_history.php',
-    'common' => [
-        'id' => 'ID',
-        'created_at' => 'Создано',
-        'updated_at' => 'Обновлено',
-        'view' => 'Просмотр',
-        'edit' => 'Редактировать',
-        'delete_selected' => 'Удалить выбранные',
-        'none' => 'Нет значения',
-        'yes' => 'Да',
-        'no' => 'Нет',
-    ],
 ];
