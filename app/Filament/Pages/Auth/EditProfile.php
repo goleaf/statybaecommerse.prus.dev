@@ -13,8 +13,6 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 
 class EditProfile extends BaseEditProfile
 {

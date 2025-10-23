@@ -5,11 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Models\Slider;
-use App\Support\Filament\Components\Flatpickr;
-use App\Support\Filament\SearchableInputHelper;
-use App\Support\Search\ContentLinkSearch;
 use BackedEnum;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -39,9 +35,9 @@ class SliderManagement extends Page implements HasActions, HasForms
     use InteractsWithActions, InteractsWithForms;
 
     /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     * @var string|BackedEnum|null
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationLabel = 'Slider Management';
 
@@ -51,10 +47,7 @@ class SliderManagement extends Page implements HasActions, HasForms
 
     protected static ?int $navigationSort = 1;
 
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Content';
-    }
+    protected static ?string $navigationGroup = 'Content';
 
     public Collection $sliders;
 

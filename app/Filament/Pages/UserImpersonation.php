@@ -13,7 +13,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
-use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
 
 final class UserImpersonation extends Page implements HasTable
 {
@@ -21,12 +20,12 @@ final class UserImpersonation extends Page implements HasTable
     use HasToggleableTable;
     use InteractsWithTable;
 
-    public static string|\BackedEnum|null $navigationIcon = 'heroicon-o-user';
+    /**
+     * @var string|BackedEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-user';
 
-    public static function getNavigationGroup(): ?string
-    {
-        return 'System';
-    }
+    protected static ?string $navigationGroup = 'System';
 
     protected static ?string $title = 'User Impersonation';
 

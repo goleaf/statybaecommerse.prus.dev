@@ -8,21 +8,23 @@ use App\Services\Shared\ComponentPerformanceService;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Filament\Schemas\Components\Section;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Throwable;
-use UnitEnum;
 
 final class CacheMaintenance extends Page
 {
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-server-stack';
+    /**
+     * @var string|BackedEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-server-stack';
 
-    protected static UnitEnum|string|null $navigationGroup = 'System';
+    protected static ?string $navigationGroup = 'System';
 
     protected static ?string $title = 'Cache Maintenance';
 
@@ -141,7 +143,7 @@ final class CacheMaintenance extends Page
                     } catch (Throwable $exception) {
                         Notification::make()
                             ->title('Tagged cache unavailable')
-                            ->body('The current cache driver does not support tag operations. '.$exception->getMessage())
+                            ->body('The current cache driver does not support tag operations. ' . $exception->getMessage())
                             ->danger()
                             ->send();
 
@@ -150,7 +152,7 @@ final class CacheMaintenance extends Page
 
                     Notification::make()
                         ->title('Tagged cache flushed')
-                        ->body('The following tags were cleared: '.implode(', ', $tags))
+                        ->body('The following tags were cleared: ' . implode(', ', $tags))
                         ->success()
                         ->send();
                     $this->refreshCacheMetrics();
@@ -183,17 +185,17 @@ final class CacheMaintenance extends Page
 
         if (Route::has('filament.admin.resources.documents.index')) {
             $links[] = [
-                'label' => 'CachePolicy Overview',
+                'label'       => 'CachePolicy Overview',
                 'description' => 'Review the CachePolicy documentation before running destructive cache operations.',
-                'url' => route('filament.admin.resources.documents.index'),
+                'url'         => route('filament.admin.resources.documents.index'),
             ];
         }
 
         if (Route::has('filament.admin.resources.documents.index')) {
             $links[] = [
-                'label' => 'CachePolicy Checklist',
+                'label'       => 'CachePolicy Checklist',
                 'description' => 'Search for "CachePolicy" within the Documents module for step-by-step guidance.',
-                'url' => route('filament.admin.resources.documents.index', [
+                'url'         => route('filament.admin.resources.documents.index', [
                     'tableSearch' => 'CachePolicy',
                 ]),
             ];
