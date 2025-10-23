@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CategoryResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
@@ -11,7 +12,7 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Forms\Form;
 use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
@@ -100,7 +101,7 @@ final class TranslationsRelationManager extends BaseRelationManager
                 TextColumn::make('description')
                     ->label(__('translations.description'))
                     ->limit(50)
-                    ->tooltip(function (TextColumn $column): ?string {
+                    ->tooltip(static function (TextColumn $column): ?string {
                         $state = $column->getState();
 
                         return strlen($state) > 50 ? $state : null;
@@ -109,7 +110,7 @@ final class TranslationsRelationManager extends BaseRelationManager
                 TextColumn::make('short_description')
                     ->label(__('translations.short_description'))
                     ->limit(30)
-                    ->tooltip(function (TextColumn $column): ?string {
+                    ->tooltip(static function (TextColumn $column): ?string {
                         $state = $column->getState();
 
                         return strlen($state) > 30 ? $state : null;
@@ -118,7 +119,7 @@ final class TranslationsRelationManager extends BaseRelationManager
                 TextColumn::make('seo_title')
                     ->label(__('translations.seo_title'))
                     ->limit(30)
-                    ->tooltip(function (TextColumn $column): ?string {
+                    ->tooltip(static function (TextColumn $column): ?string {
                         $state = $column->getState();
 
                         return strlen($state) > 30 ? $state : null;
@@ -149,7 +150,8 @@ final class TranslationsRelationManager extends BaseRelationManager
                     ->icon('heroicon-m-pencil-square')
                     ->modalHeading('Edit category translations')
                     ->modalWidth('5xl')
-                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                    // Provide an inline translation editor for category locales without leaving the relation manager.
+                    ->configureRepeater(static function (Repeater $repeater): Repeater {
                         return $repeater
                             ->collapsible()
                             ->defaultItems(0)

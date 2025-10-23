@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\UserResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -13,7 +14,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Forms\Form;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -108,7 +109,8 @@ class AddressesRelationManager extends BaseRelationManager
                     ->icon('heroicon-m-pencil-square')
                     ->modalHeading('Edit customer addresses')
                     ->modalWidth('5xl')
-                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                    // Facilitate bulk address maintenance for a user via a concise repeater-driven modal.
+                    ->configureRepeater(static function (Repeater $repeater): Repeater {
                         return $repeater
                             ->collapsible()
                             ->defaultItems(0)

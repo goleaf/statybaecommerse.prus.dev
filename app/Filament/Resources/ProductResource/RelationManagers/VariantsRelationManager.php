@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\ProductVariant;
 use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Forms\Components\Repeater;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Forms\Form;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -121,7 +122,8 @@ final class VariantsRelationManager extends BaseRelationManager
                     ->icon('heroicon-m-pencil-square')
                     ->modalHeading('Edit product variants')
                     ->modalWidth('5xl')
-                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                    // Streamline variant updates by exposing key inventory fields in a repeater modal.
+                    ->configureRepeater(static function (Repeater $repeater): Repeater {
                         return $repeater
                             ->collapsible()
                             ->cloneable()
