@@ -15,7 +15,7 @@ use Illuminate\Support\Carbon;
 final class EnhancedEcommerceOverview extends StatsOverviewWidget
 {
     /**
-     * @var string|\BackedEnum|null Navigation icon override for Filament menus.
+     * @var string|\BackedEnum|null Navigation icon override documented for consistency.
      */
     protected static $navigationIcon = 'heroicon-o-presentation-chart-line';
 
@@ -25,7 +25,7 @@ final class EnhancedEcommerceOverview extends StatsOverviewWidget
     protected static $navigationLabel = 'Enh. E-commerce Overview';
 
     /**
-     * @var string|null Dashboard group keeps analytics widgets together.
+     * @var string|\BackedEnum|null Keep dashboard grouping flexible for enums and raw strings.
      */
     protected static $navigationGroup = 'Dashboard';
 
