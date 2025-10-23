@@ -29,9 +29,9 @@ final class EnhancedFilamentSeeder extends Seeder
 
     private function createAdminUser(): void
     {
-        $adminRole = Role::query()->firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+        $adminRole = Role::query()->firstOrCreate(['name' => AuthorizationRole::ADMIN->value, 'guard_name' => 'web']);
 
-        $permissions = AuthorizationMatrix::permissionsForRole('admin');
+        $permissions = AuthorizationMatrix::permissionsForRole(AuthorizationRole::ADMIN);
 
         collect($permissions)->each(
             fn (string $permission) => Permission::query()->firstOrCreate([

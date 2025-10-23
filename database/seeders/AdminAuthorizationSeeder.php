@@ -18,7 +18,6 @@ final class AdminAuthorizationSeeder extends Seeder
         $registrar = app(PermissionRegistrar::class);
 
         foreach (AuthorizationMatrix::guardNames() as $guard) {
-            $registrar->setDefaultGuardName($guard);
             $registrar->forgetCachedPermissions();
 
             $allPermissions = AuthorizationMatrix::allPermissions();
@@ -30,9 +29,9 @@ final class AdminAuthorizationSeeder extends Seeder
                 ]);
             }
 
-            foreach (AuthorizationMatrix::roles() as $role => $matrixPermissions) {
+            foreach (AuthorizationMatrix::roles() as ['role' => $role]) {
                 $roleModel = Role::firstOrCreate([
-                    'name' => $role,
+                    'name' => $role->value,
                     'guard_name' => $guard,
                 ]);
 
