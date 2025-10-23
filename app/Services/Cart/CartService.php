@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace App\Services\Cart;
 
 use App\Models\CartItem;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\Session\Session as SessionStore;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Session;
 use Throwable;
 
 final class CartService
@@ -24,7 +23,8 @@ final class CartService
     public function clear(?int $userId, string $sessionId, ?string $fallbackSessionId = null): void
     {
         if ($fallbackSessionId === null) {
-            $storedSessionId = Session::get('cart_session_id');
+            // Use the injected session store so tests relying on in-memory sessions remain in sync with production behaviour.
+            $storedSessionId = $this->session->get('cart_session_id');
             $fallbackSessionId = is_string($storedSessionId) ? $storedSessionId : null;
         }
 
@@ -37,8 +37,8 @@ final class CartService
 
         if (function_exists('debug_cart')) {
             debug_cart('clear', [
-                'session_id' => $sessionId,
-                'user_id' => $userId,
+                'session_id'  => $sessionId,
+                'user_id'     => $userId,
                 'session_ids' => $sessionIds,
             ]);
         }
@@ -49,7 +49,8 @@ final class CartService
      */
     public function getSummary(?int $userId, string $sessionId): array
     {
-        Session::put('cart_session_id', $sessionId);
+        // Persist the session identifier on the injected store to avoid depending on the static facade in tests.
+        $this->session->put('cart_session_id', $sessionId);
 
         if ($userId !== null) {
             // Prioritise persisted records for authenticated customers so stale session
@@ -125,7 +126,7 @@ final class CartService
      * Iterating through all normalized session identifiers avoids a conflict where
      * the fallback guest session retains items after a merge into an authenticated session.
      *
-     * @param  array<int, string>  $sessionIds
+     * @param array<int, string> $sessionIds
      */
     private function clearCartSessions(array $sessionIds): void
     {
@@ -149,7 +150,7 @@ final class CartService
     }
 
     /**
-     * @param  array<int, string>  $sessionIds
+     * @param array<int, string> $sessionIds
      */
     private function clearCartStorage(?int $userId, array $sessionIds): void
     {
@@ -178,11 +179,12 @@ final class CartService
 
     private function clearSessionPayload(): void
     {
-        Session::forget(['cart', 'cart_discount', 'cart_session_id']);
+        // Forget all cart-related keys on the injected session store to ensure parity across runtime contexts.
+        $this->session->forget(['cart', 'cart_discount', 'cart_session_id']);
     }
 
     /**
-     * @param  array<int, string>  $sessionIds
+     * @param array<int, string> $sessionIds
      */
     private function forgetCachedSummary(?int $userId, array $sessionIds): void
     {
@@ -239,13 +241,13 @@ final class CartService
                 }
 
                 $items[] = [
-                    'id' => $this->extractNullableInt($item->id ?? null),
+                    'id'         => $this->extractNullableInt($item->id ?? null),
                     'product_id' => $productId,
-                    'name' => is_string($item->name ?? null) ? (string) $item->name : '',
-                    'price' => round($price, 2),
-                    'quantity' => $quantity,
-                    'total' => round($total, 2),
-                    'image' => $image,
+                    'name'       => is_string($item->name ?? null) ? (string) $item->name : '',
+                    'price'      => round($price, 2),
+                    'quantity'   => $quantity,
+                    'total'      => round($total, 2),
+                    'image'      => $image,
                     'attributes' => $this->normalizeAttributes($item->attributes ?? []),
                 ];
 
@@ -266,7 +268,8 @@ final class CartService
      */
     private function buildSummaryFromSession(): array
     {
-        $cart = Session::get('cart', []);
+        // Pull the raw cart payload directly from the injected session implementation for better testability.
+        $cart = $this->session->get('cart', []);
         $items = [];
         $subtotal = 0.0;
         $count = 0;
@@ -285,13 +288,13 @@ final class CartService
             $total = $quantity * $price;
 
             $items[] = [
-                'id' => $this->extractNullableInt($item['id'] ?? null),
+                'id'         => $this->extractNullableInt($item['id'] ?? null),
                 'product_id' => $this->extractNullableInt($item['product_id'] ?? null),
-                'name' => isset($item['name']) && is_string($item['name']) ? $item['name'] : '',
-                'price' => round($price, 2),
-                'quantity' => $quantity,
-                'total' => round($total, 2),
-                'image' => isset($item['image']) && is_string($item['image']) ? $item['image'] : null,
+                'name'       => isset($item['name']) && is_string($item['name']) ? $item['name'] : '',
+                'price'      => round($price, 2),
+                'quantity'   => $quantity,
+                'total'      => round($total, 2),
+                'image'      => isset($item['image']) && is_string($item['image']) ? $item['image'] : null,
                 'attributes' => $this->normalizeAttributes($item['attributes'] ?? []),
             ];
 
@@ -338,13 +341,13 @@ final class CartService
             $attributes = $this->normalizeAttributes($attributesSource);
 
             $items[] = [
-                'id' => $this->extractNullableInt($item->getKey()),
+                'id'         => $this->extractNullableInt($item->getKey()),
                 'product_id' => $this->extractNullableInt($item->product_id),
-                'name' => $name,
-                'price' => round($price, 2),
-                'quantity' => $quantity,
-                'total' => round($total, 2),
-                'image' => $image,
+                'name'       => $name,
+                'price'      => round($price, 2),
+                'quantity'   => $quantity,
+                'total'      => round($total, 2),
+                'image'      => $image,
                 'attributes' => $attributes,
             ];
 
@@ -356,12 +359,13 @@ final class CartService
     }
 
     /**
-     * @param  array<int, array{id:int|null, product_id:int|null, name:string, price:float, quantity:int, total:float, image:?string, attributes: array<string, mixed>}>  $items
+     * @param  array<int, array{id:int|null, product_id:int|null, name:string, price:float, quantity:int, total:float, image:?string, attributes: array<string, mixed>}>                                                                                                  $items
      * @return array{items: array<int, array{id:int|null, product_id:int|null, name:string, price:float, quantity:int, total:float, image:?string, attributes: array<string, mixed>}>, count:int, subtotal:float, tax:float, shipping:float, discount:float, total:float}
      */
     private function finalizeSummary(array $items, int $count, float $subtotal): array
     {
-        $discountRaw = Session::get('cart_discount', 0.0);
+        // Resolve the discount from the same session store we mutate elsewhere to maintain consistent state.
+        $discountRaw = $this->session->get('cart_discount', 0.0);
         $discount = is_numeric($discountRaw) ? (float) $discountRaw : 0.0;
         $taxRateRaw = config('shared.tax.default_rate', 0.21);
         $taxRate = is_numeric($taxRateRaw) ? (float) $taxRateRaw : 0.21;
@@ -377,13 +381,13 @@ final class CartService
         $total = $subtotal - $discount + $tax + $shipping;
 
         return [
-            'items' => $items,
-            'count' => $count,
+            'items'    => $items,
+            'count'    => $count,
             'subtotal' => round($subtotal, 2),
-            'tax' => round($tax, 2),
+            'tax'      => round($tax, 2),
             'shipping' => round($shipping, 2),
             'discount' => round($discount, 2),
-            'total' => round($total, 2),
+            'total'    => round($total, 2),
         ];
     }
 
@@ -409,7 +413,7 @@ final class CartService
 
     private function summaryCacheKey(?int $userId, string $sessionId): string
     {
-        return 'cart.summary.'.md5($sessionId.'|'.($userId ?? 'guest'));
+        return 'cart.summary.' . md5($sessionId . '|' . ($userId ?? 'guest'));
     }
 
     private function extractNullableInt(mixed $value): ?int
