@@ -19,8 +19,6 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Get;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -31,7 +29,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
+use LaraZeus\Quantity\Components\Quantity;
 
 /**
  * OrderItemsRelationManager
@@ -82,21 +80,18 @@ final class OrderItemsRelationManager extends BaseRelationManager
                                                 $set('sku', $variant->sku ?? ($variant->product->sku ?? ''));
                                             }
                                         }
-
-                                        ProductVariantFieldHelper::handleVariantSelection($state, $set, $get);
-                                    }),
-                                TextInput::make('quantity')
-                                    ->label(__('orders.fields.quantity'))
-                                    ->numeric()
-                                    ->required()
-                                    ->default(1)
+                                    })
+                                    ->prefixIcon('heroicon-o-cube'),
+                                Quantity::make('quantity')
+                                    ->label(__('orders.quantity'))
                                     ->minValue(1)
-                                    ->reactive()
-                                    ->afterStateUpdated(function ($state, callable $set, callable $get): void {
+                                    ->steps(1)
+                                    ->default(1)
+                                    ->live()
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                         $unitPrice = $get('unit_price') ?? 0;
                                         $set('total', $unitPrice * $state);
-                                    })
-                                    ->prefixIcon('heroicon-o-hashtag'),
+                                    }),
                             ]),
                         Grid::make(3)
                             ->schema([
