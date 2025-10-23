@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Scopes\ActiveScope;
-use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -23,7 +22,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @mixin \Eloquent
  */
-#[ScopedBy([ActiveScope::class])]
 final class CampaignSchedule extends Model
 {
     use HasFactory;
@@ -35,7 +33,23 @@ final class CampaignSchedule extends Model
      */
     protected function casts(): array
     {
-        return ['schedule_config' => 'array', 'next_run_at' => 'datetime', 'last_run_at' => 'datetime', 'is_active' => 'boolean'];
+        return [
+            'schedule_config' => 'array',
+            'next_run_at' => 'datetime',
+            'last_run_at' => 'datetime',
+            'is_active' => 'boolean',
+        ];
+    }
+
+    /**
+     * Provide a reusable scope for callers that specifically need only active schedules.
+     *
+     * We avoid applying the active scope globally so Filament can manage inactive
+     * schedules in the admin UI without silently excluding them from queries.
+     */
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('is_active', true);
     }
 
     /**
