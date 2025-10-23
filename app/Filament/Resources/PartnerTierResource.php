@@ -14,16 +14,20 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Number;
-use UnitEnum;
 
 final class PartnerTierResource extends Resource
 {
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-star';
-
-    protected static UnitEnum|string|null $navigationGroup = 'Marketing';
+    /**
+     * Navigation icon identifier displayed in the Filament sidebar (string or BackedEnum).
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
 
     protected static ?string $model = PartnerTier::class;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Marketing';
+    }
 
     protected static ?int $navigationSort = 2;
 

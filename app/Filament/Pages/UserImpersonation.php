@@ -28,10 +28,7 @@ final class UserImpersonation extends Page implements HasTable
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'System';
-    }
+    protected static string|UnitEnum|null $navigationGroup = 'System';
 
     protected static ?string $title = 'User Impersonation';
 

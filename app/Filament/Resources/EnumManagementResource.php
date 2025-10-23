@@ -51,6 +51,9 @@ final class EnumManagementResource extends Resource
 {
     protected static ?string $model = EnumValue::class;
 
+    /**
+     * Navigation icon identifier displayed in the Filament sidebar (string or BackedEnum).
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
 
     protected static ?int $navigationSort = 2;
