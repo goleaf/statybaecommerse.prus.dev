@@ -18,7 +18,7 @@ use UnitEnum;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Throwable;
-use UnitEnum;
+
 final class RecommendationSystemManagement extends Page
 {
     protected static ?string $title = 'Recommendation System Management';
@@ -27,9 +27,6 @@ final class RecommendationSystemManagement extends Page
 
     protected static ?string $slug = 'recommendation-system-management';
 
-    /**
-     * @return string|UnitEnum|null
-     */
     public static function getNavigationGroup(): ?string
     {
         return 'Analytics';
@@ -37,9 +34,6 @@ final class RecommendationSystemManagement extends Page
 
     protected static ?int $navigationSort = 40;
 
-    /**
-     * @var string|\BackedEnum|null
-     */
     protected static ?string $navigationIcon = 'heroicon-o-sparkles';
 
     protected string $view = 'filament.pages.recommendation-system-management';

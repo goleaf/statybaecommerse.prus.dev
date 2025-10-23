@@ -28,7 +28,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
-use UnitEnum;
 
 /**
  * NotificationTemplateResource
@@ -45,7 +44,7 @@ final class NotificationTemplateResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Content;
+    protected static ?string $navigationGroup = NavigationGroup::Content->value;
 
     public static function getNavigationLabel(): string
     {
@@ -75,12 +74,16 @@ final class NotificationTemplateResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->live(onBlur: true)
-                                    ->afterStateUpdated(function (string $operation, ?string $state, callable $set): void {
-                                        if ($operation !== 'create' || $state === null || $state === '') {
+                                    ->afterStateUpdated(function (string $operation, mixed $state, callable $set): void {
+                                        if ($operation !== 'create' || ! is_string($state)) {
                                             return;
                                         }
 
-                                        $set('slug', Str::slug($state));
+                                        $slug = Str::slug($state);
+
+                                        if ($slug !== '') {
+                                            $set('slug', $slug);
+                                        }
                                     }),
                                 TextInput::make('slug')
                                     ->label(__('admin.notification_templates.slug'))
@@ -173,11 +176,7 @@ final class NotificationTemplateResource extends Resource
                             return null;
                         }
 
-                        if (! is_string($state)) {
-                            return null;
-                        }
-
-                        return Str::length($state) > 50 ? $state : null;
+                        return mb_strlen($state) > 50 ? $state : null;
                     }),
                 IconColumn::make('is_active')
                     ->label(__('admin.notification_templates.is_active'))
