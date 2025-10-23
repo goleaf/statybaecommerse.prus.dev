@@ -7,8 +7,10 @@ namespace App\Models;
 use App\Contracts\TranslatableRecord;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
+use App\Observers\BrandObserver;
 use App\Traits\HasTranslations;
 use DB;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -48,6 +50,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  *
  * @mixin \Eloquent
  */
+// Attach the cache-aware observer so brand changes invalidate storefront data.
+#[ObservedBy([BrandObserver::class])]
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
 final class Brand extends Model implements HasMedia, TranslatableRecord
 {

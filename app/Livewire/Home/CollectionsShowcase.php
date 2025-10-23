@@ -12,18 +12,20 @@ use Filament\Infolists\Components\ViewEntry;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
+use Illuminate\Cache\TaggableStore;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Cache\TaggableStore;
 use Illuminate\Support\Facades\Cache;
-use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 final class CollectionsShowcase extends Component implements HasSchemas
 {
     use InteractsWithSchemas;
 
-    #[Computed]
+    /**
+     * Resolve curated collections for the storefront grid while respecting the
+     * underlying cache invalidation hooks for locale-aware payloads.
+     */
     public function collections(): EloquentCollection
     {
         $locale = app()->getLocale();
@@ -49,6 +51,15 @@ final class CollectionsShowcase extends Component implements HasSchemas
         }
 
         return Cache::remember(CacheKeys::homeCollections($locale), CacheKeys::TTL_FIVE_MINUTES, $callback);
+    }
+
+    /**
+     * Allow Livewire's property-style access (`$this->collections`) to reuse the
+     * method above so tests and templates consistently hit the caching layer.
+     */
+    public function getCollectionsProperty(): EloquentCollection
+    {
+        return $this->collections();
     }
 
     public function collectionsSchema(Schema $schema): Schema
