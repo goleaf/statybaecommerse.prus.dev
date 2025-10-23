@@ -53,7 +53,7 @@ trait HasWidgetTabs
         $this->activeWidgetTab = $this->getDefaultActiveWidgetTab();
     }
 
-    public function getDefaultActiveWidgetTab(): string|int|null
+    public function getDefaultActiveWidgetTab(): string | int | null
     {
         return array_key_first($this->getCachedWidgetTabs());
     }
@@ -86,7 +86,7 @@ trait HasWidgetTabs
      *
      * @return int|array<string, int>
      */
-    public function getWidgetsPerRow(): int|array
+    public function getWidgetsPerRow(): int | array
     {
         return 3;
     }

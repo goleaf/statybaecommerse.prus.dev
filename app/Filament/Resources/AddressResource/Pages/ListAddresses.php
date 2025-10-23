@@ -9,7 +9,6 @@ use App\Filament\Resources\AddressResource;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
-use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
@@ -18,7 +17,6 @@ use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatabl
 final class ListAddresses extends BaseListRecords
 {
     use HasWidgetTabs;
-    use SpatieTranslatableListRecords; // Track the active locale for listing translated records.
 
     protected static string $resource = AddressResource::class;
 
@@ -33,20 +31,21 @@ final class ListAddresses extends BaseListRecords
     public function getWidgetTabs(): array
     {
         return [
-            'all'      => Tab::make(__('translations.all_addresses')),
-            'shipping' => Tab::make(__('translations.shipping_addresses'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', AddressType::SHIPPING->value))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('type', AddressType::SHIPPING->value)->count()),
-            'billing' => Tab::make(__('translations.billing_addresses'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', AddressType::BILLING->value))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('type', AddressType::BILLING->value)->count()),
-            'home' => Tab::make(__('translations.home_addresses'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', AddressType::HOME->value))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('type', AddressType::HOME->value)->count()),
-            'work' => Tab::make(__('translations.work_addresses'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', AddressType::WORK->value))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('type', AddressType::WORK->value)->count()),
-            'default' => Tab::make(__('translations.default_addresses'))
+            'all' => WidgetTab::make(__('translations.all_addresses'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
+            'shipping' => WidgetTab::make(__('translations.shipping_addresses'))
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', AddressType::SHIPPING))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', AddressType::SHIPPING)->count()),
+            'billing' => WidgetTab::make(__('translations.billing_addresses'))
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', AddressType::BILLING))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', AddressType::BILLING)->count()),
+            'home' => WidgetTab::make(__('translations.home_addresses'))
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', AddressType::HOME))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', AddressType::HOME)->count()),
+            'work' => WidgetTab::make(__('translations.work_addresses'))
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', AddressType::WORK))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', AddressType::WORK)->count()),
+            'default' => WidgetTab::make(__('translations.default_addresses'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_default', true))
                 ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_default', true)->count()),
             'active' => WidgetTab::make(__('translations.active_addresses'))

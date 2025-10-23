@@ -11,6 +11,9 @@ use App\Filament\Resources\NewsResource\Widgets\NewsResourceStats;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
+use Filament\Resources\Pages\ListRecords;
+use App\Filament\WidgetTabs\Components\WidgetTab;
+use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListNews extends BaseListRecords
@@ -26,20 +29,21 @@ final class ListNews extends BaseListRecords
         ];
     }
 
-    protected function getHeaderWidgets(): array
+    public function getWidgetTabs(): array
     {
         return [
-            'all' => Tab::make(__('news.tabs.all')),
-            'draft' => Tab::make(__('news.tabs.draft'))
+            'all' => WidgetTab::make(__('news.tabs.all'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
+            'draft' => WidgetTab::make(__('news.tabs.draft'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('moderation_state', ModerationState::Draft->value))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('moderation_state', ModerationState::Draft->value)->count()),
-            'review' => Tab::make(__('news.tabs.review'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('moderation_state', ModerationState::Draft->value)->count()),
+            'review' => WidgetTab::make(__('news.tabs.review'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('moderation_state', ModerationState::Review->value))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('moderation_state', ModerationState::Review->value)->count()),
-            'published' => Tab::make(__('news.tabs.published'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('moderation_state', ModerationState::Review->value)->count()),
+            'published' => WidgetTab::make(__('news.tabs.published'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('moderation_state', ModerationState::Published->value))
-                ->badge(fn () => $this->getResource()::getEloquentQuery()->where('moderation_state', ModerationState::Published->value)->count()),
-            'featured' => Tab::make(__('news.tabs.featured'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('moderation_state', ModerationState::Published->value)->count()),
+            'featured' => WidgetTab::make(__('news.tabs.featured'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_featured', true))
                 ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_featured', true)->count()),
             'breaking' => WidgetTab::make(__('news.tabs.breaking'))

@@ -8,8 +8,9 @@ use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\PriceListResource;
 use App\Models\PriceList;
 use Filament\Actions;
-use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
+use App\Filament\WidgetTabs\Components\WidgetTab;
+use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListPriceLists extends BaseListRecords
@@ -34,21 +35,13 @@ final class ListPriceLists extends BaseListRecords
                 ->modifyQueryUsing(fn (Builder $query) => $query->active())
                 ->value(fn () => $this->getResource()::getEloquentQuery()->active()->count()),
 
-            'active' => Tab::make(__('price_lists.tabs.active'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->active())
-                ->badge(fn () => PriceList::query()->active()->count()),
-
-            'enabled' => Tab::make(__('price_lists.tabs.enabled'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('is_enabled', true))
-                ->badge(fn () => PriceList::query()->where('is_enabled', true)->count()),
-
-            'default' => Tab::make(__('price_lists.tabs.default'))
+            'default' => WidgetTab::make(__('price_lists.tabs.default'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_default', true))
-                ->badge(fn () => PriceList::query()->where('is_default', true)->count()),
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_default', true)->count()),
 
-            'auto_apply' => Tab::make(__('price_lists.tabs.auto_apply'))
+            'auto_apply' => WidgetTab::make(__('price_lists.tabs.auto_apply'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('auto_apply', true))
-                ->badge(fn () => PriceList::query()->where('auto_apply', true)->count()),
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('auto_apply', true)->count()),
         ];
     }
 }

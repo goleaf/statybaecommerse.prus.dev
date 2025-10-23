@@ -12,7 +12,8 @@ use App\Support\Recommendations\RecommendationBlockOptions;
 use Filament\Actions;
 use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Resources\Pages\ListRecords\Tab;
+use App\Filament\WidgetTabs\Components\WidgetTab;
+use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListRecommendationBlocks extends BaseListRecords
@@ -30,39 +31,36 @@ final class ListRecommendationBlocks extends BaseListRecords
 
     public function getWidgetTabs(): array
     {
-        $resource = $this->getResource();
-
         return [
-            'all' => Tab::make(__('recommendation_blocks.tabs.all'))
-                ->badge(fn () => $resource::getEloquentQuery()->count()),
-
-        $tabs = [
             'all' => WidgetTab::make(__('recommendation_blocks.tabs.all'))
-                // Cloning avoids leaking the additional constraints onto subsequent tabs.
-                ->value(fn () => (clone $baseQuery)->count()),
+                ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
             'active' => WidgetTab::make(__('recommendation_blocks.tabs.active'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_active', true))
-                ->badge(fn () => $resource::getEloquentQuery()->where('is_active', true)->count()),
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_active', true)->count()),
 
-            'featured' => Tab::make(__('recommendation_blocks.tabs.featured'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'featured'))
-                ->badge(fn () => $resource::getEloquentQuery()->where('type', 'featured')->count()),
+            'featured' => WidgetTab::make(__('recommendation_blocks.tabs.featured'))
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('is_featured', true))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_featured', true)->count()),
 
-            'related' => Tab::make(__('recommendation_blocks.tabs.related'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'related'))
-                ->badge(fn () => $resource::getEloquentQuery()->where('type', 'related')->count()),
+            'product' => WidgetTab::make(__('recommendation_blocks.tabs.product'))
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'product'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'product')->count()),
 
-            'similar' => Tab::make(__('recommendation_blocks.tabs.similar'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'similar'))
-                ->badge(fn () => $resource::getEloquentQuery()->where('type', 'similar')->count()),
+            'category' => WidgetTab::make(__('recommendation_blocks.tabs.category'))
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'category'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'category')->count()),
 
-            'trending' => Tab::make(__('recommendation_blocks.tabs.trending'))
+            'cross_sell' => WidgetTab::make(__('recommendation_blocks.tabs.cross_sell'))
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'cross_sell'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'cross_sell')->count()),
+
+            'upsell' => WidgetTab::make(__('recommendation_blocks.tabs.upsell'))
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'upsell'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'upsell')->count()),
+
+            'trending' => WidgetTab::make(__('recommendation_blocks.tabs.trending'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'trending'))
-                ->badge(fn () => $resource::getEloquentQuery()->where('type', 'trending')->count()),
-
-            'recent' => Tab::make(__('recommendation_blocks.tabs.recent'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'recent'))
-                ->badge(fn () => $resource::getEloquentQuery()->where('type', 'recent')->count()),
+                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'trending')->count()),
         ];
 
         foreach (RecommendationBlockOptions::tabLabels() as $type => $label) {

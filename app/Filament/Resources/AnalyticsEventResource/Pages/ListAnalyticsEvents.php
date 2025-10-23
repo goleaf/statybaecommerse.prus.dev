@@ -11,6 +11,8 @@ use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
 use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
+use App\Filament\WidgetTabs\Components\WidgetTab;
+use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListAnalyticsEvents extends BaseListRecords
@@ -29,8 +31,9 @@ final class ListAnalyticsEvents extends BaseListRecords
     public function getWidgetTabs(): array
     {
         return [
-            'all'        => Tab::make(__('analytics_events.tabs.all')),
-            'page_views' => Tab::make(__('analytics_events.tabs.page_views'))
+            'all' => WidgetTab::make(__('analytics_events.tabs.all'))
+                ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
+            'page_views' => WidgetTab::make(__('analytics_events.tabs.page_views'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('event_type', 'page_view'))
                 ->value(fn () => $this->getResource()::getEloquentQuery()->where('event_type', 'page_view')->count()),
             'clicks' => WidgetTab::make(__('analytics_events.tabs.clicks'))
