@@ -10,7 +10,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -25,7 +24,7 @@ final class RedemptionsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'redemptions';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([

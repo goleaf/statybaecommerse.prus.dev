@@ -24,7 +24,6 @@ use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
@@ -132,7 +131,7 @@ final class BrandResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return $schema->components([
             Section::make(__('brands.basic_information'))

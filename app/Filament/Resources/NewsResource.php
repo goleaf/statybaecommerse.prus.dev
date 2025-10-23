@@ -44,7 +44,7 @@ class NewsResource extends Resource
 
     protected static ?string $pluralModelLabel = 'News Articles';
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return $schema->components([
             Forms\Components\Section::make('Article Information')

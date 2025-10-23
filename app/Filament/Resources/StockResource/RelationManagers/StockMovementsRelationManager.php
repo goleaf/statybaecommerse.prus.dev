@@ -13,7 +13,6 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\BadgeColumn;
@@ -56,7 +55,7 @@ class StockMovementsRelationManager extends BaseRelationManager
         return __('inventory.stock_movements');
     }
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->components([

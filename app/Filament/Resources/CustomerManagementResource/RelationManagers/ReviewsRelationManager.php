@@ -26,7 +26,7 @@ class ReviewsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'reviews';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->components([

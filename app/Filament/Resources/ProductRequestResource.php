@@ -18,7 +18,6 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
-use Filament\Schemas\Schema;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -60,7 +59,7 @@ final class ProductRequestResource extends Resource
         return __('product_requests.single');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([

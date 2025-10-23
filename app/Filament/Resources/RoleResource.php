@@ -12,12 +12,10 @@ use BackedEnum;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
@@ -94,7 +92,7 @@ final class RoleResource extends Resource
         return __('roles.single');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([

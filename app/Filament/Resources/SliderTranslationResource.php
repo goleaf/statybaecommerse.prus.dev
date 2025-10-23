@@ -15,7 +15,6 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
@@ -62,7 +61,7 @@ final class SliderTranslationResource extends Resource
         return __('admin.slider_translations.model_label');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             SchemaSection::make(__('admin.slider_translations.basic_information'))

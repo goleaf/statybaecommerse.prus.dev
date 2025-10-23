@@ -8,10 +8,10 @@ use App\Filament\Resources\ReferralCodeUsageLogResource\Pages;
 use App\Filament\Resources\ReferralCodeUsageLogs\Schemas\ReferralCodeUsageLogForm as ReferralCodeUsageLogFormSchema;
 use App\Filament\Resources\ReferralCodeUsageLogs\Tables\ReferralCodeUsageLogsTable as ReferralCodeUsageLogsTableSchema;
 use App\Models\ReferralCodeUsageLog;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 use App\Filament\Resources\ReferralCodeUsageLogResource\Pages;
 use App\Models\ReferralCodeUsageLog;
@@ -55,7 +55,7 @@ final class ReferralCodeUsageLogResource extends Resource
         return __('admin.referral_code_usage_logs.model_label');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return ReferralCodeUsageLogFormSchema::configure($schema);
     }

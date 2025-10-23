@@ -9,7 +9,7 @@ use App\Filament\Resources\ActivityLogResource\Pages;
 use App\Models\ActivityLog;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
+use Filament\Actions\Action;
 use App\Support\Filament\Filters\DateRangeFilter;
 use BackedEnum;
 use Filament\Resources\Resource;

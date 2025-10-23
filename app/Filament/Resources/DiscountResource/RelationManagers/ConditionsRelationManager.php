@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Resources\DiscountResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Forms;
 use Filament\Schemas\Schema;
@@ -24,7 +23,7 @@ final class ConditionsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Conditions';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([

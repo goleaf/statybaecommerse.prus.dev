@@ -17,7 +17,6 @@ use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\Select as SelectInput;
 use Filament\Forms\Components\KeyValue;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Textarea;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -59,7 +58,7 @@ final class ProductHistoryResource extends Resource
         return __('product_history.single');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             Section::make(__('product_history.basic_information'))

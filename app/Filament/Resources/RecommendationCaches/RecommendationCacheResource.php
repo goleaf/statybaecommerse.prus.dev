@@ -14,7 +14,6 @@ use App\Filament\Resources\RecommendationCaches\Schemas\RecommendationCacheForm;
 use App\Filament\Resources\RecommendationCaches\Tables\RecommendationCachesTable;
 use App\Models\RecommendationCache;
 use BackedEnum;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -59,7 +58,7 @@ final class RecommendationCacheResource extends Resource
         return __('admin.recommendation_caches.model_label');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return RecommendationCacheForm::configure($schema);
     }

@@ -11,13 +11,12 @@ use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 use Filament\Forms\Set;
-use Filament\Schemas\Schema;
-use Filament\Tables\Actions\CreateAction;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -36,7 +35,7 @@ final class ChildrenRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Subcategories';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
         return $schema->schema([
             Section::make(__('categories.basic_information'))

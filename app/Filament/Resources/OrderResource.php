@@ -43,7 +43,6 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Schema;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -202,7 +201,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
     /**
      * Configure the comprehensive form schema with advanced features.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             Section::make(__('orders.sections.order_details'))
@@ -885,9 +884,9 @@ final class OrderResource extends Resource implements DefinesExportColumns
                     ->visible(fn (): bool => AuthorizationMatrix::check('orders', 'view')),
                 EditAction::make()
                     ->color('warning')
-                    ->visible(fn (): bool => AuthorizationMatrix::check('orders', 'update')),
-                \Filament\Tables\Actions\DeleteAction::make()
-                    ->visible(fn (): bool => AuthorizationMatrix::check('orders', 'delete')),
+                    ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
+                \Filament\Actions\DeleteAction::make()
+                    ->visible(fn () => AuthorizationMatrix::check('orders', 'delete')),
                 Action::make('mark_processing')
                     ->label(__('orders.mark_processing'))
                     ->icon('heroicon-o-cog')

@@ -6,7 +6,6 @@ namespace App\Filament\Resources\NewsCategoryResource\RelationManagers;
 
 use App\Models\News;
 use Filament\Forms;
-use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\News;
 use App\Support\Filament\Components\Flatpickr;
@@ -31,7 +30,7 @@ final class NewsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'News';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([

@@ -10,10 +10,8 @@ use App\Filament\Resources\AnalyticsResource\Pages;
 use App\Models\Order;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\Summarizers\Average;
 use Filament\Tables\Columns\Summarizers\Count;
 use Filament\Tables\Columns\Summarizers\Sum;
@@ -25,7 +23,7 @@ use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-use BackedEnum;
+use Filament\Schemas\Schema;
 
 use Filament\Schemas\Schema;
 final class AnalyticsResource extends Resource
@@ -71,7 +69,7 @@ final class AnalyticsResource extends Resource
         return 'warning';
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return $schema;
     }

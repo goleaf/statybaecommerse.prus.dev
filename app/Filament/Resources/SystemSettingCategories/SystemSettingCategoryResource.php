@@ -12,7 +12,6 @@ use App\Filament\Resources\SystemSettingCategories\Schemas\SystemSettingCategory
 use App\Filament\Resources\SystemSettingCategories\Tables\SystemSettingCategoriesTable;
 use App\Models\SystemSettingCategory;
 use BackedEnum;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -31,7 +30,7 @@ class SystemSettingCategoryResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return SystemSettingCategoryForm::configure($schema);
     }

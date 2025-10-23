@@ -14,7 +14,6 @@ use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
@@ -54,7 +53,7 @@ final class NormalSettingResource extends Resource
         return __('admin.normal_settings.navigation');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             Tabs::make(__('normal_settings.tabs.label'))

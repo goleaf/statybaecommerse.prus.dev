@@ -9,6 +9,7 @@ use App\Filament\Resources\UserResource;
 use App\Models\Post;
 use App\Models\PostApproval;
 use Filament\Actions;
+use Filament\Infolists\Infolist;
 use Filament\Schemas\Schema;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Schema;
@@ -28,7 +29,7 @@ final class ViewPost extends ViewRecord
         ];
     }
 
-    public function infolist(Schema $infolist): Schema
+    public function infolist(Schema $schema): Schema
     {
         return $schema->schema([
             ListEntry::make('postQuickLinks')

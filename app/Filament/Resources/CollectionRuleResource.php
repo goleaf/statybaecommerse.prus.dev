@@ -9,27 +9,21 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\CollectionRuleResource\Pages;
 use App\Models\CollectionRule;
 use BackedEnum;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Schemas\Components\Grid;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Schema;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\DateFilter;
@@ -86,7 +80,7 @@ final class CollectionRuleResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         // Expose the schema via the Filament v4 `Form` instance to drop the deprecated array fallback.

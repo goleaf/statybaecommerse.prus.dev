@@ -12,7 +12,6 @@ use App\Filament\Resources\NotificationTemplates\Schemas\NotificationTemplateFor
 use App\Filament\Resources\NotificationTemplates\Tables\NotificationTemplatesTable;
 use App\Models\NotificationTemplate;
 use BackedEnum;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -28,7 +27,7 @@ class NotificationTemplateResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return NotificationTemplateForm::configure($schema);
     }

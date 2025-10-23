@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Resources\DiscountRedemptionResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Forms;
 use Filament\Schemas\Schema;
@@ -25,7 +24,7 @@ class DiscountRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Discounts';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([

@@ -21,11 +21,9 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
-use Filament\Tables\Actions\HeaderAction;
+use Filament\Actions\HeaderAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -72,7 +70,7 @@ final class VariantCombinationResource extends Resource
         return __('admin.variant_combinations.model_label');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([

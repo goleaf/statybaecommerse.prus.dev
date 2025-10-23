@@ -20,16 +20,14 @@ use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup as TableBulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction as TableDeleteBulkAction;
-use Filament\Tables\Actions\EditAction as TableEditAction;
-use Filament\Tables\Actions\ViewAction as TableViewAction;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup as TableBulkActionGroup;
+use Filament\Actions\DeleteBulkAction as TableDeleteBulkAction;
+use Filament\Actions\EditAction as TableEditAction;
+use Filament\Actions\ViewAction as TableViewAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -77,7 +75,7 @@ final class CountryResource extends Resource
         return __('countries.models.countries');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([

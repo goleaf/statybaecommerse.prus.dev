@@ -12,7 +12,6 @@ use App\Filament\Resources\MenuItems\Schemas\MenuItemForm;
 use App\Filament\Resources\MenuItems\Tables\MenuItemsTable;
 use App\Models\MenuItem;
 use BackedEnum;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -28,7 +27,7 @@ class MenuItemResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return MenuItemForm::configure($schema);
     }

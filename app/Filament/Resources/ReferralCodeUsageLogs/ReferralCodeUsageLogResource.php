@@ -12,7 +12,6 @@ use App\Filament\Resources\ReferralCodeUsageLogs\Schemas\ReferralCodeUsageLogFor
 use App\Filament\Resources\ReferralCodeUsageLogs\Tables\ReferralCodeUsageLogsTable;
 use App\Models\ReferralCodeUsageLog;
 use BackedEnum;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -33,7 +32,7 @@ final class ReferralCodeUsageLogResource extends Resource
         return Heroicon::OutlinedRectangleStack;
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return ReferralCodeUsageLogForm::configure($schema);
     }

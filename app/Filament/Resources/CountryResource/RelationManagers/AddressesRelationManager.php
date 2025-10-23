@@ -6,7 +6,6 @@ namespace App\Filament\Resources\CountryResource\RelationManagers;
 
 use App\Enums\AddressType;
 use Filament\Forms;
-use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Forms;
 use Filament\Schemas\Schema;
@@ -23,7 +22,7 @@ final class AddressesRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Addresses';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([

@@ -13,7 +13,6 @@ use App\Filament\Resources\EmailCampaigns\Schemas\EmailCampaignForm;
 use App\Filament\Resources\EmailCampaigns\Tables\EmailCampaignsTable;
 use App\Models\EmailCampaign;
 use BackedEnum;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -29,7 +28,7 @@ class EmailCampaignResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return EmailCampaignForm::configure($schema);
     }

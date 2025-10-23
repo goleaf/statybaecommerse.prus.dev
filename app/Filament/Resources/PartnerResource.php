@@ -10,14 +10,13 @@ use App\Filament\Resources\PartnerResource\Pages;
 use App\Models\Partner;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use UnitEnum;
@@ -39,7 +38,7 @@ final class PartnerResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         // Build the Partner form using the Section helper to keep layouts consistent.

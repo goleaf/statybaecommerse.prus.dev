@@ -14,13 +14,13 @@ use App\Models\VariantPriceHistory;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Forms;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Schemas\Schema;
 use BackedEnum;
 use UnitEnum;
 
@@ -36,10 +36,10 @@ final class VariantPriceHistoryResource extends Resource
     /**
      * @var string|\BackedEnum|null Navigation icon override (string|\BackedEnum|null) for Filament v4 alignment.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-currency-euro';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-currency-euro';
 
     /** @var string|\BackedEnum|null Navigation grouping centralized via enum. */
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::System;
+    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 20;
 
@@ -51,7 +51,7 @@ final class VariantPriceHistoryResource extends Resource
         return $group instanceof NavigationGroup ? $group->label() : $group;
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([

@@ -11,7 +11,6 @@ use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\BadgeColumn;
@@ -35,7 +34,7 @@ final class RedemptionsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Redemptions';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
         return $schema->schema([
             Section::make('Redemption Details')

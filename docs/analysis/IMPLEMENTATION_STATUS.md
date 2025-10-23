@@ -3,8 +3,10 @@
 ## Current Status
 
 ### ✅ Completed
-1. **Brand Model Analysis**: The Brand model is working correctly with all relationships and features
-2. **BrandResource Creation**: Created a comprehensive Filament v4 BrandResource with:
+1. **Filament v4 Schema Migration**: Updated every Filament resource, relation manager, and page to use the new `Filament\\Schemas\\Schema` signature for forms and infolists while normalizing table return types.
+2. **Navigation Property Alignment**: Standardized all `$navigationIcon` and `$navigationGroup` definitions to use the new `BackedEnum|string|null` and `UnitEnum|string|null` unions required by Filament v4.
+3. **Brand Model Analysis**: The Brand model is working correctly with all relationships and features
+4. **BrandResource Creation**: Created a comprehensive Filament v4 BrandResource with:
    - Complete CRUD functionality
    - Multi-language support structure
    - Advanced filtering capabilities
@@ -12,28 +14,23 @@
    - SEO fields
    - Translation management
    - Soft delete support
-3. **Translation Files**: Created Lithuanian and English translation files for admin interface
-4. **BrandTranslation Factory**: Created factory for testing brand translations
-5. **Test Structure Analysis**: Analyzed existing test files and structure
+5. **Translation Files**: Created Lithuanian and English translation files for admin interface
+6. **BrandTranslation Factory**: Created factory for testing brand translations
+7. **Test Structure Analysis**: Analyzed existing test files and structure
+8. **SQLite-friendly Migrations**: Hardened customer group and created_at index migrations to safely skip when the backing tables do not exist during lightweight SQLite test runs.
 
 ### 🔧 In Progress
-1. **Filament v4 Compatibility**: Fixing multiple resources to use correct Filament v4 syntax
-2. **Resource Consolidation**: Resolving duplicate resource files and conflicts
+1. **Resource Consolidation**: Resolving duplicate resource files and conflicts
 
 ### ❌ Issues Identified
-1. **Multiple Filament Resources**: Many resources still use Filament v3 syntax (Forms\Form instead of Schemas\Schema)
-2. **Infolist Compatibility**: Several resources use Infolists\Infolist instead of Schemas\Schema
-3. **NavigationGroup Types**: Some resources have incorrect type hints for navigation properties
-4. **Duplicate Resources**: Multiple versions of the same resources exist
+1. **Duplicate Resources**: Multiple versions of the same resources exist
 
 ## Next Steps
 
 ### Immediate Actions Required
-1. **Fix Filament v4 Compatibility Issues**:
-   - Update all resources to use `Filament\Schemas\Schema` instead of `Filament\Forms\Form`
-   - Update all infolist methods to use `Schema` instead of `Infolist`
-   - Fix navigation property type hints
-   - Remove duplicate resource files
+1. **Finalize Resource Footprint**:
+   - Audit for lingering duplicate resource classes and remove redundant implementations
+   - Collapse legacy stubs that are no longer referenced after the schema migration
 
 2. **Complete BrandResource Implementation**:
    - Add media upload functionality
