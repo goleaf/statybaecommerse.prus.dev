@@ -8,8 +8,8 @@ use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\PriceListResource;
 use App\Models\PriceList;
 use Filament\Actions;
+use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Schemas\Components\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListPriceLists extends BaseListRecords
