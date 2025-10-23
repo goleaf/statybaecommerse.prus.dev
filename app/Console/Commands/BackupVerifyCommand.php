@@ -155,7 +155,273 @@ final class BackupVerifyCommand extends Command
 
     private function dropBackupTables(Builder $schema): void
     {
-        $schema->dropIfExists('backup_users');
-        $schema->dropIfExists('backup_products');
+        File::deleteDirectory($workingPath);
+        File::ensureDirectoryExists($workingPath);
+        File::ensureDirectoryExists($mediaExtractionPath);
+    }
+
+    private function extractArchive(string $archive, string $destination): void
+    {
+        if (Str::endsWith($archive, '.empty')) {
+            $this->components->warn('Media archive was a placeholder - skipping extraction.');
+
+            return;
+        }
+
+        $tarBinary = $this->binary('tar', 'tar');
+        $flags = $this->archiveFlags('extract_flags', '-xzf');
+        $command = sprintf('%s %s %s -C %s', escapeshellarg($tarBinary), $flags, escapeshellarg($archive), escapeshellarg($destination));
+        $process = Process::fromShellCommandline($command);
+        $process->setTimeout(null);
+        $process->mustRun();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function resolveVerificationConnectionConfig(string $connectionName): array
+    {
+        $configured = config('backup.verify.connection');
+
+        if (is_array($configured) && $configured !== []) {
+            if (array_is_list($configured)) {
+                throw new RuntimeException('Verification connection configuration must be an associative array.');
+            }
+
+            /** @var array<string, mixed> $configuredArray */
+            $configuredArray = $configured;
+
+            return $configuredArray;
+        }
+
+        $fallback = config("database.connections.{$connectionName}");
+
+        if (! is_array($fallback) || array_is_list($fallback)) {
+            throw new RuntimeException("Verification connection [{$connectionName}] is not configured.");
+        }
+
+        /** @var array<string, mixed> $fallbackArray */
+        $fallbackArray = $fallback;
+
+        return $fallbackArray;
+    }
+
+    /**
+     * @param  array<string, mixed>  $connectionConfig
+     */
+    private function restoreDatabase(string $driver, array $connectionConfig, string $artifactPath): void
+    {
+        match ($driver) {
+            'sqlite' => $this->restoreSqliteDatabase($connectionConfig, $artifactPath),
+            'mysql', 'mariadb' => $this->restoreMysqlDatabase($connectionConfig, $artifactPath),
+            'pgsql' => $this->restorePostgresDatabase($connectionConfig, $artifactPath),
+            default => throw new RuntimeException("Verification for driver [{$driver}] is not supported."),
+        };
+    }
+
+    /**
+     * @param  array<string, mixed>  $connectionConfig
+     */
+    private function restoreSqliteDatabase(array $connectionConfig, string $artifactPath): void
+    {
+        $databasePath = $connectionConfig['database'] ?? null;
+
+        if (! is_string($databasePath) || $databasePath === '') {
+            throw new RuntimeException('SQLite verification database path is not configured.');
+        }
+
+        File::ensureDirectoryExists(dirname($databasePath));
+        File::delete($databasePath);
+
+        if (Str::endsWith($artifactPath, '.sqlite')) {
+            File::copy($artifactPath, $databasePath);
+
+            return;
+        }
+
+        $sqliteBinary = $this->binary('sqlite3', 'sqlite3');
+        $command = sprintf('%s %s < %s', escapeshellarg($sqliteBinary), escapeshellarg($databasePath), escapeshellarg($artifactPath));
+        $process = Process::fromShellCommandline($command);
+        $process->setTimeout(null);
+        $process->mustRun();
+    }
+
+    /**
+     * @param  array<string, mixed>  $connectionConfig
+     */
+    private function restoreMysqlDatabase(array $connectionConfig, string $artifactPath): void
+    {
+        $database = $this->connectionValue($connectionConfig, 'database');
+        $host = $this->connectionValue($connectionConfig, 'host', '127.0.0.1') ?? '127.0.0.1';
+        $port = $this->connectionValue($connectionConfig, 'port', '3306') ?? '3306';
+        $username = $this->connectionValue($connectionConfig, 'username');
+        $password = $this->connectionValue($connectionConfig, 'password', '') ?? '';
+
+        if ($database === null || $database === '') {
+            throw new RuntimeException('MySQL verification database is not configured.');
+        }
+
+        if ($username === null || $username === '') {
+            throw new RuntimeException('MySQL verification username is not configured.');
+        }
+
+        $mysqlBinary = $this->binary('mysql', 'mysql');
+        $createCommand = sprintf(
+            '%s --host=%s --port=%s --user=%s -e %s',
+            escapeshellarg($mysqlBinary),
+            escapeshellarg($host),
+            escapeshellarg($port),
+            escapeshellarg($username),
+            escapeshellarg(sprintf('DROP DATABASE IF EXISTS `%s`; CREATE DATABASE `%s`;', $database, $database)),
+        );
+
+        $mysqlEnv = $password === '' ? [] : ['MYSQL_PWD' => $password];
+
+        $createProcess = Process::fromShellCommandline($createCommand, null, $mysqlEnv);
+        $createProcess->setTimeout(null);
+        $createProcess->mustRun();
+
+        $importCommand = sprintf(
+            '%s --host=%s --port=%s --user=%s %s < %s',
+            escapeshellarg($mysqlBinary),
+            escapeshellarg($host),
+            escapeshellarg($port),
+            escapeshellarg($username),
+            escapeshellarg($database),
+            escapeshellarg($artifactPath),
+        );
+
+        $importProcess = Process::fromShellCommandline($importCommand, null, $mysqlEnv);
+        $importProcess->setTimeout(null);
+        $importProcess->mustRun();
+    }
+
+    /**
+     * @param  array<string, mixed>  $connectionConfig
+     */
+    private function restorePostgresDatabase(array $connectionConfig, string $artifactPath): void
+    {
+        $database = $this->connectionValue($connectionConfig, 'database');
+        $host = $this->connectionValue($connectionConfig, 'host', '127.0.0.1') ?? '127.0.0.1';
+        $port = $this->connectionValue($connectionConfig, 'port', '5432') ?? '5432';
+        $username = $this->connectionValue($connectionConfig, 'username');
+        $password = $this->connectionValue($connectionConfig, 'password', '') ?? '';
+
+        if ($database === null || $database === '') {
+            throw new RuntimeException('PostgreSQL verification database is not configured.');
+        }
+
+        if ($username === null || $username === '') {
+            throw new RuntimeException('PostgreSQL verification username is not configured.');
+        }
+
+        $psqlBinary = $this->binary('psql', 'psql');
+        $dropCommand = sprintf(
+            '%s --host=%s --port=%s --username=%s --command %s',
+            escapeshellarg($psqlBinary),
+            escapeshellarg($host),
+            escapeshellarg($port),
+            escapeshellarg($username),
+            escapeshellarg(sprintf('DROP DATABASE IF EXISTS "%s";', $database)),
+        );
+
+        $createCommand = sprintf(
+            '%s --host=%s --port=%s --username=%s --command %s',
+            escapeshellarg($psqlBinary),
+            escapeshellarg($host),
+            escapeshellarg($port),
+            escapeshellarg($username),
+            escapeshellarg(sprintf('CREATE DATABASE "%s";', $database)),
+        );
+
+        $env = $password === '' ? [] : ['PGPASSWORD' => $password];
+
+        $dropProcess = Process::fromShellCommandline($dropCommand, null, $env);
+        $dropProcess->setTimeout(null);
+        $dropProcess->mustRun();
+
+        $createProcess = Process::fromShellCommandline($createCommand, null, $env);
+        $createProcess->setTimeout(null);
+        $createProcess->mustRun();
+
+        $importCommand = sprintf(
+            '%s --host=%s --port=%s --username=%s --dbname=%s -f %s',
+            escapeshellarg($psqlBinary),
+            escapeshellarg($host),
+            escapeshellarg($port),
+            escapeshellarg($username),
+            escapeshellarg($database),
+            escapeshellarg($artifactPath),
+        );
+
+        $importProcess = Process::fromShellCommandline($importCommand, null, $env);
+        $importProcess->setTimeout(null);
+        $importProcess->mustRun();
+    }
+
+    /**
+     * @param  array<string, mixed>  $config
+     */
+    private function connectionValue(array $config, string $key, ?string $default = null): ?string
+    {
+        if (! array_key_exists($key, $config)) {
+            return $default;
+        }
+
+        $value = $config[$key];
+
+        if ($value === null) {
+            return null;
+        }
+
+        if (is_scalar($value)) {
+            return (string) $value;
+        }
+
+        throw new RuntimeException(sprintf('Verification connection value for [%s] must be a scalar or null.', $key));
+    }
+
+    private function compareCounts(string $label, ?int $expected, int $actual): void
+    {
+        if ($expected === null) {
+            $this->components->warn(sprintf('No expected count recorded for %s.', $label));
+
+            return;
+        }
+
+        if ($expected !== $actual) {
+            throw new RuntimeException(sprintf('Sanity check failed for %s count. Expected %d, found %d.', $label, $expected, $actual));
+        }
+    }
+
+    private function optionString(string $name, string $default): string
+    {
+        $value = $this->option($name);
+
+        return is_string($value) && $value !== '' ? $value : $default;
+    }
+
+    private function binary(string $key, string $default): string
+    {
+        $configured = config("backup.binaries.{$key}");
+
+        if (! is_string($configured) || $configured === '') {
+            return $default;
+        }
+
+        return $configured;
+    }
+
+    private function archiveFlags(string $key, string $default): string
+    {
+        $flags = config("backup.archive.{$key}", $default);
+
+        if (! is_string($flags)) {
+            return $default;
+        }
+
+        $trimmed = trim($flags);
+
+        return $trimmed !== '' ? $trimmed : $default;
     }
 }
