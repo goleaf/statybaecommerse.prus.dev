@@ -13,7 +13,7 @@ use UnitEnum;
 
 final class SearchExplorer extends Page
 {
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-magnifying-glass-circle';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-magnifying-glass-circle';
 
     protected static UnitEnum|string|null $navigationGroup = 'Search';
 
