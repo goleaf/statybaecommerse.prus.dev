@@ -1,3 +1,4 @@
+{{-- Render a single widget tab card that mirrors the Filament stats overview look while supporting our custom theme helpers. --}}
 @php
     use Filament\Support\Enums\IconSize;
     use Illuminate\Support\Number;
