@@ -9,6 +9,7 @@ use App\Filament\Resources\FeatureFlagResource\Pages;
 use App\Models\FeatureFlag;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
+use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -31,8 +32,6 @@ use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
 
 use Filament\Schemas\Schema;
 /**
@@ -85,6 +84,17 @@ final class FeatureFlagResource extends Resource
         return __('feature_flags.title');
     }
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes([
+            ActiveScope::class,
+            EnabledScope::class,
+        ]);
+    }
+
+    /**
+     * Extend the base query so administrators can audit inactive and disabled flags.
+     */
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->withoutGlobalScopes([

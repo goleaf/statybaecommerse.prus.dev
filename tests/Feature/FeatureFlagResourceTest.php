@@ -22,7 +22,7 @@ final class FeatureFlagResourceTest extends TestCase
 
         $this->adminUser = User::factory()->create([
             'email' => 'admin@example.com',
-            'name' => 'Admin Example',
+            'name'  => 'Admin Example',
         ]);
 
         $this->actingAs($this->adminUser);
@@ -37,6 +37,20 @@ final class FeatureFlagResourceTest extends TestCase
             ->assertOk()
             ->assertSee('Feature Flags')
             ->assertSee($this->adminUser->name);
+    }
+
+    /**
+     * Ensure the listing includes flags hidden by default model scopes.
+     */
+    public function test_list_includes_inactive_feature_flags(): void
+    {
+        $inactiveFeatureFlag = FeatureFlag::factory()->create([
+            'is_active'  => false,
+            'is_enabled' => false,
+        ]);
+
+        Livewire::test('App\\Filament\\Resources\\FeatureFlagResource\\Pages\\ListFeatureFlags')
+            ->assertCanSeeTableRecords([$inactiveFeatureFlag]);
     }
 
     public function test_can_create_feature_flag(): void
@@ -59,11 +73,11 @@ final class FeatureFlagResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('feature_flags', [
-            'name' => 'New Feature',
-            'key' => 'new_feature',
-            'created_by' => $this->adminUser->id,
+            'name'            => 'New Feature',
+            'key'             => 'new_feature',
+            'created_by'      => $this->adminUser->id,
             'created_by_name' => $this->adminUser->name,
-            'updated_by' => $this->adminUser->id,
+            'updated_by'      => $this->adminUser->id,
             'updated_by_name' => $this->adminUser->name,
         ]);
     }
@@ -227,15 +241,15 @@ final class FeatureFlagResourceTest extends TestCase
     public function test_feature_flags_resource_can_create_feature_flag(): void
     {
         $featureFlagData = [
-            'name' => 'Another Feature',
-            'key' => 'another_feature',
+            'name'        => 'Another Feature',
+            'key'         => 'another_feature',
             'description' => 'Another feature flag',
-            'is_active' => true,
-            'is_enabled' => false,
-            'is_global' => false,
+            'is_active'   => true,
+            'is_enabled'  => false,
+            'is_global'   => false,
             'environment' => 'staging',
-            'category' => 'backend',
-            'priority' => 10,
+            'category'    => 'backend',
+            'priority'    => 10,
         ];
 
         Livewire::test('App\Filament\Resources\FeatureFlags\Pages\CreateFeatureFlag')
@@ -244,11 +258,11 @@ final class FeatureFlagResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('feature_flags', [
-            'name' => 'Another Feature',
-            'key' => 'another_feature',
-            'created_by' => $this->adminUser->id,
+            'name'            => 'Another Feature',
+            'key'             => 'another_feature',
+            'created_by'      => $this->adminUser->id,
             'created_by_name' => $this->adminUser->name,
-            'updated_by' => $this->adminUser->id,
+            'updated_by'      => $this->adminUser->id,
             'updated_by_name' => $this->adminUser->name,
         ]);
     }
@@ -257,11 +271,11 @@ final class FeatureFlagResourceTest extends TestCase
     {
         Livewire::test('App\Filament\Resources\FeatureFlags\Pages\CreateFeatureFlag')
             ->fillForm([
-                'name' => 'Invalid Feature',
-                'key' => 'invalid key!',
-                'is_active' => true,
+                'name'       => 'Invalid Feature',
+                'key'        => 'invalid key!',
+                'is_active'  => true,
                 'is_enabled' => false,
-                'is_global' => false,
+                'is_global'  => false,
             ])
             ->call('create')
             ->assertHasFormErrors(['key']);
