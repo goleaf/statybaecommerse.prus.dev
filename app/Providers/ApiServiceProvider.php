@@ -8,6 +8,7 @@ use App\Models\ApiKey;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
@@ -366,15 +367,63 @@ final class ApiServiceProvider extends ServiceProvider
             return null;
         }
 
-        $userId = $request->user()?->getAuthIdentifier();
+        $userId = $this->resolveAuthenticatedIdentifier($request);
 
-        if (! is_string($userId) && ! is_int($userId)) {
+        if ($userId === null) {
             return null;
         }
 
         $key = $this->formatKey('user', (string) $userId, $keySuffix ?? $bucket);
 
         return $this->buildLimit($bucket . '.user', $key, $maxAttempts);
+    }
+
+    /**
+     * Resolve the best-fit authenticated identifier across available guards.
+     */
+    private function resolveAuthenticatedIdentifier(Request $request): string|int|null
+    {
+        // Always start with the user that might already be attached to the request instance.
+        $user = $request->user();
+
+        if ($user !== null) {
+            $identifier = $user->getAuthIdentifier();
+
+            if (is_string($identifier) || is_int($identifier)) {
+                return $identifier;
+            }
+        }
+
+        // Iterate over configured guards to cover token-based authentication like Sanctum.
+        $defaultGuard = config('auth.defaults.guard');
+
+        foreach (array_keys(config('auth.guards', [])) as $guard) {
+            // Skip the default guard because it has already been evaluated above.
+            if ($guard === $defaultGuard) {
+                continue;
+            }
+
+            $guardUser = $request->user($guard);
+
+            if ($guardUser === null) {
+                continue;
+            }
+
+            $identifier = $guardUser->getAuthIdentifier();
+
+            if (is_string($identifier) || is_int($identifier)) {
+                return $identifier;
+            }
+        }
+
+        // Fall back to the global authentication manager as a final safeguard.
+        $authId = Auth::id();
+
+        if (is_string($authId) || is_int($authId)) {
+            return $authId;
+        }
+
+        return null;
     }
 
     private function perIpLimit(Request $request, string $bucket, ?int $maxAttempts, ?string $keySuffix = null): ?Limit
