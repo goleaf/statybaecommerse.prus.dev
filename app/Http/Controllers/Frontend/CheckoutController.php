@@ -7,8 +7,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\Product;
-use Illuminate\Http\JsonResponse;
+use App\Services\Cart\CartLifecycleService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -36,7 +35,7 @@ final class CheckoutController extends Controller
         ]);
     }
 
-    public function process(Request $request): RedirectResponse|JsonResponse
+    public function process(Request $request, CartLifecycleService $cartLifecycleService): RedirectResponse
     {
         $throttleKey = $this->checkoutThrottleKey($request);
         $maxAttempts = Config::get('checkout.rate_limit.attempts', 3);
@@ -102,13 +101,7 @@ final class CheckoutController extends Controller
                     'payment_method' => $validated['payment_method'],
                     'payment_reference' => (string) Str::uuid(),
                 ]);
-
-                foreach ($items as $item) {
-                    /** @var CartItem $item */
-                    /** @var array<string, mixed> $snapshot */
-                    $snapshot = is_array($item->product_snapshot) ? $item->product_snapshot : [];
-                    /** @var Product|null $product */
-                    $product = $item->product;
+            }
 
                     OrderItem::query()->create([
                         'order_id' => $order->getKey(),
@@ -123,8 +116,13 @@ final class CheckoutController extends Controller
                         'notes' => $item->notes,
                     ]);
 
-                    $item->forceDelete();
-                }
+        $cartLifecycleService->clearAfterCheckout(
+            $request->user()?->id,
+            $request->session()->getId(),
+            $order->payment_status ?? null
+        );
+
+        $request->session()->put('checkout.last_order_id', $order->getKey());
 
                 return $order;
             });
@@ -172,11 +170,11 @@ final class CheckoutController extends Controller
         ]);
     }
 
-    public function cancel(): View
+    public function cancel(Request $request, CartLifecycleService $cartLifecycleService): View
     {
-        return view('frontend.checkout.cancel', [
-            'cart' => $this->buildCartSummary(),
-        ]);
+        $cartLifecycleService->clearForAbandonedCheckout($request->user()?->id, $request->session()->getId());
+
+        return view('frontend.checkout.cancel');
     }
 
     /**
