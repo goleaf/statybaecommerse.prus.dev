@@ -11,9 +11,7 @@ use Log;
 final class Kernel extends ConsoleKernel
 {
     /**
-     * @var array
-     *
-     * @phpstan-ignore-next-line missingType.iterableValue
+     * @var array<int, class-string<\Illuminate\Console\Command>>
      */
     protected $commands = [
         \App\Console\Commands\AuditDatabaseIndexesCommand::class,
@@ -26,10 +24,6 @@ final class Kernel extends ConsoleKernel
         \App\Console\Commands\CheckRefreshDatabaseCommand::class,
         \App\Console\Commands\BackupPrepareCommand::class,
         \App\Console\Commands\BackupVerifyCommand::class,
-        \App\Console\Commands\I18nAuditCommand::class,
-        \App\Console\Commands\ValidateContractCommand::class,
-        \App\Console\Commands\ReconcileInventoryCommand::class,
-        \App\Console\Commands\SanitizeHtmlContentCommand::class,
     ];
 
     protected function schedule(Schedule $schedule): void
@@ -59,13 +53,10 @@ final class Kernel extends ConsoleKernel
         if (($prepareSchedule['enabled'] ?? true) === true) {
             $event = $schedule->command('backup:prepare');
 
-            $prepareCron = $prepareSchedule['cron'] ?? null;
-            $prepareAt = $prepareSchedule['at'] ?? null;
-
-            if (is_string($prepareCron) && $prepareCron !== '') {
-                $event->cron($prepareCron);
-            } elseif (is_string($prepareAt) && $prepareAt !== '') {
-                $event->dailyAt($prepareAt);
+            if (! empty($prepareSchedule['cron'])) {
+                $event->cron((string) $prepareSchedule['cron']);
+            } elseif (! empty($prepareSchedule['at'])) {
+                $event->dailyAt((string) $prepareSchedule['at']);
             } else {
                 $event->daily();
             }
@@ -74,8 +65,8 @@ final class Kernel extends ConsoleKernel
                 ->withoutOverlapping()
                 ->runInBackground()
                 ->onOneServer()
-                ->onFailure(static function (): void {
-                    Log::error('Scheduled backup:prepare command failed');
+                ->onFailure(static function () {
+                    \Log::error('Scheduled backup:prepare command failed');
                 });
         }
 
@@ -84,13 +75,10 @@ final class Kernel extends ConsoleKernel
         if (($verifySchedule['enabled'] ?? true) === true) {
             $event = $schedule->command('backup:verify');
 
-            $verifyCron = $verifySchedule['cron'] ?? null;
-            $verifyAt = $verifySchedule['at'] ?? null;
-
-            if (is_string($verifyCron) && $verifyCron !== '') {
-                $event->cron($verifyCron);
-            } elseif (is_string($verifyAt) && $verifyAt !== '') {
-                $event->dailyAt($verifyAt);
+            if (! empty($verifySchedule['cron'])) {
+                $event->cron((string) $verifySchedule['cron']);
+            } elseif (! empty($verifySchedule['at'])) {
+                $event->dailyAt((string) $verifySchedule['at']);
             } else {
                 $event->daily();
             }
@@ -99,17 +87,10 @@ final class Kernel extends ConsoleKernel
                 ->withoutOverlapping()
                 ->runInBackground()
                 ->onOneServer()
-                ->onFailure(static function (): void {
-                    Log::error('Scheduled backup:verify command failed');
+                ->onFailure(static function () {
+                    \Log::error('Scheduled backup:verify command failed');
                 });
         }
-
-        $schedule
-            ->command('inventory:reconcile')
-            ->everyFifteenMinutes()
-            ->onOneServer()
-            ->withoutOverlapping()
-            ->runInBackground();
     }
 
     protected function commands(): void
