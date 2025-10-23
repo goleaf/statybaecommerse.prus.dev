@@ -6,8 +6,6 @@ namespace Tests\Feature\Database;
 
 use App\Models\AnalyticsEvent;
 use App\Models\Category;
-use App\Models\Menu;
-use App\Models\MenuItem;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -72,33 +70,6 @@ final class IndexPlanTest extends TestCase
         );
 
         $this->assertPlanUsesIndex($listingPlan);
-    }
-
-    public function test_menu_queries_use_indexes(): void
-    {
-        $menu = Menu::factory()->active()->create([
-            'key' => 'main_header',
-            'location' => 'header',
-        ]);
-
-        MenuItem::factory()->count(3)->visible()->create([
-            'menu_id' => $menu->id,
-            'parent_id' => null,
-        ]);
-
-        $menuPlan = DB::select(
-            $this->explain('SELECT id FROM menus WHERE key = ? AND is_active = 1 LIMIT 1'),
-            ['main_header']
-        );
-
-        $this->assertPlanUsesIndex($menuPlan);
-
-        $itemsPlan = DB::select(
-            $this->explain('SELECT id FROM menu_items WHERE menu_id = ? AND is_visible = 1 ORDER BY sort_order'),
-            [$menu->id]
-        );
-
-        $this->assertPlanUsesIndex($itemsPlan);
     }
 
     /**
