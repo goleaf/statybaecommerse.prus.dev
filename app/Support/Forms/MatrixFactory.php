@@ -8,56 +8,54 @@ use LaraZeus\MatrixChoice\Components\Matrix;
 
 final class MatrixFactory
 {
-    private function __construct()
-    {
-        // Prevent instantiation.
-    }
-
     /**
-     * Build a standardized permissions matrix using checkbox selections.
+     * Build a checkbox matrix tailored for permission management.
      *
-     * @param array<string, string> $rows
-     * @param array<string, string> $columns
+     * @param array<array-key, string> $rows
+     * @param array<array-key, string> $columns
      */
     public static function permissions(array $rows, array $columns): Matrix
     {
-        return self::checkboxGrid('permissions_matrix', $rows, $columns)
-            ->rowSelectRequired(false);
+        return self::checkboxGrid('permissions', $rows, $columns);
     }
 
     /**
-     * Build a radio-based matrix field for mutually exclusive selections.
+     * Build a matrix configured for exclusive selection per row.
      *
-     * @param array<string, string> $rows
-     * @param array<string, string> $columns
+     * @param array<array-key, string> $rows
+     * @param array<array-key, string> $columns
      */
     public static function radioGrid(string $name, array $rows, array $columns, ?string $label = null): Matrix
     {
-        $matrix = Matrix::make($name)
-            ->asRadio()
-            ->columnData($columns)
-            ->rowData($rows);
+        $matrix = self::baseMatrix($name, $rows, $columns, $label);
 
-        if ($label !== null) {
-            $matrix->label($label);
-        }
-
-        return $matrix;
+        return $matrix->asRadio();
     }
 
     /**
-     * Build a checkbox-based matrix field for multi-select grids.
+     * Build a matrix configured for multi-select behaviour per row.
      *
-     * @param array<string, string> $rows
-     * @param array<string, string> $columns
+     * @param array<array-key, string> $rows
+     * @param array<array-key, string> $columns
      */
     public static function checkboxGrid(string $name, array $rows, array $columns, ?string $label = null): Matrix
     {
+        $matrix = self::baseMatrix($name, $rows, $columns, $label);
+
+        return $matrix->asCheckbox();
+    }
+
+    /**
+     * Prime a matrix component with shared configuration concerns.
+     *
+     * @param array<array-key, string> $rows
+     * @param array<array-key, string> $columns
+     */
+    private static function baseMatrix(string $name, array $rows, array $columns, ?string $label): Matrix
+    {
         $matrix = Matrix::make($name)
-            ->asCheckbox()
-            ->columnData($columns)
             ->rowData($rows)
-            ->rowSelectRequired(false);
+            ->columnData($columns);
 
         if ($label !== null) {
             $matrix->label($label);
