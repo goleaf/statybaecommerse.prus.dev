@@ -32,6 +32,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Multilingual experience** across storefront and admin via `spatie/laravel-translatable`, Volt-powered Livewire pages, and localized seed data.
 
 -### Latest updates
+- Coupon administration resource now bypasses the global active scope, aligns form/view bindings, and stabilizes toggle, bulk, and duplicate actions so coupon CRUD and filtering tests succeed on SQLite.
 - Cart item management in the Filament admin now honours the selected product filter across list views and exports, ensuring QA and debugging sessions see only the intended product rows.
 - Recently viewed storefront API calls now bypass visibility scopes and return session-ordered product IDs, keeping wishlist toggles and customer history widgets consistent even when draft catalogue entries populate the session during automated tests.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates

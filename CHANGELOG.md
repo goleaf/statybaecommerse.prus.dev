@@ -7,6 +7,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Bug Fixes
+* Restored the coupon administration resource by unscoping queries, fixing toggle/duplicate bulk actions, and syncing schema bindings so CRUD, filtering, and discount tests operate without runtime failures.
 * Ensured the CartItem Filament product filter applies its constraint to the
   base query so admin listings, exports, and tests narrow results down to the
   selected product without requiring manual query tweaks.
