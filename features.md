@@ -46,7 +46,7 @@
 - OpenAPI documentation now mirrors the lean product meta payload and nullable media thumbnails emitted by the presenter, keeping schema validators and client SDKs in sync with production responses.
 
 ## Admin panel resilience
-- Category resource in the Filament admin now bypasses storefront scopes, auto-synchronises slugs, and surfaces boolean toggles/filters so QA and merchandisers can manage inactive or hidden categories directly from the list page.
+- Category management re-registers the children, product, and translation relation managers so Filament renders the full taxonomy workspace and recent smoke tests confirm the resource boots with complete navigation metadata.
 - Attribute administration keeps validation rule strings verbatim, surfaces array-based rules as comma-separated chips, and pairs with regression tests that prove both paths round-trip correctly through Filament.
 - Collection resource navigation metadata, translations, and fillable casts now mirror the Filament v4 schema so admin menus, factories, and the comprehensive resource tests target the same contract.
 - Filament dashboard access checks now fall back to open access when no
