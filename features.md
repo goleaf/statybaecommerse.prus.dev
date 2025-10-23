@@ -28,7 +28,7 @@
 - Request-scoped CSP nonces now propagate through middleware, helpers, Livewire, and Vite so every inline Blade script/style satisfies the stricter nonce-based CSP and updated HSTS/permissions policy headers.
 
 ## Tooling polish
-- Weekly Dependabot runs now open dependency pull requests pre-labeled for triage and auto-merge when safe, tightening our update cadence without manual babysitting.
+- Husky Git hook bootstrap regained its full shim after the deprecation banner replacement, keeping the executable wrapper in place so local hooks continue to run with the repository binaries.
 - `scripts/upgrade_filament_schema.php` now updates navigation icon docblocks automatically while refactoring `form`, `infolist`, and `table` signatures, making repeated schema migrations safe for the entire Filament tree.
 - The `data:import` Artisan command now documents its signature and description directly on the command class, improving discoverability via `php artisan list`.
 - Legacy diagnostics artisan commands were retired in favour of PHPUnit suites guarded by a configurable coverage extension and Paratest-aware composer scripts, making quality checks part of every test run.
