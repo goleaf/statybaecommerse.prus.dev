@@ -38,18 +38,20 @@ final class CampaignViewResourceTest extends \Tests\TestCase
 
         CampaignView::factory()->create([
             'campaign_id' => $campaign->id,
-            'customer_id' => $customer->id,
+            'user_id'     => $user->id,
             'ip_address'  => '192.168.1.1',
             'user_agent'  => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
             'referrer'    => 'https://google.com',
             'session_id'  => 'session_123',
+            'viewed_at'   => now()->subHour(),
         ]);
 
         CampaignView::factory()->create([
             'campaign_id' => $campaign->id,
-            'customer_id' => null,  // Guest customer
+            'user_id'     => null,  // Guest user
             'ip_address'  => '192.168.1.2',
             'user_agent'  => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+            'viewed_at'   => now(),
         ]);
 
         $this->actingAs($this->adminUser);
@@ -63,8 +65,8 @@ final class CampaignViewResourceTest extends \Tests\TestCase
                 'customer.name',
                 'ip_address',
                 'user_agent',
-                'referer',
-                'created_at',
+                'referrer',
+                'viewed_at',
             ]);
     }
 
@@ -73,15 +75,14 @@ final class CampaignViewResourceTest extends \Tests\TestCase
         $campaign = Campaign::factory()->create(['name' => 'Test Campaign']);
         $customer = User::factory()->create(['name' => 'John Doe']);
 
-        $view = CampaignView::factory()
-            ->for($customer, 'customer')
-            ->create([
-                'campaign_id' => $campaign->id,
-                'ip_address'  => '192.168.1.100',
-                'user_agent'  => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                'referrer'    => 'https://facebook.com',
-                'session_id'  => 'session_456',
-            ]);
+        $view = CampaignView::factory()->create([
+            'campaign_id' => $campaign->id,
+            'user_id'     => $user->id,
+            'ip_address'  => '192.168.1.100',
+            'user_agent'  => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'referrer'    => 'https://facebook.com',
+            'session_id'  => 'session_456',
+        ]);
 
         $this->actingAs($this->adminUser);
 
@@ -123,19 +124,17 @@ final class CampaignViewResourceTest extends \Tests\TestCase
         $customer1 = User::factory()->create(['name' => 'Customer 1']);
         $customer2 = User::factory()->create(['name' => 'Customer 2']);
 
-        $view1 = CampaignView::factory()
-            ->for($customer1, 'customer')
-            ->create([
-                'campaign_id' => $campaign->id,
-                'ip_address'  => '192.168.1.1',
-            ]);
+        $view1 = CampaignView::factory()->create([
+            'campaign_id' => $campaign->id,
+            'user_id'     => $user1->id,
+            'ip_address'  => '192.168.1.1',
+        ]);
 
-        $view2 = CampaignView::factory()
-            ->for($customer2, 'customer')
-            ->create([
-                'campaign_id' => $campaign->id,
-                'ip_address'  => '192.168.1.2',
-            ]);
+        $view2 = CampaignView::factory()->create([
+            'campaign_id' => $campaign->id,
+            'user_id'     => $user2->id,
+            'ip_address'  => '192.168.1.2',
+        ]);
 
         $this->actingAs($this->adminUser);
 
@@ -177,7 +176,7 @@ final class CampaignViewResourceTest extends \Tests\TestCase
 
         $guestView = CampaignView::factory()->create([
             'campaign_id' => $campaign->id,
-            'customer_id' => null,
+            'user_id'     => null,
             'ip_address'  => '192.168.1.1',
         ]);
 
@@ -248,12 +247,11 @@ final class CampaignViewResourceTest extends \Tests\TestCase
         $campaign = Campaign::factory()->create();
         $customer = User::factory()->create(['name' => 'John Doe']);
 
-        $view = CampaignView::factory()
-            ->for($customer, 'customer')
-            ->create([
-                'campaign_id' => $campaign->id,
-                'ip_address'  => '192.168.1.1',
-            ]);
+        $view = CampaignView::factory()->create([
+            'campaign_id' => $campaign->id,
+            'user_id'     => $user->id,
+            'ip_address'  => '192.168.1.1',
+        ]);
 
         $this->actingAs($this->adminUser);
 
@@ -345,12 +343,12 @@ final class CampaignViewResourceTest extends \Tests\TestCase
         $view = CampaignView::factory()->create([
             'campaign_id' => $campaign->id,
             'ip_address'  => '192.168.1.1',
-            'created_at'  => $viewTime,
+            'viewed_at'   => $viewTime,
         ]);
 
         $this->assertDatabaseHas('campaign_views', [
-            'id'         => $view->id,
-            'created_at' => $viewTime->format('Y-m-d H:i:s'),
+            'id'        => $view->id,
+            'viewed_at' => $viewTime->format('Y-m-d H:i:s'),
         ]);
     }
 
@@ -360,11 +358,10 @@ final class CampaignViewResourceTest extends \Tests\TestCase
         $customer = User::factory()->create();
 
         // Create multiple views for the same campaign
-        $views = CampaignView::factory()->count(3)
-            ->for($customer, 'customer')
-            ->create([
-                'campaign_id' => $campaign->id,
-            ]);
+        $views = CampaignView::factory()->count(3)->create([
+            'campaign_id' => $campaign->id,
+            'user_id'     => $user->id,
+        ]);
 
         $this->actingAs($this->adminUser);
 
@@ -379,12 +376,11 @@ final class CampaignViewResourceTest extends \Tests\TestCase
         $campaign = Campaign::factory()->create(['name' => 'Searchable Campaign']);
         $customer = User::factory()->create(['name' => 'Searchable Customer']);
 
-        $view = CampaignView::factory()
-            ->for($customer, 'customer')
-            ->create([
-                'campaign_id' => $campaign->id,
-                'ip_address'  => '192.168.1.1',
-            ]);
+        $view = CampaignView::factory()->create([
+            'campaign_id' => $campaign->id,
+            'user_id'     => $user->id,
+            'ip_address'  => '192.168.1.1',
+        ]);
 
         $this->actingAs($this->adminUser);
 
@@ -402,13 +398,13 @@ final class CampaignViewResourceTest extends \Tests\TestCase
         $view1 = CampaignView::factory()->create([
             'campaign_id' => $campaign->id,
             'ip_address'  => '192.168.1.1',
-            'created_at'  => now()->subDay(),
+            'viewed_at'   => now()->subDay(),
         ]);
 
         $view2 = CampaignView::factory()->create([
             'campaign_id' => $campaign->id,
             'ip_address'  => '192.168.1.2',
-            'created_at'  => now(),
+            'viewed_at'   => now(),
         ]);
 
         $this->actingAs($this->adminUser);
