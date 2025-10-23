@@ -87,21 +87,22 @@ final class MenuItemResource extends Resource
                                     ->options(function (Get $get, ?MenuItem $record): array {
                                         $menuId = $get('menu_id') ?? $record?->menu_id;
 
-                                        if (! $menuId) {
+                                        if (blank($menuId)) {
                                             return [];
                                         }
 
-                                        return MenuItem::query()
-                                            ->withoutGlobalScopes()
+                                        return MenuItem::withoutGlobalScopes()
                                             ->where('menu_id', $menuId)
                                             ->whereNull('parent_id')
                                             ->when(
-                                                $record,
-                                                fn (Builder $query): Builder => $query->whereKeyNot($record->getKey()),
+                                                $record?->exists,
+                                                fn (Builder $query): Builder => $query->whereKeyNot($record),
                                             )
+                                            ->orderBy('label')
                                             ->pluck('label', 'id')
                                             ->all();
                                     })
+                                    ->reactive()
                                     ->searchable()
                                     ->preload(),
                                 TextInput::make('label')
@@ -204,17 +205,20 @@ final class MenuItemResource extends Resource
                 SelectFilter::make('parent_id')
                     ->label(__('admin.menu_items.parent'))
                     ->options(function (SelectFilter $filter): array {
-                        $menuId = data_get($filter->getLivewire()->tableFilters ?? [], 'menu_id.value');
+                        $menuFilterState = $filter->getLivewire()?->getTableFilterState('menu_id');
+                        $menuId = $menuFilterState['value'] ?? null;
 
-                        $query = MenuItem::query()
-                            ->withoutGlobalScopes()
+                        $query = MenuItem::withoutGlobalScopes()
                             ->whereNull('parent_id');
 
-                        if ($menuId) {
+                        if (filled($menuId)) {
                             $query->where('menu_id', $menuId);
                         }
 
-                        return $query->pluck('label', 'id')->all();
+                        return $query
+                            ->orderBy('label')
+                            ->pluck('label', 'id')
+                            ->all();
                     })
                     ->searchable(),
                 TernaryFilter::make('is_visible')
