@@ -33,7 +33,7 @@ SearchableInput::make('product_id')
 The normaliser closure **must** return the selected value, display label, and an array payload. The helper automatically adds the
 `id` and `label` keys to the payload so down-stream consumers always receive both fields.
 
-## Normalising payloads
+The helper converts the `value` to a string, registers it as the component state, and feeds the label through `options()` alongside the payload so downstream closures all read the same structure. When the normaliser returns an `Arrayable` payload (for example, a DTO implementing `toArray()`), the helper coerces it into an array before handing it over to Livewire. Empty or falsy identifiers short-circuit into `clear()` so the UI cannot surface stale metadata.
 
 Re-use the specialised `App\Support\Search\*Search` helpers whenever possible. They already return `SearchResult` DTOs with a
 consistent payload structure for JavaScript and PHP consumers. When you cannot rely on an existing helper, mirror the following
@@ -84,7 +84,17 @@ store stays consistent.
 
 ## Quick checklist
 
-- Always call the hydrator inside `afterStateHydrated()` so edits reopen with the correct label, option, and payload.
-- Normalise payloads through the existing search helpers whenever they exist; otherwise, provide `id` and `label` keys manually.
-- Use `clear()` whenever a lookup should wipe related fields. Keep the callbacks idempotent so repeated clears do not raise
-  errors.
+- Keep the payload structure aligned with the search service that powers the component. For example, `AddressSearch::payload()` already exposes the exact fields expected by the order form, so return it directly from your normaliser.
+- When the component stores something other than the lookup identifier (for example, a composite key), make sure the `value` key reflects the final persisted state; the helper pushes that value back into the component before rendering.
+- If a lookup fails or the state is empty, the helper automatically calls `clear()` so the UI stays in sync with the database.
+
+## Resource integration checklist
+
+- Register `afterStateHydrated` closures on your Filament form components to call `SearchableComponentHelper::hydrate()` with a finder closure and normaliser that return the `[value, label, payload]` tuple described above. This keeps edit forms and relation managers aligned when records are re-opened.
+- Pair `afterStateUpdated` hooks with `SearchableComponentHelper::clear()` so clearing the lookup also wipes any dependent state (`Set` helpers for foreign keys, cached payload fields, and related dropdowns).
+- Prefer returning a payload array that is already shaped for the downstream Livewire data structure you need. The helper simply forwards the normalised payload, making the component the single source of truth for metadata.
+
+## Related guidelines
+
+- Review the broader [searchable input metadata lifecycle](../forms/SEARCHABLE_INPUT_METADATA.md) for payload conventions and integration examples.
+- Keep Filament resource ergonomics consistent by following the [navigation structure guide](../filament-navigation-structure.md) and the [navigation group compatibility rule](../filament-v4-navigation-group-rule.md).
