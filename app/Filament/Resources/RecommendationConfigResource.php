@@ -9,6 +9,7 @@ use App\Filament\Resources\RecommendationConfigResource\Pages;
 use App\Models\RecommendationConfig;
 use Filament\Actions\BulkAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Components\Combobox;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -125,13 +126,22 @@ final class RecommendationConfigResource extends Resource
                                 ->label(__('recommendation_config.fields.products'))
                                 ->relationship('products', 'name')
                                 ->preload()
-                                ->formatStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state),
+                                ->searchable()
+                                ->boxSearchs()
+                                ->height('360px')
+                                ->formatStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state)
+                                ->dehydrateStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state)
+                                ->native(false),
                             Combobox::make('categories')
                                 ->label(__('recommendation_config.fields.categories'))
                                 ->relationship('categories', 'name')
                                 ->preload()
-                                ->formatStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state),
-
+                                ->searchable()
+                                ->boxSearchs()
+                                ->height('360px')
+                                ->formatStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state)
+                                ->dehydrateStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state)
+                                ->native(false),
                         ]),
                 ]),
         ]);
