@@ -60,14 +60,11 @@ return [
     ],
     'order_statuses' => [
         'pending'    => 'Laukiantis',
-        'confirmed'  => 'Patvirtintas',
         'processing' => 'Apdorojamas',
         'shipped'    => 'Išsiųstas',
         'delivered'  => 'Pristatytas',
-        'completed'  => 'Užbaigtas', // Užtikriname, kad administratoriaus meniu turėtų visus galimus statusus.
         'cancelled'  => 'Atšauktas',
         'refunded'   => 'Grąžintas',
-        'returned'   => 'Grąžintas pirkėjo',
     ],
     'payment_statuses' => [
         'pending'            => 'Laukiantis',

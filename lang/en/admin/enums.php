@@ -64,14 +64,11 @@ return [
     // Order statuses
     'order_statuses' => [
         'pending'    => 'Pending',
-        'confirmed'  => 'Confirmed',
         'processing' => 'Processing',
         'shipped'    => 'Shipped',
         'delivered'  => 'Delivered',
-        'completed'  => 'Completed', // Keep enums aligned with database constraints for admin filters.
         'cancelled'  => 'Cancelled',
         'refunded'   => 'Refunded',
-        'returned'   => 'Returned',
     ],
     // Payment statuses
     'payment_statuses' => [

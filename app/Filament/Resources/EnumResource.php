@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\EnumResource\Pages;
 use App\Models\EnumValue;
 use BackedEnum;
@@ -42,22 +41,13 @@ final class EnumResource extends Resource
 {
     protected static ?string $model = EnumValue::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
-
-    /** @var string|BackedEnum|null Anchor the resource to the System navigation area. */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 2;
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
-        // Use the centralized enum label to avoid duplicated translations.
-        $group = self::$navigationGroup;
-
-        return $group instanceof NavigationGroup ? $group->label() : $group;
+        return trans('admin.enums.navigation_groups.system');
     }
 
     public static function getNavigationLabel(): string
