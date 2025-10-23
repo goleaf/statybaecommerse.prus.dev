@@ -6,202 +6,340 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
-use Symfony\Component\Finder\SplFileInfo;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use RuntimeException;
+use Throwable;
 
 final class I18nAuditCommand extends Command
 {
-    protected $signature = 'i18n:audit {fallback? : Override the configured fallback locale}';
+    private Filesystem $filesystem;
 
-    protected $description = 'Audit translation keys across locales using the fallback locale as the source of truth.';
+    protected $signature = 'i18n:audit
+                            {--base= : Base locale used as the reference point}
+                            {--format=table : Output format (table or json)}
+                            {--strict : Fail when warnings (extra or untranslated strings) are found}';
 
-    private Filesystem $files;
+    protected $description = 'Audit language files to detect missing, extra, or untranslated strings across locales.';
 
-    public function __construct(Filesystem $files)
+    public function __construct()
     {
         parent::__construct();
 
-        $this->files = $files;
+        $this->filesystem = new Filesystem;
     }
 
     public function handle(): int
     {
-        $fallback = (string) ($this->argument('fallback') ?: config('app.fallback_locale'));
+        try {
+            return $this->runAudit();
+        } catch (Throwable $exception) {
+            $message = 'I18n audit failed: '.$exception->getMessage();
+
+            $this->error($message);
+            fwrite(STDERR, $message.PHP_EOL);
+
+            if ($this->output->isVerbose()) {
+                $this->line($exception->getTraceAsString());
+            }
+
+            return self::FAILURE;
+        }
+    }
+
+    private function runAudit(): int
+    {
+        $baseOption = $this->option('base');
+        $defaultLocale = config('app.locale', 'en');
+
+        if (! is_string($defaultLocale) || $defaultLocale === '') {
+            throw new RuntimeException('The configured app.locale value must be a non-empty string.');
+        }
+
+        $baseLocale = is_string($baseOption) && $baseOption !== ''
+            ? $baseOption
+            : $defaultLocale;
+
+        $formatOption = $this->option('format');
+        $format = is_string($formatOption) && $formatOption !== ''
+            ? strtolower($formatOption)
+            : 'table';
+
+        if (! in_array($format, ['table', 'json'], true)) {
+            throw new RuntimeException("Unsupported format [{$format}]. Use 'table' or 'json'.");
+        }
+
         $locales = $this->discoverLocales();
 
-        if ($locales === []) {
-            $this->error('No locales found in the lang directory.');
-
-            return self::FAILURE;
+        if ($locales->isEmpty()) {
+            throw new RuntimeException('No locales were discovered in the lang directory.');
         }
 
-        if (! in_array($fallback, $locales, true)) {
-            $this->error("Fallback locale [{$fallback}] does not have any translation files.");
-
-            return self::FAILURE;
+        if (! $locales->contains($baseLocale)) {
+            throw new RuntimeException("The base locale [{$baseLocale}] does not exist in resources/lang.");
         }
 
-        $masterKeys = $this->collectLocaleKeys($fallback);
-        sort($masterKeys);
+        $translations = $locales
+            ->mapWithKeys(fn (string $locale) => [$locale => $this->loadTranslations($locale)])
+            ->all();
 
-        $this->info("Auditing translations (fallback: {$fallback})");
+        $baseTranslations = $translations[$baseLocale];
+        $report = [];
+        $hasErrors = false;
+        $hasWarnings = false;
 
-        $hasIssues = false;
-
-        foreach ($locales as $locale) {
-            $localeKeys = $this->collectLocaleKeys($locale);
-            sort($localeKeys);
-
-            $missing = array_values(array_diff($masterKeys, $localeKeys));
-            $extra = array_values(array_diff($localeKeys, $masterKeys));
-
-            if ($missing === [] && $extra === []) {
-                $this->line(" - {$locale}: OK");
-
+        foreach ($translations as $locale => $localeTranslations) {
+            if ($locale === $baseLocale) {
                 continue;
             }
 
-            $hasIssues = true;
+            $missingKeys = array_keys(array_diff_key($baseTranslations, $localeTranslations));
+            $extraKeys = array_keys(array_diff_key($localeTranslations, $baseTranslations));
+            $untranslatedKeys = $this->detectUntranslatedKeys($baseTranslations, $localeTranslations);
 
-            $this->line(" - {$locale}:");
-
-            if ($missing !== []) {
-                $this->warn('   Missing ('.count($missing).'):');
-
-                foreach ($missing as $key) {
-                    $this->line("     • {$key}");
-                }
+            if ($missingKeys !== []) {
+                $hasErrors = true;
             }
 
-            if ($extra !== []) {
-                $this->warn('   Extra ('.count($extra).'):');
-
-                foreach ($extra as $key) {
-                    $this->line("     • {$key}");
-                }
+            if ($extraKeys !== [] || $untranslatedKeys !== []) {
+                $hasWarnings = true;
             }
+
+            sort($missingKeys);
+            sort($extraKeys);
+            sort($untranslatedKeys);
+
+            $report[$locale] = [
+                'missing' => $missingKeys,
+                'extra' => $extraKeys,
+                'untranslated' => $untranslatedKeys,
+            ];
         }
 
-        if ($hasIssues) {
-            $this->error('Translation audit found discrepancies.');
+        $this->outputReport($report, $baseLocale, $format);
 
+        if ($hasErrors || ($hasWarnings && $this->option('strict'))) {
             return self::FAILURE;
         }
-
-        $this->info('All locales match the fallback key set.');
 
         return self::SUCCESS;
     }
 
     /**
-     * @return list<string>
+     * @return Collection<int, string>
      */
-    private function collectLocaleKeys(string $locale): array
+    private function discoverLocales(): Collection
     {
-        $keys = [];
         $langPath = lang_path();
+        $locales = collect();
 
-        $directory = $langPath.DIRECTORY_SEPARATOR.$locale;
-        if ($this->files->isDirectory($directory)) {
-            /** @var SplFileInfo $file */
-            foreach ($this->files->allFiles($directory) as $file) {
+        foreach ($this->filesystem->directories($langPath) as $directory) {
+            $locales->push(basename($directory));
+        }
+
+        foreach ($this->filesystem->files($langPath) as $file) {
+            $matches = [];
+
+            if (preg_match('/^([\w-]+)\.(php|json)$/i', $file->getFilename(), $matches) === 1) {
+                $locales->push($matches[1]);
+            }
+        }
+
+        return $locales->unique()->sort()->values();
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function loadTranslations(string $locale): array
+    {
+        $translations = [];
+        $langPath = lang_path();
+        $jsonFile = $langPath.'/'.$locale.'.json';
+        $rootPhpFile = $langPath.'/'.$locale.'.php';
+        $localeDirectory = $langPath.'/'.$locale;
+
+        if ($this->filesystem->exists($jsonFile)) {
+            $translations = array_merge($translations, $this->loadJsonTranslations($jsonFile));
+        }
+
+        if ($this->filesystem->exists($rootPhpFile)) {
+            $translations = array_merge($translations, $this->loadPhpTranslations($rootPhpFile));
+        }
+
+        if ($this->filesystem->isDirectory($localeDirectory)) {
+            foreach ($this->filesystem->allFiles($localeDirectory) as $file) {
                 if ($file->getExtension() !== 'php') {
                     continue;
                 }
 
-                $relative = str_replace(['\\', '/'], '.', $file->getRelativePathname());
-                $relative = (string) preg_replace('/\.php$/', '', $relative);
+                $relativePath = trim(str_replace($localeDirectory, '', $file->getPathname()), DIRECTORY_SEPARATOR);
+                $group = str_replace(DIRECTORY_SEPARATOR, '/', substr($relativePath, 0, -4));
 
-                $data = require $file->getRealPath();
-
-                if (! is_array($data)) {
-                    continue;
-                }
-
-                foreach ($this->flattenArrayKeys($data) as $key) {
-                    $keys[] = $relative !== '' ? $relative.'.'.$key : $key;
-                }
+                $translations = array_merge(
+                    $translations,
+                    $this->loadPhpTranslations($file->getPathname(), $group)
+                );
             }
         }
 
-        $rootPhp = $langPath.DIRECTORY_SEPARATOR.$locale.'.php';
-        if ($this->files->exists($rootPhp)) {
-            $data = require $rootPhp;
+        ksort($translations);
 
-            if (is_array($data)) {
-                foreach ($this->flattenArrayKeys($data) as $key) {
-                    $keys[] = $key;
-                }
-            }
-        }
-
-        $jsonPath = $langPath.DIRECTORY_SEPARATOR.$locale.'.json';
-        if ($this->files->exists($jsonPath)) {
-            $json = json_decode((string) $this->files->get($jsonPath), true, 512, JSON_THROW_ON_ERROR);
-
-            foreach (array_keys($json) as $key) {
-                $keys[] = (string) $key;
-            }
-        }
-
-        $keys = array_values(array_unique($keys));
-        sort($keys);
-
-        return $keys;
+        return $translations;
     }
 
     /**
-     * @return list<string>
+     * @return array<string, string>
      */
-    private function flattenArrayKeys(array $data, string $prefix = ''): array
+    private function loadJsonTranslations(string $path): array
     {
-        $keys = [];
+        $contents = $this->filesystem->get($path);
+        $decoded = json_decode($contents, true);
 
-        foreach ($data as $key => $value) {
-            $key = (string) $key;
-            $fullKey = $prefix !== '' ? $prefix.'.'.$key : $key;
+        if (! is_array($decoded)) {
+            $message = json_last_error() === JSON_ERROR_NONE
+                ? 'Unexpected JSON structure.'
+                : json_last_error_msg();
 
-            if (is_array($value) && $value !== []) {
-                $keys = array_merge($keys, $this->flattenArrayKeys($value, $fullKey));
-
-                continue;
-            }
-
-            $keys[] = $fullKey;
+            throw new RuntimeException("Failed to decode JSON translations from [{$path}]: {$message}");
         }
 
-        return $keys;
+        $translations = [];
+
+        foreach ($decoded as $key => $value) {
+            $translations['__json__.'.$key] = $this->normalizeValue($value);
+        }
+
+        return $translations;
     }
 
     /**
-     * @return list<string>
+     * @return array<string, string>
      */
-    private function discoverLocales(): array
+    private function loadPhpTranslations(string $path, ?string $group = null): array
     {
-        $langPath = lang_path();
+        /** @var array<mixed>|mixed $data */
+        $data = require $path;
 
-        if (! $this->files->isDirectory($langPath)) {
+        if (! is_array($data)) {
             return [];
         }
 
-        $locales = [];
+        $flattened = Arr::dot($data);
+        $translations = [];
 
-        foreach ($this->files->directories($langPath) as $directory) {
-            $locales[] = basename($directory);
+        foreach ($flattened as $key => $value) {
+            $translationKey = $group === null || $group === ''
+                ? (string) $key
+                : $group.'.'.$key;
+
+            $translations[$translationKey] = $this->normalizeValue($value);
         }
 
-        foreach ($this->files->files($langPath) as $file) {
-            $extension = $file->getExtension();
+        return $translations;
+    }
 
-            if (! in_array($extension, ['php', 'json'], true)) {
+    /**
+     * @param  array<string, string>  $base
+     * @param  array<string, string>  $locale
+     * @return array<int, string>
+     */
+    private function detectUntranslatedKeys(array $base, array $locale): array
+    {
+        $keys = [];
+
+        foreach (array_intersect_key($locale, $base) as $key => $value) {
+            if ($this->normalizeValue($base[$key]) === $this->normalizeValue($value)) {
+                $keys[] = $key;
+            }
+        }
+
+        return $keys;
+    }
+
+    private function normalizeValue(mixed $value): string
+    {
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+
+        if (is_scalar($value) || $value === null) {
+            return trim((string) $value);
+        }
+
+        return trim(var_export($value, true));
+    }
+
+    /**
+     * @param  array<string, array<string, array<int, string>>>  $report
+     */
+    private function outputReport(array $report, string $baseLocale, string $format): void
+    {
+        if ($format === 'json') {
+            $payload = json_encode(
+                [
+                    'base_locale' => $baseLocale,
+                    'locales' => $report,
+                ],
+                JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE
+            );
+
+            if ($payload === false) {
+                throw new RuntimeException('Failed to encode report as JSON: '.json_last_error_msg());
+            }
+
+            $this->line($payload);
+
+            return;
+        }
+
+        if ($report === []) {
+            $this->info("All locales match the base locale [{$baseLocale}].");
+
+            return;
+        }
+
+        $this->line(sprintf('%-12s %-10s %-10s %-15s', 'Locale', 'Missing', 'Extra', 'Untranslated'));
+        $this->line(str_repeat('-', 50));
+
+        foreach ($report as $locale => $data) {
+            $this->line(sprintf(
+                '%-12s %-10d %-10d %-15d',
+                $locale,
+                count($data['missing']),
+                count($data['extra']),
+                count($data['untranslated'])
+            ));
+        }
+
+        foreach ($report as $locale => $data) {
+            if ($data['missing'] === [] && $data['extra'] === [] && $data['untranslated'] === []) {
                 continue;
             }
 
-            $locales[] = $file->getBasename('.'.$extension);
+            $this->newLine();
+            $this->info("Locale: {$locale}");
+
+            if ($data['missing'] !== []) {
+                $this->line('  Missing keys:');
+                foreach ($data['missing'] as $key) {
+                    $this->line("    • {$key}");
+                }
+            }
+
+            if ($data['extra'] !== []) {
+                $this->line('  Extra keys:');
+                foreach ($data['extra'] as $key) {
+                    $this->line("    • {$key}");
+                }
+            }
+
+            if ($data['untranslated'] !== []) {
+                $this->line('  Untranslated keys (identical to base):');
+                foreach ($data['untranslated'] as $key) {
+                    $this->line("    • {$key}");
+                }
+            }
         }
-
-        $locales = array_values(array_unique($locales));
-        sort($locales);
-
-        return $locales;
     }
 }
