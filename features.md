@@ -1,10 +1,7 @@
 # Feature Highlights
 
-## Logistics & Fulfilment
-- Added zone-aware shipping option management so administrators can select delivery regions directly in the Filament form and review them via dedicated columns and filters.
+## Fulfilment & Logistics
+- Shipping option delivery ranges in the Filament admin now display a precise window even when carriers promise same-day (0 day) service or when only one bound is stored, helping staff quickly spot incomplete data.
 
-## Admin Productivity
-- Maintains live validation for slugs, localized helper text, and matrix-based availability controls to keep shipping data accurate.
-
-## Internationalization
-- Extended admin translations with Lithuanian and English copy for the new zone controls to preserve parity across locales.
+## Reference
+- Review `app/Filament/Resources/ShippingOptionResource.php` for the table presentation logic and `app/Models/ShippingOption.php` for the accessor reused across storefront components.

@@ -251,9 +251,21 @@ final class ShippingOptionResource extends Resource
                 TextColumn::make('estimated_days_min')
                     ->label(__('admin.shipping_options.estimated_days'))
                     ->formatStateUsing(
-                        fn ($state, ShippingOption $record): string => $record->estimated_days_min && $record->estimated_days_max
-                            ? "{$record->estimated_days_min}-{$record->estimated_days_max} " . __('admin.shipping_options.days')
-                            : '-'
+                        function ($state, ShippingOption $record): string {
+                            // Present a stable "min-max" window when both values exist; otherwise surface a dash for clarity.
+                            $minimum = is_numeric($state) ? (int) $state : null;
+                            $maximum = is_numeric($record->estimated_days_max) ? (int) $record->estimated_days_max : null;
+
+                            if ($minimum === null || $maximum === null) {
+                                return '-';
+                            }
+
+                            if ($minimum === $maximum) {
+                                return sprintf('%d %s', $minimum, __('admin.shipping_options.days'));
+                            }
+
+                            return sprintf('%d-%d %s', $minimum, $maximum, __('admin.shipping_options.days'));
+                        }
                     ),
                 IconColumn::make('is_enabled')
                     ->label(__('admin.shipping_options.is_enabled'))
