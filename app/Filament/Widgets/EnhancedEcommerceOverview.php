@@ -16,18 +16,11 @@ use UnitEnum;
 
 final class EnhancedEcommerceOverview extends StatsOverviewWidget
 {
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-presentation-chart-line';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-presentation-chart-line';
 
-    /**
-     * Localize the navigation label to align with analytics translations.
-     */
-    public static function getNavigationLabel(): string
-    {
-        return __('analytics.enhanced_overview.navigation_label');
-    }
+    protected static $navigationLabel = 'Enh. E-commerce Overview';
+
+    protected static UnitEnum|string|null $navigationGroup = 'Dashboard';
 
     protected string $maxHeight = '32rem';
 
