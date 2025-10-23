@@ -136,21 +136,26 @@ final class BackupPrepareCommand extends Command
             throw new RuntimeException(sprintf('Only sqlite backups are supported, received [%s].', (string) $driver));
         }
 
-        $databasePath = $config['database'] ?? null;
-
-        if (! is_string($databasePath) || $databasePath === '') {
-            throw new RuntimeException('SQLite database path is not configured.');
-        }
-
-        File::ensureDirectoryExists(dirname($databasePath));
-
-        if (! File::exists($databasePath)) {
-            throw new RuntimeException(sprintf('SQLite database [%s] does not exist.', $databasePath));
-        }
-
         $targetPath = $backupPath . DIRECTORY_SEPARATOR . 'database.sqlite';
 
-        File::copy($databasePath, $targetPath);
+        // Export a consistent snapshot using SQLite's VACUUM INTO so we do not depend on filesystem copies.
+        $pdo = DB::connection($connection)->getPdo();
+
+        File::delete($targetPath);
+
+        $escapedTarget = str_replace("'", "''", $targetPath);
+
+        try {
+            $pdo->exec("VACUUM INTO '{$escapedTarget}'");
+        } catch (Throwable $exception) {
+            throw new RuntimeException('Failed to export SQLite backup using VACUUM INTO.', 0, $exception);
+        }
+
+        clearstatcache(false, $targetPath);
+
+        if (! File::exists($targetPath)) {
+            throw new RuntimeException(sprintf('SQLite backup could not be created at [%s].', $targetPath));
+        }
 
         return $targetPath;
     }

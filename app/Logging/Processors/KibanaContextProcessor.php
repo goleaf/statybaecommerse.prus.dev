@@ -34,6 +34,9 @@ final class KibanaContextProcessor
             'environment' => $environment,
         ];
 
+        // Capture the current process identifier so the logs can be correlated with CLI jobs and queue workers.
+        $pid = getmypid();
+
         if ($pid !== false) {
             $extra['process'] = [
                 'pid' => $pid,
