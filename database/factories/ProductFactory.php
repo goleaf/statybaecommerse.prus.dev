@@ -103,7 +103,7 @@ class ProductFactory extends Factory
         $basePrice = $this->faker->randomFloat(2, 5, 2000);
         $salePrice = $this->faker->boolean(25) ? $basePrice * 0.8 : null;
 
-        return [
+        $attributes = [
             'type'                => 'simple',
             'name'                => $name,
             'slug'                => Str::slug($name . '-' . $this->faker->unique()->randomNumber()),
@@ -131,6 +131,14 @@ class ProductFactory extends Factory
             'seo_description' => 'Pirkite ' . strtolower($name) . ' geriausia kaina Lietuvoje. Greitas pristatymas visoje šalyje.',
             'published_at'    => now()->subDays(3),
         ];
+
+        // Guard optional columns so ad-hoc schemas declared within isolated tests can
+        // reuse the product factory without needing to mirror every production field.
+        if (! Schema::hasColumn((new Product)->getTable(), 'is_enabled')) {
+            unset($attributes['is_enabled']);
+        }
+
+        return $attributes;
     }
 
     private function generateLithuanianDescription(string $productName): string
@@ -168,7 +176,7 @@ class ProductFactory extends Factory
                 }
             })
             ->afterCreating(function (Product $product): void {
-                $brandTable = (new Brand())->getTable();
+                $brandTable = (new Brand)->getTable();
 
                 if ($product->brand_id === null && Schema::hasTable($brandTable)) {
                     $brand = Brand::factory()->create();
@@ -253,7 +261,7 @@ class ProductFactory extends Factory
 
             $slugSource = $locale === $defaultLocale
                 ? (string) ($product->slug ?? $name)
-                : $name.'-'.$locale;
+                : $name . '-' . $locale;
 
             return [
                 'locale'            => $locale,
