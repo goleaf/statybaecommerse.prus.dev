@@ -13,6 +13,7 @@ use App\Support\Html\HtmlSanitizer;
 use App\Traits\HasProductPricing;
 use App\Traits\HasTranslations;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;

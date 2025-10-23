@@ -272,7 +272,8 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                             ->multiple()
                                             ->relationship('images', 'path')
                                             ->directory('products')
-                                            ->visibility('private')
+                                            ->disk('public')
+                                            ->visibility('public')
                                             ->reorderable()
                                             ->appendFiles(),
                                     ]),

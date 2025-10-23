@@ -13,6 +13,7 @@ use App\Models\Export;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
