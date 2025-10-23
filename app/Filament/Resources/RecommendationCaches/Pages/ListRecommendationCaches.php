@@ -8,7 +8,7 @@ use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\RecommendationCaches\RecommendationCacheResource;
 use Filament\Actions\CreateAction;
 
-final class ListRecommendationCaches extends BaseListRecords
+final class ListRecommendationCaches extends ListRecords
 {
     protected static string $resource = RecommendationCacheResource::class;
 
