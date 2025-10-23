@@ -9,10 +9,6 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\PartnerResource\Pages;
 use App\Models\Partner;
 use BackedEnum;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
@@ -31,7 +27,10 @@ final class PartnerResource extends Resource
 
     protected static ?string $model = Partner::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-user-group';
+    /**
+     * Navigation icon identifier required by Filament.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user-group';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
@@ -45,7 +44,7 @@ final class PartnerResource extends Resource
         // Build the Partner form using the Section helper to keep layouts consistent.
         return $form
             ->schema([
-                Section::make(__('admin.partners.sections.basic_information'))
+                Forms\Components\Section::make(__('admin.partners.sections.basic_information'))
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label(__('admin.partners.name'))
@@ -65,7 +64,7 @@ final class PartnerResource extends Resource
                             ->default(true),
                     ])
                     ->columns(2),
-                Section::make(__('admin.partners.sections.contact_information'))
+                Forms\Components\Section::make(__('admin.partners.sections.contact_information'))
                     ->schema([
                         Forms\Components\TextInput::make('contact_email')
                             ->label(__('admin.partners.contact_email'))
@@ -77,7 +76,7 @@ final class PartnerResource extends Resource
                             ->maxLength(255),
                     ])
                     ->columns(2),
-                Section::make(__('admin.partners.sections.financial_settings'))
+                Forms\Components\Section::make(__('admin.partners.sections.financial_settings'))
                     ->schema([
                         Forms\Components\TextInput::make('discount_rate')
                             ->label(__('admin.partners.discount_rate'))
@@ -93,7 +92,7 @@ final class PartnerResource extends Resource
                             ->step(0.0001),
                     ])
                     ->columns(2),
-                Section::make(__('admin.partners.sections.media'))
+                Forms\Components\Section::make(__('admin.partners.sections.media'))
                     ->schema([
                         Forms\Components\FileUpload::make('logo')
                             ->label(__('admin.partners.logo'))
@@ -174,8 +173,7 @@ final class PartnerResource extends Resource
         return [
             'index'  => Pages\ListPartners::route('/'),
             'create' => Pages\CreatePartner::route('/create'),
-            'view' => Pages\ViewPartner::route('/{record}'),
-            'edit' => Pages\EditPartner::route('/{record}/edit'),
+            'edit'   => Pages\EditPartner::route('/{record}/edit'),
         ];
     }
 }
