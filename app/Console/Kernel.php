@@ -12,13 +12,11 @@ use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use Illuminate\Support\Str;
+use Log;
 
 final class Kernel extends ConsoleKernel
 {
-    /** @var array<string, OperationLog> */
-    private array $commandOperations = [];
-
+    /** @phpstan-ignore-next-line */
     protected $commands = [
         \App\Console\Commands\BackupPrepareCommand::class,
         \App\Console\Commands\BackupVerifyCommand::class,
@@ -44,8 +42,8 @@ final class Kernel extends ConsoleKernel
             ->dailyAt('02:00')
             ->withoutOverlapping()
             ->runInBackground()
-            ->onFailure(function (): void {
-                \Log::error('Daily code style validation failed');
+            ->onFailure(function () {
+                Log::error('Daily code style validation failed');
             });
 
         // Run code style fix weekly on Sundays at 3 AM
@@ -54,26 +52,58 @@ final class Kernel extends ConsoleKernel
             ->weeklyOn(0, '03:00')
             ->withoutOverlapping()
             ->runInBackground()
-            ->onSuccess(function (): void {
-                \Log::info('Weekly code style fix completed successfully');
+            ->onSuccess(function () {
+                Log::info('Weekly code style fix completed successfully');
             });
 
-        $prepareSchedule = config('backup.schedule.prepare');
-        if (is_string($prepareSchedule) && $prepareSchedule !== '') {
-            $schedule
-                ->command('backup:prepare')
-                ->cron($prepareSchedule)
+        $prepareSchedule = (array) config('backup.schedule.prepare', []);
+
+        if (($prepareSchedule['enabled'] ?? true) === true) {
+            $event = $schedule->command('backup:prepare');
+
+            $cronExpression = $prepareSchedule['cron'] ?? null;
+            $scheduledAt = $prepareSchedule['at'] ?? null;
+
+            if (is_string($cronExpression) && $cronExpression !== '') {
+                $event->cron($cronExpression);
+            } elseif (is_string($scheduledAt) && $scheduledAt !== '') {
+                $event->dailyAt($scheduledAt);
+            } else {
+                $event->daily();
+            }
+
+            $event
                 ->withoutOverlapping()
-                ->runInBackground();
+                ->runInBackground()
+                ->onOneServer()
+                ->onFailure(static function () {
+                    Log::error('Scheduled backup:prepare command failed');
+                });
         }
 
-        $verifySchedule = config('backup.schedule.verify');
-        if (is_string($verifySchedule) && $verifySchedule !== '') {
-            $schedule
-                ->command('backup:verify')
-                ->cron($verifySchedule)
+        $verifySchedule = (array) config('backup.schedule.verify', []);
+
+        if (($verifySchedule['enabled'] ?? true) === true) {
+            $event = $schedule->command('backup:verify');
+
+            $cronExpression = $verifySchedule['cron'] ?? null;
+            $scheduledAt = $verifySchedule['at'] ?? null;
+
+            if (is_string($cronExpression) && $cronExpression !== '') {
+                $event->cron($cronExpression);
+            } elseif (is_string($scheduledAt) && $scheduledAt !== '') {
+                $event->dailyAt($scheduledAt);
+            } else {
+                $event->daily();
+            }
+
+            $event
                 ->withoutOverlapping()
-                ->runInBackground();
+                ->runInBackground()
+                ->onOneServer()
+                ->onFailure(static function () {
+                    Log::error('Scheduled backup:verify command failed');
+                });
         }
 
         $schedule
@@ -86,61 +116,7 @@ final class Kernel extends ConsoleKernel
 
     protected function commands(): void
     {
-        $events = $this->app['events'];
-
-        $events->listen(CommandStarting::class, function (CommandStarting $event): void {
-            $logContext = $this->app->make(LogContext::class);
-            $structuredLogger = $this->app->make(StructuredLogger::class);
-
-            $logContext->setCorrelationId((string) Str::uuid());
-            $logContext->setRequestId((string) Str::uuid());
-            $logContext->setCommandName($event->command ?? $event->input->getFirstArgument() ?? 'artisan');
-            $logContext->setUserId(null);
-            $logContext->merge([
-                'cli' => true,
-            ]);
-
-            \Log::withContext($logContext->toArray());
-
-            $operation = $structuredLogger->operation('console_command', [
-                'command' => $logContext->commandName(),
-                'arguments' => $event->input->getArguments(),
-                'options' => $event->input->getOptions(),
-            ]);
-
-            $this->commandOperations[spl_object_hash($event->input)] = $operation;
-        });
-
-        $events->listen(CommandFinished::class, function (CommandFinished $event): void {
-            $key = spl_object_hash($event->input);
-
-            if (! isset($this->commandOperations[$key])) {
-                return;
-            }
-
-            $operation = $this->commandOperations[$key];
-            $operation->finish([
-                'exit_code' => $event->exitCode,
-                'memory_peak_bytes' => memory_get_peak_usage(true),
-            ]);
-
-            unset($this->commandOperations[$key]);
-        });
-
-        $events->listen(CommandFailed::class, function (CommandFailed $event): void {
-            $key = spl_object_hash($event->input);
-
-            if (! isset($this->commandOperations[$key])) {
-                return;
-            }
-
-            $operation = $this->commandOperations[$key];
-            $operation->fail($event->exception, [
-                'exit_code' => $event->exitCode,
-            ]);
-        });
-
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }
