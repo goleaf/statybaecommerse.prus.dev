@@ -9,8 +9,9 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\PriceResource\Pages;
 use App\Models\Price;
 use App\Models\Product;
-use App\Models\ProductVariant;
-use Filament\Forms\Components\DateTimePicker;
+use App\Support\Filament\SearchableInputHelper;
+use App\Support\Search\ProductSearch;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\MorphToSelect;
@@ -88,6 +89,51 @@ final class PriceResource extends Resource
                     ->schema([
                         Grid::make(3)
                             ->schema([
+                                SearchableInput::make('product_id')
+                                    ->label(__('admin.prices.product'))
+                                    ->placeholder('SKU / EAN / name')
+                                    ->required()
+                                    ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
+                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
+                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                        // Hydrate via helper per docs/forms/SEARCHABLE_INPUT_METADATA.md contract.
+                                        SearchableInputHelper::hydrate(
+                                            $component,
+                                            $state,
+                                            static function (int $value): ?array {
+                                                $product = Product::query()
+                                                    ->select(['id', 'sku', 'name'])
+                                                    ->find($value);
+
+                                                if (! $product instanceof Product) {
+                                                    return null;
+                                                }
+
+                                                return [
+                                                    'value' => $product->getKey(),
+                                                    'label' => ProductSearch::label($product),
+                                                ];
+                                            },
+                                        );
+                                    })
+                                    ->afterStateUpdated(function (?string $state, Set $set): void {
+                                        if ($state === null || $state === '') {
+                                            // Ensure cleared lookups drop the persisted id (docs/forms/SEARCHABLE_INPUT_METADATA.md).
+                                            SearchableInputHelper::clear($set, ['product_id' => null]);
+
+                                            return;
+                                        }
+
+                                        $product = Product::query()
+                                            ->select(['id'])
+                                            ->find((int) $state);
+
+                                        if (! $product instanceof Product) {
+                                            return;
+                                        }
+
+                                        $set('product_id', $product->getKey());
+                                    }),
                                 TextInput::make('amount')
                                     ->label(__('admin.prices.amount'))
                                     ->numeric()

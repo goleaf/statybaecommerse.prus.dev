@@ -10,6 +10,7 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Support\Filament\ProductVariantFieldHelper;
 use App\Support\Filament\Filters\DateRangeFilter;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;
 use App\Support\Search\ProductVariantSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
@@ -101,7 +102,7 @@ final class OrderItemResource extends Resource
                                 ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
                                 ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?OrderItem $record): void {
-                                    // Hydrate via helper to match docs/forms/SEARCHABLE_INPUT_METADATA.md expectations.
+                                    // Helper keeps hydration in sync with docs/forms/SEARCHABLE_INPUT_METADATA.md guidance.
                                     SearchableInputHelper::hydrate(
                                         $component,
                                         $state,
@@ -131,8 +132,14 @@ final class OrderItemResource extends Resource
                                 // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
                                 ->afterStateUpdated(function (?string $state, Set $set, Get $get): void {
                                     if ($state === null || $state === '') {
-                                        // When the lookup is cleared ensure all derived metadata and totals are reset.
-                                        ProductVariantFieldHelper::handleVariantSelection(null, $set, $get);
+                                        // Clear product metadata when the lookup resets (docs/forms/SEARCHABLE_INPUT_METADATA.md).
+                                        SearchableInputHelper::clear($set, [
+                                            'product_id'         => null,
+                                            'name'               => null,
+                                            'sku'                => null,
+                                            'unit_price'         => null,
+                                            'product_variant_id' => null,
+                                        ]);
 
                                         return;
                                     }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Support\Filament\SearchableInputHelper;
 
-it('clear helper flushes dependent keys', function (): void {
+test('clear helper flushes dependent keys', function (): void {
     $calls = [];
 
     $set = function (string $field, mixed $value) use (&$calls): void {

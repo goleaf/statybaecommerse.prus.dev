@@ -36,7 +36,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
-use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
+use App\Support\Filament\SearchableInputHelper;
 
 class OrdersRelationManager extends BaseRelationManager
 {
@@ -79,17 +79,23 @@ class OrdersRelationManager extends BaseRelationManager
                             })
                             ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
                             ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                                if ($state === null || $state === '') {
+                                // Keep hydration aligned with docs/forms/SEARCHABLE_INPUT_METADATA.md.
+                                SearchableInputHelper::hydrate(
+                                    $component,
+                                    $state,
+                                    static fn (string $value): ?array => [
+                                        'value' => $value,
+                                        'label' => OrderStatus::tryFrom($value)?->getLabel() ?? $value,
+                                    ],
+                                );
+                            })
+                            ->afterStateUpdated(function (?string $state, callable $set): void {
+                                if ($state !== null && $state !== '') {
                                     return;
                                 }
 
-                                $label = OrderStatus::tryFrom($state)?->getLabel() ?? $state;
-
-                                $component
-                                    ->state($state)
-                                    ->options([
-                                        $state => $label,
-                                    ]);
+                                // Clear status selection with the helper contract.
+                                SearchableInputHelper::clear($set, ['status' => null]);
                             }),
                         TextInput::make('total_amount')
                             ->label(__('orders.total_amount'))

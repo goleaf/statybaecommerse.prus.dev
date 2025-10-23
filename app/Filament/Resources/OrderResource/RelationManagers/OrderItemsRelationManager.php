@@ -6,7 +6,8 @@ namespace App\Filament\Resources\OrderResource\RelationManagers;
 
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\OrderItem;
-use App\Support\Filament\ProductVariantFieldHelper;
+use App\Models\ProductVariant;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductVariantSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
@@ -73,9 +74,67 @@ final class OrderItemsRelationManager extends BaseRelationManager
                                     ->placeholder(__('orders.placeholders.product_variant'))
                                     ->searchUsing(fn (string $term): array => ProductVariantSearch::results($term))
                                     ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                    // Refer to docs/filament/variant-lookup-helpers.md for helper usage guidance.
-                                    ->afterStateHydrated(fn (SearchableInput $component, ?int $state) => ProductVariantFieldHelper::hydrateSearchableVariant($component, $state))
-                                    ->afterStateUpdated(fn (?string $state, Set $set, Get $get) => ProductVariantFieldHelper::handleVariantSelection($state, $set, $get)),
+                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                        // Hydrate using shared helper per docs/forms/SEARCHABLE_INPUT_METADATA.md.
+                                        SearchableInputHelper::hydrate(
+                                            $component,
+                                            $state,
+                                            static function (int $value): ?array {
+                                                $variant = ProductVariant::query()
+                                                    ->select(['id', 'product_id', 'sku', 'name', 'price'])
+                                                    ->with(['product:id,sku,name'])
+                                                    ->find($value);
+
+                                                if (! $variant instanceof ProductVariant) {
+                                                    return null;
+                                                }
+
+                                                return [
+                                                    'value' => $variant->getKey(),
+                                                    'label' => ProductVariantSearch::label($variant),
+                                                ];
+                                            },
+                                        );
+                                    })
+                                    ->afterStateUpdated(function (?string $state, Set $set, Get $get): void {
+                                        if ($state === null || $state === '') {
+                                            SearchableInputHelper::clear($set, [
+                                                'product_variant_id' => null,
+                                                'product_id'         => null,
+                                                'name'               => null,
+                                                'sku'                => null,
+                                                'unit_price'         => null,
+                                                'total'              => 0,
+                                            ]);
+
+                                            return;
+                                        }
+
+                                        $variant = ProductVariant::query()
+                                            ->select(['id', 'product_id', 'sku', 'name', 'price'])
+                                            ->with(['product:id,sku,name'])
+                                            ->find((int) $state);
+
+                                        if (! $variant instanceof ProductVariant) {
+                                            return;
+                                        }
+
+                                        $set('product_variant_id', $variant->getKey());
+                                        $set('product_id', $variant->getAttribute('product_id'));
+
+                                        $name = $variant->getAttribute('name') ?? optional($variant->product)->name ?? '';
+                                        $sku = $variant->getAttribute('sku') ?? optional($variant->product)->sku ?? '';
+
+                                        $set('name', is_string($name) ? $name : '');
+                                        $set('sku', is_string($sku) ? $sku : '');
+
+                                        $price = (float) ($variant->getAttribute('price') ?? 0);
+                                        $set('unit_price', $price);
+
+                                        $quantity = (int) ($get('quantity') ?? 1);
+                                        $discount = (float) ($get('discount_amount') ?? 0);
+                                        $set('total', ($price * $quantity) - $discount);
+                                    }),
                                 TextInput::make('quantity')
                                     ->label(__('orders.quantity'))
                                     ->numeric()

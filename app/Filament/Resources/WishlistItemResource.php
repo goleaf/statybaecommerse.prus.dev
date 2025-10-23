@@ -13,6 +13,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\UserWishlist;
 use App\Models\WishlistItem;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
@@ -169,27 +170,35 @@ final class WishlistItemResource extends Resource
                                     ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
                                     ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
                                     ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?WishlistItem $record): void {
-                                        if ($state === null) {
-                                            return;
-                                        }
+                                        // Helper enforces metadata lifecycle rules (docs/forms/SEARCHABLE_INPUT_METADATA.md).
+                                        SearchableInputHelper::hydrate(
+                                            $component,
+                                            $state,
+                                            static function (int $value) use ($record): ?array {
+                                                $product = $record?->product ?? Product::query()
+                                                    ->select(['id', 'sku', 'name'])
+                                                    ->find($value);
 
-                                        $product = $record?->product ?? Product::query()
-                                            ->select(['id', 'sku', 'name'])
-                                            ->find($state);
+                                                if (! $product instanceof Product) {
+                                                    return null;
+                                                }
 
-                                        if (! $product instanceof Product) {
-                                            return;
-                                        }
-
-                                        $component
-                                            ->state((string) $state)
-                                            ->options([
-                                                (string) $product->getKey() => ProductSearch::label($product),
-                                            ]);
+                                                return [
+                                                    'value' => $product->getKey(),
+                                                    'label' => ProductSearch::label($product),
+                                                ];
+                                            },
+                                        );
                                     })
                                     // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
                                     ->afterStateUpdated(function (?string $state, callable $set): void {
                                         if ($state === null || $state === '') {
+                                            // Reset dependent variant linkage per docs/forms/SEARCHABLE_INPUT_METADATA.md.
+                                            SearchableInputHelper::clear($set, [
+                                                'product_id' => null,
+                                                'variant_id' => null,
+                                            ]);
+
                                             return;
                                         }
 

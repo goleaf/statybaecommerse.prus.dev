@@ -8,6 +8,7 @@ use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\ProductRequestResource\Pages;
 use App\Models\Product;
 use App\Models\ProductRequest;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use BackedEnum;
@@ -71,26 +72,30 @@ final class ProductRequestResource extends Resource
                     ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
                     ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
                     ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?ProductRequest $record): void {
-                        if ($state === null) {
-                            return;
-                        }
+                        // Hydrate consistently with docs/forms/SEARCHABLE_INPUT_METADATA.md guidance.
+                        SearchableInputHelper::hydrate(
+                            $component,
+                            $state,
+                            static function (int $value) use ($record): ?array {
+                                $product = $record?->product ?? Product::query()
+                                    ->select(['id', 'sku', 'name'])
+                                    ->find($value);
 
-                        $product = $record?->product ?? Product::query()
-                            ->select(['id', 'sku', 'name'])
-                            ->find($state);
+                                if (! $product instanceof Product) {
+                                    return null;
+                                }
 
-                        if (! $product instanceof Product) {
-                            return;
-                        }
-
-                        $component
-                            ->state((string) $state)
-                            ->options([
-                                (string) $product->getKey() => ProductSearch::label($product),
-                            ]);
+                                return [
+                                    'value' => $product->getKey(),
+                                    'label' => ProductSearch::label($product),
+                                ];
+                            },
+                        );
                     })
                     ->afterStateUpdated(function (?string $state, Set $set): void {
                         if ($state === null || $state === '') {
+                            SearchableInputHelper::clear($set, ['product_id' => null]);
+
                             return;
                         }
 
