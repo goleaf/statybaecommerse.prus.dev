@@ -8,8 +8,7 @@ use App\Enums\ModerationState;
 use App\Filament\Resources\PostResource\Pages;
 use App\Filament\Resources\PostResource\RelationManagers;
 use App\Models\Post;
-use Awcodes\BadgeableColumn\Components\Badge;
-use Awcodes\BadgeableColumn\Components\BadgeableColumn;
+use App\Support\Seo\LocaleUrlGenerator;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Components\DateTimePicker;
@@ -34,6 +33,7 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
@@ -42,6 +42,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Excel;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
@@ -271,56 +272,52 @@ final class PostResource extends Resource
                     ->label(__('posts.fields.title'))
                     ->searchable()
                     ->sortable()
-                    ->prefixBadges([
-                        Badge::make('status')
-                            ->label(fn (Post $record): string => __('posts.status.' . ($record->status ?? 'draft')))
-                            ->color(fn (Post $record): string => match ($record->status) {
-                                'published' => 'success',
-                                'review'    => 'info',
-                                'archived'  => 'gray',
-                                default     => 'warning',
-                            }),
-                        Badge::make('moderation')
-                            ->label(fn (Post $record): string => $record->moderation_state?->label() ?? __('posts.status.draft'))
-                            ->color(fn (Post $record): string => match ($record->moderation_state) {
-                                ModerationState::Published => 'success',
-                                ModerationState::Review    => 'info',
-                                ModerationState::Draft     => 'warning',
-                                default                    => 'gray',
-                            }),
-                    ])
-                    ->suffixBadges(function (Post $record): array {
-                        $badges = [];
-                        $locale = app()->getLocale();
+                    ->limit(50)
+                    ->formatStateUsing(fn (?string $state, Post $record): ?string => $record->getTranslatedTitle()),
+                ViewColumn::make('quick_links')
+                    ->label(__('Quick links'))
+                    ->view('filament.tables.columns.list-group')
+                    ->state(function (Post $record): array {
+                        $localeUrlGenerator = app(LocaleUrlGenerator::class);
+                        $locales = collect($localeUrlGenerator->supportedLocales());
 
-                        if ($record->featured) {
-                            $badges[] = Badge::make('featured')
-                                ->label(__('posts.fields.featured'))
-                                ->color('warning');
-                        }
+                        return $locales
+                            ->map(function (string $locale) use ($record, $localeUrlGenerator): ?array {
+                                $slug = method_exists($record, 'getTranslation')
+                                    ? ($record->getTranslation('slug', $locale) ?: $record->slug)
+                                    : ($record->slug ?? null);
 
-                        if ($record->is_pinned) {
-                            $badges[] = Badge::make('pinned')
-                                ->label(__('posts.fields.is_pinned'))
-                                ->color('primary');
-                        }
+                                $url = $slug
+                                    ? $localeUrlGenerator->localizedRoute('localized.posts.show', ['post' => $slug], $locale)
+                                    : null;
 
-                        $tags = (string) ($record->getTranslatedTags($locale) ?? $record->tags);
-                        $tagItems = collect(preg_split('/[,;]+/', $tags))
-                            ->map(static fn (?string $tag): string => trim((string) $tag))
-                            ->filter(fn (string $tag): bool => $tag !== '');
+                                if (! $url && Route::has('frontend.posts.show')) {
+                                    $url = route('frontend.posts.show', $record);
+                                }
 
-                        foreach ($tagItems as $index => $tag) {
-                            $badges[] = Badge::make('tag-' . $index)
-                                ->label($tag)
-                                ->color('secondary');
-                        }
+                                if (! $url) {
+                                    return null;
+                                }
 
-                        return $badges;
+                                $title = method_exists($record, 'getTranslation')
+                                    ? ($record->getTranslation('title', $locale) ?: $record->title)
+                                    : ($record->getTranslatedTitle($locale) ?: $record->title);
+
+                                return [
+                                    'label' => __('View (:locale): :title', [
+                                        'locale' => strtoupper($locale),
+                                        'title' => $title,
+                                    ]),
+                                    'url' => $url,
+                                    'icon' => 'heroicon-o-document-text',
+                                    'color' => 'primary',
+                                ];
+                            })
+                            ->filter()
+                            ->values()
+                            ->all();
                     })
-                    ->asPills()
-                    ->separator('•')
-                    ->size(Size::Small),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('user.name')
                     ->label(__('posts.fields.user_id'))
                     ->sortable()
