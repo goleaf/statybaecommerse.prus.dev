@@ -50,8 +50,8 @@ final class CouponResourceTest extends TestCase
             'is_public' => false,
             'is_auto_apply' => false,
             'is_stackable' => false,
-            'valid_from' => now(),
-            'valid_until' => now()->addDays(30),
+            'starts_at' => now(),
+            'expires_at' => now()->addDays(30),
         ];
 
         Livewire::test(CouponResource\Pages\CreateCoupon::class)
