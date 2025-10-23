@@ -5,213 +5,204 @@ declare(strict_types=1);
 namespace App\Support\Contracts;
 
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Collection;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 final class SimpleJsonSchemaValidator
 {
-    public function __construct(private readonly Filesystem $filesystem) {}
-
-    /**
-     * Validate the given payload against the JSON schema located at the provided path.
-     *
-     * @return array<int, string> Validation error messages. Empty when the payload is valid.
-     */
-    public function validate(array $payload, string $schemaPath): array
-    {
-        if (! $this->filesystem->exists($schemaPath)) {
-            return [sprintf('Schema file [%s] could not be located.', $schemaPath)];
-        }
-
-        $contents = $this->filesystem->get($schemaPath);
-        $schema = json_decode($contents, true);
-
-        if (! is_array($schema)) {
-            return [sprintf('Schema file [%s] does not contain a valid JSON object.', $schemaPath)];
-        }
-
-        return $this->validateAgainstSchema($payload, $schema, '$', $schema);
+    public function __construct(
+        private readonly Filesystem $filesystem,
+    ) {
     }
 
     /**
-     * Validate the given payload against the provided schema definition.
-     *
      * @return array<int, string>
      */
-    public function validateInline(array $payload, array $schema, ?array $rootSchema = null): array
+    public function validate(string $entity, mixed $payload): array
     {
-        if ($schema === []) {
-            return ['Schema definition cannot be empty.'];
-        }
+        $schema = $this->getSchema($entity);
 
-        $root = $rootSchema ?? $schema;
-
-        return $this->validateAgainstSchema($payload, $schema, '$', $root);
+        return $this->validateAgainstSchema($schema, $payload, '$');
     }
 
     /**
-     * Recursively validate the payload using the provided schema definition.
-     *
-     * @param  array<string, mixed>|mixed  $data
-     * @param  array<string, mixed>  $schema
-     * @param  array<string, mixed>  $rootSchema
      * @return array<int, string>
      */
-    private function validateAgainstSchema(mixed $data, array $schema, string $path, array $rootSchema): array
+    private function validateAgainstSchema(array $schema, mixed $value, string $path): array
     {
-        if (isset($schema['$ref']) && is_string($schema['$ref'])) {
-            $schema = $this->resolveReference($schema['$ref'], $rootSchema) ?? [];
+        if (array_key_exists('$ref', $schema)) {
+            $referencedSchema = $this->resolveReference($schema['$ref']);
+
+            return $this->validateAgainstSchema($referencedSchema, $value, $path);
         }
 
         $errors = [];
 
-        if (isset($schema['type'])) {
-            $errors = array_merge($errors, $this->validateType($data, $schema['type'], $path));
-            if ($errors !== []) {
-                return $errors;
+        $type = $schema['type'] ?? null;
+        if ($type !== null && ! $this->isTypeSatisfied($type, $value)) {
+            $expected = is_array($type) ? implode('|', $type) : (string) $type;
+            $errors[] = sprintf('%s is expected to be of type %s.', $path, $expected);
+
+            return $errors;
+        }
+
+        if (isset($schema['enum']) && ! in_array($value, $schema['enum'], true)) {
+            $errors[] = sprintf('%s is not one of the allowed values.', $path);
+        }
+
+        if (isset($schema['required']) && is_array($schema['required']) && is_array($value)) {
+            foreach ($schema['required'] as $requiredKey) {
+                if (! array_key_exists($requiredKey, $value)) {
+                    $errors[] = sprintf('%s.%s is required.', $path, $requiredKey);
+                }
             }
         }
 
-        if (isset($schema['const']) && $data !== $schema['const']) {
-            $errors[] = sprintf('%s must equal %s.', $path, json_encode($schema['const']));
-        }
-
-        if (isset($schema['pattern']) && is_string($schema['pattern']) && is_string($data)) {
-            if (@preg_match('/'.$schema['pattern'].'/', '') === false) {
-                $errors[] = sprintf('%s has an invalid pattern definition.', $path);
-            } elseif (! preg_match('/'.$schema['pattern'].'/u', $data)) {
-                $errors[] = sprintf('%s does not match the required pattern.', $path);
+        if (isset($schema['properties']) && is_array($schema['properties']) && is_array($value)) {
+            foreach ($schema['properties'] as $key => $propertySchema) {
+                if (array_key_exists($key, $value)) {
+                    $errors = array_merge($errors, $this->validateAgainstSchema($propertySchema, $value[$key], $path.'.'.$key));
+                }
+            }
+            if (($schema['additionalProperties'] ?? true) === false) {
+                $allowed = array_keys($schema['properties']);
+                foreach (array_keys($value) as $propKey) {
+                    if (! in_array($propKey, $allowed, true)) {
+                        $errors[] = sprintf('%s.%s is not an allowed property.', $path, $propKey);
+                    }
+                }
             }
         }
 
-        if (isset($schema['minimum']) && is_numeric($schema['minimum']) && is_numeric($data)) {
-            if ((float) $data < (float) $schema['minimum']) {
+        if (($schema['type'] ?? null) === 'array' && is_array($value)) {
+            $itemsSchema = $schema['items'] ?? null;
+            if ($itemsSchema !== null) {
+                foreach ($value as $index => $item) {
+                    $errors = array_merge($errors, $this->validateAgainstSchema($itemsSchema, $item, $path.'['.$index.']'));
+                }
+            }
+            if (isset($schema['minItems']) && count($value) < (int) $schema['minItems']) {
+                $errors[] = sprintf('%s must contain at least %d item(s).', $path, $schema['minItems']);
+            }
+        }
+
+        if (($schema['type'] ?? null) === 'string' && is_string($value)) {
+            if (isset($schema['minLength']) && Str::length($value) < (int) $schema['minLength']) {
+                $errors[] = sprintf('%s must be at least %d characters.', $path, $schema['minLength']);
+            }
+            if (($schema['format'] ?? null) === 'email' && ! filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                $errors[] = sprintf('%s must be a valid e-mail address.', $path);
+            }
+            if (($schema['format'] ?? null) === 'uri' && ! filter_var($value, FILTER_VALIDATE_URL)) {
+                $errors[] = sprintf('%s must be a valid URI.', $path);
+            }
+            if (($schema['format'] ?? null) === 'date-time' && ! $this->isValidDateTime($value)) {
+                $errors[] = sprintf('%s must be a valid RFC3339 date-time string.', $path);
+            }
+            if (isset($schema['pattern']) && ! preg_match('/'.$schema['pattern'].'/', $value)) {
+                $errors[] = sprintf('%s does not match required pattern.', $path);
+            }
+        }
+
+        if (($schema['type'] ?? null) === 'integer' && is_int($value)) {
+            if (isset($schema['minimum']) && $value < (int) $schema['minimum']) {
+                $errors[] = sprintf('%s must be greater than or equal to %d.', $path, $schema['minimum']);
+            }
+        }
+
+        if (($schema['type'] ?? null) === 'number' && is_numeric($value)) {
+            if (isset($schema['minimum']) && $value < (float) $schema['minimum']) {
                 $errors[] = sprintf('%s must be greater than or equal to %s.', $path, $schema['minimum']);
             }
         }
 
-        if (isset($schema['properties']) && is_array($schema['properties']) && is_array($data)) {
-            foreach ($schema['properties'] as $property => $definition) {
-                if (array_key_exists($property, $data)) {
-                    $errors = array_merge(
-                        $errors,
-                        $this->validateAgainstSchema($data[$property], (array) $definition, $path.'.'.$property, $rootSchema)
-                    );
+        if (($schema['type'] ?? null) === 'object' && is_array($value) && isset($schema['additionalProperties']) && is_array($schema['additionalProperties'])) {
+            $additionalSchema = $schema['additionalProperties'];
+            $knownProperties = array_keys($schema['properties'] ?? []);
+            foreach ($value as $key => $propertyValue) {
+                if (! in_array($key, $knownProperties, true)) {
+                    $errors = array_merge($errors, $this->validateAgainstSchema($additionalSchema, $propertyValue, $path.'.'.$key));
                 }
             }
-        }
-
-        if (isset($schema['required']) && is_array($schema['required']) && is_array($data)) {
-            foreach ($schema['required'] as $requiredProperty) {
-                if (! array_key_exists($requiredProperty, $data)) {
-                    $errors[] = sprintf('%s.%s is required.', $path, $requiredProperty);
-                }
-            }
-        }
-
-        if (isset($schema['additionalProperties']) && $schema['additionalProperties'] === false && is_array($data)) {
-            $allowed = isset($schema['properties']) && is_array($schema['properties'])
-                ? array_keys($schema['properties'])
-                : [];
-
-            foreach (array_keys($data) as $key) {
-                if (! in_array($key, $allowed, true)) {
-                    $errors[] = sprintf('%s.%s is not allowed by the schema.', $path, $key);
-                }
-            }
-        }
-
-        if (isset($schema['items']) && is_array($schema['items']) && is_array($data)) {
-            foreach (array_values($data) as $index => $item) {
-                $errors = array_merge(
-                    $errors,
-                    $this->validateAgainstSchema($item, $schema['items'], sprintf('%s[%d]', $path, $index), $rootSchema)
-                );
-            }
-        }
-
-        if (isset($schema['anyOf']) && is_array($schema['anyOf'])) {
-            $anyOfPassed = false;
-            foreach ($schema['anyOf'] as $anyOfSchema) {
-                $result = $this->validateAgainstSchema($data, (array) $anyOfSchema, $path, $rootSchema);
-                if ($result === []) {
-                    $anyOfPassed = true;
-                    break;
-                }
-            }
-
-            if (! $anyOfPassed) {
-                $errors[] = sprintf('%s must satisfy at least one anyOf constraint.', $path);
-            }
-        }
-
-        if (isset($schema['format']) && is_string($schema['format'])) {
-            $errors = array_merge($errors, $this->validateFormat($data, $schema['format'], $path));
         }
 
         return $errors;
     }
 
-    private function resolveReference(string $reference, array $schema): ?array
+    private function isTypeSatisfied(string|array $expectedType, mixed $value): bool
     {
-        if (! str_starts_with($reference, '#/')) {
-            return null;
-        }
+        $types = Arr::wrap($expectedType);
 
-        $path = Str::of($reference)->after('#/')->explode('/');
-        $node = Collection::make($schema);
+        foreach ($types as $type) {
+            $matches = match ($type) {
+                'integer' => is_int($value),
+                'number' => is_int($value) || is_float($value),
+                'string' => is_string($value),
+                'boolean' => is_bool($value),
+                'object' => is_array($value),
+                'array' => is_array($value),
+                'null' => $value === null,
+                default => true,
+            };
 
-        foreach ($path as $segment) {
-            if ($node instanceof Collection) {
-                $node = $node->get($segment);
-            } elseif (is_array($node) && array_key_exists($segment, $node)) {
-                $node = $node[$segment];
-            } else {
-                return null;
+            if ($matches) {
+                return true;
             }
         }
 
-        return is_array($node) ? $node : null;
+        return false;
     }
 
-    private function validateType(mixed $data, string|array $type, string $path): array
+    private function isValidDateTime(string $value): bool
     {
-        $types = (array) $type;
+        $date = date_create($value);
 
-        foreach ($types as $candidate) {
-            if ($this->valueMatchesType($data, $candidate)) {
-                return [];
+        return $date !== false;
+    }
+
+    private function getSchema(string $entity): array
+    {
+        $mapping = config('contracts.entities');
+        $entityKey = strtolower($entity);
+        $info = $mapping[$entityKey] ?? null;
+        if ($info === null) {
+            throw new \InvalidArgumentException(sprintf('Unknown contract entity [%s].', $entity));
+        }
+
+        $schemaPath = base_path($info['schema']);
+        if (! $this->filesystem->exists($schemaPath)) {
+            throw new \RuntimeException(sprintf('Schema file not found at [%s].', $schemaPath));
+        }
+
+        $content = $this->filesystem->get($schemaPath);
+        $decoded = json_decode($content, true);
+        if (! is_array($decoded)) {
+            throw new \RuntimeException(sprintf('Invalid JSON schema for entity [%s].', $entity));
+        }
+
+        return $decoded;
+    }
+
+    private function resolveReference(string $reference): array
+    {
+        $mapping = config('contracts.entities');
+        foreach ($mapping as $entity => $info) {
+            if (($info['schema'] ?? null) === null) {
+                continue;
+            }
+
+            if (str_contains($reference, $info['schema'])) {
+                $schemaPath = base_path($info['schema']);
+                $content = $this->filesystem->get($schemaPath);
+                $decoded = json_decode($content, true);
+                if (! is_array($decoded)) {
+                    break;
+                }
+
+                return $decoded;
             }
         }
 
-        return [sprintf('%s must be of type %s.', $path, implode('|', $types))];
-    }
-
-    private function valueMatchesType(mixed $value, string $type): bool
-    {
-        return match ($type) {
-            'object' => is_array($value),
-            'array' => is_array($value),
-            'string' => is_string($value),
-            'integer' => is_int($value),
-            'number' => is_int($value) || is_float($value),
-            'boolean' => is_bool($value),
-            'null' => $value === null,
-            default => true,
-        };
-    }
-
-    private function validateFormat(mixed $value, string $format, string $path): array
-    {
-        if (! is_string($value)) {
-            return [];
-        }
-
-        return match ($format) {
-            'uri' => filter_var($value, FILTER_VALIDATE_URL) ? [] : [sprintf('%s must be a valid URI.', $path)],
-            'email' => filter_var($value, FILTER_VALIDATE_EMAIL) ? [] : [sprintf('%s must be a valid email address.', $path)],
-            'date-time' => strtotime($value) !== false ? [] : [sprintf('%s must be a valid date-time string.', $path)],
-            default => [],
-        };
+        throw new \RuntimeException(sprintf('Unable to resolve schema reference [%s].', $reference));
     }
 }

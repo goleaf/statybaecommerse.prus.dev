@@ -7,9 +7,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Support\Contracts\Entities\CategoryContract;
-use App\Support\ListQuery\ListQueryDefinition;
-use App\Support\ListQuery\ListQueryValidator;
-use App\Support\ListQuery\ListResponse;
 use App\Traits\HandlesContentNegotiation;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -97,7 +94,7 @@ final class CategoryController extends Controller
     public function show(Request $request, Category $category): JsonResponse|View|Response
     {
         $category->load(['children', 'parent']);
-        $payload = CategoryContract::forCategory($category);
+        $data = ['category' => CategoryContract::fromModel($category)];
 
         return $this->respondWithContract($request, $payload);
     }

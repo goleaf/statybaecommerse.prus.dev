@@ -7,43 +7,33 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use App\Support\Contracts\Entities\BrandContract;
-use App\Traits\HandlesContentNegotiation;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\View\View;
 
 final class BrandController extends Controller
 {
-    use HandlesContentNegotiation;
-
-    public function index(Request $request): JsonResponse|View|Response
+    public function index(): JsonResponse
     {
-        $perPage = min((int) $request->get('per_page', 20), 100);
-        $search = $request->string('search')->toString();
+        $brands = Brand::query()->where('is_enabled', true)->with('media')->orderBy('name')->limit(50)->get();
 
-        $brands = Brand::query()
-            ->visible()
-            ->withCount('products')
-            ->when($search !== '', function ($query) use ($search) {
-                $query->where('name', 'like', "%{$search}%");
-            })
-            ->orderBy('name')
-            ->paginate($perPage);
-
-        $payload = BrandContract::forCollection($brands, [
-            'search' => $search !== '' ? $search : null,
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'brands' => $brands->map(static fn (Brand $brand): array => BrandContract::fromModel($brand))->toArray(),
+            ],
+            'timestamp' => now()->toISOString(),
         ]);
-
-        return $this->respondWithContract($request, $payload);
     }
 
-    public function show(Request $request, Brand $brand): JsonResponse|View|Response
+    public function show(Brand $brand): JsonResponse
     {
-        $brand->loadMissing('products');
+        $brand->load('media');
 
-        $payload = BrandContract::forBrand($brand);
-
-        return $this->respondWithContract($request, $payload);
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'brand' => BrandContract::fromModel($brand),
+            ],
+            'timestamp' => now()->toISOString(),
+        ]);
     }
 }
