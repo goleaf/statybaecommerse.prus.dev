@@ -113,9 +113,13 @@ Stop background commands with `Ctrl+C` when you are done.
 Run the basic application checks to confirm everything is wired correctly:
 
 ```bash
+composer test
 php artisan test
 npm run lint
 ```
+
+`composer test` now proxies to the Pest test runner (`vendor/bin/pest`) so contributors can rely on a single command that works
+across environments without installing a global PHPUnit binary.
 
 You can explore more helper commands in the `Makefile` (`make test`, `make analyse`, `make build`).
 

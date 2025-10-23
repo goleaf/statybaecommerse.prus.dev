@@ -135,8 +135,8 @@
         "analyze": "vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G",
         "rector": "vendor/bin/rector process --ansi",
         "blade:format": "php artisan view:clear && php artisan view:cache",
-        "test": "@php vendor/bin/pest --configuration phpunit.xml",
-        "test:ci": "@php vendor/bin/pest --log-junit build/junit.xml --coverage-clover build/coverage.xml --configuration phpunit.xml",
+        "test": "@php vendor/bin/pest --configuration=phpunit.xml",
+        "test:ci": "@php vendor/bin/pest --log-junit build/junit.xml --coverage-clover build/coverage.xml --configuration=phpunit.xml",
         "tests:check-refresh": [
             "@php artisan tests:check-refresh-database --path=tests/Feature --fail-on-find"
         ],

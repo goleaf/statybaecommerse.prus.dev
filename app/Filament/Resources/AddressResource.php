@@ -94,9 +94,7 @@ final class AddressResource extends Resource
     }
 
     /**
-     * Configure the Filament form schema using the v4 Schema API to ensure
-     * compatibility with future Filament upgrades and consistent component
-     * rendering across panels.
+     * Configure the Filament schema using the dedicated Schema contract to avoid v3 regressions.
      */
     public static function form(Schema $schema): Schema
     {
@@ -326,8 +324,7 @@ final class AddressResource extends Resource
     }
 
     /**
-     * Configure the Filament table with comprehensive columns, filters, and actions
-     * while using the updated v4 return signature for compatibility.
+     * Configure the Filament table while returning the Table instance for fluent chaining.
      */
     public static function table(Table $table): Table
     {
