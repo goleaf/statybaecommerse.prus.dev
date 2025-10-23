@@ -41,7 +41,10 @@ final class UserWishlistResource extends Resource
 
     protected static ?string $model = UserWishlist::class;
 
-    
+    public static function getNavigationIcon(): BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
+    {
+        return 'heroicon-o-heart';
+    }
 
     protected static UnitEnum|string|null $navigationGroup = 'Users';
 
