@@ -2,118 +2,53 @@
 
 declare(strict_types=1);
 
-namespace Awcodes\Curator\Curations {
-    if (! class_exists(ThumbnailPreset::class)) {
-        class ThumbnailPreset {}
-    }
+namespace Darryldecode\Cart;
+
+use Illuminate\Support\Collection;
+
+if (! class_exists(CartCollection::class)) {
+    class CartCollection extends Collection {}
 }
 
-namespace Awcodes\Curator\Glide {
-    if (! class_exists(DefaultServerFactory::class)) {
-        class DefaultServerFactory {}
-    }
-}
-
-namespace Awcodes\Curator\Models {
-    if (! class_exists(Media::class)) {
-        class Media {}
-    }
-}
-
-namespace Awcodes\Curator\Resources {
-    if (! class_exists(MediaResource::class)) {
-        class MediaResource {}
-    }
-}
-
-namespace Spatie\MediaLibraryPro\Models {
-    if (! class_exists(TemporaryUpload::class)) {
-        class TemporaryUpload {}
-    }
-}
-
-namespace Laravel\Telescope\Http\Middleware {
-    if (! class_exists(Authorize::class)) {
-        class Authorize
+if (! class_exists(Cart::class)) {
+    class Cart
+    {
+        public function getContent(): CartCollection
         {
-            public function handle(mixed $request, \Closure $next): mixed
-            {
-                return $next($request);
-            }
+            return new CartCollection;
         }
+
+        public function getSubTotal(): float
+        {
+            return 0.0;
+        }
+
+        public function remove(string|int $id): void {}
+
+        public function isEmpty(): bool
+        {
+            return true;
+        }
+
+        public function getTotalQuantity(): int
+        {
+            return 0;
+        }
+
+        public function clear(): void {}
     }
 }
 
-namespace Laravel\Telescope\Watchers {
-    if (! class_exists(BatchWatcher::class)) {
-        class BatchWatcher {}
-    }
+namespace Darryldecode\Cart\Facades;
 
-    if (! class_exists(CacheWatcher::class)) {
-        class CacheWatcher {}
-    }
+use Darryldecode\Cart\Cart;
 
-    if (! class_exists(ClientRequestWatcher::class)) {
-        class ClientRequestWatcher {}
-    }
-
-    if (! class_exists(CommandWatcher::class)) {
-        class CommandWatcher {}
-    }
-
-    if (! class_exists(DumpWatcher::class)) {
-        class DumpWatcher {}
-    }
-
-    if (! class_exists(EventWatcher::class)) {
-        class EventWatcher {}
-    }
-
-    if (! class_exists(ExceptionWatcher::class)) {
-        class ExceptionWatcher {}
-    }
-
-    if (! class_exists(GateWatcher::class)) {
-        class GateWatcher {}
-    }
-
-    if (! class_exists(JobWatcher::class)) {
-        class JobWatcher {}
-    }
-
-    if (! class_exists(LogWatcher::class)) {
-        class LogWatcher {}
-    }
-
-    if (! class_exists(MailWatcher::class)) {
-        class MailWatcher {}
-    }
-
-    if (! class_exists(ModelWatcher::class)) {
-        class ModelWatcher {}
-    }
-
-    if (! class_exists(NotificationWatcher::class)) {
-        class NotificationWatcher {}
-    }
-
-    if (! class_exists(QueryWatcher::class)) {
-        class QueryWatcher {}
-    }
-
-    if (! class_exists(RedisWatcher::class)) {
-        class RedisWatcher {}
-    }
-
-    if (! class_exists(RequestWatcher::class)) {
-        class RequestWatcher {}
-    }
-
-    if (! class_exists(ScheduleWatcher::class)) {
-        class ScheduleWatcher {}
-    }
-
-    if (! class_exists(ViewWatcher::class)) {
-        class ViewWatcher {}
+if (! class_exists(CartFacade::class)) {
+    class CartFacade
+    {
+        public static function session(?string $sessionKey = null): Cart
+        {
+            return new Cart;
+        }
     }
 }
