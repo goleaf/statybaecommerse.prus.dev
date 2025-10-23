@@ -8,7 +8,11 @@ use App\Support\Security\CspNonce;
 use Closure;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class AddSecurityHeaders
 {
@@ -16,7 +20,7 @@ final class AddSecurityHeaders
 
     public function handle(Request $request, Closure $next): Response
     {
-        $nonce = CspNonce::resolve($request);
+        $nonce = $this->prepareNonce($request);
 
         /** @var Response $response */
         $response = $next($request);
@@ -26,10 +30,29 @@ final class AddSecurityHeaders
         }
 
         $this->applyStaticHeaders($response);
-        $this->applyStrictTransportSecurity($request, $response);
         $this->applyContentSecurityPolicy($response, $nonce);
+        $this->injectNonceIntoResponse($response, $nonce);
 
         return $response;
+    }
+
+    private function prepareNonce(Request $request): string
+    {
+        $nonce = $request->attributes->get('csp_nonce');
+
+        if (! is_string($nonce) || $nonce === '') {
+            $nonce = $this->generateNonce();
+            $request->attributes->set('csp_nonce', $nonce);
+        }
+
+        View::share('cspNonce', $nonce);
+
+        return $nonce;
+    }
+
+    private function generateNonce(): string
+    {
+        return rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
     }
 
     private function applyStaticHeaders(Response $response): void
@@ -52,34 +75,6 @@ final class AddSecurityHeaders
 
             $response->headers->set($header, $stringValue, true);
         }
-    }
-
-    private function applyStrictTransportSecurity(Request $request, Response $response): void
-    {
-        $config = (array) $this->config->get('security.headers.hsts', []);
-
-        $enabled = (bool) ($config['enabled'] ?? true);
-        if (! $enabled) {
-            return;
-        }
-
-        $forceOnHttp = (bool) ($config['enforce_on_http'] ?? false);
-        if (! $request->isSecure() && ! $forceOnHttp) {
-            return;
-        }
-
-        $maxAge = max(0, (int) ($config['max_age'] ?? 31536000));
-        $directives = ['max-age='.$maxAge];
-
-        if (! empty($config['include_subdomains'])) {
-            $directives[] = 'includeSubDomains';
-        }
-
-        if (! empty($config['preload'])) {
-            $directives[] = 'preload';
-        }
-
-        $response->headers->set('Strict-Transport-Security', implode('; ', $directives), true);
     }
 
     private function applyContentSecurityPolicy(Response $response, string $nonce): void
@@ -115,6 +110,38 @@ final class AddSecurityHeaders
         $response->headers->set('Content-Security-Policy', implode('; ', $compiled), true);
     }
 
+    private function injectNonceIntoResponse(Response $response, string $nonce): void
+    {
+        if ($response instanceof BinaryFileResponse || $response instanceof StreamedResponse) {
+            return;
+        }
+
+        $contentType = $response->headers->get('Content-Type');
+        if (! is_string($contentType) || ! Str::contains(Str::lower($contentType), 'text/html')) {
+            return;
+        }
+
+        $content = $response->getContent();
+        if (! is_string($content) || $content === '') {
+            return;
+        }
+
+        $scriptPattern = '/<script(?![^>]*\bsrc=)(?![^>]*\bnonce=)([^>]*)>/i';
+        $stylePattern = '/<style(?![^>]*\bnonce=)([^>]*)>/i';
+
+        $updated = preg_replace($scriptPattern, '<script$1 nonce="'.$nonce.'">', $content);
+        if ($updated === null) {
+            return;
+        }
+
+        $updated = preg_replace($stylePattern, '<style$1 nonce="'.$nonce.'">', $updated);
+        if ($updated === null) {
+            return;
+        }
+
+        $response->setContent($updated);
+    }
+
     /**
      * @param  array<mixed, mixed>|string  $values
      * @return array<int, string>
@@ -132,8 +159,9 @@ final class AddSecurityHeaders
                 continue;
             }
 
-            if ($value === '{{nonce}}') {
+            if ($value === '@nonce') {
                 $sources[] = "'nonce-{$nonce}'";
+
                 continue;
             }
 

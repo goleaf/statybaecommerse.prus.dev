@@ -37,18 +37,21 @@ return [
             'object-src' => ["'none'"],
             'script-src' => [
                 "'self'",
-                "'strict-dynamic'",
-                '{{nonce}}',
+                '@nonce',
                 'https://unpkg.com',
             ],
-            'script-src-attr' => ["'none'"],
+            'script-src-attr' => [
+                "'unsafe-inline'",
+            ],
             'style-src' => [
                 "'self'",
-                '{{nonce}}',
+                '@nonce',
                 'https://fonts.bunny.net',
                 'https://unpkg.com',
             ],
-            'style-src-attr' => ["'none'"],
+            'style-src-attr' => [
+                "'unsafe-inline'",
+            ],
             'font-src' => [
                 "'self'",
                 'https://fonts.bunny.net',
