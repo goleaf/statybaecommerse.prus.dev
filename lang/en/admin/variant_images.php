@@ -15,6 +15,7 @@ return [
     // Form Fields
     'variant' => 'Product Variant',
     'variant_info' => 'Variant Information',
+    'variant_sku' => 'SKU: :sku',
     'image' => 'Image',
     'alt_text' => 'Alt Text',
     'description' => 'Description',

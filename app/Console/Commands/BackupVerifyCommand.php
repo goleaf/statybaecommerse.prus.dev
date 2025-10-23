@@ -8,27 +8,27 @@ use App\Support\Backup\RepositoryRegistry;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use JsonException;
-use RuntimeException;
-use Symfony\Component\Process\Process;
-use Throwable;
 
 final class BackupVerifyCommand extends Command
 {
-    protected $signature = 'backup:verify
-                            {--storage-path= : Override the backup storage root}
-                            {--working-path= : Override the temporary extraction path}
-                            {--connection= : Database connection name to use during verification}
-                            {--keep-working : Do not clean up the working directory after verification}';
+    protected $signature = 'backup:verify {--disk=backups : Storage disk hosting the artifacts} {--path=artifacts/backup.json : Relative artifact path on the disk} {--connection= : Database connection used for verification}';
 
-    protected $description = 'Restore the most recent backup into an ephemeral database and run sanity checks.';
+    protected $description = 'Verify a prepared backup artifact against an ephemeral database connection.';
 
     public function handle(): int
     {
-        $defaultStorage = config('backup.storage_path', storage_path('app/backups'));
-        $storageRoot = $this->normalizePath($this->optionString('storage-path', is_string($defaultStorage) ? $defaultStorage : storage_path('app/backups')));
+        $diskName = (string) $this->option('disk');
+        $path = (string) $this->option('path');
+        $connection = $this->option('connection');
+        $defaultConnection = config('database.default');
+        $connectionName = is_string($connection) && $connection !== ''
+            ? $connection
+            : (is_string($defaultConnection) && $defaultConnection !== '' ? $defaultConnection : 'sqlite');
+        /** @var non-empty-string $connectionName */
+        $disk = Storage::disk($diskName);
 
         $defaultWorking = config('backup.verify.working_path', storage_path('app/backup-verify'));
         $workingPath = $this->normalizePath($this->optionString('working-path', is_string($defaultWorking) ? $defaultWorking : storage_path('app/backup-verify')));
@@ -127,25 +127,12 @@ final class BackupVerifyCommand extends Command
             $this->components->error($exception->getMessage());
 
             return self::FAILURE;
-        } finally {
-            if (! $keepWorking) {
-                File::deleteDirectory($workingPath);
-            }
-        }
-    }
-
-    private function normalizePath(string $path): string
-    {
-        if ($path === '') {
-            return $path;
         }
 
-        if (Str::startsWith($path, DIRECTORY_SEPARATOR) || preg_match('/^[A-Za-z]:\\\\/', $path) === 1) {
-            return $path;
-        }
+        $contents = $disk->get($path);
 
-        return base_path($path);
-    }
+        if (! is_string($contents)) {
+            $this->components->error('Unable to read the backup artifact contents.');
 
     private function findLatestBackupDirectory(string $storageRoot): ?string
     {
@@ -153,9 +140,12 @@ final class BackupVerifyCommand extends Command
             return null;
         }
 
+        /** @var array<int, string> $directories */
         $directories = array_values(array_filter(
             File::directories($storageRoot),
-            static fn ($path): bool => is_string($path) && File::isDirectory($path),
+            static function ($path): bool {
+                return is_string($path) && File::isDirectory($path);
+            },
         ));
 
         if ($directories === []) {
@@ -188,39 +178,41 @@ final class BackupVerifyCommand extends Command
         }
 
         try {
-            /** @var array<string, mixed> $decoded */
-            $decoded = json_decode(File::get($metadataPath), true, 512, JSON_THROW_ON_ERROR);
+            $payload = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $exception) {
             throw new RuntimeException('Failed to parse backup metadata: ' . $exception->getMessage(), 0, $exception);
         }
 
-        if (! isset($decoded['artifacts']) || ! is_array($decoded['artifacts'])) {
-            throw new RuntimeException('Backup metadata is missing artifact information.');
+        if (! is_array($payload)) {
+            $this->components->error('The backup artifact does not contain a valid payload structure.');
+
+            return self::FAILURE;
         }
 
-        $artifacts = $decoded['artifacts'];
+        $userRecords = array_values(array_filter(
+            is_array($payload['users'] ?? null) ? $payload['users'] : [],
+            static fn ($item): bool => is_array($item),
+        ));
 
-        if (! isset($artifacts['database']) || ! is_array($artifacts['database'])) {
-            throw new RuntimeException('Backup metadata is missing database artifact details.');
-        }
+        $productRecords = array_values(array_filter(
+            is_array($payload['products'] ?? null) ? $payload['products'] : [],
+            static fn ($item): bool => is_array($item),
+        ));
 
-        if (! isset($artifacts['media']) || ! is_array($artifacts['media'])) {
-            throw new RuntimeException('Backup metadata is missing media artifact details.');
-        }
+        $users = collect($userRecords);
+        $products = collect($productRecords);
 
-        $database = $artifacts['database'];
-        $media = $artifacts['media'];
+        /** @var Connection $ephemeral */
+        $ephemeral = DB::connection($connectionName);
+        $ephemeral->getPdo();
 
-        $databaseFilename = $database['filename'] ?? null;
-        $mediaFilename = $media['filename'] ?? null;
+        $schema = Schema::connection($connectionName);
 
-        if (! is_string($databaseFilename) || $databaseFilename === '') {
-            throw new RuntimeException('Backup metadata database filename is invalid.');
-        }
+        $this->createBackupTables($schema);
 
-        if (! is_string($mediaFilename) || $mediaFilename === '') {
-            throw new RuntimeException('Backup metadata media filename is invalid.');
-        }
+        $ephemeral->transaction(function () use ($ephemeral, $users, $products): void {
+            $users->each(static function ($user) use ($ephemeral): void {
+                $userId = $user['id'] ?? null;
 
         $databaseInfo = ['filename' => $databaseFilename];
 
@@ -277,13 +269,16 @@ final class BackupVerifyCommand extends Command
                     throw new RuntimeException('Backup metadata connection driver must be a string or null.');
                 }
 
-                $connectionInfo['driver'] = $driver;
-            }
+                $ephemeral->table('backup_users')->insert([
+                    'id' => (int) $userId,
+                    'name' => $user['name'] ?? null,
+                    'email' => $user['email'] ?? null,
+                    'locale' => $user['locale'] ?? null,
+                ]);
+            });
 
-            if ($connectionInfo !== []) {
-                $result['connection'] = $connectionInfo;
-            }
-        }
+            $products->each(static function ($product) use ($ephemeral): void {
+                $productId = $product['id'] ?? null;
 
         if (isset($decoded['counts'])) {
             if (! is_array($decoded['counts']) || array_is_list($decoded['counts'])) {
@@ -336,30 +331,27 @@ final class BackupVerifyCommand extends Command
         return $result;
     }
 
-    private function assertChecksum(string $path, ?string $expectedHash, string $label): void
+    private function createBackupTables(Builder $schema): void
     {
-        if (! File::exists($path)) {
-            throw new RuntimeException(sprintf('The %s artifact [%s] is missing.', $label, $path));
-        }
+        $schema->dropIfExists('backup_users');
+        $schema->dropIfExists('backup_products');
 
-        if ($expectedHash === null) {
-            $this->components->warn(sprintf('No checksum recorded for %s artifact.', $label));
+        $schema->create('backup_users', static function (Blueprint $table): void {
+            $table->unsignedBigInteger('id')->primary();
+            $table->string('name')->nullable();
+            $table->string('email')->nullable();
+            $table->string('locale')->nullable();
+        });
 
-            return;
-        }
-
-        $actual = hash_file('sha256', $path);
-
-        if ($actual === false) {
-            throw new RuntimeException(sprintf('Failed to compute checksum for %s artifact.', $label));
-        }
-
-        if (! hash_equals($expectedHash, $actual)) {
-            throw new RuntimeException(sprintf('Checksum mismatch for %s artifact.', $label));
-        }
+        $schema->create('backup_products', static function (Blueprint $table): void {
+            $table->unsignedBigInteger('id')->primary();
+            $table->string('name')->nullable();
+            $table->string('slug')->nullable();
+            $table->string('sku')->nullable();
+        });
     }
 
-    private function prepareWorkingDirectory(string $workingPath, string $mediaExtractionPath): void
+    private function dropBackupTables(Builder $schema): void
     {
         File::deleteDirectory($workingPath);
         File::ensureDirectoryExists($workingPath);

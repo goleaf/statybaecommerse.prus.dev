@@ -158,10 +158,10 @@
                     @foreach($results as $result)
                         <div class="result-item bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
                             <!-- Result Image -->
-                            {{-- Identify the optimal image source while preserving backwards compatibility. --}}
                             @php($image = $result['main_image'] ?? $result['thumbnail'] ?? ($result['image'] ?? null))
                             @if(!empty($image))
                                 <div class="aspect-w-16 aspect-h-9">
+                                    {{-- Render whichever media URL the API exposed for the search entry. --}}
                                     <img
                                         src="{{ $image }}"
                                         alt="{{ $result['title'] }}"

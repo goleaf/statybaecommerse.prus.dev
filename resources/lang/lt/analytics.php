@@ -16,6 +16,7 @@ return [
     'status' => 'Būsena',
     'pending' => 'Laukiantis',
     'processing' => 'Apdorojamas',
+    'completed' => 'Užbaigtas',
     'shipped' => 'Išsiųstas',
     'delivered' => 'Pristatytas',
     'cancelled' => 'Atšauktas',
@@ -88,6 +89,11 @@ return [
     'featured' => 'rekomenduojami',
     'report_exported_successfully' => 'Ataskaita sėkmingai eksportuota',
     'data_refreshed_successfully' => 'Duomenys sėkmingai atnaujinti',
+    'summary' => [
+        'orders_count' => 'Užsakymai',
+        'total_revenue' => 'Bendros pajamos',
+        'average_order_value' => 'Vidutinė užsakymo vertė',
+    ],
     'enhanced_overview' => [
         'title' => 'Išplėstinė el. prekybos apžvalga',
         'navigation_label' => 'Išplėstinė el. prekybos apžvalga',

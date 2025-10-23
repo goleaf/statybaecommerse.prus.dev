@@ -22,6 +22,21 @@ class ImportInventoryChunk implements ShouldQueue
 {
     use InteractsWithQueue, Queueable, SerializesModels;
 
+    /**
+     * Number of job attempts before failing.
+     */
+    public int $tries = 5;
+
+    /**
+     * Define retry backoff windows (in seconds).
+     *
+     * @return array<int, int>
+     */
+    public function backoff(): array
+    {
+        return [30, 90, 180, 300, 600];
+    }
+
     /** @var array<int,array<string,mixed>> */
     private array $rows;
 
@@ -41,7 +56,7 @@ class ImportInventoryChunk implements ShouldQueue
         // Use LazyCollection with timeout to prevent long-running inventory import operations
         $timeout = now()->addMinutes(15);
         // 15 minute timeout for inventory imports
-        LazyCollection::make($this->rows)->takeUntilTimeout($timeout)->each(function ($row) {
+        LazyCollection::make($this->rows)->takeUntilTimeout($timeout)->each(function ($row): void {
             $sku = (string) ($row['sku'] ?? '');
             $locationCode = (string) ($row['location_code'] ?? 'default');
             $stock = isset($row['stock']) ? (int) $row['stock'] : null;

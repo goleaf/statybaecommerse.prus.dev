@@ -7,6 +7,8 @@ namespace App\Filament\Resources\DiscountConditionResource\Widgets;
 use App\Models\DiscountCondition;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 final class DiscountConditionStatsWidget extends BaseWidget
 {
@@ -31,15 +33,17 @@ final class DiscountConditionStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),
 
-            Stat::make(__('discount_conditions.stats.current_conditions'), $currentConditions)
-                ->description(__('discount_conditions.stats.current_conditions_description'))
-                ->descriptionIcon('heroicon-m-clock')
-                ->color('info'),
+            Stat::make(__('discount_conditions.stats.inactive_conditions'), $inactiveConditions)
+                ->description(__('discount_conditions.stats.inactive_conditions_description'))
+                ->descriptionIcon('heroicon-m-pause-circle')
+                ->color('warning'),
 
-            Stat::make(__('discount_conditions.stats.expired_conditions'), $expiredConditions)
-                ->description(__('discount_conditions.stats.expired_conditions_description'))
-                ->descriptionIcon('heroicon-m-x-circle')
-                ->color('danger'),
+            Stat::make(__('discount_conditions.stats.top_condition_type'), $topTypeLabel)
+                ->description($topTypeCount > 0
+                    ? trans_choice('discount_conditions.stats.type_usage', $topTypeCount, ['count' => $topTypeCount])
+                    : __('discount_conditions.stats.top_condition_type_description'))
+                ->descriptionIcon('heroicon-m-chart-pie')
+                ->color('info'),
         ];
     }
 }

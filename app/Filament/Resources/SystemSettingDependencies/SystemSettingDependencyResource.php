@@ -3,7 +3,10 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingDependencies;
+use App\Support\Concerns\HasNav;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\SystemSettingDependencies\Pages\CreateSystemSettingDependency;
 use App\Filament\Resources\SystemSettingDependencies\Pages\EditSystemSettingDependency;
 use App\Filament\Resources\SystemSettingDependencies\Pages\ListSystemSettingDependencies;
@@ -11,27 +14,30 @@ use App\Filament\Resources\SystemSettingDependencies\Schemas\SystemSettingDepend
 use App\Filament\Resources\SystemSettingDependencies\Tables\SystemSettingDependenciesTable;
 use App\Models\SystemSettingDependency;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 class SystemSettingDependencyResource extends Resource
 {
-    protected static ?string $model = SystemSettingDependency::class;
+    use HasNav;
 
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
      */
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return SystemSettingDependencyForm::configure($form);
+        return SystemSettingDependencyForm::configure($schema);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return SystemSettingDependenciesTable::configure($table);
     }
 

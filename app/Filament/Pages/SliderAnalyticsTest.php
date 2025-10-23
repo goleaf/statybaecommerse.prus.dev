@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
-use BackedEnum;
 use Filament\Pages\Dashboard as BaseDashboard;
 
 final class SliderAnalyticsTest extends BaseDashboard

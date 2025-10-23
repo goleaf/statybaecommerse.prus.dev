@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantInventoryResource\Pages;
 use App\Models\Location;
 use App\Models\Product;
@@ -12,27 +14,27 @@ use App\Models\VariantInventory;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\LocationSearch;
+use App\Support\Search\PartnerSearch;
 use App\Support\Search\ProductVariantSearch;
-use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select; // Select component import keeps dropdown definitions consistent across the resource.
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Facades\FilamentNumber;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -41,6 +43,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
@@ -77,9 +80,9 @@ final class VariantInventoryResource extends Resource
     /**
      * Configure the Variant Inventory form schema for Filament administrators.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.variant_inventory.basic_information'))
                     ->columns(2)
@@ -92,30 +95,32 @@ final class VariantInventoryResource extends Resource
                             ->searchUsing(fn (string $value): array => ProductVariantSearch::results($value))
                             ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
                             ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                // Hydrate via helper for metadata consistency.
                                 SearchableInputHelper::hydrate(
                                     $component,
                                     $state,
-                                    static function (int $value): ?array {
+                                    static function (int $identifier): ?array {
                                         $variant = ProductVariant::query()
                                             ->select(['id', 'product_id', 'sku', 'name', 'price'])
                                             ->with(['product:id,sku,name'])
-                                            ->find($value);
+                                            ->find($identifier);
 
                                         if (! $variant instanceof ProductVariant) {
                                             return null;
                                         }
 
                                         return [
-                                            'value' => $variant->getKey(),
-                                            'label' => ProductVariantSearch::label($variant),
+                                            'value'   => $variant->getKey(),
+                                            'label'   => ProductVariantSearch::label($variant),
+                                            'payload' => self::normaliseVariantPayload($variant),
                                         ];
                                     },
-                                );
+                                ); // See docs/filament/searchable-inputs.md for helper expectations.
                             })
-                            ->afterStateUpdated(function (?string $state, Set $set): void {
-                                if ($state === null || $state === '') {
-                                    SearchableInputHelper::clear($set, [
+                            ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
+                                $identifier = is_string($state) ? trim($state) : '';
+
+                                if ($identifier === '') {
+                                    SearchableInputHelper::clear($component, $set, [
                                         'variant_id'      => null,
                                         'variant_payload' => [],
                                     ]);
@@ -126,10 +131,10 @@ final class VariantInventoryResource extends Resource
                                 $variant = ProductVariant::query()
                                     ->select(['id', 'product_id', 'sku', 'name', 'price'])
                                     ->with(['product:id,sku,name'])
-                                    ->find((int) $state);
+                                    ->find((int) $identifier);
 
                                 if (! $variant instanceof ProductVariant) {
-                                    SearchableInputHelper::clear($set, [
+                                    SearchableInputHelper::clear($component, $set, [
                                         'variant_id'      => null,
                                         'variant_payload' => [],
                                     ]);
@@ -151,29 +156,31 @@ final class VariantInventoryResource extends Resource
                             ->searchUsing(fn (string $value): array => LocationSearch::results($value))
                             ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
                             ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                // Hydrate via helper to mirror docs/forms/SEARCHABLE_INPUT_METADATA.md lifecycle.
                                 SearchableInputHelper::hydrate(
                                     $component,
                                     $state,
-                                    static function (int $value): ?array {
+                                    static function (int $identifier): ?array {
                                         $location = Location::query()
                                             ->select(['id', 'name', 'code', 'city', 'country_code'])
-                                            ->find($value);
+                                            ->find($identifier);
 
                                         if (! $location instanceof Location) {
                                             return null;
                                         }
 
                                         return [
-                                            'value' => $location->getKey(),
-                                            'label' => LocationSearch::label($location),
+                                            'value'   => $location->getKey(),
+                                            'label'   => LocationSearch::label($location),
+                                            'payload' => self::normaliseLocationPayload($location),
                                         ];
                                     },
-                                );
+                                ); // See docs/filament/searchable-inputs.md for helper expectations.
                             })
-                            ->afterStateUpdated(function (?string $state, Set $set): void {
-                                if ($state === null || $state === '') {
-                                    SearchableInputHelper::clear($set, [
+                            ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
+                                $identifier = is_string($state) ? trim($state) : '';
+
+                                if ($identifier === '') {
+                                    SearchableInputHelper::clear($component, $set, [
                                         'location_id'      => null,
                                         'location_payload' => [],
                                     ]);
@@ -183,10 +190,10 @@ final class VariantInventoryResource extends Resource
 
                                 $location = Location::query()
                                     ->select(['id', 'name', 'code', 'city', 'country_code'])
-                                    ->find((int) $state);
+                                    ->find((int) $identifier);
 
                                 if (! $location instanceof Location) {
-                                    SearchableInputHelper::clear($set, [
+                                    SearchableInputHelper::clear($component, $set, [
                                         'location_id'      => null,
                                         'location_payload' => [],
                                     ]);
@@ -306,7 +313,7 @@ final class VariantInventoryResource extends Resource
                             ->label(__('admin.variant_inventory.stock_status'))
                             ->content(fn (?VariantInventory $record): string => $record ? __('admin.variant_inventory.status_' . $record->stock_status) : '-'),
                     ])
-                    ->visible(fn (?VariantInventory $record): bool => $record !== null),
+                    ->hidden(fn (?VariantInventory $record): bool => $record === null),
             ]);
     }
 
@@ -379,8 +386,9 @@ final class VariantInventoryResource extends Resource
         ];
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('variant.name')
@@ -573,7 +581,7 @@ final class VariantInventoryResource extends Resource
 
                         $record->save();
                         Notification::make()
-                            ->title('Stock adjusted successfully')
+                            ->title(__('admin.variant_inventory.stock_adjusted_successfully'))
                             ->success()
                             ->send();
                     }),
@@ -597,9 +605,9 @@ final class VariantInventoryResource extends Resource
                         $quantity = (int) ($data['quantity'] ?? 0);
 
                         if ($record->reserveStock($quantity)) {
-                            Notification::make()->title('Stock reserved successfully')->success()->send();
+                            Notification::make()->title(__('admin.variant_inventory.stock_reserved_successfully'))->success()->send();
                         } else {
-                            Notification::make()->title('Insufficient stock')->danger()->send();
+                            Notification::make()->title(__('admin.variant_inventory.insufficient_stock'))->danger()->send();
                         }
                     }),
             ])
@@ -649,7 +657,7 @@ final class VariantInventoryResource extends Resource
                                 $count++;
                             }
                             Notification::make()
-                                ->title("Successfully adjusted stock for {$count} records")
+                                ->title(__('admin.variant_inventory.bulk_stock_adjusted_successfully', ['count' => $count]))
                                 ->success()
                                 ->send();
                         }),
@@ -694,6 +702,15 @@ final class VariantInventoryResource extends Resource
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    /**
+     * Provide a reusable percentage formatter for table output to keep display consistent.
+     */
+    protected static function formatPercentage(float|int|null $value): string
+    {
+        // Guard against null while preserving decimal precision for inventory metrics.
+        return number_format((float) $value, 2) . '%';
     }
 
     public static function getRelations(): array

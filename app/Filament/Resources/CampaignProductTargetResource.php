@@ -4,43 +4,46 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\CampaignProductTargetResource\Pages;
 use App\Models\CampaignProductTarget;
 use App\Models\Scopes\ActiveScope;
 use BackedEnum;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Lang;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class CampaignProductTargetResource extends Resource
 {
     protected static ?string $model = CampaignProductTarget::class;
@@ -48,7 +51,10 @@ final class CampaignProductTargetResource extends Resource
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-bullseye-arrow';
+    /**
+     * Use a heroicon that still ships with the current Filament distribution to avoid runtime lookup failures.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?string $recordTitleAttribute = 'target_type';
 
@@ -75,9 +81,9 @@ final class CampaignProductTargetResource extends Resource
     /**
      * Define the Campaign Product Target form with conditional selectors and marketing metadata.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('campaign_product_targets.basic_information'))
                 ->description(__('campaign_product_targets.campaign_selection_description'))
                 ->schema([
@@ -184,8 +190,9 @@ final class CampaignProductTargetResource extends Resource
     /**
      * Configure the marketing oriented table with rich filtering, search, and bulk campaign actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('id')
@@ -355,7 +362,7 @@ final class CampaignProductTargetResource extends Resource
     /**
      * Provide a structured infolist for the record view page.
      */
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Schema $schema): Schema   
     {
         return $schema->schema([
             InfolistSection::make(__('campaign_product_targets.view.sections.overview'))

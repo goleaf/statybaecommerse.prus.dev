@@ -44,7 +44,7 @@ return [
     'types' => [
         'product' => 'Produktas',
         'category' => 'Kategorija',
-        'brand' => 'Prekės ženklas',
+        'brand' => 'Prekių ženklas',
         'collection' => 'Kolekcija',
     ],
     // Relationships

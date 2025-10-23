@@ -4,39 +4,42 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\MenuResource\Pages;
 use App\Filament\Resources\MenuResource\RelationManagers\MenuItemsRelationManager;
 use App\Models\Menu;
 use App\Models\Scopes\ActiveScope;
 use BackedEnum;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class MenuResource extends Resource
 {
-    protected static ?string $model = Menu::class;
+    use HasNav;
 
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
@@ -67,8 +70,9 @@ final class MenuResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         $locationOptions = [
             'header'  => __('menus.locations.header'),
             'footer'  => __('menus.locations.footer'),
@@ -76,7 +80,7 @@ final class MenuResource extends Resource
             'mobile'  => __('menus.locations.mobile'),
         ];
 
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('menus.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -115,8 +119,9 @@ final class MenuResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('name')

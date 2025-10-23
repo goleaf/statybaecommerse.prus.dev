@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ReferralCodeStatistics;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\ReferralCodeStatistics\Pages\CreateReferralCodeStatistics;
 use App\Filament\Resources\ReferralCodeStatistics\Pages\EditReferralCodeStatistics;
 use App\Filament\Resources\ReferralCodeStatistics\Pages\ListReferralCodeStatistics;
@@ -11,11 +13,13 @@ use App\Filament\Resources\ReferralCodeStatistics\Schemas\ReferralCodeStatistics
 use App\Filament\Resources\ReferralCodeStatistics\Tables\ReferralCodeStatisticsTable;
 use App\Models\ReferralCodeStatistics;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 class ReferralCodeStatisticsResource extends Resource
 {
     protected static ?string $model = ReferralCodeStatistics::class;
@@ -25,13 +29,14 @@ class ReferralCodeStatisticsResource extends Resource
      */
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return ReferralCodeStatisticsForm::configure($form);
+        return ReferralCodeStatisticsForm::configure($schema);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return ReferralCodeStatisticsTable::configure($table);
     }
 

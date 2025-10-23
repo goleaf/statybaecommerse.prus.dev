@@ -190,4 +190,10 @@ return [
         'open' => 'Atidaryti kolekciją',
         'products_count' => '{0}Nėra prekių|{1}1 prekė|[2,*]:count prekės',
     ],
+    'messages' => [
+        'no_featured_products' => 'Išskirtiniai produktai greitai bus papildyti.',
+        'no_latest_products' => 'Naujausios prekės pasirodys vos tik bus paskelbtos.',
+        'no_trending_products' => 'Populiariausi pasiūlymai netrukus bus atnaujinti.',
+        'no_sale_products' => 'Akcijos bus rodomos, kai tik jos prasidės.',
+    ],
 ];

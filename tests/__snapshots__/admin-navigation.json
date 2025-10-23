@@ -1,0 +1,777 @@
+{
+    "groups": [
+        {
+            "label": "Dashboard",
+            "label_key": "admin.navigation.dashboard",
+            "icon": "heroicon-o-home",
+            "sort": 0,
+            "resources": []
+        },
+        {
+            "label": "Commerce",
+            "label_key": "admin.navigation.commerce",
+            "icon": "heroicon-o-shopping-bag",
+            "sort": 1,
+            "resources": []
+        },
+        {
+            "label": "Products",
+            "label_key": "admin.navigation.products",
+            "icon": "heroicon-o-cube",
+            "sort": 2,
+            "resources": [
+                {
+                    "class": "App\\Filament\\Resources\\ProductResource",
+                    "icon": "heroicon-o-cube",
+                    "sort": 1
+                },
+                {
+                    "class": "App\\Filament\\Resources\\CollectionResource",
+                    "icon": "heroicon-o-folder",
+                    "sort": 2
+                },
+                {
+                    "class": "App\\Filament\\Resources\\AttributeValueResource",
+                    "icon": "heroicon-o-tag",
+                    "sort": 3
+                },
+                {
+                    "class": "App\\Filament\\Resources\\CategoryResource",
+                    "icon": "heroicon-o-tag",
+                    "sort": 3
+                },
+                {
+                    "class": "App\\Filament\\Resources\\CollectionRuleResource",
+                    "icon": "heroicon-o-cog-6-tooth",
+                    "sort": 3
+                },
+                {
+                    "class": "App\\Filament\\Resources\\ProductVariantResource",
+                    "icon": "heroicon-o-squares-2x2",
+                    "sort": 3
+                },
+                {
+                    "class": "App\\Filament\\Resources\\VariantPricingRuleResource",
+                    "icon": null,
+                    "sort": 10
+                },
+                {
+                    "class": "App\\Filament\\Resources\\ProductHistoryResource",
+                    "icon": "heroicon-o-clock",
+                    "sort": 11
+                },
+                {
+                    "class": "App\\Filament\\Resources\\PriceResource",
+                    "icon": null,
+                    "sort": 12
+                },
+                {
+                    "class": "App\\Filament\\Resources\\RecommendationBlockResource",
+                    "icon": null,
+                    "sort": 13
+                },
+                {
+                    "class": "App\\Filament\\Resources\\ProductImageResource",
+                    "icon": "heroicon-o-photo",
+                    "sort": 14
+                },
+                {
+                    "class": "App\\Filament\\Resources\\PriceListResource",
+                    "icon": null,
+                    "sort": 15
+                },
+                {
+                    "class": "App\\Filament\\Resources\\ProductComparisonResource",
+                    "icon": null,
+                    "sort": 15
+                },
+                {
+                    "class": "App\\Filament\\Resources\\PriceListItemResource",
+                    "icon": "heroicon-o-currency-euro",
+                    "sort": 16
+                },
+                {
+                    "class": "App\\Filament\\Resources\\ProductRequestResource",
+                    "icon": "heroicon-o-clipboard-document-list",
+                    "sort": 16
+                },
+                {
+                    "class": "App\\Filament\\Resources\\ProductFeatureResource",
+                    "icon": "heroicon-o-star",
+                    "sort": 17
+                },
+                {
+                    "class": "App\\Filament\\Resources\\AttributeResource",
+                    "icon": "heroicon-o-tag",
+                    "sort": null
+                }
+            ]
+        },
+        {
+            "label": "Marketing",
+            "label_key": "admin.navigation.marketing",
+            "icon": "heroicon-o-megaphone",
+            "sort": 3,
+            "resources": [
+                {
+                    "class": "App\\Filament\\Resources\\PartnerResource",
+                    "icon": "heroicon-o-user-group",
+                    "sort": 1
+                },
+                {
+                    "class": "App\\Filament\\Resources\\PartnerTierResource",
+                    "icon": "heroicon-o-star",
+                    "sort": 2
+                },
+                {
+                    "class": "App\\Filament\\Resources\\CampaignResource",
+                    "icon": null,
+                    "sort": 7
+                },
+                {
+                    "class": "App\\Filament\\Resources\\CampaignViewResource",
+                    "icon": null,
+                    "sort": 7
+                },
+                {
+                    "class": "App\\Filament\\Resources\\ReferralResource",
+                    "icon": "heroicon-o-share",
+                    "sort": 17
+                },
+                {
+                    "class": "App\\Filament\\Resources\\CampaignClickResource",
+                    "icon": "heroicon-o-chart-bar",
+                    "sort": null
+                },
+                {
+                    "class": "App\\Filament\\Resources\\CampaignCustomerSegmentResource",
+                    "icon": "heroicon-o-users",
+                    "sort": null
+                },
+                {
+                    "class": "App\\Filament\\Resources\\CampaignProductTargetResource",
+                    "icon": "heroicon-o-bullseye-arrow",
+                    "sort": null
+                },
+                {
+                    "class": "App\\Filament\\Resources\\DiscountCodeResource",
+                    "icon": "heroicon-o-tag",
+                    "sort": null
+                }
+            ]
+        },
+        {
+            "label": "Content",
+            "label_key": "admin.navigation.content",
+            "icon": "heroicon-o-document-text",
+            "sort": 4,
+            "resources": [
+                {
+                    "class": "App\\Filament\\Resources\\Sliders\\SliderResource",
+                    "icon": null,
+                    "sort": 1
+                },
+                {
+                    "class": "App\\Filament\\Resources\\NewsCategoryResource",
+                    "icon": "heroicon-o-tag",
+                    "sort": 2
+                },
+                {
+                    "class": "App\\Filament\\Resources\\PostResource",
+                    "icon": "heroicon-o-document-text",
+                    "sort": 2
+                },
+                {
+                    "class": "App\\Filament\\Resources\\NewsCommentResource",
+                    "icon": "heroicon-o-chat-bubble-left-ellipsis",
+                    "sort": 3
+                },
+                {
+                    "class": "App\\Filament\\Resources\\NewsImageResource",
+                    "icon": "heroicon-o-photo",
+                    "sort": 4
+                },
+                {
+                    "class": "App\\Filament\\Resources\\SliderResource",
+                    "icon": "heroicon-o-rectangle-stack",
+                    "sort": 4
+                },
+                {
+                    "class": "App\\Filament\\Resources\\MenuItemResource",
+                    "icon": "heroicon-o-rectangle-stack",
+                    "sort": 5
+                },
+                {
+                    "class": "App\\Filament\\Resources\\NotificationTemplateResource",
+                    "icon": null,
+                    "sort": 6
+                },
+                {
+                    "class": "App\\Filament\\Resources\\MenuResource",
+                    "icon": "heroicon-o-rectangle-stack",
+                    "sort": null
+                },
+                {
+                    "class": "App\\Filament\\Resources\\SeoDataResource",
+                    "icon": null,
+                    "sort": null
+                }
+            ]
+        },
+        {
+            "label": "Analytics",
+            "label_key": "admin.navigation.analytics",
+            "icon": "heroicon-o-chart-bar",
+            "sort": 5,
+            "resources": [
+                {
+                    "class": "App\\Filament\\Resources\\AnalyticsEventResource",
+                    "icon": null,
+                    "sort": 1
+                },
+                {
+                    "class": "App\\Filament\\Resources\\RecommendationAnalyticsResource",
+                    "icon": "heroicon-o-chart-bar",
+                    "sort": 8
+                },
+                {
+                    "class": "App\\Filament\\Resources\\RecommendationAnalytics\\RecommendationAnalyticsResource",
+                    "icon": "heroicon-o-chart-bar",
+                    "sort": 8
+                },
+                {
+                    "class": "App\\Filament\\Resources\\ReferralCodeStatisticsResource",
+                    "icon": null,
+                    "sort": 9
+                },
+                {
+                    "class": "App\\Filament\\Resources\\ReferralRewardLogResource",
+                    "icon": null,
+                    "sort": 10
+                },
+                {
+                    "class": "App\\Filament\\Resources\\RecommendationConfigResource",
+                    "icon": null,
+                    "sort": 11
+                },
+                {
+                    "class": "App\\Filament\\Resources\\ReportResource",
+                    "icon": "heroicon-o-document-chart-bar",
+                    "sort": 17
+                },
+                {
+                    "class": "App\\Filament\\Resources\\ReferralCodeUsageLogResource",
+                    "icon": null,
+                    "sort": 18
+                },
+                {
+                    "class": "App\\Filament\\Resources\\RecommendationCacheResource",
+                    "icon": null,
+                    "sort": 20
+                },
+                {
+                    "class": "App\\Filament\\Resources\\RecommendationCaches\\RecommendationCacheResource",
+                    "icon": null,
+                    "sort": 20
+                },
+                {
+                    "class": "App\\Filament\\Resources\\AnalyticsResource",
+                    "icon": "heroicon-o-chart-bar-square",
+                    "sort": null
+                }
+            ]
+        },
+        {
+            "label": "System",
+            "label_key": "admin.navigation.system",
+            "icon": "heroicon-o-cog-6-tooth",
+            "sort": 6,
+            "resources": [
+                {
+                    "class": "App\\Filament\\Resources\\EnumValueResource",
+                    "icon": "heroicon-o-squares-2x2",
+                    "sort": 1
+                },
+                {
+                    "class": "App\\Filament\\Resources\\OrderResource",
+                    "icon": "heroicon-o-shopping-bag",
+                    "sort": 1
+                },
+                {
+                    "class": "App\\Filament\\Resources\\SystemResource",
+                    "icon": "heroicon-o-cog-6-tooth",
+                    "sort": 1
+                },
+                {
+                    "class": "App\\Filament\\Resources\\EnumManagementResource",
+                    "icon": "heroicon-o-squares-2x2",
+                    "sort": 2
+                },
+                {
+                    "class": "App\\Filament\\Resources\\EnumResource",
+                    "icon": "heroicon-o-squares-2x2",
+                    "sort": 2
+                },
+                {
+                    "class": "App\\Filament\\Resources\\SystemSettingCategoryResource",
+                    "icon": null,
+                    "sort": 2
+                },
+                {
+                    "class": "App\\Filament\\Resources\\NotificationResource",
+                    "icon": "heroicon-o-bell",
+                    "sort": 3
+                },
+                {
+                    "class": "App\\Filament\\Resources\\VariantStockHistoryResource",
+                    "icon": null,
+                    "sort": 3
+                },
+                {
+                    "class": "App\\Filament\\Resources\\FeatureFlagResource",
+                    "icon": null,
+                    "sort": 5
+                },
+                {
+                    "class": "App\\Filament\\Resources\\NormalSettingResource",
+                    "icon": null,
+                    "sort": 8
+                },
+                {
+                    "class": "App\\Filament\\Resources\\ActivityLogResource",
+                    "icon": "heroicon-o-document-text",
+                    "sort": 9
+                },
+                {
+                    "class": "App\\Filament\\Resources\\ReferralCampaignResource",
+                    "icon": "heroicon-o-megaphone",
+                    "sort": 14
+                },
+                {
+                    "class": "App\\Filament\\Resources\\NormalSettingTranslationResource",
+                    "icon": "heroicon-o-language",
+                    "sort": 16
+                },
+                {
+                    "class": "App\\Filament\\Resources\\RoleResource",
+                    "icon": "heroicon-o-shield-check",
+                    "sort": 19
+                },
+                {
+                    "class": "App\\Filament\\Resources\\DocumentResource",
+                    "icon": "heroicon-o-document",
+                    "sort": 20
+                },
+                {
+                    "class": "App\\Filament\\Resources\\VariantPriceHistoryResource",
+                    "icon": "heroicon-o-currency-euro",
+                    "sort": 20
+                }
+            ]
+        },
+        {
+            "label": "translations.recommendation_system",
+            "label_key": "translations.recommendation_system",
+            "icon": "heroicon-o-sparkles",
+            "sort": 7,
+            "resources": []
+        }
+    ],
+    "ungrouped": [
+        {
+            "class": "App\\Filament\\Resources\\AdminUserResource",
+            "icon": "heroicon-o-document-text",
+            "sort": 1
+        },
+        {
+            "class": "App\\Filament\\Resources\\Countries\\CountryResource",
+            "icon": "heroicon-o-globe-alt",
+            "sort": 1
+        },
+        {
+            "class": "App\\Filament\\Resources\\CountryResource",
+            "icon": null,
+            "sort": 1
+        },
+        {
+            "class": "App\\Filament\\Resources\\DiscountResource",
+            "icon": "heroicon-o-tag",
+            "sort": 1
+        },
+        {
+            "class": "App\\Filament\\Resources\\NewsImages\\NewsImageResource",
+            "icon": "heroicon-o-photo",
+            "sort": 1
+        },
+        {
+            "class": "App\\Filament\\Resources\\NewsResource",
+            "icon": "heroicon-o-newspaper",
+            "sort": 1
+        },
+        {
+            "class": "App\\Filament\\Resources\\SubscriberResource",
+            "icon": null,
+            "sort": 1
+        },
+        {
+            "class": "App\\Filament\\Resources\\UserResource",
+            "icon": null,
+            "sort": 1
+        },
+        {
+            "class": "App\\Filament\\Resources\\ChannelResource",
+            "icon": "heroicon-o-rectangle-stack",
+            "sort": 2
+        },
+        {
+            "class": "App\\Filament\\Resources\\CustomerResource",
+            "icon": "heroicon-o-users",
+            "sort": 2
+        },
+        {
+            "class": "App\\Filament\\Resources\\InventoryResource",
+            "icon": "heroicon-o-cube",
+            "sort": 2
+        },
+        {
+            "class": "App\\Filament\\Resources\\OrderItemResource",
+            "icon": null,
+            "sort": 2
+        },
+        {
+            "class": "App\\Filament\\Resources\\VariantAnalyticsResource",
+            "icon": "heroicon-o-chart-bar-square",
+            "sort": 2
+        },
+        {
+            "class": "App\\Filament\\Resources\\VariantInventoryResource",
+            "icon": "heroicon-o-archive-box",
+            "sort": 2
+        },
+        {
+            "class": "App\\Filament\\Resources\\AddressResource",
+            "icon": null,
+            "sort": 3
+        },
+        {
+            "class": "App\\Filament\\Resources\\CartItemResource",
+            "icon": "heroicon-o-shopping-cart",
+            "sort": 3
+        },
+        {
+            "class": "App\\Filament\\Resources\\CityResource",
+            "icon": null,
+            "sort": 3
+        },
+        {
+            "class": "App\\Filament\\Resources\\DocumentTemplateResource",
+            "icon": "heroicon-o-document-text",
+            "sort": 3
+        },
+        {
+            "class": "App\\Filament\\Resources\\LegalResource",
+            "icon": "heroicon-o-scale",
+            "sort": 3
+        },
+        {
+            "class": "App\\Filament\\Resources\\OrderShippingResource",
+            "icon": null,
+            "sort": 3
+        },
+        {
+            "class": "App\\Filament\\Resources\\ShippingOptionResource",
+            "icon": "heroicon-o-truck",
+            "sort": 3
+        },
+        {
+            "class": "App\\Filament\\Resources\\SliderTranslationResource",
+            "icon": "heroicon-o-rectangle-stack",
+            "sort": 3
+        },
+        {
+            "class": "App\\Filament\\Resources\\StockMovementResource",
+            "icon": "heroicon-o-archive-box",
+            "sort": 3
+        },
+        {
+            "class": "App\\Filament\\Resources\\ApiKeyResource",
+            "icon": "heroicon-o-key",
+            "sort": 4
+        },
+        {
+            "class": "App\\Filament\\Resources\\EmailCampaignResource",
+            "icon": "heroicon-o-envelope",
+            "sort": 4
+        },
+        {
+            "class": "App\\Filament\\Resources\\NewsTagResource",
+            "icon": "heroicon-o-tag",
+            "sort": 4
+        },
+        {
+            "class": "App\\Filament\\Resources\\ReviewResource",
+            "icon": "heroicon-o-star",
+            "sort": 4
+        },
+        {
+            "class": "App\\Filament\\Resources\\UserBehaviorResource",
+            "icon": "heroicon-o-document-text",
+            "sort": 5
+        },
+        {
+            "class": "App\\Filament\\Resources\\UserPreferenceResource",
+            "icon": "heroicon-o-document-text",
+            "sort": 6
+        },
+        {
+            "class": "App\\Filament\\Resources\\StockResource",
+            "icon": null,
+            "sort": 7
+        },
+        {
+            "class": "App\\Filament\\Resources\\UserWishlistResource",
+            "icon": "heroicon-o-heart",
+            "sort": 8
+        },
+        {
+            "class": "App\\Filament\\Resources\\WishlistItemResource",
+            "icon": "heroicon-o-heart",
+            "sort": 10
+        },
+        {
+            "class": "App\\Filament\\Resources\\SystemSettingHistoryResource",
+            "icon": "heroicon-o-clock",
+            "sort": 13
+        },
+        {
+            "class": "App\\Filament\\Resources\\ReferralStatisticsResource",
+            "icon": "heroicon-o-chart-bar-square",
+            "sort": 14
+        },
+        {
+            "class": "App\\Filament\\Resources\\SystemSettingTranslationResource",
+            "icon": "heroicon-o-document-text",
+            "sort": 14
+        },
+        {
+            "class": "App\\Filament\\Resources\\ReferralRewardResource",
+            "icon": "heroicon-o-gift",
+            "sort": 15
+        },
+        {
+            "class": "App\\Filament\\Resources\\SystemSettingCategoryTranslationResource",
+            "icon": "heroicon-o-language",
+            "sort": 15
+        },
+        {
+            "class": "App\\Filament\\Resources\\VariantImageResource",
+            "icon": "heroicon-o-photo",
+            "sort": 15
+        },
+        {
+            "class": "App\\Filament\\Resources\\SystemSettingResource",
+            "icon": "heroicon-o-cog-6-tooth",
+            "sort": 18
+        },
+        {
+            "class": "App\\Filament\\Resources\\VariantAttributeValueResource",
+            "icon": "heroicon-o-tag",
+            "sort": 18
+        },
+        {
+            "class": "App\\Filament\\Resources\\VariantCombinationResource",
+            "icon": "heroicon-o-squares-2x2",
+            "sort": 19
+        },
+        {
+            "class": "App\\Filament\\Resources\\BrandResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\CampaignConversionResource",
+            "icon": "heroicon-o-rocket-launch",
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\CampaignScheduleResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\Channels\\ChannelResource",
+            "icon": "heroicon-o-rectangle-stack",
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\CompanyResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\CouponResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\CouponUsageResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\CurrencyResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\CustomerGroupResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\CustomerManagementResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\DiscountConditionResource",
+            "icon": "heroicon-o-adjustments-horizontal",
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\DiscountRedemptionResource",
+            "icon": "heroicon-o-ticket",
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\EmailCampaigns\\EmailCampaignResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\FeatureFlags\\FeatureFlagResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\LocationResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\MenuItems\\MenuItemResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\NewsCategories\\NewsCategoryResource",
+            "icon": "heroicon-o-rectangle-stack",
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\NewsComments\\NewsCommentResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\NewsTags\\NewsTagResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\NotificationTemplates\\NotificationTemplateResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\OrderShippings\\OrderShippingResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\ProductSimilarities\\ProductSimilarityResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\ProductSimilarityResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\ReferralCodeResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\ReferralCodeStatistics\\ReferralCodeStatisticsResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\ReferralCodeUsageLogs\\ReferralCodeUsageLogResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\ReferralRewardLogs\\ReferralRewardLogResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\ReferralStatistics\\ReferralStatisticsResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\Settings\\SettingResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\ShippingOptions\\ShippingOptionResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\SystemSettingCategories\\SystemSettingCategoryResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\SystemSettingDependencies\\SystemSettingDependencyResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\SystemSettingDependencyResource",
+            "icon": "heroicon-o-link",
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\SystemSettingHistories\\SystemSettingHistoryResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\SystemSettingsResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\UserProductInteractionResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\UserProductInteractions\\UserProductInteractionResource",
+            "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\VariantStockResource",
+            "icon": "heroicon-o-archive-box",
+            "sort": null
+        }
+    ]
+}

@@ -1,19 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 return [
+    // Navigacija ir pavadinimai
     'navigation_label' => 'Meniu elementai',
     'plural_model_label' => 'Meniu elementai',
     'model_label' => 'Meniu elementas',
+
+    // Formos skyriai
     'basic_information' => 'Pagrindinė informacija',
+    'status' => 'Būsena',
+
+    // Laukai
     'menu' => 'Meniu',
     'parent' => 'Tėvinis elementas',
-    'label' => 'Pavadinimas',
+    'label' => 'Žyma',
     'url' => 'URL',
     'route_name' => 'Maršruto pavadinimas',
-    'route_name_help' => 'Pasirinktinai nurodykite vidinio maršruto pavadinimą.',
     'icon' => 'Piktograma',
-    'icon_help' => 'Nurodykite naudojamos piktogramos klasę arba identifikatorių.',
     'sort_order' => 'Rikiavimo tvarka',
-    'status' => 'Būsena',
     'is_visible' => 'Matomas',
+
+    // Pagalbos tekstai
+    'route_name_help' => 'Nurodykite maršruto pavadinimą, kad nuoroda būtų sugeneruota automatiškai.',
+    'icon_help' => 'Nurodykite Heroicon identifikatorių arba piktogramos klasę.',
 ];

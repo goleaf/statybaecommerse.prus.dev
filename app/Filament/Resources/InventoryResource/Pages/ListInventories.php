@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 
 class ListInventories extends BaseListRecords
 {
+    use HasResizableColumns;
     use HasWidgetTabs;
 
     protected static string $resource = InventoryResource::class;

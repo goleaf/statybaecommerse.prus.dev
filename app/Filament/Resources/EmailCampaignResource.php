@@ -4,29 +4,36 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\EmailCampaignResource\Pages;
 use App\Models\EmailCampaign;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class EmailCampaignResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = EmailCampaign::class;
 
     protected static ?int $navigationSort = 4;
@@ -51,9 +58,9 @@ final class EmailCampaignResource extends Resource
         return __('admin.email_campaigns.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('admin.email_campaigns.basic_information'))
                 ->description(__('admin.email_campaigns.basic_information_description'))
                 ->schema([
@@ -99,8 +106,9 @@ final class EmailCampaignResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('name')

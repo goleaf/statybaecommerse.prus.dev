@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderShippings\Schemas;
 
+use App\Forms\Components\Flatpickr;
 use App\Models\Order;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms\Components\KeyValue;

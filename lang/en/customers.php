@@ -3,14 +3,14 @@
 declare(strict_types=1);
 
 return [
-    'title'  => 'Customers',
-    'plural' => 'Customers',
-    'single' => 'Customer',
-    'orders' => 'Orders',
-    'order_number_label' => 'Order #:number',
-    'order_placed_on' => 'Placed on :date',
-    'reviews' => 'Reviews',
-    'review_for_product' => 'Review for :product',
+    'title'                 => 'Customers',
+    'plural'                => 'Customers',
+    'single'                => 'Customer',
+    'orders'                => 'Orders',
+    'order_number_label'    => 'Order #:number',
+    'order_placed_on'       => 'Placed on :date',
+    'reviews'               => 'Reviews',
+    'review_for_product'    => 'Review for :product',
     'review_rating_tooltip' => 'Rated :rating/5 — :title',
 
     'basic_information'    => 'Basic Information',
@@ -79,6 +79,10 @@ return [
     'unverified_only' => 'Unverified Only',
     'active_only'     => 'Active Only',
     'inactive_only'   => 'Inactive Only',
+    'badges' => [
+        'active' => 'Active',
+        'inactive' => 'Inactive',
+    ],
     'created_from'    => 'Created From',
     'created_until'   => 'Created Until',
 
@@ -95,6 +99,17 @@ return [
     'bulk_verified_success'    => 'Selected records verified successfully',
     'bulk_activated_success'   => 'Selected records activated successfully',
     'bulk_deactivated_success' => 'Selected records deactivated successfully',
+    'badges'                   => [
+        'country'    => 'Country: :country',
+        'city'       => 'City: :city',
+        'company'    => 'Company: :company',
+        'active'     => 'Active',
+        'inactive'   => 'Inactive',
+        'verified'   => 'Verified',
+        'unverified' => 'Unverified',
+        'orders'     => 'Orders: :count',
+        'ltv'        => 'Lifetime value: :total',
+    ],
     'sparkline' => [
         'orders_label' => 'Orders over the last :days days',
     ],

@@ -136,6 +136,7 @@ return [
     'search' => [
         'placeholder' => 'Search products...',
         'results' => 'Search Results',
+        'help' => 'Search products across categories, brands, and collections.',
         'no_results' => 'No results found',
         'showing_results' => 'Showing :from-:to of :total results',
         'sort_by' => 'Sort By',
@@ -162,6 +163,10 @@ return [
         'new_arrivals' => 'New Arrivals',
         'featured' => 'Featured',
         'searching' => 'Searching...',
+        'result_count' => '{0} No results|{1} :count result|[2,*] :count results',
+        'for_query' => 'for “:query”',
+        'pagination_label' => 'Pagination',
+        'no_results_for_query' => 'No results found for “:query”',
         'view_all_results' => 'View all results',
         'try_different_keywords' => 'Try different keywords',
         'category_with_products' => ':count products',

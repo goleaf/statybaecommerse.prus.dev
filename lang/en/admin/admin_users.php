@@ -12,6 +12,7 @@ return [
         'sections' => [
             'basic_information' => 'Basic Information',
             'account_details' => 'Account Details',
+            'roles_permissions' => 'Roles & Permissions',
         ],
         'fields' => [
             'name' => 'Name',
@@ -21,6 +22,12 @@ return [
             'email_verified_at' => 'Email Verified',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
+            'roles' => 'Roles',
+            'audit_reason' => 'Reason for change',
+        ],
+        'helpers' => [
+            'roles' => 'Select the administrative roles to assign to this user.',
+            'audit_reason' => 'Explain why these role assignments are being modified.',
         ],
     ],
     'filters' => [

@@ -3,7 +3,9 @@
 declare(strict_types=1);
 
 use App\Filament\Resources\DocumentTemplateResource;
+use App\Support\Nav;
 use App\Models\DocumentTemplate;
+use App\Support\Nav;
 
 it('can load DocumentTemplateResource class', function () {
     expect(class_exists(DocumentTemplateResource::class))->toBeTrue();
@@ -18,7 +20,9 @@ it('can get DocumentTemplateResource model', function () {
 });
 
 it('can get DocumentTemplateResource navigation group', function () {
-    expect(DocumentTemplateResource::getNavigationGroup())->toBe('Documents');
+    expect(DocumentTemplateResource::getNavigationGroup())->toBe(
+        Nav::groupForResource(DocumentTemplateResource::class)
+    );
 });
 
 it('can get DocumentTemplateResource navigation label', function () {

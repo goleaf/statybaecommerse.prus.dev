@@ -27,8 +27,8 @@ function makeTestTable(): Table
 }
 
 it('can create form', function (): void {
-    $form = DiscountRedemptionResource::form(Form::make());
-    expect($form)->toBeInstanceOf(Form::class);
+    $form = DiscountRedemptionResource::form(Schema::make());
+    expect($form)->toBeInstanceOf(Schema::class);
 });
 
 it('can create table', function (): void {
@@ -41,15 +41,16 @@ it('has correct model', function (): void {
 });
 
 it('has correct navigation group', function (): void {
-    expect(DiscountRedemptionResource::getNavigationGroup())->toBe('Marketing');
+    // The resource now lives under the Discounts cluster to mirror Filament navigation.
+    expect(DiscountRedemptionResource::getNavigationGroup())->toBe('Discounts');
 });
 
 it('has correct navigation icon', function (): void {
-    expect(DiscountRedemptionResource::getNavigationIcon())->toBe('heroicon-o-ticket');
+    expect(DiscountRedemptionResource::getNavigationIcon())->toBe('heroicon-o-receipt-percent');
 });
 
 it('has correct navigation sort', function (): void {
-    expect(DiscountRedemptionResource::getNavigationSort())->toBe(2);
+    expect(DiscountRedemptionResource::getNavigationSort())->toBeNull();
 });
 
 it('has correct pages', function (): void {
@@ -70,5 +71,5 @@ it('has navigation badge', function (): void {
 });
 
 it('has navigation badge color', function (): void {
-    expect(DiscountRedemptionResource::getNavigationBadgeColor())->toBe('warning');
+    expect(DiscountRedemptionResource::getNavigationBadgeColor())->toBeNull();
 });

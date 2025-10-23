@@ -1,118 +1,34 @@
-@extends('frontend.layouts.app')
-
-@section('title', __('frontend/home.meta.title'))
-@section('description', __('frontend/home.meta.description'))
-@section('meta_description', __('frontend/home.meta.description'))
-
-@section('content')
-    <div class="relative overflow-hidden bg-white">
-        <section class="relative isolate">
-            <div class="absolute inset-0 -z-10 bg-gradient-to-br from-blue-50 via-white to-indigo-100"></div>
-            <div class="mx-auto flex max-w-7xl flex-col gap-12 px-4 pb-16 pt-12 sm:gap-16 sm:px-6 lg:flex-row lg:items-center lg:px-8 lg:pt-20">
-                <div class="flex-1 space-y-8">
-                    <div class="inline-flex items-center gap-3 rounded-full border border-blue-100 bg-white px-4 py-1 text-sm font-medium text-blue-600 shadow-sm">
-                        <x-untitledui-sparkles class="h-4 w-4" />
-                        <span>{{ __('frontend/home.hero.eyebrow') }}</span>
+<x-layouts.base title="{{ __('Home') }}">
+    <div class="max-w-7xl mx-auto px-4 py-10 space-y-12">
+        <section>
+            <h1 class="text-3xl font-semibold mb-4">{{ __('Featured products') }}</h1>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                @forelse ($featuredProducts as $product)
+                    <div class="p-4 border border-gray-200 rounded-xl bg-white shadow-sm dark:bg-gray-900 dark:border-white/10">
+                        <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">{{ $product->name }}</h2>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $product->brand?->name }}</p>
+                        <p class="mt-2 text-primary-600 font-semibold">{{ app_money_format($product->sale_price ?? $product->price ?? 0) }}</p>
+                        <a class="mt-3 inline-flex items-center text-sm text-primary-700 hover:text-primary-800"
+                           href="{{ route('frontend.products.show', $product) }}">{{ __('View product') }}</a>
                     </div>
-
-                    <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
-                        {{ __('frontend/home.hero.title') }}
-                    </h1>
-
-                    <p class="text-lg leading-8 text-gray-600 sm:max-w-xl">
-                        {{ __('frontend/home.hero.subtitle') }}
-                    </p>
-
-                    <div class="flex flex-wrap items-center gap-4">
-                        <a href="{{ route('frontend.products.index') }}"
-                           class="inline-flex items-center justify-center gap-2 rounded-full bg-blue-600 px-6 py-3 text-base font-semibold text-white shadow-lg transition hover:bg-blue-700">
-                            <x-untitledui-shopping-bag class="h-5 w-5" />
-                            <span>{{ __('frontend/home.hero.cta_primary') }}</span>
-                        </a>
-                        <a href="{{ route('frontend.products.index', ['sort' => 'latest']) }}"
-                           class="inline-flex items-center justify-center gap-2 rounded-full border border-blue-200 bg-white px-6 py-3 text-base font-semibold text-blue-700 transition hover:bg-blue-50">
-                            <x-untitledui-trending-up class="h-5 w-5" />
-                            <span>{{ __('frontend/home.hero.cta_secondary') }}</span>
-                        </a>
-                    </div>
-
-                    <dl class="grid grid-cols-2 gap-6 sm:grid-cols-4">
-                        <div class="rounded-2xl border border-gray-200 bg-white p-5 text-center shadow-sm">
-                            <dt class="text-sm font-medium text-gray-500">{{ __('frontend/home.stats.products.label') }}</dt>
-                            <dd class="mt-2 text-2xl font-semibold text-gray-900">{{ number_format($stats['products_count']) }}</dd>
-                            <dd class="mt-1 text-xs text-gray-500">{{ __('frontend/home.stats.products.caption') }}</dd>
-                        </div>
-                        <div class="rounded-2xl border border-gray-200 bg-white p-5 text-center shadow-sm">
-                            <dt class="text-sm font-medium text-gray-500">{{ __('frontend/home.stats.categories.label') }}</dt>
-                            <dd class="mt-2 text-2xl font-semibold text-gray-900">{{ number_format($stats['categories_count']) }}</dd>
-                            <dd class="mt-1 text-xs text-gray-500">{{ __('frontend/home.stats.categories.caption') }}</dd>
-                        </div>
-                        <div class="rounded-2xl border border-gray-200 bg-white p-5 text-center shadow-sm">
-                            <dt class="text-sm font-medium text-gray-500">{{ __('frontend/home.stats.brands.label') }}</dt>
-                            <dd class="mt-2 text-2xl font-semibold text-gray-900">{{ number_format($stats['brands_count']) }}</dd>
-                            <dd class="mt-1 text-xs text-gray-500">{{ __('frontend/home.stats.brands.caption') }}</dd>
-                        </div>
-                        <div class="rounded-2xl border border-gray-200 bg-white p-5 text-center shadow-sm">
-                            <dt class="text-sm font-medium text-gray-500">{{ __('frontend/home.stats.reviews.label') }}</dt>
-                            <dd class="mt-2 text-2xl font-semibold text-gray-900">
-                                {{ number_format($stats['reviews_count']) }}
-                            </dd>
-                            <dd class="mt-1 text-xs text-gray-500">
-                                {{ __('frontend/home.stats.reviews.caption', ['rating' => number_format($stats['avg_rating'], 1)]) }}
-                            </dd>
-                        </div>
-                    </dl>
-                </div>
-
-                <div class="relative flex-1 rounded-[2.5rem] border border-blue-100 bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-500 p-1 shadow-xl">
-                    <div class="rounded-[2.35rem] bg-white p-6">
-                        <div class="grid gap-4">
-                            <div class="rounded-3xl bg-gradient-to-br from-slate-900 to-slate-700 p-6 text-white shadow-lg">
-                                <p class="text-sm uppercase tracking-wide text-white/70">{{ __('frontend/home.hero.featured_card.badge') }}</p>
-                                <p class="mt-3 text-2xl font-semibold leading-snug">
-                                    {{ __('frontend/home.hero.featured_card.title') }}
-                                </p>
-                                <p class="mt-3 text-sm text-white/80">
-                                    {{ __('frontend/home.hero.featured_card.subtitle') }}
-                                </p>
-                                <a href="{{ route('frontend.products.index', ['filter' => 'featured']) }}"
-                                   class="mt-6 inline-flex items-center gap-2 text-sm font-medium text-white transition hover:text-blue-100">
-                                    <span>{{ __('frontend/home.hero.featured_card.link') }}</span>
-                                    <x-untitledui-arrow-up-right class="h-4 w-4" />
-                                </a>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="rounded-3xl border border-gray-100 bg-white p-5 text-gray-900 shadow-sm">
-                                    <p class="text-xs font-medium uppercase tracking-wide text-indigo-500">{{ __('frontend/home.hero.secondary_cards.new.badge') }}</p>
-                                    <p class="mt-2 text-lg font-semibold leading-tight">{{ __('frontend/home.hero.secondary_cards.new.title') }}</p>
-                                    <p class="mt-2 text-sm text-gray-500">{{ __('frontend/home.hero.secondary_cards.new.subtitle') }}</p>
-                                    <a href="{{ route('frontend.products.index', ['sort' => 'latest']) }}"
-                                       class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-indigo-600 hover:text-indigo-700">
-                                        {{ __('frontend/home.hero.secondary_cards.new.link') }}
-                                        <x-untitledui-arrow-narrow-right class="h-4 w-4" />
-                                    </a>
-                                </div>
-                                <div class="rounded-3xl border border-gray-100 bg-white p-5 text-gray-900 shadow-sm">
-                                    <p class="text-xs font-medium uppercase tracking-wide text-rose-500">{{ __('frontend/home.hero.secondary_cards.sale.badge') }}</p>
-                                    <p class="mt-2 text-lg font-semibold leading-tight">{{ __('frontend/home.hero.secondary_cards.sale.title') }}</p>
-                                    <p class="mt-2 text-sm text-gray-500">{{ __('frontend/home.hero.secondary_cards.sale.subtitle') }}</p>
-                                    <a href="{{ route('frontend.products.index', ['filter' => 'sale']) }}"
-                                       class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-rose-600 hover:text-rose-700">
-                                        {{ __('frontend/home.hero.secondary_cards.sale.link') }}
-                                        <x-untitledui-arrow-narrow-right class="h-4 w-4" />
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @empty
+                    <p class="text-gray-500 dark:text-gray-400">{{ __('No featured products available.') }}</p>
+                @endforelse
             </div>
         </section>
 
-        <section class="relative bg-white">
-            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <livewire:home-slider />
+        <section>
+            <h2 class="text-2xl font-semibold mb-4">{{ __('Latest arrivals') }}</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                @forelse ($latestProducts as $product)
+                    <div class="p-4 rounded-xl border border-gray-200 bg-white dark:bg-gray-900 dark:border-white/10">
+                        <h3 class="text-base font-semibold">{{ $product->name }}</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $product->brand?->name }}</p>
+                        <div class="mt-2 text-primary-600 font-medium">{{ app_money_format($product->sale_price ?? $product->price ?? 0) }}</div>
+                    </div>
+                @empty
+                    <p class="text-gray-500 dark:text-gray-400">{{ __('Products will appear here soon.') }}</p>
+                @endforelse
             </div>
         </section>
 
@@ -128,7 +44,10 @@
                         </p>
                     </div>
 
-                    @include('frontend.catalogue.product-grid', ['products' => $featuredProducts, 'columns' => 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'])
+                    @include('frontend.products.partials.product-grid', [
+                        'products' => $featuredProducts,
+                        'emptyMessage' => __('frontend/home.messages.no_featured_products'),
+                    ])
                 </div>
             </div>
         </section>
@@ -169,6 +88,11 @@
                                         </li>
                                     @endforelse
                                 </ul>
+                                <a href="{{ route('frontend.categories.index') }}"
+                                   class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-700">
+                                    {{ __('frontend/home.sections.catalogue.cards.categories.link') }}
+                                    <x-untitledui-arrow-narrow-right class="h-4 w-4" />
+                                </a>
                             </div>
                             <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
                                 <div class="flex items-center justify-between">
@@ -193,6 +117,11 @@
                                         </li>
                                     @endforelse
                                 </ul>
+                                <a href="{{ route('frontend.brands.index') }}"
+                                   class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-rose-600 hover:text-rose-700">
+                                    {{ __('frontend/home.sections.catalogue.cards.brands.link') }}
+                                    <x-untitledui-arrow-narrow-right class="h-4 w-4" />
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -299,28 +228,43 @@
                                 <x-untitledui-newsletter class="h-5 w-5" />
                                 <span>{{ __('frontend/home.sections.cta.primary') }}</span>
                             </a>
-                            <a href="{{ route('frontend.contact.index') }}"
-                               class="inline-flex items-center gap-2 rounded-full border border-white/30 bg-transparent px-6 py-3 text-base font-semibold text-white transition hover:bg-white/10">
-                                <x-untitledui-chat-bubble class="h-5 w-5" />
-                                <span>{{ __('frontend/home.sections.cta.secondary') }}</span>
+                            <span class="text-sm text-gray-500">{{ trans_choice('{0}No products|{1}1 product|[2,*]:count products', $category->products_count, ['count' => $category->products_count]) }}</span>
+                        </li>
+                    @empty
+                        <li class="text-gray-500 dark:text-gray-400">{{ __('No categories available yet.') }}</li>
+                    @endforelse
+                </ul>
+            </div>
+            <div>
+                <h2 class="text-2xl font-semibold mb-4">{{ __('Brands customers love') }}</h2>
+                <ul class="space-y-3">
+                    @forelse ($popularBrands as $brand)
+                        <li class="flex items-center justify-between">
+                            <a href="{{ route('frontend.brands.show', $brand) }}" class="text-primary-700 hover:text-primary-800">
+                                {{ $brand->name }}
                             </a>
-                        </div>
-                    </div>
-                    <div class="space-y-4 rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl backdrop-blur">
-                        <p class="text-sm uppercase tracking-wide text-white/70">{{ __('frontend/home.sections.cta.review_badge') }}</p>
-                        <p class="text-4xl font-semibold">{{ number_format($stats['avg_rating'], 1) }}<span class="text-lg text-white/70">/5</span></p>
-                        <p class="text-sm text-white/80">
-                            {{ __('frontend/home.sections.cta.review_copy') }}
-                        </p>
-                        <div class="flex items-center gap-1 text-amber-300">
-                            @for ($i = 0; $i < 5; $i++)
-                                <x-untitledui-star class="h-5 w-5" />
-                            @endfor
-                        </div>
-                        <p class="text-xs text-white/60">{{ __('frontend/home.sections.cta.review_caption', ['count' => number_format($stats['reviews_count'])]) }}</p>
-                    </div>
-                </div>
+                            <span class="text-sm text-gray-500">{{ trans_choice('{0}No products|{1}1 product|[2,*]:count products', $brand->products_count, ['count' => $brand->products_count]) }}</span>
+                        </li>
+                    @empty
+                        <li class="text-gray-500 dark:text-gray-400">{{ __('No brands available yet.') }}</li>
+                    @endforelse
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-semibold mb-4">{{ __('Active discounts') }}</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                @forelse ($activeDiscounts as $discount)
+                    <article class="p-4 rounded-xl border border-dashed border-primary-200 bg-primary-50 dark:bg-primary-900/10">
+                        <h3 class="text-lg font-semibold text-primary-900 dark:text-primary-200">{{ $discount->name }}</h3>
+                        <p class="text-sm text-primary-700 dark:text-primary-300">{{ $discount->description }}</p>
+                        <p class="mt-2 text-sm text-primary-600">{{ __('Value: :value', ['value' => $discount->value]) }}</p>
+                    </article>
+                @empty
+                    <p class="text-gray-500 dark:text-gray-400">{{ __('There are no active discounts right now.') }}</p>
+                @endforelse
             </div>
         </section>
     </div>
-@endsection
+</x-layouts.base>

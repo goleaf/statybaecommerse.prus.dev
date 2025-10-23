@@ -4,64 +4,52 @@ declare(strict_types=1);
 
 namespace App\Filament\Components;
 
-use Closure;
+use Illuminate\Support\Facades\Lang;
 use Novadaemon\FilamentCombobox\Combobox as BaseCombobox;
 
 /**
- * Application wrapper around the Filament combobox plugin.
- *
- * Centralises default configuration and exposes helper shortcuts for
- * consistent labelling across admin resources.
+ * Application wrapper for the Novadaemon combobox component.
  */
 final class Combobox extends BaseCombobox
 {
-    public static function make(?string $name = null): static
+    /**
+     * Apply the default application-wide combobox settings.
+     */
+    protected function setUp(): void
     {
-        $component = parent::make($name);
+        parent::setUp();
 
-        // Apply the shared UX defaults immediately so every combobox feels consistent.
-        return $component
-            ->boxSearchs(true)
-            ->height('340px')
-            ->native(false)
-            ->preload();
+        // Surface the dual search inputs by default so operators can filter quickly.
+        $this->boxSearchs();
+
+        // Provide a generous default height that works well for most admin layouts.
+        $this->height('360px');
     }
 
     /**
-     * Apply static column labels without repeating boilerplate closures.
+     * Configure translated column headers with an optional plain-text fallback.
      */
-    public function withLabels(string $optionsLabel, string $selectedLabel): static
-    {
-        // Delegate to the closure-based helper so late binding remains possible if needed.
-        return $this->withLabelClosures(
-            static fn (): string => $optionsLabel,
-            static fn (): string => $selectedLabel,
-        );
+    public function translatedLabels(
+        string $availableKey,
+        string $selectedKey,
+        ?string $availableFallback = null,
+        ?string $selectedFallback = null,
+    ): static {
+        $this->optionsLabel($this->resolveLabel($availableKey, $availableFallback));
+        $this->selectedLabel($this->resolveLabel($selectedKey, $selectedFallback));
+
+        return $this;
     }
 
     /**
-     * Resolve the dual-list headers from translation keys for localisation.
+     * Resolve a translation key while gracefully falling back to a provided default string.
      */
-    public function withLocalizedLabels(string $optionsKey, string $selectedKey): static
+    private function resolveLabel(string $key, ?string $fallback): string
     {
-        // Wrap the translation calls in closures so the current locale is honoured at render time.
-        return $this->withLabelClosures(
-            static fn (): string => __($optionsKey),
-            static fn (): string => __($selectedKey),
-        );
-    }
+        if (Lang::has($key)) {
+            return __($key);
+        }
 
-    /**
-     * Accept arbitrary label resolver callbacks for advanced use cases.
-     *
-     * @param Closure():string $optionsResolver  Lazily resolves the available column heading.
-     * @param Closure():string $selectedResolver Lazily resolves the selected column heading.
-     */
-    public function withLabelClosures(Closure $optionsResolver, Closure $selectedResolver): static
-    {
-        // Let the underlying component manage the callbacks, but keep the fluent chain intact.
-        return $this
-            ->optionsLabel($optionsResolver)
-            ->selectedLabel($selectedResolver);
+        return $fallback ?? $key;
     }
 }

@@ -89,4 +89,29 @@ return [
     'deactivate_selected'      => 'Deactivate Selected',
     'bulk_activated_success'   => 'Selected records activated successfully',
     'bulk_deactivated_success' => 'Selected records deactivated successfully',
+    'set_priority' => 'Set Priority',
+
+    'boolean_yes' => 'Yes',
+    'boolean_no' => 'No',
+
+    'charts' => [
+        'conditions_by_type' => 'Conditions by type',
+    ],
+
+    'stats' => [
+        'total_conditions' => 'Total conditions',
+        'total_conditions_description' => 'Overall number of configured conditions.',
+        'active_conditions' => 'Active conditions',
+        'active_conditions_description' => 'Currently enabled conditions.',
+        'inactive_conditions' => 'Inactive conditions',
+        'inactive_conditions_description' => 'Conditions disabled for now.',
+        'top_condition_type' => 'Most common type',
+        'top_condition_type_description' => 'Most frequently used condition type.',
+        'type_usage' => '{1} :count condition|[2,*] :count conditions',
+        'no_data' => 'No data yet',
+    ],
+
+    'widgets' => [
+        'recent_conditions' => 'Recent discount conditions',
+    ],
 ];

@@ -17,12 +17,13 @@ final class RecentRedemptionsWidget extends BaseWidget
 
     protected int|string|array $columnSpan = 'full';
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->query(
                 DiscountRedemption::query()
-                    ->with(['user', 'discount', 'discountCode'])
+                    ->with(['user', 'discount', 'code'])
                     ->latest('redeemed_at')
             )
             ->columns([
@@ -34,23 +35,27 @@ final class RecentRedemptionsWidget extends BaseWidget
                     ->label('Discount')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('discount_code.code')
+                Tables\Columns\TextColumn::make('code.code')
                     ->label('Code')
+                    ->badge()
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('original_amount')
-                    ->label('Original')
-                    ->money('EUR')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('discount_amount')
-                    ->label('Discount')
-                    ->money('EUR')
+                Tables\Columns\TextColumn::make('amount_saved')
+                    ->label('Amount Saved')
                     ->sortable()
+                    ->formatStateUsing(fn ($state, DiscountRedemption $record): string => $state === null
+                        ? '-' : number_format((float) $state, 2).' '.($record->currency_code ?? 'EUR'))
                     ->color('success'),
-                Tables\Columns\TextColumn::make('final_amount')
-                    ->label('Final')
-                    ->money('EUR')
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->colors([
+                        'warning' => 'pending',
+                        'success' => 'redeemed',
+                        'secondary' => 'refunded',
+                        'danger' => 'cancelled',
+                        'gray' => 'expired',
+                    ]),
                 Tables\Columns\TextColumn::make('redeemed_at')
                     ->label('Redeemed At')
                     ->dateTime()

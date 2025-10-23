@@ -6,6 +6,7 @@ namespace App\Filament\Resources\SystemSettingHistories\Pages;
 
 use App\Filament\Resources\SystemSettingHistories\SystemSettingHistoryResource;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 
 class EditSystemSettingHistory extends EditRecord
@@ -15,6 +16,7 @@ class EditSystemSettingHistory extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            ViewAction::make(),
             DeleteAction::make(),
         ];
     }

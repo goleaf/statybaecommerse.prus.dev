@@ -8,7 +8,7 @@ use App\Filament\Resources\NormalSettingResource\Pages\ListNormalSettings;
 use App\Models\NormalSetting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
+use Illuminate\Support\Facades\Lang;
 use Tests\TestCase;
 
 final class NormalSettingResourceTest extends TestCase
@@ -160,14 +160,25 @@ final class NormalSettingResourceTest extends TestCase
 
     public function test_can_filter_normal_settings_by_type(): void
     {
-        NormalSetting::factory()->create(['type' => 'string']);
-        NormalSetting::factory()->create(['type' => 'integer']);
+        foreach (NormalSetting::CANONICAL_TYPES as $type) {
+            NormalSetting::factory()->create([
+                'type'  => $type,
+                'value' => match ($type) {
+                    NormalSetting::TYPE_INTEGER => 5,
+                    NormalSetting::TYPE_BOOLEAN => true,
+                    NormalSetting::TYPE_ARRAY   => ['items' => ['alpha']],
+                    NormalSetting::TYPE_JSON    => ['meta' => ['foo' => 'bar']],
+                    default                     => 'string-value',
+                },
+            ]);
+        }
 
         $this->actingAs($this->admin);
 
-        $response = $this->get('/admin/normal-settings?filter[type]=string');
-
-        $response->assertStatus(200);
+        foreach (NormalSetting::CANONICAL_TYPES as $type) {
+            $this->get("/admin/normal-settings?filter[type]={$type}")
+                ->assertStatus(200);
+        }
     }
 
     public function test_can_filter_public_normal_settings(): void
@@ -233,8 +244,8 @@ final class NormalSettingResourceTest extends TestCase
 
     public function test_can_sort_normal_settings_by_type(): void
     {
-        NormalSetting::factory()->create(['type' => 'string']);
-        NormalSetting::factory()->create(['type' => 'integer']);
+        NormalSetting::factory()->create(['type' => 'text']);
+        NormalSetting::factory()->create(['type' => 'number']);
 
         $this->actingAs($this->admin);
 
@@ -397,7 +408,6 @@ final class NormalSettingResourceTest extends TestCase
         $setting = NormalSetting::factory()->create([
             'is_public'    => '1',
             'is_encrypted' => '0',
-            'is_active'    => '1',
             'sort_order'   => '5',
         ]);
 
@@ -456,5 +466,31 @@ final class NormalSettingResourceTest extends TestCase
 
         // But should be decrypted when accessed
         $this->assertEquals('sensitive_data', $setting->value);
+    }
+
+    public function test_admin_tab_translations_are_strings(): void
+    {
+        $expected = [
+            'en' => [
+                'label'  => 'Tabs',
+                'all'    => 'All',
+                'string' => 'String',
+            ],
+            'lt' => [
+                'label'  => 'Skirtukai',
+                'all'    => 'Visi',
+                'string' => 'Tekstas',
+            ],
+        ];
+
+        foreach ($expected as $locale => $translations) {
+            app()->setLocale($locale);
+
+            foreach ($translations as $key => $value) {
+                $this->assertSame($value, Lang::get("admin.normal_settings.tabs.{$key}"));
+            }
+
+            $this->assertIsString(Lang::get('admin.normal_settings.tabs.integer'));
+        }
     }
 }

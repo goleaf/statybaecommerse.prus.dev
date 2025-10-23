@@ -1,16 +1,17 @@
 # Relation Manager Repeater quick-edit actions
 
-The `zvizvi/relation-manager-repeater` plugin (v2.x) is now rolled out across the Filament admin panel. Eligible HasMany relation managers expose a **Quick edit** header action that opens a repeater-powered modal and syncs the submitted rows back to the underlying relationship, keeping in-line adjustments fast without abandoning the table view.
+The `zvizvi/relation-manager-repeater` plugin (v2.x) is installed to provide bulk editing modals for high-volume HasMany relations. Each enabled relation manager now exposes a **Quick edit** header action that opens a repeater-powered modal and syncs the submitted rows back to the underlying relationship. As of the latest admin refresh, any relation manager that renders a create action now pairs it with a repeater configured via `BaseRelationManager::getQuickEditSchema()`, ensuring we reuse the exact form schema plus a hidden `id` to keep updates idempotent.
 
 ## Enabled relation managers
 
-| Resource | Relation manager | Relationship | Action label | Repeater highlights |
-| --- | --- | --- | --- | --- |
-| `ProductResource` | `ImagesRelationManager` | `HasMany images` | **Quick edit images** | Reuses the image upload flow plus metadata fields, supports cloning/reordering, and keeps existing records stable through a hidden `id` input. |
-| `ProductResource` | `VariantsRelationManager` | `HasMany variants` | **Quick edit variants** | Focuses on pricing, inventory, and publish toggles; variant attributes stay editable in the standard form. |
-| `OrderResource` | `OrderItemsRelationManager` | `HasMany orderItems` | **Quick edit items** | Lets operators adjust quantity, pricing, and notes without reopening each row; product and SKU stay read-only safeguards. |
-| `UserResource` | `AddressesRelationManager` | `HasMany addresses` | **Quick edit addresses** | Batches contact/address fields while keeping country lookups and default toggles. |
-| `CategoryResource` | `TranslationsRelationManager` | `HasMany translations` | **Quick edit translations** | Provides localized content fields with locale locking after creation to prevent duplicates. |
+Every HasMany relation manager that previously surfaced `CreateAction::make()` now ships with a quick-edit partner. Highlights worth calling out:
+
+- **Catalogues** – categories, brands, attributes, collections, price lists, and stock relations now let merchandisers batch-edit metadata without visiting each record individually.
+- **Customer data** – customer, user, and user-management relations (addresses, orders, referrals, loyalty) expose repeaters so support teams can triage cases faster.
+- **Marketing & content** – news, campaigns, discounts, coupons, and legal translations benefit from mirrored schemas for rapid proofreading or toggling visibility.
+- **Operations** – order shipping/documents, variant stock, and currency price relations gained inline adjustments to streamline fulfilment and finance reviews.
+
+Refer to the corresponding relation manager class (for example `Channels\RelationManagers\ProductsRelationManager`) to see the `RelationManagerRepeaterAction::make()` implementation and any context-specific modal wording.
 
 ## Usage tips
 

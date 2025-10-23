@@ -21,7 +21,7 @@ final class ReferralRewardLogFactory extends Factory
         return [
             'referral_reward_id' => ReferralReward::factory(),
             'user_id' => User::factory(),
-            'action' => $this->faker->randomElement(['claimed', 'expired', 'cancelled', 'pending']),
+            'action' => $this->faker->randomElement(ReferralRewardLog::ACTIONS),
             'data' => [
                 'amount' => $this->faker->randomFloat(2, 1, 100),
                 'currency' => 'EUR',
@@ -32,15 +32,15 @@ final class ReferralRewardLogFactory extends Factory
         ];
     }
 
-    public function claimed(): static
+    public function earned(): static
     {
         return $this->state(fn (array $attributes) => [
-            'action' => 'claimed',
+            'action' => ReferralRewardLog::ACTION_EARNED,
             'data' => [
                 'amount' => $this->faker->randomFloat(2, 1, 100),
                 'currency' => 'EUR',
                 'reward_type' => 'discount',
-                'claimed_at' => now()->toISOString(),
+                'earned_at' => now()->toISOString(),
             ],
         ]);
     }
@@ -48,7 +48,7 @@ final class ReferralRewardLogFactory extends Factory
     public function expired(): static
     {
         return $this->state(fn (array $attributes) => [
-            'action' => 'expired',
+            'action' => ReferralRewardLog::ACTION_EXPIRED,
             'data' => [
                 'amount' => $this->faker->randomFloat(2, 1, 100),
                 'currency' => 'EUR',
@@ -61,7 +61,7 @@ final class ReferralRewardLogFactory extends Factory
     public function cancelled(): static
     {
         return $this->state(fn (array $attributes) => [
-            'action' => 'cancelled',
+            'action' => ReferralRewardLog::ACTION_CANCELLED,
             'data' => [
                 'amount' => $this->faker->randomFloat(2, 1, 100),
                 'currency' => 'EUR',
@@ -72,15 +72,15 @@ final class ReferralRewardLogFactory extends Factory
         ]);
     }
 
-    public function pending(): static
+    public function redeemed(): static
     {
         return $this->state(fn (array $attributes) => [
-            'action' => 'pending',
+            'action' => ReferralRewardLog::ACTION_REDEEMED,
             'data' => [
                 'amount' => $this->faker->randomFloat(2, 1, 100),
                 'currency' => 'EUR',
                 'reward_type' => 'discount',
-                'pending_since' => now()->toISOString(),
+                'redeemed_at' => now()->toISOString(),
             ],
         ]);
     }

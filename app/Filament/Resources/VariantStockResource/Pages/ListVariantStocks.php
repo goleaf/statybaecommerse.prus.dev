@@ -9,5 +9,7 @@ use App\Filament\Resources\VariantStockResource;
 
 final class ListVariantStocks extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = VariantStockResource::class;
 }

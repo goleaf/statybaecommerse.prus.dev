@@ -21,14 +21,25 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 // Load the Filament compatibility shims before the application boots so the
 // legacy class aliases are always available during early package discovery.
 require_once __DIR__ . '/filament_compat.php';
 
-return Application::configure(basePath: dirname(__DIR__))
+$appEnvironment = (string) env('APP_ENV', 'production');
+$queueConnection = (string) env('QUEUE_CONNECTION', 'sync');
+
+if ($appEnvironment !== 'local' || $queueConnection !== 'sync') {
+    $providers[] = App\Providers\HorizonServiceProvider::class;
+}
+
+$providers[] = App\Providers\LocaleServiceProvider::class;
+$providers[] = App\Providers\Filament\AdminPanelProvider::class;
+$providers[] = SecurityServiceProvider::class;
+
+$app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__ . '/../routes/web.php',
         api: __DIR__ . '/../routes/api.php',
@@ -43,10 +54,12 @@ return Application::configure(basePath: dirname(__DIR__))
             // Load reports routes
             Route::middleware('web')
                 ->group(base_path('routes/reports.php'));
+            Route::middleware('api')
+                ->group(base_path('routes/monitoring.php'));
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->prepend(AttachCorrelationId::class);
+        $middleware->append(App\Http\Middleware\AddSecurityHeaders::class);
         $middleware->append(App\Http\Middleware\SetLocale::class);
         $middleware->append(App\Http\Middleware\SetFilamentLocale::class);
         // Handle user impersonation for admin support
@@ -71,7 +84,53 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (DomainException $exception, Request $request) {
-            if (! RequestContext::isApiRequest($request)) {
+            $locale = RequestContext::resolveLocale($request);
+            $traceId = RequestContext::resolveTraceId($request);
+            $correlationHeader = RequestContext::correlationHeader();
+
+            $message = TranslationService::get($exception->translationKey(), $exception->context(), $locale);
+
+            Log::withContext([
+                'trace_id'       => $traceId,
+                'correlation_id' => $traceId,
+                'locale'         => $locale,
+                'error_code'     => $exception->errorCode(),
+                'request_path'   => $request->path(),
+                'request_method' => $request->method(),
+            ]);
+
+            Log::warning('Domain exception rendered.', [
+                'exception'       => $exception::class,
+                'status'          => $exception->status(),
+                'translation_key' => $exception->translationKey(),
+                'context'         => $exception->context(),
+            ]);
+
+            $payload = [
+                'error' => [
+                    'code'    => $exception->errorCode(),
+                    'message' => $message,
+                    'locale'  => $locale,
+                ],
+                'meta' => [
+                    'trace_id'       => $traceId,
+                    'correlation_id' => $traceId,
+                    'timestamp'      => now()->toIso8601String(),
+                ],
+            ];
+
+            if ($exception->context() !== []) {
+                $payload['error']['context'] = $exception->context();
+            }
+
+            return response()
+                ->json($payload, $exception->status())
+                ->header($correlationHeader, $traceId)
+                ->header('Content-Language', $locale);
+        });
+
+        $exceptions->render(function (Throwable $throwable, Request $request) {
+            if ($throwable instanceof DomainException) {
                 return null;
             }
 
@@ -134,11 +193,41 @@ return Application::configure(basePath: dirname(__DIR__))
 
             if ($validator instanceof ValidatorContract) {
                 $originalLocale = app()->getLocale();
+                $translator = null;
+                $originalTranslatorLocale = null;
+                $originalTranslatorFallback = null;
+
+                if (app()->bound('translator')) {
+                    /** @var object $translatorInstance */
+                    $translatorInstance = app('translator');
+
+                    $translator = $translatorInstance;
+
+                    if (method_exists($translatorInstance, 'getLocale')) {
+                        $originalTranslatorLocale = $translatorInstance->getLocale();
+                    }
+
+                    if (method_exists($translatorInstance, 'getFallback')) {
+                        $originalTranslatorFallback = $translatorInstance->getFallback();
+                    }
+                }
 
                 try {
                     // Re-run the validator with the fallback locale so we can surface
                     // a predictable English summary alongside the localized messages.
                     app()->setLocale($fallbackLocale);
+
+                    // Ensure the translator aligns with the fallback locale so that
+                    // rule replacements (like :attribute) resolve in English too.
+                    if ($translator !== null) {
+                        if (method_exists($translator, 'setLocale')) {
+                            $translator->setLocale($fallbackLocale);
+                        }
+
+                        if (method_exists($translator, 'setFallback')) {
+                            $translator->setFallback($fallbackLocale);
+                        }
+                    }
 
                     $fallbackValidator = app('validator')->make(
                         $validator->getData(),
@@ -177,6 +266,16 @@ return Application::configure(basePath: dirname(__DIR__))
                     // Always restore the previous locale so downstream formatters keep the
                     // request-scoped language selected by RequestContext.
                     app()->setLocale($originalLocale);
+
+                    if ($translator !== null) {
+                        if ($originalTranslatorLocale !== null && method_exists($translator, 'setLocale')) {
+                            $translator->setLocale($originalTranslatorLocale);
+                        }
+
+                        if ($originalTranslatorFallback !== null && method_exists($translator, 'setFallback')) {
+                            $translator->setFallback($originalTranslatorFallback);
+                        }
+                    }
                 }
             }
 
@@ -214,7 +313,18 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->render(function (AuthenticationException $exception, Request $request) {
             if (! RequestContext::isApiRequest($request)) {
-                return null;
+                if ($request->expectsJson()) {
+                    // Preserve JSON semantics for Sanctum guarded routes that hit the admin panel without a browser session.
+                    return response()->json(['message' => $exception->getMessage()], 401);
+                }
+
+                if (Route::has('filament.admin.auth.login')) {
+                    // Mirror Filament's default behaviour by redirecting guests to the admin login screen.
+                    return redirect()->guest(route('filament.admin.auth.login'));
+                }
+
+                // Fallback to the default login route so other guards keep working in tests.
+                return redirect()->guest(Route::has('login') ? route('login') : '/login');
             }
 
             $locale = RequestContext::resolveLocale($request);
@@ -298,14 +408,46 @@ return Application::configure(basePath: dirname(__DIR__))
             );
         });
 
-        $exceptions->render(function (Throwable $throwable, Request $request) {
-            if ($throwable instanceof DomainException) {
+        $exceptions->render(function (Throwable $throwable, Request $request) use ($shouldRenderJson, $resolveLocale, $resolveTraceId, $resolveCorrelationHeader) {
+            if ($throwable instanceof DomainException || ! $shouldRenderJson($request)) {
                 return null;
             }
 
-            $locale = RequestContext::resolveLocale($request);
-            $traceId = RequestContext::resolveTraceId($request);
-            $correlationHeader = RequestContext::correlationHeader();
+            $locale = $resolveLocale($request);
+            $traceId = $resolveTraceId($request);
+            $correlationHeader = $resolveCorrelationHeader();
+
+            $errorCode = match (true) {
+                $throwable instanceof ValidationException => ErrorCode::ValidationFailed,
+                $throwable instanceof AuthenticationException => ErrorCode::Unauthorized,
+                $throwable instanceof AuthorizationException => ErrorCode::Forbidden,
+                $throwable instanceof ModelNotFoundException, $throwable instanceof NotFoundHttpException => ErrorCode::NotFound,
+                $throwable instanceof HttpExceptionInterface && $throwable->getStatusCode() === 404 => ErrorCode::NotFound,
+                $throwable instanceof HttpExceptionInterface && $throwable->getStatusCode() === 401 => ErrorCode::Unauthorized,
+                $throwable instanceof HttpExceptionInterface && $throwable->getStatusCode() === 403 => ErrorCode::Forbidden,
+                $throwable instanceof HttpExceptionInterface && $throwable->getStatusCode() === 422 => ErrorCode::ValidationFailed,
+                default => ErrorCode::ServerError,
+            };
+
+            $status = match (true) {
+                $throwable instanceof ValidationException => $throwable->status,
+                $throwable instanceof HttpExceptionInterface => $throwable->getStatusCode(),
+                default => $errorCode->defaultStatus(),
+            };
+
+            $details = [
+                'locale' => $locale,
+            ];
+
+            if ($throwable instanceof ValidationException) {
+                $details['errors'] = $throwable->errors();
+            }
+
+            if ($throwable instanceof HttpExceptionInterface && $throwable->getMessage() !== '') {
+                $details['hint'] = $throwable->getMessage();
+            }
+
+            $message = TranslationService::get($errorCode->translationKey(), [], $locale);
 
             $context = [
                 'trace_id'       => $traceId,
@@ -330,10 +472,51 @@ return Application::configure(basePath: dirname(__DIR__))
                         default => ErrorCodes::SERVER_ERROR,
                     };
 
+                    $rawHeaders = $throwable->getHeaders();
+                    $sanitizedHeaders = [];
+
+                    foreach ($rawHeaders as $headerName => $headerValue) {
+                        if (! is_string($headerName)) {
+                            continue;
+                        }
+
+                        $normalizedName = trim($headerName);
+
+                        if ($normalizedName === '' || str_contains($normalizedName, "\r") || str_contains($normalizedName, "\n")) {
+                            continue;
+                        }
+
+                        $values = is_array($headerValue) ? $headerValue : [$headerValue];
+                        $normalizedValues = [];
+
+                        foreach ($values as $value) {
+                            if (! is_scalar($value) && ! (is_object($value) && method_exists($value, '__toString'))) {
+                                continue;
+                            }
+
+                            $stringValue = (string) $value;
+                            $stringValue = preg_replace('/[\x00-\x1F\x7F]+/', '', $stringValue) ?? '';
+
+                            if ($stringValue === '') {
+                                continue;
+                            }
+
+                            $normalizedValues[] = $stringValue;
+                        }
+
+                        if ($normalizedValues === []) {
+                            continue;
+                        }
+
+                        $sanitizedHeaders[$normalizedName] = count($normalizedValues) === 1
+                            ? $normalizedValues[0]
+                            : $normalizedValues;
+                    }
+
                     Log::notice('HTTP exception rendered.', [
                         'exception' => $throwable::class,
                         'status'    => $status,
-                        'headers'   => $throwable->getHeaders(),
+                        'headers'   => $sanitizedHeaders,
                     ]);
 
                     $detail = $throwable->getMessage() !== ''
@@ -363,7 +546,9 @@ return Application::configure(basePath: dirname(__DIR__))
                     );
 
                     foreach ($throwable->getHeaders() as $name => $value) {
-                        $response->headers->set($name, $value);
+                        // Symfony's header bag expects scalar values to be strings, so normalise integers from rate limiting
+                        // exceptions to avoid type errors while preserving array headers untouched.
+                        $response->headers->set($name, is_array($value) ? $value : (string) $value);
                     }
 
                     return $response;
@@ -417,8 +602,16 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $providers[] = App\Providers\LocaleServiceProvider::class;
         $providers[] = App\Providers\Filament\AdminPanelProvider::class;
+        // Register the Livewire testing helpers so resource hooks and test assets load reliably.
+        $providers[] = App\Providers\LivewireTestingServiceProvider::class;
         $providers[] = SecurityServiceProvider::class;
 
         return $providers;
     })())
     ->create();
+
+if (! $app->bound('request')) {
+    $app->instance('request', Request::createFromGlobals());
+}
+
+return $app;

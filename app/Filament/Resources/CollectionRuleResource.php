@@ -4,41 +4,50 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\CollectionRuleResource\Pages;
 use App\Models\CollectionRule;
 use BackedEnum;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class CollectionRuleResource extends Resource
 {
+    /**
+     * @var string|\BackedEnum|null Use the documented property approach so Filament can resolve the navigation icon reliably.
+     */
+    protected static $navigationIcon = 'heroicon-o-cog-6-tooth';
+
     protected static ?string $model = CollectionRule::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
     {
         // Surface a mechanical icon so merchandisers immediately identify automation tooling entries.
         return 'heroicon-o-cog-6-tooth';
@@ -71,10 +80,11 @@ final class CollectionRuleResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         // Expose the schema via the Filament v4 `Form` instance to drop the deprecated array fallback.
-        return $form->schema([
+        return $schema->schema([
             Tabs::make('collection_rule_tabs')
                 ->tabs([
                     Tab::make(__('admin.collection_rules.form.tabs.basic_information'))
@@ -154,8 +164,9 @@ final class CollectionRuleResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         // Publish the full table definition through the Filament v4 `Table` signature for consistency.
         return $table
             ->columns([

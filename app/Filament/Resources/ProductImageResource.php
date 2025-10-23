@@ -4,28 +4,30 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\ProductImageResource\Pages;
 use App\Models\ProductImage;
 use BackedEnum;
-use Filament\Actions\BulkActionGroup;
+use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class ProductImageResource extends Resource
 {
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Products';
-    }
+    use HasNav;
 
-    public static function getNavigationIcon(): BackedEnum|string|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|string|null
     {
         return 'heroicon-o-photo';
     }
@@ -34,9 +36,9 @@ final class ProductImageResource extends Resource
 
     protected static ?int $navigationSort = 14;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Select::make('product_id')
                     ->relationship('product', 'name')
@@ -61,8 +63,9 @@ final class ProductImageResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 Tables\Columns\ImageColumn::make('path')

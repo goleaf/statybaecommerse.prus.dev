@@ -15,6 +15,11 @@ final class RebuildSearchIndexJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    /**
+     * Number of job attempts before failing.
+     */
+    public int $tries = 1;
+
     public function handle(): void
     {
         Log::info('Dashboard quick action: rebuilding search index placeholder triggered.');

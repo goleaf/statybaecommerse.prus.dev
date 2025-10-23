@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Support\Contracts\Entities;
 
-use App\Data\Pricing\PriceBreakdown;
 use App\Models\Order;
-use App\Services\Pricing\PriceConfiguration;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
@@ -46,29 +44,26 @@ final class OrderContract
     {
         $order->loadMissing(['items']);
 
-        $configuration = app(PriceConfiguration::class);
-        $breakdown = PriceBreakdown::fromOrder($order, $configuration);
-
         return [
-            'id' => $order->getKey(),
+            'id'     => $order->getKey(),
             'number' => (string) $order->number,
             'status' => [
-                'state' => (string) $order->status,
+                'state'         => (string) $order->status,
                 'payment_state' => $order->payment_status,
             ],
-            'totals' => $breakdown->toSummary(),
-            'items' => $order->items->map(static fn ($item): array => [
-                'id' => $item->getKey(),
+            'totals' => $breakdown->toContractTotals(),
+            'items'  => $order->items->map(static fn ($item): array => [
+                'id'         => $item->getKey(),
                 'product_id' => $item->product_id,
-                'name' => (string) $item->name,
-                'quantity' => (int) $item->quantity,
+                'name'       => (string) $item->name,
+                'quantity'   => (int) $item->quantity,
                 'unit_price' => (float) $item->unit_price,
-                'total' => (float) $item->total,
+                'total'      => (float) $item->total,
             ])->all(),
-            'billing_address' => is_array($order->billing_address) ? $order->billing_address : [],
+            'billing_address'  => is_array($order->billing_address) ? $order->billing_address : [],
             'shipping_address' => is_array($order->shipping_address) ? $order->shipping_address : [],
-            'placed_at' => $order->created_at?->toISOString(),
-            'links' => [
+            'placed_at'        => $order->created_at?->toISOString(),
+            'links'            => [
                 'self' => route('frontend.orders.show', $order->number),
             ],
         ];
@@ -82,9 +77,9 @@ final class OrderContract
 
         return [
             'contract' => self::CONTRACT,
-            'version' => self::VERSION,
-            'data' => $data,
-            'meta' => $meta,
+            'version'  => self::VERSION,
+            'data'     => $data,
+            'meta'     => $meta,
         ];
     }
 }

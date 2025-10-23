@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ListCampaignProductTargets extends BaseListRecords
 {
+    use HasResizableColumns;
     use HasWidgetTabs;
 
     protected static string $resource = CampaignProductTargetResource::class;
@@ -27,9 +28,8 @@ class ListCampaignProductTargets extends BaseListRecords
     public function getWidgetTabs(): array
     {
         return [
-            'all' => WidgetTab::make(__('campaign_product_targets.tabs.all'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
-            'product' => WidgetTab::make(__('campaign_product_targets.tabs.product'))
+            'all'     => Tab::make(__('campaign_product_targets.tabs.all')),
+            'product' => Tab::make(__('campaign_product_targets.tabs.product'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('target_type', 'product'))
                 ->value(fn () => $this->getResource()::getEloquentQuery()->where('target_type', 'product')->count()),
             'category' => WidgetTab::make(__('campaign_product_targets.tabs.category'))

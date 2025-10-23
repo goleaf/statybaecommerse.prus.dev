@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ProductComparisonResource\Pages;
 use App\Models\ProductComparison;
@@ -15,17 +17,21 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 /**
  * ProductComparisonResource
  *
@@ -33,12 +39,11 @@ use UnitEnum;
  */
 final class ProductComparisonResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $slug = 'product-comparisons';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return NavigationGroup::Products;
-    }
+    
 
     protected static ?string $model = ProductComparison::class;
 
@@ -73,9 +78,9 @@ final class ProductComparisonResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             SchemaSection::make(__('product_comparisons.basic_information'))
                 ->components([
                     Grid::make(2)->components([
@@ -103,8 +108,9 @@ final class ProductComparisonResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('user.name')

@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 final class ListNews extends BaseListRecords
 {
+    use HasResizableColumns;
     use HasWidgetTabs;
 
     protected static string $resource = NewsResource::class;
@@ -44,9 +45,8 @@ final class ListNews extends BaseListRecords
     public function getWidgetTabs(): array
     {
         return [
-            'all' => WidgetTab::make(__('news.tabs.all'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
-            'draft' => WidgetTab::make(__('news.tabs.draft'))
+            'all'   => Tab::make(__('news.tabs.all')),
+            'draft' => Tab::make(__('news.tabs.draft'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('moderation_state', ModerationState::Draft->value))
                 ->value(fn () => $this->getResource()::getEloquentQuery()->where('moderation_state', ModerationState::Draft->value)->count()),
             'review' => WidgetTab::make(__('news.tabs.review'))

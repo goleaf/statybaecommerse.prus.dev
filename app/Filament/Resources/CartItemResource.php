@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\CartItemResource\Pages;
 use App\Models\CartItem;
 use App\Models\Product;
@@ -19,21 +21,23 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 
+use Filament\Schemas\Schema;
+use BackedEnum;
 final class CartItemResource extends Resource
 {
     /** @var string|BackedEnum|null Navigation icon configured per Filament v4 guidance. */
@@ -64,9 +68,9 @@ final class CartItemResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('cart_items.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -107,10 +111,10 @@ final class CartItemResource extends Resource
                                     );
                                 })
                                 // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
-                                ->afterStateUpdated(function (?string $state, Forms\Set $set): void {
+                                ->afterStateUpdated(function (SearchableInput $component, ?string $state, Forms\Set $set): void {
                                     if ($state === null || $state === '') {
                                         // Clear dependent metadata when the lookup resets.
-                                        SearchableInputHelper::clear($set, [
+                                        SearchableInputHelper::clear($component, $set, [
                                             'product_id'         => null,
                                             'product_name'       => null,
                                             'product_sku'        => null,
@@ -171,8 +175,8 @@ final class CartItemResource extends Resource
                         ->schema([
                             TextInput::make('quantity')
                                 ->label(__('cart_items.quantity'))
-                                ->numeric()
                                 ->minValue(1)
+                                ->steps(1)
                                 ->default(1)
                                 ->required()
                                 ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set): void {
@@ -181,10 +185,10 @@ final class CartItemResource extends Resource
                                     $total = $unitPrice * $quantity;
                                     $set('total_price', number_format($total, 2, '.', ''));
                                 }),
-                            TextInput::make('minimum_quantity')
+                            Quantity::make('minimum_quantity')
                                 ->label(__('cart_items.minimum_quantity'))
-                                ->numeric()
                                 ->minValue(1)
+                                ->steps(1)
                                 ->default(1),
                         ]),
                     TextInput::make('session_id')
@@ -254,8 +258,9 @@ final class CartItemResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 // Present the owning user with search and sorting capabilities for administrative triage.

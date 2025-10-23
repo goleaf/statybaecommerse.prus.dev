@@ -16,30 +16,32 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Grid;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
-use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use UnitEnum;
 
+use Filament\Schemas\Schema;
 final class NotificationResource extends Resource
 {
     use HasNav; // Proxy navigation metadata to the centralized Nav registry for consistency.
@@ -74,9 +76,9 @@ final class NotificationResource extends Resource
         return __('admin.notifications.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('admin.notifications.form.sections.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -162,6 +164,7 @@ final class NotificationResource extends Resource
 
     public static function table(Table $table): Table
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('user.name')
@@ -273,14 +276,14 @@ final class NotificationResource extends Resource
                         DatePicker::make('value')
                             ->label(__('admin.notifications.filters.created_at')),
                     ])
-                    ->query(fn (Builder $query, array $data): Builder => SingleDateFilter::apply(
+                    ->modifyQueryUsing(fn (Builder $query, array $data): Builder => SingleDateFilter::apply(
                         $query,
                         is_string($data['value'] ?? null) ? $data['value'] : null,
                         'created_at',
                     )),
                 Filter::make('recent')
                     ->label(__('admin.notifications.filters.recent'))
-                    ->query(fn (Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(7))),
+                    ->modifyQueryUsing(fn (Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(7))),
             ])
             ->recordActions([
                 ViewAction::make(),

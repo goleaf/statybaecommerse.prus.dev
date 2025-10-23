@@ -52,8 +52,9 @@ final class CreateProduct extends CreateRecord
             $data['slug'] = $slug;
         }
 
-        if (empty($data['slug']) && filled($defaultName)) {
-            $data['slug'] = Str::slug($defaultName);
+        // Generate slug if not provided
+        if (empty($data['slug'])) {
+            $data['slug'] = Str::slug($data['name']);
         }
 
         if (! isset($data['published_at']) && ($data['is_visible'] ?? false)) {

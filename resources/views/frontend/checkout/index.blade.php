@@ -1,23 +1,13 @@
-@extends('components.layouts.base')
+<x-layouts.base title="{{ __('Checkout') }}">
+    <div class="max-w-5xl mx-auto px-4 py-10 space-y-8">
+        <h1 class="text-3xl font-semibold text-gray-900 dark:text-gray-100">{{ __('Checkout') }}</h1>
 
-@section('title', __('Checkout'))
-
-@section('content')
-    <div class="container mx-auto px-4 py-10">
-        <div class="max-w-5xl mx-auto space-y-8">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ __('Checkout') }}</h1>
-                <p class="mt-2 text-gray-600 dark:text-gray-400">{{ __('Confirm your details and place your order securely.') }}</p>
-            </div>
-
-            @if($cartItems->isEmpty())
-                <div class="rounded-xl border border-dashed border-gray-300 dark:border-gray-700 bg-white/60 dark:bg-gray-900/40 p-12 text-center">
-                    <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">{{ __('Your cart is empty') }}</h2>
-                    <p class="mt-2 text-gray-600 dark:text-gray-400">{{ __('Add items to your cart before heading to checkout.') }}</p>
-                    <a href="{{ route('frontend.cart.index') }}"
-                       class="mt-6 inline-flex items-center justify-center rounded-lg bg-blue-600 px-5 py-3 text-white shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        {{ __('Return to cart') }}
-                    </a>
+        <section class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-xl shadow-sm p-6">
+            <h2 class="text-2xl font-semibold mb-4">{{ __('Order summary') }}</h2>
+            <dl class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                <div class="flex justify-between">
+                    <dt>{{ __('Subtotal') }}</dt>
+                    <dd>{{ app_money_format($cart['subtotal']) }}</dd>
                 </div>
             @else
                 <div class="grid gap-8 lg:grid-cols-5">
@@ -91,7 +81,103 @@
                         </div>
                     </div>
                 </div>
-            @endif
-        </div>
+                <div class="flex justify-between">
+                    <dt>{{ __('Shipping') }}</dt>
+                    <dd>{{ app_money_format($cart['shipping']) }}</dd>
+                </div>
+                <div class="flex justify-between text-primary-700">
+                    <dt>{{ __('Discount') }}</dt>
+                    <dd>-{{ app_money_format($cart['discount']) }}</dd>
+                </div>
+                <div class="flex justify-between text-lg font-semibold text-primary-700">
+                    <dt>{{ __('Total') }}</dt>
+                    <dd>{{ app_money_format($cart['total']) }}</dd>
+                </div>
+            </dl>
+        </section>
+
+        <section class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-xl shadow-sm p-6">
+            <h2 class="text-2xl font-semibold mb-4">{{ __('Billing & shipping information') }}</h2>
+            <form method="POST" action="{{ route('frontend.checkout.process') }}" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @csrf
+                <div>
+                    <label for="full_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Full name') }}</label>
+                    <input id="full_name" name="full_name" value="{{ old('full_name', $user->name) }}" required class="mt-1 block w-full rounded-lg border-gray-300 dark:border-white/10 bg-gray-50 dark:bg-gray-800">
+                    @error('full_name')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Email') }}</label>
+                    <input id="email" name="email" type="email" value="{{ old('email', $user->email) }}" required class="mt-1 block w-full rounded-lg border-gray-300 dark:border-white/10 bg-gray-50 dark:bg-gray-800">
+                    @error('email')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Phone') }}</label>
+                    <input id="phone" name="phone" value="{{ old('phone') }}" class="mt-1 block w-full rounded-lg border-gray-300 dark:border-white/10 bg-gray-50 dark:bg-gray-800">
+                    @error('phone')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label for="address_line_1" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Address line 1') }}</label>
+                    <input id="address_line_1" name="address_line_1" value="{{ old('address_line_1') }}" required class="mt-1 block w-full rounded-lg border-gray-300 dark:border-white/10 bg-gray-50 dark:bg-gray-800">
+                    @error('address_line_1')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label for="address_line_2" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Address line 2') }}</label>
+                    <input id="address_line_2" name="address_line_2" value="{{ old('address_line_2') }}" class="mt-1 block w-full rounded-lg border-gray-300 dark:border-white/10 bg-gray-50 dark:bg-gray-800">
+                    @error('address_line_2')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label for="city" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('City') }}</label>
+                    <input id="city" name="city" value="{{ old('city') }}" required class="mt-1 block w-full rounded-lg border-gray-300 dark:border-white/10 bg-gray-50 dark:bg-gray-800">
+                    @error('city')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label for="postal_code" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Postal code') }}</label>
+                    <input id="postal_code" name="postal_code" value="{{ old('postal_code') }}" required class="mt-1 block w-full rounded-lg border-gray-300 dark:border-white/10 bg-gray-50 dark:bg-gray-800">
+                    @error('postal_code')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label for="country" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Country') }}</label>
+                    <input id="country" name="country" value="{{ old('country', 'Lithuania') }}" required class="mt-1 block w-full rounded-lg border-gray-300 dark:border-white/10 bg-gray-50 dark:bg-gray-800">
+                    @error('country')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label for="payment_method" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Payment method') }}</label>
+                    <select id="payment_method" name="payment_method" class="mt-1 block w-full rounded-lg border-gray-300 dark:border-white/10 bg-gray-50 dark:bg-gray-800">
+                        <option value="card" @selected(old('payment_method') === 'card')>{{ __('Card payment') }}</option>
+                        <option value="bank" @selected(old('payment_method') === 'bank')>{{ __('Bank transfer') }}</option>
+                        <option value="cod" @selected(old('payment_method') === 'cod')>{{ __('Cash on delivery') }}</option>
+                    </select>
+                    @error('payment_method')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div class="md:col-span-2">
+                    <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Order notes') }}</label>
+                    <textarea id="notes" name="notes" rows="3" class="mt-1 block w-full rounded-lg border-gray-300 dark:border-white/10 bg-gray-50 dark:bg-gray-800">{{ old('notes') }}</textarea>
+                    @error('notes')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div class="md:col-span-2 flex justify-end">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">{{ __('Place order') }}</button>
+                </div>
+            </form>
+        </section>
     </div>
-@endsection
+</x-layouts.base>

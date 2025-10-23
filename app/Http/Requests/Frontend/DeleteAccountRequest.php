@@ -6,23 +6,31 @@ namespace App\Http\Requests\Frontend;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class DeleteAccountRequest extends FormRequest
+final class DeleteAccountRequest extends FormRequest
 {
     public function authorize(): bool
     {
         return $this->user() !== null;
     }
 
+    /**
+     * @return array<string, array<int, string>>
+     */
     public function rules(): array
     {
         return [
             'password' => ['required', 'current_password'],
-            'confirmation' => ['required', 'accepted'],
+            'confirm_deletion' => ['required', 'accepted'],
         ];
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function messages(): array
     {
-        return [];
+        return [
+            'confirm_deletion.accepted' => __('translations.profile_delete_confirmation_required'),
+        ];
     }
 }

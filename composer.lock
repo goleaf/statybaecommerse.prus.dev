@@ -4773,16 +4773,16 @@
         },
         {
             "name": "lara-zeus/filament-plugin-tools",
-            "version": "2.0.3",
+            "version": "2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/lara-zeus/filament-plugin-tools.git",
-                "reference": "a037d71f8a41f8a5e788e02711953af09e3079da"
+                "reference": "8eb510b0a85b942e035f30d61f3c6c9e7296c5f9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/lara-zeus/filament-plugin-tools/zipball/a037d71f8a41f8a5e788e02711953af09e3079da",
-                "reference": "a037d71f8a41f8a5e788e02711953af09e3079da",
+                "url": "https://api.github.com/repos/lara-zeus/filament-plugin-tools/zipball/8eb510b0a85b942e035f30d61f3c6c9e7296c5f9",
+                "reference": "8eb510b0a85b942e035f30d61f3c6c9e7296c5f9",
                 "shasum": ""
             },
             "require": {
@@ -4849,7 +4849,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-10-21T18:51:15+00:00"
+            "time": "2025-06-12T00:05:31+00:00"
         },
         {
             "name": "lara-zeus/inline-chart",
@@ -5009,16 +5009,16 @@
         },
         {
             "name": "lara-zeus/list-group",
-            "version": "2.0.1",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/lara-zeus/list-group.git",
-                "reference": "c4fb7ca637556561d982231258d7cb20112ea17e"
+                "reference": "3d23f8726f1b66c1e191326ae14eda1c4bf21e72"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/lara-zeus/list-group/zipball/c4fb7ca637556561d982231258d7cb20112ea17e",
-                "reference": "c4fb7ca637556561d982231258d7cb20112ea17e",
+                "url": "https://api.github.com/repos/lara-zeus/list-group/zipball/3d23f8726f1b66c1e191326ae14eda1c4bf21e72",
+                "reference": "3d23f8726f1b66c1e191326ae14eda1c4bf21e72",
                 "shasum": ""
             },
             "require": {
@@ -5027,11 +5027,11 @@
                 "spatie/laravel-package-tools": "^1.16"
             },
             "require-dev": {
+                "larastan/larastan": "^2.0",
                 "laravel/pint": "^1.0",
-                "nunomaduro/collision": "^8.0",
-                "nunomaduro/larastan": "^2.0.1",
+                "nunomaduro/collision": "^7.0",
                 "nunomaduro/phpinsights": "^2.8",
-                "orchestra/testbench": "^9.0",
+                "orchestra/testbench": "^8.0",
                 "phpstan/extension-installer": "^1.1"
             },
             "type": "library",
@@ -5091,7 +5091,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-10-22T17:55:07+00:00"
+            "time": "2025-06-11T19:19:30+00:00"
         },
         {
             "name": "lara-zeus/matrix-choice",
@@ -5303,16 +5303,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v12.35.0",
+            "version": "v12.34.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "9583ef9e405a71d5b8c04ff6efd05a7ef9a5baef"
+                "reference": "f9ec5a5d88bc8c468f17b59f88e05c8ac3c8d687"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/9583ef9e405a71d5b8c04ff6efd05a7ef9a5baef",
-                "reference": "9583ef9e405a71d5b8c04ff6efd05a7ef9a5baef",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/f9ec5a5d88bc8c468f17b59f88e05c8ac3c8d687",
+                "reference": "f9ec5a5d88bc8c468f17b59f88e05c8ac3c8d687",
                 "shasum": ""
             },
             "require": {
@@ -5518,20 +5518,20 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2025-10-21T15:15:41+00:00"
+            "time": "2025-10-14T13:58:31+00:00"
         },
         {
             "name": "laravel/horizon",
-            "version": "v5.37.0",
+            "version": "v5.36.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/horizon.git",
-                "reference": "3a970f934e95e396faa0aab53b3a996c6bf47e95"
+                "reference": "eccc804c9da78064c97a8f506bb148f05c816409"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/horizon/zipball/3a970f934e95e396faa0aab53b3a996c6bf47e95",
-                "reference": "3a970f934e95e396faa0aab53b3a996c6bf47e95",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/eccc804c9da78064c97a8f506bb148f05c816409",
+                "reference": "eccc804c9da78064c97a8f506bb148f05c816409",
                 "shasum": ""
             },
             "require": {
@@ -5596,9 +5596,9 @@
             ],
             "support": {
                 "issues": "https://github.com/laravel/horizon/issues",
-                "source": "https://github.com/laravel/horizon/tree/v5.37.0"
+                "source": "https://github.com/laravel/horizon/tree/v5.36.0"
             },
-            "time": "2025-10-21T14:32:49+00:00"
+            "time": "2025-10-10T13:44:39+00:00"
         },
         {
             "name": "laravel/prompts",
@@ -7790,16 +7790,16 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v5.6.2",
+            "version": "v5.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "3a454ca033b9e06b63282ce19562e892747449bb"
+                "reference": "f103601b29efebd7ff4a1ca7b3eeea9e3336a2a2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/3a454ca033b9e06b63282ce19562e892747449bb",
-                "reference": "3a454ca033b9e06b63282ce19562e892747449bb",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/f103601b29efebd7ff4a1ca7b3eeea9e3336a2a2",
+                "reference": "f103601b29efebd7ff4a1ca7b3eeea9e3336a2a2",
                 "shasum": ""
             },
             "require": {
@@ -7842,9 +7842,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nikic/PHP-Parser/issues",
-                "source": "https://github.com/nikic/PHP-Parser/tree/v5.6.2"
+                "source": "https://github.com/nikic/PHP-Parser/tree/v5.6.1"
             },
-            "time": "2025-10-21T19:32:17+00:00"
+            "time": "2025-08-13T20:13:15+00:00"
         },
         {
             "name": "novadaemon/filament-combobox",
@@ -9596,16 +9596,16 @@
         },
         {
             "name": "pxlrbt/filament-excel",
-            "version": "v3.1.1",
+            "version": "v3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pxlrbt/filament-excel.git",
-                "reference": "8b22caad73f430d4e56f1587d73994e23d6edf8e"
+                "reference": "c097ebd162b9d7cbd5457a977137e29243135b39"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pxlrbt/filament-excel/zipball/8b22caad73f430d4e56f1587d73994e23d6edf8e",
-                "reference": "8b22caad73f430d4e56f1587d73994e23d6edf8e",
+                "url": "https://api.github.com/repos/pxlrbt/filament-excel/zipball/c097ebd162b9d7cbd5457a977137e29243135b39",
+                "reference": "c097ebd162b9d7cbd5457a977137e29243135b39",
                 "shasum": ""
             },
             "require": {
@@ -9651,7 +9651,7 @@
             ],
             "support": {
                 "issues": "https://github.com/pxlrbt/filament-excel/issues",
-                "source": "https://github.com/pxlrbt/filament-excel/tree/v3.1.1"
+                "source": "https://github.com/pxlrbt/filament-excel/tree/v3.1.0"
             },
             "funding": [
                 {
@@ -9659,7 +9659,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-10-22T07:28:48+00:00"
+            "time": "2025-08-13T15:38:12+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
@@ -10895,16 +10895,16 @@
         },
         {
             "name": "spatie/laravel-medialibrary",
-            "version": "11.17.0",
+            "version": "11.16.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-medialibrary.git",
-                "reference": "0d58f3184d6449e3173ee3e44b29dc5ff7425d71"
+                "reference": "3515057560927ff762cb76f3cb2c4777a34b1519"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-medialibrary/zipball/0d58f3184d6449e3173ee3e44b29dc5ff7425d71",
-                "reference": "0d58f3184d6449e3173ee3e44b29dc5ff7425d71",
+                "url": "https://api.github.com/repos/spatie/laravel-medialibrary/zipball/3515057560927ff762cb76f3cb2c4777a34b1519",
+                "reference": "3515057560927ff762cb76f3cb2c4777a34b1519",
                 "shasum": ""
             },
             "require": {
@@ -10989,7 +10989,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-medialibrary/issues",
-                "source": "https://github.com/spatie/laravel-medialibrary/tree/11.17.0"
+                "source": "https://github.com/spatie/laravel-medialibrary/tree/11.16.0"
             },
             "funding": [
                 {
@@ -11001,7 +11001,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-10-22T08:01:45+00:00"
+            "time": "2025-10-21T06:59:05+00:00"
         },
         {
             "name": "spatie/laravel-package-tools",
@@ -18079,16 +18079,16 @@
         },
         {
             "name": "rector/rector",
-            "version": "2.2.4",
+            "version": "2.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "904f12f23858ef54ec5782b05cb2979b703cb185"
+                "reference": "d27f976a332a87b5d03553c2e6f04adbe5da034f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/904f12f23858ef54ec5782b05cb2979b703cb185",
-                "reference": "904f12f23858ef54ec5782b05cb2979b703cb185",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/d27f976a332a87b5d03553c2e6f04adbe5da034f",
+                "reference": "d27f976a332a87b5d03553c2e6f04adbe5da034f",
                 "shasum": ""
             },
             "require": {
@@ -18127,7 +18127,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/2.2.4"
+                "source": "https://github.com/rectorphp/rector/tree/2.2.3"
             },
             "funding": [
                 {
@@ -18135,7 +18135,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-10-22T07:50:23+00:00"
+            "time": "2025-10-11T21:50:23+00:00"
         },
         {
             "name": "respect/stringifier",

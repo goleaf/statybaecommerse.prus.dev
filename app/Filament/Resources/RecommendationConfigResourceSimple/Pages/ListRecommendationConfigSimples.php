@@ -10,6 +10,8 @@ use Filament\Actions;
 
 final class ListRecommendationConfigSimples extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = RecommendationConfigResourceSimple::class;
 
     protected function getHeaderActions(): array

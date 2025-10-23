@@ -7,7 +7,9 @@ namespace App\Models;
 use App\Contracts\TranslatableRecord;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\VisibleScope;
+use App\Observers\CollectionObserver;
 use App\Traits\HasTranslations;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -36,6 +38,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  *
  * @mixin \Eloquent
  */
+// Attach the observer that keeps storefront collection caches up to date.
+#[ObservedBy([CollectionObserver::class])]
 #[ScopedBy([ActiveScope::class, VisibleScope::class])]
 final class Collection extends Model implements HasMedia, TranslatableRecord
 {
@@ -45,16 +49,16 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
 
     protected $table = 'collections';
 
-    protected $fillable = ['name', 'slug', 'description', 'is_visible', 'sort_order', 'seo_title', 'seo_description', 'is_automatic', 'is_active', 'meta_title', 'meta_description', 'meta_keywords', 'display_type', 'products_per_page', 'show_filters'];
+    protected $fillable = ['name', 'slug', 'description', 'is_visible', 'sort_order', 'seo_title', 'seo_description', 'is_automatic', 'is_active', 'meta_title', 'meta_description', 'meta_keywords', 'display_type', 'products_per_page', 'show_filters', 'max_products', 'rules'];
 
-    public static $translatable = ['name', 'description', 'meta_title', 'meta_description', 'meta_keywords'];
+    public static $translatable = ['name', 'description', 'meta_title', 'meta_description', 'meta_keywords', 'slug'];
 
     /**
      * Handle casts functionality with proper error handling.
      */
     protected function casts(): array
     {
-        return ['is_visible' => 'boolean', 'sort_order' => 'integer', 'is_automatic' => 'boolean', 'is_active' => 'boolean', 'products_per_page' => 'integer', 'show_filters' => 'boolean', 'meta_keywords' => 'array'];
+        return ['is_visible' => 'boolean', 'sort_order' => 'integer', 'is_automatic' => 'boolean', 'is_active' => 'boolean', 'products_per_page' => 'integer', 'show_filters' => 'boolean', 'meta_keywords' => 'array', 'max_products' => 'integer'];
     }
 
     /**

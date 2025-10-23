@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\RecommendationBlockResource\Pages;
 use App\Models\RecommendationBlock;
@@ -18,17 +20,21 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Novadaemon\FilamentCombobox\Combobox;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Novadaemon\FilamentCombobox\Combobox;
 use UnitEnum;
 
+use Filament\Schemas\Schema;
+use UnitEnum;
 /**
  * RecommendationBlockResource
  *
@@ -36,6 +42,8 @@ use UnitEnum;
  */
 final class RecommendationBlockResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = RecommendationBlock::class;
 
     /**
@@ -83,13 +91,13 @@ final class RecommendationBlockResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('recommendation_blocks.basic_information'))
                 ->schema([
                     TextInput::make('name')
-                        ->label(__('recommendation_blocks.name'))
+                        ->label(__('recommendation_blocks.fields.name'))
                         ->required()
                         ->unique(ignoreRecord: true)
                         ->maxLength(255),
@@ -98,7 +106,7 @@ final class RecommendationBlockResource extends Resource
                         ->required()
                         ->maxLength(255),
                     Textarea::make('description')
-                        ->label(__('recommendation_blocks.description'))
+                        ->label(__('recommendation_blocks.fields.description'))
                         ->maxLength(1000)
                         ->rows(3),
                     Select::make('type')
@@ -114,12 +122,11 @@ final class RecommendationBlockResource extends Resource
                         ->required()
                         ->native(false),
                 ]),
-            Section::make(__('recommendation_blocks.products'))
+            Section::make(__('recommendation_blocks.sections.products'))
                 ->schema([
                     Combobox::make('products')
                         ->label(__('recommendation_blocks.products'))
                         ->relationship('products', 'name', fn (Builder $query) => $query->withoutGlobalScopes())
-                        ->boxSearchs()
                         ->height('320px')
                         ->afterStateHydrated(function ($state, callable $set): void {
                             $set('products', collect($state)->sort()->values()->all());
@@ -132,25 +139,25 @@ final class RecommendationBlockResource extends Resource
                                 ->maxLength(1000),
                         ]),
                     TextInput::make('max_products')
-                        ->label(__('recommendation_blocks.max_products'))
+                        ->label(__('recommendation_blocks.fields.max_products'))
                         ->numeric()
                         ->default(10)
                         ->minValue(1)
                         ->maxValue(50),
                 ]),
-            Section::make(__('recommendation_blocks.settings'))
+            Section::make(__('recommendation_blocks.sections.settings'))
                 ->schema([
                     Toggle::make('is_active')
-                        ->label(__('recommendation_blocks.is_active'))
+                        ->label(__('recommendation_blocks.fields.is_active'))
                         ->default(true),
                     Toggle::make('show_title')
-                        ->label(__('recommendation_blocks.show_title'))
+                        ->label(__('recommendation_blocks.fields.show_title'))
                         ->default(true),
                     Toggle::make('show_description')
-                        ->label(__('recommendation_blocks.show_description'))
+                        ->label(__('recommendation_blocks.fields.show_description'))
                         ->default(false),
                     TextInput::make('sort_order')
-                        ->label(__('recommendation_blocks.sort_order'))
+                        ->label(__('recommendation_blocks.fields.sort_order'))
                         ->numeric()
                         ->default(0),
                 ]),
@@ -160,17 +167,18 @@ final class RecommendationBlockResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label(__('recommendation_blocks.name'))
+                    ->label(__('recommendation_blocks.fields.name'))
                     ->searchable()
                     ->sortable()
                     ->copyable(),
                 TextColumn::make('type')
-                    ->label(__('recommendation_blocks.type'))
+                    ->label(__('recommendation_blocks.fields.type'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'featured' => 'success',
@@ -181,7 +189,7 @@ final class RecommendationBlockResource extends Resource
                         default    => 'gray',
                     }),
                 TextColumn::make('position')
-                    ->label(__('recommendation_blocks.position'))
+                    ->label(__('recommendation_blocks.fields.position'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'top'     => 'success',
@@ -191,31 +199,31 @@ final class RecommendationBlockResource extends Resource
                         default   => 'gray',
                     }),
                 TextColumn::make('products_count')
-                    ->label(__('recommendation_blocks.products_count'))
+                    ->label(__('recommendation_blocks.fields.products_count'))
                     ->counts('products')
                     ->sortable(),
                 TextColumn::make('max_products')
-                    ->label(__('recommendation_blocks.max_products'))
+                    ->label(__('recommendation_blocks.fields.max_products'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('is_active')
-                    ->label(__('recommendation_blocks.is_active'))
+                    ->label(__('recommendation_blocks.fields.is_active'))
                     ->boolean()
                     ->trueIcon('heroicon-o-check-circle')
                     ->falseIcon('heroicon-o-x-circle')
                     ->trueColor('success')
                     ->falseColor('danger'),
                 TextColumn::make('sort_order')
-                    ->label(__('recommendation_blocks.sort_order'))
+                    ->label(__('recommendation_blocks.fields.sort_order'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
-                    ->label(__('recommendation_blocks.created_at'))
+                    ->label(__('recommendation_blocks.fields.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->label(__('recommendation_blocks.updated_at'))
+                    ->label(__('recommendation_blocks.fields.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -241,6 +249,37 @@ final class RecommendationBlockResource extends Resource
                     DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    /**
+     * Get available recommendation block types mapped to their translations.
+     *
+     * @return array<string, string>
+     */
+    protected static function getTypeOptions(): array
+    {
+        return [
+            'featured' => __('recommendation_blocks.types.featured'),
+            'related' => __('recommendation_blocks.types.related'),
+            'similar' => __('recommendation_blocks.types.similar'),
+            'trending' => __('recommendation_blocks.types.trending'),
+            'recent' => __('recommendation_blocks.types.recent'),
+        ];
+    }
+
+    /**
+     * Get available recommendation block positions mapped to their translations.
+     *
+     * @return array<string, string>
+     */
+    protected static function getPositionOptions(): array
+    {
+        return [
+            'top' => __('recommendation_blocks.positions.top'),
+            'bottom' => __('recommendation_blocks.positions.bottom'),
+            'sidebar' => __('recommendation_blocks.positions.sidebar'),
+            'inline' => __('recommendation_blocks.positions.inline'),
+        ];
     }
 
     public static function getRelations(): array

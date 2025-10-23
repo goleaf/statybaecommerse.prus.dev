@@ -10,6 +10,8 @@ use Filament\Actions;
 
 final class ListSliderTranslations extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = SliderTranslationResource::class;
 
     protected function getHeaderActions(): array

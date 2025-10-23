@@ -3,16 +3,21 @@
 declare(strict_types=1);
 
 use Filament\Facades\Filament;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 
 uses(Tests\TestCase::class)->in('Feature', 'Unit', 'admin', 'frontend', 'Performance');
 
-uses(RefreshDatabase::class)->in('Feature', 'Unit', 'admin', 'frontend', 'Performance');
 
 beforeAll(function () {
+    $testingDatabasePath = database_path('testing.sqlite');
+
+    if (! file_exists($testingDatabasePath)) {
+        // Ensure the shared SQLite database file is available for all tests.
+        touch($testingDatabasePath);
+    }
+
     $envPath = base_path('.env');
     if (! file_exists($envPath)) {
         file_put_contents($envPath, implode(PHP_EOL, [
@@ -23,14 +28,34 @@ beforeAll(function () {
             'LOG_CHANNEL=stack',
             'DB_CONNECTION=sqlite',
             'DB_DATABASE=:memory:',
-        ]).PHP_EOL);
+        ]) . PHP_EOL);
     }
 
     config()->set('database.default', 'sqlite');
-    config()->set('database.connections.sqlite.database', ':memory:');
+    config()->set('database.connections.sqlite.database', $testingDatabasePath);
+    \Illuminate\Foundation\Testing\RefreshDatabaseState::$migrated = false;
 
     // Ensure Filament uses the web guard for tests
     config()->set('filament.auth.guard', 'web');
+
+    $manifestPath = public_path('build/manifest.json');
+    if (! is_dir(dirname($manifestPath))) {
+        mkdir(dirname($manifestPath), 0777, true);
+    }
+    if (! file_exists($manifestPath)) {
+        file_put_contents($manifestPath, json_encode([
+            'resources/css/app.scss' => [
+                'file' => 'css/app.css',
+                'src' => 'resources/css/app.scss',
+                'isEntry' => true,
+            ],
+            'resources/js/app.js' => [
+                'file' => 'js/app.js',
+                'src' => 'resources/js/app.js',
+                'isEntry' => true,
+            ],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+    }
 
     // Stub missing Filament resource routes referenced by navigation during tests
     if (! Route::has('filament.admin.resources.system-settings.index')) {
@@ -91,3 +116,14 @@ if (! function_exists('post')) {
         return test()->post($uri, $data, $headers);
     }
 }
+
+expect()->extend('toHaveCountLessThan', function (int $expected) {
+    $value = $this->value;
+
+    // Count array-like values so assertions remain expressive in navigation tests.
+    $actualCount = is_countable($value) ? count($value) : count((array) $value);
+
+    expect($actualCount)->toBeLessThan($expected);
+
+    return $this;
+});

@@ -255,9 +255,17 @@ final class ShoppingCartWidget extends Component
     /**
      * Handle getCartItems functionality with proper error handling.
      */
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection<int, CartItem>
+     */
     protected function getCartItems()
     {
         return CartItem::where('session_id', Session::getId())->with(['product.media', 'product.brand'])->get();
+    }
+
+    private function priceCalculator(): PriceCalculator
+    {
+        return app(PriceCalculator::class);
     }
 
     /**

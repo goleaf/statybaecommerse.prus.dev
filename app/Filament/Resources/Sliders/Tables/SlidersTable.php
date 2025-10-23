@@ -10,11 +10,11 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -24,6 +24,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Filament\Schemas\Schema;
 
 final class SlidersTable
 {

@@ -18,6 +18,11 @@ class FixFilamentV4Command extends Command
 
     private array $errors = [];
 
+    /**
+     * Shared literal for the UnitEnum import so repeated strings are avoided.
+     */
+    private const UNIT_ENUM_IMPORT = 'use UnitEnum;';
+
     public function handle(): int
     {
         $this->info('🚀 Starting Filament v4 migration...');

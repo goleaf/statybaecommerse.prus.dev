@@ -4,28 +4,30 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\MenuItemResource\Pages;
 use App\Models\Menu;
 use App\Models\MenuItem;
 use App\Models\Scopes\VisibleScope;
-use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid as FormGrid;
-use Filament\Forms\Components\Section as FormSection;
+use Filament\Schemas\Components\Grid as FormGrid;
+use Filament\Schemas\Components\Section as FormSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 
 final class MenuItemResource extends Resource
@@ -56,9 +58,9 @@ final class MenuItemResource extends Resource
         return __('admin.menu_items.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 FormSection::make(__('admin.menu_items.basic_information'))
                     ->schema([
@@ -69,7 +71,7 @@ final class MenuItemResource extends Resource
                                     ->options(
                                         static fn (): array => Menu::withoutGlobalScopes()
                                             ->pluck('name', 'id')
-                                            ->all()
+                                            ->toArray()
                                     )
                                     ->required()
                                     ->searchable(),
@@ -91,9 +93,8 @@ final class MenuItemResource extends Resource
                                             )
                                             ->orderBy('label')
                                             ->pluck('label', 'id')
-                                            ->all();
-                                    })
-                                    ->reactive()
+                                            ->toArray()
+                                    )
                                     ->searchable()
                                     ->preload(),
                                 TextInput::make('label')
@@ -130,8 +131,9 @@ final class MenuItemResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('menu.name')
@@ -148,25 +150,23 @@ final class MenuItemResource extends Resource
                     ->tooltip(static function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        if ($state === null || $state === '') {
+                        if (! is_string($state) || $state === '') {
                             return null;
                         }
 
-                        $stateString = (string) $state;
-
-                        if (strlen($stateString) <= 30) {
+                        if (strlen($state) <= 30) {
                             return null;
                         }
 
-                        return $stateString;
+                        return $state;
                     }),
                 TextColumn::make('route_name')
                     ->label(__('admin.menu_items.route_name'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('icon')
+                IconColumn::make('icon')
                     ->label(__('admin.menu_items.icon'))
-                    ->icon()
+                    ->icon(static fn (?string $state): ?string => $state)
                     ->sortable(),
                 TextColumn::make('parent.label')
                     ->label(__('admin.menu_items.parent'))
@@ -190,13 +190,13 @@ final class MenuItemResource extends Resource
                     ->options(
                         static fn (): array => Menu::withoutGlobalScopes()
                             ->pluck('name', 'id')
-                            ->all()
+                            ->toArray()
                     )
                     ->searchable(),
                 SelectFilter::make('parent_id')
                     ->label(__('admin.menu_items.parent'))
                     ->options(function (SelectFilter $filter): array {
-                        $menuFilterState = $filter->getLivewire()?->getTableFilterState('menu_id');
+                        $menuFilterState = $filter->getLivewire()->getTableFilterState('menu_id');
                         $menuId = $menuFilterState['value'] ?? null;
 
                         $query = MenuItem::withoutGlobalScopes()
@@ -209,8 +209,8 @@ final class MenuItemResource extends Resource
                         return $query
                             ->orderBy('label')
                             ->pluck('label', 'id')
-                            ->all();
-                    })
+                            ->toArray()
+                    )
                     ->searchable(),
                 TernaryFilter::make('is_visible')
                     ->label(__('admin.menu_items.is_visible')),
@@ -244,6 +244,9 @@ final class MenuItemResource extends Resource
         ];
     }
 
+    /**
+     * @return Builder<MenuItem>
+     */
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->withoutGlobalScopes([VisibleScope::class]);

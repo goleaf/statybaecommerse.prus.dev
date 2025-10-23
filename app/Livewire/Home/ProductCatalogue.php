@@ -8,6 +8,7 @@ use App\Livewire\Concerns\WithCart;
 use App\Livewire\Concerns\WithNotifications;
 use App\Models\Category;
 use App\Models\Product;
+use App\Services\Shared\CacheService as SharedCacheService;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTagHelper;
 use Filament\Infolists\Components\ViewEntry;
@@ -38,10 +39,10 @@ final class ProductCatalogue extends Component implements HasSchemas
     public string $search = '';
 
     protected $queryString = [
-        'sort' => ['except' => 'latest'],
+        'sort'     => ['except' => 'latest'],
         'category' => ['except' => null],
-        'search' => ['except' => ''],
-        'page' => ['except' => 1],
+        'search'   => ['except' => ''],
+        'page'     => ['except' => 1],
     ];
 
     public function updatingSort(): void
@@ -87,10 +88,10 @@ final class ProductCatalogue extends Component implements HasSchemas
         $query = Product::query()
             ->with(['brand', 'categories', 'media'])
             ->with([
-                'translations' => function ($q) use ($locale) {
+                'translations' => function ($q) use ($locale): void {
                     $q->where('locale', $locale);
                 },
-                'categories.translations' => function ($q) use ($locale) {
+                'categories.translations' => function ($q) use ($locale): void {
                     $q->where('locale', $locale);
                 },
             ])
@@ -107,16 +108,16 @@ final class ProductCatalogue extends Component implements HasSchemas
         if (filled($this->search)) {
             $query->where(function ($builder): void {
                 $builder
-                    ->where('name', 'like', '%'.$this->search.'%')
-                    ->orWhere('sku', 'like', '%'.$this->search.'%');
+                    ->where('name', 'like', '%' . $this->search . '%')
+                    ->orWhere('sku', 'like', '%' . $this->search . '%');
             });
         }
 
         $query = match ($this->sort) {
-            'price_asc' => $query->orderBy('price'),
+            'price_asc'  => $query->orderBy('price'),
             'price_desc' => $query->orderByDesc('price'),
-            'popular' => $query->withSum('orderItems as orders_quantity', 'quantity')->orderByDesc('orders_quantity')->orderByDesc('reviews_count')->orderByDesc('published_at'),
-            default => $query->orderByDesc('published_at'),
+            'popular'    => $query->withSum('orderItems as orders_quantity', 'quantity')->orderByDesc('orders_quantity')->orderByDesc('reviews_count')->orderByDesc('published_at'),
+            default      => $query->orderByDesc('published_at'),
         };
 
         return $query->paginate($this->perPage);
@@ -129,10 +130,10 @@ final class ProductCatalogue extends Component implements HasSchemas
                 ->label('')
                 ->view('livewire.home.product-catalogue')
                 ->viewData(fn (): array => [
-                    'products' => $this->products(),
-                    'categories' => $this->categories(),
-                    'sort' => $this->sort,
-                    'search' => $this->search,
+                    'products'         => $this->products(),
+                    'categories'       => $this->categories(),
+                    'sort'             => $this->sort,
+                    'search'           => $this->search,
                     'selectedCategory' => $this->category,
                 ]),
         ]);

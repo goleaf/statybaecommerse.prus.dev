@@ -12,6 +12,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use OpenApi\Attributes as OA;
 
+#[OA\Tag(name: 'Autocomplete', description: 'Internal autocomplete utilities exposed over the API.')]
 final class AutocompleteSearchController extends Controller
 {
     #[OA\Post(

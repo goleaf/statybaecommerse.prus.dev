@@ -4,18 +4,22 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use BackedEnum;
 use App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
 use App\Models\User;
 use BackedEnum;
 use Filament\Pages\Page;
+use UnitEnum;
 use Filament\Tables;
-use Filament\Tables\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
+use BackedEnum;
 
+use BackedEnum;
 final class UserImpersonation extends Page implements HasTable
 {
     use ConfiguresToggleableTableLayout;
@@ -27,9 +31,11 @@ final class UserImpersonation extends Page implements HasTable
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user';
 
-    public static function getNavigationGroup(): ?string
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-user';
+
+    public static function getNavigationGroup(): BackedEnum|string|null
     {
-        return 'System';
+        return 'System'; // Keep impersonation tools alongside other system controls.
     }
 
     protected static ?string $title = 'User Impersonation';
@@ -38,8 +44,9 @@ final class UserImpersonation extends Page implements HasTable
 
     protected string $view = 'filament.pages.user-impersonation';
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the Filament table definition for the resource.
         $table = $table
             ->query(User::query()->where('is_admin', false))
             ->columns([
@@ -73,6 +80,6 @@ final class UserImpersonation extends Page implements HasTable
                     }),
             ]);
 
-        return $this->applyToggleableTableLayout($table);
+        return $this->applyToggleableTableLayout($table); // Preserve stored table layout preferences.
     }
 }

@@ -4,46 +4,52 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
-use App\Models\Address;
-use App\Models\Channel;
 use App\Models\Order;
 use App\Models\Partner;
 use App\Models\User;
 use App\Services\Pricing\PriceCalculator;
 use App\Support\Authorization\AuthorizationMatrix;
 use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Filament\Filters\DateRangeFilter;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\AddressSearch;
 use App\Support\Search\ChannelSearch;
 use App\Support\Search\CustomerSearch;
 use App\Support\Search\PartnerSearch;
+use App\Support\Search\SearchableComponentHelper;
 use App\Support\Seo\LocaleUrlGenerator;
+use Awcodes\BadgeableColumn\Components\Badge;
+use Awcodes\BadgeableColumn\Components\BadgeableColumn;
 use BackedEnum;
+use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Exception;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Support\Enums\MaxWidth;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Filters\Filter;
@@ -51,10 +57,12 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Number;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
@@ -63,7 +71,9 @@ use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 /**
  * OrderResource
  *
@@ -76,7 +86,7 @@ use UnitEnum;
  * - Export capabilities
  * - Audit trail integration
  */
-final class OrderResource extends Resource
+final class OrderResource extends Resource implements DefinesExportColumns
 {
     use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
 
@@ -87,6 +97,31 @@ final class OrderResource extends Resource
     protected static ?string $recordTitleAttribute = 'number';
 
     protected static ?string $navigationLabel = 'orders.navigation.orders';
+
+    public static function canViewAny(): bool
+    {
+        return Gate::allows('viewAny', Order::class);
+    }
+
+    public static function canView(Order $record): bool
+    {
+        return Gate::allows('view', $record);
+    }
+
+    public static function canCreate(): bool
+    {
+        return Gate::allows('create', Order::class);
+    }
+
+    public static function canEdit(Order $record): bool
+    {
+        return Gate::allows('update', $record);
+    }
+
+    public static function canDelete(Order $record): bool
+    {
+        return Gate::allows('delete', $record);
+    }
 
     protected static ?string $modelLabel = 'orders.models.order';
 
@@ -132,15 +167,12 @@ final class OrderResource extends Resource
         return AuthorizationMatrix::check('orders', 'update');
     }
 
-    public static function getNavigationIcon(): string|BackedEnum|null
+    public static function getNavigationIcon(): string|\BackedEnum|null
     {
         return 'heroicon-o-shopping-bag';
     }
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'System';
-    }
+    
 
     /**
      * Get the navigation label with translation support.
@@ -169,9 +201,9 @@ final class OrderResource extends Resource
     /**
      * Configure the comprehensive form schema with advanced features.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('orders.sections.order_details'))
                 ->description(__('orders.sections.customer_information'))
                 ->icon('heroicon-o-information-circle')
@@ -218,10 +250,10 @@ final class OrderResource extends Resource
                                         },
                                     );
                                 })
-                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
                                     if ($state === null || $state === '') {
                                         // Reset relation when lookup clears.
-                                        SearchableInputHelper::clear($set, ['user_id' => null]);
+                                        SearchableInputHelper::clear($component, $set, ['user_id' => null]);
 
                                         return;
                                     }
@@ -258,11 +290,12 @@ final class OrderResource extends Resource
                                     'cash_on_delivery' => __('orders.payment_methods.cash_on_delivery'),
                                     'paypal'           => __('orders.payment_methods.paypal'),
                                     'stripe'           => __('orders.payment_methods.stripe'),
-                                    'apple_pay'        => __('orders.payment_methods.credit_card'),
-                                    'google_pay'       => __('orders.payment_methods.credit_card'),
+                                    'apple_pay'        => __('orders.payment_methods.apple_pay'), // Ensure the metadata surfaces the proper Apple Pay label.
+                                    'google_pay'       => __('orders.payment_methods.google_pay'), // Keep Google Pay aligned with the localized payment labels.
                                 ]),
                             TextInput::make('payment_reference')
-                                ->label(__('orders.fields.tracking_number')),
+                                ->label(__('orders.fields.payment_reference')) // Present the correct payment reference metadata for operators.
+                                ->helperText(__('orders.fields.payment_reference_help') ?? ''),
                         ]),
                 ])
                 ->collapsible(),
@@ -294,9 +327,51 @@ final class OrderResource extends Resource
                                 ->prefix('€')
                                 ->step(0.01),
                         ]),
+                    SearchableInput::make('coupon_id')
+                        ->label(__('orders.fields.coupon'))
+                        ->placeholder(__('orders.fields.coupon_placeholder'))
+                        ->searchUsing(fn (string $search): array => CouponSearch::byCode($search))
+                        ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                        ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?Order $record): void {
+                            if ($state === null) {
+                                return;
+                            }
+
+                            $coupon = $record?->coupon ?? Coupon::query()->select(['id', 'code', 'name'])->find($state);
+
+                            if (! $coupon instanceof Coupon) {
+                                return;
+                            }
+
+                            $code = (string) ($coupon->getAttribute('code') ?? '');
+                            $name = (string) ($coupon->getAttribute('name') ?? '');
+                            $label = trim(sprintf('%s — %s', $code, $name));
+
+                            $component
+                                ->state((string) $state)
+                                ->options([
+                                    (string) $coupon->getKey() => $label,
+                                ]);
+                        })
+                        ->onItemSelected(function (SearchResult $item): void {
+                            app()->call(function (Set $set) use ($item): void {
+                                $rawId = $item->get('coupon_id');
+
+                                if (! is_numeric($rawId)) {
+                                    $rawId = $item->value();
+                                }
+
+                                if (! is_numeric($rawId)) {
+                                    return;
+                                }
+
+                                $set('coupon_id', (int) $rawId);
+                            });
+                        })
+                        ->suffixIcon('heroicon-o-ticket'),
                     Placeholder::make('total')
                         ->label(__('orders.fields.total'))
-                        ->content(function (\Filament\Schemas\Components\Utilities\Get $get): string {
+                        ->content(function (Get $get): string {
                             $subtotal = (float) $get('subtotal') ?? 0;
                             $tax = (float) $get('tax_amount') ?? 0;
                             $shipping = (float) $get('shipping_amount') ?? 0;
@@ -308,7 +383,7 @@ final class OrderResource extends Resource
                             return $breakdown->toSummary()['formatted_total'];
                         }),
                     Hidden::make('total')
-                        ->default(function (\Filament\Schemas\Components\Utilities\Get $get): float {
+                        ->default(function (Get $get): float {
                             $subtotal = (float) $get('subtotal') ?? 0;
                             $tax = (float) $get('tax_amount') ?? 0;
                             $shipping = (float) $get('shipping_amount') ?? 0;
@@ -317,7 +392,7 @@ final class OrderResource extends Resource
                             $rate = $taxable > 0 ? $tax / $taxable : null;
                             $breakdown = app(PriceCalculator::class)->breakdown($subtotal, $discount, $shipping, $rate);
 
-                            return $breakdown->total;
+                            return $breakdown->total; // Persist the calculated total to keep invoices and exports in sync.
                         }),
                 ])
                 ->collapsible(),
@@ -337,14 +412,28 @@ final class OrderResource extends Resource
                                     SearchableInputHelper::hydrate(
                                         $component,
                                         $state,
-                                        static fn (int $value): ?array => ['value' => $value, 'label' => (string) $value],
+                                        static function (int $value): ?array {
+                                            $address = Address::query()
+                                                ->select(['id', 'address_line_1', 'address_line_2', 'city', 'state', 'postal_code', 'country_code'])
+                                                ->find($value);
+
+                                            if (! $address instanceof Address) {
+                                                return null;
+                                            }
+
+                                            return [
+                                                'value'   => $address->getKey(),
+                                                'label'   => self::formatAddress($address),
+                                                'payload' => AddressSearch::payload($address),
+                                            ];
+                                        },
                                     );
                                 })
                                 // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
-                                ->afterStateUpdated(function (?int $state, Set $set): void {
+                                ->afterStateUpdated(function (SearchableInput $component, ?int $state, Set $set): void {
                                     if ($state === null) {
                                         // Reset the cached billing payload when cleared.
-                                        SearchableInputHelper::clear($set, ['billing_address' => []]);
+                                        SearchableInputHelper::clear($component, $set, ['billing_address' => []]);
 
                                         return;
                                     }
@@ -354,6 +443,8 @@ final class OrderResource extends Resource
                                         ->find($state);
 
                                     if (! $address instanceof Address) {
+                                        SearchableInputHelper::clear($component, $set, ['billing_address' => []]);
+
                                         return;
                                     }
 
@@ -370,13 +461,27 @@ final class OrderResource extends Resource
                                     SearchableInputHelper::hydrate(
                                         $component,
                                         $state,
-                                        static fn (int $value): ?array => ['value' => $value, 'label' => (string) $value],
+                                        static function (int $value): ?array {
+                                            $address = Address::query()
+                                                ->select(['id', 'address_line_1', 'address_line_2', 'city', 'state', 'postal_code', 'country_code'])
+                                                ->find($value);
+
+                                            if (! $address instanceof Address) {
+                                                return null;
+                                            }
+
+                                            return [
+                                                'value'   => $address->getKey(),
+                                                'label'   => self::formatAddress($address),
+                                                'payload' => AddressSearch::payload($address),
+                                            ];
+                                        },
                                     );
                                 })
                                 // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
-                                ->afterStateUpdated(function (?int $state, Set $set): void {
+                                ->afterStateUpdated(function (SearchableInput $component, ?int $state, Set $set): void {
                                     if ($state === null) {
-                                        SearchableInputHelper::clear($set, ['shipping_address' => []]);
+                                        SearchableInputHelper::clear($component, $set, ['shipping_address' => []]);
 
                                         return;
                                     }
@@ -386,6 +491,8 @@ final class OrderResource extends Resource
                                         ->find($state);
 
                                     if (! $address instanceof Address) {
+                                        SearchableInputHelper::clear($component, $set, ['shipping_address' => []]);
+
                                         return;
                                     }
 
@@ -463,9 +570,9 @@ final class OrderResource extends Resource
                                         },
                                     );
                                 })
-                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
                                     if ($state === null || $state === '') {
-                                        SearchableInputHelper::clear($set, ['channel_id' => null]);
+                                        SearchableInputHelper::clear($component, $set, ['channel_id' => null]);
 
                                         return;
                                     }
@@ -497,9 +604,9 @@ final class OrderResource extends Resource
                                         },
                                     );
                                 })
-                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
                                     if ($state === null || $state === '') {
-                                        SearchableInputHelper::clear($set, ['partner_id' => null]);
+                                        SearchableInputHelper::clear($component, $set, ['partner_id' => null]);
 
                                         return;
                                     }
@@ -539,11 +646,12 @@ final class OrderResource extends Resource
     /**
      * Configure the comprehensive table with advanced features.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
-                TextColumn::make('number')
+                BadgeableColumn::make('number')
                     ->label(__('orders.fields.order_number'))
                     ->searchable()
                     ->sortable()
@@ -604,45 +712,76 @@ final class OrderResource extends Resource
                     })
                     ->searchable()
                     ->sortable(),
-                BadgeColumn::make('status')
+                BadgeableColumn::make('status')
                     ->label(__('orders.fields.status'))
-                    ->colors([
-                        'warning'   => 'pending',
-                        'primary'   => 'processing',
-                        'info'      => 'shipped',
-                        'success'   => 'delivered',
-                        'danger'    => 'cancelled',
-                        'secondary' => 'refunded',
-                    ])
-                    ->formatStateUsing(fn (string $state): string => __("orders.status.{$state}"))
-                    ->sortable(),
-                BadgeColumn::make('payment_status')
-                    ->label(__('orders.fields.payment_status'))
-                    ->colors([
-                        'warning'   => 'pending',
-                        'success'   => 'paid',
-                        'danger'    => 'failed',
-                        'secondary' => 'refunded',
-                    ])
-                    ->formatStateUsing(fn (string $state): string => __("orders.payment_status.{$state}"))
-                    ->sortable(),
-                TextColumn::make('total')
-                    ->label(__('orders.fields.total'))
-                    ->money('EUR')
-                    ->sortable(),
-                TextColumn::make('items_count')
-                    ->label(__('orders.fields.items_count'))
-                    ->counts('items')
-                    ->sortable(),
-                TextColumn::make('payment_method')
-                    ->label(__('orders.fields.payment_method'))
-                    ->formatStateUsing(fn (?string $state): string => $state ? __("orders.payment_methods.{$state}") : '-')
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->sortable(),
-                TextColumn::make('channel.name')
-                    ->label(__('orders.fields.customer'))
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->sortable(),
+                    ->formatStateUsing(fn (string $state): string => __('orders.statuses.' . $state))
+                    ->sortable()
+                    ->asPills()
+                    ->searchable(['status', 'payment_status', 'channel.name', 'payment_method'])
+                    ->prefixBadges(function (Order $record): array {
+                        // Combine payment and channel metadata directly ahead of the main status label.
+                        $paymentStatus = $record->payment_status ?? 'pending';
+                        $paymentLabel = __('orders.payment_statuses.' . $paymentStatus);
+                        $paymentColor = match ($paymentStatus) {
+                            'paid', 'captured', 'settled', 'authorized' => 'success',
+                            'failed' => 'danger',
+                            'refunded', 'partially_refunded' => 'secondary',
+                            default => 'warning',
+                        };
+
+                        $badges = [
+                            Badge::make('payment_status')
+                                ->label(__('orders.badges.payment', ['status' => $paymentLabel]))
+                                ->color($paymentColor),
+                        ];
+
+                        if ($record->payment_method) {
+                            $badges[] = Badge::make('payment_method')
+                                ->label(__('orders.badges.payment_method', ['method' => __('orders.payment_methods.' . $record->payment_method)]))
+                                ->color('gray');
+                        }
+
+                        if ($record->channel?->name) {
+                            $badges[] = Badge::make('channel')
+                                ->label(__('orders.badges.channel', ['channel' => $record->channel->name]))
+                                ->color('info');
+                        }
+
+                        return collect($badges)->filter()->values()->all();
+                    })
+                    ->suffixBadges(function (Order $record): array {
+                        // Surface fulfillment progress, totals, and line counts adjacent to the status for at-a-glance triage.
+                        $shippingState = match (true) {
+                            filled($record->delivered_at) => 'delivered',
+                            filled($record->shipped_at)   => 'shipped',
+                            default                       => 'pending',
+                        };
+
+                        $shippingColor = match ($shippingState) {
+                            'delivered' => 'success',
+                            'shipped'   => 'info',
+                            default     => 'warning',
+                        };
+
+                        $shippingDate = $shippingState === 'delivered'
+                            ? optional($record->delivered_at)?->format('Y-m-d')
+                            : ($shippingState === 'shipped' ? optional($record->shipped_at)?->format('Y-m-d') : null);
+
+                        $itemsCount = (int) ($record->items_count ?? 0);
+
+                        return collect([
+                            Badge::make('shipping')
+                                ->label(__('orders.badges.shipping.' . $shippingState, ['date' => $shippingDate]))
+                                ->color($shippingColor),
+                            Badge::make('total')
+                                ->label(__('orders.badges.total', ['total' => Number::currency((float) $record->total, 'EUR', app()->getLocale())]))
+                                ->color('gray'),
+                            Badge::make('items')
+                                ->label(trans_choice('orders.badges.items', $itemsCount, ['count' => $itemsCount]))
+                                ->color($itemsCount > 0 ? 'primary' : 'gray'),
+                        ])->filter()->values()->all();
+                    })
+                    ->tooltip(fn (Order $record): string => __('orders.badges.status_tooltip', ['number' => $record->number])),
                 TextColumn::make('created_at')
                     ->label(__('orders.fields.created_at'))
                     ->dateTime()
@@ -742,17 +881,17 @@ final class OrderResource extends Resource
             ->actions([
                 ViewAction::make()
                     ->color('info')
-                    ->visible(fn () => AuthorizationMatrix::check('orders', 'view')),
+                    ->visible(fn (): bool => AuthorizationMatrix::check('orders', 'view')),
                 EditAction::make()
                     ->color('warning')
                     ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
-                \Filament\Tables\Actions\DeleteAction::make()
+                \Filament\Actions\DeleteAction::make()
                     ->visible(fn () => AuthorizationMatrix::check('orders', 'delete')),
                 Action::make('mark_processing')
                     ->label(__('orders.mark_processing'))
                     ->icon('heroicon-o-cog')
                     ->color('primary')
-                    ->visible(fn (Order $record): bool => $record->status === 'pending')
+                    ->visible(fn (Order $record): bool => AuthorizationMatrix::check('orders', 'update') && $record->status === 'pending') // Keep the action hidden unless the operator can update and the order is pending.
                     ->action(function (Order $record): void {
                         $record->update(['status' => 'processing']);
                         Notification::make()
@@ -760,13 +899,12 @@ final class OrderResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->requiresConfirmation()
-                    ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
+                    ->requiresConfirmation(),
                 Action::make('mark_shipped')
                     ->label(__('orders.mark_shipped'))
                     ->icon('heroicon-o-truck')
                     ->color('info')
-                    ->visible(fn (Order $record): bool => $record->status === 'processing')
+                    ->visible(fn (Order $record): bool => AuthorizationMatrix::check('orders', 'update') && $record->status === 'processing') // Ensure only authorized staff can advance processing orders.
                     ->action(function (Order $record): void {
                         $record->update([
                             'status'     => 'shipped',
@@ -777,13 +915,12 @@ final class OrderResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->requiresConfirmation()
-                    ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
+                    ->requiresConfirmation(),
                 Action::make('mark_delivered')
                     ->label(__('orders.mark_delivered'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn (Order $record): bool => $record->status === 'shipped')
+                    ->visible(fn (Order $record): bool => AuthorizationMatrix::check('orders', 'update') && $record->status === 'shipped') // Restrict delivery confirmation to authorized operators.
                     ->action(function (Order $record): void {
                         $record->update([
                             'status'       => 'delivered',
@@ -794,13 +931,12 @@ final class OrderResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->requiresConfirmation()
-                    ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
+                    ->requiresConfirmation(),
                 Action::make('cancel_order')
                     ->label(__('orders.cancel_order'))
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->visible(fn (Order $record): bool => in_array($record->status, ['pending', 'processing']))
+                    ->visible(fn (Order $record): bool => AuthorizationMatrix::check('orders', 'update') && in_array($record->status, ['pending', 'processing'], true)) // Combine status and permission gating for cancellation.
                     ->action(function (Order $record): void {
                         $record->update(['status' => 'cancelled']);
                         Notification::make()
@@ -808,13 +944,12 @@ final class OrderResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->requiresConfirmation()
-                    ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
+                    ->requiresConfirmation(),
                 Action::make('refund_order')
                     ->label(__('orders.refund_order'))
                     ->icon('heroicon-o-arrow-uturn-left')
                     ->color('secondary')
-                    ->visible(fn (Order $record): bool => in_array($record->status, ['delivered', 'completed']))
+                    ->visible(fn (Order $record): bool => AuthorizationMatrix::check('orders', 'update') && in_array($record->status, ['delivered', 'completed'], true)) // Only show refunds for authorized users when fulfillment is complete.
                     ->action(function (Order $record): void {
                         $record->update(['status' => 'refunded']);
                         Notification::make()
@@ -822,8 +957,7 @@ final class OrderResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->requiresConfirmation()
-                    ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
+                    ->requiresConfirmation(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -895,12 +1029,37 @@ final class OrderResource extends Resource
                         ->requiresConfirmation()
                         ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
                     BulkAction::make('export_orders')
-                        ->label(__('orders.export'))
+                        ->label(__('exports.actions.export_orders'))
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('gray')
-                        ->action(function (Collection $records): void {
+                        ->form([
+                            Select::make('format')
+                                ->label(__('exports.form.format'))
+                                ->options(collect(ExportFormat::cases())->mapWithKeys(fn (ExportFormat $format) => [$format->value => $format->label()])->all())
+                                ->default(ExportFormat::Csv->value)
+                                ->required(),
+                            CheckboxList::make('columns')
+                                ->label(__('exports.form.columns'))
+                                ->options(self::exportColumnOptions())
+                                ->default(array_keys(self::exportColumnOptions()))
+                                ->columns(2)
+                                ->required(),
+                        ])
+                        ->action(function (Collection $records, array $data): void {
+                            /** @var ExportService $exportService */
+                            $exportService = app(ExportService::class);
+
+                            $exportService->queueResourceExport(
+                                resourceClass: self::class,
+                                records: $records,
+                                columnKeys: $data['columns'],
+                                format: ExportFormat::from($data['format']),
+                                requestedBy: auth()->user(),
+                            );
+
                             Notification::make()
-                                ->title(__('orders.export_success'))
+                                ->title(__('exports.notifications.queued'))
+                                ->body(__('exports.notifications.queued_body'))
                                 ->success()
                                 ->send();
                         })
@@ -912,6 +1071,77 @@ final class OrderResource extends Resource
             ->poll('30s')
             ->striped()
             ->paginated([10, 25, 50, 100]);
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::canViewAny();
+    }
+
+    public static function canViewAny(): bool
+    {
+        return static::authorizeOrder(null, 'viewAny');
+    }
+
+    public static function canCreate(): bool
+    {
+        return static::authorizeOrder(null, 'create');
+    }
+
+    public static function canView(Order $record): bool
+    {
+        return static::authorizeOrder($record, 'view');
+    }
+
+    public static function canEdit(Order $record): bool
+    {
+        return static::authorizeOrder($record, 'update');
+    }
+
+    public static function canDelete(Order $record): bool
+    {
+        return static::authorizeOrder($record, 'delete');
+    }
+
+    public static function canRestore(Order $record): bool
+    {
+        return static::authorizeOrder($record, 'restore');
+    }
+
+    /**
+     * @return array<string, ExportColumn>
+     */
+    public static function availableExportColumns(): array
+    {
+        return [
+            'number' => new ExportColumn('number', __('orders.number'), fn (Order $order): string => (string) $order->number),
+            'status' => new ExportColumn('status', __('orders.status'), fn (Order $order): string => (string) $order->status),
+            'payment_status' => new ExportColumn('payment_status', __('orders.payment_status'), fn (Order $order): string => (string) $order->payment_status),
+            'total' => new ExportColumn('total', __('orders.total'), fn (Order $order): string => (string) $order->total),
+            'customer' => new ExportColumn('customer', __('orders.customer'), fn (Order $order): string => (string) ($order->user?->name ?? '')),
+            'created_at' => new ExportColumn('created_at', __('orders.created_at'), fn (Order $order): string => optional($order->created_at)->toDateTimeString() ?? ''),
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function exportColumnOptions(): array
+    {
+        return array_map(static fn (ExportColumn $column): string => $column->label, self::availableExportColumns());
+    }
+
+    /**
+     * @return Builder<Order>
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with([
+                'user:id,name,email',
+                'channel:id,name',
+            ])
+            ->withCount(['items']);
     }
 
     /**
@@ -979,6 +1209,86 @@ final class OrderResource extends Resource
     }
 
     /**
+     * @return array<int, SearchResult>
+     */
+    private static function searchChannels(string $term, int $limit = 15): array
+    {
+        /** @var \Illuminate\Database\Eloquent\Collection<int, Channel> $channels */
+        $channels = Channel::query()
+            ->select(['id', 'name', 'code'])
+            ->when($term !== '', static function (Builder $builder) use ($term): void {
+                $builder->where(static function (Builder $query) use ($term): void {
+                    $query
+                        ->where('name', 'like', "%{$term}%")
+                        ->orWhere('code', 'like', "%{$term}%");
+                });
+            })
+            ->orderBy('name')
+            ->limit($limit)
+            ->get();
+
+        return $channels
+            ->map(static function (Channel $channel): SearchResult {
+                $label = self::formatChannelLabel($channel);
+
+                return SearchResult::make((string) $channel->getKey(), $label);
+            })
+            ->all();
+    }
+
+    /**
+     * @return array<int, SearchResult>
+     */
+    private static function searchPartners(string $term, int $limit = 15): array
+    {
+        /** @var \Illuminate\Database\Eloquent\Collection<int, Partner> $partners */
+        $partners = Partner::query()
+            ->select(['id', 'name', 'code'])
+            ->when($term !== '', static function (Builder $builder) use ($term): void {
+                $builder->where(static function (Builder $query) use ($term): void {
+                    $query
+                        ->where('name', 'like', "%{$term}%")
+                        ->orWhere('code', 'like', "%{$term}%");
+                });
+            })
+            ->orderBy('name')
+            ->limit($limit)
+            ->get();
+
+        return $partners
+            ->map(static function (Partner $partner): SearchResult {
+                $label = self::formatPartnerLabel($partner);
+
+                return SearchResult::make((string) $partner->getKey(), $label);
+            })
+            ->all();
+    }
+
+    private static function formatChannelLabel(?Channel $channel): string
+    {
+        if (! $channel instanceof Channel) {
+            return '';
+        }
+
+        $code = $channel->getAttribute('code');
+        $name = $channel->getAttribute('name');
+
+        return trim(sprintf('[%s] %s', $code !== null && $code !== '' ? $code : '—', (string) ($name ?? '')));
+    }
+
+    private static function formatPartnerLabel(?Partner $partner): string
+    {
+        if (! $partner instanceof Partner) {
+            return '';
+        }
+
+        $code = $partner->getAttribute('code');
+        $name = $partner->getAttribute('name');
+
+        return trim(sprintf('[%s] %s', $code !== null && $code !== '' ? $code : '—', (string) ($name ?? '')));
+    }
+
+    /**
      * Get the relations for this resource.
      */
     public static function getRelations(): array
@@ -1003,6 +1313,15 @@ final class OrderResource extends Resource
         ];
     }
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with([
+            'user:id,name,email',
+            'shipping:id,order_id,status',
+            'channel:id,name',
+        ]);
+    }
+
     /**
      * Get the global search result details.
      */
@@ -1023,20 +1342,24 @@ final class OrderResource extends Resource
         $actions = [];
 
         try {
-            $actions[] = Action::make('view')
-                ->label(__('orders.actions.view'))
-                ->icon('heroicon-o-eye')
-                ->url(self::getUrl('view', ['record' => $record]));
-        } catch (Exception $e) {
+            if ($record instanceof Order && static::canView($record)) {
+                $actions[] = PageAction::make('view')
+                    ->label(__('orders.actions.view'))
+                    ->icon('heroicon-o-eye')
+                    ->url(self::getUrl('view', ['record' => $record]));
+            }
+        } catch (\Exception $e) {
             // Route might not exist, skip this action
         }
 
         try {
-            $actions[] = Action::make('edit')
-                ->label(__('orders.actions.edit'))
-                ->icon('heroicon-o-pencil')
-                ->url(self::getUrl('edit', ['record' => $record]));
-        } catch (Exception $e) {
+            if ($record instanceof Order && static::canEdit($record)) {
+                $actions[] = PageAction::make('edit')
+                    ->label(__('orders.actions.edit'))
+                    ->icon('heroicon-o-pencil')
+                    ->url(self::getUrl('edit', ['record' => $record]));
+            }
+        } catch (\Exception $e) {
             // Route might not exist, skip this action
         }
 

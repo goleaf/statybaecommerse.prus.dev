@@ -4,19 +4,24 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CustomerGroupResource\RelationManagers;
 
+
+use Filament\Schemas\Schema;
+use Filament\Forms;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class PriceListsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'priceLists';
 
     protected static ?string $title = 'customer_groups.relation_price_lists';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $schema): Schema   
     {
         return $schema
             ->schema([
@@ -28,8 +33,9 @@ final class PriceListsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->recordTitleAttribute('name')
             ->columns([
@@ -55,6 +61,7 @@ final class PriceListsRelationManager extends BaseRelationManager
                     ->label(__('price_lists.is_default')),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\AttachAction::make()
                     ->label(__('customer_groups.attach_price_list')),
             ])

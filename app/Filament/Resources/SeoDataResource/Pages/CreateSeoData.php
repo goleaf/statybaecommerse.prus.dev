@@ -15,6 +15,13 @@ final class CreateSeoData extends CreateRecord
 
     protected static string $resource = SeoDataResource::class;
 
+    protected function getHeaderActions(): array
+    {
+        return [
+            LocaleSwitcher::make(),
+        ];
+    }
+
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');

@@ -90,8 +90,20 @@ class RouteTest extends TestCase
         Category::factory()->create();
 
         // Create products
-        Product::factory()->create();
-        Product::factory()->create();
+        Product::factory()->create([
+            'status'         => 'published',
+            'is_visible'     => true,
+            'published_at'   => now()->subDay(),
+            'stock_quantity' => 25,
+            'manage_stock'   => true,
+        ]);
+        Product::factory()->create([
+            'status'         => 'published',
+            'is_visible'     => true,
+            'published_at'   => now()->subHours(2),
+            'stock_quantity' => 12,
+            'manage_stock'   => true,
+        ]);
 
         // Create brands
         \App\Models\Brand::factory()->create();
@@ -235,14 +247,15 @@ class RouteTest extends TestCase
      */
     public function test_product_routes(): void
     {
-        $product = Product::first();
+        $product = Product::query()->first();
+        $this->assertNotNull($product);
 
         // Test product catalog
         $response = $this->get('/products');
         $response->assertStatus(200);
 
         // Test single product
-        $response = $this->get("/products/{$product->id}");
+        $response = $this->get("/products/{$product->slug}");
         $response->assertStatus(200);
 
         // Test product history
@@ -274,7 +287,7 @@ class RouteTest extends TestCase
         // Test store product request
         $response = $this->post('/product-requests', [
             'product_id' => $product->id,
-            'message' => 'Test request message',
+            'message'    => 'Test request message',
         ]);
         $response->assertRedirect();
 
@@ -527,10 +540,10 @@ class RouteTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Security Audit');
 
-        // Test system monitoring
-        $response = $this->get('/admin/system-monitoring');
+        // Test observability dashboard
+        $response = $this->get('/admin/observability');
         $response->assertStatus(200);
-        $response->assertSee('System Monitoring');
+        $response->assertSee('Observability');
     }
 
     /**
@@ -561,16 +574,16 @@ class RouteTest extends TestCase
 
         // Test zone create
         $response = $this->post('/admin/zones/create', [
-            'name' => 'Test Zone',
-            'code' => 'TZ',
+            'name'       => 'Test Zone',
+            'code'       => 'TZ',
             'is_enabled' => true,
         ]);
         $response->assertRedirect();
 
         // Test zone update
         $response = $this->put("/admin/zones/{$zone->id}/edit", [
-            'name' => 'Updated Zone',
-            'code' => 'UZ',
+            'name'       => 'Updated Zone',
+            'code'       => 'UZ',
             'is_enabled' => true,
         ]);
         $response->assertRedirect();
@@ -716,8 +729,9 @@ class RouteTest extends TestCase
         $response = $this->get('/lt/products');
         $response->assertStatus(200);
 
-        $product = Product::first();
-        $response = $this->get("/lt/products/{$product->id}");
+        $product = Product::query()->first();
+        $this->assertNotNull($product);
+        $response = $this->get("/lt/products/{$product->slug}");
         $response->assertStatus(200);
 
         $response = $this->get("/lt/products/{$product->id}/history");
@@ -791,14 +805,14 @@ class RouteTest extends TestCase
 
         // Test news store
         $response = $this->post('/admin/news', [
-            'is_visible' => true,
+            'is_visible'   => true,
             'published_at' => now(),
-            'author_name' => 'Test Author',
+            'author_name'  => 'Test Author',
             'translations' => [
                 [
-                    'locale' => 'lt',
-                    'title' => 'Test Title',
-                    'slug' => 'test-title',
+                    'locale'  => 'lt',
+                    'title'   => 'Test Title',
+                    'slug'    => 'test-title',
                     'summary' => 'Test Summary',
                     'content' => 'Test Content',
                 ],
@@ -809,14 +823,14 @@ class RouteTest extends TestCase
         // Test news update
         $news = News::first();
         $response = $this->put("/admin/news/{$news->id}", [
-            'is_visible' => true,
+            'is_visible'   => true,
             'published_at' => now(),
-            'author_name' => 'Updated Author',
+            'author_name'  => 'Updated Author',
             'translations' => [
                 [
-                    'locale' => 'lt',
-                    'title' => 'Updated Title',
-                    'slug' => 'updated-title',
+                    'locale'  => 'lt',
+                    'title'   => 'Updated Title',
+                    'slug'    => 'updated-title',
                     'summary' => 'Updated Summary',
                     'content' => 'Updated Content',
                 ],
@@ -1077,8 +1091,8 @@ class RouteTest extends TestCase
 
         // Test location contact
         $response = $this->post("/locations/{$location->id}/contact", [
-            'name' => 'Test Name',
-            'email' => 'test@example.com',
+            'name'    => 'Test Name',
+            'email'   => 'test@example.com',
             'message' => 'Test message',
         ]);
         $response->assertStatus(200);

@@ -12,10 +12,10 @@ use Filament\Schemas\Schema;
 
 class SystemSettingCategoryForm
 {
-    public static function configure(Schema $schema): Schema
+    public static function configure(Form $form): Form
     {
-        return $schema
-            ->components([
+        return $form
+            ->schema([
                 TextInput::make('name')
                     ->required(),
                 TextInput::make('slug')

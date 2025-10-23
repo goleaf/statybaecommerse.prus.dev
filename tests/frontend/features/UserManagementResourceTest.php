@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Filament;
 
-use App\Filament\Resources\UserResource as UserManagementResource;
+use App\Filament\Resources\UserManagementResource;
 use App\Models\User;
+use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -160,7 +161,7 @@ class UserManagementResourceTest extends TestCase
         $url = UserManagementResource::getGlobalSearchResultUrl($targetUser);
 
         $this->assertIsString($url);
-        $this->assertStringContainsString('users', $url);
+        $this->assertStringContainsString('user-management', $url);
     }
 
     public function test_can_manage_user_roles(): void
@@ -189,13 +190,32 @@ class UserManagementResourceTest extends TestCase
     {
         $navigationGroup = UserManagementResource::getNavigationGroup();
 
-        $this->assertIsString($navigationGroup);
+        $this->assertSame(Nav::groupForResource(UserManagementResource::class), $navigationGroup);
     }
 
     public function test_user_management_resource_has_correct_navigation_icon(): void
     {
-        $navigationIcon = UserManagementResource::getNavigationIcon();
+        $this->assertSame(
+            Nav::iconForResource(UserManagementResource::class),
+            UserManagementResource::getNavigationIcon(),
+        );
+    }
 
-        $this->assertIsString($navigationIcon);
+    public function test_user_management_resource_registers_relation_managers(): void
+    {
+        $relations = UserManagementResource::getRelations();
+
+        $this->assertContains(
+            \App\Filament\Resources\UserManagementResource\RelationManagers\AddressesRelationManager::class,
+            $relations,
+        );
+        $this->assertContains(
+            \App\Filament\Resources\UserManagementResource\RelationManagers\OrdersRelationManager::class,
+            $relations,
+        );
+        $this->assertContains(
+            \App\Filament\Resources\UserManagementResource\RelationManagers\ReviewsRelationManager::class,
+            $relations,
+        );
     }
 }

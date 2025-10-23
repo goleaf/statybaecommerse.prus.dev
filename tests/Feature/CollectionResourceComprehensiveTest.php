@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Filament\Resources\CollectionResource;
+use App\Support\Nav;
 use App\Models\Collection;
 use App\Models\Product;
 use App\Models\User;
+use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -46,7 +48,10 @@ class CollectionResourceComprehensiveTest extends TestCase
         $navigationGroupProperty = $reflection->getProperty('navigationGroup');
         $navigationGroupProperty->setAccessible(true);
 
-        $this->assertEquals('Products', $navigationGroupProperty->getValue());
+        $this->assertEquals(
+            Nav::groupForResource(CollectionResource::class),
+            $navigationGroupProperty->getValue()
+        );
     }
 
     public function test_collection_resource_form_method_exists(): void
@@ -77,7 +82,10 @@ class CollectionResourceComprehensiveTest extends TestCase
     public function test_collection_resource_get_navigation_group(): void
     {
         $this->assertIsString(CollectionResource::getNavigationGroup());
-        $this->assertEquals('Products', CollectionResource::getNavigationGroup());
+        $this->assertEquals(
+            Nav::groupForResource(CollectionResource::class),
+            CollectionResource::getNavigationGroup()
+        );
     }
 
     public function test_collection_resource_get_plural_model_label(): void

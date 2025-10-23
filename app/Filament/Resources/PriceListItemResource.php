@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\PriceListItemResource\Pages;
 use App\Models\PriceListItem;
 use App\Models\Product;
@@ -15,15 +17,15 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -31,12 +33,14 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
-use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 /**
  * PriceListItemResource
  *
@@ -50,9 +54,9 @@ final class PriceListItemResource extends Resource
 
     protected static ?int $navigationSort = 16;
 
-    protected static ?string $recordTitleAttribute = 'product.name';
+    protected static UnitEnum|string|null $navigationGroup = 'Products';
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
     {
         return 'heroicon-o-currency-euro';
     }
@@ -89,9 +93,9 @@ final class PriceListItemResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('price_list_items.basic_information'))
                     ->schema([
@@ -172,6 +176,7 @@ final class PriceListItemResource extends Resource
                                     ->default(true),
                                 Toggle::make('is_featured')
                                     ->label(__('price_list_items.is_featured'))
+                                    ->default(false)
                                     ->helperText(__('price_list_items.is_featured_help')),
                             ]),
                     ]),
@@ -193,8 +198,9 @@ final class PriceListItemResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('priceList.name')
@@ -326,12 +332,16 @@ final class PriceListItemResource extends Resource
                 Filter::make('has_discount')
                     ->label(__('price_list_items.has_discount'))
                     ->query(fn (Builder $query): Builder => $query->where(function (Builder $query): void {
-                        $query->whereNotNull('compare_amount')->where('compare_amount', '>', 0);
+                        // Ensure only items with a meaningful discount (compare price higher than net price) are returned.
+                        $query
+                            ->whereNotNull('compare_amount')
+                            ->whereNotNull('net_amount')
+                            ->whereColumn('compare_amount', '>', 'net_amount');
                     }))
                     ->toggle(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 EditAction::make(),
                 Action::make('toggle_active')
                     ->label(fn (PriceListItem $record): string => $record->is_active ? __('price_list_items.deactivate') : __('price_list_items.activate'))

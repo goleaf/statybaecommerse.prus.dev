@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingCategoryResource\RelationManagers;
 
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+
+use Filament\Schemas\Schema;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -22,8 +23,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Str;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class SettingsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'settings';
@@ -34,7 +36,7 @@ final class SettingsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Settings';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $schema): Schema   
     {
         return $schema->schema([
             Section::make(__('system_setting_categories.settings.basic_information'))
@@ -126,8 +128,9 @@ final class SettingsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->columns([
                 TextColumn::make('key')
@@ -141,10 +144,10 @@ final class SettingsRelationManager extends BaseRelationManager
                     ->searchable()
                     ->sortable()
                     ->limit(50)
-                    ->tooltip(function (TextColumn $column): ?string {
+                    ->tooltip(static function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        return strlen($state) > 50 ? $state : null;
+                        return is_string($state) && mb_strlen($state) > 50 ? $state : null;
                     }),
 
                 TextColumn::make('type')
@@ -168,20 +171,20 @@ final class SettingsRelationManager extends BaseRelationManager
                 TextColumn::make('default_value')
                     ->label(__('system_setting_categories.settings.default_value'))
                     ->limit(30)
-                    ->tooltip(function (TextColumn $column): ?string {
+                    ->tooltip(static function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        return strlen($state) > 30 ? $state : null;
+                        return is_string($state) && mb_strlen($state) > 30 ? $state : null;
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('description')
                     ->label(__('system_setting_categories.settings.description'))
                     ->limit(50)
-                    ->tooltip(function (TextColumn $column): ?string {
+                    ->tooltip(static function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        return strlen($state) > 50 ? $state : null;
+                        return is_string($state) && mb_strlen($state) > 50 ? $state : null;
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
 
@@ -230,15 +233,15 @@ final class SettingsRelationManager extends BaseRelationManager
                     ->native(false),
             ])
             ->headerActions([
-                CreateAction::make(),
+                Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-                ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                DeleteBulkAction::make(),
+                Tables\Actions\DeleteBulkAction::make(),
             ])
             ->defaultSort('sort_order');
     }

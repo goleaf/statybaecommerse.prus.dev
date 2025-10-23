@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Channels\Schemas;
 
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
-use Str;
+use Filament\Schemas\Schema;
 
 class ChannelForm
 {
-    public static function configure(Form $form): Form
+    public static function configure(Schema $form): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.channels.basic_information'))
                     ->schema([

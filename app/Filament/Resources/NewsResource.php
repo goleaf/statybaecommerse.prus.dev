@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Enums\ModerationState;
+use App\Filament\Components\Combobox;
 use App\Filament\Resources\NewsResource\Pages;
 use App\Filament\Resources\NewsResource\RelationManagers;
 use App\Models\News;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Infolists;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -19,6 +20,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -28,7 +30,7 @@ use RuntimeException;
 
 class NewsResource extends Resource
 {
-    protected static ?string $model = News::class;
+    use HasNav;
 
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
@@ -41,9 +43,9 @@ class NewsResource extends Resource
 
     protected static ?string $pluralModelLabel = 'News Articles';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->components([
+        return $schema->components([
             Forms\Components\Section::make('Article Information')
                 ->components([
                     LanguageTabs::make([
@@ -139,24 +141,27 @@ class NewsResource extends Resource
                     Combobox::make('categories')
                         ->label(__('news.fields.categories'))
                         ->relationship('categories', 'name')
-                        ->boxSearchs()
                         ->height('320px')
-                        ->optionsLabel(__('news.combobox.categories.available'))
-                        ->selectedLabel(__('news.combobox.categories.selected')),
+                        ->translatedLabels(
+                            'news.combobox.categories.available',
+                            'news.combobox.categories.selected',
+                        ),
                     Combobox::make('tags')
                         ->label(__('news.fields.tags'))
                         ->relationship('tags', 'name')
-                        ->boxSearchs()
                         ->height('320px')
-                        ->optionsLabel(__('news.combobox.tags.available'))
-                        ->selectedLabel(__('news.combobox.tags.selected')),
+                        ->translatedLabels(
+                            'news.combobox.tags.available',
+                            'news.combobox.tags.selected',
+                        ),
                 ])
                 ->columns(2),
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 Tables\Columns\ImageColumn::make('featured_image')
@@ -382,8 +387,9 @@ class NewsResource extends Resource
             ->defaultSort('published_at', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Schema $schema): Schema   
     {
+        // Provide the infolist schema using the Filament v4 return type.
         return $schema
             ->components([
                 Infolists\Components\Section::make('Article Details')
@@ -472,9 +478,14 @@ class NewsResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
-            ->withoutGlobalScopes([
+        $query = parent::getEloquentQuery();
+
+        if (in_array(SoftDeletes::class, class_uses_recursive(static::getModel()))) {
+            $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+        }
+
+        return $query;
     }
 }

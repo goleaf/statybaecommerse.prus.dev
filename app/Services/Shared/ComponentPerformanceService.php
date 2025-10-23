@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services\Shared;
 
+use App\Support\Telemetry\TelemetryManager;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use OpenTelemetry\API\Trace\SpanInterface;
 
 /**
  * ComponentPerformanceService
@@ -19,27 +21,36 @@ final class ComponentPerformanceService
     private const METRICS_TTL = 3600;
 
     // 1 hour
+    public function __construct(private readonly TelemetryManager $telemetry)
+    {
+    }
+
     /**
      * Handle trackComponentRender functionality with proper error handling.
      */
     public function trackComponentRender(string $component, float $renderTime): void
     {
-        $metrics = $this->getMetrics();
-        if (! isset($metrics[$component])) {
-            $metrics[$component] = ['total_renders' => 0, 'total_time' => 0, 'avg_time' => 0, 'min_time' => PHP_FLOAT_MAX, 'max_time' => 0, 'last_render' => null];
-        }
-        $metrics[$component]['total_renders']++;
-        $metrics[$component]['total_time'] += $renderTime;
-        $metrics[$component]['avg_time'] = $metrics[$component]['total_time'] / $metrics[$component]['total_renders'];
-        $metrics[$component]['min_time'] = min($metrics[$component]['min_time'], $renderTime);
-        $metrics[$component]['max_time'] = max($metrics[$component]['max_time'], $renderTime);
-        $metrics[$component]['last_render'] = now()->toISOString();
-        $this->saveMetrics($metrics);
-        // Log slow components
-        if ($renderTime > 100) {
-            // 100ms threshold
-            Log::warning('Slow component render detected', ['component' => $component, 'render_time' => $renderTime, 'avg_time' => $metrics[$component]['avg_time']]);
-        }
+        $this->telemetry->inSpan('components.render', function (?SpanInterface $span) use ($component, $renderTime): void {
+            $metrics = $this->getMetrics();
+            if (! isset($metrics[$component])) {
+                $metrics[$component] = ['total_renders' => 0, 'total_time' => 0, 'avg_time' => 0, 'min_time' => PHP_FLOAT_MAX, 'max_time' => 0, 'last_render' => null];
+            }
+            $metrics[$component]['total_renders']++;
+            $metrics[$component]['total_time'] += $renderTime;
+            $metrics[$component]['avg_time'] = $metrics[$component]['total_time'] / $metrics[$component]['total_renders'];
+            $metrics[$component]['min_time'] = min($metrics[$component]['min_time'], $renderTime);
+            $metrics[$component]['max_time'] = max($metrics[$component]['max_time'], $renderTime);
+            $metrics[$component]['last_render'] = now()->toISOString();
+            $this->saveMetrics($metrics);
+            $span?->setAttribute('component.name', $component);
+            $span?->setAttribute('component.render_time', $renderTime);
+            $span?->setAttribute('component.render_count', $metrics[$component]['total_renders']);
+            if ($renderTime > 100) {
+                Log::warning('Slow component render detected', ['component' => $component, 'render_time' => $renderTime, 'avg_time' => $metrics[$component]['avg_time']]);
+            }
+        }, [
+            'component.name' => $component,
+        ]);
     }
 
     /**

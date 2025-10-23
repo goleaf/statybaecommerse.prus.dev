@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\CartItemResource\Widgets;
 
 use App\Models\CartItem;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,8 +17,9 @@ final class LowStockCartItemsWidget extends BaseWidget
 
     protected static ?string $heading = 'Low Stock Cart Items';
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->query(
                 CartItem::query()

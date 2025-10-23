@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use BackedEnum;
 use App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
 use App\Models\Product;
-use BackedEnum;
+use Filament\Actions\BulkAction;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Pages\Page;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
@@ -16,7 +16,9 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
+use BackedEnum;
 
+use BackedEnum;
 final class InventoryManagement extends Page implements HasTable
 {
     use ConfiguresToggleableTableLayout;
@@ -28,9 +30,11 @@ final class InventoryManagement extends Page implements HasTable
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
 
-    public static function getNavigationGroup(): ?string
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-archive-box';
+
+    public static function getNavigationGroup(): BackedEnum|string|null
     {
-        return 'Products';
+        return 'Products'; // Keep stock controls grouped with the rest of the product catalog tools.
     }
 
     public static function getSlug(?\Filament\Panel $panel = null): string
@@ -43,8 +47,9 @@ final class InventoryManagement extends Page implements HasTable
         return 'Inventory Management';
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the Filament table definition for the resource.
         $table = $table
             ->query(Product::query())
             ->columns([
@@ -61,9 +66,10 @@ final class InventoryManagement extends Page implements HasTable
                                 'decrease' => 'Decrease',
                             ])
                             ->required(),
-                        TextInput::make('quantity')
-                            ->numeric()
+                        Quantity::make('quantity')
                             ->minValue(0)
+                            ->steps(1)
+                            ->default(0)
                             ->required(),
                     ])
                     ->action(function (array $data, $records): void {
@@ -84,6 +90,6 @@ final class InventoryManagement extends Page implements HasTable
                     }),
             ]);
 
-        return $this->applyToggleableTableLayout($table);
+        return $this->applyToggleableTableLayout($table); // Reuse the helper to apply saved column visibility.
     }
 }

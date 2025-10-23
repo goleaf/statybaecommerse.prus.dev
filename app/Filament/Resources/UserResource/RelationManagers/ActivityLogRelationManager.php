@@ -4,19 +4,24 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\UserResource\RelationManagers;
 
+
+use Filament\Schemas\Schema;
+use Filament\Forms;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class ActivityLogRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'activities';
 
     protected static ?string $title = 'admin.sections.activity_log';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $schema): Schema   
     {
         return $schema
             ->components([
@@ -31,8 +36,9 @@ final class ActivityLogRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->recordTitleAttribute('description')
             ->columns([

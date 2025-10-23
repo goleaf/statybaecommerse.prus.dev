@@ -4,31 +4,35 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Enums\ModerationState;
 use App\Filament\Resources\PostResource\Pages;
 use App\Filament\Resources\PostResource\RelationManagers;
 use App\Models\Post;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Seo\LocaleUrlGenerator;
+use Awcodes\BadgeableColumn\Components\Badge;
+use Awcodes\BadgeableColumn\Components\BadgeableColumn;
 use BackedEnum;
 use Filament\Forms;
-use Filament\Forms\Components\Grid;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
@@ -38,6 +42,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -51,7 +56,10 @@ use pxlrbt\FilamentExcel\Columns\Column as ExcelColumn;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use RuntimeException;
 use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 /**
  * PostResource
  *
@@ -59,10 +67,9 @@ use UnitEnum;
  */
 final class PostResource extends Resource
 {
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Content';
-    }
+    use HasNav;
+
+    
 
     protected static ?string $model = Post::class;
 
@@ -71,9 +78,9 @@ final class PostResource extends Resource
     protected static ?string $recordTitleAttribute = 'title';
 
     /**
-     * @var string|BackedEnum|null
+     * @var string|\BackedEnum|null
      */
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
     {
         return 'heroicon-o-document-text';
     }
@@ -105,9 +112,9 @@ final class PostResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->components([
                 Section::make(__('posts.sections.basic_information'))
                     ->components([
@@ -132,7 +139,17 @@ final class PostResource extends Resource
                                 ->columnSpanFull(),
                         ]),
                         Grid::make(2)
-                            ->components([
+                            ->schema([
+                                TextInput::make('title')
+                                    ->label(__('posts.fields.title'))
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->live()
+                                    ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set, ?string $state): void {
+                                        if (! $get('slug') && filled($state)) {
+                                            $set('slug', Str::slug($state));
+                                        }
+                                    }),
                                 TextInput::make('slug')
                                     ->label(__('posts.fields.slug'))
                                     ->required()
@@ -252,8 +269,9 @@ final class PostResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 SpatieMediaLibraryImageColumn::make('images')
@@ -262,7 +280,7 @@ final class PostResource extends Resource
                     ->conversion('thumb')
                     ->circular()
                     ->size(50),
-                TextColumn::make('title')
+                BadgeableColumn::make('title')
                     ->label(__('posts.fields.title'))
                     ->searchable()
                     ->sortable()
@@ -316,36 +334,40 @@ final class PostResource extends Resource
                     ->label(__('posts.fields.user_id'))
                     ->sortable()
                     ->searchable(),
-                BadgeColumn::make('moderation_state')
+                BadgeableColumn::make('moderation_state')
                     ->label(__('posts.fields.moderation_state'))
-                    ->formatStateUsing(fn (?ModerationState $state): ?string => $state?->label())
-                    ->colors([
-                        'warning' => fn (?ModerationState $state): bool => $state === ModerationState::Draft,
-                        'info'    => fn (?ModerationState $state): bool => $state === ModerationState::Review,
-                        'success' => fn (?ModerationState $state): bool => $state === ModerationState::Published,
-                    ])
-                    ->sortable(),
-                BadgeColumn::make('status')
-                    ->label(__('posts.fields.status'))
-                    ->colors([
-                        'warning' => 'draft',
-                        'success' => 'published',
-                        'danger'  => 'archived',
-                    ]),
-                IconColumn::make('featured')
-                    ->label(__('posts.fields.featured'))
-                    ->boolean()
-                    ->trueIcon('heroicon-o-star')
-                    ->falseIcon('heroicon-o-star')
-                    ->trueColor('warning')
-                    ->falseColor('gray'),
-                IconColumn::make('is_pinned')
-                    ->label(__('posts.fields.is_pinned'))
-                    ->boolean()
-                    ->trueIcon('heroicon-o-thumbtack')
-                    ->falseIcon('heroicon-o-thumbtack')
-                    ->trueColor('success')
-                    ->falseColor('gray'),
+                    ->formatStateUsing(fn (?ModerationState $state): string => $state?->label() ?? __('posts.badges.moderation_unknown'))
+                    ->sortable()
+                    ->asPills()
+                    ->prefixBadges(function (Post $record): array {
+                        // Pair workflow moderation with publishing status for faster review triage.
+                        $statusColor = match ($record->status) {
+                            'published' => 'success',
+                            'archived'  => 'danger',
+                            'draft'     => 'warning',
+                            default     => 'gray',
+                        };
+
+                        return [
+                            Badge::make('status')
+                                ->label(__('posts.status.' . $record->status))
+                                ->color($statusColor),
+                        ];
+                    })
+                    ->suffixBadges(function (Post $record): array {
+                        // Surface promotional flags and comment settings inline with moderation.
+                        return collect([
+                            Badge::make('featured')
+                                ->label($record->featured ? __('posts.badges.featured') : __('posts.badges.standard'))
+                                ->color($record->featured ? 'warning' : 'gray'),
+                            Badge::make('pinned')
+                                ->label($record->is_pinned ? __('posts.badges.pinned') : __('posts.badges.not_pinned'))
+                                ->color($record->is_pinned ? 'success' : 'gray'),
+                            Badge::make('comments')
+                                ->label($record->allow_comments ? __('posts.badges.comments_on') : __('posts.badges.comments_off'))
+                                ->color($record->allow_comments ? 'primary' : 'gray'),
+                        ])->filter()->values()->all();
+                    }),
                 TextColumn::make('published_at')
                     ->label(__('posts.fields.published_at'))
                     ->dateTime()
@@ -404,7 +426,7 @@ final class PostResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 EditAction::make(),
-                Action::make('submit_for_review')
+                TableAction::make('submit_for_review')
                     ->label(__('moderation.actions.submit_for_review'))
                     ->icon('heroicon-o-paper-airplane')
                     ->color('info')
@@ -428,7 +450,7 @@ final class PostResource extends Resource
                             ->success()
                             ->send();
                     }),
-                Action::make('approve')
+                TableAction::make('approve')
                     ->label(__('moderation.actions.approve'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
@@ -476,7 +498,7 @@ final class PostResource extends Resource
                             ->success()
                             ->send();
                     }),
-                Action::make('request_changes')
+                TableAction::make('request_changes')
                     ->label(__('moderation.actions.return_to_draft'))
                     ->icon('heroicon-o-arrow-uturn-left')
                     ->color('warning')
@@ -524,6 +546,133 @@ final class PostResource extends Resource
                             ->warning()
                             ->send();
                     }),
+                TableAction::make('publish')
+                    ->label(__('posts.actions.publish'))
+                    ->icon('heroicon-o-megaphone')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->visible(fn (Post $record): bool => ! $record->isPublished() && ! $record->isArchived())
+                    ->action(function (Post $record): void {
+                        $userId = Auth::id();
+
+                        $record->update([
+                            'status'                  => 'published',
+                            'moderation_state'        => ModerationState::Published,
+                            'submitted_for_review_at' => $record->submitted_for_review_at ?? now(),
+                            'approved_at'             => $record->approved_at ?? now(),
+                            'approved_by_id'          => $record->approved_by_id ?? $userId,
+                            'published_at'            => $record->published_at ?? now(),
+                        ]);
+
+                        activity()
+                            ->performedOn($record)
+                            ->causedBy(Auth::user())
+                            ->event('published')
+                            ->log('Post manually published');
+
+                        Notification::make()
+                            ->title(__('posts.messages.published'))
+                            ->success()
+                            ->send();
+                    }),
+                TableAction::make('unpublish')
+                    ->label(__('posts.actions.unpublish'))
+                    ->icon('heroicon-o-eye-slash')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->visible(fn (Post $record): bool => $record->isPublished())
+                    ->action(function (Post $record): void {
+                        $record->update([
+                            'status'                  => 'draft',
+                            'moderation_state'        => ModerationState::Draft,
+                            'submitted_for_review_at' => null,
+                            'approved_at'             => null,
+                            'approved_by_id'          => null,
+                            'published_at'            => null,
+                        ]);
+
+                        activity()
+                            ->performedOn($record)
+                            ->causedBy(Auth::user())
+                            ->event('unpublished')
+                            ->log('Post manually unpublished');
+
+                        Notification::make()
+                            ->title(__('posts.messages.unpublished'))
+                            ->warning()
+                            ->send();
+                    }),
+                TableAction::make('archive')
+                    ->label(__('posts.actions.archive'))
+                    ->icon('heroicon-o-archive-box')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->visible(fn (Post $record): bool => ! $record->isArchived())
+                    ->action(function (Post $record): void {
+                        $record->update([
+                            'status'                  => 'archived',
+                            'moderation_state'        => ModerationState::Draft,
+                            'submitted_for_review_at' => null,
+                            'approved_at'             => null,
+                            'approved_by_id'          => null,
+                        ]);
+
+                        activity()
+                            ->performedOn($record)
+                            ->causedBy(Auth::user())
+                            ->event('archived')
+                            ->log('Post archived');
+
+                        Notification::make()
+                            ->title(__('posts.messages.archived'))
+                            ->success()
+                            ->send();
+                    }),
+                TableAction::make('feature')
+                    ->label(__('posts.actions.feature'))
+                    ->icon('heroicon-o-star')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->visible(fn (Post $record): bool => ! $record->featured)
+                    ->action(function (Post $record): void {
+                        $record->update([
+                            'featured' => true,
+                        ]);
+
+                        activity()
+                            ->performedOn($record)
+                            ->causedBy(Auth::user())
+                            ->event('featured')
+                            ->log('Post marked as featured');
+
+                        Notification::make()
+                            ->title(__('posts.messages.featured'))
+                            ->success()
+                            ->send();
+                    }),
+                TableAction::make('unfeature')
+                    ->label(__('posts.actions.unfeature'))
+                    ->icon('heroicon-o-star')
+                    ->color('gray')
+                    ->requiresConfirmation()
+                    ->visible(fn (Post $record): bool => $record->featured)
+                    ->action(function (Post $record): void {
+                        $record->update([
+                            'featured' => false,
+                        ]);
+
+                        activity()
+                            ->performedOn($record)
+                            ->causedBy(Auth::user())
+                            ->event('unfeatured')
+                            ->log('Post unmarked as featured');
+
+                        Notification::make()
+                            ->title(__('posts.messages.unfeatured'))
+                            ->info()
+                            ->send();
+                    }),
+                DeleteAction::make(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -545,6 +694,20 @@ final class PostResource extends Resource
                 ]),
             ])
             ->defaultSort('published_at', 'desc');
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with(['user:id,name']);
+    }
+
+    /**
+     * @return Builder<Post>
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with(['user:id,name']);
     }
 
     /**

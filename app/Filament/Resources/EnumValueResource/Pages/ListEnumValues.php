@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ListEnumValues extends BaseListRecords
 {
+    use HasResizableColumns;
     use HasWidgetTabs;
 
     protected static string $resource = EnumValueResource::class;
@@ -27,9 +28,8 @@ class ListEnumValues extends BaseListRecords
     public function getWidgetTabs(): array
     {
         return [
-            'all' => WidgetTab::make('All Enum Values')
-                ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
-            'product_status' => WidgetTab::make('Product Status')
+            'all'            => Tab::make('All Enum Values'),
+            'product_status' => Tab::make('Product Status')
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'product_status'))
                 ->value(fn () => $this->getResource()::getModel()::where('type', 'product_status')->count()),
             'order_status' => WidgetTab::make('Order Status')
@@ -60,5 +60,13 @@ class ListEnumValues extends BaseListRecords
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'review_status'))
                 ->value(fn () => $this->getResource()::getModel()::where('type', 'review_status')->count()),
         ];
+
+        foreach (EnumValue::getTypes() as $type => $label) {
+            $tabs[$type] = Tab::make($label)
+                ->modifyQueryUsing(fn (Builder $query): Builder => $query->where('type', $type))
+                ->badge(fn () => $this->getResource()::getModel()::where('type', $type)->count());
+        }
+
+        return $tabs;
     }
 }

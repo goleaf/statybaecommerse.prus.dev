@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\AnalyticsResource\Pages;
 use App\Models\Order;
@@ -12,7 +14,7 @@ use App\Support\Filament\Filters\DateRangeFilter;
 use BackedEnum;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\Summarizers\Average;
 use Filament\Tables\Columns\Summarizers\Count;
 use Filament\Tables\Columns\Summarizers\Sum;
@@ -21,12 +23,15 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class AnalyticsResource extends Resource
 {
-    protected static ?string $model = Order::class;
+    use TranslatableResource;
 
     /**
      * Mirror the Filament base class union so icon definitions support both enum-backed and string identifiers.
@@ -66,19 +71,19 @@ final class AnalyticsResource extends Resource
         return $count > 0 ? (string) $count : null;
     }
 
-    public static function getNavigationBadgeColor(): ?string
+    public static function getNavigationBadgeColor(): string|array|null
     {
         return 'warning';
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        // Keep the dashboard read-only by returning the base form configuration untouched.
-        return $form;
+        return $schema;
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             // Preload frequently accessed relationships so table metrics do not suffer from N+1 queries.
             ->modifyQueryUsing(
@@ -100,7 +105,7 @@ final class AnalyticsResource extends Resource
                     ]),
                 // Preserve the localized order date column but keep the explicit accessor for clarity.
                 TextColumn::make('order_date')
-                    ->label(__('analytics.order_date'))
+                    ->label(__('analytics.columns.order_date'))
                     ->date()
                     ->sortable()
                     ->getStateUsing(static fn (Order $record) => $record->created_at)

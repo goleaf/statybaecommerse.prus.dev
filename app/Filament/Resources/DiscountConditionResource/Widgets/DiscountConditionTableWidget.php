@@ -9,28 +9,38 @@ use Filament\Actions\EditAction;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 final class DiscountConditionTableWidget extends BaseWidget
 {
     protected int|string|array $columnSpan = 'full';
 
-    protected static ?string $heading = 'Recent Discount Conditions';
+    protected static ?string $heading = null;
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->query(
-                DiscountCondition::query()->latest()->limit(10)
+                DiscountCondition::query()->latest('created_at')->limit(10)
             )
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                Tables\Columns\TextColumn::make('translated_name')
                     ->label(__('discount_conditions.name'))
+                    ->placeholder('—')
                     ->searchable()
                     ->sortable()
                     ->limit(50),
                 Tables\Columns\TextColumn::make('type')
                     ->label(__('discount_conditions.type'))
-                    ->formatStateUsing(fn (string $state): string => __("discount_conditions.types.{$state}"))
+                    ->formatStateUsing(fn (string $state): string => __('discount_conditions.types.' . Str::slug($state, '_')))
+                    ->badge()
+                    ->color(fn (string $state): string => $this->typeColor($state))
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('operator')
+                    ->label(__('discount_conditions.operator'))
+                    ->formatStateUsing(fn (string $state): string => __('discount_conditions.operators.' . Str::slug($state, '_')))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'minimum_amount'   => 'blue',
@@ -49,14 +59,11 @@ final class DiscountConditionTableWidget extends BaseWidget
                         default            => $state ?? '-',
                     })
                     ->sortable(),
-                Tables\Columns\TextColumn::make('valid_from')
-                    ->label(__('discount_conditions.valid_from'))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('valid_until')
-                    ->label(__('discount_conditions.valid_until'))
-                    ->dateTime()
+                Tables\Columns\TextColumn::make('priority')
+                    ->label(__('discount_conditions.priority'))
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('position')
+                    ->label(__('discount_conditions.position'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('is_active')

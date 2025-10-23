@@ -5,13 +5,13 @@ declare(strict_types=1);
 use App\Http\Controllers\Api\AuditLogController;
 use App\Http\Controllers\Api\AuthenticatedUserController;
 use App\Http\Controllers\Api\AutocompleteSearchController;
-use App\Http\Controllers\Api\SignedExportDownloadController;
+use App\Http\Controllers\Api\ExportDownloadController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\SearchController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')
-    ->middleware('throttle:api.default')
+    ->middleware('throttle:api.read')
     ->name('api.v1.')
     ->group(function (): void {
         Route::get('/health', [HealthController::class, 'health'])
@@ -21,16 +21,19 @@ Route::prefix('v1')
             ->name('ready');
 
         Route::get('/search', SearchController::class)
-            ->middleware(['throttle:api.default'])
             ->name('search');
 
         Route::middleware('auth:sanctum')->group(function (): void {
             Route::get('/user', AuthenticatedUserController::class)
-                ->middleware(['abilities:profile.read', 'throttle:api.profile'])
+                // Ability checks are handled inside ShowAuthenticatedUserRequest so we only keep the
+                // dedicated profile rate limit middleware on the route definition itself.
+                ->middleware(['throttle:api.profile'])
                 ->name('user.show');
 
             Route::post('/autocomplete-search', AutocompleteSearchController::class)
-                ->middleware(['abilities:system.autocomplete', 'throttle:api.autocomplete'])
+                // AutocompleteRequest performs the Sanctum ability validation which keeps response
+                // messaging consistent with the rest of our API layer while we retain rate limiting.
+                ->middleware(['throttle:api.autocomplete'])
                 ->withoutMiddleware('throttle:api.default')
                 ->name('autocomplete.search');
 
@@ -39,7 +42,7 @@ Route::prefix('v1')
     });
 
 Route::get('exports/download/{export:uuid}', SignedExportDownloadController::class)
-    ->middleware(['signed'])
+    ->middleware(['signed', 'auth:sanctum', 'abilities:exports.download', 'throttle:api.exports'])
     ->name('exports.signed-download');
 
 Route::prefix('partner')
@@ -50,5 +53,8 @@ Route::prefix('partner')
     });
 
 Route::get('audit-logs', [AuditLogController::class, 'index'])
-    ->middleware(['throttle:api.default'])
+    ->middleware(['throttle:api.read'])
     ->name('api.audit-logs.index');
+
+// Pull in the legacy campaign click endpoints until we consolidate them under the versioned API namespace.
+require base_path('routes/campaign-clicks.php');

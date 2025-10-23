@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\OrderShippingResource\Pages;
 use App\Models\Order;
 use App\Models\OrderShipping;
@@ -16,35 +18,44 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class OrderShippingResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = OrderShipping::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
     {
         return Heroicon::OutlinedRectangleStack;
     }
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Orders';
-    }
+    
 
     protected static ?int $navigationSort = 3;
 
@@ -63,9 +74,9 @@ final class OrderShippingResource extends Resource
         return __('admin.order_shippings.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('admin.order_shippings.basic_information'))
                 ->description(__('admin.order_shippings.basic_information_description'))
                 ->schema([
@@ -91,7 +102,8 @@ final class OrderShippingResource extends Resource
                         )
                         ->required()
                         ->searchable()
-                        ->preload(),
+                        ->preload()
+                        ->placeholder(__('shared.select_option')),
                     Grid::make(2)
                         ->schema([
                             TextInput::make('carrier_name')
@@ -147,8 +159,9 @@ final class OrderShippingResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('order.number')

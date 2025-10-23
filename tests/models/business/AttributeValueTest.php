@@ -1,8 +1,6 @@
-<?php
+<?php declare(strict_types=1);
 
-declare(strict_types=1);
-
-namespace Tests\Unit;
+namespace Tests\Models\Business;
 
 use App\Models\Attribute;
 use App\Models\AttributeValue;

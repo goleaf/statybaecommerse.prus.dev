@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CustomerManagementResource\RelationManagers;
 
+use App\Forms\Components\Flatpickr;
 use App\Enums\OrderStatus;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\Order;
@@ -12,15 +13,15 @@ use App\Support\Filament\SearchableInputHelper;
 use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\AssociateAction;
-use Filament\Actions\BulkActionGroup;
+use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\DissociateAction;
 use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Set;
@@ -36,12 +37,13 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
+use App\Support\Filament\SearchableInputHelper;
 
 class OrdersRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'orders';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $schema): Schema   
     {
         return $schema
             ->components([
@@ -91,10 +93,10 @@ class OrdersRelationManager extends BaseRelationManager
                                     },
                                 );
                             })
-                            ->afterStateUpdated(function (?string $state, Set $set): void {
+                            ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
                                 if ($state === null || $state === '') {
                                     // Clear persisted status when wiped.
-                                    SearchableInputHelper::clear($set, ['status' => null]);
+                                    SearchableInputHelper::clear($component, $set, ['status' => null]);
 
                                     return;
                                 }
@@ -113,12 +115,90 @@ class OrdersRelationManager extends BaseRelationManager
                     ]),
                 Section::make(__('orders.shipping_information'))
                     ->schema([
-                        TextInput::make('shipping_address')
-                            ->label(__('orders.shipping_address'))
-                            ->maxLength(500),
-                        TextInput::make('billing_address')
-                            ->label(__('orders.billing_address'))
-                            ->maxLength(500),
+                        Grid::make(2)
+                            ->schema([
+                                SearchableInput::make('shipping_address_lookup')
+                                    ->label(__('orders.shipping_address'))
+                                    ->placeholder(__('orders.placeholders.shipping_address'))
+                                    ->helperText(__('orders.helpers.shipping_address'))
+                                    ->searchUsing(fn (string $term): array => AddressSearch::results($term))
+                                    ->afterStateHydrated(function (SearchableInput $component, $state, ?Order $record): void {
+                                        $payload = $record?->getAttribute('shipping_address');
+
+                                        if (! is_array($payload) || ! isset($payload['address_id'])) {
+                                            return;
+                                        }
+
+                                        $id = (int) $payload['address_id'];
+                                        $label = (string) ($payload['label'] ?? AddressSearch::formatPayload($payload));
+
+                                        $component
+                                            ->state((string) $id)
+                                            ->options([
+                                                (string) $id => $label,
+                                            ]);
+                                    })
+                                    ->afterStateUpdated(function (?string $state, callable $set): void {
+                                        if ($state === null || $state === '') {
+                                            $set('shipping_address', null);
+
+                                            return;
+                                        }
+
+                                        $payload = AddressSearch::payloadFromId((int) $state);
+
+                                        if ($payload !== null) {
+                                            $set('shipping_address', $payload);
+                                        }
+                                    })
+                                    ->dehydrated(false),
+                                SearchableInput::make('billing_address_lookup')
+                                    ->label(__('orders.billing_address'))
+                                    ->placeholder(__('orders.placeholders.billing_address'))
+                                    ->helperText(__('orders.helpers.billing_address'))
+                                    ->searchUsing(fn (string $term): array => AddressSearch::results($term))
+                                    ->afterStateHydrated(function (SearchableInput $component, $state, ?Order $record): void {
+                                        $payload = $record?->getAttribute('billing_address');
+
+                                        if (! is_array($payload) || ! isset($payload['address_id'])) {
+                                            return;
+                                        }
+
+                                        $id = (int) $payload['address_id'];
+                                        $label = (string) ($payload['label'] ?? AddressSearch::formatPayload($payload));
+
+                                        $component
+                                            ->state((string) $id)
+                                            ->options([
+                                                (string) $id => $label,
+                                            ]);
+                                    })
+                                    ->afterStateUpdated(function (?string $state, callable $set): void {
+                                        if ($state === null || $state === '') {
+                                            $set('billing_address', null);
+
+                                            return;
+                                        }
+
+                                        $payload = AddressSearch::payloadFromId((int) $state);
+
+                                        if ($payload !== null) {
+                                            $set('billing_address', $payload);
+                                        }
+                                    })
+                                    ->dehydrated(false),
+                            ]),
+                        Grid::make(2)
+                            ->schema([
+                                KeyValue::make('shipping_address')
+                                    ->label(__('orders.shipping_address'))
+                                    ->addActionLabel(__('orders.actions.create'))
+                                    ->columnSpan(1),
+                                KeyValue::make('billing_address')
+                                    ->label(__('orders.billing_address'))
+                                    ->addActionLabel(__('orders.actions.create'))
+                                    ->columnSpan(1),
+                            ]),
                         TextInput::make('tracking_number')
                             ->label(__('orders.tracking_number'))
                             ->maxLength(255),
@@ -143,8 +223,9 @@ class OrdersRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function infolist(Schema $schema): Schema
+    public function infolist(Schema $schema): Schema   
     {
+        // Provide the infolist schema using the Filament v4 return type.
         return $schema
             ->components([
                 InfolistSection::make(__('orders.basic_information'))
@@ -204,8 +285,9 @@ class OrdersRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->recordTitleAttribute('order_number')
             ->columns([
@@ -301,10 +383,68 @@ class OrdersRelationManager extends BaseRelationManager
                     }),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit ' . $this->getPluralModelLabel())
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        // Provide a quick-edit modal for managing records inline.
+                        return $repeater->schema($this->getQuickEditSchema());
+                    }),
                 CreateAction::make()
                     ->label(__('orders.create_order')),
                 AssociateAction::make()
-                    ->label(__('orders.associate_order')),
+                    ->label(__('orders.associate_order'))
+                    ->form([
+                        SearchableInput::make('recordId')
+                            ->label(__('orders.order'))
+                            ->placeholder(__('orders.search_placeholder'))
+                            ->searchUsing(function (string $search): array {
+                                $term = trim($search);
+
+                                return Order::query()
+                                    ->select(['id', 'number', 'status', 'total'])
+                                    ->when($term !== '', function (Builder $query) use ($term): void {
+                                        $query->where(function (Builder $nested) use ($term): void {
+                                            $nested
+                                                ->where('number', 'like', "%{$term}%")
+                                                ->orWhere('status', 'like', "%{$term}%");
+                                        });
+                                    })
+                                    ->orderByDesc('created_at')
+                                    ->limit(15)
+                                    ->get()
+                                    ->map(function (Order $order): SearchResult {
+                                        $number = (string) ($order->getAttribute('number') ?? '');
+                                        $status = (string) ($order->getAttribute('status') ?? '');
+                                        $total = (float) ($order->getAttribute('total') ?? 0.0);
+                                        $label = trim(sprintf('#%s — %s — €%s', $number, __('orders.statuses.' . $status) ?? $status, number_format($total, 2)));
+
+                                        return SearchResult::make((string) $order->getKey(), $label)
+                                            ->withData('order_id', $order->getKey());
+                                    })
+                                    ->all();
+                            })
+                            ->required()
+                            ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                            ->onItemSelected(function (SearchResult $item): void {
+                                app()->call(function (Set $set) use ($item): void {
+                                    $rawId = $item->get('order_id');
+
+                                    if (! is_numeric($rawId)) {
+                                        $rawId = $item->value();
+                                    }
+
+                                    if (! is_numeric($rawId)) {
+                                        return;
+                                    }
+
+                                    $set('recordId', (int) $rawId);
+                                });
+                            })
+                            ->suffixIcon('heroicon-o-queue-list'),
+                    ]),
             ])
             ->recordActions([
                 ViewAction::make(),

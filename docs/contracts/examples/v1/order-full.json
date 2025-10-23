@@ -1,0 +1,68 @@
+{
+  "id": 1002,
+  "number": "SBA-2024-0042",
+  "status": "completed",
+  "items": [
+    {
+      "id": 1,
+      "product": {
+        "id": 42,
+        "sku": "LT-PRO-9876",
+        "title": "Profesionalus kampinis šlifuoklis"
+      },
+      "quantity": 2,
+      "unit_price": 249.5,
+      "total": 499,
+      "status": "fulfilled"
+    },
+    {
+      "id": 2,
+      "product": {
+        "id": 77,
+        "sku": "LT-BIT-5555",
+        "title": "Grąžtų komplektas"
+      },
+      "quantity": 1,
+      "unit_price": 39.99,
+      "total": 39.99,
+      "status": "fulfilled"
+    }
+  ],
+  "totals": {
+    "subtotal": 538.99,
+    "tax": 0,
+    "shipping": 6.99,
+    "discount": 20,
+    "total": 525.98,
+    "currency": "EUR"
+  },
+  "customer": {
+    "id": 12,
+    "email": "meistras@example.lt",
+    "name": "Meistras Stalius",
+    "meta": {
+      "company": "Statybų sprendimai, UAB",
+      "phone": "+37060000000"
+    }
+  },
+  "payments": [
+    {
+      "status": "captured",
+      "amount": 525.98,
+      "method": "card",
+      "reference": "PAY-123456",
+      "processed_at": "2024-08-01T08:15:30+00:00"
+    }
+  ],
+  "shipments": [
+    {
+      "status": "in_transit",
+      "carrier": "DPD",
+      "service": "Classic",
+      "tracking_number": "LT123456789",
+      "tracking_url": "https://tracking.example.com/LT123456789",
+      "shipped_at": "2024-08-01T09:00:00+00:00",
+      "delivered_at": null
+    }
+  ]
+}

@@ -10,8 +10,10 @@ use App\Filament\Resources\VariantCombinationResource\Pages\ViewVariantCombinati
 use App\Models\Product;
 use App\Models\User;
 use App\Models\VariantCombination;
+use App\Support\Nav;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
+use Filament\Schemas\Schema;
 use Filament\Forms\Components\Toggle;
 
 beforeEach(function () {
@@ -289,9 +291,15 @@ describe('VariantCombinationResource', function () {
     });
 
     it('has correct navigation configuration', function () {
-        expect(VariantCombinationResource::getNavigationIcon())->toBe('heroicon-o-squares-2x2');
-        expect(VariantCombinationResource::getNavigationGroup())->toBe('Inventory');
-        expect(VariantCombinationResource::getNavigationSort())->toBe(19);
+        expect(VariantCombinationResource::getNavigationIcon())->toBe(
+            Nav::iconForResource(VariantCombinationResource::class)
+        );
+        expect(VariantCombinationResource::getNavigationGroup())->toBe(
+            Nav::groupForResource(VariantCombinationResource::class)
+        );
+        expect(VariantCombinationResource::getNavigationSort())->toBe(
+            Nav::sortForResource(VariantCombinationResource::class)
+        );
     });
 
     it('has correct model configuration', function () {
@@ -315,12 +323,12 @@ describe('VariantCombinationResource', function () {
 
 describe('VariantCombinationResource Form', function () {
     it('has correct form schema', function () {
-        $form = VariantCombinationResource::form(new \Filament\Forms\Form);
+        $form = VariantCombinationResource::form(Schema::make());
 
-        expect($form->getSchema())->toHaveCount(3); // 3 sections
+        expect($form->getComponents())->toHaveCount(3); // 3 sections
 
         // Check if sections exist
-        $schema = $form->getSchema();
+        $schema = $form->getComponents();
         $sectionLabels = collect($schema)->map(fn ($component) => $component->getLabel());
 
         expect($sectionLabels)->toContain('admin.variant_combinations.basic_information');
@@ -329,8 +337,8 @@ describe('VariantCombinationResource Form', function () {
     });
 
     it('has product selection field', function () {
-        $form = VariantCombinationResource::form(new \Filament\Forms\Form);
-        $schema = $form->getSchema();
+        $form = VariantCombinationResource::form(Schema::make());
+        $schema = $form->getComponents();
 
         $basicInfoSection = $schema[0];
         $grid = $basicInfoSection->getChildComponents()[0];
@@ -341,8 +349,8 @@ describe('VariantCombinationResource Form', function () {
     });
 
     it('has availability toggle field', function () {
-        $form = VariantCombinationResource::form(new \Filament\Forms\Form);
-        $schema = $form->getSchema();
+        $form = VariantCombinationResource::form(Schema::make());
+        $schema = $form->getComponents();
 
         $basicInfoSection = $schema[0];
         $grid = $basicInfoSection->getChildComponents()[0];
@@ -353,8 +361,8 @@ describe('VariantCombinationResource Form', function () {
     });
 
     it('has attribute combinations field', function () {
-        $form = VariantCombinationResource::form(new \Filament\Forms\Form);
-        $schema = $form->getSchema();
+        $form = VariantCombinationResource::form(Schema::make());
+        $schema = $form->getComponents();
 
         $combinationsSection = $schema[1];
         $keyValueField = $combinationsSection->getChildComponents()[0];

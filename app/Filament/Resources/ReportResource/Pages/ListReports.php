@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 final class ListReports extends BaseListRecords
 {
+    use HasResizableColumns;
     use HasWidgetTabs;
 
     protected static string $resource = ReportResource::class;

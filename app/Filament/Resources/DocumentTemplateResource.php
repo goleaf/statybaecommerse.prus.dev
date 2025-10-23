@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Enums\DocumentTemplateCategory;
 use App\Enums\DocumentTemplateType;
 use App\Filament\Resources\DocumentTemplateResource\Pages;
@@ -22,7 +24,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -33,6 +34,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
@@ -81,9 +83,9 @@ final class DocumentTemplateResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Tabs::make('document_template_form')
                 ->tabs([
                     Tab::make(__('admin/document_templates.form.tabs.basic_information'))
@@ -193,9 +195,11 @@ final class DocumentTemplateResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->withCount('documents'))
             ->columns([
                 TextColumn::make('name')
                     ->label(__('admin/document_templates.form.fields.name'))
@@ -208,16 +212,31 @@ final class DocumentTemplateResource extends Resource
                 TextColumn::make('type')
                     ->label(__('admin/document_templates.form.fields.type'))
                     ->badge()
-                    ->color(fn (string $state): string => DocumentTemplateType::tryFrom($state)?->color() ?? 'gray')
-                    ->formatStateUsing(fn (string $state): string => DocumentTemplateType::tryFrom($state)?->label() ?? $state),
+                    ->color(fn (string $state): string => match ($state) {
+                        'invoice'  => 'success',
+                        'receipt'  => 'info',
+                        'quote'    => 'warning',
+                        'contract' => 'danger',
+                        'report'   => 'gray',
+                        default    => 'gray',
+                    }),
                 TextColumn::make('category')
                     ->label(__('admin/document_templates.form.fields.category'))
                     ->badge()
-                    ->color(fn (string $state): string => DocumentTemplateCategory::tryFrom($state)?->color() ?? 'gray')
-                    ->formatStateUsing(fn (string $state): string => DocumentTemplateCategory::tryFrom($state)?->label() ?? $state),
+                    ->color(fn (string $state): string => match ($state) {
+                        'financial'   => 'success',
+                        'legal'       => 'danger',
+                        'marketing'   => 'info',
+                        'operational' => 'warning',
+                        default       => 'gray',
+                    }),
                 IconColumn::make('is_active')
                     ->label(__('admin/document_templates.form.fields.is_active'))
                     ->boolean(),
+                TextColumn::make('documents_count')
+                    ->label(__('document_templates.documents_count'))
+                    ->sortable()
+                    ->toggleable(),
                 TextColumn::make('created_at')
                     ->label(__('admin/document_templates.form.fields.created_at'))
                     ->dateTime()
@@ -240,16 +259,123 @@ final class DocumentTemplateResource extends Resource
                     ->label(__('admin/document_templates.filters.is_active')),
             ])
             ->actions([
-                ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
+                TableAction::make('preview_template')
+                    ->label(__('document_templates.actions.preview'))
+                    ->icon('heroicon-o-eye')
+                    ->modalHeading(__('document_templates.actions.preview'))
+                    ->modalSubmitAction(false)
+                    ->modalContent(fn (DocumentTemplate $record): HtmlString => new HtmlString($record->content))
+                    ->action(function (DocumentTemplate $record): void {
+                        Notification::make()
+                            ->success()
+                            ->title(__('document_templates.notifications.previewed'))
+                            ->send();
+                    }),
+                TableAction::make('duplicate_template')
+                    ->label(__('document_templates.actions.duplicate'))
+                    ->icon('heroicon-o-document-duplicate')
+                    ->requiresConfirmation()
+                    ->action(function (DocumentTemplate $record): void {
+                        self::duplicateTemplate($record);
+
+                        Notification::make()
+                            ->success()
+                            ->title(__('document_templates.notifications.duplicated'))
+                            ->send();
+                    }),
+                TableViewAction::make(),
+                TableEditAction::make(),
+                DeleteAction::make()
+                    ->before(function (DeleteAction $action, DocumentTemplate $record): void {
+                        if (! $record->documents()->exists()) {
+                            return;
+                        }
+
+                        Notification::make()
+                            ->title(__('document_templates.notifications.delete_has_documents.title'))
+                            ->body(__('document_templates.notifications.delete_has_documents.body'))
+                            ->warning()
+                            ->send();
+
+                        $action->halt();
+                    }),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                TableBulkActionGroup::make([
+                    TableBulkAction::make('activate')
+                        ->label(__('document_templates.actions.activate'))
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->action(function (EloquentCollection $records): void {
+                            $records->each->update(['is_active' => true]);
+
+                            Notification::make()
+                                ->success()
+                                ->title(__('document_templates.notifications.activated'))
+                                ->send();
+                        }),
+                    TableBulkAction::make('deactivate')
+                        ->label(__('document_templates.actions.deactivate'))
+                        ->color('gray')
+                        ->requiresConfirmation()
+                        ->action(function (EloquentCollection $records): void {
+                            $records->each->update(['is_active' => false]);
+
+                            Notification::make()
+                                ->success()
+                                ->title(__('document_templates.notifications.deactivated'))
+                                ->send();
+                        }),
+                    TableDeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    public static function duplicateTemplate(DocumentTemplate $template): DocumentTemplate
+    {
+        $duplicate = $template->replicate();
+
+        $duplicate->name = self::generateDuplicateName($template->name);
+        $duplicate->slug = self::generateUniqueSlug($template->slug);
+
+        $duplicate->save();
+
+        return $duplicate;
+    }
+
+    protected static function generateDuplicateName(string $name): string
+    {
+        $copySuffix = __('document_templates.copy_suffix');
+        $baseName = sprintf('%s %s', $name, $copySuffix);
+        $nextName = $baseName;
+        $counter = 2;
+
+        while (DocumentTemplate::query()->where('name', $nextName)->exists()) {
+            if (str_ends_with($copySuffix, ')')) {
+                $nextName = sprintf('%s %s %d)', $name, rtrim($copySuffix, ')'), $counter);
+            } else {
+                $nextName = sprintf('%s %s %d', $name, $copySuffix, $counter);
+            }
+
+            $counter++;
+        }
+
+        return $nextName;
+    }
+
+    protected static function generateUniqueSlug(string $slug): string
+    {
+        $baseSlug = Str::slug($slug . '-copy');
+        $newSlug = $baseSlug;
+        $suffix = 2;
+
+        while (DocumentTemplate::query()->where('slug', $newSlug)->exists()) {
+            $newSlug = sprintf('%s-%d', $baseSlug, $suffix);
+            $suffix++;
+        }
+
+        return $newSlug;
     }
 
     /**

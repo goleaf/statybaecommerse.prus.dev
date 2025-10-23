@@ -1,6 +1,13 @@
 <?php
 
 return [
+    'exceptions_orders_not_found' => 'Заказ :order не найден.',
+    'exceptions_inventory_insufficient' => 'Недостаточно запасов для артикула :sku.',
+    'errors_not_found' => 'Страница не найдена',
+    'errors_server_error' => 'Ошибка сервера',
+    'errors_validation_failed' => 'Проверьте введённые данные',
+    'errors_unauthorized' => 'Нет доступа',
+    'errors_forbidden' => 'Доступ запрещён',
     // Navigation
     'nav_home' => 'Главная',
     'nav_categories' => 'Категории',

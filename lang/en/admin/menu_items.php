@@ -1,19 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 return [
+    // Navigation & Labels
     'navigation_label' => 'Menu Items',
     'plural_model_label' => 'Menu Items',
     'model_label' => 'Menu Item',
+
+    // Form Sections
     'basic_information' => 'Basic Information',
+    'status' => 'Status',
+
+    // Fields
     'menu' => 'Menu',
     'parent' => 'Parent Item',
     'label' => 'Label',
     'url' => 'URL',
     'route_name' => 'Route Name',
-    'route_name_help' => 'Optionally specify the internal route name to link to.',
     'icon' => 'Icon',
-    'icon_help' => 'Provide the icon class or identifier that should be displayed.',
     'sort_order' => 'Sort Order',
-    'status' => 'Status',
-    'is_visible' => 'Is Visible',
+    'is_visible' => 'Visible',
+
+    // Helper Texts
+    'route_name_help' => 'Provide a named route to generate the link automatically.',
+    'icon_help' => 'Specify a Heroicon identifier or icon class.',
 ];

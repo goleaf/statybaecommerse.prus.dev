@@ -2,7 +2,29 @@
 
 declare(strict_types=1);
 
+$defaultLocales = config('shared.localization.supported_locales', []);
+
+if ($defaultLocales === [] || ! is_array($defaultLocales)) {
+    $defaultLocales = array_filter(array_map(
+        static fn (string $locale): string => trim($locale),
+        explode(',', (string) config('app.supported_locales', 'lt,en')),
+    ));
+}
+
+$defaultLocales = array_values(array_unique($defaultLocales));
+
+$requiredLocales = array_filter([
+    config('app.locale'),
+    config('app.fallback_locale'),
+]);
+
+if ($requiredLocales === []) {
+    $requiredLocales = [
+        $defaultLocales[0] ?? 'lt',
+    ];
+}
+
 return [
-    'default_locales'  => array_values(array_filter(array_map('trim', explode(',', (string) env('FILAMENT_LANGUAGE_TABS_LOCALES', 'lt,en,ru'))))),
-    'required_locales' => array_values(array_filter(array_map('trim', explode(',', (string) env('FILAMENT_LANGUAGE_TABS_REQUIRED_LOCALES', 'lt,en'))))),
+    'default_locales'  => $defaultLocales,
+    'required_locales' => array_values(array_unique($requiredLocales)),
 ];

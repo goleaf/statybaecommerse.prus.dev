@@ -5,12 +5,10 @@ includes:
 parameters:
   level: 9
   paths:
-    - app
-    - database
     - config
   scanFiles:
     - stubs/phpstan/livewire-components.php
-    - stubs/optional-packages.php
+    - stubs/phpstan/tag-aware-cache.stub.php
   checkExplicitMixed: true
   checkImplicitMixed: true
   checkMissingTypehints: true
@@ -26,6 +24,8 @@ parameters:
   tmpDir: storage/framework/cache/phpstan
   universalObjectCratesClasses:
     - Illuminate\Support\Fluent
+  bootstrapFiles:
+    - stubs/optional-packages.php
 
 # Filament v4 specific ignores
 # ignoreErrors:

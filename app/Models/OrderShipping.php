@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Scopes\UserOwnedScope;
+use Database\Factories\OrderShippingFactory;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,18 +17,23 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * Eloquent model representing the OrderShipping entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property mixed $table
- * @property mixed $fillable
+ * @property mixed                           $table
+ * @property mixed                           $fillable
+ * @property \Illuminate\Support\Carbon|null $shipped_at
+ * @property \Illuminate\Support\Carbon|null $delivered_at
  *
  * @method static \Illuminate\Database\Eloquent\Builder|OrderShipping newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderShipping newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderShipping query()
  *
  * @mixin \Eloquent
+ *
+ * @phpstan-use HasFactory<OrderShippingFactory>
  */
 #[ScopedBy([UserOwnedScope::class])]
 final class OrderShipping extends Model
 {
+    /** @phpstan-ignore-next-line */
     use HasFactory;
 
     protected $table = 'order_shippings';
@@ -42,6 +49,7 @@ final class OrderShipping extends Model
         'delivered_at',
         'weight',
         'dimensions',
+        'cost', // Persist aggregated shipping cost for simplified reporting flows.
         'base_cost',
         'insurance_cost',
         'total_cost',
@@ -58,6 +66,7 @@ final class OrderShipping extends Model
             'estimated_delivery' => 'datetime',
             'delivered_at'       => 'datetime',
             'weight'             => 'decimal:3',
+            'cost'               => 'decimal:2',
             'base_cost'          => 'decimal:2',
             'insurance_cost'     => 'decimal:2',
             'total_cost'         => 'decimal:2',
@@ -70,17 +79,26 @@ final class OrderShipping extends Model
     /**
      * Handle order functionality with proper error handling.
      */
+    /**
+     * @return BelongsTo<Order, self>
+     *
+     * @phpstan-return BelongsTo<Order, self>
+     */
     public function order(): BelongsTo
     {
-        return $this->belongsTo(Order::class);
+        /** @var BelongsTo<Order, self> $relation */
+        $relation = $this->belongsTo(Order::class);
+
+        return $relation;
     }
 
     /**
      * Handle scopeShipped functionality with proper error handling.
      *
-     * @param mixed $query
+     * @param  Builder<OrderShipping> $query
+     * @return Builder<OrderShipping>
      */
-    public function scopeShipped($query)
+    public function scopeShipped(Builder $query): Builder
     {
         return $query->whereNotNull('shipped_at');
     }
@@ -88,9 +106,10 @@ final class OrderShipping extends Model
     /**
      * Handle scopeDelivered functionality with proper error handling.
      *
-     * @param mixed $query
+     * @param  Builder<OrderShipping> $query
+     * @return Builder<OrderShipping>
      */
-    public function scopeDelivered($query)
+    public function scopeDelivered(Builder $query): Builder
     {
         return $query->whereNotNull('delivered_at');
     }
@@ -98,9 +117,10 @@ final class OrderShipping extends Model
     /**
      * Handle scopeByCarrier functionality with proper error handling.
      *
-     * @param mixed $query
+     * @param  Builder<OrderShipping> $query
+     * @return Builder<OrderShipping>
      */
-    public function scopeByCarrier($query, string $carrier)
+    public function scopeByCarrier(Builder $query, string $carrier): Builder
     {
         return $query->where('carrier_name', $carrier);
     }

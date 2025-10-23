@@ -4,30 +4,32 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\SystemSettingResource\Pages;
 use App\Models\SystemSetting;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
@@ -67,9 +69,9 @@ final class SystemSettingResource extends Resource
         return true;
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('system_settings.basic_information'))
                     ->schema([
@@ -223,8 +225,9 @@ final class SystemSettingResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('key')
@@ -280,7 +283,7 @@ final class SystemSettingResource extends Resource
                     }),
                 TextColumn::make('category')
                     ->label(__('system_settings.category'))
-                    ->formatStateUsing(fn (?string $state): string => $state !== null ? __("system_settings.categories.{$state}") : __('system_settings.category'))
+                    ->formatStateUsing(fn (?string $state): string => $state ? __("system_settings.categories.{$state}") : '-')
                     ->badge()
                     ->color(fn (?string $state): string => match ($state) {
                         'general'     => 'gray',
@@ -396,7 +399,7 @@ final class SystemSettingResource extends Resource
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
-                \Filament\Actions\DeleteAction::make()
+                DeleteAction::make()
                     ->action(function (SystemSetting $record): void {
                         $record->forceDelete();
                     }),
@@ -409,7 +412,7 @@ final class SystemSettingResource extends Resource
                         $record->type = 'string';
                         $record->update(['value' => $record->default_value]);
                         Notification::make()
-                            ->title(__('system_settings.reset_to_default_success'))
+                            ->title(__('system_settings.reset_successfully'))
                             ->success()
                             ->send();
                     })

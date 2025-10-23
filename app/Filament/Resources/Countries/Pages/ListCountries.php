@@ -10,6 +10,8 @@ use Filament\Actions\CreateAction;
 
 class ListCountries extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = CountryResource::class;
 
     protected function getHeaderActions(): array

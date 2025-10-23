@@ -4,24 +4,31 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\UserManagementResource\RelationManagers;
 
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+
+use Filament\Schemas\Schema;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class OrdersRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'orders';
 
     protected static ?string $title = 'Orders';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $schema): Schema   
     {
         return $schema
             ->components([
@@ -45,15 +52,18 @@ final class OrdersRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
-            ->recordTitleAttribute('order_number')
+            ->recordTitleAttribute('number')
             ->columns([
-                Tables\Columns\TextColumn::make('order_number')
+                TextColumn::make('number')
+                    ->label(__('orders.fields.number'))
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('status')
+                TextColumn::make('status')
+                    ->label(__('orders.fields.status'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'pending'    => 'warning',
@@ -73,24 +83,27 @@ final class OrdersRelationManager extends BaseRelationManager
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit ' . $this->getPluralModelLabel())
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        // Provide a quick-edit modal for managing records inline.
+                        return $repeater->schema($this->getQuickEditSchema());
+                    }),
                 Tables\Actions\CreateAction::make(),
             ])
+            ->headerActions([])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 EditAction::make(),
-                DeleteAction::make(),
-                Tables\Actions\RestoreAction::make(),
-                Tables\Actions\ForceDeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                ]),
-            ])
+            ->bulkActions([])
             ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
+                ActiveScope::class,
+                StatusScope::class,
             ]));
     }
 }

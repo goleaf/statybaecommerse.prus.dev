@@ -190,4 +190,10 @@ return [
         'open' => 'Open collection',
         'products_count' => '{0}No products|{1}1 product|[2,*]:count products',
     ],
+    'messages' => [
+        'no_featured_products' => 'Featured products are coming soon.',
+        'no_latest_products' => 'New arrivals will appear here once published.',
+        'no_trending_products' => 'Trending picks update soon – check back shortly.',
+        'no_sale_products' => 'Sale items will populate as promotions go live.',
+    ],
 ];

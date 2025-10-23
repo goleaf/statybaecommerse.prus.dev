@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Enums\NavigationGroup;
 use App\Models\NotificationTemplate;
 use App\Models\User;
+use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -321,12 +321,18 @@ final class NotificationTemplateResourceTest extends TestCase
 
     public function test_navigation_group_is_content(): void
     {
-        $this->assertEquals(NavigationGroup::Content, \App\Filament\Resources\NotificationTemplateResource::getNavigationGroup());
+        $this->assertEquals(
+            Nav::groupForResource(\App\Filament\Resources\NotificationTemplateResource::class),
+            \App\Filament\Resources\NotificationTemplateResource::getNavigationGroup()
+        );
     }
 
     public function test_has_correct_navigation_sort(): void
     {
-        $this->assertEquals(6, \App\Filament\Resources\NotificationTemplateResource::getNavigationSort());
+        $this->assertEquals(
+            Nav::sortForResource(\App\Filament\Resources\NotificationTemplateResource::class),
+            \App\Filament\Resources\NotificationTemplateResource::getNavigationSort()
+        );
     }
 
     public function test_has_correct_record_title_attribute(): void

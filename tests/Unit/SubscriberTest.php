@@ -19,9 +19,25 @@ final class SubscriberTest extends TestCase
         $fillable = $subscriber->getFillable();
 
         $expectedFillable = [
-            'user_id', 'email', 'first_name', 'last_name', 'phone', 'company',
-            'job_title', 'interests', 'source', 'status', 'subscribed_at',
-            'unsubscribed_at', 'last_email_sent_at', 'email_count', 'metadata',
+            'user_id',
+            'email',
+            'first_name',
+            'last_name',
+            'phone',
+            'company',
+            'job_title',
+            'interests',
+            'source',
+            'status',
+            'is_verified',
+            'accepts_marketing',
+            'newsletter_subscription',
+            'subscribed_at',
+            'unsubscribed_at',
+            'unsubscribe_reason',
+            'last_email_sent_at',
+            'email_count',
+            'metadata',
         ];
 
         $this->assertEquals($expectedFillable, $fillable);
@@ -38,6 +54,9 @@ final class SubscriberTest extends TestCase
         $this->assertArrayHasKey('unsubscribed_at', $casts);
         $this->assertArrayHasKey('last_email_sent_at', $casts);
         $this->assertArrayHasKey('email_count', $casts);
+        $this->assertArrayHasKey('is_verified', $casts);
+        $this->assertArrayHasKey('accepts_marketing', $casts);
+        $this->assertArrayHasKey('newsletter_subscription', $casts);
 
         $this->assertEquals('array', $casts['interests']);
         $this->assertEquals('array', $casts['metadata']);
@@ -45,18 +64,21 @@ final class SubscriberTest extends TestCase
         $this->assertEquals('datetime', $casts['unsubscribed_at']);
         $this->assertEquals('datetime', $casts['last_email_sent_at']);
         $this->assertEquals('integer', $casts['email_count']);
+        $this->assertEquals('boolean', $casts['is_verified']);
+        $this->assertEquals('boolean', $casts['accepts_marketing']);
+        $this->assertEquals('boolean', $casts['newsletter_subscription']);
     }
 
     public function test_subscriber_uses_soft_deletes(): void
     {
         $subscriber = new Subscriber;
-        $this->assertTrue(in_array('SoftDeletes', class_uses($subscriber)));
+        $this->assertTrue(in_array(\Illuminate\Database\Eloquent\SoftDeletes::class, class_uses($subscriber)));
     }
 
     public function test_subscriber_uses_has_factory(): void
     {
         $subscriber = new Subscriber;
-        $this->assertTrue(in_array('HasFactory', class_uses($subscriber)));
+        $this->assertTrue(in_array(\Illuminate\Database\Eloquent\Factories\HasFactory::class, class_uses($subscriber)));
     }
 
     public function test_subscriber_relationship_with_user(): void

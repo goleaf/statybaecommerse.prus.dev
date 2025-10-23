@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Tests\Admin\Resources;
 
 use App\Filament\Resources\UserPreferenceResource;
+use App\Support\Nav;
 use App\Models\User;
 use App\Models\UserPreference;
+use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -291,14 +293,17 @@ final class UserPreferenceResourceTest extends TestCase
 
     public function test_user_preference_resource_navigation_labels(): void
     {
-        $this->assertEquals('admin.user_preferences.navigation_label', UserPreferenceResource::getNavigationLabel());
-        $this->assertEquals('admin.user_preferences.plural_model_label', UserPreferenceResource::getPluralModelLabel());
-        $this->assertEquals('admin.user_preferences.model_label', UserPreferenceResource::getModelLabel());
+        $this->assertEquals(__('admin/user_preferences.navigation_label'), UserPreferenceResource::getNavigationLabel());
+        $this->assertEquals(__('admin/user_preferences.plural_model_label'), UserPreferenceResource::getPluralModelLabel());
+        $this->assertEquals(__('admin/user_preferences.model_label'), UserPreferenceResource::getModelLabel());
     }
 
     public function test_user_preference_resource_navigation_group(): void
     {
-        $this->assertEquals('Users', UserPreferenceResource::getNavigationGroup());
+        $this->assertEquals(
+            Nav::groupForResource(UserPreferenceResource::class),
+            UserPreferenceResource::getNavigationGroup()
+        );
         $this->assertEquals(6, UserPreferenceResource::getNavigationSort());
     }
 

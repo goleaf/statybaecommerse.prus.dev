@@ -37,9 +37,9 @@
 - Added proper error handling for problematic model factories
 
 ### **📊 Index Verification Updates (2025-02-15)**
-- Added dedicated `orders_created_at_index` (with matching `products` and `users` indexes) to accelerate analytics scopes that rely on date filters.
-- Updated dashboard widgets and Livewire dashboards to consume the reusable `Order` date scopes so the new index is always engaged.
-- Introduced `tests/Feature/Database/OrderCreatedAtIndexTest.php` to capture SQLite `EXPLAIN QUERY PLAN` output and assert that the `createdBetween`/`createdSince` scopes remain index-backed.
+- Added dedicated `orders_created_at_index` (plus supporting `products` and `users` indexes) through `2025_02_15_120000_add_created_at_indexes.php` so analytics workloads consistently use timestamp coverage.
+- Refined analytics widgets and the `Order` model to rely on the reusable `createdBetween`, `createdSince`, and `createdOnDate` scopes, keeping dashboard queries aligned with the new index helpers.
+- Introduced `tests/Feature/Database/OrderCreatedAtIndexTest.php` to assert the SQLite query plan references `orders_created_at_index`, preventing future regressions.
 
 ### **📈 Widget Categories Tested**
 

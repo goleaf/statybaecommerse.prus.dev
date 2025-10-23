@@ -6,8 +6,8 @@ namespace App\Filament\Pages;
 
 use App\Data\SearchQueryData;
 use App\Services\SearchService;
-use BackedEnum;
 use Filament\Pages\Page;
+use UnitEnum;
 
 final class SearchExplorer extends Page
 {
@@ -16,9 +16,9 @@ final class SearchExplorer extends Page
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-magnifying-glass-circle';
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): BackedEnum|string|null
     {
-        return 'Search';
+        return 'Search'; // Keep discovery tooling under the dedicated search navigation bucket.
     }
 
     protected static ?string $title = 'Search Explorer';

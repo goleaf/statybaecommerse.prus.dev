@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CategoryResource\RelationManagers;
 
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+
+use Filament\Schemas\Schema;
 use App\Support\Storage\SecureStorage;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -20,9 +21,11 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
-use Str;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class ProductsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'products';
@@ -33,7 +36,7 @@ final class ProductsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Products';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $schema): Schema   
     {
         return $schema->schema([
             TextInput::make('name')
@@ -72,8 +75,9 @@ final class ProductsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->columns([
                 ImageColumn::make('image')
@@ -153,6 +157,7 @@ final class ProductsRelationManager extends BaseRelationManager
                     }),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 AttachAction::make()
                     ->preloadRecordSelect()
                     ->form(fn (AttachAction $action): array => [

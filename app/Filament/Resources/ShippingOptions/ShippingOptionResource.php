@@ -3,7 +3,10 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\ShippingOptions;
+use App\Support\Concerns\HasNav;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\ShippingOptions\Pages\CreateShippingOption;
 use App\Filament\Resources\ShippingOptions\Pages\EditShippingOption;
 use App\Filament\Resources\ShippingOptions\Pages\ListShippingOptions;
@@ -11,27 +14,30 @@ use App\Filament\Resources\ShippingOptions\Schemas\ShippingOptionForm;
 use App\Filament\Resources\ShippingOptions\Tables\ShippingOptionsTable;
 use App\Models\ShippingOption;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 class ShippingOptionResource extends Resource
 {
-    protected static ?string $model = ShippingOption::class;
+    use HasNav;
 
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
      */
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return ShippingOptionForm::configure($form);
+        return ShippingOptionForm::configure($schema);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return ShippingOptionsTable::configure($table);
     }
 

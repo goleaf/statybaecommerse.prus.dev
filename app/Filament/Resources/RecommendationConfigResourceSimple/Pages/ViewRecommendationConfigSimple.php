@@ -39,8 +39,9 @@ final class ViewRecommendationConfigSimple extends ViewRecord implements HasTabl
         ];
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         $table = $table
             ->paginated([10])
             ->defaultGroup(null)

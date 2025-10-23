@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Support\ErrorCodes;
+use App\Support\ErrorCode;
 
 return [
     'titles' => [

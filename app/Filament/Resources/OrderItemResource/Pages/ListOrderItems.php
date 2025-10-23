@@ -10,6 +10,8 @@ use Filament\Actions;
 
 final class ListOrderItems extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = OrderItemResource::class;
 
     protected function getHeaderActions(): array

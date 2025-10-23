@@ -4,26 +4,26 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantCombinationResource\Pages;
 use App\Models\Product;
 use App\Models\VariantCombination;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\HeaderAction;
+use Filament\Actions\HeaderAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -31,6 +31,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
@@ -66,9 +67,9 @@ final class VariantCombinationResource extends Resource
         return __('admin.variant_combinations.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->components([
                 Section::make(__('admin.variant_combinations.basic_information'))
                     ->description(__('admin.variant_combinations.basic_information_description'))
@@ -92,6 +93,18 @@ final class VariantCombinationResource extends Resource
                                         } else {
                                             $set('available_attributes', []);
                                         }
+
+                                        $product = Product::find($state);
+
+                                        if (! $product) {
+                                            $set('available_attributes', []);
+
+                                            return;
+                                        }
+
+                                        $attributes = $product->attributes()->pluck('name', 'id')->toArray();
+
+                                        $set('available_attributes', $attributes);
                                     }),
                                 Toggle::make('is_available')
                                     ->label(__('admin.variant_combinations.is_available'))
@@ -104,6 +117,7 @@ final class VariantCombinationResource extends Resource
                     ->schema([
                         KeyValue::make('attribute_combinations')
                             ->label(__('admin.variant_combinations.attribute_combinations'))
+                            ->default([])
                             ->keyLabel(__('admin.variant_combinations.attribute'))
                             ->valueLabel(__('admin.variant_combinations.value'))
                             ->columnSpanFull()
@@ -132,8 +146,9 @@ final class VariantCombinationResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('id')
@@ -145,7 +160,9 @@ final class VariantCombinationResource extends Resource
                     ->label(__('admin.variant_combinations.product'))
                     ->sortable()
                     ->searchable()
-                    ->url(fn ($record) => route('filament.admin.resources.products.view', $record->product_id))
+                    ->url(fn (VariantCombination $record): ?string => $record->product_id
+                        ? route('filament.admin.resources.products.view', $record->product_id)
+                        : null)
                     ->color('primary'),
                 TextColumn::make('attribute_combinations')
                     ->label(__('admin.variant_combinations.attribute_combinations'))

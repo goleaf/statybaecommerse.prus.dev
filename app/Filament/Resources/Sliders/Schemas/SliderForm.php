@@ -6,20 +6,24 @@ namespace App\Filament\Resources\Sliders\Schemas;
 
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ContentLinkSearch;
+use App\Support\Search\SearchResultPayload;
+
+use function collect;
+
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 
 final class SliderForm
 {
-    public static function configure(Form $form): Form
+    public static function configure(Schema $form): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.sliders.basic_information'))
                     ->description(__('admin.sliders.basic_information_description'))
@@ -48,8 +52,10 @@ final class SliderForm
                 Section::make(__('admin.sliders.media'))
                     ->description(__('admin.sliders.media_description'))
                     ->components([
-                        FileUpload::make('image')
+                        SpatieMediaLibraryFileUpload::make('slider_images')
                             ->label(__('admin.sliders.image'))
+                            ->collection('slider_images')
+                            ->disk('public')
                             ->image()
                             ->imageEditor()
                             ->imageEditorAspectRatios([
@@ -57,8 +63,20 @@ final class SliderForm
                                 '4:3',
                                 '1:1',
                             ])
-                            ->directory('sliders/images')
-                            ->visibility('private')
+                            ->maxSize(5120)  // 5MB
+                            ->required(fn (string $operation): bool => $operation === 'create')
+                            ->columnSpanFull(),
+                        SpatieMediaLibraryFileUpload::make('slider_backgrounds')
+                            ->label(__('admin.sliders.background_image'))
+                            ->collection('slider_backgrounds')
+                            ->disk('public')
+                            ->image()
+                            ->imageEditor()
+                            ->imageEditorAspectRatios([
+                                '16:9',
+                                '4:3',
+                                '1:1',
+                            ])
                             ->maxSize(5120)  // 5MB
                             ->columnSpanFull(),
                     ])
@@ -66,7 +84,7 @@ final class SliderForm
                 Section::make(__('admin.sliders.call_to_action'))
                     ->description(__('admin.sliders.call_to_action_description'))
                     ->components([
-                        Grid::make(2)
+                        Grid::make(3)
                             ->components([
                                 TextInput::make('button_text')
                                     ->label(__('admin.sliders.button_text'))
@@ -74,7 +92,9 @@ final class SliderForm
                                     ->columnSpan(1),
                                 SearchableInput::make('button_url')
                                     ->label(__('admin.sliders.button_url'))
-                                    ->placeholder(__('admin.sliders.link_search.placeholder'))
+                                    ->placeholder(__('admin.sliders.button_url_placeholder'))
+                                    ->helperText(__('admin.sliders.button_url_helper'))
+                                    ->searchUsing(fn (string $term): array => ContentLinkSearch::suggest($term))
                                     ->maxLength(255)
                                     ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                                     ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
@@ -86,13 +106,13 @@ final class SliderForm
                                             static fn (string $value): ?array => ['value' => $value, 'label' => $value],
                                         );
                                     })
-                                    ->afterStateUpdated(function (?string $state, callable $set): void {
+                                    ->afterStateUpdated(function (SearchableInput $component, ?string $state, callable $set): void {
                                         if ($state !== null && $state !== '') {
                                             return;
                                         }
 
                                         // Reset CTA URLs whenever lookup is cleared to avoid stale payloads.
-                                        SearchableInputHelper::clear($set, ['button_url' => null]);
+                                        SearchableInputHelper::clear($component, $set, ['button_url' => null]);
                                     })
                                     ->columnSpan(1),
                             ]),

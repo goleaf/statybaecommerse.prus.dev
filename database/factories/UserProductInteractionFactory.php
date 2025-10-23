@@ -23,22 +23,27 @@ final class UserProductInteractionFactory extends Factory
      */
     public function definition(): array
     {
-        $interactionTypes = ['view', 'click', 'add_to_cart', 'purchase', 'review', 'share'];
-        $interactionType = fake()->randomElement($interactionTypes);
+        $interactionTypes = ['click', 'add_to_cart', 'purchase', 'review', 'share', 'favorite', 'compare'];
+        // Rotate through the type list so repeated factory calls for the same
+        // user/product pair stay unique even when the test does not override
+        // `interaction_type`, keeping the SQLite unique index satisfied.
+        static $typePointer = 0;
+        $interactionType = $interactionTypes[$typePointer % count($interactionTypes)];
+        $typePointer++;
 
-        $firstInteraction = fake()->dateTimeBetween('-6 months', '-1 month');
-        $lastInteraction = fake()->dateTimeBetween($firstInteraction, 'now');
+        // Anchor the interaction window to the past month so tests relying
+        // on the "recent" scope receive deterministic timestamps.
+        $firstInteraction = fake()->dateTimeBetween('-30 days', '-1 day');
+        $lastInteraction = fake()->dateTimeBetween('-1 day', 'now');
+
         return [
-            'user_id' => User::factory(),
-            'product_id' => Product::factory(),
-            'interaction_type' => $interactionType,
-            'rating' => $interactionType === 'review' ? fake()->randomFloat(1, 1, 5) : null,
-            'count' => fake()->numberBetween(1, 20),
-            'notes' => fake()->optional(0.4)->realText(120),
-            'is_anonymous' => false,
-            'ip_address' => fake()->ipv4(),
+            'user_id'           => User::factory(),
+            'product_id'        => Product::factory(),
+            'interaction_type'  => $interactionType,
+            'rating'            => $interactionType === 'review' ? fake()->randomFloat(1, 1, 5) : null,
+            'count'             => fake()->numberBetween(1, 20),
             'first_interaction' => $firstInteraction,
-            'last_interaction' => $lastInteraction,
+            'last_interaction'  => $lastInteraction,
         ];
     }
 
@@ -49,8 +54,8 @@ final class UserProductInteractionFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'interaction_type' => 'view',
-            'rating' => null,
-            'count' => fake()->numberBetween(1, 50),
+            'rating'           => null,
+            'count'            => fake()->numberBetween(1, 50),
         ]);
     }
 
@@ -61,8 +66,8 @@ final class UserProductInteractionFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'interaction_type' => 'click',
-            'rating' => null,
-            'count' => fake()->numberBetween(1, 10),
+            'rating'           => null,
+            'count'            => fake()->numberBetween(1, 10),
         ]);
     }
 
@@ -73,8 +78,8 @@ final class UserProductInteractionFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'interaction_type' => 'add_to_cart',
-            'rating' => null,
-            'count' => fake()->numberBetween(1, 5),
+            'rating'           => null,
+            'count'            => fake()->numberBetween(1, 5),
         ]);
     }
 
@@ -85,8 +90,8 @@ final class UserProductInteractionFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'interaction_type' => 'purchase',
-            'rating' => null,
-            'count' => fake()->numberBetween(1, 3),
+            'rating'           => null,
+            'count'            => fake()->numberBetween(1, 3),
         ]);
     }
 
@@ -97,8 +102,8 @@ final class UserProductInteractionFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'interaction_type' => 'review',
-            'rating' => fake()->randomFloat(1, 1, 5),
-            'count' => 1,
+            'rating'           => fake()->randomFloat(1, 1, 5),
+            'count'            => 1,
         ]);
     }
 
@@ -109,8 +114,8 @@ final class UserProductInteractionFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'interaction_type' => 'share',
-            'rating' => null,
-            'count' => fake()->numberBetween(1, 5),
+            'rating'           => null,
+            'count'            => fake()->numberBetween(1, 5),
         ]);
     }
 
@@ -143,7 +148,7 @@ final class UserProductInteractionFactory extends Factory
 
         return $this->state(fn (array $attributes) => [
             'first_interaction' => fake()->dateTimeBetween('-7 days', '-1 day'),
-            'last_interaction' => fake()->dateTimeBetween('-1 day', $now),
+            'last_interaction'  => fake()->dateTimeBetween('-1 day', $now),
         ]);
     }
 
@@ -154,7 +159,7 @@ final class UserProductInteractionFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'first_interaction' => fake()->dateTimeBetween('-1 year', '-6 months'),
-            'last_interaction' => fake()->dateTimeBetween('-6 months', '-1 month'),
+            'last_interaction'  => fake()->dateTimeBetween('-6 months', '-1 month'),
         ]);
     }
 

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\UserProductInteractionResource\Pages;
 use App\Models\Product;
 use App\Models\User;
@@ -11,8 +13,8 @@ use App\Models\UserProductInteraction;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\Action as TableAction;
 use Filament\Actions\BulkAction as TableBulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Hidden;
@@ -20,11 +22,11 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -32,6 +34,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Hash;
@@ -39,6 +42,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use UnitEnum;
 
+use Filament\Schemas\Schema;
 final class UserProductInteractionResource extends Resource
 {
     protected static ?string $model = UserProductInteraction::class;
@@ -66,51 +70,26 @@ final class UserProductInteractionResource extends Resource
     /**
      * Ensure Filament v4 receives a concrete Form instance for schema binding.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
-                SchemaSection::make(__('admin.user_product_interactions.basic_information'))
+                SchemaGrid::make(2)
                     ->schema([
-                        SchemaGrid::make(2)
-                            ->schema([
-                                Select::make('user_id')
-                                    ->label(__('admin.user_product_interactions.user'))
-                                    ->relationship('user', 'name')
+                        Select::make('user_id')
+                            ->label(__('admin.user_product_interactions.user'))
+                            ->relationship('user', 'name')
+                            ->required()
+                            ->searchable()
+                            ->preload()
+                            ->createOptionForm([
+                                TextInput::make('name')
+                                    ->label(__('admin.users.name'))
                                     ->required()
-                                    ->searchable()
-                                    ->preload()
-                                    ->createOptionForm([
-                                        TextInput::make('name')
-                                            ->label(__('admin.users.name'))
-                                            ->required()
-                                            ->maxLength(255),
-                                        TextInput::make('email')
-                                            ->label(__('admin.users.email'))
-                                            ->email()
-                                            ->required()
-                                            ->maxLength(255)
-                                            ->unique(User::class, 'email', ignoreRecord: true),
-                                        TextInput::make('password')
-                                            ->label(__('filament-panels::password_reset.reset.form.password.label'))
-                                            ->password()
-                                            ->required()
-                                            ->minLength(8)
-                                            ->rule(Password::defaults())
-                                            ->dehydrateStateUsing(fn ($state) => Hash::make($state)),
-                                        TextInput::make('password_confirmation')
-                                            ->label(__('filament-panels::password_reset.reset.form.password_confirmation.label'))
-                                            ->password()
-                                            ->required()
-                                            ->same('password')
-                                            ->dehydrated(false),
-                                    ])
-                                    ->createOptionUsing(function (array $data): int {
-                                        return User::create($data)->getKey();
-                                    }),
-                                Select::make('product_id')
-                                    ->label(__('admin.user_product_interactions.product'))
-                                    ->relationship('product', 'name')
+                                    ->maxLength(255),
+                                TextInput::make('email')
+                                    ->label(__('admin.users.email'))
+                                    ->email()
                                     ->required()
                                     ->searchable()
                                     ->preload()
@@ -175,32 +154,93 @@ final class UserProductInteractionResource extends Resource
                                     ->displayFormat('d/m/Y H:i')
                                     ->seconds(false),
                             ]),
-                    ])
-                    ->collapsible(),
-                SchemaSection::make(__('admin.user_product_interactions.additional_information'))
-                    ->schema([
-                        Textarea::make('notes')
-                            ->label(__('admin.user_product_interactions.notes'))
-                            ->rows(3)
-                            ->maxLength(500)
-                            ->helperText(__('admin.user_product_interactions.notes_help')),
-                        Toggle::make('is_anonymous')
-                            ->label(__('admin.user_product_interactions.is_anonymous'))
-                            ->default(false)
-                            ->helperText(__('admin.user_product_interactions.is_anonymous_help')),
-                        Hidden::make('ip_address')
-                            ->default(request()->ip()),
-                    ])
-                    ->collapsible()
-                    ->collapsed(),
-            ]);
+                        Select::make('product_id')
+                            ->label(__('admin.user_product_interactions.product'))
+                            ->relationship('product', 'name')
+                            ->required()
+                            ->searchable()
+                            ->preload()
+                            ->createOptionForm([
+                                TextInput::make('name')
+                                    ->label(__('admin.products.name'))
+                                    ->required()
+                                    ->maxLength(255),
+                                TextInput::make('sku')
+                                    ->label(__('admin.products.sku'))
+                                    ->maxLength(100),
+                            ]),
+                        Select::make('interaction_type')
+                            ->label(__('admin.user_product_interactions.interaction_type'))
+                            ->options([
+                                'view'        => __('admin.user_product_interactions.interaction_types.view'),
+                                'click'       => __('admin.user_product_interactions.interaction_types.click'),
+                                'add_to_cart' => __('admin.user_product_interactions.interaction_types.add_to_cart'),
+                                'purchase'    => __('admin.user_product_interactions.interaction_types.purchase'),
+                                'review'      => __('admin.user_product_interactions.interaction_types.review'),
+                                'share'       => __('admin.user_product_interactions.interaction_types.share'),
+                                'favorite'    => __('admin.user_product_interactions.interaction_types.favorite'),
+                                'compare'     => __('admin.user_product_interactions.interaction_types.compare'),
+                            ])
+                            ->required()
+                            ->default('view')
+                            ->searchable(),
+                        TextInput::make('rating')
+                            ->label(__('admin.user_product_interactions.rating'))
+                            ->numeric()
+                            ->step(0.1)
+                            ->minValue(0)
+                            ->maxValue(5)
+                            ->suffix('/5')
+                            ->helperText(__('admin.user_product_interactions.rating_help')),
+                        TextInput::make('count')
+                            ->label(__('admin.user_product_interactions.count'))
+                            ->numeric()
+                            ->minValue(1)
+                            ->default(1)
+                            ->helperText(__('admin.user_product_interactions.count_help')),
+                        DateTimePicker::make('first_interaction')
+                            ->label(__('admin.user_product_interactions.first_interaction'))
+                            ->default(now())
+                            ->displayFormat('d/m/Y H:i')
+                            ->seconds(false),
+                        DateTimePicker::make('last_interaction')
+                            ->label(__('admin.user_product_interactions.last_interaction'))
+                            ->default(now())
+                            ->displayFormat('d/m/Y H:i')
+                            ->seconds(false),
+                    ]),
+            ])
+            ->collapsible();
+
+        $additionalInformationSection = SchemaSection::make(__('admin.user_product_interactions.additional_information'))
+            ->schema([
+                Textarea::make('notes')
+                    ->label(__('admin.user_product_interactions.notes'))
+                    ->rows(3)
+                    ->maxLength(500)
+                    ->helperText(__('admin.user_product_interactions.notes_help')),
+                Toggle::make('is_anonymous')
+                    ->label(__('admin.user_product_interactions.is_anonymous'))
+                    ->default(false)
+                    ->helperText(__('admin.user_product_interactions.is_anonymous_help')),
+                Hidden::make('ip_address')
+                    ->default(request()->ip()),
+            ])
+            ->collapsible()
+            ->collapsed();
+
+        return $form->schema([
+            $basicInformationSection,
+            $additionalInformationSection,
+        ]);
     }
 
     /**
      * Return a Table instance to satisfy Filament v4 table expectations.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->deferLoading(false)
             ->columns([
@@ -222,6 +262,10 @@ final class UserProductInteractionResource extends Resource
                     ->limit(30)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
+                        if (! is_string($state)) {
+                            return null;
+                        }
 
                         return strlen($state) > 30 ? $state : null;
                     })
@@ -425,7 +469,7 @@ final class UserProductInteractionResource extends Resource
                     ->label(__('admin.user_product_interactions.view_product'))
                     ->icon('heroicon-o-cube')
                     ->color('gray')
-                    ->url(fn ($record) => ProductResource::getUrl('view', ['record' => $record->product_id]))
+                    ->url(fn (UserProductInteraction $record) => \App\Filament\Resources\ProductResource::getUrl('view', ['record' => $record->product_id]))
                     ->openUrlInNewTab(),
             ])
             ->bulkActions([
@@ -439,7 +483,11 @@ final class UserProductInteractionResource extends Resource
                         ->icon('heroicon-o-plus')
                         ->color('success')
                         ->action(function (Collection $records): void {
-                            $records->each(function (UserProductInteraction $record): void {
+                            $records->each(function ($record): void {
+                                if (! $record instanceof UserProductInteraction) {
+                                    return;
+                                }
+
                                 $record->incrementInteraction();
                             });
                             Notification::make()
@@ -455,7 +503,11 @@ final class UserProductInteractionResource extends Resource
                         ->icon('heroicon-o-arrow-path')
                         ->color('warning')
                         ->action(function (Collection $records): void {
-                            $records->each(function (UserProductInteraction $record): void {
+                            $records->each(function ($record): void {
+                                if (! $record instanceof UserProductInteraction) {
+                                    return;
+                                }
+
                                 $record->update(['count' => 1, 'last_interaction' => now()]);
                             });
                             Notification::make()
@@ -471,7 +523,11 @@ final class UserProductInteractionResource extends Resource
                         ->icon('heroicon-o-eye-slash')
                         ->color('gray')
                         ->action(function (Collection $records): void {
-                            $records->each(function (UserProductInteraction $record): void {
+                            $records->each(function ($record): void {
+                                if (! $record instanceof UserProductInteraction) {
+                                    return;
+                                }
+
                                 $record->update(['is_anonymous' => true]);
                             });
                             Notification::make()
@@ -485,7 +541,11 @@ final class UserProductInteractionResource extends Resource
                         ->icon('heroicon-o-eye')
                         ->color('gray')
                         ->action(function (Collection $records): void {
-                            $records->each(function (UserProductInteraction $record): void {
+                            $records->each(function ($record): void {
+                                if (! $record instanceof UserProductInteraction) {
+                                    return;
+                                }
+
                                 $record->update(['is_anonymous' => false]);
                             });
                             Notification::make()

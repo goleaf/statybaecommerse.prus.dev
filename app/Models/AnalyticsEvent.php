@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Scopes\UserOwnedScope;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Illuminate\Contracts\Session\Session as SessionContract;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -83,13 +86,13 @@ final class AnalyticsEvent extends Model
     ];
 
     protected $casts = [
-        'properties' => 'array',
-        'event_data' => 'array',
-        'is_important' => 'boolean',
-        'is_conversion' => 'boolean',
+        'properties'       => 'array',
+        'event_data'       => 'array',
+        'is_important'     => 'boolean',
+        'is_conversion'    => 'boolean',
         'conversion_value' => 'decimal:2',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
+        'created_at'       => 'datetime',
+        'updated_at'       => 'datetime',
     ];
 
     protected $dates = ['created_at', 'updated_at'];
@@ -118,7 +121,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeByEventType(Builder $query, string $eventType): Builder
     {
-        return $query->where('event_type', $eventType);
+        return self::withoutOwnershipScope($query)->where('event_type', $eventType);
     }
 
     /**
@@ -126,6 +129,13 @@ final class AnalyticsEvent extends Model
      */
     public function scopeByUser(Builder $query, int $userId): Builder
     {
+        // Guard against leaking analytics for other customers by enforcing the authenticated user when present.
+        $authenticatedUser = auth()->user();
+
+        if ($authenticatedUser !== null && ! $authenticatedUser->is_admin && $authenticatedUser->id !== $userId) {
+            return $query->whereRaw('0 = 1');
+        }
+
         return $query->where('user_id', $userId);
     }
 
@@ -134,7 +144,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeBySession(Builder $query, string $sessionId): Builder
     {
-        return $query->where('session_id', $sessionId);
+        return self::withoutOwnershipScope($query)->where('session_id', $sessionId);
     }
 
     /**
@@ -142,7 +152,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeWithValue(Builder $query): Builder
     {
-        return $query->whereNotNull('value');
+        return self::withoutOwnershipScope($query)->whereNotNull('value');
     }
 
     /**
@@ -150,7 +160,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeRegisteredUsers(Builder $query): Builder
     {
-        return $query->whereNotNull('user_id');
+        return self::withoutOwnershipScope($query)->whereNotNull('user_id');
     }
 
     /**
@@ -158,7 +168,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeAnonymousUsers(Builder $query): Builder
     {
-        return $query->whereNull('user_id');
+        return self::withoutOwnershipScope($query)->whereNull('user_id');
     }
 
     /**
@@ -166,7 +176,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeByDeviceType(Builder $query, string $deviceType): Builder
     {
-        return $query->where('device_type', $deviceType);
+        return self::withoutOwnershipScope($query)->where('device_type', $deviceType);
     }
 
     /**
@@ -174,7 +184,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeByBrowser(Builder $query, string $browser): Builder
     {
-        return $query->where('browser', $browser);
+        return self::withoutOwnershipScope($query)->where('browser', $browser);
     }
 
     /**
@@ -182,7 +192,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeByDateRange(Builder $query, string $startDate, string $endDate): Builder
     {
-        return $query->whereBetween('created_at', [$startDate, $endDate]);
+        return self::withoutOwnershipScope($query)->whereBetween('created_at', [$startDate, $endDate]);
     }
 
     /**
@@ -190,7 +200,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeToday(Builder $query): Builder
     {
-        return $query->whereDate('created_at', today());
+        return self::withoutOwnershipScope($query)->whereDate('created_at', today());
     }
 
     /**
@@ -198,7 +208,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeThisWeek(Builder $query): Builder
     {
-        return $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
+        return self::withoutOwnershipScope($query)->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
     }
 
     /**
@@ -206,7 +216,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeThisMonth(Builder $query): Builder
     {
-        return $query->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()]);
+        return self::withoutOwnershipScope($query)->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()]);
     }
 
     /**
@@ -214,7 +224,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeOfType(Builder $query, string $eventType): Builder
     {
-        return $query->where('event_type', $eventType);
+        return self::withoutOwnershipScope($query)->where('event_type', $eventType);
     }
 
     /**
@@ -222,7 +232,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeForSession(Builder $query, string $sessionId): Builder
     {
-        return $query->where('session_id', $sessionId);
+        return self::withoutOwnershipScope($query)->where('session_id', $sessionId);
     }
 
     /**
@@ -230,7 +240,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeForUser(Builder $query, int $userId): Builder
     {
-        return $query->where('user_id', $userId);
+        return self::withoutOwnershipScope($query)->where('user_id', $userId);
     }
 
     /**
@@ -238,17 +248,41 @@ final class AnalyticsEvent extends Model
      */
     public function scopeInDateRange(Builder $query, string $startDate, string $endDate): Builder
     {
-        return $query->whereBetween('created_at', [$startDate, $endDate]);
+        return self::withoutOwnershipScope($query)->whereBetween('created_at', [$startDate, $endDate]);
     }
 
     // Accessors & Mutators
+
+    public const EVENT_TYPES = [
+        'page_view',
+        'click',
+        'form_submit',
+        'purchase',
+        'signup',
+        'login',
+        'logout',
+        'search',
+        'download',
+        'custom',
+        'product_view',
+        'add_to_cart',
+        'remove_from_cart',
+        'user_register',
+        'user_login',
+        'user_logout',
+        'newsletter_signup',
+        'contact_form',
+        'video_play',
+        'social_share',
+        'scroll',
+    ];
 
     /**
      * Handle getEventTypeLabelAttribute functionality with proper error handling.
      */
     public function getEventTypeLabelAttribute(): string
     {
-        $translationKey = 'admin.analytics.event_types.'.$this->event_type;
+        $translationKey = 'admin.analytics.event_types.' . $this->event_type;
 
         // Allow gracefully falling back to the raw event type when the translation
         // string is missing instead of triggering translator argument exceptions.
@@ -266,9 +300,9 @@ final class AnalyticsEvent extends Model
     {
         return match ($this->device_type) {
             'desktop' => 'heroicon-o-computer-desktop',
-            'mobile' => 'heroicon-o-device-phone-mobile',
-            'tablet' => 'heroicon-o-device-tablet',
-            default => 'heroicon-o-question-mark-circle',
+            'mobile'  => 'heroicon-o-device-phone-mobile',
+            'tablet'  => 'heroicon-o-device-tablet',
+            default   => 'heroicon-o-question-mark-circle',
         };
     }
 
@@ -282,7 +316,7 @@ final class AnalyticsEvent extends Model
         }
         $currency = $this->currency ?? 'EUR';
 
-        return number_format($this->value, 2).' '.$currency;
+        return number_format($this->value, 2) . ' ' . $currency;
     }
 
     /**
@@ -301,11 +335,30 @@ final class AnalyticsEvent extends Model
         return is_null($this->user_id);
     }
 
+    private static function withoutOwnershipScope(Builder $query): Builder
+    {
+        return $query->withoutGlobalScopes([UserOwnedScope::class]);
+    }
+
+    private static function ownershiplessQuery(): Builder
+    {
+        return static::query()->withoutGlobalScopes([UserOwnedScope::class]);
+    }
+
     // Static methods
 
     /**
      * Handle getEventTypes functionality with proper error handling.
      */
+    public static function eventTypeOptions(): array
+    {
+        return collect(self::EVENT_TYPES)
+            ->mapWithKeys(fn (string $type): array => [
+                $type => __('analytics_events.types.' . $type),
+            ])
+            ->all();
+    }
+
     public static function getEventTypes(): array
     {
         return ['page_view' => __('admin.analytics.event_types.page_view'), 'product_view' => __('admin.analytics.event_types.product_view'), 'add_to_cart' => __('admin.analytics.event_types.add_to_cart'), 'remove_from_cart' => __('admin.analytics.event_types.remove_from_cart'), 'purchase' => __('admin.analytics.event_types.purchase'), 'search' => __('admin.analytics.event_types.search'), 'click' => __('admin.analytics.event_types.click'), 'user_register' => __('admin.analytics.event_types.user_register'), 'user_login' => __('admin.analytics.event_types.user_login'), 'user_logout' => __('admin.analytics.event_types.user_logout'), 'newsletter_signup' => __('admin.analytics.event_types.newsletter_signup'), 'contact_form' => __('admin.analytics.event_types.contact_form'), 'download' => __('admin.analytics.event_types.download'), 'video_play' => __('admin.analytics.event_types.video_play'), 'social_share' => __('admin.analytics.event_types.social_share')];
@@ -332,7 +385,7 @@ final class AnalyticsEvent extends Model
      */
     public static function getEventTypeStats(): array
     {
-        return static::queryForAdmin()
+        return self::queryForAdmin()
             ->selectRaw('event_type, COUNT(*) as count')
             ->groupBy('event_type')
             ->orderBy('count', 'desc')
@@ -345,7 +398,7 @@ final class AnalyticsEvent extends Model
      */
     public static function getDeviceTypeStats(): array
     {
-        return static::queryForAdmin()
+        return self::queryForAdmin()
             ->selectRaw('device_type, COUNT(*) as count')
             ->whereNotNull('device_type')
             ->groupBy('device_type')
@@ -359,7 +412,7 @@ final class AnalyticsEvent extends Model
      */
     public static function getBrowserStats(): array
     {
-        return static::queryForAdmin()
+        return self::queryForAdmin()
             ->selectRaw('browser, COUNT(*) as count')
             ->whereNotNull('browser')
             ->groupBy('browser')
@@ -373,7 +426,7 @@ final class AnalyticsEvent extends Model
      */
     public static function getRevenueStats(): array
     {
-        return static::queryForAdmin()
+        return self::queryForAdmin()
             ->whereNotNull('value')
             ->selectRaw('DATE(created_at) as date, SUM(value) as revenue')
             ->groupBy('date')
@@ -397,13 +450,13 @@ final class AnalyticsEvent extends Model
      */
     protected static function queryForAdmin(): Builder
     {
-        return static::query()->withoutGlobalScope(UserOwnedScope::class);
+        return self::query()->withoutGlobalScope(UserOwnedScope::class);
     }
 
     /**
      * Handle track functionality with proper error handling.
      *
-     * @param  mixed  $trackable
+     * @param mixed $trackable
      */
     public static function track(string $eventType, array $data = [], $trackable = null): self
     {
@@ -427,9 +480,9 @@ final class AnalyticsEvent extends Model
         $eventData = [
             'event_type' => $eventType,
             'session_id' => $sessionId,
-            'user_id' => auth()->id(),
-            'url' => $request?->fullUrl(),
-            'referrer' => $request?->headers->get('referer'),
+            'user_id'    => auth()->id(),
+            'url'        => $request?->fullUrl(),
+            'referrer'   => $request?->headers->get('referer'),
             'ip_address' => $request?->ip(),
             'user_agent' => $request?->userAgent(),
             'created_at' => now(),

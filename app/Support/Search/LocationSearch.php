@@ -6,8 +6,9 @@ namespace App\Support\Search;
 
 use App\Models\Location;
 use DefStudio\SearchableInput\DTO\SearchResult;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 final class LocationSearch
 {
@@ -16,8 +17,19 @@ final class LocationSearch
      */
     public static function results(string $term, int $limit = 15): array
     {
-        /** @var \Illuminate\Database\Eloquent\Collection<int, Location> $locations */
-        $locations = self::query($term)
+        /** @var EloquentCollection<int, Location> $locations */
+        $locations = Location::query()
+            ->select(['id', 'name', 'code', 'city', 'country_code'])
+            ->when(trim($term) !== '', function (Builder $builder) use ($term): void {
+                $builder->where(function (Builder $query) use ($term): void {
+                    $query
+                        ->where('name', 'like', "%{$term}%")
+                        ->orWhere('code', 'like', "%{$term}%")
+                        ->orWhere('city', 'like', "%{$term}%")
+                        ->orWhere('country_code', 'like', "%{$term}%");
+                });
+            })
+            ->orderBy('name')
             ->limit($limit)
             ->get();
 
@@ -46,24 +58,37 @@ final class LocationSearch
     {
         /** @var string|null $rawName */
         $rawName = $location->getAttribute('name');
-        /** @var string|null $rawCity */
-        $rawCity = $location->getAttribute('city');
         /** @var string|null $rawCode */
         $rawCode = $location->getAttribute('code');
+        /** @var string|null $rawCity */
+        $rawCity = $location->getAttribute('city');
         /** @var string|null $rawCountry */
         $rawCountry = $location->getAttribute('country_code');
 
+        $code = $rawCode ?: '—';
         $name = $rawName ?? '';
         $city = $rawCity ?? '';
-        $code = $rawCode ?? '';
         $country = $rawCountry ?? '';
 
-        return trim(implode(' • ', array_filter([
-            $name !== '' ? $name : __('inventory.locations.unknown'),
-            $city !== '' ? $city : null,
-            $code !== '' ? $code : null,
-            $country !== '' ? Str::upper($country) : null,
-        ])));
+        $locationPart = trim(sprintf('%s, %s', $city, $country));
+
+    public static function hydrateComponent(SearchableInput $component, ?int $state): void
+    {
+        if ($state === null) {
+            SearchableComponentHelper::forget($component);
+
+            return;
+        }
+
+        $location = Location::query()
+            ->select(['id', 'name', 'code', 'city', 'country_code'])
+            ->find($state);
+
+        if (! $location instanceof Location) {
+            return;
+        }
+
+        SearchableComponentHelper::apply($component, self::toResult($location));
     }
 
     /**

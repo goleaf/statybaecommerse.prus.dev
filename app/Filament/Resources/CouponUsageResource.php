@@ -4,46 +4,52 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\CouponUsageResource\Pages;
 use App\Models\Coupon;
 use App\Models\CouponUsage;
-use App\Models\User;
 use App\Support\Filament\Components\Flatpickr;
-use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\CouponSearch;
 use App\Support\Search\CustomerSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class CouponUsageResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = CouponUsage::class;
 
     public static function getPluralModelLabel(): string
@@ -56,9 +62,9 @@ final class CouponUsageResource extends Resource
         return __('admin.coupon_usages.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->components([
+        return $schema->components([
             Tabs::make('coupon_usage_tabs')
                 ->tabs([
                     Tab::make(__('admin.coupon_usages.form.tabs.basic_information'))
@@ -96,10 +102,10 @@ final class CouponUsageResource extends Resource
                                                         },
                                                     );
                                                 })
-                                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                                ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
                                                     if ($state === null || $state === '') {
                                                         // Clear the persisted relation id when the lookup resets.
-                                                        SearchableInputHelper::clear($set, ['coupon_id' => null]);
+                                                        SearchableInputHelper::clear($component, $set, ['coupon_id' => null]);
 
                                                         return;
                                                     }
@@ -135,9 +141,9 @@ final class CouponUsageResource extends Resource
                                                         },
                                                     );
                                                 })
-                                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                                ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
                                                     if ($state === null || $state === '') {
-                                                        SearchableInputHelper::clear($set, ['user_id' => null]);
+                                                        SearchableInputHelper::clear($component, $set, ['user_id' => null]);
 
                                                         return;
                                                     }
@@ -180,7 +186,13 @@ final class CouponUsageResource extends Resource
                                         ->content(fn (?Model $record) => $record?->user?->email ?? '-'),
                                     Placeholder::make('order_total')
                                         ->label(__('admin.coupon_usages.form.fields.order_total'))
-                                        ->content(fn (?Model $record) => $record?->order ? '€' . number_format($record->order->total_amount, 2) : '-'),
+                                        ->content(fn (?Model $record): string => $record?->order
+                                            ? Number::currency(
+                                                (float) $record->order->total,
+                                                $record->order->currency ?? 'EUR',
+                                                locale: app()->getLocale(),
+                                            )
+                                            : '-'),
                                     Textarea::make('notes')
                                         ->label(__('admin.coupon_usages.form.fields.notes'))
                                         ->rows(3),
@@ -190,8 +202,9 @@ final class CouponUsageResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('coupon.code')
@@ -218,9 +231,9 @@ final class CouponUsageResource extends Resource
                     ->label(__('admin.coupon_usages.form.fields.usage_period'))
                     ->state(fn (CouponUsage $record): string => $record->usage_period)
                     ->colors([
-                        'success' => fn ($state) => in_array($state, [__('admin.coupon_usages.periods.today'), __('admin.coupon_usages.periods.this_week')], true),
-                        'warning' => fn ($state) => $state === __('admin.coupon_usages.periods.this_month'),
-                        'danger'  => fn ($state) => $state === __('admin.coupon_usages.periods.older'),
+                        'success' => fn (?string $state): bool => in_array($state, [__('admin.coupon_usages.periods.today'), __('admin.coupon_usages.periods.this_week')], true),
+                        'warning' => fn (?string $state): bool => $state === __('admin.coupon_usages.periods.this_month'),
+                        'danger'  => fn (?string $state): bool => $state === __('admin.coupon_usages.periods.older'),
                     ]),
             ])
             ->filters([
@@ -239,15 +252,27 @@ final class CouponUsageResource extends Resource
                     ->relationship('order', 'id')
                     ->searchable()
                     ->preload(),
-                Filter::make('used_at_range')
+                Filter::make('used_at')
                     ->label(__('admin.coupon_usages.filters.used_at'))
                     ->form([
                         Flatpickr::makeDateTime('from')->label(__('admin.coupon_usages.filters.used_at_from')),
                         Flatpickr::makeDateTime('until')->label(__('admin.coupon_usages.filters.used_at_until')),
                     ])
-                    ->query(fn (Builder $query, array $data): Builder => $query
-                        ->when($data['from'] ?? null, fn (Builder $q, $date): Builder => $q->where('used_at', '>=', $date))
-                        ->when($data['until'] ?? null, fn (Builder $q, $date): Builder => $q->where('used_at', '<=', $date))),
+                    ->query(function (Builder $query, array|string|null $data): Builder {
+                        // Allow both the range picker (array payload) and the single date test helper string.
+                        $exactDate = is_array($data) ? null : $data;
+
+                        if (filled($exactDate)) {
+                            return $query->whereDate('used_at', '=', $exactDate);
+                        }
+
+                        $from = is_array($data) ? ($data['from'] ?? null) : null;
+                        $until = is_array($data) ? ($data['until'] ?? null) : null;
+
+                        return $query
+                            ->when($from, fn (Builder $q, $date): Builder => $q->where('used_at', '>=', $date))
+                            ->when($until, fn (Builder $q, $date): Builder => $q->where('used_at', '<=', $date));
+                    }),
                 TernaryFilter::make('used_today')
                     ->label(__('admin.coupon_usages.filters.used_today'))
                     ->queries(
@@ -270,6 +295,8 @@ final class CouponUsageResource extends Resource
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
+                // Surface the standard delete button so Livewire table actions stay in sync with the feature tests.
+                DeleteAction::make(),
                 Action::make('export_usage_report')
                     ->label(__('admin.coupon_usages.actions.export_usage_report'))
                     ->icon('heroicon-o-document-arrow-down')

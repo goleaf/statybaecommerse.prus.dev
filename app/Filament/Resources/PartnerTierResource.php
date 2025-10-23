@@ -4,17 +4,21 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\PartnerTierResource\Pages;
 use App\Models\PartnerTier;
-use BackedEnum;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Number;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class PartnerTierResource extends Resource
 {
     /**
@@ -29,11 +33,16 @@ final class PartnerTierResource extends Resource
 
     protected static ?string $model = PartnerTier::class;
 
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Marketing';
+    }
+
     protected static ?int $navigationSort = 2;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Section::make(__('admin.partner_tiers.sections.basic_information'))
                     ->schema([
@@ -89,8 +98,9 @@ final class PartnerTierResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')

@@ -3,7 +3,9 @@
 declare(strict_types=1);
 
 use App\Filament\Resources\CustomerGroupResource;
+use App\Support\Nav;
 use App\Models\CustomerGroup;
+use App\Support\Nav;
 
 it('can load CustomerGroupResource class', function () {
     expect(class_exists(CustomerGroupResource::class))->toBeTrue();
@@ -18,7 +20,9 @@ it('can get CustomerGroupResource model', function () {
 });
 
 it('can get CustomerGroupResource navigation group', function () {
-    expect(CustomerGroupResource::getNavigationGroup())->toBe('Customers');
+    expect(CustomerGroupResource::getNavigationGroup())->toBe(
+        Nav::groupForResource(CustomerGroupResource::class)
+    );
 });
 
 it('can get CustomerGroupResource navigation label', function () {

@@ -3,7 +3,10 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsComments;
+use App\Support\Concerns\HasNav;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\NewsComments\Pages\CreateNewsComment;
 use App\Filament\Resources\NewsComments\Pages\EditNewsComment;
 use App\Filament\Resources\NewsComments\Pages\ListNewsComments;
@@ -11,28 +14,41 @@ use App\Filament\Resources\NewsComments\Schemas\NewsCommentForm;
 use App\Filament\Resources\NewsComments\Tables\NewsCommentsTable;
 use App\Models\NewsComment;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 class NewsCommentResource extends Resource
 {
-    protected static ?string $model = NewsComment::class;
+    use HasNav;
 
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
      */
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return NewsCommentForm::configure($form);
+        return NewsCommentForm::configure($schema);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return NewsCommentsTable::configure($table);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes([
+            ActiveScope::class,
+            ApprovedScope::class,
+            VisibleScope::class,
+            'active_flag',
+        ]);
     }
 
     public static function getRelations(): array

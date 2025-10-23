@@ -4,28 +4,29 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\SystemSettingCategoryTranslationResource\Pages;
 use App\Models\SystemSettingCategory;
 use App\Models\SystemSettingCategoryTranslation;
-use BackedEnum;
 use Exception;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
@@ -40,7 +41,7 @@ final class SystemSettingCategoryTranslationResource extends Resource
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-language';
 
     /**
-     * @var string|UnitEnum|null Navigation group assignment stored without a typed property to avoid enum collisions.
+     * @var string|\UnitEnum|null Navigation group assignment stored without a typed property to avoid enum collisions.
      */
     protected static UnitEnum|string|null $navigationGroup = 'Settings';
 
@@ -61,9 +62,9 @@ final class SystemSettingCategoryTranslationResource extends Resource
         return __('admin.system_setting_category_translations.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('admin.system_setting_category_translations.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -105,8 +106,9 @@ final class SystemSettingCategoryTranslationResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('systemSettingCategory.name')

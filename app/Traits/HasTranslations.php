@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Traits;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use RuntimeException;
 
 /**
  * HasTranslations
@@ -85,6 +88,6 @@ trait HasTranslations
         if (property_exists($this, 'translationModel')) {
             return $this->translationModel;
         }
-        throw new \RuntimeException(static::class.' must define $translationModel to use HasTranslations');
+        throw new RuntimeException(static::class . ' must define $translationModel to use HasTranslations');
     }
 }

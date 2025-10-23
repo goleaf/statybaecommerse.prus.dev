@@ -3,35 +3,42 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\MenuItems;
+use App\Support\Concerns\HasNav;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\MenuItems\Pages\CreateMenuItem;
 use App\Filament\Resources\MenuItems\Pages\EditMenuItem;
 use App\Filament\Resources\MenuItems\Pages\ListMenuItems;
 use App\Filament\Resources\MenuItems\Schemas\MenuItemForm;
 use App\Filament\Resources\MenuItems\Tables\MenuItemsTable;
 use App\Models\MenuItem;
-use BackedEnum;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 class MenuItemResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = MenuItem::class;
 
     /**
-     * @var string|BackedEnum|null Menu item icon aligned with Filament v4 guidance.
+     * @var string|\BackedEnum|null Menu item icon aligned with Filament v4 guidance.
      */
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     /**
      * Compose the shared form schema for creating and editing menu items.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         // Delegate field layout to the dedicated schema configurator for reuse.
-        return MenuItemForm::configure($form);
+        return MenuItemForm::configure($schema);
     }
 
     /**

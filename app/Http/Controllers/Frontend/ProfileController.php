@@ -13,10 +13,9 @@ use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Exists;
+use Illuminate\View\View;
 
 final class ProfileController extends Controller
 {
@@ -28,155 +27,95 @@ final class ProfileController extends Controller
 
     public function index(Request $request): View
     {
-        /** @var User $user */
-        $user = $request->user();
-        $user->loadMissing([
-            'addresses' => static fn ($query) => $query->orderByDesc('is_default')->orderByDesc('created_at'),
-        ]);
-
-        return view('profile.index', [
-            'user' => $user,
-            'customer' => $this->resolveCustomerForUser($user),
-            'addresses' => $user->addresses,
+        return view('frontend.profile.index', [
+            'user' => $request->user()->load('addresses'),
         ]);
     }
 
     public function edit(Request $request): View
     {
-        /** @var User $user */
-        $user = $request->user();
-        $user->loadMissing('addresses');
-
-        return view('profile.edit', [
-            'user' => $user,
-            'customer' => $this->resolveCustomerForUser($user),
-            'countries' => $this->resolveCountries(),
+        return view('frontend.profile.edit', [
+            'user' => $request->user(),
         ]);
     }
 
     public function update(Request $request): RedirectResponse
     {
-        /** @var User $user */
         $user = $request->user();
-        $originalEmail = (string) $user->email;
 
         $validated = $request->validate([
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
-            'phone' => ['nullable', 'string', 'max:50'],
-            'address' => ['nullable', 'string', 'max:500'],
-            'postal_code' => ['nullable', 'string', 'max:20'],
-            'country_id' => $this->countryRule(),
-            'city_id' => $this->cityRule(),
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->getKey())],
+            'password' => ['nullable', 'confirmed', 'min:8'],
         ]);
 
-        $user->forceFill([
-            'first_name' => $validated['first_name'],
-            'last_name' => $validated['last_name'],
-            'name' => trim($validated['first_name'].' '.$validated['last_name']),
-            'email' => $validated['email'],
-            'phone' => $validated['phone'] ?? null,
-            'phone_number' => $validated['phone'] ?? null,
-        ])->save();
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
 
-        $this->updateCustomerRecord($user, $validated, $originalEmail);
+        if (! empty($validated['password'])) {
+            $user->password = Hash::make($validated['password']);
+        }
 
-        return redirect()
-            ->route('frontend.profile.index')
-            ->with('success', __('translations.profile_updated_successfully'));
+        $user->save();
+
+        return redirect()->route('frontend.profile.index')->with('status', 'profile-updated');
     }
 
     public function addresses(Request $request): View
     {
-        /** @var User $user */
-        $user = $request->user();
-
-        $addresses = $user->addresses()
-            ->orderByDesc('is_default')
-            ->orderByDesc('created_at')
-            ->get();
-
-        return view('profile.addresses', [
-            'user' => $user,
-            'addresses' => $addresses,
-            'addressTypes' => AddressType::options(),
-            'countries' => $this->resolveCountries(),
+        return view('frontend.profile.addresses', [
+            'addresses' => $request->user()->addresses()->latest()->get(),
+            'types' => AddressType::cases(),
         ]);
     }
 
     public function storeAddress(Request $request): RedirectResponse
     {
-        /** @var User $user */
-        $user = $request->user();
         $validated = $this->validateAddress($request);
 
-        $address = new Address($validated);
-        $address->user_id = $user->id;
-        $address->is_active = true;
-        $address->save();
+        $address = $request->user()->addresses()->create($validated);
 
-        $this->synchroniseAddressFlags($user, $address);
+        if ($address->is_default) {
+            $this->ensureSingleDefault($request, $address);
+        }
 
-        return redirect()
-            ->route('frontend.profile.addresses')
-            ->with('success', __('translations.address_created_successfully'));
+        return redirect()->route('frontend.profile.addresses')->with('status', 'address-created');
     }
 
     public function updateAddress(Request $request, Address $address): RedirectResponse
     {
-        /** @var User $user */
-        $user = $request->user();
-        $this->ensureAddressOwner($user->id, $address);
+        $validated = $this->validateAddress($request, $address);
 
-        $validated = $this->validateAddress($request);
-        $address->fill($validated);
-        $address->save();
+        $address->update($validated);
 
-        $this->synchroniseAddressFlags($user, $address);
+        if ($address->is_default) {
+            $this->ensureSingleDefault($request, $address);
+        }
 
-        return redirect()
-            ->route('frontend.profile.addresses')
-            ->with('success', __('translations.address_updated_successfully'));
+        return redirect()->route('frontend.profile.addresses')->with('status', 'address-updated');
     }
 
-    public function deleteAddress(Request $request, Address $address): RedirectResponse
+    public function deleteAddress(Address $address): RedirectResponse
     {
-        /** @var User $user */
-        $user = $request->user();
-        $this->ensureAddressOwner($user->id, $address);
-
         $address->delete();
 
-        return redirect()
-            ->route('frontend.profile.addresses')
-            ->with('success', __('translations.address_deleted_successfully'));
+        return redirect()->route('frontend.profile.addresses')->with('status', 'address-deleted');
     }
 
-    private function validateAddress(Request $request): array
+    private function validateAddress(Request $request, ?Address $address = null): array
     {
-        $rules = [
-            'type' => ['required', Rule::in(AddressType::values())],
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'company_name' => ['nullable', 'string', 'max:255'],
-            'company_vat' => ['nullable', 'string', 'max:50'],
+        $validated = $request->validate([
+            'type' => ['required', Rule::in(array_map(fn (AddressType $type) => $type->value, AddressType::cases()))],
+            'first_name' => ['required', 'string', 'max:120'],
+            'last_name' => ['required', 'string', 'max:120'],
             'address_line_1' => ['required', 'string', 'max:255'],
             'address_line_2' => ['nullable', 'string', 'max:255'],
-            'apartment' => ['nullable', 'string', 'max:100'],
-            'floor' => ['nullable', 'string', 'max:100'],
-            'building' => ['nullable', 'string', 'max:100'],
-            'city' => ['required', 'string', 'max:100'],
-            'state' => ['nullable', 'string', 'max:100'],
-            'postal_code' => ['required', 'string', 'max:20'],
+            'city' => ['required', 'string', 'max:120'],
+            'state' => ['nullable', 'string', 'max:120'],
+            'postal_code' => ['required', 'string', 'max:32'],
             'country_code' => ['required', 'string', 'size:2'],
-            'country_id' => $this->countryRule(),
-            'city_id' => $this->cityRule(),
-            'phone' => ['nullable', 'string', 'max:20'],
+            'phone' => ['nullable', 'string', 'max:50'],
             'email' => ['nullable', 'email', 'max:255'],
-            'notes' => ['nullable', 'string', 'max:1000'],
-            'instructions' => ['nullable', 'string', 'max:1000'],
-            'landmark' => ['nullable', 'string', 'max:255'],
             'is_default' => ['sometimes', 'boolean'],
             'is_billing' => ['sometimes', 'boolean'],
             'is_shipping' => ['sometimes', 'boolean'],
@@ -252,17 +191,14 @@ final class ProfileController extends Controller
             'city_id' => $validated['city_id'] ?? null,
         ]);
 
-        if (! $customer->exists) {
-            $customer->is_active = true;
-        }
+        $validated['is_default'] = (bool) ($validated['is_default'] ?? false);
+        $validated['is_billing'] = (bool) ($validated['is_billing'] ?? false);
+        $validated['is_shipping'] = (bool) ($validated['is_shipping'] ?? false);
 
-        $customer->save();
+        return $validated;
     }
 
-    /**
-     * @return array<int, string|Exists>
-     */
-    private function countryRule(): array
+    private function ensureSingleDefault(Request $request, Address $address): void
     {
         $rules = ['nullable', 'integer'];
 

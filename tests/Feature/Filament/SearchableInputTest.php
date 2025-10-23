@@ -11,7 +11,7 @@ use App\Filament\Resources\WishlistItemResource;
 use App\Models\Product;
 use App\Support\Search\SearchResultPayload;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema as FormSchema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Illuminate\Support\Carbon;
@@ -49,7 +49,7 @@ it('exposes product search results through the form component', function (string
         'updated_at'   => Carbon::now(),
     ]));
 
-    $form = $resourceClass::form(Form::make());
+    $form = $resourceClass::form(FormSchema::make());
     $components = $form->getFlatComponents(withActions: false);
 
     expect($components)->toHaveKey('product_id');

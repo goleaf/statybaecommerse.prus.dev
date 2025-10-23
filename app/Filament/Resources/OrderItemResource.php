@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\OrderItemResource\Pages;
 use App\Models\OrderItem;
 use App\Models\Product;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Filament\ProductVariantFieldHelper;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Filament\Filters\DateRangeFilter;
 use App\Support\Filament\ProductVariantFieldHelper;
 use App\Support\Filament\SearchableInputHelper;
@@ -20,20 +23,26 @@ use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 /**
  * OrderItemResource
  *
@@ -43,7 +52,7 @@ final class OrderItemResource extends Resource
 {
     public static function getNavigationGroup(): UnitEnum|string|null
     {
-        return 'Orders';
+        return NavigationGroup::Orders;
     }
 
     protected static ?string $model = OrderItem::class;
@@ -79,9 +88,9 @@ final class OrderItemResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('orders.sections.order_items'))
                 ->schema([
                     Grid::make(2)
@@ -127,10 +136,10 @@ final class OrderItemResource extends Resource
                                     );
                                 })
                                 // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
-                                ->afterStateUpdated(function (?string $state, Set $set, Get $get): void {
+                                ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set, Get $get): void {
                                     if ($state === null || $state === '') {
                                         // When the lookup is cleared ensure all derived metadata and totals are reset.
-                                        SearchableInputHelper::clear($set, [
+                                        SearchableInputHelper::clear($component, $set, [
                                             'product_id'         => null,
                                             'name'               => null,
                                             'sku'                => null,
@@ -280,8 +289,9 @@ final class OrderItemResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('order.number')

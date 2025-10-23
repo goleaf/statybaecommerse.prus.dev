@@ -13,7 +13,6 @@ use App\Data\Notifications\NotificationStatsData;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -95,7 +94,9 @@ final class NotificationService
 
     public function markAllAsReadForUser(User $user): int
     {
-        return Notification::markAllAsReadForUser($user->id);
+        $notification->markAsUnread();
+
+        return NotificationPayloadData::fromModel($notification->fresh());
     }
 
     public function markAllAsUnreadForUser(User $user): int
@@ -207,5 +208,18 @@ final class NotificationService
             'back_in_stock' => "Produktas '{$productData['name']}' atsikūrė atsargos.",
             default => "Produktas '{$productData['name']}' buvo {$action}.",
         };
+    }
+
+    private function applyFilters(Builder $query, NotificationFilterData $filter): Builder
+    {
+        if ($filter->type !== null) {
+            $query->byType($filter->type);
+        }
+
+        if ($filter->read !== null) {
+            $filter->read ? $query->read() : $query->unread();
+        }
+
+        return $query;
     }
 }

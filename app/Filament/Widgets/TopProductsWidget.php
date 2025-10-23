@@ -35,8 +35,9 @@ final class TopProductsWidget extends BaseWidget
         return __('analytics.top_products');
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the widget table to meet the Filament v4 return type contract.
         $since = Carbon::now()->subDays(7);
 
         $query = Product::query()

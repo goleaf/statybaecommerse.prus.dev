@@ -10,6 +10,8 @@ use Filament\Actions;
 
 final class ListProductHistories extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = ProductHistoryResource::class;
 
     protected function getHeaderActions(): array

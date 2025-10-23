@@ -10,6 +10,8 @@ use Filament\Actions;
 
 final class ListReviews extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = ReviewResource::class;
 
     protected function getHeaderActions(): array

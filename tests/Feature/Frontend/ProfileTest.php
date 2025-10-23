@@ -8,6 +8,8 @@ use App\Enums\AddressType;
 use App\Models\Address;
 use App\Models\Customer;
 use App\Models\User;
+use App\Support\Database\TableAvailability;
+use Closure;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
@@ -40,7 +42,7 @@ final class ProfileTest extends TestCase
             ->withArgs(static fn (string $table): bool => $table !== 'countries')
             ->andReturnTrue();
 
-        $user = User::factory()->create();
+            $response = $this->actingAs($user)->get(route('frontend.profile.edit'));
 
         $response = $this->actingAs($user)->get(route('frontend.profile.edit'));
 
@@ -173,19 +175,19 @@ final class ProfileTest extends TestCase
             ->withArgs(static fn (string $table): bool => ! in_array($table, ['countries', 'cities'], true))
             ->andReturnTrue();
 
-        $user = User::factory()->create();
+            $payload = [
+                'type' => AddressType::SHIPPING->value,
+                'first_name' => 'Jonas',
+                'last_name' => 'Jonaitis',
+                'address_line_1' => 'Gedimino pr. 1',
+                'city' => 'Vilnius',
+                'postal_code' => '01103',
+                'country_code' => 'LT',
+            ];
 
-        $payload = [
-            'type' => AddressType::SHIPPING->value,
-            'first_name' => 'Jonas',
-            'last_name' => 'Jonaitis',
-            'address_line_1' => 'Gedimino pr. 1',
-            'city' => 'Vilnius',
-            'postal_code' => '01103',
-            'country_code' => 'LT',
-        ];
+            $response = $this->actingAs($user)->post(route('frontend.profile.store-address'), $payload);
 
-        $response = $this->actingAs($user)->post(route('frontend.profile.store-address'), $payload);
+            $response->assertRedirect(route('frontend.profile.addresses'));
 
         $response->assertRedirect(route('frontend.profile.addresses'));
 
@@ -251,5 +253,39 @@ final class ProfileTest extends TestCase
         $this->assertSoftDeleted('addresses', [
             'id' => $address->id,
         ]);
+    }
+
+    /**
+     * @param  array<string, bool>  $overrides
+     */
+    private function withTableAvailability(array $overrides, Closure $callback): void
+    {
+        $original = app(TableAvailability::class);
+
+        $fake = new class($overrides) extends TableAvailability {
+            /**
+             * @param  array<string, bool>  $overrides
+             */
+            public function __construct(private readonly array $overrides)
+            {
+            }
+
+            public function has(string $table, ?string $connection = null): bool
+            {
+                if (array_key_exists($table, $this->overrides)) {
+                    return $this->overrides[$table];
+                }
+
+                return parent::has($table, $connection);
+            }
+        };
+
+        $this->app->instance(TableAvailability::class, $fake);
+
+        try {
+            $callback();
+        } finally {
+            $this->app->instance(TableAvailability::class, $original);
+        }
     }
 }

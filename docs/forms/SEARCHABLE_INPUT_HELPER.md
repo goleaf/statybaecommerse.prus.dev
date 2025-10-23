@@ -1,41 +1,62 @@
-# Searchable Input Helper
+# SearchableInput Helper Reference
 
-The `App\Support\Filament\Components\SearchableComponentHelper` centralises common state management tasks for [`DefStudio\SearchableInput`](https://github.com/defstudio/searchable-input) components so Filament resources stay concise.
+The `App\Support\Filament\Components\SearchableComponentHelper` centralises the repetitive work required to keep [`DefStudio\SearchableInput`](https://github.com/defstudio/searchable-input) fields hydrated with the correct state, option list, and metadata payload. By funnelling hydration and update hooks through the helper, resources inherit consistent behaviour while reusing the canonical `{ value, label, payload }` tuple produced by our search services.
 
-## Core scenarios
+## Available Utilities
 
 | Scenario | Helper | Notes |
 | --- | --- | --- |
-| Hydrating an edit form with an existing model | `hydrateFromModel()` or `hydrateUsingFinder()` | Restores the component state and option list from a model instance without duplicating query logic. |
-| Persisting nullable foreign keys | `syncNullableIntState()` | Normalises blank values to `null`, clears the component when empty, and persists integer IDs. |
-| Propagating lookup payloads to dependent fields | `syncLookupPayload()` | Keeps downstream payload arrays in sync and clears the lookup component when state is removed. |
+| Hydrating an edit form with an existing model | `hydrate()` | Resolves the stored identifier, normalises the payload, and feeds the dropdown state/options/payload tuple back into the component. |
+| Updating related attributes after a selection changes | `syncSelectedRecord()` | Persists the identifier to another form field (for example, `product_id`) while rebuilding the dropdown state and payload metadata. Optional callbacks let resources cache enriched payloads or clear dependant fields. |
+| Clearing stale selections | `clear()` | Resets the component state, options, and payload while executing any supplied callbacks to tidy related form data. |
 
-## Usage checklist
+## Usage Notes
 
-1. Normalise raw component values with `normaliseIdentifier()` before casting to integers.
-2. Clear the lookup via `clearComponent()` whenever the helper determines the state is empty.
-3. Pass the optional component instance to `syncNullableIntState()` so clearing logic stays centralised.
-4. Use the optional label resolver in `syncLookupPayload()` when a component needs its option list rebuilt (e.g. editing existing orders).
+1. Provide a resolver that accepts the persisted identifier and returns the backing record (`hydrate()` and `syncSelectedRecord()` receive the raw component state).
+2. The normaliser should emit the `{ value, label, payload }` tuple—`payload` can be any associative array or `Arrayable` instance.
+3. Use the optional `$onSync` callback on `syncSelectedRecord()` to mirror payload metadata into hidden fields or computed totals.
+4. Supply the optional `$onClear` callback to wipe dependant form fields whenever the lookup is emptied or fails to resolve.
 
-> **Tip:** The helper intentionally returns payload arrays untouched, so dependent totals, key-value components, or computed summaries continue to consume the normalised data emitted by search payload builders like `AddressSearch::payload()`.
+> **Tip:** When your search service already emits a `SearchResult` via `SearchResultPayload::normalise()`, call `SearchResultPayload::hydrate()` inside the normaliser and return the resulting tuple to avoid duplicating field mapping logic.
 
 ## Example
 
 ```php
-SearchableInput::make('customer_id')
-    ->searchUsing(fn (string $search) => CustomerSearch::byEmailPhoneName($search))
-    ->dehydrateStateUsing(static fn ($state) => SearchableComponentHelper::normaliseIdentifier($state))
-    ->afterStateHydrated(fn (SearchableInput $component, ?int $state) =>
-        SearchableComponentHelper::hydrateUsingFinder($component, $state, $finder, $labelResolver)
-    )
-    ->afterStateUpdated(fn (SearchableInput $component, $state, Set $set) =>
-        SearchableComponentHelper::syncNullableIntState($state, $set, 'customer_id', $component)
-    );
+SearchableInput::make('product_id')
+    ->searchUsing(fn (string $search) => ProductSearch::complex($search))
+    ->afterStateHydrated(fn (SearchableInput $component, ?int $state) => SearchableComponentHelper::hydrate(
+        component: $component,
+        state: $state,
+        resolveRecord: fn (int $id) => Product::query()->select(['id', 'sku', 'name', 'price'])->find($id),
+        normalizePayload: fn (Product $product) => [
+            'value'   => $product->getKey(),
+            'label'   => ProductSearch::label($product),
+            'payload' => [
+                'product_id' => $product->getKey(),
+                'sku'        => (string) $product->sku,
+                'name'       => $product->getTranslatedName(),
+                'price'      => (float) ($product->price ?? 0),
+            ],
+        ],
+    ))
+    ->afterStateUpdated(fn (SearchableInput $component, ?string $state, Set $set) => SearchableComponentHelper::syncSelectedRecord(
+        component: $component,
+        state: $state,
+        set: $set,
+        attribute: 'product_id',
+        resolveRecord: fn (string $id) => Product::find((int) $id),
+        normalizePayload: fn (Product $product) => [...],
+        onSync: fn (array $normalised) => $set('product_payload', $normalised['payload']),
+        onClear: fn () => $set('product_payload', []),
+    ));
 
+Hidden::make('product_payload')
+    ->default([])
+    ->dehydrated(false);
 ```
 
 ## Payload expectations
 
-- `syncLookupPayload()` expects the payload resolver to return associative arrays ready for downstream consumers (e.g. `KeyValue` components or computed totals). The helper writes these arrays verbatim so structure the payload according to the receiving field.
-- Provide an `$emptyPayload` value mirroring the target field's default shape. For example, supply an empty array for key-value components or a zeroed structure for totals so the UI remains consistent when the lookup is cleared.
-- When using the optional label resolver, return the same text you would normally push into `$component->options()` to keep edit forms hydrated correctly.
+- The helper casts labels to strings and payloads to arrays, ensuring Livewire receives serialisable data even when DTOs or value objects back the metadata.
+- When the normaliser returns an empty identifier, the helper automatically delegates to `clear()` so the UI cannot surface stale payloads.
+- Downstream components should consume the payload array as the single source of truth—search services embed IDs, labels, and domain-specific metadata (SKU, price, etc.) by default.

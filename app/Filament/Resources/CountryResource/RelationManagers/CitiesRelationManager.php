@@ -4,20 +4,26 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CountryResource\RelationManagers;
 
+
+use Filament\Schemas\Schema;
+use Filament\Forms;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class CitiesRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'cities';
 
     protected static ?string $title = 'Cities';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $schema): Schema   
     {
         return $schema
             ->schema([
@@ -110,8 +116,9 @@ final class CitiesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->recordTitleAttribute('name')
             ->columns([
@@ -180,6 +187,15 @@ final class CitiesRelationManager extends BaseRelationManager
                     ->label(__('cities.is_default')),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit ' . $this->getPluralModelLabel())
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        // Provide a quick-edit modal for managing records inline.
+                        return $repeater->schema($this->getQuickEditSchema());
+                    }),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

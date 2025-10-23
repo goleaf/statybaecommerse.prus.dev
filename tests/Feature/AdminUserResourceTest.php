@@ -10,7 +10,9 @@ use App\Filament\Resources\AdminUserResource\Pages\ListAdminUsers;
 use App\Filament\Resources\AdminUserResource\Pages\ViewAdminUser;
 use App\Models\AdminUser;
 use Filament\Facades\Filament;
+use Hash;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -48,9 +50,9 @@ final class AdminUserResourceTest extends TestCase
     {
         // Arrange
         $adminUserData = [
-            'name' => 'Test Admin',
-            'email' => 'test@example.com',
-            'password' => 'password123',
+            'name'                  => 'Test Admin',
+            'email'                 => 'test@example.com',
+            'password'              => 'password123',
             'password_confirmation' => 'password123',
         ];
 
@@ -62,7 +64,7 @@ final class AdminUserResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('admin_users', [
-            'name' => 'Test Admin',
+            'name'  => 'Test Admin',
             'email' => 'test@example.com',
         ]);
     }
@@ -81,7 +83,7 @@ final class AdminUserResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('admin_users', [
-            'id' => $adminUser->id,
+            'id'   => $adminUser->id,
             'name' => $newName,
         ]);
     }
@@ -115,6 +117,8 @@ final class AdminUserResourceTest extends TestCase
     {
         // Arrange
         $adminUser = AdminUser::factory()->create(['email_verified_at' => null]);
+        // Freeze time so the recorded verification timestamp matches our assertion precisely.
+        Carbon::setTestNow(now());
 
         // Act & Assert
         Livewire::actingAs($this->adminUser)
@@ -123,9 +127,12 @@ final class AdminUserResourceTest extends TestCase
             ->assertNotified();
 
         $this->assertDatabaseHas('admin_users', [
-            'id' => $adminUser->id,
+            'id'                => $adminUser->id,
             'email_verified_at' => now()->format('Y-m-d H:i:s'),
         ]);
+
+        // Clear the frozen time to avoid leaking into other tests.
+        Carbon::setTestNow();
     }
 
     public function test_can_send_verification_email(): void
@@ -144,6 +151,8 @@ final class AdminUserResourceTest extends TestCase
     {
         // Arrange
         $adminUsers = AdminUser::factory()->count(3)->create(['email_verified_at' => null]);
+        // Lock the time so the bulk update uses a deterministic timestamp for verification.
+        Carbon::setTestNow(now());
 
         // Act & Assert
         Livewire::actingAs($this->adminUser)
@@ -153,10 +162,13 @@ final class AdminUserResourceTest extends TestCase
 
         foreach ($adminUsers as $adminUser) {
             $this->assertDatabaseHas('admin_users', [
-                'id' => $adminUser->id,
+                'id'                => $adminUser->id,
                 'email_verified_at' => now()->format('Y-m-d H:i:s'),
             ]);
         }
+
+        // Release the mocked time after the assertions run.
+        Carbon::setTestNow();
     }
 
     public function test_can_bulk_send_verification_emails(): void
@@ -212,9 +224,9 @@ final class AdminUserResourceTest extends TestCase
     {
         // Arrange
         $adminUserData = [
-            'name' => 'Test Admin',
-            'email' => 'test@example.com',
-            'password' => 'password123',
+            'name'                  => 'Test Admin',
+            'email'                 => 'test@example.com',
+            'password'              => 'password123',
             'password_confirmation' => 'different_password',
         ];
 
@@ -231,9 +243,9 @@ final class AdminUserResourceTest extends TestCase
         // Arrange
         $existingUser = AdminUser::factory()->create(['email' => 'existing@example.com']);
         $adminUserData = [
-            'name' => 'Test Admin',
-            'email' => 'existing@example.com',
-            'password' => 'password123',
+            'name'                  => 'Test Admin',
+            'email'                 => 'existing@example.com',
+            'password'              => 'password123',
             'password_confirmation' => 'password123',
         ];
 
@@ -302,7 +314,7 @@ final class AdminUserResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('admin_users', [
-            'id' => $adminUser->id,
+            'id'   => $adminUser->id,
             'name' => 'Updated Name',
         ]);
     }
@@ -317,7 +329,7 @@ final class AdminUserResourceTest extends TestCase
         Livewire::actingAs($this->adminUser)
             ->test(EditAdminUser::class, ['record' => $adminUser->id])
             ->fillForm([
-                'password' => $newPassword,
+                'password'              => $newPassword,
                 'password_confirmation' => $newPassword,
             ])
             ->call('save')
@@ -325,7 +337,7 @@ final class AdminUserResourceTest extends TestCase
 
         // Verify password was updated by checking if we can authenticate
         $this->assertTrue(
-            \Hash::check($newPassword, $adminUser->fresh()->password)
+            Hash::check($newPassword, $adminUser->fresh()->password)
         );
     }
 }

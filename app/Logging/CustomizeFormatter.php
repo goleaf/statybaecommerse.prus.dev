@@ -9,6 +9,7 @@ use App\Logging\Processors\TraceContextProcessor;
 use Illuminate\Log\Logger as IlluminateLogger;
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 
 final class CustomizeFormatter
 {
@@ -22,8 +23,8 @@ final class CustomizeFormatter
             return;
         }
 
-        $monolog->pushProcessor(new TraceContextProcessor);
-        $monolog->pushProcessor(new KibanaContextProcessor);
+        $monolog->pushProcessor(new TraceContextProcessor());
+        $monolog->pushProcessor(new KibanaContextProcessor());
 
         foreach ($monolog->getHandlers() as $handler) {
             if (method_exists($handler, 'setFormatter')) {

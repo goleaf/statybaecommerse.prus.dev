@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Exceptions\Domain;
 
-use App\Support\ErrorCodes;
+use App\Support\ErrorCode;
 use Exception;
 
 /**
@@ -12,32 +12,32 @@ use Exception;
  */
 abstract class DomainException extends Exception
 {
+    private readonly string $translationKey;
+
     /**
-     * @param  string  $errorCode  Machine readable error code (e.g. `orders.not_found`).
-     * @param  string  $translationKey  Translation key used to localize the human readable message.
+     * @param  ErrorCode  $errorCode  Machine readable error code that describes the failure.
      * @param  array<string, mixed>  $context  Placeholder replacements that will be injected into the translation string.
      * @param  int  $status  HTTP status code that best represents the failure.
      */
+    private readonly string $translationKey;
+
     public function __construct(
-        private readonly string $errorCode,
-        private readonly string $translationKey,
+        private readonly ErrorCode $errorCode,
         private readonly array $context = [],
         private readonly int $status = 400,
         ?Exception $previous = null,
     ) {
-        ErrorCodes::assertValid($errorCode);
-
-        parent::__construct($translationKey, $status, $previous);
+        parent::__construct($errorCode->translationKey(), $status, $previous);
     }
 
-    public function errorCode(): string
+    public function errorCode(): ErrorCode
     {
         return $this->errorCode;
     }
 
     public function translationKey(): string
     {
-        return $this->translationKey;
+        return $this->errorCode->translationKey();
     }
 
     /**

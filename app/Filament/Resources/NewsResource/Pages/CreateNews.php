@@ -9,6 +9,7 @@ use App\Filament\Concerns\InteractsWithTranslationTabs;
 use App\Filament\Concerns\ManagesNewsTranslationTabs;
 use App\Filament\Resources\NewsResource;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Database\Eloquent\Model;
 
 final class CreateNews extends CreateRecord
 {
@@ -19,6 +20,11 @@ final class CreateNews extends CreateRecord
     }
 
     protected static string $resource = NewsResource::class;
+
+    /**
+     * @var array<string, mixed>
+     */
+    private array $translationPayload = [];
 
     protected function getRedirectUrl(): string
     {

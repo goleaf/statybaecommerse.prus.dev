@@ -103,4 +103,8 @@ return [
             'cron'    => env('BACKUP_VERIFY_CRON'),
         ],
     ],
+
+    'verify' => [
+        'connection' => env('BACKUP_VERIFY_CONNECTION', 'sqlite'),
+    ],
 ];

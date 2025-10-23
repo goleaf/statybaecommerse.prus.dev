@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\SystemSettingsResource;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
 use App\Models\User;
+use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
@@ -324,7 +324,7 @@ final class SystemSettingsResourceTest extends TestCase
     public function test_navigation_group_is_system(): void
     {
         $this->assertEquals(
-            NavigationGroup::System->value,
+            Nav::groupForResource(SystemSettingsResource::class),
             SystemSettingsResource::getNavigationGroup()
         );
     }
@@ -360,7 +360,10 @@ final class SystemSettingsResourceTest extends TestCase
 
     public function test_navigation_sort_is_one(): void
     {
-        $this->assertEquals(1, SystemSettingsResource::getNavigationSort());
+        $this->assertEquals(
+            Nav::sortForResource(SystemSettingsResource::class),
+            SystemSettingsResource::getNavigationSort()
+        );
     }
 
     public function test_can_create_category_from_form(): void

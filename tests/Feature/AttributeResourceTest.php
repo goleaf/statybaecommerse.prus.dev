@@ -141,6 +141,17 @@ final class AttributeResourceTest extends TestCase
             ->assertCanNotSeeTableRecords($technicalAttributes);
     }
 
+    public function test_list_view_handles_attribute_with_null_group(): void
+    {
+        // Arrange
+        $attribute = Attribute::factory()->create(['group_name' => null]);
+
+        // Act & Assert
+        Livewire::actingAs($this->adminUser)
+            ->test(ListAttributes::class)
+            ->assertCanSeeTableRecords([$attribute]);
+    }
+
     public function test_can_filter_attributes_by_required_status(): void
     {
         // Arrange

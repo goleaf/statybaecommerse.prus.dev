@@ -4,26 +4,30 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+
+use Filament\Schemas\Schema;
 use App\Models\ProductVariant;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Forms\Components\Repeater;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class VariantsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'variants';
 
     protected static ?string $title = 'Product Variants';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $schema): Schema   
     {
         return $schema
             ->components([
@@ -69,8 +73,9 @@ final class VariantsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->recordTitleAttribute('name')
             ->columns([
@@ -121,7 +126,8 @@ final class VariantsRelationManager extends BaseRelationManager
                     ->icon('heroicon-m-pencil-square')
                     ->modalHeading('Edit product variants')
                     ->modalWidth('5xl')
-                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                    // Streamline variant updates by exposing key inventory fields in a repeater modal.
+                    ->configureRepeater(static function (Repeater $repeater): Repeater {
                         return $repeater
                             ->collapsible()
                             ->cloneable()

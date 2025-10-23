@@ -89,4 +89,29 @@ return [
     'deactivate_selected'      => 'Deaktyvuoti pasirinktus',
     'bulk_activated_success'   => 'Sėkmingai aktyvuoti pasirinkti įrašai',
     'bulk_deactivated_success' => 'Sėkmingai deaktyvuoti pasirinkti įrašai',
+    'set_priority' => 'Nustatyti prioritetą',
+
+    'boolean_yes' => 'Taip',
+    'boolean_no' => 'Ne',
+
+    'charts' => [
+        'conditions_by_type' => 'Sąlygos pagal tipą',
+    ],
+
+    'stats' => [
+        'total_conditions' => 'Iš viso sąlygų',
+        'total_conditions_description' => 'Bendras sukonfigūruotų sąlygų skaičius.',
+        'active_conditions' => 'Aktyvios sąlygos',
+        'active_conditions_description' => 'Šiuo metu įjungtos sąlygos.',
+        'inactive_conditions' => 'Neaktyvios sąlygos',
+        'inactive_conditions_description' => 'Šiuo metu išjungtos sąlygos.',
+        'top_condition_type' => 'Dažniausias tipas',
+        'top_condition_type_description' => 'Dažniausiai naudojamas sąlygos tipas.',
+        'type_usage' => '{1} :count sąlyga|{2} :count sąlygos|[3,*] :count sąlygų',
+        'no_data' => 'Nėra duomenų',
+    ],
+
+    'widgets' => [
+        'recent_conditions' => 'Naujausios nuolaidų sąlygos',
+    ],
 ];

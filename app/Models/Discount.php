@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 /**
  * Discount
@@ -36,6 +37,26 @@ final class Discount extends Model
     protected $table = 'discounts';
 
     protected $fillable = ['name', 'slug', 'description', 'type', 'value', 'is_active', 'is_enabled', 'starts_at', 'ends_at', 'usage_limit', 'usage_count', 'minimum_amount', 'maximum_amount', 'status', 'scope', 'stacking_policy', 'metadata', 'priority', 'exclusive', 'applies_to_shipping', 'free_shipping', 'first_order_only', 'per_customer_limit', 'per_code_limit', 'per_day_limit', 'channel_restrictions', 'currency_restrictions', 'weekday_mask', 'time_window'];
+
+    /**
+     * Wire up lifecycle hooks so we can safely derive slugs when a record is created or renamed.
+     */
+    protected static function booted(): void
+    {
+        self::creating(function (Discount $discount): void {
+            // Guarantee a slug value so slug-dependent queries remain stable even if the UI omits the field.
+            if (! filled($discount->slug)) {
+                $discount->slug = self::generateUniqueSlug((string) ($discount->name ?? ''));
+            }
+        });
+
+        self::updating(function (Discount $discount): void {
+            // When the name changes, refresh the slug unless the editor intentionally provided a different slug.
+            if ($discount->isDirty('name') && ! $discount->isDirty('slug')) {
+                $discount->slug = self::generateUniqueSlug((string) ($discount->name ?? ''), (int) $discount->getKey());
+            }
+        });
+    }
 
     /**
      * Handle casts functionality with proper error handling.
@@ -158,6 +179,27 @@ final class Discount extends Model
     }
 
     /**
+     * Generate a unique slug for the current discount name, optionally excluding a given record.
+     */
+    public static function generateUniqueSlug(string $name, ?int $ignoreId = null): string
+    {
+        $baseSlug = Str::slug($name) ?: 'discount';
+        $candidate = $baseSlug;
+        $suffix = 2;
+
+        while (self::withoutGlobalScopes()
+            ->withTrashed()
+            ->when($ignoreId !== null, fn ($query) => $query->where('id', '!=', $ignoreId))
+            ->where('slug', $candidate)
+            ->exists()) {
+            $candidate = sprintf('%s-%d', $baseSlug, $suffix);
+            $suffix++;
+        }
+
+        return $candidate;
+    }
+
+    /**
      * Handle customers functionality with proper error handling.
      */
     public function customers(): BelongsToMany
@@ -227,10 +269,10 @@ final class Discount extends Model
     public function getDiscountAmountAttribute(): float
     {
         return match ($this->type) {
-            'percentage' => $this->value,
-            'fixed' => $this->value,
+            'percentage'    => $this->value,
+            'fixed'         => $this->value,
             'free_shipping' => 0,
-            default => 0,
+            default         => 0,
         };
     }
 
@@ -276,8 +318,8 @@ final class Discount extends Model
     {
         return match ($this->type) {
             'percentage' => round($amount * (float) $this->value / 100, 2),
-            'fixed' => (float) min((float) $this->value, $amount),
-            default => 0.0,
+            'fixed'      => (float) min((float) $this->value, $amount),
+            default      => 0.0,
         };
     }
 

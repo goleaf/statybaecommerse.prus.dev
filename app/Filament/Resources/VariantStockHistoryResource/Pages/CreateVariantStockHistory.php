@@ -10,4 +10,11 @@ use Filament\Resources\Pages\CreateRecord;
 final class CreateVariantStockHistory extends CreateRecord
 {
     protected static string $resource = VariantStockHistoryResource::class;
+
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['quantity_change'] = ($data['new_quantity'] ?? 0) - ($data['old_quantity'] ?? 0);
+
+        return $data;
+    }
 }

@@ -4,35 +4,39 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\CustomerResource\Pages;
 use App\Filament\Widgets\InlineCharts\CustomerOrdersSparkline;
 use App\Models\City;
 use App\Models\Customer;
 use App\Models\Scopes\ActiveScope;
+use Awcodes\BadgeableColumn\Components\Badge;
+use Awcodes\BadgeableColumn\Components\BadgeableColumn;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get as SchemaGet;
 use Filament\Schemas\Components\Utilities\Set as SchemaSet;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -44,12 +48,20 @@ use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
+use LaraZeus\InlineChart\Tables\Columns\InlineChart;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class CustomerResource extends Resource
 {
+    /**
+     * Icon displayed in the navigation menu.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-users';
+
     protected static ?string $model = Customer::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
     {
         return 'heroicon-o-users';
     }
@@ -88,9 +100,9 @@ final class CustomerResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('customers.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -132,7 +144,7 @@ final class CustomerResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Set|SchemaSet $set): void {
+                                ->afterStateUpdated(function ($state, Set $set): void {
                                     if ($state) {
                                         $set('city_id', null);
                                     }
@@ -142,7 +154,7 @@ final class CustomerResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->options(function (Forms\Get|SchemaGet $get): array {
+                                ->options(function (Get $get): array {
                                     $query = City::query()->orderBy('name');
 
                                     if ($countryId = $get('country_id')) {
@@ -151,7 +163,7 @@ final class CustomerResource extends Resource
 
                                     return $query->pluck('name', 'id')->all();
                                 })
-                                ->getSearchResultsUsing(function (Forms\Get|SchemaGet $get, string $search): array {
+                                ->getSearchResultsUsing(function (Get $get, string $search): array {
                                     return City::query()
                                         ->where('name', 'like', "%{$search}%")
                                         ->when($get('country_id'), fn (Builder $query, $countryId): Builder => $query->where('country_id', $countryId))
@@ -187,15 +199,61 @@ final class CustomerResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
-                TextColumn::make('name')
+                BadgeableColumn::make('name')
                     ->label(__('customers.name'))
-                    ->searchable()
+                    ->searchable(['name', 'email', 'phone', 'country.name', 'city.name', 'company.name'])
                     ->sortable()
-                    ->weight('bold'),
+                    ->weight('bold')
+                    ->asPills()
+                    ->tooltip(fn (Customer $record): ?string => mb_strlen((string) $record->name) > 40 ? $record->name : null)
+                    ->prefixBadges(function (Customer $record): array {
+                        // Display geographic and organizational context up front.
+                        return collect([
+                            $record->country?->name
+                                ? Badge::make('country')
+                                    ->label(__('customers.badges.country', ['country' => $record->country->name]))
+                                    ->color('info')
+                                : null,
+                            $record->city?->name
+                                ? Badge::make('city')
+                                    ->label(__('customers.badges.city', ['city' => $record->city->name]))
+                                    ->color('info')
+                                : null,
+                            $record->company?->name
+                                ? Badge::make('company')
+                                    ->label(__('customers.badges.company', ['company' => $record->company->name]))
+                                    ->color('gray')
+                                : null,
+                        ])->filter()->values()->all();
+                    })
+                    ->suffixBadges(function (Customer $record): array {
+                        // Surface activation, verification, and revenue health alongside the customer name.
+                        $isVerified = (bool) data_get($record->metadata, 'is_verified', false);
+                        $ordersCount = (int) ($record->orders_count ?? 0);
+                        $ordersTotal = $record->orders_sum_total ?? $record->orders_total_sum ?? null;
+
+                        return collect([
+                            Badge::make('active')
+                                ->label($record->is_active ? __('customers.badges.active') : __('customers.badges.inactive'))
+                                ->color($record->is_active ? 'success' : 'danger'),
+                            Badge::make('verified')
+                                ->label($isVerified ? __('customers.badges.verified') : __('customers.badges.unverified'))
+                                ->color($isVerified ? 'success' : 'warning'),
+                            Badge::make('orders')
+                                ->label(__('customers.badges.orders', ['count' => number_format($ordersCount)]))
+                                ->color($ordersCount > 0 ? 'primary' : 'gray'),
+                            $ordersTotal !== null
+                                ? Badge::make('ltv')
+                                    ->label(__('customers.badges.ltv', ['total' => Number::currency((float) $ordersTotal, 'EUR', app()->getLocale())]))
+                                    ->color('gray')
+                                : null,
+                        ])->filter()->values()->all();
+                    }),
                 ViewColumn::make('quick_links')
                     ->label(__('Quick links'))
                     ->view('filament.tables.columns.list-group')
@@ -248,42 +306,9 @@ final class CustomerResource extends Resource
                     ->label(__('customers.address'))
                     ->limit(50)
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('country.name')
-                    ->label(__('customers.country'))
-                    ->sortable()
-                    ->searchable(),
-                TextColumn::make('city.name')
-                    ->label(__('customers.city'))
-                    ->sortable()
-                    ->searchable(),
-                TextColumn::make('company.name')
-                    ->label(__('customers.company'))
-                    ->sortable()
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('postal_code')
                     ->label(__('customers.postal_code'))
                     ->toggleable(isToggledHiddenByDefault: true),
-                // Badge that surfaces the active or inactive status for quick scanning.
-                BadgeColumn::make('is_active')
-                    ->label(__('customers.is_active'))
-                    ->getStateUsing(static fn (Customer $record): string => $record->is_active ? 'active' : 'inactive')
-                    ->formatStateUsing(static fn (string $state): string => __('customers.badges.' . $state))
-                    ->color(static fn (string $state): string => match ($state) {
-                        'active'   => 'success',
-                        'inactive' => 'gray',
-                        default    => 'gray',
-                    })
-                    ->icon(static fn (string $state): ?string => match ($state) {
-                        'active'   => 'heroicon-o-check',
-                        'inactive' => 'heroicon-o-x-mark',
-                        default    => null,
-                    })
-                    ->sortable(),
-                TextColumn::make('orders_count')
-                    ->label(__('customers.orders_count'))
-                    ->counts('orders')
-                    ->sortable(),
                 // Inline orders sparkline to visualize recent activity without leaving the table.
                 InlineChart::make('orders_sparkline')
                     ->label(__('customers.orders_trend'))
@@ -431,8 +456,16 @@ final class CustomerResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->withoutGlobalScopes([
-            ActiveScope::class,
-        ]);
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                ActiveScope::class,
+            ])
+            ->with([
+                'country:id,name',
+                'city:id,name',
+                'company:id,name',
+            ])
+            ->withCount(['orders'])
+            ->withSum('orders', 'total');
     }
 }

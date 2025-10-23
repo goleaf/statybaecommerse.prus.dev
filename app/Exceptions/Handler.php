@@ -1,8 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Exceptions;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Route;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -30,5 +36,25 @@ class Handler extends ExceptionHandler
             // Intentionally left blank for now so default exception reporting remains intact.
             // Future enhancements can log domain specific context here without touching bootstrap.
         });
+    }
+
+    protected function unauthenticated($request, AuthenticationException $exception): JsonResponse|RedirectResponse
+    {
+        if ($request->expectsJson()) {
+            // APIs should continue receiving structured JSON payloads instead of redirects.
+            return response()->json([
+                'message' => $exception->getMessage(),
+            ], 401);
+        }
+
+        if (Route::has('filament.admin.auth.login')) {
+            // Filament routes in tests expect a redirect to the admin login screen instead of an exception.
+            return redirect()->guest(route('filament.admin.auth.login'));
+        }
+
+        $fallback = Route::has('login') ? route('login') : '/login';
+
+        // Preserve Laravel's default redirect behaviour for any other web guard.
+        return redirect()->guest($fallback);
     }
 }

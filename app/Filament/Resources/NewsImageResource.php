@@ -4,31 +4,31 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\NewsImageResource\Pages;
 use App\Models\News;
 use App\Models\NewsImage;
 use App\Support\Storage\SecureStorage;
-use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -36,22 +36,23 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Storage;
-use Throwable;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class NewsImageResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = NewsImage::class;
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Content';
-    }
+    
 
-    public static function getNavigationIcon(): BackedEnum|string|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|string|null
     {
         return 'heroicon-o-photo';
     }
@@ -73,9 +74,9 @@ final class NewsImageResource extends Resource
         return __('admin.news_images.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Tabs::make(__('admin.news_images.tabs'))
                     ->tabs([
@@ -87,7 +88,24 @@ final class NewsImageResource extends Resource
                                     ->schema([
                                         Select::make('news_id')
                                             ->label(__('admin.news_images.news'))
-                                            ->options(News::pluck('title', 'id'))
+                                            ->options(function (): array {
+                                                return News::query()
+                                                    ->where('is_visible', true)
+                                                    ->whereNotNull('published_at')
+                                                    ->where('published_at', '<=', now())
+                                                    ->orderByDesc('published_at')
+                                                    ->get()
+                                                    ->mapWithKeys(static function (News $news): array {
+                                                        $title = (string) $news->title;
+
+                                                        if ($title === '') {
+                                                            $title = (string) ($news->author_name ?? 'News #' . $news->id);
+                                                        }
+
+                                                        return [$news->id => $title];
+                                                    })
+                                                    ->all();
+                                            })
                                             ->required()
                                             ->searchable()
                                             ->preload()
@@ -131,13 +149,34 @@ final class NewsImageResource extends Resource
                                                 $set('file_size', $disk->size($state));
                                                 $set('mime_type', $disk->mimeType($state));
 
-                                                $imageInfo = null;
-                                                $imagePath = null;
+                                                $path = null;
 
                                                 try {
                                                     $imagePath = Storage::disk($diskName)->path($state);
                                                 } catch (Throwable) {
                                                     $imagePath = null;
+                                                }
+
+                                                if ($path) {
+                                                    $imageInfo = @getimagesize($path);
+
+                                                    if ($imageInfo) {
+                                                        $set('dimensions', [
+                                                            'width' => $imageInfo[0],
+                                                            'height' => $imageInfo[1],
+                                                        ]);
+                                                    }
+
+                                                    if ($temporaryUrl) {
+                                                        $imageInfo = @getimagesize($temporaryUrl);
+                                                    }
+                                                }
+
+                                                if ($imageInfo) {
+                                                    $set('dimensions', [
+                                                        'width'  => $imageInfo[0],
+                                                        'height' => $imageInfo[1],
+                                                    ]);
                                                 }
 
                                                 if ($imagePath && is_file($imagePath)) {
@@ -262,8 +301,9 @@ final class NewsImageResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 ImageColumn::make('file_path')
@@ -366,7 +406,24 @@ final class NewsImageResource extends Resource
             ->filters([
                 SelectFilter::make('news_id')
                     ->label(__('admin.news_images.news'))
-                    ->options(News::pluck('title', 'id'))
+                    ->options(function (): array {
+                        return News::query()
+                            ->where('is_visible', true)
+                            ->whereNotNull('published_at')
+                            ->where('published_at', '<=', now())
+                            ->orderByDesc('published_at')
+                            ->get()
+                            ->mapWithKeys(static function (News $news): array {
+                                $title = (string) $news->title;
+
+                                if ($title === '') {
+                                    $title = (string) ($news->author_name ?? 'News #' . $news->id);
+                                }
+
+                                return [$news->id => $title];
+                            })
+                            ->all();
+                    })
                     ->searchable()
                     ->preload()
                     ->multiple(),

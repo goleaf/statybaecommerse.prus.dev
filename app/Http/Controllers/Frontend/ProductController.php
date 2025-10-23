@@ -8,10 +8,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Support\Frontend\DataProviders\BrandCatalogueDataProvider;
+use App\Support\Frontend\DataProviders\CategoryCatalogueDataProvider;
 use App\Support\Frontend\DataProviders\ProductCatalogueDataProvider;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\View\View;
 
 final class ProductController extends Controller
 {
@@ -19,39 +23,37 @@ final class ProductController extends Controller
 
     public function index(Request $request): View
     {
-        $listing = $this->dataProvider->listing($request->all());
+        $data = $this->dataProvider->getListingData($request->all());
 
-        return view('frontend.products.index', $listing);
+        return view('frontend.products.index', $data);
     }
 
     public function search(Request $request): View
     {
-        $filters = array_merge($request->all(), [
-            'q' => $request->input('q', $request->input('search', '')),
-        ]);
+        $data = $this->dataProvider->getListingData($request->all());
 
-        $listing = $this->dataProvider->listing($filters);
+        return view('frontend.products.index', $data);
+    }
 
-        return view('frontend.products.index', array_merge($listing, [
-            'isSearch' => true,
-        ]));
+    public function byCategory(Category $category, Request $request, CategoryCatalogueDataProvider $categories): View
+    {
+        $data = $categories->show($category, $request->all());
+
+        return view('frontend.categories.show', $data);
+    }
+
+    public function byBrand(Brand $brand, Request $request, BrandCatalogueDataProvider $brands): View
+    {
+        $data = $brands->show($brand, $request->all());
+
+        return view('frontend.brands.show', $data);
     }
 
     public function show(Product $product): View
     {
-        $data = $this->dataProvider->detail($product);
+        $data = $this->dataProvider->getProductDetailData($product);
 
         return view('frontend.products.show', $data);
-    }
-
-    public function byCategory(Category $category): RedirectResponse
-    {
-        return redirect()->route('frontend.categories.show', $category);
-    }
-
-    public function byBrand(Brand $brand): RedirectResponse
-    {
-        return redirect()->route('frontend.brands.show', $brand);
     }
 
     public function addReview(Product $product): RedirectResponse

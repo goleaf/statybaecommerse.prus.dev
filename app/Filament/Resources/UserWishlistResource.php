@@ -4,30 +4,29 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\UserWishlistResource\Pages;
 use App\Models\UserWishlist;
 use BackedEnum;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 /**
  * UserWishlistResource
  *
@@ -35,9 +34,11 @@ use UnitEnum;
  */
 final class UserWishlistResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = UserWishlist::class;
 
-    public static function getNavigationIcon(): BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|\Illuminate\Contracts\Support\Htmlable|string|null
     {
         return 'heroicon-o-heart';
     }
@@ -64,10 +65,10 @@ final class UserWishlistResource extends Resource
         return __('admin.user_wishlists.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
         // Configure the wishlist creation and editing form components.
-        return $form
+        return $schema
             ->components([
                 Select::make('user_id')
                     ->label(__('admin.user_wishlists.user'))
@@ -92,9 +93,9 @@ final class UserWishlistResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
-        // Define table columns, filters, and actions for wishlist management.
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('user.name')
@@ -111,7 +112,11 @@ final class UserWishlistResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        return strlen($state) > 50 ? $state : null;
+                        if (! is_string($state)) {
+                            return null;
+                        }
+
+                        return mb_strlen($state) > 50 ? $state : null;
                     })
                     ->toggleable(),
                 IconColumn::make('is_public')

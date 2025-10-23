@@ -4,48 +4,50 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\AdminUserResource\Pages;
 use App\Models\AdminUser;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\Action;
-use Filament\Actions\BulkActionGroup;
+use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
+use Filament\Schemas\Schema;
 final class AdminUserResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = AdminUser::class;
 
     protected static ?int $navigationSort = 1;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
     {
         return 'heroicon-o-document-text';
     }
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Users';
-    }
+    
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -67,9 +69,9 @@ final class AdminUserResource extends Resource
      * Configure the Filament form schema using the v4 Schema contract so the
      * resource signature remains compatible with the upstream Resource base class.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('admin.admin_users.form.sections.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -119,6 +121,22 @@ final class AdminUserResource extends Resource
                         ->content(fn ($record) => $record?->updated_at?->format('Y-m-d H:i:s') ?? '-'),
                 ])
                 ->columns(2),
+            SchemaSection::make(__('admin.admin_users.form.sections.roles_permissions'))
+                ->schema([
+                    Select::make('roles')
+                        ->label(__('admin.admin_users.form.fields.roles'))
+                        ->relationship('roles', 'name')
+                        ->multiple()
+                        ->preload()
+                        ->searchable()
+                        ->helperText(__('admin.admin_users.form.helpers.roles')),
+                    Textarea::make('audit_reason')
+                        ->label(__('admin.admin_users.form.fields.audit_reason'))
+                        ->helperText(__('admin.admin_users.form.helpers.audit_reason'))
+                        ->visible(fn (?AdminUser $record): bool => (bool) ($record?->exists))
+                        ->columnSpanFull(),
+                ])
+                ->columns(1),
         ]);
     }
 
@@ -126,9 +144,11 @@ final class AdminUserResource extends Resource
      * Configure the Filament table while returning the Table instance to satisfy
      * Filament v4's stricter resource method typing.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
+            // Returning the configured Table keeps action and bulk workflows type-safe in Filament v4.
             ->columns([
                 TextColumn::make('name')
                     ->label(__('admin.admin_users.form.fields.name'))
@@ -227,6 +247,8 @@ final class AdminUserResource extends Resource
                         ->label(__('admin.admin_users.actions.verify_emails'))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
+                        // Enable access to the selected records collection within the handler.
+                        ->accessSelectedRecords()
                         ->action(function (Collection $records): void {
                             $records->each(function (AdminUser $record): void {
                                 $record->update(['email_verified_at' => now()]);
@@ -240,6 +262,8 @@ final class AdminUserResource extends Resource
                         ->label(__('admin.admin_users.actions.send_verifications'))
                         ->icon('heroicon-o-envelope')
                         ->color('info')
+                        // Allow the callback to iterate through the selected records.
+                        ->accessSelectedRecords()
                         ->action(function (Collection $records): void {
                             // Send verification emails logic here
                             FilamentNotification::make()

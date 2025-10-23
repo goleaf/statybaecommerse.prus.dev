@@ -4,36 +4,45 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\CustomerManagementResource\Pages;
 use App\Models\User;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Forms;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as TranslatableResource;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class CustomerManagementResource extends Resource
 {
+    use TranslatableResource;
+
     protected static ?string $model = User::class;
 
     /**
@@ -55,9 +64,9 @@ final class CustomerManagementResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('customers.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -93,9 +102,10 @@ final class CustomerManagementResource extends Resource
                                 ->label(__('customers.is_verified'))
                                 ->default(false),
                         ]),
-                    Select::make('customer_group_id')
+                    Select::make('customerGroups')
                         ->label(__('customers.customer_group'))
-                        ->relationship('customerGroup', 'name')
+                        ->relationship('customerGroups', 'name')
+                        ->multiple()
                         ->searchable()
                         ->preload()
                         ->createOptionForm([
@@ -166,8 +176,9 @@ final class CustomerManagementResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('name')
@@ -182,7 +193,7 @@ final class CustomerManagementResource extends Resource
                     ->label(__('customers.phone'))
                     ->copyable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('customerGroup.name')
+                TextColumn::make('customerGroups.name')
                     ->label(__('customers.customer_group'))
                     ->sortable(),
                 TextColumn::make('email_verified_at')
@@ -215,8 +226,8 @@ final class CustomerManagementResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                SelectFilter::make('customer_group_id')
-                    ->relationship('customerGroup', 'name')
+                SelectFilter::make('customerGroups')
+                    ->relationship('customerGroups', 'name')
                     ->preload(),
                 TernaryFilter::make('email_verified_at')
                     ->label(__('customers.email_verified'))

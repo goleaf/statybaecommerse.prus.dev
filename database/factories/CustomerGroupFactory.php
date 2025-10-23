@@ -56,7 +56,7 @@ final class CustomerGroupFactory extends Factory
     public function active(): static
     {
         return $this->state(fn (array $attributes) => [
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
     }
@@ -67,7 +67,7 @@ final class CustomerGroupFactory extends Factory
     public function inactive(): static
     {
         return $this->state(fn (array $attributes) => [
-            'is_active' => false,
+            'is_active'  => false,
             'is_enabled' => false,
         ]);
     }
@@ -79,7 +79,7 @@ final class CustomerGroupFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'is_default' => true,
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
     }

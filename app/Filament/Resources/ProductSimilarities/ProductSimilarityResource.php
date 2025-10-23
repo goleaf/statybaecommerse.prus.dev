@@ -3,35 +3,39 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductSimilarities;
+use App\Support\Concerns\HasNav;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\ProductSimilarities\Pages\CreateProductSimilarity;
 use App\Filament\Resources\ProductSimilarities\Pages\EditProductSimilarity;
 use App\Filament\Resources\ProductSimilarities\Pages\ListProductSimilarities;
-use App\Filament\Resources\ProductSimilarities\Schemas\ProductSimilarityForm;
-use App\Filament\Resources\ProductSimilarities\Tables\ProductSimilaritiesTable;
 use App\Models\ProductSimilarity;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 class ProductSimilarityResource extends Resource
 {
-    protected static ?string $model = ProductSimilarity::class;
+    use HasNav;
 
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
      */
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return ProductSimilarityForm::configure($form);
+        return ProductSimilarityForm::configure($schema);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return ProductSimilaritiesTable::configure($table);
     }
 

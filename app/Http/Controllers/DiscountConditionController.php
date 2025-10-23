@@ -16,6 +16,7 @@ use OpenApi\Attributes as OA;
  *
  * HTTP controller handling DiscountConditionController related web requests, responses, and business logic with proper validation and error handling.
  */
+#[OA\Tag(name: 'Discount Conditions', description: 'Discount condition evaluation and metadata endpoints.')]
 final class DiscountConditionController extends Controller
 {
     /**
@@ -78,6 +79,34 @@ final class DiscountConditionController extends Controller
     /**
      * Handle test functionality with proper error handling.
      */
+    #[OA\Post(
+        path: '/discount-conditions/{discountCondition}/test',
+        summary: 'Evaluate whether a payload satisfies the discount condition.',
+        tags: ['Discount Conditions'],
+        parameters: [
+            new OA\PathParameter(
+                name: 'discountCondition',
+                description: 'Discount condition identifier.',
+                required: true,
+                schema: new OA\Schema(type: 'integer'),
+            ),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            description: 'Value to test against the condition.',
+            content: new OA\JsonContent(
+                type: 'object',
+                required: ['test_value'],
+                properties: [
+                    new OA\Property(property: 'test_value', type: 'string'),
+                ],
+            ),
+        ),
+        responses: [
+            new OA\Response(response: 200, ref: '#/components/responses/DiscountConditionTest'),
+            new OA\Response(response: 422, ref: '#/components/responses/ValidationError'),
+        ]
+    )]
     public function test(Request $request, DiscountCondition $discountCondition): JsonResponse
     {
         $request->validate(['test_value' => 'required']);
@@ -102,6 +131,22 @@ final class DiscountConditionController extends Controller
     /**
      * Handle forDiscount functionality with proper error handling.
      */
+    #[OA\Get(
+        path: '/discount-conditions/api/for-discount/{discount}',
+        summary: 'List active discount conditions for the given discount.',
+        tags: ['Discount Conditions'],
+        parameters: [
+            new OA\PathParameter(
+                name: 'discount',
+                description: 'Discount identifier.',
+                required: true,
+                schema: new OA\Schema(type: 'integer'),
+            ),
+        ],
+        responses: [
+            new OA\Response(response: 200, ref: '#/components/responses/DiscountConditions'),
+        ]
+    )]
     public function forDiscount(Discount $discount): JsonResponse
     {
         $conditions = $discount->conditions()->active()->byPriority('desc')->with('translations')->get();
@@ -126,6 +171,22 @@ final class DiscountConditionController extends Controller
     /**
      * Handle operatorsForType functionality with proper error handling.
      */
+    #[OA\Get(
+        path: '/discount-conditions/api/operators-for-type',
+        summary: 'List supported operators for a discount condition type.',
+        tags: ['Discount Conditions'],
+        parameters: [
+            new OA\QueryParameter(
+                name: 'type',
+                description: 'Condition type key.',
+                required: false,
+                schema: new OA\Schema(type: 'string'),
+            ),
+        ],
+        responses: [
+            new OA\Response(response: 200, ref: '#/components/responses/DiscountConditionOperators'),
+        ]
+    )]
     public function operatorsForType(Request $request): JsonResponse
     {
         $type = $request->get('type');
@@ -149,6 +210,14 @@ final class DiscountConditionController extends Controller
     /**
      * Handle statistics functionality with proper error handling.
      */
+    #[OA\Get(
+        path: '/discount-conditions/api/statistics',
+        summary: 'Summarize discount condition usage metrics.',
+        tags: ['Discount Conditions'],
+        responses: [
+            new OA\Response(response: 200, ref: '#/components/responses/DiscountConditionStatistics'),
+        ]
+    )]
     public function statistics(): JsonResponse
     {
         $stats = ['total' => DiscountCondition::count(), 'active' => DiscountCondition::where('is_active', true)->count(), 'inactive' => DiscountCondition::where('is_active', false)->count(), 'by_type' => DiscountCondition::selectRaw('type, COUNT(*) as count')->groupBy('type')->pluck('count', 'type')->toArray(), 'by_operator' => DiscountCondition::selectRaw('operator, COUNT(*) as count')->groupBy('operator')->pluck('count', 'operator')->toArray()];

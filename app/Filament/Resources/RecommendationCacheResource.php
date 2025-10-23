@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\RecommendationCacheResource\Pages;
 use App\Models\Product;
 use App\Models\RecommendationBlock;
@@ -19,13 +21,18 @@ use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 /**
  * RecommendationCacheResource
  *
@@ -33,10 +40,9 @@ use UnitEnum;
  */
 final class RecommendationCacheResource extends Resource
 {
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Analytics';
-    }
+    use HasNav;
+
+    
 
     protected static ?string $model = RecommendationCache::class;
 
@@ -59,9 +65,9 @@ final class RecommendationCacheResource extends Resource
         return __('admin.recommendation_caches.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.recommendation_caches.basic_information'))
                     ->schema([
@@ -107,8 +113,9 @@ final class RecommendationCacheResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('cache_key')
@@ -119,11 +126,6 @@ final class RecommendationCacheResource extends Resource
                     ->limit(30)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
-
-                        if (! is_string($state)) {
-                            return null;
-                        }
-
                         return strlen($state) > 30 ? $state : null;
                     }),
                 TextColumn::make('block.name')
@@ -142,7 +144,7 @@ final class RecommendationCacheResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        if (! is_string($state)) {
+                        if (! is_string($state) || $state === '') {
                             return null;
                         }
 

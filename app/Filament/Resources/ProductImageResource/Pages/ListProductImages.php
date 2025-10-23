@@ -10,6 +10,8 @@ use Filament\Actions;
 
 final class ListProductImages extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = ProductImageResource::class;
 
     protected function getHeaderActions(): array

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\LegalResource\Pages;
 use App\Filament\Resources\LegalResource\RelationManagers\TranslationsRelationManager;
 use App\Models\Legal;
@@ -14,20 +16,24 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class LegalResource extends Resource
 {
     protected static ?string $model = Legal::class;
@@ -36,7 +42,7 @@ final class LegalResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'key';
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
     {
         return 'heroicon-o-scale';
     }
@@ -61,9 +67,9 @@ final class LegalResource extends Resource
         return __('legal.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Section::make(__('legal.basic_information'))
                     ->schema([
@@ -166,8 +172,9 @@ final class LegalResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('key')

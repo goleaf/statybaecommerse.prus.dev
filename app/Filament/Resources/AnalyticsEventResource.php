@@ -4,44 +4,50 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\AnalyticsEventResource\Pages;
 use App\Models\AnalyticsEvent;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
+use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class AnalyticsEventResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = AnalyticsEvent::class;
 
     protected static ?int $navigationSort = 1;
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Analytics';
-    }
+    
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -62,9 +68,9 @@ final class AnalyticsEventResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->components([
+        return $schema->components([
             Section::make(__('analytics_events.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -85,6 +91,7 @@ final class AnalyticsEventResource extends Resource
                                     'login'       => __('analytics_events.types.login'),
                                     'logout'      => __('analytics_events.types.logout'),
                                     'search'      => __('analytics_events.types.search'),
+                                    'scroll'      => __('analytics_events.types.scroll'),
                                     'download'    => __('analytics_events.types.download'),
                                     'custom'      => __('analytics_events.types.custom'),
                                     // Extended set to avoid validation issues on edit
@@ -219,8 +226,9 @@ final class AnalyticsEventResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('event_name')
@@ -308,6 +316,7 @@ final class AnalyticsEventResource extends Resource
                         'login'       => __('analytics_events.types.login'),
                         'logout'      => __('analytics_events.types.logout'),
                         'search'      => __('analytics_events.types.search'),
+                        'scroll'      => __('analytics_events.types.scroll'),
                         'download'    => __('analytics_events.types.download'),
                         'custom'      => __('analytics_events.types.custom'),
                     ]),

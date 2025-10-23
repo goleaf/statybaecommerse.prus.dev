@@ -41,14 +41,15 @@ class DashboardOverviewWidget extends BaseWidget
         $yesterday = $now->copy()->subDay();
 
         // Core Business Metrics
-        $totalRevenue = Order::where('status', '!=', 'cancelled')->sum('total_amount');
-        $lastMonthRevenue = Order::where('status', '!=', 'cancelled')
+        $totalRevenue = Order::query()->where('status', '!=', 'cancelled')->sum('total_amount');
+        $lastMonthRevenue = Order::query()
+            ->where('status', '!=', 'cancelled')
             ->createdSince($lastMonth)
             ->sum('total_amount');
         $revenueGrowth = $lastMonthRevenue > 0 ? (($totalRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100 : 0;
 
         $totalOrders = Order::count();
-        $lastMonthOrders = Order::createdSince($lastMonth)->count();
+        $lastMonthOrders = Order::query()->createdSince($lastMonth)->count();
         $orderGrowth = $lastMonthOrders > 0 ? (($totalOrders - $lastMonthOrders) / $lastMonthOrders) * 100 : 0;
 
         $totalUsers = User::count();
@@ -177,8 +178,9 @@ class DashboardOverviewWidget extends BaseWidget
         $data = [];
         for ($i = 6; $i >= 0; $i--) {
             $date = Carbon::now()->subDays($i);
-            $revenue = Order::where('status', '!=', 'cancelled')
-                ->createdOn($date)
+            $revenue = Order::query()
+                ->where('status', '!=', 'cancelled')
+                ->createdOnDate($date)
                 ->sum('total_amount');
             $data[] = $revenue;
         }
@@ -191,7 +193,7 @@ class DashboardOverviewWidget extends BaseWidget
         $data = [];
         for ($i = 6; $i >= 0; $i--) {
             $date = Carbon::now()->subDays($i);
-            $orders = Order::createdOn($date)->count();
+            $orders = Order::query()->createdOnDate($date)->count();
             $data[] = $orders;
         }
 

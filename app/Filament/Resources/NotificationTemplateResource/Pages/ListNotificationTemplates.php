@@ -10,6 +10,8 @@ use Filament\Actions;
 
 final class ListNotificationTemplates extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = NotificationTemplateResource::class;
 
     protected function getHeaderActions(): array

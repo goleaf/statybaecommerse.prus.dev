@@ -9,7 +9,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
 use Spatie\Activitylog\ActivityLogStatus;
 
-class DatabaseSeeder extends Seeder
+final class DatabaseSeeder extends Seeder
 {
     /**
      * Seed the application's database using the configured profile.
@@ -61,5 +61,46 @@ class DatabaseSeeder extends Seeder
                 activity()->enableLogging();
             }
         }
+    }
+
+    private function determineProfile(): string
+    {
+        $configured = config('seeds.runtime_profile');
+
+        if (! \is_string($configured) || $configured === '') {
+            $configured = config('seeds.default_profile', self::PROFILE_MINIMAL);
+        }
+
+        $normalized = strtolower($configured);
+
+        return \in_array($normalized, [self::PROFILE_MINIMAL, self::PROFILE_FULL], true)
+            ? $normalized
+            : self::PROFILE_MINIMAL;
+    }
+
+    /**
+     * @return array<int, class-string<Seeder>>
+     */
+    private function seedersForProfile(string $profile): array
+    {
+        $profiles = config('seeds.profiles', []);
+        $minimal = Arr::get($profiles, self::PROFILE_MINIMAL, []);
+
+        if ($profile === self::PROFILE_FULL) {
+            $full = array_merge($minimal, Arr::get($profiles, self::PROFILE_FULL, []));
+
+            return $this->uniqueSeeders($full);
+        }
+
+        return $this->uniqueSeeders($minimal);
+    }
+
+    /**
+     * @param array<int, class-string<Seeder>> $seeders
+     * @return array<int, class-string<Seeder>>
+     */
+    private function uniqueSeeders(array $seeders): array
+    {
+        return array_values(array_unique($seeders));
     }
 }

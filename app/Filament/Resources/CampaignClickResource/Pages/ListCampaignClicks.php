@@ -10,6 +10,8 @@ use Filament\Actions;
 
 final class ListCampaignClicks extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = CampaignClickResource::class;
 
     protected function getHeaderActions(): array

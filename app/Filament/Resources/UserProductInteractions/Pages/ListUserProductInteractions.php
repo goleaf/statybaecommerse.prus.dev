@@ -10,6 +10,8 @@ use Filament\Actions\CreateAction;
 
 class ListUserProductInteractions extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = UserProductInteractionResource::class;
 
     protected function getHeaderActions(): array

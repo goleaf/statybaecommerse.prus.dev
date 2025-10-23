@@ -33,6 +33,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  *
  * @mixin \Eloquent
  */
+#[ObservedBy([AttributionObserver::class])]
 #[ScopedBy([StatusScope::class])]
 #[ObservedBy([AttributionObserver::class])]
 final class Document extends Model

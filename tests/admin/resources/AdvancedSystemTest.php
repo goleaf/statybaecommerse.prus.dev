@@ -11,7 +11,7 @@ use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->seed(AdminAuthorizationSeeder::class);
 
     $additionalPermissions = [
@@ -38,14 +38,14 @@ beforeEach(function () {
     $this->admin->assignRole($adminRole);
 });
 
-it('can access all advanced admin pages', function () {
+it('can access all advanced admin pages', function (): void {
     $pages = [
         '/admin/data-import-export',
         '/admin/customer-segmentation',
         '/admin/seo-analytics',
         '/admin/security-audit',
         '/admin/user-impersonation',
-        '/admin/system-monitoring',
+        '/admin/observability',
         '/admin/inventory-management',
     ];
 
@@ -58,7 +58,7 @@ it('can access all advanced admin pages', function () {
     }
 });
 
-it('can perform data import operations', function () {
+it('can perform data import operations', function (): void {
     // Test that the data import export page loads correctly
     $response = $this->actingAs($this->admin)->get('/admin/data-import-export');
     $response->assertOk();
@@ -68,7 +68,7 @@ it('can perform data import operations', function () {
     $response->assertSee('Export');
 });
 
-it('can export data in multiple formats', function () {
+it('can export data in multiple formats', function (): void {
     Product::factory()->count(5)->create();
 
     // Test that the data import export page loads correctly
@@ -79,7 +79,7 @@ it('can export data in multiple formats', function () {
     $response->assertSee('Export');
 });
 
-it('can perform customer segmentation', function () {
+it('can perform customer segmentation', function (): void {
     // Create customers with different spending patterns
     $highValueCustomer = User::factory()->create(['is_admin' => false]);
     $regularCustomer = User::factory()->create(['is_admin' => false]);
@@ -104,7 +104,7 @@ it('can perform customer segmentation', function () {
         ->assertSee($regularCustomer->name);
 });
 
-it('can create customer groups and assign users', function () {
+it('can create customer groups and assign users', function (): void {
     $customer = User::factory()->create(['is_admin' => false]);
     $group = CustomerGroup::factory()->create(['name' => 'VIP Customers']);
 
@@ -118,7 +118,7 @@ it('can create customer groups and assign users', function () {
     expect($customer->fresh()->customerGroups->first()->name)->toBe('VIP Customers');
 });
 
-it('can perform SEO audits and optimization', function () {
+it('can perform SEO audits and optimization', function (): void {
     $product = Product::factory()->create([
         'name' => 'Test Product',
         'seo_title' => null,
@@ -134,7 +134,7 @@ it('can perform SEO audits and optimization', function () {
     expect($product->fresh()->seo_description)->not()->toBeNull();
 });
 
-it('can track and analyze security activities', function () {
+it('can track and analyze security activities', function (): void {
     // Create some test activities
     activity('security')
         ->causedBy($this->admin)
@@ -152,7 +152,7 @@ it('can track and analyze security activities', function () {
         ->assertOk();
 });
 
-it('can manage inventory with bulk operations', function () {
+it('can manage inventory with bulk operations', function (): void {
     $products = Product::factory()->count(3)->create(['stock_quantity' => 10]);
 
     Livewire::actingAs($this->admin)
@@ -167,7 +167,7 @@ it('can manage inventory with bulk operations', function () {
     }
 });
 
-it('can generate product recommendations', function () {
+it('can generate product recommendations', function (): void {
     $user = User::factory()->create();
     $category = \App\Models\Category::factory()->create();
 
@@ -196,7 +196,7 @@ it('can generate product recommendations', function () {
         ->assertSee($product2->name);  // Should recommend product2 based on category
 });
 
-it('can track recently viewed products', function () {
+it('can track recently viewed products', function (): void {
     $product1 = Product::factory()->create();
     $product2 = Product::factory()->create();
 
@@ -209,7 +209,7 @@ it('can track recently viewed products', function () {
     expect(session('recently_viewed'))->toContain($product1->id);
 });
 
-it('can send marketing emails to customers', function () {
+it('can send marketing emails to customers', function (): void {
     $customer = User::factory()->create(['is_admin' => false]);
 
     // Test that the page loads and the action is available
@@ -218,8 +218,8 @@ it('can send marketing emails to customers', function () {
         ->assertOk();
 });
 
-it('can perform comprehensive system monitoring', function () {
+it('can perform comprehensive system monitoring', function (): void {
     Livewire::actingAs($this->admin)
-        ->test(\App\Filament\Pages\SystemMonitoring::class)
+        ->test(\App\Filament\Pages\ObservabilityDashboard::class)
         ->assertOk();
 });

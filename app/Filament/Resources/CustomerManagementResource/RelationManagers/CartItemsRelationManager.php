@@ -4,27 +4,32 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CustomerManagementResource\RelationManagers;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\AssociateAction;
-use Filament\Actions\BulkActionGroup;
+use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\DissociateAction;
 use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 class CartItemsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'cartItems';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $schema): Schema   
     {
         return $schema
             ->schema([
@@ -37,7 +42,7 @@ class CartItemsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function infolist(Schema $schema): Schema
+    public function infolist(Schema $schema): Schema   
     {
         return $schema
             ->schema([
@@ -45,8 +50,9 @@ class CartItemsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the Filament table definition for the resource.
         return $table
             ->recordTitleAttribute('id')
             ->columns([
@@ -57,6 +63,15 @@ class CartItemsRelationManager extends BaseRelationManager
                 //
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit ' . $this->getPluralModelLabel())
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        // Provide a quick-edit modal for managing records inline.
+                        return $repeater->schema($this->getQuickEditSchema());
+                    }),
                 CreateAction::make(),
                 AssociateAction::make(),
             ])

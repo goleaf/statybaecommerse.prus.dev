@@ -1,6 +1,7 @@
 @extends('frontend.layouts.app')
 
-@section('title', $brand->name)
+@section('title', $brand->seo_title ?: $brand->name)
+@section('description', $brand->seo_description ?: str($brand->description)->stripTags()->limit(160))
 
 @section('content')
     <div class="bg-gray-50 py-12">
@@ -30,59 +31,70 @@
                             </a>
                         @endif
                     </div>
-                    <div class="grid gap-4 rounded-2xl border border-emerald-100 bg-emerald-50 p-6 text-sm text-emerald-900">
-                        <div class="flex items-center gap-3">
-                            <x-untitledui-layers-three class="h-5 w-5" />
-                            {{ __('Active catalogue items: :count', ['count' => method_exists($products, 'total') ? $products->total() : $products->count()]) }}
+                    <div class="flex flex-col gap-3 rounded-3xl bg-white/10 p-6 text-sm text-white/80">
+                        <div class="flex items-center justify-between">
+                            <span>{{ __('Products live') }}</span>
+                            <span class="text-lg font-semibold text-white">{{ number_format($products->total()) }}</span>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <x-untitledui-map-pin class="h-5 w-5" />
-                            {{ __('Preferred across Lithuania and neighbouring markets') }}
+                        <div class="flex items-center justify-between">
+                            <span>{{ __('Categories served') }}</span>
+                            <span class="text-lg font-semibold text-white">{{ number_format($relatedCategories->count()) }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span>{{ __('Sort options available') }}</span>
+                            <span class="text-lg font-semibold text-white">{{ number_format(count($availableSorts)) }}</span>
                         </div>
                     </div>
                 </div>
-            </div>
+            </header>
 
-            <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-                <form method="GET" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <div class="space-y-2">
-                        <label for="brand-sort" class="text-sm font-semibold text-gray-700">{{ __('Sort by') }}</label>
-                        <select id="brand-sort" name="sort" class="w-full rounded-xl border-gray-200 text-sm focus:border-emerald-500 focus:ring-emerald-500">
-                            @foreach($availableSorts as $value => $label)
-                                <option value="{{ $value }}" @selected($appliedSort === $value)>{{ $label }}</option>
+            <section class="mt-10 space-y-8">
+                <div class="flex flex-col gap-4 rounded-3xl border border-gray-200 bg-white p-6 sm:flex-row sm:items-center sm:justify-between">
+                    <form method="get" class="flex flex-wrap items-center gap-3 text-sm font-medium text-gray-700">
+                        <span class="text-gray-500">{{ __('Quick filters:') }}</span>
+                        @foreach ($availableFilters as $key => $label)
+                            <label class="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-gray-50 px-3 py-1">
+                                <input type="radio" name="filter" value="{{ $key }}" @checked($activeFilter === $key) class="h-4 w-4 text-rose-600" />
+                                <span>{{ $label }}</span>
+                            </label>
+                        @endforeach
+                        <label class="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-gray-50 px-3 py-1">
+                            <input type="radio" name="filter" value="" @checked(! $activeFilter) class="h-4 w-4 text-rose-600" />
+                            <span>{{ __('All products') }}</span>
+                        </label>
+                        <button type="submit" class="rounded-full bg-white/20 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white shadow-sm hover:bg-white/30">{{ __('Apply') }}</button>
+                    </form>
+
+                    <form method="get" class="flex items-center gap-3 text-sm">
+                        @foreach (request()->except('sort') as $key => $value)
+                            <input type="hidden" name="{{ $key }}" value="{{ $value }}" />
+                        @endforeach
+                        <label for="sort" class="text-gray-500">{{ __('Sort by') }}</label>
+                        <select id="sort" name="sort" class="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 focus:border-rose-500 focus:outline-none">
+                            @foreach ($availableSorts as $key => $label)
+                                <option value="{{ $key }}" @selected($activeSort === $key)>{{ $label }}</option>
                             @endforeach
                         </select>
-                    </div>
-                    <div class="space-y-2">
-                        <label for="brand-filter" class="text-sm font-semibold text-gray-700">{{ __('Filter') }}</label>
-                        <select id="brand-filter" name="filter" class="w-full rounded-xl border-gray-200 text-sm focus:border-emerald-500 focus:ring-emerald-500">
-                            @foreach($availableFilters as $value => $label)
-                                <option value="{{ $value }}" @selected($appliedFilter === $value)>{{ $label }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="space-y-2">
-                        <label for="brand-per-page" class="text-sm font-semibold text-gray-700">{{ __('Results per page') }}</label>
-                        <input id="brand-per-page" type="number" min="6" max="60" name="per_page" value="{{ $perPage }}" class="w-full rounded-xl border-gray-200 text-sm focus:border-emerald-500 focus:ring-emerald-500">
-                    </div>
-                    <div class="flex items-end">
-                        <button type="submit" class="inline-flex w-full items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700">
-                            {{ __('Update view') }}
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <section class="space-y-6">
-                <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <h2 class="text-2xl font-semibold text-gray-900">{{ __('Products by :brand', ['brand' => $brand->name]) }}</h2>
-                    @if($searchTerm)
-                        <p class="text-sm text-gray-500">{{ __('Search term: ":term"', ['term' => $searchTerm]) }}</p>
-                    @endif
+                        <button type="submit" class="rounded-full border border-rose-500 px-4 py-2 text-sm font-semibold text-rose-600 hover:bg-rose-50">{{ __('Update') }}</button>
+                    </form>
                 </div>
-                @include('frontend.catalogue.product-grid', ['products' => $products])
+
+                @include('frontend.products.partials.product-grid', ['products' => $products, 'emptyMessage' => __('No products have been published for this brand yet.')])
+            </section>
+
+            <section class="mt-12 rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+                <h2 class="text-xl font-semibold text-gray-900">{{ __('Categories this brand powers') }}</h2>
+                <ul class="mt-4 grid gap-3 text-sm text-gray-700 sm:grid-cols-2 lg:grid-cols-3">
+                    @forelse ($relatedCategories as $category)
+                        <li class="rounded-2xl border border-gray-200 bg-gray-50 p-4 transition hover:border-rose-500 hover:bg-white">
+                            <a href="{{ route('frontend.categories.show', $category) }}" class="font-semibold text-gray-900 hover:text-rose-600">{{ $category->name }}</a>
+                            <p class="mt-2 text-xs text-gray-600">{{ __(':count products in stock', ['count' => number_format($category->published_products_count ?? 0)]) }}</p>
+                        </li>
+                    @empty
+                        <li class="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-6 text-center text-sm text-gray-500">{{ __('Category highlights will appear as soon as inventory is linked.') }}</li>
+                    @endforelse
+                </ul>
             </section>
         </div>
     </div>
 @endsection
-

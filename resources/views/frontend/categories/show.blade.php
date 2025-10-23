@@ -1,6 +1,7 @@
 @extends('frontend.layouts.app')
 
-@section('title', $category->name)
+@section('title', $category->seo_title ?: $category->name)
+@section('description', $category->seo_description ?: str($category->description)->stripTags()->limit(160))
 
 @section('content')
     <div class="bg-gray-50 py-12">
@@ -29,67 +30,88 @@
                             </p>
                         @endif
                     </div>
-                    <div class="flex flex-col gap-4 text-sm text-gray-600">
-                        <div class="flex items-center gap-2">
-                            <x-untitledui-cube class="h-4 w-4 text-blue-500" />
-                            {{ __('Visible products: :count', ['count' => method_exists($products, 'total') ? $products->total() : $products->count()]) }}
+                    <div class="flex flex-col gap-3 rounded-3xl bg-white/10 p-6 text-sm text-white/80">
+                        <div class="flex items-center justify-between">
+                            <span>{{ __('Products live') }}</span>
+                            <span class="text-lg font-semibold text-white">{{ number_format($products->total()) }}</span>
                         </div>
-                        @if($category->children->isNotEmpty())
-                            <div>
-                                <p class="font-semibold text-gray-900">{{ __('Popular subcategories') }}</p>
-                                <div class="mt-2 flex flex-wrap gap-2">
-                                    @foreach($category->children->take(6) as $child)
-                                        <a href="{{ route('frontend.categories.show', $child) }}" class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 hover:bg-blue-100">
-                                            {{ $child->name }}
-                                        </a>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endif
+                        <div class="flex items-center justify-between">
+                            <span>{{ __('Subcategories') }}</span>
+                            <span class="text-lg font-semibold text-white">{{ number_format($relatedCategories->count()) }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span>{{ __('Featured brands') }}</span>
+                            <span class="text-lg font-semibold text-white">{{ number_format($highlightedBrands->count()) }}</span>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </header>
 
-            <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-                <form method="GET" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <div class="space-y-2">
-                        <label for="category-sort" class="text-sm font-semibold text-gray-700">{{ __('Sort by') }}</label>
-                        <select id="category-sort" name="sort" class="w-full rounded-xl border-gray-200 text-sm focus:border-blue-500 focus:ring-blue-500">
-                            @foreach($availableSorts as $value => $label)
-                                <option value="{{ $value }}" @selected($appliedSort === $value)>{{ $label }}</option>
+            <section class="mt-10 space-y-8">
+                <div class="flex flex-col gap-4 rounded-3xl border border-gray-200 bg-gray-50 p-6 sm:flex-row sm:items-center sm:justify-between">
+                    <form method="get" class="flex flex-wrap items-center gap-3 text-sm font-medium text-gray-700">
+                        <span class="text-gray-500">{{ __('Quick filters:') }}</span>
+                        @foreach ($availableFilters as $key => $label)
+                            <label class="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-3 py-1">
+                                <input type="radio" name="filter" value="{{ $key }}" @checked($activeFilter === $key) class="h-4 w-4 text-indigo-600" />
+                                <span>{{ $label }}</span>
+                            </label>
+                        @endforeach
+                        <label class="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-3 py-1">
+                            <input type="radio" name="filter" value="" @checked(! $activeFilter) class="h-4 w-4 text-indigo-600" />
+                            <span>{{ __('All products') }}</span>
+                        </label>
+                        <button type="submit" class="rounded-full bg-indigo-600 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white shadow-sm hover:bg-indigo-700">{{ __('Apply') }}</button>
+                    </form>
+
+                    <form method="get" class="flex items-center gap-3 text-sm">
+                        @foreach (request()->except('sort') as $key => $value)
+                            <input type="hidden" name="{{ $key }}" value="{{ $value }}" />
+                        @endforeach
+                        <label for="sort" class="text-gray-500">{{ __('Sort by') }}</label>
+                        <select id="sort" name="sort" class="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 focus:border-indigo-500 focus:outline-none">
+                            @foreach ($availableSorts as $key => $label)
+                                <option value="{{ $key }}" @selected($activeSort === $key)>{{ $label }}</option>
                             @endforeach
                         </select>
-                    </div>
-                    <div class="space-y-2">
-                        <label for="category-filter" class="text-sm font-semibold text-gray-700">{{ __('Filter') }}</label>
-                        <select id="category-filter" name="filter" class="w-full rounded-xl border-gray-200 text-sm focus:border-blue-500 focus:ring-blue-500">
-                            @foreach($availableFilters as $value => $label)
-                                <option value="{{ $value }}" @selected($appliedFilter === $value)>{{ $label }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="space-y-2">
-                        <label for="category-per-page" class="text-sm font-semibold text-gray-700">{{ __('Results per page') }}</label>
-                        <input id="category-per-page" type="number" min="6" max="60" name="per_page" value="{{ $perPage }}" class="w-full rounded-xl border-gray-200 text-sm focus:border-blue-500 focus:ring-blue-500">
-                    </div>
-                    <div class="flex items-end">
-                        <button type="submit" class="inline-flex w-full items-center justify-center rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">
-                            {{ __('Update view') }}
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <section class="space-y-6">
-                <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <h2 class="text-2xl font-semibold text-gray-900">{{ __('Catalogue for :category', ['category' => $category->name]) }}</h2>
-                    @if($searchTerm)
-                        <p class="text-sm text-gray-500">{{ __('Search term: ":term"', ['term' => $searchTerm]) }}</p>
-                    @endif
+                        <button type="submit" class="rounded-full border border-indigo-500 px-4 py-2 text-sm font-semibold text-indigo-600 hover:bg-indigo-50">{{ __('Update') }}</button>
+                    </form>
                 </div>
-                @include('frontend.catalogue.product-grid', ['products' => $products])
+
+                @include('frontend.products.partials.product-grid', ['products' => $products, 'emptyMessage' => __('No products available for this category yet.')])
+            </section>
+
+            <section class="mt-12 grid gap-8 lg:grid-cols-2">
+                <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+                    <h2 class="text-xl font-semibold text-gray-900">{{ __('Explore related categories') }}</h2>
+                    <ul class="mt-4 grid gap-3 text-sm text-gray-700 sm:grid-cols-2">
+                        @forelse ($relatedCategories as $related)
+                            <li class="rounded-2xl border border-gray-200 bg-gray-50 p-4 transition hover:border-indigo-500 hover:bg-white">
+                                <a href="{{ route('frontend.categories.show', $related) }}" class="font-semibold text-gray-900 hover:text-indigo-600">{{ $related->name }}</a>
+                                @if ($related->description)
+                                    <p class="mt-2 text-xs text-gray-600">{!! str($related->description)->stripTags()->limit(100) !!}</p>
+                                @endif
+                            </li>
+                        @empty
+                            <li class="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-6 text-center text-sm text-gray-500">{{ __('Additional categories will appear here as soon as they are available.') }}</li>
+                        @endforelse
+                    </ul>
+                </div>
+
+                <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+                    <h2 class="text-xl font-semibold text-gray-900">{{ __('Featured brands in this category') }}</h2>
+                    <ul class="mt-4 space-y-3 text-sm text-gray-700">
+                        @forelse ($highlightedBrands as $brand)
+                            <li class="flex items-center justify-between rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3">
+                                <a href="{{ route('frontend.brands.show', $brand) }}" class="font-semibold text-gray-900 hover:text-indigo-600">{{ $brand->name }}</a>
+                                <span class="rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-semibold text-indigo-600">{{ number_format($brand->published_products_count ?? $brand->products_count ?? 0) }}</span>
+                            </li>
+                        @empty
+                            <li class="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-6 text-center text-sm text-gray-500">{{ __('Brand highlights will appear as soon as products are published.') }}</li>
+                        @endforelse
+                    </ul>
+                </div>
             </section>
         </div>
     </div>
 @endsection
-

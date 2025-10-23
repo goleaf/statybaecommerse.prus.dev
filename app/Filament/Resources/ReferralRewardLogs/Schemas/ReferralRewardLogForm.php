@@ -11,21 +11,34 @@ use Filament\Schemas\Schema;
 
 class ReferralRewardLogForm
 {
-    public static function configure(Schema $schema): Schema
+    public static function configure(Form $form): Form
     {
-        return $schema
+        return $form
             ->components([
                 Select::make('referral_reward_id')
                     ->relationship('referralReward', 'title')
+                    ->searchable()
                     ->required(),
                 Select::make('user_id')
-                    ->relationship('user', 'name'),
-                TextInput::make('action')
+                    ->relationship('user', 'name')
+                    ->searchable()
+                    ->nullable(),
+                Select::make('action')
+                    ->options([
+                        'earned' => 'Earned',
+                        'redeemed' => 'Redeemed',
+                        'expired' => 'Expired',
+                        'cancelled' => 'Cancelled',
+                    ])
+                    ->default('earned')
                     ->required(),
                 Textarea::make('data')
                     ->columnSpanFull(),
-                TextInput::make('ip_address'),
+                TextInput::make('ip_address')
+                    ->ip()
+                    ->maxLength(45),
                 Textarea::make('user_agent')
+                    ->maxLength(500)
                     ->columnSpanFull(),
             ]);
     }

@@ -6,6 +6,7 @@ namespace App\View\Creators;
 
 use App\Services\Pricing\PriceCalculator;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
 /**
@@ -16,24 +17,28 @@ use Illuminate\Support\Facades\Session;
  */
 final class CartDataCreator
 {
+    public function __construct(private readonly PriceCalculator $priceCalculator) {}
+
     /**
      * Create the view creator.
      */
     public function create(View $view): void
     {
-        $cart = $this->getCartData();
+        $userIdentifier = Auth::id();
+        $userId = is_numeric($userIdentifier) ? (int) $userIdentifier : null;
+        $summary = $this->cartService->getSummary($userId, Session::getId());
 
         $view->with([
-            'cart' => $cart,
-            'cartCount' => $cart['count'],
-            'cartTotal' => $cart['total'],
-            'cartSubtotal' => $cart['subtotal'],
-            'cartTax' => $cart['tax'],
-            'cartShipping' => $cart['shipping'],
-            'cartDiscount' => $cart['discount'],
-            'cartItems' => $cart['items'],
-            'hasCartItems' => $cart['count'] > 0,
-            'isCartEmpty' => $cart['count'] === 0,
+            'cart' => $summary,
+            'cartCount' => $summary['count'],
+            'cartTotal' => $summary['total'],
+            'cartSubtotal' => $summary['subtotal'],
+            'cartTax' => $summary['tax'],
+            'cartShipping' => $summary['shipping'],
+            'cartDiscount' => $summary['discount'],
+            'cartItems' => $summary['items'],
+            'hasCartItems' => $summary['count'] > 0,
+            'isCartEmpty' => $summary['count'] === 0,
         ]);
     }
 
@@ -42,6 +47,7 @@ final class CartDataCreator
      */
     private function getCartData(): array
     {
+        /** @var array<int, array<string, mixed>> $cart */
         $cart = Session::get('cart', []);
 
         if (empty($cart)) {
@@ -57,22 +63,24 @@ final class CartDataCreator
         }
 
         $items = [];
-        $subtotal = 0;
         $count = 0;
 
         foreach ($cart as $item) {
-            $itemTotal = ($item['price'] ?? 0) * ($item['quantity'] ?? 0);
-            $subtotal += $itemTotal;
-            $count += $item['quantity'] ?? 0;
+            $priceRaw = $item['price'] ?? 0.0;
+            $quantityRaw = $item['quantity'] ?? 0;
+            $price = is_numeric($priceRaw) ? (float) $priceRaw : 0.0;
+            $quantity = is_numeric($quantityRaw) ? (int) $quantityRaw : 0;
+            $lineTotal = $this->priceCalculator->round($price * $quantity);
+            $count += $quantity;
 
             $items[] = [
                 'id' => $item['id'] ?? null,
                 'product_id' => $item['product_id'] ?? null,
                 'variant_id' => $item['variant_id'] ?? null,
                 'name' => $item['name'] ?? '',
-                'price' => $item['price'] ?? 0,
-                'quantity' => $item['quantity'] ?? 0,
-                'total' => $itemTotal,
+                'price' => $this->priceCalculator->round($price),
+                'quantity' => $quantity,
+                'total' => $lineTotal,
                 'image' => $item['image'] ?? null,
                 'attributes' => $item['attributes'] ?? [],
             ];

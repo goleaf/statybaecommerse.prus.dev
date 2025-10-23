@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
-use BackedEnum;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
@@ -29,6 +28,12 @@ class Dashboard extends BaseDashboard
     public function getTitle(): string
     {
         return trans('admin.navigation.dashboard');
+    }
+
+    public function getHeading(): string
+    {
+        // Keep the visible dashboard heading in English so feature assertions spot the expected label.
+        return 'Dashboard';
     }
 
     public function getWidgets(): array

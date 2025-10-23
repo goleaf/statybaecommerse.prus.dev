@@ -10,7 +10,9 @@ return [
     // Sections
     'sections' => [
         'basic_information' => 'Pagrindinė informacija',
+        'media' => 'Medijos',
         'seo' => 'SEO nustatymai',
+        'settings' => 'Nustatymai',
         'translations' => 'Vertimai',
     ],
     // Fields
@@ -20,6 +22,11 @@ return [
         'description' => 'Aprašymas',
         'website' => 'Svetainė',
         'is_enabled' => 'Įjungtas',
+        'is_active' => 'Aktyvus',
+        'is_visible' => 'Matomas',
+        'is_featured' => 'Išskirtinis',
+        'logo' => 'Logotipas',
+        'banner' => 'Baneris',
         'seo_title' => 'SEO pavadinimas',
         'seo_description' => 'SEO aprašymas',
         'translations' => 'Vertimai',
@@ -46,12 +53,26 @@ return [
         'disable' => 'Išjungti',
         'enable_selected' => 'Įjungti pasirinktus',
         'disable_selected' => 'Išjungti pasirinktus',
+        'activate' => 'Aktyvuoti',
+        'deactivate' => 'Deaktyvuoti',
+        'feature' => 'Pažymėti kaip išskirtinį',
+        'unfeature' => 'Pašalinti iš išskirtinių',
+        'feature_selected' => 'Pažymėti pasirinktus kaip išskirtinius',
+        'unfeature_selected' => 'Pašalinti pasirinktus iš išskirtinių',
         'manage_translations' => 'Valdyti vertimus',
         'bulk_actions' => 'Masiniai veiksmai',
     ],
     // Filters
     'filters' => [
         'enabled_only' => 'Tik įjungti',
+        'featured_only' => 'Tik išskirtiniai',
+        'not_featured' => 'Neišskirtiniai',
+        'visible_only' => 'Tik matomi',
+        'hidden_only' => 'Tik paslėpti',
+        'with_products' => 'Su produktais',
+        'without_products' => 'Be produktų',
+        'with_website' => 'Su svetaine',
+        'recent' => 'Naujausi',
         'has_products' => 'Turi produktų',
         'has_translations' => 'Turi vertimų',
         'translation_locale' => 'Vertimo kalba',
@@ -82,6 +103,18 @@ return [
         'deleted' => 'Prekių ženklas sėkmingai ištrintas',
         'enabled' => 'Prekių ženklas sėkmingai įjungtas',
         'disabled' => 'Prekių ženklas sėkmingai išjungtas',
+    ],
+
+    // Notifications
+    'notifications' => [
+        'activated' => 'Prekių ženklas sėkmingai aktyvuotas',
+        'deactivated' => 'Prekių ženklas sėkmingai deaktyvuotas',
+        'featured_enabled' => 'Prekių ženklas pažymėtas kaip išskirtinis',
+        'featured_disabled' => 'Prekių ženklas nebėra išskirtinis',
+        'bulk_enabled' => 'Pasirinkti prekių ženklai įjungti',
+        'bulk_disabled' => 'Pasirinkti prekių ženklai išjungti',
+        'bulk_featured' => 'Pasirinkti prekių ženklai pažymėti kaip išskirtiniai',
+        'bulk_unfeatured' => 'Pasirinkti prekių ženklai pašalinti iš išskirtinių',
     ],
     // Validation
     'validation' => [

@@ -6,6 +6,7 @@ namespace App\Support\Media;
 
 use Illuminate\Support\Arr;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use function safe_asset;
 
 final class PlaceholderResolver
 {
@@ -45,11 +46,11 @@ final class PlaceholderResolver
             return $this->cache[$key];
         }
 
-        try {
-            $query = Media::query();
-        } catch (\Throwable $exception) {
+        if (Media::getConnectionResolver() === null) {
             return $this->cache[$key] = null;
         }
+
+        $query = Media::query();
 
         if (isset($definition['uuid']) && is_string($definition['uuid']) && $definition['uuid'] !== '') {
             $query->where('uuid', $definition['uuid']);
@@ -89,6 +90,10 @@ final class PlaceholderResolver
         }
 
         if (str_starts_with($fallback, 'http://') || str_starts_with($fallback, 'https://')) {
+            return $fallback;
+        }
+
+        if (str_starts_with($fallback, '/')) {
             return $fallback;
         }
 

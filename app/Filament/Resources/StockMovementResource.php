@@ -4,26 +4,29 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\StockMovementResource\Pages;
 use App\Models\StockMovement;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use UnitEnum;
 
 final class StockMovementResource extends Resource
@@ -62,9 +65,9 @@ final class StockMovementResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('stock_movement.sections.basic_information'))
                 ->components([
                     Grid::make(2)
@@ -85,9 +88,11 @@ final class StockMovementResource extends Resource
                         ]),
                     Grid::make(2)
                         ->components([
-                            TextInput::make('quantity')
+                            Quantity::make('quantity')
                                 ->label(__('stock_movement.fields.quantity'))
-                                ->numeric()
+                                ->minValue(1)
+                                ->steps(1)
+                                ->default(1)
                                 ->required(),
                             Select::make('type')
                                 ->label(__('stock_movement.fields.type'))
@@ -124,8 +129,9 @@ final class StockMovementResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('variantInventory.variant.name')

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Support\Concerns\HasNav;
+
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\SeoDataResource\Pages;
 use App\Models\Brand;
@@ -14,9 +16,10 @@ use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
@@ -70,9 +73,10 @@ final class SeoDataResource extends Resource
         return __('seo_data.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        // Configure the Filament resource form schema using the v4 Schema API.
+        return $schema
             ->columns(3)
             ->schema([
                 Section::make(__('seo_data.sections.basic_info'))
@@ -93,7 +97,7 @@ final class SeoDataResource extends Resource
                             }),
                         Select::make('seoable_id')
                             ->label(__('seo_data.fields.seoable_id'))
-                            ->options(function (Get $get): array {
+                            ->options(function (Forms\Get $get): array {
                                 $type = $get('seoable_type');
 
                                 if (! is_string($type)) {
@@ -101,9 +105,9 @@ final class SeoDataResource extends Resource
                                 }
 
                                 return match ($type) {
-                                    Product::class  => Product::query()->pluck('name', 'id')->all(),
-                                    Category::class => Category::query()->pluck('name', 'id')->all(),
-                                    Brand::class    => Brand::query()->pluck('name', 'id')->all(),
+                                    Product::class  => Product::pluck('name', 'id')->all(),
+                                    Category::class => Category::pluck('name', 'id')->all(),
+                                    Brand::class    => Brand::pluck('name', 'id')->all(),
                                     default         => [],
                                 };
                             })
@@ -124,25 +128,65 @@ final class SeoDataResource extends Resource
                             ->label(__('seo_data.fields.title'))
                             ->required()
                             ->maxLength(255)
-                            ->live(),
+                            ->live()
+                            ->afterStateUpdated(function (?string $state, callable $set): void {
+                                $length = mb_strlen($state ?? '');
+                                $set('title_length', $length);
+                                if ($length < 30) {
+                                    $set('title_warning', __('seo_data.warnings.title_too_short'));
+                                } elseif ($length > 60) {
+                                    $set('title_warning', __('seo_data.warnings.title_too_long'));
+                                } else {
+                                    $set('title_warning', null);
+                                }
+                            }),
                         Placeholder::make('title_length')
                             ->label(__('seo_data.fields.title_length'))
-                            ->content(fn (Get $get): string => (string) mb_strlen(self::normalizeString($get('title'))) . ' ' . __('seo_data.characters')),
+                            ->content(function (Forms\Get $get): string {
+                                $length = $get('title_length');
+                                $numericLength = is_numeric($length) ? (int) $length : 0;
+
+                                return sprintf('%d %s', $numericLength, __('seo_data.characters'));
+                            }),
                         Placeholder::make('title_warning')
-                            ->content(fn (Get $get): ?string => self::resolveTitleWarning(self::normalizeNullableString($get('title'))))
-                            ->visible(fn (Get $get): bool => filled(self::resolveTitleWarning(self::normalizeNullableString($get('title'))))),
+                            ->content(function (Forms\Get $get): ?string {
+                                $warning = $get('title_warning');
+
+                                return is_string($warning) && $warning !== '' ? $warning : null;
+                            })
+                            ->visible(fn (Forms\Get $get): bool => filled($get('title_warning'))),
                         Textarea::make('description')
                             ->label(__('seo_data.fields.description'))
                             ->required()
                             ->maxLength(160)
                             ->rows(3)
-                            ->live(),
+                            ->live()
+                            ->afterStateUpdated(function (?string $state, callable $set): void {
+                                $length = mb_strlen($state ?? '');
+                                $set('description_length', $length);
+                                if ($length < 120) {
+                                    $set('description_warning', __('seo_data.warnings.description_too_short'));
+                                } elseif ($length > 160) {
+                                    $set('description_warning', __('seo_data.warnings.description_too_long'));
+                                } else {
+                                    $set('description_warning', null);
+                                }
+                            }),
                         Placeholder::make('description_length')
                             ->label(__('seo_data.fields.description_length'))
-                            ->content(fn (Get $get): string => (string) mb_strlen(self::normalizeString($get('description'))) . ' ' . __('seo_data.characters')),
+                            ->content(function (Forms\Get $get): string {
+                                $length = $get('description_length');
+                                $numericLength = is_numeric($length) ? (int) $length : 0;
+
+                                return sprintf('%d %s', $numericLength, __('seo_data.characters'));
+                            }),
                         Placeholder::make('description_warning')
-                            ->content(fn (Get $get): ?string => self::resolveDescriptionWarning(self::normalizeNullableString($get('description'))))
-                            ->visible(fn (Get $get): bool => filled(self::resolveDescriptionWarning(self::normalizeNullableString($get('description'))))),
+                            ->content(function (Forms\Get $get): ?string {
+                                $warning = $get('description_warning');
+
+                                return is_string($warning) && $warning !== '' ? $warning : null;
+                            })
+                            ->visible(fn (Forms\Get $get): bool => filled($get('description_warning'))),
                         TextInput::make('keywords')
                             ->label(__('seo_data.fields.keywords'))
                             ->maxLength(255)
@@ -187,8 +231,9 @@ final class SeoDataResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('title')
@@ -232,6 +277,7 @@ final class SeoDataResource extends Resource
                     ->toggleable(),
                 TextColumn::make('canonical_url')
                     ->label(__('seo_data.fields.canonical_url'))
+                    ->url(fn (?string $state): ?string => $state)
                     ->limit(50)
                     ->toggleable(),
                 IconColumn::make('no_index')
@@ -245,13 +291,12 @@ final class SeoDataResource extends Resource
                 TextColumn::make('seo_score')
                     ->label(__('seo_data.fields.seo_score'))
                     ->badge()
-                    ->color(fn (?int $state): string => match (true) {
-                        $state === null => 'gray',
-                        $state >= 80    => 'success',
-                        $state >= 60    => 'warning',
-                        default         => 'danger',
+                    ->color(fn (int $state): string => match (true) {
+                        $state >= 80 => 'success',
+                        $state >= 60 => 'warning',
+                        default      => 'danger',
                     })
-                    ->formatStateUsing(fn (?int $state): string => $state === null ? '—' : $state . '%'),
+                    ->formatStateUsing(fn (int $state): string => $state . '%'),
                 TextColumn::make('created_at')
                     ->label(__('seo_data.fields.created_at'))
                     ->dateTime()
@@ -374,8 +419,9 @@ final class SeoDataResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Schema $schema): Schema   
     {
+        // Provide the infolist schema using the Filament v4 return type.
         return $schema
             ->components([
                 Section::make(__('seo_data.sections.basic_info'))
@@ -387,17 +433,17 @@ final class SeoDataResource extends Resource
                         TextEntry::make('seoable_type')
                             ->label(__('seo_data.fields.seoable_type'))
                             ->badge()
-                            ->color(fn (?string $state): string => match ($state) {
+                            ->color(fn (string $state): string => match ($state) {
                                 Product::class  => 'success',
                                 Category::class => 'info',
                                 Brand::class    => 'warning',
                                 default         => 'gray',
                             })
-                            ->formatStateUsing(fn (?string $state): string => match ($state) {
+                            ->formatStateUsing(fn (string $state): string => match ($state) {
                                 Product::class  => __('seo_data.types.product'),
                                 Category::class => __('seo_data.types.category'),
                                 Brand::class    => __('seo_data.types.brand'),
-                                default         => $state ? class_basename($state) : __('seo_data.placeholders.seoable_not_found'),
+                                default         => class_basename($state),
                             }),
                         TextEntry::make('seoable.name')
                             ->label(__('seo_data.fields.seoable_name'))
@@ -417,7 +463,7 @@ final class SeoDataResource extends Resource
                             ->placeholder(__('seo_data.placeholders.no_keywords')),
                         TextEntry::make('canonical_url')
                             ->label(__('seo_data.fields.canonical_url'))
-                            ->url(fn (mixed $state): ?string => self::normalizeNullableString($state))
+                            ->url(fn (?string $state): ?string => $state)
                             ->placeholder(__('seo_data.placeholders.no_canonical_url')),
                     ]),
                 Section::make(__('seo_data.sections.robots'))
@@ -425,9 +471,7 @@ final class SeoDataResource extends Resource
                     ->schema([
                         IconEntry::make('no_index')
                             ->label(__('seo_data.fields.no_index'))
-                            ->boolean()
-                            ->true('heroicon-o-check-circle', 'success')
-                            ->false('heroicon-o-x-circle', 'danger'),
+                            ->boolean(),
                         IconEntry::make('no_follow')
                             ->label(__('seo_data.fields.no_follow'))
                             ->boolean()
@@ -448,13 +492,12 @@ final class SeoDataResource extends Resource
                         TextEntry::make('seo_score')
                             ->label(__('seo_data.fields.seo_score'))
                             ->badge()
-                            ->color(fn (?int $state): string => match (true) {
-                                $state === null => 'gray',
-                                $state >= 80    => 'success',
-                                $state >= 60    => 'warning',
-                                default         => 'danger',
+                            ->color(fn (int $state): string => match (true) {
+                                $state >= 80 => 'success',
+                                $state >= 60 => 'warning',
+                                default      => 'danger',
                             })
-                            ->formatStateUsing(fn (?int $state): string => $state === null ? '—' : $state . '%'),
+                            ->formatStateUsing(fn (int $state): string => $state . '%'),
                         TextEntry::make('title_length')
                             ->label(__('seo_data.fields.title_length'))
                             ->numeric()
@@ -539,7 +582,7 @@ final class SeoDataResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $count = self::getModel()::count();
+        $count = (int) self::getModel()::count();
 
         return $count > 0 ? (string) $count : null;
     }

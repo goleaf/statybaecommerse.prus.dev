@@ -133,6 +133,7 @@ return [
     'search' => [
         'placeholder' => 'Ieškoti produktų...',
         'results' => 'Paieškos rezultatai',
+        'help' => 'Ieškokite produktų pagal kategorijas, prekės ženklus ir kolekcijas.',
         'no_results' => 'Nerasta rezultatų',
         'showing_results' => 'Rodoma :from-:to iš :total rezultatų',
         'sort_by' => 'Rikiuoti pagal',
@@ -157,6 +158,10 @@ return [
         'new_arrivals' => 'Naujos prekės',
         'featured' => 'Rekomenduojamos',
         'searching' => 'Ieškoma...',
+        'result_count' => '{0} Rezultatų nėra|{1} :count rezultatas|[2,*] :count rezultatai',
+        'for_query' => 'pagal „:query“',
+        'pagination_label' => 'Puslapių numeracija',
+        'no_results_for_query' => 'Rezultatų nerasta užklausai „:query“',
         'view_all_results' => 'Peržiūrėti visus rezultatus',
         'try_different_keywords' => 'Išbandykite kitus raktažodžius',
         'category_with_products' => ':count produktų',

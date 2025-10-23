@@ -69,9 +69,9 @@ final class CacheService
             CacheTagHelper::categories(),
             CacheKeys::categoryNavigationTree(),
             CacheKeys::TTL_ONE_DAY,
-            fn () => Category::where('is_visible', true)->whereNull('parent_id')->with(['children' => function ($query) {
+            fn () => Category::where('is_visible', true)->whereNull('parent_id')->with(['children' => function ($query): void {
                 $query->where('is_visible', true)->orderBy('sort_order')->orderBy('name');
-            }])->orderBy('sort_order')->orderBy('name')->get()
+            }])->orderBy('sort_order')->orderBy('name')->get(),
         );
     }
 

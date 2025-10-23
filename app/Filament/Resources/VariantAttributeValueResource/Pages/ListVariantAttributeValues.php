@@ -10,6 +10,8 @@ use Filament\Actions;
 
 final class ListVariantAttributeValues extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = VariantAttributeValueResource::class;
 
     protected function getHeaderActions(): array

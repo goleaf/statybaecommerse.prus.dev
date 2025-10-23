@@ -6,10 +6,10 @@ namespace App\Services\Export;
 
 use App\Data\ExportRequestData;
 use App\Enums\ExportStatus;
-use App\Jobs\ProcessExportJob;
+use App\Jobs\ProcessExport;
 use App\Models\Export;
+use App\Notifications\ExportCompletedNotification;
 use App\Notifications\ExportFailedNotification;
-use App\Notifications\ExportReadyNotification;
 use App\Services\Export\Contracts\Exportable;
 use App\Services\Export\Contracts\ExportWriter;
 use App\Services\Export\Writers\CsvExportWriter;
@@ -30,16 +30,48 @@ final class ExportService
 {
     private string $disk;
 
-    public function __construct(?string $disk = null)
+    private int $chunkSize;
+
+    private int $downloadUrlTtl;
+
+    /**
+     * @var array<string, class-string<ExportWriter>>
+     */
+    private array $writerMap = [];
+
+    public function __construct(private readonly Container $container, ?string $disk = null)
     {
-        $this->disk = $disk ?? config('filesystems.exports_disk', config('media-security.disk', config('filesystems.default', 'secure-media')));
+        $config = config('export');
+
+        if (! is_array($config)) {
+            $config = [];
+        }
+
+        $configuredDisk = $config['disk'] ?? config('filesystems.default', 'public');
+        $this->disk = $disk ?? (is_string($configuredDisk) ? $configuredDisk : 'public');
+        $this->chunkSize = $this->resolveInteger($config['chunk_size'] ?? null, 250);
+        $this->downloadUrlTtl = $this->resolveInteger($config['download_url_ttl'] ?? null, 60);
+        $formats = $config['formats'] ?? [];
+
+        if (is_array($formats)) {
+            foreach ($formats as $key => $writer) {
+                if (! is_string($key) || ! is_string($writer) || ! is_subclass_of($writer, ExportWriter::class)) {
+                    continue;
+                }
+
+                $this->writerMap[Str::lower($key)] = $writer;
+            }
+        }
     }
 
     public function queue(ExportRequestData $data): Export
     {
         $payload = $data->toPayload();
         $exportable = $this->resolveExportable($payload['exportable']);
-        $columns = $this->resolveColumns($exportable, $payload['columns']);
+
+        /** @var array<int, string> $requestedColumns */
+        $requestedColumns = $payload['columns'];
+        $columns = $this->resolveColumns($exportable, $requestedColumns);
 
         $export = Export::query()->create([
             'name' => $payload['name'] ?: $exportable->name(),
@@ -56,7 +88,13 @@ final class ExportService
             'requested_by' => $payload['user_id'],
         ]);
 
-        Bus::dispatch(new ProcessExportJob($export->getKey()));
+        $exportId = $export->getKey();
+
+        if (! is_int($exportId)) {
+            throw new \UnexpectedValueException('Export primary key must be an integer.');
+        }
+
+        Bus::dispatch(new ProcessExport($exportId));
 
         return $export;
     }
@@ -78,7 +116,9 @@ final class ExportService
 
         try {
             $exportable = $this->resolveExportable($export->exportable_type);
-            $columns = $this->resolveColumns($exportable, $export->columns);
+            /** @var array<int, string> $columnKeys */
+            $columnKeys = $export->columns ?? [];
+            $columns = $this->resolveColumns($exportable, $columnKeys);
             $query = $this->buildQuery($exportable, $export->exportable_options ?? []);
             $writer = $this->makeWriter($export->format);
             $headers = Collection::make($columns)->map(fn (ExportColumn $column) => $column->label)->values()->all();
@@ -87,7 +127,7 @@ final class ExportService
             $writer->open($export->artifact_disk ?? $this->disk, $path, $headers);
 
             $total = 0;
-            $query->chunkById(250, function (Collection $chunk) use (&$total, $writer, $exportable, $columns): void {
+            $query->chunkById($this->chunkSize, function (Collection $chunk) use (&$total, $writer, $exportable, $columns): void {
                 /** @var Model $model */
                 foreach ($chunk as $model) {
                     $writer->append($exportable->map($model, $columns));
@@ -135,6 +175,7 @@ final class ExportService
     }
 
     /**
+     * @param  array<int, string>  $requested
      * @return array<string, ExportColumn>
      */
     private function resolveColumns(Exportable $exportable, array $requested): array
@@ -159,7 +200,7 @@ final class ExportService
 
     private function resolveExportable(string $class): Exportable
     {
-        $instance = app($class);
+        $instance = $this->container->make($class);
 
         if (! $instance instanceof Exportable) {
             throw new \InvalidArgumentException(sprintf('%s must implement %s', $class, Exportable::class));
@@ -170,12 +211,19 @@ final class ExportService
 
     private function makeWriter(string $format): ExportWriter
     {
-        return match ($format) {
-            'csv' => new CsvExportWriter,
-            'xlsx' => new XlsxExportWriter,
-            'pdf' => new PdfExportWriter,
-            default => throw new \InvalidArgumentException("Unsupported export format: {$format}"),
-        };
+        $format = Str::lower($format);
+
+        if (! array_key_exists($format, $this->writerMap)) {
+            throw new \InvalidArgumentException("Unsupported export format: {$format}");
+        }
+
+        $writer = $this->container->make($this->writerMap[$format]);
+
+        if (! $writer instanceof ExportWriter) {
+            throw new \InvalidArgumentException(sprintf('Writer for format %s must implement %s', $format, ExportWriter::class));
+        }
+
+        return $writer;
     }
 
     /**
@@ -186,7 +234,7 @@ final class ExportService
         $query = $exportable->query($options);
         $ids = Arr::get($options, 'record_ids', []);
 
-        if ($ids) {
+        if (is_array($ids) && $ids !== []) {
             $query->whereKey($ids);
         }
 
@@ -207,5 +255,22 @@ final class ExportService
         $extension = Str::lower($export->format);
 
         return trim($base.'-'.$timestamp.'.'.$extension, '-');
+    }
+
+    private function resolveInteger(mixed $value, int $default): int
+    {
+        if (is_int($value)) {
+            return $value;
+        }
+
+        if (is_float($value)) {
+            return (int) round($value);
+        }
+
+        if (is_string($value) && is_numeric($value)) {
+            return (int) $value;
+        }
+
+        return $default;
     }
 }

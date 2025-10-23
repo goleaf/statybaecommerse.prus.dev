@@ -10,6 +10,8 @@ use Filament\Actions;
 
 final class ListDiscountRedemptions extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = DiscountRedemptionResource::class;
 
     protected function getHeaderActions(): array

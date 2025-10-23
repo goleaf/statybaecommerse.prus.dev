@@ -20,6 +20,7 @@ final class StatsWidget extends BaseStatsOverviewWidget
 
     public function getStats(): array
     {
+        $now = Carbon::now();
         $totalRevenue = (float) (Order::sum('total') ?? 0);
         $totalOrders = (int) Order::count();
         $totalProducts = (int) Product::where('is_visible', true)->count();

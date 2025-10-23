@@ -13,6 +13,10 @@ namespace {
         class_alias(\Filament\Schemas\Schema::class, \Filament\Forms\Form::class);
     }
 
+    if (! class_exists(\Filament\Infolists\Infolist::class) && class_exists(\Filament\Schemas\Schema::class)) {
+        class_alias(\Filament\Schemas\Schema::class, \Filament\Infolists\Infolist::class);
+    }
+
     if (! class_exists(\Filament\Tables\Table::class) && class_exists(\Filament\Resources\Table::class)) {
         class_alias(\Filament\Resources\Table::class, \Filament\Tables\Table::class);
     }
@@ -21,38 +25,42 @@ namespace {
         // Preserve the legacy component namespace so third-party discovery hooks can resolve Flatpickr during upgrades.
         class_alias(\Coolsam\Flatpickr\Forms\Components\Flatpickr::class, \Filament\Forms\Components\Flatpickr::class);
     }
+
+    if (! class_exists(\Filament\Tables\Actions\DeleteAction::class) && class_exists(\Filament\Actions\DeleteAction::class)) {
+        // Maintain backwards compatibility with test helpers and legacy code targeting table-specific delete actions.
+        class_alias(\Filament\Actions\DeleteAction::class, \Filament\Tables\Actions\DeleteAction::class);
+    }
 }
 
 namespace Filament\Forms\Components {
+    if (! class_exists(Section::class) && class_exists(\Filament\Schemas\Components\Section::class)) {
+        class_alias(\Filament\Schemas\Components\Section::class, Section::class);
+    }
 
-    if (! class_exists(Combobox::class) && class_exists(Select::class)) {
-        class Combobox extends Select
-        {
-            public static function make(?string $name = null): static
-            {
-                return parent::make($name);
-            }
+    if (! class_exists(Grid::class) && class_exists(\Filament\Schemas\Components\Grid::class)) {
+        class_alias(\Filament\Schemas\Components\Grid::class, Grid::class);
+    }
 
-            public function boxSearchs(bool $condition = true): static
-            {
-                return $this;
-            }
+    if (! class_exists(Combobox::class) && class_exists(\App\Support\FilamentCompat\Combobox::class)) {
+        class_alias(\App\Support\FilamentCompat\Combobox::class, Combobox::class);
+    }
+}
 
-            public function optionsLabel(?string $label): static
-            {
-                return $this;
-            }
+namespace Filament\Tables {
+    if (! class_exists(Table::class) && class_exists(\Filament\Resources\Table::class)) {
+        class_alias(\Filament\Resources\Table::class, Table::class);
+    }
+}
 
-            public function selectedLabel(?string $label): static
-            {
-                return $this;
-            }
+namespace Filament\Infolists {
+    if (! class_exists(Infolist::class) && class_exists(\Filament\Schemas\Schema::class)) {
+        class_alias(\Filament\Schemas\Schema::class, Infolist::class);
+    }
+}
 
-            public function height(string|int $value): static
-            {
-                return $this;
-            }
-        }
+namespace Filament\Infolists\Components {
+    if (! class_exists(Section::class) && class_exists(\Filament\Schemas\Components\Section::class)) {
+        class_alias(\Filament\Schemas\Components\Section::class, Section::class);
     }
 }
 
@@ -125,19 +133,8 @@ namespace SolutionForest\TabLayoutPlugin\Schemas {
 }
 
 namespace Asmit\ResizedColumn {
-    if (! trait_exists(HasResizableColumn::class)) {
-        trait HasResizableColumn
-        {
-            /**
-             * Provide a minimal stub implementation for the resizable column concern when the vendor package is unavailable.
-             *
-             * @return array<int, string>
-             */
-            protected function getResizableColumns(): array
-            {
-                return [];
-            }
-        }
+    if (! trait_exists(HasResizableColumn::class) && trait_exists(\App\Support\FilamentCompat\HasResizableColumn::class)) {
+        class_alias(\App\Support\FilamentCompat\HasResizableColumn::class, HasResizableColumn::class);
     }
 }
 
@@ -208,5 +205,69 @@ namespace Hydrat\TableLayoutToggle\Concerns {
 namespace {
     if (! class_exists(\Filament\Infolists\Infolist::class) && class_exists(\Filament\Schemas\Schema::class)) {
         class_alias(\Filament\Schemas\Schema::class, \Filament\Infolists\Infolist::class);
+    }
+}
+
+namespace Hydrat\TableLayoutToggle\Concerns {
+    if (! trait_exists(HasToggleableTable::class)) {
+        trait HasToggleableTable
+        {
+            public ?string $layoutView = null;
+
+            public function initializeHasToggleableTable(): void
+            {
+                // No-op fallback when the Table Layout Toggle plugin is unavailable.
+            }
+
+            public function updatedLayoutView(mixed $value): void
+            {
+                // No-op fallback when the Table Layout Toggle plugin is unavailable.
+            }
+
+            public function bootHasToggleableTable(): void
+            {
+                // No-op fallback when the Table Layout Toggle plugin is unavailable.
+            }
+
+            public function configurePersister(): void
+            {
+                // No-op fallback when the Table Layout Toggle plugin is unavailable.
+            }
+
+            public function bootedHasToggleableTable(): void
+            {
+                // No-op fallback when the Table Layout Toggle plugin is unavailable.
+            }
+
+            public function getDefaultLayoutView(): string
+            {
+                return 'list';
+            }
+
+            public function isGridLayout(): bool
+            {
+                return false;
+            }
+
+            public function isListLayout(): bool
+            {
+                return true;
+            }
+
+            public function getLayoutView(): string
+            {
+                return $this->layoutView ?? $this->getDefaultLayoutView();
+            }
+
+            protected function registerLayoutViewToogleActionHook(string $filamentHook): void
+            {
+                // No-op fallback when the Table Layout Toggle plugin is unavailable.
+            }
+
+            public function changeLayoutView(): void
+            {
+                $this->layoutView = $this->isListLayout() ? 'grid' : 'list';
+            }
+        }
     }
 }

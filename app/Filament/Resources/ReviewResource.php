@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use UnitEnum;
+use BackedEnum;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ReviewResource\Pages;
 use App\Models\Review;
@@ -13,14 +15,13 @@ use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\Select as SelectInput;
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Text\TextInput as TextInputInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
+use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
@@ -39,9 +40,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
+use BackedEnum;
+use UnitEnum;
 final class ReviewResource extends Resource
 {
-    protected static ?string $model = Review::class;
+    use HasNav;
 
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
@@ -80,9 +83,9 @@ final class ReviewResource extends Resource
         return __('reviews.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('reviews.sections.basic_info'))
                     ->description(__('reviews.sections.basic_info_description'))
@@ -153,8 +156,9 @@ final class ReviewResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('title')
@@ -395,8 +399,9 @@ final class ReviewResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Schema $schema): Schema   
     {
+        // Provide the infolist schema using the Filament v4 return type.
         return $schema
             ->components([
                 InfolistSection::make(__('reviews.sections.basic_info'))

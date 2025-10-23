@@ -4,24 +4,33 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\UserManagementResource\RelationManagers;
 
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+
+use Filament\Schemas\Schema;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Tables;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class AddressesRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'addresses';
 
     protected static ?string $title = 'Addresses';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $schema): Schema   
     {
         return $schema
             ->components([
@@ -40,24 +49,72 @@ final class AddressesRelationManager extends BaseRelationManager
                         'shipping' => 'Shipping',
                     ])
                     ->required(),
-                Forms\Components\Toggle::make('is_default')
+            ]),
+            Grid::make(2)->schema([
+                TextInput::make('address_line_1')
+                    ->label(__('addresses.address_line_1'))
+                    ->required()
+                    ->maxLength(255),
+                TextInput::make('address_line_2')
+                    ->label(__('addresses.address_line_2'))
+                    ->maxLength(255),
+                TextInput::make('city')
+                    ->label(__('addresses.city'))
+                    ->required()
+                    ->maxLength(255),
+                TextInput::make('state')
+                    ->label(__('addresses.state'))
+                    ->maxLength(255),
+                TextInput::make('postal_code')
+                    ->label(__('addresses.postal_code'))
+                    ->maxLength(20),
+                Select::make('country_id')
+                    ->label(__('addresses.country'))
+                    ->relationship('countryById', 'name')
+                    ->searchable()
+                    ->preload(),
+            ]),
+            Grid::make(2)->schema([
+                Toggle::make('is_default')
+                    ->label(__('addresses.is_default'))
                     ->default(false),
-            ]);
+                Toggle::make('is_billing')
+                    ->label(__('addresses.is_billing')),
+                Toggle::make('is_shipping')
+                    ->label(__('addresses.is_shipping')),
+                Toggle::make('is_active')
+                    ->label(__('addresses.is_active')),
+            ]),
+            Textarea::make('notes')
+                ->label(__('addresses.notes'))
+                ->maxLength(1000)
+                ->columnSpanFull(),
+        ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
-            ->recordTitleAttribute('name')
+            ->recordTitleAttribute('full_name')
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('full_name')
+                    ->label(__('addresses.full_name'))
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('address_line_1')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('city'),
-                Tables\Columns\TextColumn::make('country'),
-                Tables\Columns\TextColumn::make('type')
+                TextColumn::make('address_line_1')
+                    ->label(__('addresses.address_line_1'))
+                    ->searchable()
+                    ->toggleable(),
+                TextColumn::make('city')
+                    ->label(__('addresses.city'))
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('countryById.name')
+                    ->label(__('addresses.country'))
+                    ->sortable(),
+                TextColumn::make('type')
+                    ->label(__('addresses.type'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'billing'  => 'info',
@@ -66,16 +123,34 @@ final class AddressesRelationManager extends BaseRelationManager
                     }),
                 Tables\Columns\IconColumn::make('is_default')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(),
+                IconColumn::make('is_active')
+                    ->label(__('addresses.is_active'))
+                    ->boolean(),
+                TextColumn::make('created_at')
+                    ->label(__('addresses.created_at'))
+                    ->dateTime()
+                    ->sortable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('type'),
-                Tables\Filters\TernaryFilter::make('is_default')
-                    ->label('Default Address'),
-                Tables\Filters\TrashedFilter::make(),
+                SelectFilter::make('type')
+                    ->label(__('addresses.type'))
+                    ->options(AddressType::options()),
+                TernaryFilter::make('is_default')
+                    ->label(__('addresses.is_default')),
+                TernaryFilter::make('is_active')
+                    ->label(__('addresses.is_active')),
+                TrashedFilter::make(),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit ' . $this->getPluralModelLabel())
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        // Provide a quick-edit modal for managing records inline.
+                        return $repeater->schema($this->getQuickEditSchema());
+                    }),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

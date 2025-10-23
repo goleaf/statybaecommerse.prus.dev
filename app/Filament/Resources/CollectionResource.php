@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\CollectionResource\Pages;
 use App\Models\Collection;
 use BackedEnum;
@@ -12,31 +14,51 @@ use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Novadaemon\FilamentCombobox\Combobox;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class CollectionResource extends Resource
 {
+    /**
+     * @var string|null Navigation group displayed in the Filament sidebar.
+     */
+    protected static ?string $navigationGroup = 'Products';
+
+    /**
+     * @var string|null Explicit navigation label to avoid relying on defaults.
+     */
+    protected static ?string $navigationLabel = 'Collections';
+
     protected static ?string $model = Collection::class;
+
+    /**
+     * Provide the localized navigation label for the resource menu entry.
+     */
+    public static function getNavigationLabel(): string
+    {
+        return __('collections.navigation_label');
+    }
 
     public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
@@ -45,7 +67,7 @@ final class CollectionResource extends Resource
 
     public static function getNavigationGroup(): UnitEnum|string|null
     {
-        return 'Products';
+        return static::$navigationGroup;
     }
 
     protected static ?int $navigationSort = 2;
@@ -69,57 +91,28 @@ final class CollectionResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->components([
+        return $schema->components([
             Section::make(__('collections.basic_information'))
-                ->components([
-                    LanguageTabs::make([
-                        TextInput::make('name')
-                            ->label(__('collections.name'))
-                            ->required()
-                            ->maxLength(255),
-                        TextInput::make('slug')
-                            ->label(__('collections.slug'))
-                            ->rules(['alpha_dash'])
-                            ->helperText(__('collections.help.slug')),
-                        Textarea::make('description')
-                            ->label(__('collections.description'))
-                            ->rows(4),
-                    ]),
-                ]),
-            Section::make(__('collections.business_info'))
-                ->components([
-                    Grid::make(3)
-                        ->components([
-                            Toggle::make('is_visible')
-                                ->label(__('collections.is_visible'))
-                                ->default(true),
-                            Toggle::make('is_active')
-                                ->label(__('collections.is_active'))
-                                ->default(true),
-                            Toggle::make('is_automatic')
-                                ->label(__('collections.is_automatic'))
-                                ->default(false),
+                ->schema([
+                    Grid::make(2)
+                        ->schema([
+                            TextInput::make('name')
+                                ->label(__('collections.name'))
+                                ->required()
+                                ->maxLength(255)
+                                ->live(onBlur: true)
+                                ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', Str::slug((string) $state)) : null),
+                            TextInput::make('slug')
+                                ->label(__('collections.slug'))
+                                ->unique(table: Collection::class, column: 'slug', ignoreRecord: true)
+                                ->rules(['alpha_dash'])
+                                ->helperText(__('collections.help.slug')),
                         ]),
-                    Grid::make(3)
-                        ->components([
-                            TextInput::make('sort_order')
-                                ->label(__('collections.sort_order'))
-                                ->numeric()
-                                ->default(0)
-                                ->helperText(__('collections.help.sort_order')),
-                            TextInput::make('max_products')
-                                ->label(__('collections.max_products'))
-                                ->numeric()
-                                ->minValue(0)
-                                ->helperText(__('collections.help.max_products')),
-                            Textarea::make('rules')
-                                ->label(__('collections.rules'))
-                                ->rows(3)
-                                ->columnSpanFull()
-                                ->helperText(__('collections.help.rules')),
-                        ])
+                    Textarea::make('description')
+                        ->label(__('collections.description'))
+                        ->rows(4)
                         ->columnSpanFull(),
                 ])
                 ->columns(1),
@@ -146,8 +139,66 @@ final class CollectionResource extends Resource
                                 ->default(true),
                         ]),
                 ]),
+            Section::make(__('collections.business_info'))
+                ->schema([
+                    Grid::make(3)
+                        ->schema([
+                            Toggle::make('is_visible')
+                                ->label(__('collections.is_visible'))
+                                ->default(true),
+                            Toggle::make('is_active')
+                                ->label(__('collections.is_active'))
+                                ->default(true),
+                            Toggle::make('is_automatic')
+                                ->label(__('collections.is_automatic'))
+                                ->default(false),
+                        ]),
+                    Grid::make(3)
+                        ->schema([
+                            TextInput::make('sort_order')
+                                ->label(__('collections.sort_order'))
+                                ->numeric()
+                                ->default(0)
+                                ->helperText(__('collections.help.sort_order')),
+                            TextInput::make('max_products')
+                                ->label(__('collections.max_products'))
+                                ->numeric()
+                                ->minValue(0)
+                                ->helperText(__('collections.help.max_products')),
+                            Textarea::make('rules')
+                                ->label(__('collections.rules'))
+                                ->rows(3)
+                                ->columnSpanFull()
+                                ->helperText(__('collections.help.rules')),
+                        ])
+                        ->columnSpanFull(),
+                ])
+                ->columns(1),
+            Section::make(__('collections.display_type'))
+                ->schema([
+                    Grid::make(3)
+                        ->schema([
+                            Select::make('display_type')
+                                ->label(__('collections.display_type'))
+                                ->options([
+                                    'grid'     => __('collections.display_types.grid'),
+                                    'list'     => __('collections.display_types.list'),
+                                    'carousel' => __('collections.display_types.carousel'),
+                                ])
+                                ->default('grid')
+                                ->required(),
+                            TextInput::make('products_per_page')
+                                ->label(__('collections.products_per_page'))
+                                ->numeric()
+                                ->minValue(1)
+                                ->default(12),
+                            Toggle::make('show_filters')
+                                ->label(__('collections.show_filters'))
+                                ->default(true),
+                        ]),
+                ]),
             Section::make(__('collections.media'))
-                ->components([
+                ->schema([
                     SpatieMediaLibraryFileUpload::make('images')
                         ->collection('images')
                         ->label(__('collections.image'))
@@ -169,29 +220,31 @@ final class CollectionResource extends Resource
                         ->relationship('products', 'name')
                         ->multiple()
                         ->searchable()
-                        ->boxSearchs()
                         ->height('350px')
                         ->preload(),
                 ]),
             Section::make(__('collections.seo_info'))
-                ->components([
-                    LanguageTabs::make([
-                        TextInput::make('seo_title')
-                            ->label(__('collections.seo_title'))
-                            ->maxLength(255),
-                        Textarea::make('seo_description')
-                            ->label(__('collections.seo_description'))
-                            ->rows(2),
-                        TextInput::make('meta_title')
-                            ->label(__('collections.meta_title'))
-                            ->maxLength(255),
-                        Textarea::make('meta_description')
-                            ->label(__('collections.meta_description'))
-                            ->rows(2),
-                        TextInput::make('meta_keywords')
-                            ->label(__('collections.meta_keywords'))
-                            ->helperText(__('collections.help.meta_keywords')),
-                    ]),
+                ->schema([
+                    Grid::make(2)
+                        ->schema([
+                            TextInput::make('seo_title')
+                                ->label(__('collections.seo_title'))
+                                ->maxLength(255),
+                            TextInput::make('meta_title')
+                                ->label(__('collections.meta_title'))
+                                ->maxLength(255),
+                            Textarea::make('seo_description')
+                                ->label(__('collections.seo_description'))
+                                ->rows(2)
+                                ->columnSpan(2),
+                            Textarea::make('meta_description')
+                                ->label(__('collections.meta_description'))
+                                ->rows(2)
+                                ->columnSpan(2),
+                            TextInput::make('meta_keywords')
+                                ->label(__('collections.meta_keywords'))
+                                ->helperText(__('collections.help.meta_keywords')),
+                        ]),
                 ]),
         ]);
     }
@@ -199,8 +252,9 @@ final class CollectionResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 ImageColumn::make('image')

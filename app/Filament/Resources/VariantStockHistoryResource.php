@@ -4,35 +4,39 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantStockHistoryResource\Pages;
 use App\Models\VariantStockHistory;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class VariantStockHistoryResource extends Resource
 {
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'System';
-    }
+    use HasNav;
+
+    
 
     protected static ?string $model = VariantStockHistory::class;
 
@@ -53,9 +57,9 @@ final class VariantStockHistoryResource extends Resource
         return __('admin.variant_stock_histories.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('admin.variant_stock_histories.sections.basic_info'))
                 ->description(__('admin.variant_stock_histories.sections.basic_info_description'))
                 ->schema([
@@ -72,6 +76,13 @@ final class VariantStockHistoryResource extends Resource
                                 ->numeric()
                                 ->minValue(0)
                                 ->required()
+                                ->live(debounce: 500)
+                                ->afterStateUpdated(function (Set $set, $state, Get $get): void {
+                                    $set(
+                                        'quantity_change',
+                                        self::calculateQuantityChange($state, $get('new_quantity')),
+                                    );
+                                })
                                 ->validationMessages([
                                     'min' => __('The previous quantity must be zero or positive.'),
                                 ]),
@@ -79,7 +90,14 @@ final class VariantStockHistoryResource extends Resource
                                 ->label(__('admin.variant_stock_histories.fields.new_quantity'))
                                 ->numeric()
                                 ->minValue(0)
-                                ->required(),
+                                ->required()
+                                ->live(debounce: 500)
+                                ->afterStateUpdated(function (Set $set, $state, Get $get): void {
+                                    $set(
+                                        'quantity_change',
+                                        self::calculateQuantityChange($get('old_quantity'), $state),
+                                    );
+                                }),
                         ]),
                     TextInput::make('quantity_change')
                         ->label(__('admin.variant_stock_histories.fields.quantity_change'))
@@ -88,27 +106,11 @@ final class VariantStockHistoryResource extends Resource
                         ->schema([
                             Select::make('change_type')
                                 ->label(__('admin.variant_stock_histories.fields.change_type'))
-                                ->options([
-                                    'increase'   => __('admin.variant_stock_histories.change_types.increase'),
-                                    'decrease'   => __('admin.variant_stock_histories.change_types.decrease'),
-                                    'adjustment' => __('admin.variant_stock_histories.change_types.adjustment'),
-                                    'reserve'    => __('admin.variant_stock_histories.change_types.reserve'),
-                                    'unreserve'  => __('admin.variant_stock_histories.change_types.unreserve'),
-                                ])
+                                ->options(self::getChangeTypeOptions())
                                 ->required(),
                             Select::make('change_reason')
                                 ->label(__('admin.variant_stock_histories.fields.change_reason'))
-                                ->options([
-                                    'sale'       => __('admin.variant_stock_histories.change_reasons.sale'),
-                                    'return'     => __('admin.variant_stock_histories.change_reasons.return'),
-                                    'adjustment' => __('admin.variant_stock_histories.change_reasons.adjustment'),
-                                    'reserve'    => __('admin.variant_stock_histories.change_reasons.reserve'),
-                                    'unreserve'  => __('admin.variant_stock_histories.change_reasons.unreserve'),
-                                    'damage'     => __('admin.variant_stock_histories.change_reasons.damage'),
-                                    'theft'      => __('admin.variant_stock_histories.change_reasons.theft'),
-                                    'expired'    => __('admin.variant_stock_histories.change_reasons.expired'),
-                                    'manual'     => __('admin.variant_stock_histories.change_reasons.manual'),
-                                ])
+                                ->options(self::getChangeReasonOptions())
                                 ->required(),
                         ]),
                     Grid::make(2)
@@ -132,8 +134,9 @@ final class VariantStockHistoryResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('variant.name')
@@ -142,30 +145,27 @@ final class VariantStockHistoryResource extends Resource
                     ->sortable(),
                 TextColumn::make('old_quantity')
                     ->label(__('admin.variant_stock_histories.fields.old_quantity'))
-                    ->sortable(),
+                    ->sortable()
+                    ->numeric(),
                 TextColumn::make('new_quantity')
                     ->label(__('admin.variant_stock_histories.fields.new_quantity'))
-                    ->sortable(),
+                    ->sortable()
+                    ->numeric(),
                 TextColumn::make('quantity_change')
                     ->label(__('admin.variant_stock_histories.fields.quantity_change'))
-                    ->getStateUsing(function ($record) {
-                        $change = $record->new_quantity - $record->old_quantity;
-                        $sign = $change >= 0 ? '+' : '';
-
-                        return $sign . $change;
-                    })
-                    ->color(fn ($state) => $state >= 0 ? 'success' : 'danger'),
+                    ->formatStateUsing(fn (?int $state): string => (($state ?? 0) >= 0 ? '+' : '') . (string) ($state ?? 0))
+                    ->color(fn (?int $state): string => ($state ?? 0) >= 0 ? 'success' : 'danger'),
                 BadgeColumn::make('change_type')
                     ->label(__('admin.variant_stock_histories.fields.change_type'))
+                    ->formatStateUsing(fn (string $state): string => __('admin.variant_stock_histories.change_types.' . $state))
                     ->colors([
-                        'success'   => 'increase',
-                        'danger'    => 'decrease',
-                        'warning'   => 'adjustment',
-                        'info'      => 'reserve',
-                        'secondary' => 'unreserve',
+                        'success' => ['increase', 'unreserve'],
+                        'danger'  => ['decrease', 'reserve'],
+                        'warning' => ['adjustment'],
                     ]),
                 BadgeColumn::make('change_reason')
                     ->label(__('admin.variant_stock_histories.fields.change_reason'))
+                    ->formatStateUsing(fn (string $state): string => __('admin.variant_stock_histories.change_reasons.' . $state))
                     ->colors([
                         'success' => 'sale',
                         'info'    => 'return',
@@ -193,26 +193,10 @@ final class VariantStockHistoryResource extends Resource
             ->filters([
                 SelectFilter::make('change_type')
                     ->label(__('admin.variant_stock_histories.filters.change_type'))
-                    ->options([
-                        'increase'   => __('admin.variant_stock_histories.change_types.increase'),
-                        'decrease'   => __('admin.variant_stock_histories.change_types.decrease'),
-                        'adjustment' => __('admin.variant_stock_histories.change_types.adjustment'),
-                        'reserve'    => __('admin.variant_stock_histories.change_types.reserve'),
-                        'unreserve'  => __('admin.variant_stock_histories.change_types.unreserve'),
-                    ]),
+                    ->options(self::getChangeTypeOptions()),
                 SelectFilter::make('change_reason')
                     ->label(__('admin.variant_stock_histories.filters.change_reason'))
-                    ->options([
-                        'sale'       => __('admin.variant_stock_histories.change_reasons.sale'),
-                        'return'     => __('admin.variant_stock_histories.change_reasons.return'),
-                        'adjustment' => __('admin.variant_stock_histories.change_reasons.adjustment'),
-                        'reserve'    => __('admin.variant_stock_histories.change_reasons.reserve'),
-                        'unreserve'  => __('admin.variant_stock_histories.change_reasons.unreserve'),
-                        'damage'     => __('admin.variant_stock_histories.change_reasons.damage'),
-                        'theft'      => __('admin.variant_stock_histories.change_reasons.theft'),
-                        'expired'    => __('admin.variant_stock_histories.change_reasons.expired'),
-                        'manual'     => __('admin.variant_stock_histories.change_reasons.manual'),
-                    ]),
+                    ->options(self::getChangeReasonOptions()),
                 SelectFilter::make('variant_id')
                     ->label(__('admin.variant_stock_histories.filters.variant'))
                     ->relationship('variant', 'name')
@@ -244,6 +228,43 @@ final class VariantStockHistoryResource extends Resource
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    private static function calculateQuantityChange(mixed $oldQuantity, mixed $newQuantity): int
+    {
+        return (int) ($newQuantity ?? 0) - (int) ($oldQuantity ?? 0);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function getChangeTypeOptions(): array
+    {
+        return [
+            'increase'   => __('admin.variant_stock_histories.change_types.increase'),
+            'decrease'   => __('admin.variant_stock_histories.change_types.decrease'),
+            'adjustment' => __('admin.variant_stock_histories.change_types.adjustment'),
+            'reserve'    => __('admin.variant_stock_histories.change_types.reserve'),
+            'unreserve'  => __('admin.variant_stock_histories.change_types.unreserve'),
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function getChangeReasonOptions(): array
+    {
+        return [
+            'sale'       => __('admin.variant_stock_histories.change_reasons.sale'),
+            'return'     => __('admin.variant_stock_histories.change_reasons.return'),
+            'adjustment' => __('admin.variant_stock_histories.change_reasons.adjustment'),
+            'reserve'    => __('admin.variant_stock_histories.change_reasons.reserve'),
+            'unreserve'  => __('admin.variant_stock_histories.change_reasons.unreserve'),
+            'damage'     => __('admin.variant_stock_histories.change_reasons.damage'),
+            'theft'      => __('admin.variant_stock_histories.change_reasons.theft'),
+            'expired'    => __('admin.variant_stock_histories.change_reasons.expired'),
+            'manual'     => __('admin.variant_stock_histories.change_reasons.manual'),
+        ];
     }
 
     public static function getRelations(): array

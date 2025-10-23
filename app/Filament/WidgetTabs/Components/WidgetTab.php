@@ -12,14 +12,15 @@ use App\Filament\WidgetTabs\Components\Concerns\HasTheme;
 use App\Filament\WidgetTabs\Components\Concerns\HasValue;
 use Closure;
 use Filament\Support\Components\Component;
-use Filament\Support\Concerns\CanConfigure;
 use Filament\Support\Concerns\EvaluatesClosures;
 use Filament\Support\Concerns\HasExtraAttributes;
 use Illuminate\Database\Eloquent\Builder;
 
 class WidgetTab extends Component
 {
-    use CanConfigure;
+    // The upstream Filament component already ships with configuration helpers
+    // (via the Configurable trait), so we only need to opt into the pieces that
+    // power our widget tab metadata and dynamic query callbacks.
     use EvaluatesClosures;
     use HasExtraAttributes;
     use HasIcon;
@@ -39,6 +40,7 @@ class WidgetTab extends Component
     public static function make(string|Closure|null $label = null): static
     {
         $static = app(static::class, ['label' => $label]);
+        // Leverage the inherited Configurable trait to allow downstream modifiers to hook into setup.
         $static->configure();
 
         return $static;

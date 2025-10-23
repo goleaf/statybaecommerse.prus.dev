@@ -10,6 +10,16 @@ use Tests\Support\TestingDatabase;
 
 trait CreatesApplication
 {
+    /**
+     * Track the lazily created SQLite database path so repeated calls reuse it.
+     */
+    private ?string $sqliteDatabasePath = null;
+
+    /**
+     * Remember whether the SQLite database file existed before the test run.
+     */
+    private bool $sqliteDatabasePreExisted = false;
+
     public function createApplication(): Application
     {
         $envPath = __DIR__ . '/../.env';
@@ -52,5 +62,27 @@ trait CreatesApplication
         config()->set('debugbar.enabled', false);
 
         return $app;
+    }
+
+    /**
+     * Resolve the SQLite database path, creating the file if it is missing.
+     */
+    protected function resolveSqliteDatabasePath(): string
+    {
+        if (is_string($this->sqliteDatabasePath) && $this->sqliteDatabasePath !== '') {
+            return $this->sqliteDatabasePath;
+        }
+
+        $databasePath = dirname(__DIR__) . '/database/testing.sqlite';
+        $this->sqliteDatabasePreExisted = file_exists($databasePath);
+
+        if (! $this->sqliteDatabasePreExisted) {
+            // Touch the file so SQLite has a persistent database to migrate against.
+            touch($databasePath);
+        }
+
+        $this->sqliteDatabasePath = $databasePath;
+
+        return $this->sqliteDatabasePath;
     }
 }
