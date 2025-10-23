@@ -46,7 +46,7 @@ final class AttributeValue extends Model
      */
     protected function casts(): array
     {
-        return ['sort_order' => 'integer', 'is_enabled' => 'boolean', 'is_active' => 'boolean', 'is_default' => 'boolean'];
+        return ['sort_order' => 'integer', 'is_enabled' => 'boolean', 'is_active' => 'boolean', 'is_default' => 'boolean', 'metadata' => 'array'];
     }
 
     protected string $translationModel = \App\Models\Translations\AttributeValueTranslation::class;
