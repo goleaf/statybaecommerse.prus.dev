@@ -247,6 +247,8 @@ final class AdminUserResource extends Resource
                         ->label(__('admin.admin_users.actions.verify_emails'))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
+                        // Enable access to the selected records collection within the handler.
+                        ->accessSelectedRecords()
                         ->action(function (Collection $records): void {
                             $records->each(function (AdminUser $record): void {
                                 $record->update(['email_verified_at' => now()]);
@@ -260,6 +262,8 @@ final class AdminUserResource extends Resource
                         ->label(__('admin.admin_users.actions.send_verifications'))
                         ->icon('heroicon-o-envelope')
                         ->color('info')
+                        // Allow the callback to iterate through the selected records.
+                        ->accessSelectedRecords()
                         ->action(function (Collection $records): void {
                             // Send verification emails logic here
                             FilamentNotification::make()
