@@ -10,12 +10,15 @@ use Illuminate\Contracts\Support\Htmlable;
 use UnitEnum;
 
 /**
- * Trait that exposes centralised navigation metadata helpers to Filament resources.
+ * Shared helpers that proxy Filament navigation metadata lookups to the central Nav registry.
+ *
+ * Resources can opt-in to the trait to remove duplicated navigation boilerplate while
+ * keeping backwards compatibility with Filament's static API surface.
  */
 trait HasNav
 {
     /**
-     * Delegate group resolution to the shared navigation helper.
+     * Resolve the translated navigation group label for the resource.
      */
     public static function getNavigationGroup(): UnitEnum|string|null
     {
@@ -23,7 +26,7 @@ trait HasNav
     }
 
     /**
-     * Delegate icon resolution to the shared navigation helper.
+     * Resolve the navigation icon using the central Nav metadata map.
      */
     public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
@@ -31,7 +34,7 @@ trait HasNav
     }
 
     /**
-     * Delegate sort resolution to the shared navigation helper.
+     * Resolve the navigation sort order so resources render deterministically.
      */
     public static function getNavigationSort(): ?int
     {
