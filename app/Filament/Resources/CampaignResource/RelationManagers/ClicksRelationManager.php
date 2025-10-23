@@ -7,6 +7,7 @@ namespace App\Filament\Resources\CampaignResource\RelationManagers;
 use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -15,6 +16,7 @@ use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class ClicksRelationManager extends BaseRelationManager
 {
@@ -50,7 +52,11 @@ final class ClicksRelationManager extends BaseRelationManager
             TextInput::make('customer_id')
                 ->label('Customer ID')
                 ->numeric(),
-            Flatpickr::makeDateTime('clicked_at')
+            Flatpickr::make('clicked_at')
+                ->time(true)
+                ->time24hr(true)
+                ->seconds(false)
+                ->format('Y-m-d H:i')
                 ->label('Clicked At')
                 ->required(),
         ]);

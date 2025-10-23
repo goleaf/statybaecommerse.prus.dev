@@ -7,6 +7,7 @@ namespace App\Filament\Resources\StockResource\RelationManagers;
 use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -21,7 +22,7 @@ use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use LaraZeus\Quantity\Components\Quantity;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 class StockMovementsRelationManager extends BaseRelationManager
 {
@@ -91,7 +92,11 @@ class StockMovementsRelationManager extends BaseRelationManager
                     ->label(__('inventory.notes'))
                     ->rows(3)
                     ->maxLength(1000),
-                Flatpickr::makeDateTime('moved_at')
+                Flatpickr::make('moved_at')
+                    ->time(true)
+                    ->time24hr(true)
+                    ->seconds(false)
+                    ->format('Y-m-d H:i')
                     ->label(__('inventory.moved_at'))
                     ->default(now())
                     ->required(),

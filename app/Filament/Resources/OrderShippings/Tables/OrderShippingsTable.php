@@ -12,7 +12,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
+
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Number;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 class OrderShippingsTable
 {
@@ -136,9 +137,19 @@ class OrderShippingsTable
                 Filter::make('shipped_at')
                     ->label(__('Shipped at'))
                     ->form([
-                        DateTimePicker::make('shipped_from')
+                        Flatpickr::make('shipped_from')
+                            ->time(true)
+                            ->time24hr(true)
+                            ->seconds(false)
+                            ->format('Y-m-d H:i')
+                            ->rangePicker()
                             ->label(__('Shipped from')),
-                        DateTimePicker::make('shipped_until')
+                        Flatpickr::make('shipped_until')
+                            ->time(true)
+                            ->time24hr(true)
+                            ->seconds(false)
+                            ->format('Y-m-d H:i')
+                            ->rangePicker()
                             ->label(__('Shipped until')),
                     ])
                     ->query(static function (Builder $query, array $data): Builder {

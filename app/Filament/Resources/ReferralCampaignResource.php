@@ -14,8 +14,7 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Grid;
+
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -31,6 +30,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class ReferralCampaignResource extends Resource
 {
@@ -85,10 +85,16 @@ final class ReferralCampaignResource extends Resource
                                     ->label(__('admin.referral_campaigns.is_active'))
                                     ->inline(false)
                                     ->default(true),
-                                Flatpickr::makeDate('start_date')
+                                Flatpickr::make('start_date')
+                                    ->time(false)
+                                    ->format('Y-m-d')
+                                    ->rangePicker()
                                     ->label(__('admin.referral_campaigns.start_date'))
                                     ->nullable(),
-                                Flatpickr::makeDate('end_date')
+                                Flatpickr::make('end_date')
+                                    ->time(false)
+                                    ->format('Y-m-d')
+                                    ->rangePicker()
                                     ->label(__('admin.referral_campaigns.end_date'))
                                     ->nullable(),
                             ]),

@@ -16,6 +16,7 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -31,6 +32,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Lang;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 /**
  * UserPreferenceResource
@@ -91,9 +93,13 @@ final class UserPreferenceResource extends Resource
                     ->maxValue(1)
                     ->step(0.000001)
                     ->default(0),
-                DateTimePicker::make('last_updated')
-                    ->label(__('admin/user_preferences.last_updated'))
-                    ->default(fn () => now()),
+                Flatpickr::make('last_updated')
+                    ->time(true)
+                    ->time24hr(true)
+                    ->seconds(false)
+                    ->format('Y-m-d H:i')
+                    ->label(__('admin.user_preferences.last_updated'))
+                    ->default(now()),
                 KeyValue::make('metadata')
                     ->label(__('admin/user_preferences.metadata'))
                     ->keyLabel(__('admin/user_preferences.key'))

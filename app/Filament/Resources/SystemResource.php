@@ -13,6 +13,7 @@ use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\ColorPicker;
+
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
@@ -45,6 +46,8 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 /**
  * System Resource - Comprehensive System Management
@@ -321,6 +324,44 @@ final class SystemResource extends Resource
                                             ->label(__('system.tooltip'))
                                             ->maxLength(500)
                                             ->helperText(__('system.tooltip_help')),
+                                        Toggle::make('value')
+                                            ->label(__('system.enabled'))
+                                            ->visible(fn (callable $get) => $get('type') === 'boolean')
+                                            ->helperText(__('system.enabled_help')),
+                                        ColorPicker::make('value')
+                                            ->label(__('system.color_value'))
+                                            ->visible(fn (callable $get) => $get('type') === 'color')
+                                            ->helperText(__('system.color_value_help')),
+                                        Flatpickr::make('value')
+                                            ->time(true)
+                                            ->time24hr(true)
+                                            ->seconds(false)
+                                            ->format('Y-m-d H:i')
+                                            ->label(__('system.date_time'))
+                                            ->visible(fn (callable $get) => $get('type') === 'datetime')
+                                            ->helperText(__('system.date_time_help')),
+                                        Flatpickr::make('value')
+                                            ->time(true)
+                                            ->time24hr(true)
+                                            ->seconds(false)
+                                            ->format('Y-m-d H:i')
+                                            ->label(__('system.date'))
+                                            ->displayFormat('Y-m-d')
+                                            ->visible(fn (callable $get) => $get('type') === 'date')
+                                            ->helperText(__('system.date_help')),
+                                        FileUpload::make('value')
+                                            ->label(__('system.file_upload'))
+                                            ->visible(fn (callable $get) => $get('type') === 'file')
+                                            ->helperText(__('system.file_upload_help')),
+                                        Select::make('value')
+                                            ->label(__('system.select_value'))
+                                            ->visible(fn (callable $get) => $get('type') === 'select')
+                                            ->options(fn (callable $get) => json_decode($get('options') ?? '{}', true) ?? [])
+                                            ->helperText(__('system.select_value_help')),
+                                        KeyValue::make('value')
+                                            ->label(__('system.key_value_pairs'))
+                                            ->visible(fn (callable $get) => $get('type') === 'json')
+                                            ->helperText(__('system.key_value_pairs_help')),
                                         Textarea::make('options')
                                             ->label(__('system.options'))
                                             ->visible(fn (Get $get): bool => in_array($get('type'), ['select', 'json'], true))

@@ -16,7 +16,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
+
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -48,6 +48,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use BackedEnum;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 /**
  * VariantAnalyticsResource
@@ -121,7 +122,9 @@ final class VariantAnalyticsResource extends Resource
                                                             }
                                                         }
                                                     }),
-                                                DatePicker::make('date')
+                                                Flatpickr::make('date')
+                                                    ->time(false)
+                                                    ->format('Y-m-d')
                                                     ->label(__('admin.variant_analytics.date'))
                                                     ->required()
                                                     ->default(now())
@@ -494,9 +497,15 @@ final class VariantAnalyticsResource extends Resource
                     ->label(__('admin.variant_analytics.date')),
                 Tables\Filters\Filter::make('date_range')
                     ->form([
-                        Flatpickr::makeDate('date_from')
+                        Flatpickr::make('date_from')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker()
                             ->label(__('admin.variant_analytics.date_from')),
-                        Flatpickr::makeDate('date_until')
+                        Flatpickr::make('date_until')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker()
                             ->label(__('admin.variant_analytics.date_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

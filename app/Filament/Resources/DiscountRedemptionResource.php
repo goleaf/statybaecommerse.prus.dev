@@ -14,7 +14,7 @@ use Filament\Actions\Action as TableAction;
 use Filament\Actions\BulkAction as TableBulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Components\DateTimePicker;
+
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
@@ -35,6 +35,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Carbon;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class DiscountRedemptionResource extends Resource
 {
@@ -126,16 +127,16 @@ final class DiscountRedemptionResource extends Resource
                                 ->default(now())
                                 ->required(),
                         ]),
-                    Textarea::make('notes')
-                        ->label(__('admin.discount_redemptions.form.fields.notes'))
-                        ->rows(3)
-                        ->columnSpanFull(),
-                    KeyValue::make('metadata')
-                        ->label(__('admin.discount_redemptions.form.fields.metadata'))
-                        ->keyLabel(__('admin.discount_redemptions.form.fields.metadata_key'))
-                        ->valueLabel(__('admin.discount_redemptions.form.fields.metadata_value'))
-                        ->default([])
-                        ->columnSpanFull(),
+                    Flatpickr::make('redeemed_at')
+                        ->time(true)
+                        ->time24hr(true)
+                        ->seconds(false)
+                        ->format('Y-m-d H:i')
+                        ->label(__('discount_redemptions.fields.redeemed_at'))
+                        ->seconds(false)
+                        ->displayFormat('Y-m-d H:i')
+                        ->default(now())
+                        ->required(),
                     Grid::make(2)
                         ->schema([
                             TextInput::make('ip_address')
@@ -214,8 +215,20 @@ final class DiscountRedemptionResource extends Resource
                 Filter::make('redeemed_at')
                     ->label(__('admin.discount_redemptions.filters.redeemed_at'))
                     ->form([
-                        DateTimePicker::make('from')->label(__('admin.discount_redemptions.filters.redeemed_from')),
-                        DateTimePicker::make('until')->label(__('admin.discount_redemptions.filters.redeemed_until')),
+                        Flatpickr::make('from')
+                            ->time(true)
+                            ->time24hr(true)
+                            ->seconds(false)
+                            ->format('Y-m-d H:i')
+                            ->rangePicker()
+                            ->label(__('discount_redemptions.filters.redeemed_from')),
+                        Flatpickr::make('until')
+                            ->time(true)
+                            ->time24hr(true)
+                            ->seconds(false)
+                            ->format('Y-m-d H:i')
+                            ->rangePicker()
+                            ->label(__('discount_redemptions.filters.redeemed_until')),
                     ])
                     ->query(static function (Builder $query, array $data): Builder {
                         return $query

@@ -16,7 +16,7 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\DateTimePicker;
+
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -42,6 +42,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 /**
  * PriceListItemResource
@@ -154,11 +155,21 @@ final class PriceListItemResource extends Resource
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                                Flatpickr::makeDateTime('valid_from')
+                                Flatpickr::make('valid_from')
+                                    ->time(true)
+                                    ->time24hr(true)
+                                    ->seconds(false)
+                                    ->format('Y-m-d H:i')
+                                    ->rangePicker()
                                     ->label(__('price_list_items.valid_from'))
                                     ->default(now())
                                     ->helperText(__('price_list_items.valid_from_help')),
-                                Flatpickr::makeDateTime('valid_until')
+                                Flatpickr::make('valid_until')
+                                    ->time(true)
+                                    ->time24hr(true)
+                                    ->seconds(false)
+                                    ->format('Y-m-d H:i')
+                                    ->rangePicker()
                                     ->label(__('price_list_items.valid_until'))
                                     ->after('valid_from')
                                     ->helperText(__('price_list_items.valid_until_help')),

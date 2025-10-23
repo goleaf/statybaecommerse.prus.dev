@@ -8,8 +8,7 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\FeatureFlagResource\Pages;
 use App\Models\FeatureFlag;
-use BackedEnum;
-use Filament\Forms\Components\DateTimePicker;
+
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -32,6 +31,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 /**
  * FeatureFlagResource
@@ -153,10 +153,20 @@ final class FeatureFlagResource extends Resource
                 ->components([
                     Grid::make(2)
                         ->components([
-                            Flatpickr::makeDateTime('starts_at')
+                            Flatpickr::make('starts_at')
+                                ->time(true)
+                                ->time24hr(true)
+                                ->seconds(false)
+                                ->format('Y-m-d H:i')
+                                ->rangePicker()
                                 ->label(__('feature_flags.starts_at'))
                                 ->nullable(),
-                            Flatpickr::makeDateTime('ends_at')
+                            Flatpickr::make('ends_at')
+                                ->time(true)
+                                ->time24hr(true)
+                                ->seconds(false)
+                                ->format('Y-m-d H:i')
+                                ->rangePicker()
                                 ->label(__('feature_flags.ends_at'))
                                 ->nullable(),
                         ]),

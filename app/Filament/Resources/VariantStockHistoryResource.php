@@ -8,8 +8,7 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\VariantStockHistoryResource\Pages;
 use App\Models\VariantStockHistory;
-use App\Support\Filament\Components\Flatpickr;
-use App\Support\Filament\Filters\DateRangeFilter;
+
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -30,6 +29,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class VariantStockHistoryResource extends Resource
 {
@@ -201,11 +201,16 @@ final class VariantStockHistoryResource extends Resource
                 Filter::make('created_at')
                     ->label(__('admin.variant_stock_histories.filters.created_at'))
                     ->form([
-                        Flatpickr::makeRange('range')
-                            ->label(__('admin.variant_stock_histories.filters.created_at'))
-
+                        Flatpickr::make('created_from')
+                            ->time(false)
                             ->format('Y-m-d')
-                            ->displayFormat('Y-m-d'),
+                            ->rangePicker()
+                            ->label(__('admin.variant_stock_histories.filters.created_from')),
+                        Flatpickr::make('created_until')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker()
+                            ->label(__('admin.variant_stock_histories.filters.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query

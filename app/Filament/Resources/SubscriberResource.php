@@ -9,9 +9,7 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\SubscriberResource\Pages;
 use App\Models\Subscriber;
 use Filament\Forms;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -29,6 +27,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 /**
  * SubscriberResource
@@ -159,7 +158,11 @@ final class SubscriberResource extends Resource
                                     ->label(__('subscribers.newsletter_subscription'))
                                     ->default(true),
                             ]),
-                        Flatpickr::makeDateTime('subscribed_at')
+                        Flatpickr::make('subscribed_at')
+                            ->time(true)
+                            ->time24hr(true)
+                            ->seconds(false)
+                            ->format('Y-m-d H:i')
                             ->label(__('subscribers.subscribed_at'))
                             ->default(fn () => now()),
                     ]),
@@ -266,9 +269,15 @@ final class SubscriberResource extends Resource
                     ->native(false),
                 Filter::make('subscribed_at')
                     ->form([
-                        Flatpickr::makeDate('subscribed_from')
+                        Flatpickr::make('subscribed_from')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker()
                             ->label(__('subscribers.subscribed_from')),
-                        Flatpickr::makeDate('subscribed_until')
+                        Flatpickr::make('subscribed_until')
+                            ->time(false)
+                            ->format('Y-m-d')
+                            ->rangePicker()
                             ->label(__('subscribers.subscribed_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

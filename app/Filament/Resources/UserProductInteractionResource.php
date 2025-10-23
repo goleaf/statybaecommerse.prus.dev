@@ -16,6 +16,7 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -36,6 +37,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use UnitEnum;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class UserProductInteractionResource extends Resource
 {
@@ -84,7 +86,74 @@ final class UserProductInteractionResource extends Resource
                                     ->label(__('admin.users.email'))
                                     ->email()
                                     ->required()
-                                    ->maxLength(255),
+                                    ->searchable()
+                                    ->preload()
+                                    ->createOptionForm([
+                                        TextInput::make('name')
+                                            ->label(__('admin.products.name'))
+                                            ->required()
+                                            ->maxLength(255),
+                                        TextInput::make('slug')
+                                            ->label(__('products.fields.slug'))
+                                            ->required()
+                                            ->maxLength(255)
+                                            ->unique(Product::class, 'slug', ignoreRecord: true),
+                                        TextInput::make('sku')
+                                            ->label(__('admin.products.sku'))
+                                            ->maxLength(100),
+                                    ])
+                                    ->createOptionUsing(function (array $data): int {
+                                        $data['slug'] = Str::slug($data['slug'] ?? $data['name'] ?? '');
+
+                                        return Product::create($data)->getKey();
+                                    }),
+                                Select::make('interaction_type')
+                                    ->label(__('admin.user_product_interactions.interaction_type'))
+                                    ->options([
+                                        'view' => __('admin.user_product_interactions.interaction_types.view'),
+                                        'click' => __('admin.user_product_interactions.interaction_types.click'),
+                                        'add_to_cart' => __('admin.user_product_interactions.interaction_types.add_to_cart'),
+                                        'purchase' => __('admin.user_product_interactions.interaction_types.purchase'),
+                                        'review' => __('admin.user_product_interactions.interaction_types.review'),
+                                        'share' => __('admin.user_product_interactions.interaction_types.share'),
+                                        'favorite' => __('admin.user_product_interactions.interaction_types.favorite'),
+                                        'compare' => __('admin.user_product_interactions.interaction_types.compare'),
+                                    ])
+                                    ->required()
+                                    ->default('view')
+                                    ->searchable(),
+                                TextInput::make('rating')
+                                    ->label(__('admin.user_product_interactions.rating'))
+                                    ->numeric()
+                                    ->step(0.1)
+                                    ->minValue(0)
+                                    ->maxValue(5)
+                                    ->suffix('/5')
+                                    ->helperText(__('admin.user_product_interactions.rating_help')),
+                                TextInput::make('count')
+                                    ->label(__('admin.user_product_interactions.count'))
+                                    ->numeric()
+                                    ->minValue(1)
+                                    ->default(1)
+                                    ->helperText(__('admin.user_product_interactions.count_help')),
+                                Flatpickr::make('first_interaction')
+                                    ->time(true)
+                                    ->time24hr(true)
+                                    ->seconds(false)
+                                    ->format('Y-m-d H:i')
+                                    ->label(__('admin.user_product_interactions.first_interaction'))
+                                    ->default(now())
+                                    ->displayFormat('d/m/Y H:i')
+                                    ->seconds(false),
+                                Flatpickr::make('last_interaction')
+                                    ->time(true)
+                                    ->time24hr(true)
+                                    ->seconds(false)
+                                    ->format('Y-m-d H:i')
+                                    ->label(__('admin.user_product_interactions.last_interaction'))
+                                    ->default(now())
+                                    ->displayFormat('d/m/Y H:i')
+                                    ->seconds(false),
                             ]),
                         Select::make('product_id')
                             ->label(__('admin.user_product_interactions.product'))

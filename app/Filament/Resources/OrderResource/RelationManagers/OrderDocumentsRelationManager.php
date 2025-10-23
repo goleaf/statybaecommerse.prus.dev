@@ -13,6 +13,7 @@ use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -33,7 +34,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 /**
  * OrderDocumentsRelationManager
@@ -155,7 +156,11 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
                                     ->label(__('orders.access_password'))
                                     ->password()
                                     ->maxLength(255),
-                                Flatpickr::makeDateTime('expires_at')
+                                Flatpickr::make('expires_at')
+                                    ->time(true)
+                                    ->time24hr(true)
+                                    ->seconds(false)
+                                    ->format('Y-m-d H:i')
                                     ->label(__('orders.expires_at')),
                             ]),
                     ])

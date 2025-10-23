@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountResource\RelationManagers;
 
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -19,6 +18,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
 
 final class RedemptionsRelationManager extends BaseRelationManager
 {
@@ -73,7 +73,11 @@ final class RedemptionsRelationManager extends BaseRelationManager
                         ])
                         ->default('pending')
                         ->required(),
-                    DateTimePicker::make('redeemed_at')
+                    Flatpickr::make('redeemed_at')
+                        ->time(true)
+                        ->time24hr(true)
+                        ->seconds(false)
+                        ->format('Y-m-d H:i')
                         ->label('Redeemed At')
                         ->seconds(false)
                         ->required(),
