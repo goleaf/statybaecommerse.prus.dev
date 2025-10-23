@@ -22,10 +22,7 @@ final class CacheMaintenance extends Page
 {
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-server-stack';
 
-    /**
-     * @return string|null
-     */
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         return 'System';
     }

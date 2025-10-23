@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 final class PriceListActivityWidget extends ChartWidget
 {
-    protected function getHeading(): ?string
+    public function getHeading(): string
     {
         return __('price_lists.charts.activity_over_time');
     }
