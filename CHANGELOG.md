@@ -39,6 +39,8 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Introduced a reusable HTML sanitization pipeline with a maintenance command, model hooks, and storefront renderer updates to harden product and legal content.
 
 ### Bug Fixes
+* Restored the shipping option ↔ zone relationship so orders, factories, and zone aggregations attach carriers without manual
+  attribute overrides during tests.
 * Hardened the API search endpoint to short-circuit suspicious payloads and ensure exact-title matches outrank fuzzy results, keeping injection attempts empty while surfacing precise catalogue hits first.
 - Ensured the customer and product inline sparkline widgets reuse the cached series datasets and publish matching checksums so Filament tables render the same analytics payload verified by unit tests.
 * Normalized search type filters to treat mixed-case input from clients as valid bucket selectors, keeping aggregated storefront results scoped correctly instead of silently reverting to every result category.
