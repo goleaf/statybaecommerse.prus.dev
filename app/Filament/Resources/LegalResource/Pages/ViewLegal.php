@@ -12,8 +12,8 @@ use Filament\Infolists\Components\KeyValueEntry;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Schema;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewLegal extends ViewRecord
 {
