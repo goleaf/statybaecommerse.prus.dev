@@ -8,12 +8,7 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\ReferralRewardResource\Pages;
 use App\Models\ReferralReward;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
+use BackedEnum;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
@@ -24,17 +19,21 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Section as InfolistSection;
 use Filament\Schemas\Schema;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Collection;
 use UnitEnum;
 
 final class ReferralRewardResource extends Resource
@@ -260,7 +259,7 @@ final class ReferralRewardResource extends Resource
                     BulkAction::make('apply')
                         ->label(__('referral_rewards.actions.apply_selected'))
                         ->requiresConfirmation()
-                        ->action(function (iterable $records): void {
+                        ->action(function (Collection $records): void {
                             foreach ($records as $record) {
                                 if ($record instanceof ReferralReward) {
                                     $record->apply();
@@ -270,7 +269,7 @@ final class ReferralRewardResource extends Resource
                     BulkAction::make('expire')
                         ->label(__('referral_rewards.actions.expire_selected'))
                         ->requiresConfirmation()
-                        ->action(function (iterable $records): void {
+                        ->action(function (Collection $records): void {
                             foreach ($records as $record) {
                                 if ($record instanceof ReferralReward) {
                                     $record->markAsExpired();
