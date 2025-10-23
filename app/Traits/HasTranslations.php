@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Traits;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use RuntimeException;
 
 /**
  * HasTranslations
@@ -102,12 +105,17 @@ trait HasTranslations
         return $this->getAttributeFromArray($field) ?? null;
     }
 
+    public function getTranslation(string $field, ?string $locale = null): mixed
+    {
+        return $this->trans($field, $locale);
+    }
+
     protected function translationModelClass(): string
     {
         // Expect model to define translation model via property
         if (property_exists($this, 'translationModel')) {
             return $this->translationModel;
         }
-        throw new \RuntimeException(static::class.' must define $translationModel to use HasTranslations');
+        throw new RuntimeException(static::class . ' must define $translationModel to use HasTranslations');
     }
 }

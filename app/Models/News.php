@@ -69,17 +69,15 @@ final class News extends Model implements TranslatableRecord
     protected function casts(): array
     {
         return [
-            'is_visible' => 'boolean',
-            'is_featured' => 'boolean',
-            'is_breaking' => 'boolean',
-            'moderation_state' => ModerationState::class,
+            'is_visible'              => 'boolean',
+            'is_featured'             => 'boolean',
+            'moderation_state'        => ModerationState::class,
             'submitted_for_review_at' => 'datetime',
             'approved_at'             => 'datetime',
             'approved_by_id'          => 'integer',
             'published_at'            => 'datetime',
             'view_count'              => 'integer',
             'meta_data'               => 'array',
-            'deleted_at'              => 'datetime',
         ];
     }
 
@@ -261,7 +259,7 @@ final class News extends Model implements TranslatableRecord
      */
     public function getSlugAttribute(): string
     {
-        return $this->getTranslation('slug', app()->getLocale());
+        return (string) ($this->getTranslation('slug', app()->getLocale()) ?? '');
     }
 
     /**
@@ -269,7 +267,7 @@ final class News extends Model implements TranslatableRecord
      */
     public function getTitleAttribute(): string
     {
-        return $this->getTranslation('title', app()->getLocale());
+        return (string) ($this->getTranslation('title', app()->getLocale()) ?? '');
     }
 
     /**

@@ -8,16 +8,13 @@ use App\Data\SearchQueryData;
 use App\Services\SearchService;
 use BackedEnum;
 use Filament\Pages\Page;
+use UnitEnum;
+
 final class SearchExplorer extends Page
 {
-    /**
-     * Navigation icon that Filament displays for this page.
-     *
-     * @var string|BackedEnum|null Filament navigation icon identifier.
-     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-magnifying-glass-circle';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Search';
+    protected static UnitEnum|string|null $navigationGroup = 'Search';
 
     protected static ?string $title = 'Search Explorer';
 
