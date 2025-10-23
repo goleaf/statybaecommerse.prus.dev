@@ -47,8 +47,8 @@ class SystemSettingHistoryResource extends Resource
         return [
             'index'  => ListSystemSettingHistories::route('/'),
             'create' => CreateSystemSettingHistory::route('/create'),
-            'view'   => ViewSystemSettingHistory::route('/{record}'),
-            'edit'   => EditSystemSettingHistory::route('/{record}/edit'),
+            'view' => ViewSystemSettingHistory::route('/{record}'),
+            'edit' => EditSystemSettingHistory::route('/{record}/edit'),
         ];
     }
 }

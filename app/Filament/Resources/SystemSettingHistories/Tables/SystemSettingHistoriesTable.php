@@ -94,10 +94,9 @@ final class SystemSettingHistoriesTable
                     ->color('warning')
                     ->action(function (SystemSettingHistory $record): void {
                         $record->systemSetting()->update([
-                            'type'  => 'string',
+                            'type' => 'string',
                             'value' => $record->old_value,
                         ]);
-
                         Notification::make()
                             ->title(__('admin.system_setting_histories.value_restored_successfully'))
                             ->success()

@@ -8,7 +8,7 @@ use App\Filament\Resources\SystemSettingHistories\SystemSettingHistoryResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
-class ViewSystemSettingHistory extends ViewRecord
+final class ViewSystemSettingHistory extends ViewRecord
 {
     protected static string $resource = SystemSettingHistoryResource::class;
 
