@@ -13,7 +13,9 @@ use App\Application\Product\UseCases\SearchProductsUseCase;
 use App\Domain\Product\Exceptions\ProductNotFoundException;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
-use App\Repositories\ProductRepository;
+use App\Support\ListQuery\ListQueryDefinition;
+use App\Support\ListQuery\ListQueryValidator;
+use App\Support\ListQuery\ListResponse;
 use App\Traits\HandlesContentNegotiation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -70,25 +72,79 @@ final class ProductController extends Controller
      */
     public function catalog(Request $request): JsonResponse|View|Response
     {
-        $perPage = max(1, min((int) $request->get('per_page', 20), 100));
-        $category = $request->get('category');
-        $brand = $request->get('brand');
-        $sortBy = $request->get('sort_by', 'name');
-        $sortOrder = $request->get('sort_order', 'asc');
-        $filters = ['category' => $category, 'brand' => $brand, 'search' => $request->get('q')];
-        $currentPage = (int) $request->get('page', 1);
-
-        $paginatedData = $this->products->paginateCatalog(
-            $filters,
-            $perPage,
-            $currentPage,
-            $sortBy,
-            $sortOrder
+        $definition = ListQueryDefinition::make(
+            allowedSorts: [
+                'name' => 'name',
+                'price' => 'price',
+                'sale_price' => 'sale_price',
+                'created_at' => 'created_at',
+            ],
+            defaultSort: 'name',
+            defaultDirection: 'asc',
+            defaultPerPage: 20,
+            maxPerPage: 100,
         );
 
-        $paginatedData->setCollection($paginatedData->getCollection()->map(static fn (Product $product): array => ProductContract::fromModel($product)));
+        $listQuery = ListQueryValidator::fromRequest($request, $definition);
+        $filters = $listQuery->filters;
 
-        return $this->handleProductContentNegotiation($request, $paginatedData);
+        $query = Product::query()->where('is_visible', true)->with(['brand', 'media', 'category']);
+
+        if (array_key_exists('category', $filters)) {
+            $query->whereHas('category', static function ($q) use ($filters): void {
+                $q->where('slug', $filters['category']);
+            });
+        }
+
+        if (array_key_exists('brand', $filters)) {
+            $query->whereHas('brand', static function ($q) use ($filters): void {
+                $q->where('slug', $filters['brand']);
+            });
+        }
+
+        $query = $listQuery->apply($query, $definition);
+
+        $products = $query->get()->filter(static function (Product $product) {
+            return ! (empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug));
+        })->values();
+
+        $total = $products->count();
+        $offset = ($listQuery->page - 1) * $listQuery->perPage;
+        $paginatedProducts = $products->slice($offset, $listQuery->perPage)->values();
+
+        $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+            $paginatedProducts,
+            $total,
+            $listQuery->perPage,
+            $listQuery->page,
+            ['path' => $request->url(), 'pageName' => 'page'],
+        );
+
+        $paginator->appends($request->query());
+
+        if ($request->expectsJson()) {
+            $response = ListResponse::fromPaginator(
+                $paginator->through(static function (Product $product) {
+                    return [
+                        'id' => $product->id,
+                        'name' => $product->name,
+                        'slug' => $product->slug,
+                        'sku' => $product->sku,
+                        'price' => $product->price,
+                        'sale_price' => $product->sale_price,
+                        'brand' => $product->brand?->name,
+                        'category' => $product->category?->name,
+                        'image' => $product->getFirstMediaUrl('images', 'thumb'),
+                        'url' => route('product.show', $product->slug),
+                        'stock_quantity' => $product->stock_quantity ?? 0,
+                    ];
+                }),
+            );
+
+            return response()->json($response);
+        }
+
+        return $this->handleProductContentNegotiation($request, $paginator);
     }
 
     /**

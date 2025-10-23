@@ -122,90 +122,15 @@ final class NotificationService
     /**
      * Handle getUserNotifications functionality with proper error handling.
      */
-    public function getUserNotifications(User $user, NotificationFilterData $filter): NotificationCollectionData
-    {
-        $query = $this->applyFilters(Notification::forUser($user->id), $filter);
-
-        $paginator = $query->latest()->paginate($filter->perPage);
-
-        return NotificationCollectionData::fromPaginator($paginator);
-    }
-
-    /**
-     * Handle search functionality with proper error handling.
-     */
-    public function searchNotifications(User $user, NotificationSearchData $filter): NotificationCollectionData
-    {
-        $query = $this->applyFilters(Notification::forUser($user->id), $filter);
-        $searchTerm = '%'.$filter->query.'%';
-        $query->where(function (Builder $builder) use ($searchTerm): void {
-            $builder
-                ->where('data->title', 'like', $searchTerm)
-                ->orWhere('data->message', 'like', $searchTerm);
-        });
-
-        $paginator = $query->latest()->paginate($filter->perPage);
-
-        return NotificationCollectionData::fromPaginator($paginator);
-    }
-
-    /**
-     * Handle stats functionality with proper error handling.
-     */
-    public function getUserNotificationStats(User $user): NotificationStatsData
-    {
-        $baseQuery = Notification::forUser($user->id);
-
-        $total = (clone $baseQuery)->count();
-        $read = (clone $baseQuery)->read()->count();
-        $unread = (clone $baseQuery)->unread()->count();
-        $urgent = (clone $baseQuery)->urgent()->count();
-        $today = (clone $baseQuery)->whereDate('created_at', today())->count();
-        $thisWeek = (clone $baseQuery)->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count();
-        $thisMonth = (clone $baseQuery)->whereMonth('created_at', now()->month)->count();
-
-        return new NotificationStatsData($total, $read, $unread, $urgent, $today, $thisWeek, $thisMonth);
-    }
-
-    /**
-     * Aggregate statistics for the authenticated user's notifications.
-     */
-    public function getUserNotificationStats(User $user): array
-    {
-        $baseQuery = Notification::forUser($user->id);
-
-        return [
-            'total' => (clone $baseQuery)->count(),
-            'read' => (clone $baseQuery)->read()->count(),
-            'unread' => (clone $baseQuery)->unread()->count(),
-            'urgent' => (clone $baseQuery)->urgent()->count(),
-        ];
-    }
-
-    /**
-     * Mark all notifications as unread for the given user.
-     */
-    public function markAllAsUnreadForUser(User $user): int
-    {
-        return Notification::markAllAsUnreadForUser($user->id);
-    }
-
-    /**
-     * Search notifications for the authenticated user.
-     */
-    public function searchNotifications(string $query, User $user, ?string $type = null, ?bool $read = null, int $perPage = 25): LengthAwarePaginator
-    {
-        $builder = $this->applyFilters(Notification::forUser($user->id), $type, $read)
-            ->where(function (Builder $searchQuery) use ($query): void {
-                $searchQuery->where('data->title', 'like', '%'.$query.'%')
-                    ->orWhere('data->message', 'like', '%'.$query.'%')
-                    ->orWhere('data->type', 'like', '%'.$query.'%');
-            });
-
-        return $builder->latest()->paginate($perPage);
-    }
-
-    private function applyFilters(Builder $query, ?string $type, ?bool $read): Builder
+    public function getUserNotifications(
+        User $user,
+        int $perPage = 25,
+        ?string $type = null,
+        ?bool $read = null,
+        string $sortColumn = 'created_at',
+        string $sortDirection = 'desc',
+        int $page = 1,
+    ): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
         if ($type) {
             $query->byType($type);
@@ -215,7 +140,9 @@ final class NotificationService
             $query = $read ? $query->read() : $query->unread();
         }
 
-        return $query;
+        return $query
+            ->orderBy($sortColumn, $sortDirection)
+            ->paginate($perPage, ['*'], 'page', $page);
     }
 
     private function getOrderMessage(string $action, array $orderData): string
