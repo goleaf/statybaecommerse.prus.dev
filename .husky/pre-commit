@@ -1,5 +1,5 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
+#!/usr/bin/env sh
+# Execute pre-commit quality gates with Husky's modern shim already providing PATH access.
 
 set -eu
 
