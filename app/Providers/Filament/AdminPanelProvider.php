@@ -6,10 +6,6 @@ namespace App\Providers\Filament;
 
 use App\Support\Nav;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
-
-use function class_exists;
-
-use Filament\Contracts\Plugin as FilamentPlugin;
 use Filament\Enums\UserMenuPosition;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -49,14 +45,9 @@ final class AdminPanelProvider extends PanelProvider
 
     public function panel(Panel $panel): Panel
     {
-        $configuredResources = array_values(array_filter(
+        $resourceClasses = array_values(array_filter(
             (array) config('filament.navigation.resources', []),
             static fn (mixed $resource): bool => is_string($resource),
-        ));
-
-        $resourceClasses = array_values(array_unique(
-            [...Nav::orderedResources(), ...$configuredResources],
-            SORT_STRING,
         ));
 
         /** @var array<class-string> $resourceClasses */
@@ -90,8 +81,8 @@ final class AdminPanelProvider extends PanelProvider
                 'info' => Color::Sky,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
-            ->resources(config('filament.navigation.resources', []))
-            ->pages(config('filament.navigation.pages', []))
+            ->resources($resourceClasses)
+            ->pages($pageClasses)
             ->widgets([
                 AccountWidget::class,
             ])
@@ -123,6 +114,7 @@ final class AdminPanelProvider extends PanelProvider
             ->databaseTransactions()
             ->readOnlyRelationManagersOnResourceViewPagesByDefault()
             ->navigationGroups($this->configuredNavigationGroups())
+            ->userMenu(position: UserMenuPosition::Sidebar)
             ->userMenuItems([
                 'profile' => \Filament\Navigation\MenuItem::make()
                     ->label(__('admin.navigation.profile'))
@@ -149,8 +141,15 @@ final class AdminPanelProvider extends PanelProvider
      */
     private function configuredNavigationGroups(): array
     {
-        return collect(config('filament.navigation.groups', []))
-            ->map(static function (array $group): NavigationGroup {
+        $groupConfigurations = array_values(array_filter(
+            (array) config('filament.navigation.groups', []),
+            static fn (mixed $group): bool => is_array($group),
+        ));
+
+        /** @var array<int, array{label?: string, icon?: string|null, collapsed?: bool|null}> $groupConfigurations */
+
+        return collect($groupConfigurations)
+            ->map(static function (array $group, int|string $unused): NavigationGroup {
                 $navigationGroup = NavigationGroup::make()
                     ->label(__($group['label'] ?? ''));
 
