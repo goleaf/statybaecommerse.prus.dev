@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 
 final class AutocompleteSearchController extends Controller
 {
@@ -18,13 +17,8 @@ final class AutocompleteSearchController extends Controller
     {
         $validated = $request->validated();
 
+        /** @var class-string<Model> $modelClass */
         $modelClass = $validated['model_class'];
-
-        if (! class_exists($modelClass) || ! is_subclass_of($modelClass, Model::class)) {
-            throw ValidationException::withMessages([
-                'model_class' => ['The selected model_class must be an Eloquent model.'],
-            ]);
-        }
 
         $searchField = Arr::get($validated, 'search_field', Arr::get($validated, 'label_field', 'name'));
         $searchQuery = $validated['search_query'];

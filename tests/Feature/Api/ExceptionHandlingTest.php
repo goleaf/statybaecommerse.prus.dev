@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Api;
 
+use App\Support\ApiErrorResponse;
+use App\Support\ErrorCodes;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Testing\TestResponse;
-use Illuminate\Validation\ValidationException;
 use RuntimeException;
 use Tests\Feature\TestCase;
 
@@ -19,107 +20,89 @@ final class ExceptionHandlingTest extends TestCase
         parent::setUp();
 
         Route::middleware('api')->group(function (): void {
-            Route::get('/testing/authentication-exception', function (): never {
-                throw new AuthenticationException();
+            Route::get('/testing/exceptions/server', function () {
+                throw new RuntimeException('Unexpected failure');
             });
 
-            Route::get('/testing/authorization-exception', function (): never {
-                throw new AuthorizationException();
+            Route::get('/testing/exceptions/not-found', function () {
+                abort(404, 'Record not found');
             });
 
-            Route::get('/testing/validation-exception', function (): never {
-                throw ValidationException::withMessages([
-                    'email' => ['The email field is required.'],
+            Route::get('/testing/exceptions/authentication', function () {
+                throw new AuthenticationException('Authentication required.');
+            });
+
+            Route::get('/testing/exceptions/authorization', function () {
+                throw new AuthorizationException('Missing [system.autocomplete] ability.');
+            });
+
+            Route::post('/testing/exceptions/validation', function (Request $request) {
+                $request->validate([
+                    'model_class' => ['required', 'string'],
                 ]);
-            });
 
-            Route::get('/testing/server-exception', function (): never {
-                throw new RuntimeException('Boom');
+                return response()->json(['ok' => true]);
             });
         });
     }
 
-    public function test_validation_exception_is_rendered_as_problem_details(): void
+    public function test_unhandled_exception_returns_problem_details(): void
     {
-        $response = $this->getJson('/testing/validation-exception');
-
-        $response
-            ->assertStatus(422)
-            ->assertJsonPath('type', 'tag:statybaecommerse.prus.dev,2024:error:error.validation')
-            ->assertJsonPath('title', 'Validation failed')
-            ->assertJsonPath('detail', 'The submitted data was invalid.')
-            ->assertJsonPath('error.code', 'error.validation')
-            ->assertJsonPath('error.context.email.0', 'The email field is required.');
-
-        $this->assertResponseCarriesCorrelationId($response);
-    }
-
-    public function test_authentication_exception_uses_standard_contract(): void
-    {
-        $response = $this->getJson('/testing/authentication-exception');
-
-        $response
-            ->assertStatus(401)
-            ->assertJsonPath('type', 'tag:statybaecommerse.prus.dev,2024:error:error.unauthorized')
-            ->assertJsonPath('title', 'Unauthorized')
-            ->assertJsonPath('detail', 'Authentication is required to access this resource.')
-            ->assertJsonPath('error.code', 'error.unauthorized');
-
-        $this->assertResponseCarriesCorrelationId($response);
-    }
-
-    public function test_authorization_exception_uses_standard_contract(): void
-    {
-        $response = $this->getJson('/testing/authorization-exception');
-
-        $response
-            ->assertStatus(403)
-            ->assertJsonPath('type', 'tag:statybaecommerse.prus.dev,2024:error:error.forbidden')
-            ->assertJsonPath('title', 'Forbidden')
-            ->assertJsonPath('detail', 'You do not have permission to perform this action.')
-            ->assertJsonPath('error.code', 'error.forbidden');
-
-        $this->assertResponseCarriesCorrelationId($response);
-    }
-
-    public function test_not_found_exception_is_normalized(): void
-    {
-        $response = $this->getJson('/testing/route-that-does-not-exist');
-
-        $response
-            ->assertStatus(404)
-            ->assertJsonPath('type', 'tag:statybaecommerse.prus.dev,2024:error:error.not_found')
-            ->assertJsonPath('title', 'Not Found')
-            ->assertJsonPath('detail', 'The requested resource could not be located.')
-            ->assertJsonPath('error.code', 'error.not_found');
-
-        $this->assertResponseCarriesCorrelationId($response);
-    }
-
-    public function test_generic_exception_maps_to_server_error(): void
-    {
-        $response = $this->getJson('/testing/server-exception');
+        $response = $this->getJson('/testing/exceptions/server');
 
         $response
             ->assertStatus(500)
-            ->assertJsonPath('type', 'tag:statybaecommerse.prus.dev,2024:error:error.server')
-            ->assertJsonPath('title', 'Internal Server Error')
-            ->assertJsonPath('detail', 'An unexpected error occurred. Please try again later.')
-            ->assertJsonPath('error.code', 'error.server');
-
-        $this->assertResponseCarriesCorrelationId($response);
+            ->assertJsonPath('type', ApiErrorResponse::typeFor(ErrorCodes::SERVER_ERROR))
+            ->assertJsonPath('title', ErrorCodes::describe(ErrorCodes::SERVER_ERROR))
+            ->assertJsonPath('error.code', ErrorCodes::SERVER_ERROR)
+            ->assertJsonStructure([
+                'correlation' => ['trace_id', 'correlation_id'],
+                'meta' => ['locale', 'timestamp'],
+            ]);
     }
 
-    private function assertResponseCarriesCorrelationId(TestResponse $response): void
+    public function test_validation_exception_returns_structured_violations(): void
     {
-        $payload = $response->json();
-        $this->assertArrayHasKey('correlation_id', $payload);
-        $this->assertIsString($payload['correlation_id']);
-        $this->assertNotEmpty($payload['correlation_id']);
-        $this->assertArrayHasKey('meta', $payload);
-        $this->assertArrayHasKey('timestamp', $payload['meta']);
-        $this->assertIsString($payload['meta']['timestamp']);
-        $this->assertNotEmpty($payload['meta']['timestamp']);
-        $this->assertSame($payload['correlation_id'], $response->headers->get('X-Correlation-ID'));
+        $response = $this->postJson('/testing/exceptions/validation', []);
+
+        $response
+            ->assertStatus(422)
+            ->assertJsonPath('type', ApiErrorResponse::typeFor(ErrorCodes::VALIDATION_FAILED))
+            ->assertJsonPath('error.code', ErrorCodes::VALIDATION_FAILED)
+            ->assertJsonPath('error.context.violations.0.field', 'model_class')
+            ->assertJsonPath('error.context.violations.0.reason', 'The model class field is required.');
+    }
+
+    public function test_authentication_exception_uses_shared_error_code(): void
+    {
+        $response = $this->getJson('/testing/exceptions/authentication');
+
+        $response
+            ->assertStatus(401)
+            ->assertJsonPath('type', ApiErrorResponse::typeFor(ErrorCodes::UNAUTHORIZED))
+            ->assertJsonPath('error.code', ErrorCodes::UNAUTHORIZED)
+            ->assertJsonPath('detail', 'Authentication required.');
+    }
+
+    public function test_authorization_exception_uses_shared_error_code(): void
+    {
+        $response = $this->getJson('/testing/exceptions/authorization');
+
+        $response
+            ->assertStatus(403)
+            ->assertJsonPath('type', ApiErrorResponse::typeFor(ErrorCodes::FORBIDDEN))
+            ->assertJsonPath('error.code', ErrorCodes::FORBIDDEN)
+            ->assertJsonPath('error.context.reason', 'Missing [system.autocomplete] ability.');
+    }
+
+    public function test_http_exception_maps_to_not_found_error_code(): void
+    {
+        $response = $this->getJson('/testing/exceptions/not-found');
+
+        $response
+            ->assertStatus(404)
+            ->assertJsonPath('type', ApiErrorResponse::typeFor(ErrorCodes::NOT_FOUND))
+            ->assertJsonPath('error.code', ErrorCodes::NOT_FOUND)
+            ->assertJsonPath('detail', 'Record not found');
     }
 }
