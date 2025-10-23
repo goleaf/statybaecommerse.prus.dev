@@ -9,16 +9,17 @@ use App\Support\Concerns\HasNav;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ProductComparisonResource\Pages;
 use App\Models\ProductComparison;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -75,7 +76,7 @@ final class ProductComparisonResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            SchemaSection::make(__('product_comparisons.basic_information'))
+            Section::make(__('product_comparisons.basic_information'))
                 ->components([
                     Grid::make(2)->components([
                         Select::make('user_id')
@@ -146,11 +147,10 @@ final class ProductComparisonResource extends Resource
                     ->preload(),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::makeRange('range')
-                            ->label(__('product_comparisons.created_at'))
-
-                            ->format('Y-m-d')
-                            ->displayFormat('Y-m-d'),
+                        DatePicker::make('created_from')
+                            ->label(__('product_comparisons.created_from')),
+                        DatePicker::make('created_until')
+                            ->label(__('product_comparisons.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         $createdFrom = data_get($data, 'created_from');
