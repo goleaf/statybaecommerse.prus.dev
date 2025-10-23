@@ -10,7 +10,7 @@ final class AdvancedReports extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    public static function getNavigationGroup(): string|\UnitEnum|null
+    public static function getNavigationGroup(): ?string
     {
         return 'Analytics';
     }
