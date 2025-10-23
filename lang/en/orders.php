@@ -140,10 +140,11 @@ return [
     'document_name' => 'Document Name',
     'document_type' => 'Document Type',
     'document_file' => 'Document File',
-    'file_size'     => 'File Size',
-    'mime_type'     => 'MIME Type',
-    'download'      => 'Download',
-    'description'   => 'Description',
+    'file_size' => 'File Size',
+    'mime_type' => 'MIME Type',
+    'download' => 'Download',
+    'description' => 'Description',
+    'document_version_tooltip' => 'Open generated document version :version',
 
     // Document types
     'document_types' => [

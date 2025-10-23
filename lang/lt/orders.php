@@ -140,10 +140,11 @@ return [
     'document_name' => 'Dokumento pavadinimas',
     'document_type' => 'Dokumento tipas',
     'document_file' => 'Dokumento failas',
-    'file_size'     => 'Failo dydis',
-    'mime_type'     => 'MIME tipas',
-    'download'      => 'Atsisiųsti',
-    'description'   => 'Aprašymas',
+    'file_size' => 'Failo dydis',
+    'mime_type' => 'MIME tipas',
+    'download' => 'Atsisiųsti',
+    'description' => 'Aprašymas',
+    'document_version_tooltip' => 'Atidaryti sugeneruotą dokumento versiją :version',
 
     // Document types
     'document_types' => [
