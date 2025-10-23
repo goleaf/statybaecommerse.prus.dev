@@ -133,20 +133,20 @@ final class WishlistItemResource extends Resource
                                     ->createOptionUsing(function (array $data): int {
                                         return UserWishlist::create($data)->getKey();
                                     }),
-                                Placeholder::make('wishlist_user')
+                                Placeholder::make('user_name')
                                     ->label(__('admin.wishlist_items.fields.user'))
                                     ->content(function (callable $get): string {
                                         $wishlistId = $get('wishlist_id');
 
                                         if (! $wishlistId) {
-                                            return '';
+                                            return '-';
                                         }
 
                                         $wishlist = UserWishlist::with('user')->find($wishlistId);
 
-                                        return $wishlist?->user?->name ?? '';
+                                        return $wishlist?->user?->name ?? '-';
                                     })
-                                    ->columnSpanFull(),
+                                    ->reactive(),
                             ]),
                         FormGrid::make(2)
                             ->schema([
