@@ -43,4 +43,5 @@
 - Reinstated the Husky shared bootstrap script so Git hooks run without deprecation notices or missing PATH exports during repository installs.
 - Captured the `sh -n .husky/_/husky.sh` smoke check that verifies the restored script syntax before publishing commits.
 - Removed the deprecated Husky v10 warning stub that overwrote the shim so local Git hooks keep executing through the repository toolchain instead of exiting early.
-- Normalized search pagination boolean filters so "false" and "0" values are respected for in-stock and featured facets, preventing shoppers from being locked into positive-only filters.
+- Corrected the `DataFilteringService` so catalog filters now remove invalid records regardless of position and reindex the resulting collections, closing the gap where interleaved bad data previously survived storefront queries.
+- Hardened the `DataFilteringService` helpers to normalise price filtering across array/object payloads, enforce strict recommendation de-duplication, and document regression coverage for future storefront data consistency reviews.
