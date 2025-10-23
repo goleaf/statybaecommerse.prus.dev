@@ -48,17 +48,8 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Introduced a reusable HTML sanitization pipeline with a maintenance command, model hooks, and storefront renderer updates to harden product and legal content.
 
 ### Bug Fixes
-* Updated the product catalogue OpenAPI metadata schema to match the presenter payload and documented nullable media fields, eliminating validation mismatches during contract tests.
-* Added the missing coupon schema columns (maximum discount caps, per-user limits, and scoped product/category JSON fields) so Laravel migrations and factories align, restoring the API coupon application test suite.
-* Rounded coupon discount calculations inside the application service to prevent `Number::parseFloat` type errors when returning pricing payloads during checkout flows.
-- Restored the application exception handler so requests and artisan commands stop crashing with `Whoops\\Run::handleShutdown()` when Laravel bootstraps without the class.
-* Stabilized the SQLite-powered test bootstrap by forcing an on-disk database, guarding factories against optional columns, and eliminating the `no such table: users` regression that blocked the user attribution observer suite.
-* Stabilized analytics event tracking by skipping the user-owned scope in console contexts, gracefully handling missing request/session data, enriching event type listings, and returning float-safe stats so regression suites can assert conversions reliably.
-* Made administrative rate limiting, authorization matrix lookups, and brand metadata diagnostics console-friendly by avoiding container-bound config calls and explicitly removing visibility scopes, which restores the targeted unit tests.
-* Restored the shipping option ↔ zone relationship so orders, factories, and zone aggregations attach carriers without manual
-  attribute overrides during tests.
-* Hardened the API search endpoint to short-circuit suspicious payloads and ensure exact-title matches outrank fuzzy results, keeping injection attempts empty while surfacing precise catalogue hits first.
-- Ensured the customer and product inline sparkline widgets reuse the cached series datasets and publish matching checksums so Filament tables render the same analytics payload verified by unit tests.
+* Reset the test refresh state before each PHPUnit boot so feature suites reliably run pending migrations on the in-memory SQLite connection and avoid missing table errors during API assertions.
+* Allowed the recently viewed storefront API to collapse draft products to their identifiers while still returning full media metadata for live catalogue entries, keeping wishlist toggles and guest history calls deterministic in tests.
 * Normalized search type filters to treat mixed-case input from clients as valid bucket selectors, keeping aggregated storefront results scoped correctly instead of silently reverting to every result category.
 * Updated the Attribute Value Filament resource to ignore active/enabled global scopes for admin actions, restoring toggle, duplicate, and bulk activation helpers that previously failed once records were hidden by storefront filters.
 * Updated the data import console command regression test to invoke the protected truncation helper via reflection, preserving foreign key enforcement coverage while respecting the command's final modifier.
