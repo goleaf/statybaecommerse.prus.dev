@@ -39,19 +39,15 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
-
-use function in_array;
-
-use InvalidArgumentException;
-
-use function is_array;
-
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 use Throwable;
@@ -101,12 +97,16 @@ class AppServiceProvider extends ServiceProvider
         // Register Livewire components
         Livewire::component('live-notification-feed', LiveNotificationFeed::class);
 
-        if (method_exists(Livewire::class, 'useCspNonce')) {
-            Livewire::useCspNonce(static fn (): string => csp_nonce());
-        }
+        if (! Testable::hasMacro('assertCanSeeFormData')) {
+            Testable::macro('assertCanSeeFormData', function (array $data): Testable {
+                foreach (Arr::dot($data) as $value) {
+                    if (is_scalar($value) && $value !== null) {
+                        $this->assertSee((string) $value, escape: false);
+                    }
+                }
 
-        if (method_exists(Vite::class, 'useCspNonce')) {
-            Vite::useCspNonce(static fn (): string => csp_nonce());
+                return $this;
+            });
         }
 
         if (! class_exists(\Filament\Forms\Form::class) && class_exists(\Filament\Schemas\Schema::class)) {
