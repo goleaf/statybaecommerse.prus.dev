@@ -11,13 +11,6 @@ use App\Models\PriceListItem;
 use App\Models\Product;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -28,14 +21,18 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
@@ -48,17 +45,15 @@ use UnitEnum;
  */
 final class PriceListItemResource extends Resource
 {
-    use HasNav;
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-currency-euro';
 
     protected static ?string $model = PriceListItem::class;
 
     protected static ?int $navigationSort = 16;
 
-    protected static ?string $recordTitleAttribute = 'product.name';
+    protected static UnitEnum|string|null $navigationGroup = 'Products';
 
-    
-
-    
+    protected static ?string $recordTitleAttribute = 'display_name';
 
     /**
      * Handle getNavigationLabel functionality with proper error handling.
