@@ -4,7 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
+use App\Filament\Resources\ReferralCodeUsageLogResource\Pages;
+use App\Filament\Resources\ReferralCodeUsageLogs\Schemas\ReferralCodeUsageLogForm as ReferralCodeUsageLogFormSchema;
+use App\Filament\Resources\ReferralCodeUsageLogs\Tables\ReferralCodeUsageLogsTable as ReferralCodeUsageLogsTableSchema;
+use App\Models\ReferralCodeUsageLog;
+use Filament\Schemas\Schema;
+use Filament\Resources\Resource;
+use Filament\Tables\Table;
+use UnitEnum;
 
 use App\Filament\Resources\ReferralCodeUsageLogResource\Pages;
 use App\Models\ReferralCodeUsageLog;

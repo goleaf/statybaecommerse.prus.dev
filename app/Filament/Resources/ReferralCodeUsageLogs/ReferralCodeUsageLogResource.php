@@ -12,6 +12,7 @@ use App\Filament\Resources\ReferralCodeUsageLogs\Schemas\ReferralCodeUsageLogFor
 use App\Filament\Resources\ReferralCodeUsageLogs\Tables\ReferralCodeUsageLogsTable;
 use App\Models\ReferralCodeUsageLog;
 use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;

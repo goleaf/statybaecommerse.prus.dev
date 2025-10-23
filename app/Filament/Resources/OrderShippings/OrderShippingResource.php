@@ -12,6 +12,7 @@ use App\Filament\Resources\OrderShippings\Schemas\OrderShippingForm;
 use App\Filament\Resources\OrderShippings\Tables\OrderShippingsTable;
 use App\Models\OrderShipping;
 use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;

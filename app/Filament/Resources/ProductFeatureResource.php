@@ -19,6 +19,7 @@ use Filament\Tables\Actions\DeleteAction as TablesDeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction as TablesDeleteBulkAction;
 use Filament\Tables\Actions\EditAction as TablesEditAction;
 use Filament\Forms;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;

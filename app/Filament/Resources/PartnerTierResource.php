@@ -9,6 +9,7 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\PartnerTierResource\Pages;
 use App\Models\PartnerTier;
 use Filament\Forms;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
