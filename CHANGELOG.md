@@ -21,6 +21,9 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 - Harmonised the campaign conversion translation model wiring, defaulted
   `converted_at` during factory creation, and kept the SQLite-friendly scopes in
   sync so ROI/ROAS dashboards and unit tests stop dropping recent conversions.
+* Stabilized Filament dashboard feature coverage by loading a curated widget set in tests, falling back to the admin login route when guests hit `/admin`, and providing a safe heroicon fallback so missing assets no longer crash the page render.
+* Kept Filament resource and page discovery active during the test suite while layering the deterministic dashboard widgets and explicit route registration, ensuring comprehensive admin integration coverage stays green alongside the focused dashboard assertions.
+* Normalized user profile data contract exports to emit UTC timestamps and hardened JSON/CSV parsing so the round-trip fixtures match the expectations codified in `UserProfilesDataTransferTest`.
 * Normalized API validation problem responses to always include a fallback English reason alongside the localized message list so integrators receive consistent messaging even when the initial validation ran before locale negotiation completed.
 * Ensured forbidden problem responses raised through `AccessDeniedHttpException` retain the explicit denial reason in the error context, mirroring the structure used for authorization exceptions and keeping client-side handlers uniform.
 * Added a dedicated discount redemption branch in the status scope so pending, redeemed, expired, and cancelled records surface in Filament listings and seeders without being filtered away by unrelated defaults.

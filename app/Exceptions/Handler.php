@@ -7,8 +7,8 @@ namespace App\Exceptions;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Route;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -38,33 +38,23 @@ class Handler extends ExceptionHandler
         });
     }
 
-    /**
-     * Normalize authentication failures so guard-specific redirects work during browser and test flows.
-     */
-    protected function unauthenticated($request, AuthenticationException $exception): JsonResponse|Response
+    protected function unauthenticated($request, AuthenticationException $exception): JsonResponse|RedirectResponse
     {
-        /** @var Request $request */
         if ($request->expectsJson()) {
-            // Preserve the original behaviour for API consumers.
-            return response()->json(['message' => $exception->getMessage()], 401);
+            // APIs should continue receiving structured JSON payloads instead of redirects.
+            return response()->json([
+                'message' => $exception->getMessage(),
+            ], 401);
         }
 
-        try {
-            $loginRoute = route('filament.admin.auth.login');
-        } catch (Throwable) {
-            $loginRoute = null;
+        if (Route::has('filament.admin.auth.login')) {
+            // Filament routes in tests expect a redirect to the admin login screen instead of an exception.
+            return redirect()->guest(route('filament.admin.auth.login'));
         }
 
-        if ($loginRoute === null) {
-            try {
-                $loginRoute = route('login');
-            } catch (Throwable) {
-                // Last resort: send the user to the root URL to avoid bubbling the exception.
-                $loginRoute = '/';
-            }
-        }
+        $fallback = Route::has('login') ? route('login') : '/login';
 
-        // Gracefully redirect guests back to the intended login route without surfacing framework exceptions.
-        return redirect()->guest($loginRoute);
+        // Preserve Laravel's default redirect behaviour for any other web guard.
+        return redirect()->guest($fallback);
     }
 }
