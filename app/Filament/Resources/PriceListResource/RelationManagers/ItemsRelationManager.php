@@ -15,6 +15,8 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 final class ItemsRelationManager extends BaseRelationManager
 {
@@ -25,7 +27,7 @@ final class ItemsRelationManager extends BaseRelationManager
         return __('price_lists.relation_managers.items.title');
     }
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $form): Schema
     {
 
         $form = $schema; // Preserve legacy variable naming for existing schema definitions.

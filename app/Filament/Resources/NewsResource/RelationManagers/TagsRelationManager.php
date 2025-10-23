@@ -13,7 +13,7 @@ use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
+use Filament\Schemas\Schema;
 
 final class TagsRelationManager extends BaseRelationManager
 {
@@ -21,7 +21,7 @@ final class TagsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Tags';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $form): Schema
     {
 
         $form = $schema; // Preserve legacy variable naming for existing schema definitions.

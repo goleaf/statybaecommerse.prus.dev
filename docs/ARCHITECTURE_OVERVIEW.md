@@ -15,7 +15,7 @@ Laravel 12 provides the HTTP kernel, queue worker, and scheduler. Filament v4 su
 
 ## Backend structure
 
-- `app/Filament/` — Filament resources, widgets, actions, and custom pages. Resources follow v4 signatures and lean on schema container builders (for example `AddressResource` now wires its form through `Filament\Schemas\Schema::components([...])`) to expose product, marketing, and operations data with consistent admin ergonomics.
+- `app/Filament/` — Filament resources, widgets, actions, and custom pages. Resources follow v4 signatures and lean on `Filament\\Schemas\\Schema` based form/table/infolist builders (instead of legacy `Form` containers) to expose product, marketing, and operations data.
 - `app/Http/Controllers/` & `routes/*.php` — REST controllers and route definitions. `routes/admin.php` adds Filament-specific routing while `routes/web.php` handles storefront flows.
 - `app/Services/` — Coarse-grained services (pricing engines, recommendation systems, marketing automation). Many services accept DTOs from `app/Data/` and emit events consumed by listeners in `app/Listeners/`.
 - `app/Actions/` — Reusable command objects invoked by jobs, controllers, or Filament actions. Actions encapsulate multi-step workflows (e.g., syncing external catalogues).

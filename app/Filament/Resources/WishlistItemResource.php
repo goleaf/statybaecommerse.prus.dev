@@ -49,6 +49,8 @@ use Illuminate\Support\Str;
 use RuntimeException;
 use Str;
 use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 /**
  * WishlistItemResource
@@ -107,7 +109,7 @@ final class WishlistItemResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
 
         $form = $schema; // Preserve legacy variable naming for existing schema definitions.

@@ -24,6 +24,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Novadaemon\FilamentCombobox\Combobox;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 final class RecommendationConfigResource extends Resource
 {
@@ -57,7 +58,7 @@ final class RecommendationConfigResource extends Resource
         return __('recommendation_configs.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
 
         $form = $schema; // Preserve legacy variable naming for existing schema definitions.

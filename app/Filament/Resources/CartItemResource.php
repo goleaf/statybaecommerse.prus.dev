@@ -39,13 +39,14 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Filament\Schemas\Schema;
 
 final class CartItemResource extends Resource
 {
     /**
      * Define the navigation icon in a docblock to keep compatibility with Filament's autoloading.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static ?string $model = CartItem::class;
 
@@ -72,7 +73,7 @@ final class CartItemResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
 
         $form = $schema; // Preserve legacy variable naming for existing schema definitions.

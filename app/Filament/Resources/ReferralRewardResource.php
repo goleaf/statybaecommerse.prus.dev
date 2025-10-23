@@ -34,7 +34,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
-use UnitEnum;
+use Filament\Schemas\Schema;
 
 final class ReferralRewardResource extends Resource
 {
@@ -60,7 +60,7 @@ final class ReferralRewardResource extends Resource
      */
     protected static $navigationGroup = 'Referral';
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
 
         $form = $schema; // Preserve legacy variable naming for existing schema definitions.
@@ -296,7 +296,7 @@ final class ReferralRewardResource extends Resource
             ]);
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Schema $infolist): Schema
     {
 
         $infolist = $schema; // Preserve legacy infolist variable naming for clarity.

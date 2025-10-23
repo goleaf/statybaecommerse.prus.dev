@@ -24,6 +24,7 @@ use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
 final class AnalyticsResource extends Resource
 {
@@ -73,7 +74,7 @@ final class AnalyticsResource extends Resource
         return 'warning';
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
 
         $form = $schema; // Preserve legacy variable naming for existing schema definitions.

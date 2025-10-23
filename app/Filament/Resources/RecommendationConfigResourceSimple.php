@@ -28,7 +28,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
-use Novadaemon\FilamentCombobox\Combobox;
+use Filament\Schemas\Schema;
 
 final class RecommendationConfigResourceSimple extends Resource
 {
@@ -53,7 +53,7 @@ final class RecommendationConfigResourceSimple extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
 
         $form = $schema; // Preserve legacy variable naming for existing schema definitions.

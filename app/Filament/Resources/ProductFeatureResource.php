@@ -19,6 +19,8 @@ use Filament\Tables\Actions\DeleteAction as TablesDeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction as TablesDeleteBulkAction;
 use Filament\Tables\Actions\EditAction as TablesEditAction;
 use Filament\Tables\Table;
+use UnitEnum;
+use Filament\Schemas\Schema;
 
 final class ProductFeatureResource extends Resource
 {
@@ -51,7 +53,7 @@ final class ProductFeatureResource extends Resource
 
     protected static ?int $navigationSort = 17;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
 
         $form = $schema; // Preserve legacy variable naming for existing schema definitions.

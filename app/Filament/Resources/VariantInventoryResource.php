@@ -44,6 +44,8 @@ use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use UnitEnum;
+use Filament\Schemas\Schema;
 
 /**
  * VariantInventoryResource
@@ -63,7 +65,7 @@ final class VariantInventoryResource extends Resource
     /**
      * @var string|BackedEnum|null Navigation icon configured for the inventory module.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-archive-box';
 
     /**
      * Navigation group for Filament navigation.
@@ -90,7 +92,7 @@ final class VariantInventoryResource extends Resource
     /**
      * Configure the Variant Inventory form schema for Filament administrators.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
 
         $form = $schema; // Preserve legacy variable naming for existing schema definitions.

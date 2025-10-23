@@ -14,6 +14,7 @@ use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Schema;
 use LaraZeus\ListGroup\Entries\ListItem;
 use LaraZeus\ListGroup\Infolists\ListEntry;
+use Filament\Schemas\Schema;
 
 final class ViewPost extends ViewRecord
 {
@@ -26,7 +27,7 @@ final class ViewPost extends ViewRecord
         ];
     }
 
-    public function infolist(Schema $schema): Schema
+    public function infolist(Schema $infolist): Schema
     {
 
         $infolist = $schema; // Preserve legacy infolist variable naming for clarity.

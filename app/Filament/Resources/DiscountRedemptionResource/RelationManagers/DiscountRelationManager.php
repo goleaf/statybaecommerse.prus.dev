@@ -10,7 +10,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
+use Filament\Schemas\Schema;
 
 class DiscountRelationManager extends BaseRelationManager
 {
@@ -22,7 +22,7 @@ class DiscountRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Discounts';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $form): Schema
     {
 
         $form = $schema; // Preserve legacy variable naming for existing schema definitions.

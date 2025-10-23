@@ -26,7 +26,7 @@ class AddressesRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'addresses';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $form): Schema
     {
 
         $form = $schema; // Preserve legacy variable naming for existing schema definitions.

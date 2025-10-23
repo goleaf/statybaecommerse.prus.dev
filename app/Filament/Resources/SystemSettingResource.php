@@ -30,6 +30,8 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
+use UnitEnum;
+use Filament\Schemas\Schema;
 
 /**
  * SystemSettingResource
@@ -82,7 +84,7 @@ class SystemSettingResource extends Resource
         return true;
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
 
         $form = $schema; // Preserve legacy variable naming for existing schema definitions.

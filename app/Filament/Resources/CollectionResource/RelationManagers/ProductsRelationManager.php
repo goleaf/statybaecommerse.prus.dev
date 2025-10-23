@@ -12,6 +12,8 @@ use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 final class ProductsRelationManager extends BaseRelationManager
 {
@@ -19,7 +21,7 @@ final class ProductsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Collection Products';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $form): Schema
     {
 
         $form = $schema; // Preserve legacy variable naming for existing schema definitions.

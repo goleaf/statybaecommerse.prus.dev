@@ -31,6 +31,8 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 final class AdminUserResource extends Resource
 {
@@ -66,7 +68,7 @@ final class AdminUserResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation on the provided Form instance for v4 compliance.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $form->schema([
             // Returning the Form instance maintains Filament's schema pipeline for admin user management.

@@ -13,7 +13,7 @@ final class AdvancedReports extends Page
     /**
      * @var string|BackedEnum|null Navigation icon override documented for enum compatibility.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
     public static function getNavigationGroup(): BackedEnum|string|null
     {

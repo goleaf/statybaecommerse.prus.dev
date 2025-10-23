@@ -14,6 +14,8 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Number;
+use UnitEnum;
+use Filament\Schemas\Schema;
 
 final class PartnerTierResource extends Resource
 {
@@ -40,7 +42,7 @@ final class PartnerTierResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
 
         $form = $schema; // Preserve legacy variable naming for existing schema definitions.

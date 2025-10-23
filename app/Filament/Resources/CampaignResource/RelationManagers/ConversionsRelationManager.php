@@ -16,6 +16,8 @@ use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
 final class ConversionsRelationManager extends BaseRelationManager
 {
@@ -23,7 +25,7 @@ final class ConversionsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Campaign Conversions';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $form): Schema
     {
 
         $form = $schema; // Preserve legacy variable naming for existing schema definitions.

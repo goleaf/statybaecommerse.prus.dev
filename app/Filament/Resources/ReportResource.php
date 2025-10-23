@@ -78,7 +78,7 @@ final class ReportResource extends Resource
         return __('reports.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
 
         $form = $schema; // Preserve legacy variable naming for existing schema definitions.

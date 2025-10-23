@@ -23,6 +23,7 @@ use LaraZeus\ListGroup\Entries\ListItem;
 use LaraZeus\ListGroup\Infolists\ListEntry;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
 use LaraZeus\SpatieTranslatable\Resources\Pages\ViewRecord\Concerns\Translatable as SpatieTranslatableViewRecord;
+use Filament\Schemas\Schema;
 
 final class ViewOrder extends ViewRecord
 {
@@ -38,7 +39,7 @@ final class ViewOrder extends ViewRecord
         ];
     }
 
-    public function infolist(Schema $schema): Schema
+    public function infolist(Schema $infolist): Schema
     {
 
         $infolist = $schema; // Preserve legacy infolist variable naming for clarity.

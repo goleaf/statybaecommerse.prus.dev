@@ -20,6 +20,8 @@ use Icetalker\FilamentTableRepeatableEntry\Infolists\Components\TableRepeatableE
 use Illuminate\Support\Str;
 use LaraZeus\ListGroup\Entries\ListItem;
 use LaraZeus\ListGroup\Infolists\ListEntry;
+use Illuminate\Support\Str;
+use Filament\Schemas\Schema;
 
 final class ViewCustomer extends ViewRecord
 {
@@ -32,7 +34,7 @@ final class ViewCustomer extends ViewRecord
         ];
     }
 
-    public function infolist(Schema $schema): Schema
+    public function infolist(Schema $infolist): Schema
     {
 
         $infolist = $schema; // Preserve legacy infolist variable naming for clarity.

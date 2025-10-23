@@ -35,7 +35,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
+use Filament\Schemas\Schema;
 
 final class EnumValueResource extends Resource
 {
@@ -43,11 +43,11 @@ final class EnumValueResource extends Resource
 
     protected static ?string $model = EnumValue::class;
 
-    /** @var string|BackedEnum|null Provide a consistent icon for value maintenance. */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
+    /** @var string|\BackedEnum|null Provide a consistent icon for value maintenance. */
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-squares-2x2';
 
-    /** @var string|BackedEnum|null Keep enum value tools inside the System cluster. */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
+    /** @var string|\BackedEnum|null Keep enum value tools inside the System cluster. */
+    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::System;
 
     public static function getNavigationGroup(): ?string
     {
@@ -74,7 +74,7 @@ final class EnumValueResource extends Resource
         return __('admin.enum_values.navigation_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
 
         $form = $schema; // Preserve legacy variable naming for existing schema definitions.

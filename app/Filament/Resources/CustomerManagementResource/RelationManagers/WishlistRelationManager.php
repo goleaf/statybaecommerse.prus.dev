@@ -12,7 +12,7 @@ use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
+use Filament\Schemas\Schema;
 
 final class WishlistRelationManager extends BaseRelationManager
 {
@@ -20,7 +20,7 @@ final class WishlistRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Wishlist';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $form): Schema
     {
 
         $form = $schema; // Preserve legacy variable naming for existing schema definitions.

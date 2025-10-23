@@ -62,7 +62,7 @@ final class DocumentResource extends Resource
         return __('admin.documents.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
 
         $form = $schema; // Preserve legacy variable naming for existing schema definitions.
