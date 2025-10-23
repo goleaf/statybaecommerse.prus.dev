@@ -146,7 +146,7 @@ final class StockMovementResource extends Resource
                 TextColumn::make('type')
                     ->label(__('stock_movement.fields.type'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn (?string $state): string => match ($state) {
                         'in' => 'success',
                         'out' => 'danger',
                         'adjustment' => 'warning',
