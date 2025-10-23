@@ -40,6 +40,16 @@ return new class extends Migration
 
         $legacyTable = 'discount_codes_legacy';
 
+        $this->dropSqliteIndexes('discount_codes', [
+            'discount_codes_code_unique',
+            'discount_codes_active_window_idx',
+            'discount_codes_discount_code_idx',
+            'discount_codes_customer_status_idx',
+            'discount_codes_valid_window_idx',
+            'discount_codes_created_by_index',
+            'discount_codes_updated_by_index',
+        ]);
+
         Schema::disableForeignKeyConstraints();
 
         try {
@@ -116,6 +126,16 @@ return new class extends Migration
         $legacyTranslations = 'discount_redemption_translations_legacy';
         $hasTranslations = Schema::hasTable('discount_redemption_translations');
 
+        $this->dropSqliteIndexes('discount_redemptions', [
+            'discount_redemptions_discount_status_idx',
+            'discount_redemptions_code_user_idx',
+            'discount_redemptions_user_status_idx',
+            'discount_redemptions_order_status_idx',
+            'discount_redemptions_redeemed_at_index',
+            'discount_redemptions_created_by_index',
+            'discount_redemptions_updated_by_index',
+        ]);
+
         Schema::disableForeignKeyConstraints();
 
         try {
@@ -123,6 +143,11 @@ return new class extends Migration
             Schema::dropIfExists($legacyTable);
 
             if ($hasTranslations) {
+                $this->dropSqliteIndexes('discount_redemption_translations', [
+                    'discount_redemption_translations_discount_redemption_id_locale_unique',
+                    'discount_redemption_translations_locale_index',
+                ]);
+
                 Schema::rename('discount_redemption_translations', $legacyTranslations);
             }
 
@@ -419,5 +444,29 @@ return new class extends Migration
         }
 
         return false;
+    }
+
+    /**
+     * SQLite requires globally unique index names, so remove existing ones before recreating tables.
+     *
+     * @param  array<int, string>  $indexes
+     */
+    private function dropSqliteIndexes(string $table, array $indexes): void
+    {
+        if (Schema::getConnection()->getDriverName() !== 'sqlite') {
+            return;
+        }
+
+        if (! Schema::hasTable($table)) {
+            return;
+        }
+
+        foreach ($indexes as $index) {
+            try {
+                DB::statement(sprintf('DROP INDEX IF EXISTS "%s"', $index));
+            } catch (\Throwable) {
+                // Ignore drop failures to keep migrations resilient across environments.
+            }
+        }
     }
 };

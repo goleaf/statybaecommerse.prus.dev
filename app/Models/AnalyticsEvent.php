@@ -5,13 +5,18 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Scopes\UserOwnedScope;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Illuminate\Contracts\Session\Session as SessionContract;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Throwable;
 
 /**
  * AnalyticsEvent
@@ -136,7 +141,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeByEventType(Builder $query, string $eventType): Builder
     {
-        return $query->where('event_type', $eventType);
+        return self::withoutOwnershipScope($query)->where('event_type', $eventType);
     }
 
     /**
@@ -144,7 +149,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeByUser(Builder $query, int $userId): Builder
     {
-        return $query->where('user_id', $userId);
+        return self::withoutOwnershipScope($query)->where('user_id', $userId);
     }
 
     /**
@@ -152,7 +157,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeBySession(Builder $query, string $sessionId): Builder
     {
-        return $query->where('session_id', $sessionId);
+        return self::withoutOwnershipScope($query)->where('session_id', $sessionId);
     }
 
     /**
@@ -160,7 +165,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeWithValue(Builder $query): Builder
     {
-        return $query->whereNotNull('value');
+        return self::withoutOwnershipScope($query)->whereNotNull('value');
     }
 
     /**
@@ -168,7 +173,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeRegisteredUsers(Builder $query): Builder
     {
-        return $query->whereNotNull('user_id');
+        return self::withoutOwnershipScope($query)->whereNotNull('user_id');
     }
 
     /**
@@ -176,7 +181,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeAnonymousUsers(Builder $query): Builder
     {
-        return $query->whereNull('user_id');
+        return self::withoutOwnershipScope($query)->whereNull('user_id');
     }
 
     /**
@@ -184,7 +189,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeByDeviceType(Builder $query, string $deviceType): Builder
     {
-        return $query->where('device_type', $deviceType);
+        return self::withoutOwnershipScope($query)->where('device_type', $deviceType);
     }
 
     /**
@@ -192,7 +197,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeByBrowser(Builder $query, string $browser): Builder
     {
-        return $query->where('browser', $browser);
+        return self::withoutOwnershipScope($query)->where('browser', $browser);
     }
 
     /**
@@ -200,7 +205,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeByDateRange(Builder $query, string $startDate, string $endDate): Builder
     {
-        return $query->whereBetween('created_at', [$startDate, $endDate]);
+        return self::withoutOwnershipScope($query)->whereBetween('created_at', [$startDate, $endDate]);
     }
 
     /**
@@ -208,7 +213,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeToday(Builder $query): Builder
     {
-        return $query->whereDate('created_at', today());
+        return self::withoutOwnershipScope($query)->whereDate('created_at', today());
     }
 
     /**
@@ -216,7 +221,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeThisWeek(Builder $query): Builder
     {
-        return $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
+        return self::withoutOwnershipScope($query)->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
     }
 
     /**
@@ -224,7 +229,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeThisMonth(Builder $query): Builder
     {
-        return $query->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()]);
+        return self::withoutOwnershipScope($query)->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()]);
     }
 
     /**
@@ -232,7 +237,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeOfType(Builder $query, string $eventType): Builder
     {
-        return $query->where('event_type', $eventType);
+        return self::withoutOwnershipScope($query)->where('event_type', $eventType);
     }
 
     /**
@@ -240,7 +245,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeForSession(Builder $query, string $sessionId): Builder
     {
-        return $query->where('session_id', $sessionId);
+        return self::withoutOwnershipScope($query)->where('session_id', $sessionId);
     }
 
     /**
@@ -248,7 +253,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeForUser(Builder $query, int $userId): Builder
     {
-        return $query->where('user_id', $userId);
+        return self::withoutOwnershipScope($query)->where('user_id', $userId);
     }
 
     /**
@@ -256,7 +261,7 @@ final class AnalyticsEvent extends Model
      */
     public function scopeInDateRange(Builder $query, string $startDate, string $endDate): Builder
     {
-        return $query->whereBetween('created_at', [$startDate, $endDate]);
+        return self::withoutOwnershipScope($query)->whereBetween('created_at', [$startDate, $endDate]);
     }
 
     // Accessors & Mutators
@@ -267,13 +272,9 @@ final class AnalyticsEvent extends Model
     public function getEventTypeLabelAttribute(): string
     {
         $key = 'admin.analytics.event_types.'.$this->event_type;
-        $translation = __($key);
+        $label = __($key);
 
-        if ($translation !== $key) {
-            return $translation;
-        }
-
-        return Str::of($this->event_type)->replace('_', ' ')->title()->toString();
+        return is_string($label) && $label !== $key ? $label : (string) $this->event_type;
     }
 
     /**
@@ -302,6 +303,11 @@ final class AnalyticsEvent extends Model
         return number_format($this->value, 2).' '.$currency;
     }
 
+    public function getConversionValueAttribute($value): ?float
+    {
+        return $value !== null ? (float) $value : null;
+    }
+
     /**
      * Handle getIsRegisteredUserAttribute functionality with proper error handling.
      */
@@ -318,6 +324,16 @@ final class AnalyticsEvent extends Model
         return is_null($this->user_id);
     }
 
+    private static function withoutOwnershipScope(Builder $query): Builder
+    {
+        return $query->withoutGlobalScopes([UserOwnedScope::class]);
+    }
+
+    private static function ownershiplessQuery(): Builder
+    {
+        return static::query()->withoutGlobalScopes([UserOwnedScope::class]);
+    }
+
     // Static methods
 
     /**
@@ -325,11 +341,23 @@ final class AnalyticsEvent extends Model
      */
     public static function getEventTypes(): array
     {
-        return collect(self::EVENT_TYPES)
-            ->mapWithKeys(fn(string $eventType): array => [
-                $eventType => __('admin.analytics.event_types.'.$eventType),
-            ])
-            ->all();
+        return [
+            'page_view' => __('admin.analytics.event_types.page_view'),
+            'click' => __('admin.analytics.event_types.click'),
+            'product_view' => __('admin.analytics.event_types.product_view'),
+            'add_to_cart' => __('admin.analytics.event_types.add_to_cart'),
+            'remove_from_cart' => __('admin.analytics.event_types.remove_from_cart'),
+            'purchase' => __('admin.analytics.event_types.purchase'),
+            'search' => __('admin.analytics.event_types.search'),
+            'user_register' => __('admin.analytics.event_types.user_register'),
+            'user_login' => __('admin.analytics.event_types.user_login'),
+            'user_logout' => __('admin.analytics.event_types.user_logout'),
+            'newsletter_signup' => __('admin.analytics.event_types.newsletter_signup'),
+            'contact_form' => __('admin.analytics.event_types.contact_form'),
+            'download' => __('admin.analytics.event_types.download'),
+            'video_play' => __('admin.analytics.event_types.video_play'),
+            'social_share' => __('admin.analytics.event_types.social_share'),
+        ];
     }
 
     /**
@@ -353,7 +381,7 @@ final class AnalyticsEvent extends Model
      */
     public static function getEventTypeStats(): array
     {
-        return static::queryForAdmin()
+        return self::ownershiplessQuery()
             ->selectRaw('event_type, COUNT(*) as count')
             ->groupBy('event_type')
             ->orderBy('count', 'desc')
@@ -366,7 +394,7 @@ final class AnalyticsEvent extends Model
      */
     public static function getDeviceTypeStats(): array
     {
-        return static::queryForAdmin()
+        return self::ownershiplessQuery()
             ->selectRaw('device_type, COUNT(*) as count')
             ->whereNotNull('device_type')
             ->groupBy('device_type')
@@ -380,7 +408,7 @@ final class AnalyticsEvent extends Model
      */
     public static function getBrowserStats(): array
     {
-        return static::queryForAdmin()
+        return self::ownershiplessQuery()
             ->selectRaw('browser, COUNT(*) as count')
             ->whereNotNull('browser')
             ->groupBy('browser')
@@ -394,14 +422,16 @@ final class AnalyticsEvent extends Model
      */
     public static function getRevenueStats(): array
     {
-        return self::whereNotNull('value')
+        $totals = self::ownershiplessQuery()
+            ->whereNotNull('value')
             ->selectRaw('DATE(created_at) as date, SUM(value) as revenue')
             ->groupBy('date')
             ->orderBy('date', 'desc')
             ->limit(30)
             ->pluck('revenue', 'date')
-            ->map(fn($revenue) => (float) $revenue)
             ->toArray();
+
+        return array_map(static fn ($value): float => (float) $value, $totals);
     }
 
     /**
@@ -411,31 +441,101 @@ final class AnalyticsEvent extends Model
      */
     public static function track(string $eventType, array $data = [], $trackable = null): self
     {
-        // Resolve the current HTTP request in a defensive way so console-driven
-        // contexts (for example PHPUnit or artisan commands) can still capture
-        // analytics records without encountering missing request bindings.
-        $request = app()->bound('request') ? request() : null;
-
-        // Ensure a stable session identifier even when the session manager is
-        // unavailable by falling back to a deterministic UUID for analytics
-        // correlation inside non-HTTP execution paths.
         $sessionId = null;
-        if (app()->bound('session')) {
-            $sessionStore = session();
-            if (method_exists($sessionStore, 'getId')) {
-                $sessionId = $sessionStore->getId();
+        $container = Container::getInstance();
+
+        if ($container->bound('session')) {
+            try {
+                /** @var SessionContract $session */
+                $session = $container->make('session');
+                if (method_exists($session, 'getId')) {
+                    $sessionId = $session->getId();
+                }
+            } catch (Throwable) {
+                $sessionId = null;
             }
         }
-        $sessionId ??= (string) Str::uuid();
+
+        $authId = null;
+        if ($container->bound('auth')) {
+            try {
+                /** @var AuthFactory $auth */
+                $auth = $container->make('auth');
+                $authId = $auth->guard()->id();
+            } catch (Throwable) {
+                $authId = null;
+            }
+        }
+
+        $requestUrl = null;
+        $requestReferrer = null;
+        $requestIp = null;
+        $requestUserAgent = null;
+        if ($container->bound('request')) {
+            try {
+                $request = $container->make('request');
+                if ($request instanceof Request) {
+                    $requestUrl = $request->fullUrl();
+                    $requestReferrer = $request->headers->get('referer');
+                    $requestIp = $request->ip();
+                    $requestUserAgent = $request->userAgent();
+                }
+            } catch (Throwable) {
+                $requestUrl = null;
+                $requestReferrer = null;
+                $requestIp = null;
+                $requestUserAgent = null;
+            }
+        }
+
+        if ($sessionId === null && function_exists('session')) {
+            try {
+                $helperSession = session();
+                if (is_object($helperSession) && method_exists($helperSession, 'getId')) {
+                    $sessionId = $helperSession->getId();
+                }
+            } catch (Throwable) {
+                $sessionId = null;
+            }
+        }
+
+        if ($authId === null && function_exists('auth')) {
+            try {
+                $authId = auth()->id();
+            } catch (Throwable) {
+                $authId = null;
+            }
+        }
+
+        if ($requestUrl === null && function_exists('request')) {
+            try {
+                $helperRequest = request();
+                if ($helperRequest instanceof Request) {
+                    $requestUrl = $helperRequest->fullUrl();
+                    $requestReferrer = $helperRequest->headers->get('referer');
+                    $requestIp = $helperRequest->ip();
+                    $requestUserAgent = $helperRequest->userAgent();
+                }
+            } catch (Throwable) {
+                $requestUrl = null;
+                $requestReferrer = null;
+                $requestIp = null;
+                $requestUserAgent = null;
+            }
+        }
+
+        if ($sessionId === null) {
+            $sessionId = (string) Str::uuid();
+        }
 
         $eventData = [
             'event_type' => $eventType,
             'session_id' => $sessionId,
-            'user_id' => auth()->id(),
-            'url' => $request?->fullUrl(),
-            'referrer' => $request?->headers->get('referer'),
-            'ip_address' => $request?->ip(),
-            'user_agent' => $request?->userAgent(),
+            'user_id' => $authId,
+            'url' => $requestUrl,
+            'referrer' => $requestReferrer,
+            'ip_address' => $requestIp,
+            'user_agent' => $requestUserAgent,
             'created_at' => now(),
             'updated_at' => now(),
         ];
