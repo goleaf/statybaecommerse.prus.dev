@@ -16,29 +16,25 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
 use UnitEnum;
 
 final class ActivityLogResource extends Resource
 {
-    use HasNav;
+    protected static string|UnitEnum|null $navigationGroup = 'System';
 
     protected static ?string $model = ActivityLog::class;
 
     protected static ?int $navigationSort = 9;
+
+    protected static ?string $recordTitleAttribute = 'description';
+
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
     protected static ?string $navigationLabel = null;
 
     protected static ?string $modelLabel = null;
 
     protected static ?string $pluralModelLabel = null;
-
-    protected static ?string $recordTitleAttribute = 'description';
-
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-document-text';
-    }
 
     public static function getNavigationLabel(): string
     {
@@ -101,7 +97,7 @@ final class ActivityLogResource extends Resource
             ->filters([
                 SelectFilter::make('log_name')
                     ->label(__('Log Name'))
-                    ->options(fn (): array => ActivityLog::query()
+                    ->options(fn (): array => \Spatie\Activitylog\Models\Activity::query()
                         ->select('log_name')
                         ->whereNotNull('log_name')
                         ->distinct()
@@ -109,7 +105,7 @@ final class ActivityLogResource extends Resource
                         ->toArray()),
                 SelectFilter::make('subject_type')
                     ->label(__('Subject Type'))
-                    ->options(fn (): array => ActivityLog::query()
+                    ->options(fn (): array => \Spatie\Activitylog\Models\Activity::query()
                         ->select('subject_type')
                         ->whereNotNull('subject_type')
                         ->distinct()
@@ -132,9 +128,15 @@ final class ActivityLogResource extends Resource
             ->actions([
                 Action::make('view_details')
                     ->label(__('View details'))
-                    ->modalHeading(fn (ActivityLog $record) => (string) ($record->description ?? __('Activity details')))
-                    ->modalSubheading(fn (ActivityLog $record) => (string) ($record->causer?->name ?? __('System')))
-                    ->modalContent(fn (ActivityLog $record) => view(
+                    ->modalHeading(fn (\Spatie\Activitylog\Models\Activity $record): string => (string) ($record->description ?? __('Activity details')))
+                    ->modalSubheading(function (\Spatie\Activitylog\Models\Activity $record): string {
+                        $name = data_get($record->causer, 'name');
+
+                        return is_string($name) && $name !== ''
+                            ? $name
+                            : __('System');
+                    })
+                    ->modalContent(fn (\Spatie\Activitylog\Models\Activity $record) => view(
                         'filament.resources.activity-log-resource.components.activity-details',
                         ['activity' => $record->loadMissing('causer', 'subject')]
                     ))
@@ -172,5 +174,10 @@ final class ActivityLogResource extends Resource
         return [
             'index' => Pages\ListActivityLogs::route('/'),
         ];
+    }
+
+    public static function getRecordTitleAttribute(): ?string
+    {
+        return self::$recordTitleAttribute;
     }
 }

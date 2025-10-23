@@ -11,12 +11,16 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Widgets\StatsOverviewWidget;
-use Illuminate\Contracts\Foundation\Application as ApplicationContract;
-use InvalidArgumentException;
+use Illuminate\Contracts\Foundation\Application;
 
 class AdminPanelProvider extends PanelProvider
 {
-    public function __construct(?ApplicationContract $app = null)
+    public function __construct(?Application $app = null)
+    {
+        parent::__construct($app ?? app());
+    }
+
+    public function panel(Panel $panel): Panel
     {
         if (app()->environment('testing')) {
             return $panel
