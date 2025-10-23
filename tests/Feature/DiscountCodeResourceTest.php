@@ -33,29 +33,29 @@ final class DiscountCodeResourceTest extends TestCase
 
         $this->actingAs($adminUser);
 
+        // Create lightweight pivot tables when running under SQLite-based test migrations.
         if (! Schema::hasTable('discount_redemptions')) {
-            Schema::create('discount_redemptions', function (Blueprint $table): void {
+            Schema::create('discount_redemptions', function ($table): void {
                 $table->id();
-                $table->foreignId('discount_id')->nullable()->constrained()->cascadeOnDelete();
-                $table->foreignId('code_id')->nullable()->constrained('discount_codes')->cascadeOnDelete();
-                $table->foreignId('order_id')->nullable()->constrained()->cascadeOnDelete();
-                $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+                $table->unsignedBigInteger('discount_id')->nullable();
+                $table->unsignedBigInteger('code_id')->nullable();
+                $table->unsignedBigInteger('order_id')->nullable();
+                $table->unsignedBigInteger('user_id')->nullable();
                 $table->decimal('amount_saved', 12, 2)->default(0);
-                $table->char('currency_code', 3)->nullable();
-                $table->timestamp('redeemed_at')->nullable();
+                $table->string('redemption_status')->default('pending');
                 $table->timestamps();
             });
         }
 
         if (! Schema::hasTable('discount_redemption_translations')) {
-            Schema::create('discount_redemption_translations', function (Blueprint $table): void {
+            Schema::create('discount_redemption_translations', function ($table): void {
                 $table->id();
-                $table->foreignId('discount_redemption_id')->constrained('discount_redemptions')->cascadeOnDelete();
+                $table->unsignedBigInteger('discount_redemption_id')->nullable();
                 $table->string('locale', 5);
                 $table->text('notes')->nullable();
+                $table->string('status_description')->nullable();
+                $table->json('metadata_description')->nullable();
                 $table->timestamps();
-
-                $table->unique(['discount_redemption_id', 'locale']);
             });
         }
     }
@@ -75,7 +75,7 @@ final class DiscountCodeResourceTest extends TestCase
     public function test_can_create_discount_code(): void
     {
         $discount = Discount::factory()->create();
-        $customerGroup = CustomerGroup::factory()->create();
+        $customerGroup = CustomerGroup::factory()->active()->create();
         $newDiscountCodeData = DiscountCode::factory()->make([
             'discount_id' => $discount->id,
             'code'        => 'TEST10',
@@ -181,8 +181,8 @@ final class DiscountCodeResourceTest extends TestCase
     public function test_can_filter_discount_codes_by_customer_group(): void
     {
         $discount = Discount::factory()->create();
-        $customerGroup1 = CustomerGroup::factory()->create(['name' => 'VIP']);
-        $customerGroup2 = CustomerGroup::factory()->create(['name' => 'Regular']);
+        $customerGroup1 = CustomerGroup::factory()->active()->create(['name' => 'VIP']);
+        $customerGroup2 = CustomerGroup::factory()->active()->create(['name' => 'Regular']);
 
         $code1 = DiscountCode::factory()->create([
             'discount_id'       => $discount->id,
@@ -265,11 +265,14 @@ final class DiscountCodeResourceTest extends TestCase
         Livewire::test(ListDiscountCodes::class)
             ->callTableAction('duplicate', $discountCode);
 
-        $this->assertDatabaseHas('discount_codes', [
-            'code'        => 'ORIGINAL_copy_' . time(),
-            'name'        => 'Original Code (Copy)',
-            'usage_count' => 0,
-        ]);
+        $duplicated = DiscountCode::withoutGlobalScopes()
+            ->where('code', 'like', 'ORIGINAL_copy_%')
+            ->latest('id')
+            ->first();
+
+        $this->assertNotNull($duplicated);
+        $this->assertSame('Original Code (Copy)', $duplicated->name);
+        $this->assertSame(0, $duplicated->usage_count);
     }
 
     public function test_can_bulk_activate_discount_codes(): void
@@ -325,7 +328,7 @@ final class DiscountCodeResourceTest extends TestCase
     public function test_discount_code_relationships(): void
     {
         $discount = Discount::factory()->create();
-        $customerGroup = CustomerGroup::factory()->create();
+        $customerGroup = CustomerGroup::factory()->active()->create();
         $discountCode = DiscountCode::factory()->create([
             'discount_id'       => $discount->id,
             'customer_group_id' => $customerGroup->id,

@@ -49,8 +49,7 @@
   storefront metrics while trimming duplicate queries from feature coverage.
 
 ## Admin panel resilience
-- Campaign click resource now ships with a timestamp picker, defaults conversion values to zero, and backfills missing data on save so marketers can create or import clicks without violating database constraints during tests or UI flows.
-- Campaign schedule administration exposes inactive records by default thanks to the new optional `active()` scope, so Filament listings, filters, and actions can manage every schedule without being blocked by the previous global ActiveScope.
+- Discount code resource actions now bypass storefront scopes, ensuring edits, toggles, duplicates, and bulk activation/deactivation succeed even when codes are hidden from customer-facing queries, and regression tests locate clones via scope-free lookups.
 - Attribute administration keeps validation rule strings verbatim, surfaces array-based rules as comma-separated chips, and pairs with regression tests that prove both paths round-trip correctly through Filament.
 - Attribute group filters, columns, and form selectors now share a translation fallback so legacy group slugs render as readable labels instead of raw keys throughout the Filament admin.
 - Cart item listings now synchronise the product filter with the underlying query builder, so filtered admin views, exports, and regression tests align on the same dataset.
