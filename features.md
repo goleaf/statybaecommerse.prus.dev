@@ -25,10 +25,7 @@
 - Order analytics scopes now hint the standalone created-at index, the orders table seeds that index on fresh installs, and the refined ActiveScope lets diagnostics seeders retain processing orders for regression coverage.
 - Discount rebuild migrations now temporarily relax foreign key checks only while replaying legacy rows, preventing the `discount_codes_created_by_foreign` MySQL error during full refreshes without sacrificing referential integrity.
 - User and author foreign keys on rebuilt discount tables now attach after verifying the `users` table compatibility, ensuring MySQL restores with mixed storage engines keep migrating without tripping the `discount_codes_created_by_foreign` system-table check.
-- Campaign click fixtures now exercise the same routes and timestamps across environments thanks to deterministic UTC formatting, ability-aware profile responses, and factory slugs that remain unique under SQLite.
-
-## Testing updates
-- Livewire resource tests now preload the custom widget tab components and alias Filament schema classes, eliminating missing component errors during the campaign product target suite.
+- User profile data contract exports now emit UTC timestamps and validate CSV/JSON payloads defensively, keeping the round-trip import/export workflow in sync with the documented fixtures.
 
 ## Discounts & promotions
 - Discount redemption listings now leverage a dedicated status scope branch so pending, redeemed, expired, and cancelled entries remain visible for Filament CRUD workflows, regression tests, and seeded demo data.
@@ -51,8 +48,7 @@
 ## Admin panel resilience
 - Discount code resource actions now bypass storefront scopes, ensuring edits, toggles, duplicates, and bulk activation/deactivation succeed even when codes are hidden from customer-facing queries, and regression tests locate clones via scope-free lookups.
 - Attribute administration keeps validation rule strings verbatim, surfaces array-based rules as comma-separated chips, and pairs with regression tests that prove both paths round-trip correctly through Filament.
-- Attribute group filters, columns, and form selectors now share a translation fallback so legacy group slugs render as readable labels instead of raw keys throughout the Filament admin.
-- Cart item listings now synchronise the product filter with the underlying query builder, so filtered admin views, exports, and regression tests align on the same dataset.
+- Filament dashboard tests spin up a minimal widget stack with a temporary Vite manifest and heroicon fallback while keeping full resource/page discovery active, and a dedicated admin authenticate middleware redirects guests to the Filament login screen, keeping feature coverage aligned with browser flows.
 - Filament dashboard access checks now fall back to open access when no
   permissions are configured and inline sparkline widgets respect the base
   nullable model contract, eliminating the latest regression tests failures.

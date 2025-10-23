@@ -38,17 +38,11 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Multilingual experience** across storefront and admin via `spatie/laravel-translatable`, Volt-powered Livewire pages, and localized seed data.
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
--### Latest updates
-- Discount code administration now saves edits, toggles, and bulk actions without storefront scopes blocking inactive records,
-  and duplication resets usage counts while tests locate the clone via scope-free queries.
-- Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
-  those values without forcing JSON, and new regression coverage keeps both storage paths stable.
-- Attribute group selectors now reuse a shared translation helper so historical slugs render as human-readable labels across Filament forms, filters, and tables instead of exposing raw keys.
-- Region-aware address tables and the dedicated `customers` dataset are back online for the SQLite harness, letting factories and
-  analytics widgets build customer journeys without missing foreign keys during PHPUnit runs.
-- SearchableInput payload macros are registered lazily with safer fallbacks, and the SQLite testing harness now spins up one
-  database per parallel worker so hydrate/clear flows avoid TypeErrors and filesystem locks during `php artisan test --parallel`.
-- Campaign click analytics, profile lookup, and category factory flows now have deterministic timestamps, consistent ability error payloads, and collision-free slugs so the API and factories behave the same under SQLite-driven test runs.
+### Latest updates
+- Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates those values without forcing JSON, and new regression coverage keeps both storage paths stable.
+- Region-aware address tables and the dedicated `customers` dataset are back online for the SQLite harness, letting factories and analytics widgets build customer journeys without missing foreign keys during PHPUnit runs.
+- SearchableInput payload macros are registered lazily with safer fallbacks, and the SQLite testing harness now spins up one database per parallel worker so hydrate/clear flows avoid TypeErrors and filesystem locks during `php artisan test --parallel`.
+- Filament dashboard smoke tests now boot a lightweight widget stack with a temporary Vite manifest and heroicon fallback while still discovering every resource/page during tests, and user profile contract exports emit deterministic UTC timestamps to keep the import/export suites green.
 - System setting translation records can once again be soft deleted, restored, and replicated thanks to the relaxed locale index and leaner fillable list that align with the documented API expectations.
 - Product review aggregates in the API now reuse eager-loaded counts and averages, eliminating redundant queries and
   keeping cached storefront metrics intact for the Product API regression suite.

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     /*
      * |--------------------------------------------------------------------------
@@ -137,7 +139,8 @@ return [
      * | reference any icon from any configured set.
      * |
      */
-    'fallback' => '',
+    // Provide a sane default icon so missing heroicons (such as the absent bullseye arrow) never trigger runtime errors.
+    'fallback' => 'heroicon-o-circle-stack',
 
     /*
      * |--------------------------------------------------------------------------

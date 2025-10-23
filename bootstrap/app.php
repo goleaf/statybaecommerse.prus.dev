@@ -313,7 +313,18 @@ $app = Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->render(function (AuthenticationException $exception, Request $request) {
             if (! RequestContext::isApiRequest($request)) {
-                return null;
+                if ($request->expectsJson()) {
+                    // Preserve JSON semantics for Sanctum guarded routes that hit the admin panel without a browser session.
+                    return response()->json(['message' => $exception->getMessage()], 401);
+                }
+
+                if (Route::has('filament.admin.auth.login')) {
+                    // Mirror Filament's default behaviour by redirecting guests to the admin login screen.
+                    return redirect()->guest(route('filament.admin.auth.login'));
+                }
+
+                // Fallback to the default login route so other guards keep working in tests.
+                return redirect()->guest(Route::has('login') ? route('login') : '/login');
             }
 
             $locale = RequestContext::resolveLocale($request);

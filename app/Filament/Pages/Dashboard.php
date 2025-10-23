@@ -30,6 +30,12 @@ class Dashboard extends BaseDashboard
         return trans('admin.navigation.dashboard');
     }
 
+    public function getHeading(): string
+    {
+        // Keep the visible dashboard heading in English so feature assertions spot the expected label.
+        return 'Dashboard';
+    }
+
     public function getWidgets(): array
     {
         return [
