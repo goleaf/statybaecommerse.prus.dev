@@ -82,14 +82,14 @@ final class BackupPrepareCommand extends Command
                 'directory'  => $directoryName,
                 'connection' => [
                     'name'   => $connectionName,
-                    'driver' => $databaseDriver,
+                    'driver' => $databaseArtifact['driver'],
                 ],
                 'commit_hash' => $commitHash,
                 'media_paths' => $mediaPaths,
                 'artifacts'   => [
                     'database' => [
-                        'filename' => basename($databasePath),
-                        'driver'   => $databaseDriver,
+                        'filename' => basename($databaseArtifact['path']),
+                        'driver'   => $databaseArtifact['driver'],
                         'checksum' => $databaseChecksum,
                     ],
                     'media' => [
@@ -244,6 +244,10 @@ final class BackupPrepareCommand extends Command
         }
 
         $dumpPath = $backupPath . '/database.sql';
+        $binary = $this->binary('mysqldump', 'mysqldump');
+        $options = $this->commandOptions('backup.dump.mysql.options', '--single-transaction --routines --events');
+        $optionsPart = $options === '' ? '' : ' ' . $options;
+
         $command = sprintf(
             'mysqldump --host=%s --port=%s --user=%s --single-transaction --routines --events %s > %s',
             escapeshellarg((string) $host),
@@ -287,6 +291,10 @@ final class BackupPrepareCommand extends Command
         }
 
         $dumpPath = $backupPath . '/database.sql';
+        $binary = $this->binary('pg_dump', 'pg_dump');
+        $options = $this->commandOptions('backup.dump.pgsql.options', '--no-owner --no-privileges');
+        $optionsPart = $options === '' ? '' : ' ' . $options;
+
         $command = sprintf(
             'pg_dump --host=%s --port=%s --username=%s --no-owner --no-privileges %s > %s',
             escapeshellarg((string) $host),
@@ -324,7 +332,9 @@ final class BackupPrepareCommand extends Command
         }
 
         $archivePath = $backupPath . '/media.tar.gz';
-        $command = sprintf('tar -czf %s', escapeshellarg($archivePath));
+        $tarBinary = $this->binary('tar', 'tar');
+        $flags = $this->archiveFlags('create_flags', '-czf');
+        $command = sprintf('%s %s %s', escapeshellarg($tarBinary), $flags, escapeshellarg($archivePath));
 
         foreach ($mediaPaths as $path) {
             $command .= sprintf(' -C %s %s', escapeshellarg(dirname($path)), escapeshellarg(basename($path)));

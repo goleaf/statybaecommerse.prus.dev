@@ -22,6 +22,30 @@ return [
         }, $paths);
     }),
 
+    'binaries' => [
+        'tar'       => env('BACKUP_TAR_BINARY', 'tar'),
+        'git'       => env('BACKUP_GIT_BINARY', 'git'),
+        'mysqldump' => env('BACKUP_MYSQLDUMP_BINARY', 'mysqldump'),
+        'mysql'     => env('BACKUP_MYSQL_BINARY', 'mysql'),
+        'pg_dump'   => env('BACKUP_PG_DUMP_BINARY', 'pg_dump'),
+        'psql'      => env('BACKUP_PSQL_BINARY', 'psql'),
+        'sqlite3'   => env('BACKUP_SQLITE3_BINARY', 'sqlite3'),
+    ],
+
+    'archive' => [
+        'create_flags'  => env('BACKUP_TAR_CREATE_FLAGS', '-czf'),
+        'extract_flags' => env('BACKUP_TAR_EXTRACT_FLAGS', '-xzf'),
+    ],
+
+    'dump' => [
+        'mysql' => [
+            'options' => env('BACKUP_MYSQLDUMP_OPTIONS', '--single-transaction --routines --events'),
+        ],
+        'pgsql' => [
+            'options' => env('BACKUP_PG_DUMP_OPTIONS', '--no-owner --no-privileges'),
+        ],
+    ],
+
     'verify' => [
         'working_path'    => env('BACKUP_VERIFY_WORKING_PATH', storage_path('app/backup-verify')),
         'connection_name' => env('BACKUP_VERIFY_CONNECTION', 'backup-verify'),

@@ -16,7 +16,11 @@ use Log;
 
 final class Kernel extends ConsoleKernel
 {
-    /** @phpstan-ignore-next-line */
+    /**
+     * @var array
+     *
+     * @phpstan-ignore-next-line missingType.iterableValue
+     */
     protected $commands = [
         \App\Console\Commands\BackupPrepareCommand::class,
         \App\Console\Commands\BackupVerifyCommand::class,
@@ -61,13 +65,13 @@ final class Kernel extends ConsoleKernel
         if (($prepareSchedule['enabled'] ?? true) === true) {
             $event = $schedule->command('backup:prepare');
 
-            $cronExpression = $prepareSchedule['cron'] ?? null;
-            $scheduledAt = $prepareSchedule['at'] ?? null;
+            $prepareCron = $prepareSchedule['cron'] ?? null;
+            $prepareAt = $prepareSchedule['at'] ?? null;
 
-            if (is_string($cronExpression) && $cronExpression !== '') {
-                $event->cron($cronExpression);
-            } elseif (is_string($scheduledAt) && $scheduledAt !== '') {
-                $event->dailyAt($scheduledAt);
+            if (is_string($prepareCron) && $prepareCron !== '') {
+                $event->cron($prepareCron);
+            } elseif (is_string($prepareAt) && $prepareAt !== '') {
+                $event->dailyAt($prepareAt);
             } else {
                 $event->daily();
             }
@@ -86,13 +90,13 @@ final class Kernel extends ConsoleKernel
         if (($verifySchedule['enabled'] ?? true) === true) {
             $event = $schedule->command('backup:verify');
 
-            $cronExpression = $verifySchedule['cron'] ?? null;
-            $scheduledAt = $verifySchedule['at'] ?? null;
+            $verifyCron = $verifySchedule['cron'] ?? null;
+            $verifyAt = $verifySchedule['at'] ?? null;
 
-            if (is_string($cronExpression) && $cronExpression !== '') {
-                $event->cron($cronExpression);
-            } elseif (is_string($scheduledAt) && $scheduledAt !== '') {
-                $event->dailyAt($scheduledAt);
+            if (is_string($verifyCron) && $verifyCron !== '') {
+                $event->cron($verifyCron);
+            } elseif (is_string($verifyAt) && $verifyAt !== '') {
+                $event->dailyAt($verifyAt);
             } else {
                 $event->daily();
             }
