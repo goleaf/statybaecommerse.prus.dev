@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\EnumManagementResource\Pages;
 use App\Models\EnumValue;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -42,22 +40,13 @@ final class EnumManagementResource extends Resource
 {
     protected static ?string $model = EnumValue::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
-
-    /** @var string|BackedEnum|null Pin enum tools to the shared System navigation section. */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
+    protected static ?string $navigationIcon = 'heroicon-o-squares-2x2';
 
     protected static ?int $navigationSort = 2;
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
-        // Share the navigation label via enum for localization consistency.
-        $group = self::$navigationGroup;
-
-        return $group instanceof NavigationGroup ? $group->label() : $group;
+        return trans('admin.enums.navigation_groups.system');
     }
 
     public static function getNavigationLabel(): string
@@ -170,12 +159,12 @@ final class EnumManagementResource extends Resource
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'navigation_group' => 'primary',
-                        'order_status'     => 'success',
-                        'payment_status'   => 'warning',
-                        'shipping_status'  => 'info',
-                        'user_role'        => 'danger',
-                        'product_status'   => 'secondary',
-                        default            => 'gray',
+                        'order_status' => 'success',
+                        'payment_status' => 'warning',
+                        'shipping_status' => 'info',
+                        'user_role' => 'danger',
+                        'product_status' => 'secondary',
+                        default => 'gray',
                     }),
                 TextColumn::make('key')
                     ->label(trans('admin.enums.form.fields.key'))
@@ -336,14 +325,14 @@ final class EnumManagementResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'       => Pages\ListEnumManagement::route('/'),
-            'create'      => Pages\CreateEnumManagement::route('/create'),
-            'view'        => Pages\ViewEnumManagement::route('/{record}'),
-            'edit'        => Pages\EditEnumManagement::route('/{record}/edit'),
-            'enums'       => Pages\ListEnums::route('/enums'),
+            'index' => Pages\ListEnumManagement::route('/'),
+            'create' => Pages\CreateEnumManagement::route('/create'),
+            'view' => Pages\ViewEnumManagement::route('/{record}'),
+            'edit' => Pages\EditEnumManagement::route('/{record}/edit'),
+            'enums' => Pages\ListEnums::route('/enums'),
             'create_enum' => Pages\CreateEnum::route('/enums/create'),
-            'view_enum'   => Pages\ViewEnum::route('/enums/{record}'),
-            'edit_enum'   => Pages\EditEnum::route('/enums/{record}/edit'),
+            'view_enum' => Pages\ViewEnum::route('/enums/{record}'),
+            'edit_enum' => Pages\EditEnum::route('/enums/{record}/edit'),
         ];
     }
 
@@ -383,8 +372,8 @@ final class EnumManagementResource extends Resource
     public static function getGlobalSearchResultDetails($record): array
     {
         return [
-            trans('admin.enums.form.fields.value')       => $record->value,
-            trans('admin.enums.form.fields.name')        => $record->name,
+            trans('admin.enums.form.fields.value') => $record->value,
+            trans('admin.enums.form.fields.name') => $record->name,
             trans('admin.enums.form.fields.description') => $record->description,
         ];
     }
