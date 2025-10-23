@@ -71,6 +71,10 @@ composer run dev
 | Frontend assets | `resources/views`, `resources/js`, `resources/css`, `tailwind.config.js`, `vite.config.js` | Uses Tailwind v4 + Vite; Livewire Volt pages bridge server-driven UI to the storefront. |
 | Quality & automation | `Makefile`, `composer.json` scripts, `package.json` scripts, `scripts/*.mjs`, `autofix-realtime.sh` | Make targets wrap Composer/NPM scripts; MCP tooling (`mcp/filament-docs-server.js`) serves Filament component docs locally. |
 
+### Developer tooling hygiene
+
+- Git hooks are bootstrapped through Husky's shim at `.husky/_/husky.sh`, ensuring every hook uses the repository-local Node toolchain while still surfacing the upstream deprecation warning for upcoming Husky major releases.
+
 ## Data and integration dependencies
 - **Caching & queues**: Redis (or Predis) backing Horizon for real-time metrics and queue execution.
 - **Search**: Toggle between database and Laravel Scout engines with `SEARCH_DRIVER`; keep `SCOUT_ENABLED=false` locally for SQL fallback, or enable Scout for Algolia/Meilisearch and rebuild indexes via `php artisan search:index`.
