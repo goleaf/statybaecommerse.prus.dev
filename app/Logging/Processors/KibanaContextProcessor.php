@@ -14,27 +14,44 @@ final class KibanaContextProcessor
         private readonly string $serviceName = '',
         private readonly string $environment = '',
         private readonly DateTimeZone $timezone = new DateTimeZone('UTC'),
-    ) {
-    }
+    ) {}
 
-    public function __invoke(LogRecord $record): LogRecord
+    public function __invoke(LogRecord|array $record): LogRecord|array
     {
-        $extra = $record->extra;
-
-        if ($record->datetime instanceof DateTimeInterface) {
-            $timestamp = $record->datetime->setTimezone($this->timezone)->format('Y-m-d\TH:i:s.v\Z');
-            $extra['@timestamp'] = $timestamp;
-        }
-
         $serviceName = $this->serviceName !== '' ? $this->serviceName : config('app.name', 'laravel');
         $environment = $this->environment !== '' ? $this->environment : (string) config('app.env', 'production');
+        $pid = getmypid();
 
-        $extra['service'] = [
-            'name' => $serviceName,
+        if ($record instanceof LogRecord) {
+            $timestamp = $record->datetime->setTimezone($this->timezone)->format('Y-m-d\TH:i:s.v\Z');
+
+            $extra = $record->extra;
+            $extra['@timestamp'] = $timestamp;
+            $extra['service'] = [
+                'name'        => $serviceName,
+                'environment' => $environment,
+            ];
+
+            if ($pid !== false) {
+                $extra['process']['pid'] = $pid;
+            }
+
+            return $record->with(extra: $extra);
+        }
+
+        if (($record['datetime'] ?? null) instanceof DateTimeInterface) {
+            /** @var DateTimeInterface $datetime */
+            $datetime = $record['datetime'];
+            $timestamp = $datetime->setTimezone($this->timezone)->format('Y-m-d\TH:i:s.v\Z');
+            $record['datetime'] = $timestamp;
+            $record['extra']['@timestamp'] = $timestamp;
+        }
+
+        $record['extra']['service'] = [
+            'name'        => $serviceName,
             'environment' => $environment,
         ];
 
-        $pid = getmypid();
         if ($pid !== false) {
             $extra['process'] = [
                 'pid' => $pid,

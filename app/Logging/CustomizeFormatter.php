@@ -15,20 +15,18 @@ final class CustomizeFormatter
 {
     private const DATE_FORMAT = 'Y-m-d\TH:i:s.vP';
 
-    public function __invoke(LoggerInterface $logger): void
+    public function __invoke(IlluminateLogger $logger): void
     {
-        if ($logger instanceof IlluminateLogger) {
-            $logger = $logger->getLogger();
-        }
+        $monolog = $logger->getLogger();
 
-        if (! $logger instanceof Logger) {
+        if (! $monolog instanceof Logger) {
             return;
         }
 
-        $logger->pushProcessor(new TraceContextProcessor());
-        $logger->pushProcessor(new KibanaContextProcessor());
+        $monolog->pushProcessor(new TraceContextProcessor);
+        $monolog->pushProcessor(new KibanaContextProcessor);
 
-        foreach ($logger->getHandlers() as $handler) {
+        foreach ($monolog->getHandlers() as $handler) {
             if (method_exists($handler, 'setFormatter')) {
                 $handler->setFormatter($this->createFormatter());
             }
