@@ -197,16 +197,20 @@ final class StockResource extends Resource
                 TernaryFilter::make('is_tracked')
                     ->label(__('inventory.tracked_only'))
                     ->native(false),
-                TernaryFilter::make('low_stock')
+                Filter::make('low_stock')
                     ->label(__('inventory.low_stock'))
-                    ->placeholder(__('inventory.all_stock_levels'))
-                    ->native(false)
-                    ->trueLabel(__('inventory.low_stock_only'))
-                    ->falseLabel(__('inventory.sufficient_stock_only'))
-                    ->queries(
-                        true: fn (Builder $query): Builder => $query->whereColumn('quantity', '<=', 'threshold'),
-                        false: fn (Builder $query): Builder => $query->whereColumn('quantity', '>', 'threshold'),
-                    ),
+                    ->form([
+                        Toggle::make('is_low_stock')
+                            ->label(__('inventory.low_stock_only')),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        if (! ($data['is_low_stock'] ?? false)) {
+                            return $query;
+                        }
+
+                        return $query->whereColumn('quantity', '<=', 'threshold');
+                    })
+                    ->indicateUsing(fn (array $data): ?string => ($data['is_low_stock'] ?? false) ? __('inventory.low_stock_only') : null),
             ])
             ->actions([
                 ViewAction::make(),
