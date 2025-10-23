@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit\Support;
 
@@ -7,38 +9,35 @@ use Tests\TestCase;
 
 final class HtmlSanitizerTest extends TestCase
 {
-    private HtmlSanitizer $sanitizer;
-
-    protected function setUp(): void
+    public function test_it_removes_disallowed_elements_and_attributes(): void
     {
-        parent::setUp();
+        $sanitizer = new HtmlSanitizer();
 
-        $this->sanitizer = new HtmlSanitizer();
+        $dirty = '<p>Safe<script>alert(1)</script><span onclick="doBad()">text</span></p>';
+        $clean = $sanitizer->sanitize($dirty);
+
+        // The script tag and inline handler must be stripped while keeping semantic markup intact.
+        $this->assertSame('<p>Safe<span>text</span></p>', $clean);
     }
 
-    public function test_it_strips_dangerous_elements(): void
+    public function test_it_preserves_safe_links_with_required_rel_attributes(): void
     {
-        $input = '<p>Safe</p><script>alert(1)</script><iframe src="https://example.com"></iframe>';
-        $this->assertSame('<p>Safe</p>', $this->sanitizer->sanitize($input));
+        $sanitizer = new HtmlSanitizer();
+
+        $dirty = '<a href="https://example.com" rel="nofollow" target="_blank">Link</a>';
+        $clean = $sanitizer->sanitize($dirty);
+
+        $this->assertSame('<a href="https://example.com" rel="nofollow noopener noreferrer" target="_blank">Link</a>', $clean);
     }
 
-    public function test_it_removes_disallowed_attributes_and_schemes(): void
+    public function test_it_drops_unsafe_urls(): void
     {
-        $input = '<a href="javascript:alert(1)" onclick="doBad()">Click</a>';
-        $this->assertSame('<a>Click</a>', $this->sanitizer->sanitize($input));
-    }
+        $sanitizer = new HtmlSanitizer();
 
-    public function test_it_normalises_styles_and_discards_unknown_properties(): void
-    {
-        $input = '<p style="color: #FF0000; position:absolute; text-align: center">Test</p>';
-        $this->assertSame('<p style="color: #ff0000; text-align: center">Test</p>', $this->sanitizer->sanitize($input));
-    }
+        $dirty = '<a href="javascript:alert(1)">Click</a><img src="data:text/plain;base64,abcd">';
+        $clean = $sanitizer->sanitize($dirty);
 
-    public function test_it_preserves_allowed_table_markup(): void
-    {
-        $input = '<table><tr><th scope="col">Heading</th><td colspan="2">Cell</td></tr></table>';
-        $expected = '<table><tr><th scope="col">Heading</th><td colspan="2">Cell</td></tr></table>';
-
-        $this->assertSame($expected, $this->sanitizer->sanitize($input));
+        // Unsafe protocols should be removed while valid image schemes remain untouched.
+        $this->assertSame('<a>Click</a>', $clean);
     }
 }

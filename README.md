@@ -10,6 +10,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Product catalogue management** with rich attribute, variant, bundle, and availability tooling powered by Filament resources.
 - **Customer- and order-centric workflows** including loyalty, referral, and recommendation engines surfaced through reusable services and widgets.
 - **Content & marketing** features such as news, landing pages, SEO metadata, and email campaign tooling with automated translations.
+- **Content safety guardrails** with a centralized HTML sanitization service, reusable Blade renderer, and `php artisan maintenance:sanitize-html` command for retrofitting stored markup.
 - **Operational dashboards** for activity logs, analytics, and background job health leveraging Laravel Horizon, Scout, and bespoke widgets.
 - **Feature flag governance** with Filament listings that expose inactive and disabled toggles for quick rollout audits and remediation.
 - **Multilingual experience** across storefront and admin via `spatie/laravel-translatable`, Volt-powered Livewire pages, and localized seed data.

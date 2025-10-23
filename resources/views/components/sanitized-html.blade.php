@@ -1,18 +1,16 @@
 @props([
-    'content' => null,
-    'tag' => null,
+    'content' => '',
+    'tag' => 'div',
 ])
 
+{{-- Render sanitized markup within a configurable wrapper tag. --}}
 @php
-    $html = $content instanceof \Illuminate\Support\HtmlString ? $content->toHtml() : ($content ?? '');
+    /** @var \App\Support\Html\HtmlSanitizer $sanitizer */
+    $sanitizer = app(\App\Support\Html\HtmlSanitizer::class);
+    $prepared = is_string($content) ? $content : ($content ?? '');
+    $sanitized = $prepared === '' ? '' : $sanitizer->sanitize($prepared);
 @endphp
 
-@if (blank($html))
-    {{-- No sanitized content to render. --}}
-@elseif ($tag)
-    <{{ $tag }} {!! $attributes !!}>{!! $html !!}</{{ $tag }}>
-@elseif ($attributes->isNotEmpty())
-    <div {!! $attributes !!}>{!! $html !!}</div>
-@else
-    {!! $html !!}
-@endif
+<{{ $tag }} {{ $attributes }}>
+    {!! $sanitized !!}
+</{{ $tag }}>

@@ -72,4 +72,23 @@ final class ProductTranslation extends Model
     {
         return $this->belongsTo(\App\Models\Product::class);
     }
+
+    protected static function booted(): void
+    {
+        static::saving(static function (ProductTranslation $translation): void {
+            /** @var HtmlSanitizer $sanitizer */
+            $sanitizer = app(HtmlSanitizer::class);
+
+            foreach (['description', 'short_description', 'summary'] as $field) {
+                $value = $translation->{$field};
+
+                if (! is_string($value) || trim($value) === '') {
+                    continue;
+                }
+
+                // Align translation payloads with the shared sanitizer policy.
+                $translation->{$field} = $sanitizer->sanitize($value);
+            }
+        });
+    }
 }
