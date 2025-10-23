@@ -9,7 +9,6 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\PartnerTierResource\Pages;
 use App\Models\PartnerTier;
 use Filament\Forms;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
@@ -36,7 +35,7 @@ final class PartnerTierResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([

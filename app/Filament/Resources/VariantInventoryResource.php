@@ -29,7 +29,6 @@ use Filament\Forms\Components\Select; // Select component import keeps dropdown 
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
@@ -68,7 +67,7 @@ final class VariantInventoryResource extends Resource
     /**
      * @var string|\BackedEnum|null Navigation icon configured for the inventory module.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-archive-box';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Inventory';
 
@@ -90,7 +89,7 @@ final class VariantInventoryResource extends Resource
     /**
      * Configure the Variant Inventory form schema for Filament administrators.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([

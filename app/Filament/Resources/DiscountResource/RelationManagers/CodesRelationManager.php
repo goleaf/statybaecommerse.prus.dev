@@ -6,7 +6,6 @@ namespace App\Filament\Resources\DiscountResource\RelationManagers;
 
 use App\Models\DiscountCode;
 use Filament\Forms;
-use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\DiscountCode;
 use App\Support\Filament\Components\Flatpickr;
@@ -30,7 +29,7 @@ final class CodesRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Codes';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([

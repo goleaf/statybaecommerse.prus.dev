@@ -8,7 +8,6 @@ use App\Services\Shared\ComponentPerformanceService;
 use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
-use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
@@ -85,7 +84,7 @@ final class CacheMaintenance extends Page
         return (bool) ($user->is_admin ?? false);
     }
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         // Embrace the Filament v4 return contract so downstream tooling can rely on a `Form` instance.

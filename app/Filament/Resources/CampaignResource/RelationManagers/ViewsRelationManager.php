@@ -10,7 +10,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -27,7 +26,7 @@ final class ViewsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Campaign Views';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
         return $schema->schema([
             TextInput::make('session_id')

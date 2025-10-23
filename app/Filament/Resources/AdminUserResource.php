@@ -19,7 +19,6 @@ use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Schema;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -71,7 +70,7 @@ final class AdminUserResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation on the provided Form instance for v4 compliance.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             Section::make(__('admin.admin_users.form.sections.basic_information'))

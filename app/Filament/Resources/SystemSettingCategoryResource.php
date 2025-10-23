@@ -25,7 +25,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
@@ -42,6 +41,7 @@ use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Filament\Schemas\Schema;
 use UnitEnum;
 
 use Filament\Schemas\Schema;
@@ -60,7 +60,7 @@ final class SystemSettingCategoryResource extends Resource
     /**
      * @var string|\UnitEnum|null Keep navigation grouping aligned with the shared enum helper.
      */
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::System;
+    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::System;
 
     public static function getNavigationGroup(): ?string
     {
@@ -103,7 +103,7 @@ final class SystemSettingCategoryResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([

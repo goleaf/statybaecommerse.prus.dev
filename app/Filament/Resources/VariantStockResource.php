@@ -23,7 +23,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
@@ -49,7 +48,7 @@ final class VariantStockResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Inventory';
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             Section::make('Stock Details')

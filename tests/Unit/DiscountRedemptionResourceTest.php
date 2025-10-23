@@ -3,37 +3,24 @@
 declare(strict_types=1);
 
 use App\Filament\Resources\DiscountRedemptionResource;
-use App\Support\Nav;
-use Filament\Forms\Form;
-use Filament\Support\Contracts\TranslatableContentDriver;
-use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Schemas\Schema;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 
-function makeTestTable(): Table
-{
-    // Provide a minimal HasTable implementation so Filament can construct the table during the unit test.
-    $component = new class implements HasTable
-    {
-        use InteractsWithTable;
-
-        public function makeFilamentTranslatableContentDriver(): ?TranslatableContentDriver
-        {
-            // Return null because translation handling is irrelevant for these simple unit assertions.
-            return null;
-        }
-    };
-
-    return Table::make($component);
-}
+afterEach(function (): void {
+    // Ensure Mockery expectations are cleaned up between tests for deterministic runs.
+    \Mockery::close();
+});
 
 it('can create form', function (): void {
-    $form = DiscountRedemptionResource::form(Form::make());
-    expect($form)->toBeInstanceOf(Form::class);
+    $form = DiscountRedemptionResource::form(Schema::make());
+    expect($form)->toBeInstanceOf(Schema::class);
 });
 
 it('can create table', function (): void {
-    $table = DiscountRedemptionResource::table(makeTestTable());
+    $table = DiscountRedemptionResource::table(Table::make(
+        \Mockery::mock(HasTable::class)->shouldIgnoreMissing(),
+    ));
     expect($table)->toBeInstanceOf(Table::class);
 });
 
@@ -42,9 +29,8 @@ it('has correct model', function (): void {
 });
 
 it('has correct navigation group', function (): void {
-    expect(DiscountRedemptionResource::getNavigationGroup())->toBe(
-        Nav::groupForResource(DiscountRedemptionResource::class)
-    );
+    // The resource now lives under the Discounts cluster to mirror Filament navigation.
+    expect(DiscountRedemptionResource::getNavigationGroup())->toBe('Discounts');
 });
 
 it('has correct navigation icon', function (): void {
@@ -52,9 +38,7 @@ it('has correct navigation icon', function (): void {
 });
 
 it('has correct navigation sort', function (): void {
-    expect(DiscountRedemptionResource::getNavigationSort())->toBe(
-        Nav::sortForResource(DiscountRedemptionResource::class)
-    );
+    expect(DiscountRedemptionResource::getNavigationSort())->toBeNull();
 });
 
 it('has correct pages', function (): void {

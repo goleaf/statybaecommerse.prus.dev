@@ -15,7 +15,6 @@ use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Schema;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -39,7 +38,7 @@ final class PriceResource extends Resource
 
     protected static ?int $navigationSort = 12;
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([

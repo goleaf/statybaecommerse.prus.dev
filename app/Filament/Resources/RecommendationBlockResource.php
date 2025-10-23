@@ -19,7 +19,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Novadaemon\FilamentCombobox\Combobox;
@@ -30,6 +29,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Schemas\Schema;
 use UnitEnum;
 
 use Filament\Schemas\Schema;
@@ -48,7 +48,7 @@ final class RecommendationBlockResource extends Resource
     /**
      * @var string|\UnitEnum|null Tracks the navigation group while remaining Filament compatible.
      */
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Products;
+    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 13;
 
@@ -90,7 +90,7 @@ final class RecommendationBlockResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             Section::make(__('recommendation_blocks.basic_information'))

@@ -12,7 +12,6 @@ use App\Filament\Resources\ReferralRewardLogs\Schemas\ReferralRewardLogForm;
 use App\Filament\Resources\ReferralRewardLogs\Tables\ReferralRewardLogsTable;
 use App\Models\ReferralRewardLog;
 use BackedEnum;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -28,7 +27,7 @@ class ReferralRewardLogResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return ReferralRewardLogForm::configure($schema);
     }

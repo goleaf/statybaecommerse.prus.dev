@@ -11,7 +11,6 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -28,7 +27,7 @@ final class ConversionsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Campaign Conversions';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
         return $schema->schema([
             Select::make('conversion_type')

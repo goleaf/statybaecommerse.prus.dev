@@ -11,7 +11,6 @@ use App\Filament\Resources\ProductSimilarities\Pages\EditProductSimilarity;
 use App\Filament\Resources\ProductSimilarities\Pages\ListProductSimilarities;
 use App\Models\ProductSimilarity;
 use BackedEnum;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -27,7 +26,7 @@ class ProductSimilarityResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return ProductSimilarityForm::configure($schema);
     }

@@ -16,7 +16,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Schema;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -27,7 +26,7 @@ class CartItemsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'cartItems';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([

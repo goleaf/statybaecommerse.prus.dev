@@ -13,7 +13,6 @@ use App\Filament\Resources\NewsCategories\Schemas\NewsCategoryForm;
 use App\Filament\Resources\NewsCategories\Tables\NewsCategoriesTable;
 use App\Models\NewsCategory;
 use BackedEnum;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
@@ -43,7 +42,7 @@ final class NewsCategoryResource extends Resource
         return $group instanceof NavigationGroup ? $group->label() : $group;
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return NewsCategoryForm::configure($schema);
     }

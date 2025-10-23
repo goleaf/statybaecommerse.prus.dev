@@ -12,7 +12,6 @@ use App\Filament\Resources\Countries\Pages\ViewCountry;
 use App\Filament\Resources\Countries\Schemas\CountryForm;
 use App\Filament\Resources\Countries\Tables\CountriesTable;
 use App\Models\Country;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
@@ -47,7 +46,7 @@ final class CountryResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         return CountryForm::configure($schema);
     }

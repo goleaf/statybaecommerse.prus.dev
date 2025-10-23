@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Resources\CustomerGroupResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Forms;
 use Filament\Schemas\Schema;
@@ -20,7 +19,7 @@ final class DiscountsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'customer_groups.relation_discounts';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([

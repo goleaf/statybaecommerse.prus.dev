@@ -7,7 +7,6 @@ namespace App\Filament\Resources\CountryResource\RelationManagers;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\User;
 use Filament\Forms;
-use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -22,7 +21,7 @@ final class UsersRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Users';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([

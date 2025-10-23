@@ -10,7 +10,6 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -25,7 +24,7 @@ final class CustomerSegmentsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Customer Segments';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
         return $schema->schema([
             Select::make('customer_group_id')

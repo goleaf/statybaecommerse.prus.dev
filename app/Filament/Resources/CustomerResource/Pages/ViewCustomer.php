@@ -13,6 +13,7 @@ use App\Models\Review;
 use Filament\Actions;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Schemas\Schema;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Schema;
@@ -35,7 +36,7 @@ final class ViewCustomer extends ViewRecord
         ];
     }
 
-    public function infolist(Schema $infolist): Schema
+    public function infolist(Schema $schema): Schema
     {
         return $schema->schema([
             ListEntry::make('customerQuickLinks')
