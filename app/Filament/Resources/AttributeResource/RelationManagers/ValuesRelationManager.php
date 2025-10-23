@@ -19,7 +19,7 @@ final class ValuesRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Attribute Values';
 
-    public function form(Schema $form): Schema
+    public function form(Form $form): Form
     {
         return $schema
             ->schema([
@@ -37,7 +37,7 @@ final class ValuesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('value')

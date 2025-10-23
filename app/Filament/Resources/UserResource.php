@@ -130,7 +130,7 @@ final class UserResource extends Resource implements DefinesExportColumns
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -216,7 +216,7 @@ final class UserResource extends Resource implements DefinesExportColumns
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         $formats = config('export.formats', []);
 

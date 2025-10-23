@@ -19,7 +19,7 @@ final class CommentsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Comments';
 
-    public function form(Schema $form): Schema
+    public function form(Form $form): Form
     {
         return $schema
             ->components([
@@ -52,7 +52,7 @@ final class CommentsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('content')

@@ -20,7 +20,7 @@ final class ConditionsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Conditions';
 
-    public function form(Schema $form): Schema
+    public function form(Form $form): Form
     {
         return $schema
             ->schema([
@@ -62,7 +62,7 @@ final class ConditionsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('type')

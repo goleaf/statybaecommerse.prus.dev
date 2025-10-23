@@ -191,7 +191,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
     /**
      * Configure the comprehensive form schema with advanced features.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return $form->schema([
             Section::make(__('orders.sections.order_details'))
@@ -573,7 +573,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
     /**
      * Configure the comprehensive table with advanced features.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         $formats = config('export.formats', []);
 

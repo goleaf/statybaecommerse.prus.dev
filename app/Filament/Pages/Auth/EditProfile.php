@@ -18,7 +18,7 @@ use Filament\Schemas\Schema;
 
 class EditProfile extends BaseEditProfile
 {
-    public function form(Schema $form): Schema
+    public function form(Form $form): Form
     {
         return $schema
             ->components([

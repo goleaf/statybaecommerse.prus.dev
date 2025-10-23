@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Enums\NavigationGroup;
+use BackedEnum;
+use UnitEnum;
 use App\Filament\Resources\VariantPriceHistoryResource\Pages;
 use App\Models\VariantPriceHistory;
 use App\Support\Filament\Components\Flatpickr;
@@ -23,10 +25,10 @@ final class VariantPriceHistoryResource extends Resource
     /**
      * Navigation icon override (string|\BackedEnum|null) for Filament v4 alignment.
      */
-    protected static $navigationIcon = 'heroicon-o-currency-euro';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-currency-euro';
 
-    /** @var string|\BackedEnum|null Navigation grouping centralized via enum. */
-    protected static $navigationGroup = NavigationGroup::System;
+    /** @var UnitEnum|string|null Navigation grouping centralized via enum. */
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 20;
 

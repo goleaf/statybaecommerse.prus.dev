@@ -25,12 +25,12 @@ class ReferralRewardLogResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return ReferralRewardLogForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return ReferralRewardLogsTable::configure($table);
     }

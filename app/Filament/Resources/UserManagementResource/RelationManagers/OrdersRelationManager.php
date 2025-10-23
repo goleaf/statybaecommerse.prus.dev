@@ -25,7 +25,7 @@ final class OrdersRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Orders';
 
-    public function form(Schema $form): Schema
+    public function form(Form $form): Form
     {
         return $form
             ->components([
@@ -49,8 +49,9 @@ final class OrdersRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
+        // Filament 4 expects the fluent Table builder, so we configure it before returning.
         return $table
             ->recordTitleAttribute('number')
             ->columns([

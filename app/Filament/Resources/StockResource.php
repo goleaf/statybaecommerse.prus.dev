@@ -69,7 +69,7 @@ final class StockResource extends Resource
         return __('inventory.single');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return $form->schema([
             Section::make(__('inventory.product_information'))
@@ -140,7 +140,7 @@ final class StockResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

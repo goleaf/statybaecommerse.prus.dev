@@ -23,7 +23,7 @@ final class ViewsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Campaign Views';
 
-    public function form(Schema $form): Schema
+    public function form(Form $form): Form
     {
         return $schema->schema([
             TextInput::make('session_id')
@@ -47,7 +47,7 @@ final class ViewsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

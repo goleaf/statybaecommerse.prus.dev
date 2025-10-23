@@ -21,7 +21,7 @@ final class RecentSlidersWidget extends BaseWidget
 
     protected int|string|array $columnSpanFull = 'full';
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->query(

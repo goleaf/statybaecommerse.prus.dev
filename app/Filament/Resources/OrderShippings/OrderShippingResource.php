@@ -26,12 +26,12 @@ class OrderShippingResource extends Resource
 
     
 
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return OrderShippingForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return OrderShippingsTable::configure($table);
     }

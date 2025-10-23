@@ -38,7 +38,7 @@ final class ChildrenRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Sub Categories';
 
-    public function form(Schema $form): Schema
+    public function form(Form $form): Form
     {
         return $schema->schema([
             Section::make(__('system_setting_categories.children.basic_information'))
@@ -95,7 +95,7 @@ final class ChildrenRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

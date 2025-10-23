@@ -48,9 +48,6 @@ final class CompanyResource extends Resource
         return __('companies.single');
     }
 
-    /**
-     * Build the form schema for creating and editing companies.
-     */
     public static function form(Form $form): Form
     {
         return $form->schema([

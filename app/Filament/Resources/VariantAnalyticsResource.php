@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Enums\NavigationGroup;
 use BackedEnum;
+use UnitEnum;
 use App\Filament\Resources\VariantAnalyticsResource\Pages;
 use App\Models\ProductVariant;
 use App\Models\VariantAnalytics;
@@ -52,10 +53,10 @@ final class VariantAnalyticsResource extends Resource
      *
      * @var string|\BackedEnum|null
      */
-    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    /** @var string|\BackedEnum|null Ensure inventory analytics stay grouped centrally. */
-    protected static $navigationGroup = NavigationGroup::Inventory;
+    /** @var UnitEnum|string|null Ensure inventory analytics stay grouped centrally. */
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Inventory;
 
     public static function getNavigationGroup(): string|UnitEnum|null
     {

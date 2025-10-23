@@ -30,7 +30,7 @@ final class RedemptionsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Redemptions';
 
-    public function form(Schema $form): Schema
+    public function form(Form $form): Form
     {
         return $form->schema([
             Section::make('Redemption Details')
@@ -90,7 +90,7 @@ final class RedemptionsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('code.code')

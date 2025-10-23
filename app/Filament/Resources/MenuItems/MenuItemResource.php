@@ -24,13 +24,13 @@ class MenuItemResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         // Delegate field layout to the dedicated schema configurator for reuse.
         return MenuItemForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         // Centralise column configuration in the shared table builder.
         return MenuItemsTable::configure($table);

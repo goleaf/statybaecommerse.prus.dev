@@ -20,7 +20,7 @@ class RecentDiscountRedemptionsWidget extends BaseWidget
 
     protected ?string $pollingInterval = '30s';
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->query(

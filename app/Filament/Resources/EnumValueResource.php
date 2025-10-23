@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Enums\NavigationGroup;
+use BackedEnum;
+use UnitEnum;
 use App\Filament\Resources\EnumValueResource\Pages;
 use BackedEnum;
 use App\Models\EnumValue;
@@ -39,11 +41,11 @@ final class EnumValueResource extends Resource
 
     protected static ?string $model = EnumValue::class;
 
-    /** @var string|\BackedEnum|null Provide a consistent icon for value maintenance. */
-    protected static $navigationIcon = 'heroicon-o-squares-2x2';
+    /** @var BackedEnum|string|null Provide a consistent icon for value maintenance. */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
 
-    /** @var string|\BackedEnum|null Keep enum value tools inside the System cluster. */
-    protected static $navigationGroup = NavigationGroup::System;
+    /** @var UnitEnum|string|null Keep enum value tools inside the System cluster. */
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
 
     public static function getNavigationGroup(): ?string
     {

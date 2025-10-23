@@ -27,7 +27,7 @@ final class PricesRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Prices';
 
-    public function form(Schema $form): Schema
+    public function form(Form $form): Form
     {
         return $schema
             ->components([
@@ -66,7 +66,7 @@ final class PricesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('amount')

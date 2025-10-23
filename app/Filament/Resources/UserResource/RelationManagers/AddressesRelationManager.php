@@ -30,7 +30,7 @@ class AddressesRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Addresses';
 
-    public function form(Schema $form): Schema
+    public function form(Form $form): Form
     {
         return $schema
             ->components([
@@ -72,7 +72,7 @@ class AddressesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

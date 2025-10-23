@@ -26,7 +26,7 @@ final class NewsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'News';
 
-    public function form(Schema $form): Schema
+    public function form(Form $form): Form
     {
         return $schema
             ->schema([
@@ -57,7 +57,7 @@ final class NewsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('title')
