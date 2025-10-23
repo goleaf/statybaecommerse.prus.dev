@@ -58,6 +58,11 @@ final class VariantAnalyticsResource extends Resource
 {
     protected static ?string $model = VariantAnalytics::class;
 
+    /**
+     * Icon displayed in the Filament navigation sidebar.
+     *
+     * @var string|BackedEnum|null Navigation icon identifier.
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';

@@ -34,7 +34,9 @@ final class ReferralResource extends Resource
     protected static ?string $model = Referral::class;
 
     /**
-     * Navigation icon for the resource.
+     * Icon displayed in the Filament navigation sidebar.
+     *
+     * @var string|BackedEnum|null Navigation icon identifier.
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-share';
 
