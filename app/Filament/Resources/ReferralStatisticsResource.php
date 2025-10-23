@@ -220,11 +220,11 @@ final class ReferralStatisticsResource extends Resource
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
                             ->when(
-                                $data['from'],
+                                $data['from'] ?? null,
                                 fn (Builder $query, $date): Builder => $query->whereDate('date', '>=', $date),
                             )
                             ->when(
-                                $data['until'],
+                                $data['until'] ?? null,
                                 fn (Builder $query, $date): Builder => $query->whereDate('date', '<=', $date),
                             );
                     }),
