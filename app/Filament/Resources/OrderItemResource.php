@@ -8,19 +8,20 @@ use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\OrderItemResource\Pages;
 use App\Models\OrderItem;
 use App\Models\Product;
-use App\Support\Filament\ProductVariantFieldHelper;
+use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
-use App\Support\Filament\SearchableInputHelper;
+use App\Support\Filament\ProductVariantFieldHelper;
 use App\Support\Search\ProductSearch;
 use App\Support\Search\ProductVariantSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Get;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -33,8 +34,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
 
 /**
  * OrderItemResource
@@ -191,9 +190,9 @@ final class OrderItemResource extends Resource
                                 ->searchUsing(fn (string $value): array => ProductVariantSearch::results($value))
                                 ->dehydrateStateUsing(fn (?string $value): ?int => $value !== null && $value !== '' ? (int) $value : null)
                                 ->reactive()
-                                // Refer to docs/filament/variant-lookup-helpers.md for helper usage guidance.
+                                // Refer to docs/filament/searchable-inputs.md for helper usage guidance and payload expectations.
                                 ->afterStateHydrated(fn (SearchableInput $component, ?int $state) => ProductVariantFieldHelper::hydrateSearchableVariant($component, $state))
-                                ->afterStateUpdated(fn (?string $state, Set $set, Get $get) => ProductVariantFieldHelper::handleVariantSelection($state, $set, $get)),
+                                ->afterStateUpdated(fn (SearchableInput $component, ?string $state, Set $set, Get $get) => ProductVariantFieldHelper::handleVariantSelection($state, $set, $get, $component)),
                             TextInput::make('name')
                                 ->label(__('order_items.product_name'))
                                 ->maxLength(255),
@@ -325,7 +324,7 @@ final class OrderItemResource extends Resource
                     ->form([
                         Flatpickr::makeRange('range')
                             ->label(__('order_items.created_at'))
-                            
+
                             ->format('Y-m-d')
                             ->displayFormat('Y-m-d'),
                     ])

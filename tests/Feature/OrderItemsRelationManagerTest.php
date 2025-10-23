@@ -323,7 +323,9 @@ final class OrderItemsRelationManagerTest extends TestCase
             ->assertHasFormErrors(['quantity']);
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function it_clears_variant_lookup_and_snapshot_fields_when_selection_is_removed(): void
     {
         $this->actingAs($this->user);
