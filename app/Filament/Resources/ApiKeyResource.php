@@ -40,6 +40,9 @@ final class ApiKeyResource extends Resource
 
     protected static ?string $navigationLabel = 'api_keys.navigation.label';
 
+    /**
+     * @var string|BackedEnum|null Icon identifier displayed in the navigation menu.
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-key';
 
     protected static UnitEnum|string|null $navigationGroup = null;
@@ -224,7 +227,7 @@ final class ApiKeyResource extends Resource
                         $credentials = ApiKey::generateCredentials();
 
                         $record->forceFill([
-                            'key' => $credentials['hashed'],
+                            'key'          => $credentials['hashed'],
                             'last_used_at' => null,
                         ])->save();
 
@@ -246,9 +249,9 @@ final class ApiKeyResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListApiKeys::route('/'),
+            'index'  => Pages\ListApiKeys::route('/'),
             'create' => Pages\CreateApiKey::route('/create'),
-            'edit' => Pages\EditApiKey::route('/{record}/edit'),
+            'edit'   => Pages\EditApiKey::route('/{record}/edit'),
         ];
     }
 }
