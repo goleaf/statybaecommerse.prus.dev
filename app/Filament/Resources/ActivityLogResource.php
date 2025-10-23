@@ -7,9 +7,7 @@ namespace App\Filament\Resources;
 use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\ActivityLogResource\Pages;
 use App\Models\ActivityLog;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Actions\Action;
+use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -26,8 +24,11 @@ final class ActivityLogResource extends Resource
 {
     protected static ?string $model = ActivityLog::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
+    /**
+     * Align the navigation icon property with Filament's typed base declaration so runtime
+     * package discovery does not crash when reflecting on the resource hierarchy.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
 
     protected static ?int $navigationSort = 9;
 
@@ -62,13 +63,12 @@ final class ActivityLogResource extends Resource
     }
 
     /**
-     * Define the create/edit form schema using the Filament v4 Form API.
-     * The resource remains read-only for now, so we return an empty schema
+     * Define the create/edit form schema using the Filament v4 Schema contract.
+     * The resource remains read-only for now, so we still return an empty schema
      * while keeping the hook available for future enhancements.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Configure the Filament resource form schema using the v4 Schema API.
         return $schema->schema([]);
     }
 

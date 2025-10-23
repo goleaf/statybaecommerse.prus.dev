@@ -46,4 +46,7 @@
 - Reinstated the Husky shared bootstrap script so Git hooks run without deprecation notices or missing PATH exports during repository installs.
 - Captured the `sh -n .husky/_/husky.sh` smoke check that verifies the restored script syntax before publishing commits.
 - Removed the deprecated Husky v10 warning stub that overwrote the shim so local Git hooks keep executing through the repository toolchain instead of exiting early.
-- Extended the Schema-based signature normalization across Address and AdminUser resources so autoload discovery no longer crashes on mismatched form/table contracts.
+- Normalized the storefront JSON contracts, CSS widgets, and shared JavaScript bundles with Prettier so `npm run lint` succeeds without manual intervention in local setups.
+- Updated the Address resource form/table signatures to the Filament v4 Schema API, removing package discovery fatals and keeping static analysis parsers satisfied.
+- Matched the Activity Log resource navigation icon property type with Filament's union declaration to unblock composer script discovery and downstream tooling runs.
+- Migrated the Admin User resource to Filament's Schema-based form/table signatures so composer autoload discovery and static analysis no longer encounter legacy Form return types.

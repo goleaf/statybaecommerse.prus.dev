@@ -101,10 +101,8 @@ final class AddressResource extends Resource
     }
 
     /**
-     * Configure the Filament form by relying on the canonical Form contract.
-     *
-     * Keeping the Form wrapper avoids mismatches with auto-discovery checks that expect Filament
-     * resource signatures to follow the documented `Form $form` pattern during application boot.
+     * Configure the Filament form schema using the Schema contract shipped in v4 so
+     * the resource stays compatible with the upstream signature expectations.
      */
     public static function form(Form $form): Form
     {
@@ -334,10 +332,8 @@ final class AddressResource extends Resource
     }
 
     /**
-     * Configure the Filament table with comprehensive columns, filters, and actions.
-     *
-     * Returning a concrete Table instance aligns with Filament v4's stricter type expectations
-     * enforced during package discovery.
+     * Configure the Filament table while returning the provided Table instance so the
+     * resource method signature aligns with Filament v4's stricter contract.
      */
     public static function table(Table $table): Table
     {
