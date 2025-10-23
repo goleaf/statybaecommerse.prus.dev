@@ -28,7 +28,7 @@ final class GenerateReportsJob implements ShouldQueue
     public int $tries = 3;
 
     /**
-     * @param  array<string, mixed>  $filters
+     * @param array<string, mixed> $filters
      */
     public function __construct(
         private readonly string $type,
@@ -147,7 +147,8 @@ final class GenerateReportsJob implements ShouldQueue
     }
 
     /**
-     * @param  callable(array<string, mixed>):string  $formatter
+     * @param callable(array<string, mixed>):string $formatter
+     *
      * @return array<string, mixed>
      */
     private function writeReport(string $filename, array $data, callable $formatter): array
@@ -168,7 +169,7 @@ final class GenerateReportsJob implements ShouldQueue
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $rows
+     * @param array<int, array<string, mixed>> $rows
      */
     private function formatPayload(array $rows): string
     {
@@ -196,7 +197,7 @@ final class GenerateReportsJob implements ShouldQueue
     }
 
     /**
-     * @param  array<string, mixed>  $report
+     * @param array<string, mixed> $report
      * @return array<int, array<string, mixed>>
      */
     private function flattenSystemReport(array $report): array

@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Models\VariantInventory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use App\Support\Storage\SecureStorage;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -30,7 +29,7 @@ final class GenerateStockExport implements ShouldQueue
     public int $tries = 3;
 
     /**
-     * @param  array<string, mixed>  $filters
+     * @param array<string, mixed> $filters
      */
     public function __construct(
         private readonly array $filters,
@@ -54,7 +53,7 @@ final class GenerateStockExport implements ShouldQueue
      */
     public function handle(): void
     {
-        $disk = Storage::disk(SecureStorage::disk());
+        $disk = Storage::disk('public');
         if (! $disk->exists('exports')) {
             $disk->makeDirectory('exports');
         }
