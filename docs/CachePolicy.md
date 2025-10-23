@@ -30,10 +30,11 @@ Legacy helpers (`CacheKeys::productTag($id)`, `CacheKeys::homeTag()`, and simila
 
 ## Invalidation Rules
 
-- The `App\Services\CacheInvalidationService` is the single entry point for cache flushing. Observers and service hooks call `flushForModel()` so changing a `Product`, `Category`, `Brand`, or `Collection` automatically clears the correct tag groups.
-- Product mutations therefore clear featured, trending, navigation, and dashboard caches through the shared product tag group. Category mutations flush category and related product caches, and so on.
-- Dashboard metrics rely on short TTLs but still receive `CacheTagHelper::dashboards()` so forced refreshes happen instantly during deployments or data imports.
-- When cache tags are unavailable (for example, while using the array driver) the invalidation service logs the issue and falls back to targeted key resets. Product events clear the `home:*` shelves, featured lists, and related product entries per locale and currency, while categories, brands, and collections drop their respective navigation trees and showcase caches.
+- Product mutations should clear featured, trending, and navigation caches using the product/category/brand tags.
+- Category structure changes must clear navigation trees (`CacheKeys::categoryNavigationTree()`) and home catalogue lookups.
+- Dashboard metrics rely on short TTLs but still respect `CacheKeys::dashboardTag()` for forced refreshes during deployments.
+- Product, user, and order observers flush the aggregate tags above on `created`, `updated`, `deleted`, `restored`, and `forceDeleted` so repository counts and dashboard snapshots never drift. When cache tags are unavailable (e.g. array store), the observers fall back to forgetting `CacheKeys::productTotalCount()`, `CacheKeys::userTotalCount()`, and the locale-aware dashboard metric keys.
+- The `CacheInvalidationService` coordinates fallback invalidation when drivers do not support tags by clearing home shelves, collection showcases, navigation menus, and dashboard metrics via `Cache::forget()` calls that leverage the helper builders. This prevents us from flushing the entire cache store when using the array/file driver while still keeping storefront widgets in sync.
 
 Where Redis tags are unavailable, fall back to targeted `Cache::forget()` calls that leverage the centralized builders.
 

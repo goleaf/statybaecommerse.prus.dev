@@ -11,211 +11,334 @@ use App\Models\Product;
 use App\Observers\Concerns\ResolvesSupportedLocales;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTagHelper;
-use Illuminate\Cache\TaggableStore;
+use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
 /**
- * Centralized cache tag invalidation service responsible for flushing storefront and dashboard caches.
+ * Service that keeps cache invalidation consistent across catalog features.
  */
 final class CacheInvalidationService
 {
     use ResolvesSupportedLocales;
 
     /**
-     * Map of model classes to their associated cache tags.
+     * Limits used by brand driven cache entries when cache tags are unavailable.
      *
-     * @var array<class-string, array<int, string>>
+     * @var array<int, int>
      */
-    private const MODEL_TAGS = [
-        Product::class => [
-            CacheTagHelper::PRODUCTS,
-            CacheTagHelper::CATEGORIES,
-            CacheTagHelper::BRANDS,
-            CacheTagHelper::COLLECTIONS,
-            CacheTagHelper::DASHBOARDS,
-        ],
-        Category::class => [
-            CacheTagHelper::CATEGORIES,
-            CacheTagHelper::PRODUCTS,
-            CacheTagHelper::DASHBOARDS,
-        ],
-        Brand::class => [
-            CacheTagHelper::BRANDS,
-            CacheTagHelper::PRODUCTS,
-            CacheTagHelper::DASHBOARDS,
-        ],
-        Collection::class => [
-            CacheTagHelper::COLLECTIONS,
-            CacheTagHelper::PRODUCTS,
-            CacheTagHelper::DASHBOARDS,
-        ],
-    ];
+    private const COMMON_BRAND_LIMITS = [4, 6, 8, 10, 12];
 
     /**
-     * Default limits we cache for product driven shelves.
+     * Limits used by category cache entries when cache tags are unavailable.
+     *
+     * @var array<int, int>
+     */
+    private const COMMON_CATEGORY_LIMITS = [4, 6, 8, 10, 12];
+
+    /**
+     * Limits used for featured/latest product lists when tag support is unavailable.
      *
      * @var array<int, int>
      */
     private const PRODUCT_LIST_LIMITS = [4, 6, 8, 10, 12];
 
     /**
-     * Default limits for category popularity calculations.
-     *
-     * @var array<int, int>
-     */
-    private const CATEGORY_LIST_LIMITS = [6, 8, 10, 12];
-
-    /**
-     * Default limits for brand leaderboards.
-     *
-     * @var array<int, int>
-     */
-    private const BRAND_LIST_LIMITS = [6, 8, 10, 12];
-
-    /**
-     * Shelf presets rendered on the home page.
-     *
-     * @var array<int, string>
-     */
-    private const SHELF_PRESETS = ['featured', 'latest', 'sale', 'trending'];
-
-    /**
-     * Shelf sizes we warm for the storefront carousel widgets.
+     * Limits used by product shelf widgets when cache tags are unavailable.
      *
      * @var array<int, int>
      */
     private const SHELF_LIMITS = [4, 6, 8, 10, 12];
 
     /**
-     * Flush cache tags for a specific model instance.
+     * Presets supported by product shelf widgets when cache tags are unavailable.
+     *
+     * @var array<int, string>
+     */
+    private const SHELF_PRESETS = ['featured', 'latest', 'sale', 'trending'];
+
+    /**
+     * Metrics exposed on dashboard widgets for explicit cache eviction.
+     *
+     * @var array<int, string>
+     */
+    private const DASHBOARD_METRICS = [
+        'orders_today',
+        'revenue_last_seven_days',
+        'new_users_today',
+        'low_stock_items',
+    ];
+
+    /**
+     * Windows used by product sales series caches for fallback invalidation.
+     *
+     * @var array<int, int>
+     */
+    private const PRODUCT_SERIES_WINDOWS = [3, 7, 14, 30];
+
+    /**
+     * Limits used by navigation category lookups without tag support.
+     *
+     * @var array<int, int>
+     */
+    private const NAVIGATION_CATEGORY_LIMITS = [6, 8, 10];
+
+    /**
+     * Flush cache tags that correspond to the given model instance.
      */
     public function flushForModel(Model $model): void
     {
-        foreach (self::MODEL_TAGS as $class => $tags) {
-            if (! ($model instanceof $class)) {
-                continue;
-            }
+        $tags = $this->tagsForModel($model);
+        $fallback = $this->fallbackForModel($model);
 
-            // Pass the relevant identifier into the fallback context so per-model caches can be cleared precisely.
-            $this->flushTags($tags, $this->contextForModel($model));
+        if ($tags === []) {
+            $this->runFallback($fallback);
 
             return;
         }
+
+        $this->flushTags($tags, $fallback);
     }
 
     /**
-     * Flush product related caches.
+     * Force refresh of all product centric caches.
      */
-    public function flushProducts(?int $productId = null): void
+    public function flushProducts(): void
     {
-        $this->flushTags(CacheTagHelper::products(), ['product_id' => $productId]);
+        $this->flushTags(CacheTagHelper::products(), $this->fallbackForProducts());
     }
 
     /**
-     * Flush category related caches.
+     * Force refresh of all category centric caches.
      */
-    public function flushCategories(?int $categoryId = null): void
+    public function flushCategories(): void
     {
-        $this->flushTags(CacheTagHelper::categories(), ['category_id' => $categoryId]);
+        $this->flushTags(CacheTagHelper::categories(), $this->fallbackForCategories());
     }
 
     /**
-     * Flush brand related caches.
+     * Force refresh of all brand centric caches.
      */
-    public function flushBrands(?int $brandId = null): void
+    public function flushBrands(): void
     {
-        $this->flushTags(CacheTagHelper::brands(), ['brand_id' => $brandId]);
+        $this->flushTags(CacheTagHelper::brands(), $this->fallbackForBrands());
     }
 
     /**
-     * Flush collection related caches.
+     * Force refresh of collection centric caches.
      */
-    public function flushCollections(?int $collectionId = null): void
+    public function flushCollections(): void
     {
-        $this->flushTags(CacheTagHelper::collections(), ['collection_id' => $collectionId]);
+        $this->flushTags(CacheTagHelper::collections(), $this->fallbackForCollections());
     }
 
     /**
-     * Flush dashboard related caches.
+     * Force refresh of dashboard caches.
      */
     public function flushDashboards(): void
     {
-        $this->flushTags(CacheTagHelper::dashboards());
+        $this->flushTags(CacheTagHelper::dashboards(), $this->fallbackForDashboards());
     }
 
     /**
-     * Attempt to flush the given tags and gracefully handle unsupported stores.
+     * Determine which tag groups should be cleared for a model instance.
+     *
+     * @return array<int, string>
+     */
+    private function tagsForModel(Model $model): array
+    {
+        if ($model instanceof Product) {
+            return CacheTagHelper::merge(
+                CacheTagHelper::products(),
+                CacheTagHelper::categories(),
+                CacheTagHelper::brands(),
+                CacheTagHelper::collections(),
+                CacheTagHelper::dashboards(),
+            );
+        }
+
+        if ($model instanceof Category) {
+            return CacheTagHelper::merge(
+                CacheTagHelper::categories(),
+                CacheTagHelper::products(),
+                CacheTagHelper::dashboards(),
+            );
+        }
+
+        if ($model instanceof Brand) {
+            return CacheTagHelper::merge(
+                CacheTagHelper::brands(),
+                CacheTagHelper::products(),
+                CacheTagHelper::dashboards(),
+            );
+        }
+
+        if ($model instanceof Collection) {
+            return CacheTagHelper::merge(
+                CacheTagHelper::collections(),
+                CacheTagHelper::products(),
+                CacheTagHelper::dashboards(),
+            );
+        }
+
+        return [];
+    }
+
+    /**
+     * Attempt to flush a set of tags with graceful degradation when unsupported.
      *
      * @param array<int, string> $tags
-     * @param array<string, int|null> $context
      */
-    private function flushTags(array $tags, array $context = []): void
+    private function flushTags(array $tags, ?Closure $fallback = null): void
     {
         if ($tags === []) {
             return;
         }
 
-        $store = Cache::getStore();
-
-        if ($store instanceof TaggableStore) {
+        if (Cache::supportsTags()) {
             try {
                 Cache::tags($tags)->flush();
 
                 return;
             } catch (Throwable $exception) {
                 Log::warning('Failed to flush cache tags', [
-                    'tags'    => $tags,
-                    'error'   => $exception->getMessage(),
-                    'context' => $context,
+                    'tags'  => $tags,
+                    'error' => $exception->getMessage(),
                 ]);
             }
         }
 
-        $this->flushFallback($tags, $context);
+        if ($this->runFallback($fallback)) {
+            return;
+        }
+
+        Cache::flush();
     }
 
     /**
-     * Provide manual cache invalidation when cache tags are unavailable.
-     *
-     * @param array<int, string>        $tags
-     * @param array<string, int|null> $context
+     * Determine which fallback routine should run for a model instance.
      */
-    private function flushFallback(array $tags, array $context): void
+    private function fallbackForModel(Model $model): ?Closure
     {
-        foreach ($tags as $tag) {
-            match ($tag) {
-                CacheTagHelper::PRODUCTS => $this->flushProductFallback($context['product_id'] ?? null),
-                CacheTagHelper::CATEGORIES => $this->flushCategoryFallback($context['category_id'] ?? null),
-                CacheTagHelper::BRANDS => $this->flushBrandFallback($context['brand_id'] ?? null),
-                CacheTagHelper::COLLECTIONS => $this->flushCollectionFallback($context['collection_id'] ?? null),
-                CacheTagHelper::DASHBOARDS => $this->flushDashboardFallback(),
-                default => null,
+        if ($model instanceof Product) {
+            $productId = (int) $model->getKey();
+
+            return function () use ($productId): void {
+                $this->fallbackForProducts($productId)();
             };
+        }
+
+        if ($model instanceof Category) {
+            return $this->fallbackForCategories();
+        }
+
+        if ($model instanceof Brand) {
+            return $this->fallbackForBrands();
+        }
+
+        if ($model instanceof Collection) {
+            return $this->fallbackForCollections();
+        }
+
+        return null;
+    }
+
+    /**
+     * Build a fallback routine for product-related caches.
+     */
+    private function fallbackForProducts(?int $productId = null): Closure
+    {
+        return function () use ($productId): void {
+            $this->forgetProductSummaries();
+            $this->forgetBrandAggregates();
+            $this->forgetCategoryAggregates();
+            $this->forgetNavigationCaches();
+            $this->forgetHomeShelves();
+            $this->forgetCollectionWidgets();
+            $this->forgetDashboardMetrics();
+
+            if ($productId !== null) {
+                foreach (self::PRODUCT_SERIES_WINDOWS as $days) {
+                    Cache::forget(CacheKeys::productSalesSeries($productId, $days));
+                }
+            }
+        };
+    }
+
+    /**
+     * Build a fallback routine for category caches.
+     */
+    private function fallbackForCategories(): Closure
+    {
+        return function (): void {
+            $this->forgetCategoryAggregates();
+            $this->forgetNavigationCaches();
+        };
+    }
+
+    /**
+     * Build a fallback routine for brand caches.
+     */
+    private function fallbackForBrands(): Closure
+    {
+        return function (): void {
+            $this->forgetBrandAggregates();
+        };
+    }
+
+    /**
+     * Build a fallback routine for collection caches.
+     */
+    private function fallbackForCollections(): Closure
+    {
+        return function (): void {
+            $this->forgetCollectionWidgets();
+        };
+    }
+
+    /**
+     * Build a fallback routine for dashboard caches.
+     */
+    private function fallbackForDashboards(): Closure
+    {
+        return function (): void {
+            $this->forgetDashboardMetrics();
+        };
+    }
+
+    /**
+     * Forget common brand aggregate caches without tag support.
+     */
+    private function forgetBrandAggregates(): void
+    {
+        foreach (self::COMMON_BRAND_LIMITS as $limit) {
+            Cache::forget(CacheKeys::brandTopList($limit));
+        }
+
+        foreach ($this->supportedLocales() as $locale) {
+            Cache::forget(sprintf('navigation.featured_brands.%s', $locale));
         }
     }
 
     /**
-     * Determine the contextual identifiers for the provided model.
-     *
-     * @return array<string, int>
+     * Forget common category aggregate caches without tag support.
      */
-    private function contextForModel(Model $model): array
+    private function forgetCategoryAggregates(): void
     {
-        return match (true) {
-            $model instanceof Product => ['product_id' => (int) $model->getKey()],
-            $model instanceof Category => ['category_id' => (int) $model->getKey()],
-            $model instanceof Brand => ['brand_id' => (int) $model->getKey()],
-            $model instanceof Collection => ['collection_id' => (int) $model->getKey()],
-            default => [],
-        };
+        foreach (self::COMMON_CATEGORY_LIMITS as $limit) {
+            Cache::forget(CacheKeys::categoryPopularList($limit));
+        }
+
+        Cache::forget(CacheKeys::categoryNavigationTree());
     }
 
-    private function flushProductFallback(?int $productId): void
+    /**
+     * Forget product summary caches such as featured/latest lists.
+     */
+    private function forgetProductSummaries(): void
     {
-        // Aggregate counts shared across dashboards and storefront widgets.
         Cache::forget(CacheKeys::productTotalCount());
         Cache::forget(CacheKeys::productVisibleCount());
 
@@ -224,144 +347,82 @@ final class CacheInvalidationService
             Cache::forget(CacheKeys::productLatestList($limit));
         }
 
-        $locales = $this->supportedLocales();
-        $currencies = $this->supportedCurrencies();
-
-        foreach ($locales as $locale) {
+        foreach ($this->supportedLocales() as $locale) {
             Cache::forget(CacheKeys::homeFeaturedProducts($locale));
             Cache::forget(CacheKeys::homeLatestProducts($locale));
-            Cache::forget(CacheKeys::homeStats($locale));
+        }
+    }
 
+    /**
+     * Forget navigation caches shared across storefront widgets.
+     */
+    private function forgetNavigationCaches(): void
+    {
+        foreach ($this->supportedLocales() as $locale) {
+            Cache::forget(CacheKeys::homeCategoryTree($locale));
+            Cache::forget(CacheKeys::homeCatalogueCategories($locale));
+
+            foreach (self::NAVIGATION_CATEGORY_LIMITS as $limit) {
+                Cache::forget(CacheKeys::navigationCategories($limit, $locale));
+            }
+        }
+    }
+
+    /**
+     * Forget home shelf caches for known presets without tag support.
+     */
+    private function forgetHomeShelves(): void
+    {
+        foreach ($this->supportedLocales() as $locale) {
             foreach (self::SHELF_PRESETS as $preset) {
                 foreach (self::SHELF_LIMITS as $limit) {
                     Cache::forget(CacheKeys::homeShelf($preset, $limit, $locale));
                 }
             }
         }
-
-        foreach ($locales as $locale) {
-            foreach ($currencies as $currency) {
-                Cache::forget("featured_products.{$locale}.{$currency}");
-                Cache::forget("new_arrivals.{$locale}.{$currency}");
-
-                if ($productId !== null) {
-                    Cache::forget("related_products.{$productId}.{$locale}.{$currency}");
-                }
-            }
-        }
-
-        if ($productId !== null) {
-            Cache::forget(CacheKeys::productTag($productId));
-        }
-    }
-
-    private function flushCategoryFallback(?int $categoryId): void
-    {
-        $locales = $this->supportedLocales();
-
-        foreach (self::CATEGORY_LIST_LIMITS as $limit) {
-            Cache::forget(CacheKeys::categoryPopularList($limit));
-        }
-
-        foreach ($locales as $locale) {
-            Cache::forget(CacheKeys::homeCategoryTree($locale));
-            Cache::forget(CacheKeys::homeCatalogueCategories($locale));
-            Cache::forget(CacheKeys::navigationCategories(8, $locale));
-            Cache::forget(CacheKeys::navigationCategories(12, $locale));
-            Cache::forget(CacheKeys::homeStats($locale));
-        }
-
-        if ($categoryId !== null) {
-            Cache::forget(CacheKeys::categoryTag($categoryId));
-        }
-    }
-
-    private function flushBrandFallback(?int $brandId): void
-    {
-        foreach (self::BRAND_LIST_LIMITS as $limit) {
-            Cache::forget(CacheKeys::brandTopList($limit));
-        }
-
-        foreach ($this->supportedLocales() as $locale) {
-            Cache::forget(CacheKeys::homeStats($locale));
-        }
-
-        if ($brandId !== null) {
-            Cache::forget(CacheKeys::brandTag($brandId));
-        }
-    }
-
-    private function flushCollectionFallback(?int $collectionId): void
-    {
-        foreach ($this->supportedLocales() as $locale) {
-            Cache::forget(CacheKeys::homeCollections($locale));
-
-            if ($collectionId !== null) {
-                Cache::forget("collection.{$collectionId}.{$locale}");
-            }
-        }
-    }
-
-    private function flushDashboardFallback(): void
-    {
-        Cache::forget(CacheKeys::dashboardSummary());
-
-        $ranges = ['1h', '24h', '7d', '30d'];
-
-        foreach ($ranges as $range) {
-            Cache::forget(CacheKeys::dashboardStats($range));
-            Cache::forget(CacheKeys::dashboardActivity($range));
-            Cache::forget(CacheKeys::dashboardPerformance($range));
-        }
-
-        $now = now();
-        $start = $now->copy()->subDays(6)->toDateString();
-        $end = $now->copy()->toDateString();
-
-        Cache::forget("dashboard.simplified-stats.chart.{$start}.{$end}");
     }
 
     /**
-     * @return array<int, string>
+     * Forget collection showcase caches without tag support.
      */
-    private function supportedCurrencies(): array
+    private function forgetCollectionWidgets(): void
     {
-        $mapping = config('shared.localization.locale_currency_mapping', []);
-
-        if (! is_array($mapping)) {
-            $mapping = [];
+        foreach ($this->supportedLocales() as $locale) {
+            Cache::forget(CacheKeys::homeCollections($locale));
         }
+    }
 
-        $currencies = array_filter(array_map(
-            static fn ($currency) => is_string($currency) ? trim($currency) : null,
-            array_values($mapping)
-        ));
-
-        $defaults = [
-            config('shared.localization.default_currency'),
-            config('app.currency'),
-        ];
-
-        foreach ($defaults as $default) {
-            if (is_string($default)) {
-                $currencies[] = trim($default);
+    /**
+     * Forget dashboard metric caches without tag support.
+     */
+    private function forgetDashboardMetrics(): void
+    {
+        foreach (self::DASHBOARD_METRICS as $metric) {
+            foreach ($this->supportedLocales() as $locale) {
+                Cache::forget(CacheKeys::dashboardMetric($metric, $locale));
             }
         }
+    }
 
-        $normalized = [];
-
-        foreach ($currencies as $currency) {
-            if ($currency === '') {
-                continue;
-            }
-
-            $normalized[$currency] = $currency;
+    /**
+     * Safely execute a fallback routine and report failures.
+     */
+    private function runFallback(?Closure $fallback): bool
+    {
+        if ($fallback === null) {
+            return false;
         }
 
-        if ($normalized === []) {
-            $normalized['EUR'] = 'EUR';
-        }
+        try {
+            $fallback();
 
-        return array_values($normalized);
+            return true;
+        } catch (Throwable $exception) {
+            Log::warning('Cache invalidation fallback failed', [
+                'error' => $exception->getMessage(),
+            ]);
+
+            return false;
+        }
     }
 }

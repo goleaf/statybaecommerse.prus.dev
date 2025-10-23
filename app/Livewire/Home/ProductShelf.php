@@ -59,9 +59,9 @@ final class ProductShelf extends Component implements HasSchemas
             function () use ($locale): EloquentCollection {
                 $query = Product::query()
                     ->with(['brand', 'media', 'categories'])
-                    ->with(['translations' => function ($q) use ($locale): void {
+                    ->with(['translations' => function ($q) use ($locale) {
                         $q->where('locale', $locale);
-                    }, 'categories.translations' => function ($q) use ($locale): void {
+                    }, 'categories.translations' => function ($q) use ($locale) {
                         $q->where('locale', $locale);
                     }])
                     ->withAvg(['reviews as average_rating' => fn ($q) => $q->where('is_approved', true)], 'rating')

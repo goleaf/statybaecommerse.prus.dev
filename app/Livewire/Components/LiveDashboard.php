@@ -11,8 +11,6 @@ use App\Models\User;
 use App\Services\CacheInvalidationService;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTagHelper;
-use DateInterval;
-use Illuminate\Cache\TaggableStore;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -244,6 +242,18 @@ final class LiveDashboard extends Component
     private function clearCache(): void
     {
         app(CacheInvalidationService::class)->flushDashboards();
+    }
+
+    /**
+     * Cache dashboard datasets under the shared dashboard tag when available.
+     */
+    private function rememberDashboard(string $key, int $ttl, callable $callback): array
+    {
+        if (Cache::supportsTags()) {
+            return Cache::tags(CacheTagHelper::dashboards())->remember($key, $ttl, $callback);
+        }
+
+        return Cache::remember($key, $ttl, $callback);
     }
 
     /**

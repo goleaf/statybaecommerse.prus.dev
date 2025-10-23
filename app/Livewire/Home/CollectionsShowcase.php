@@ -29,10 +29,9 @@ final class CollectionsShowcase extends Component implements HasSchemas
         return app(SharedCacheService::class)->rememberLong(
             CacheKeys::homeCollections($locale),
             function () use ($locale) {
-
                 return ProductCollection::query()
                     ->with('media')
-                    ->with(['translations' => function ($q) use ($locale): void {
+                    ->with(['translations' => function ($q) use ($locale) {
                         $q->where('locale', $locale);
                     }])
                     ->withCount(['products'])
