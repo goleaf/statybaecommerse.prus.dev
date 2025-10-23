@@ -46,7 +46,7 @@ final class VariantAnalyticsResource extends Resource
     protected static ?string $model = VariantAnalytics::class;
 
     /**
-     * @var string|\BackedEnum|null Ensure Filament interprets the icon while supporting enums without forcing an import.
+     * @var string|\BackedEnum|null Typed navigation icon ensures the analytics section resolves enum-backed overrides cleanly.
      */
     protected static ?string $navigationIcon = 'heroicon-o-chart-bar-square';
 

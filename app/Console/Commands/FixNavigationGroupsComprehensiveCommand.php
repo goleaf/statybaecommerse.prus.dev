@@ -8,6 +8,11 @@ use Illuminate\Console\Command;
 
 final class FixNavigationGroupsComprehensiveCommand extends Command
 {
+    /**
+     * Centralised import string so duplicate "use UnitEnum;" statements are never emitted.
+     */
+    private const UNIT_ENUM_IMPORT = 'use UnitEnum;';
+
     protected $signature = 'filament:navigation-groups:fix-comprehensive';
 
     protected $description = 'Apply comprehensive navigation group type fixes for Filament resources.';
@@ -33,10 +38,10 @@ final class FixNavigationGroupsComprehensiveCommand extends Command
                 $content = preg_replace($pattern, $replacement, $content);
             }
 
-            if (str_contains($content, 'protected static $navigationGroup') && ! str_contains($content, 'use UnitEnum;')) {
+            if (str_contains($content, 'protected static $navigationGroup') && ! str_contains($content, self::UNIT_ENUM_IMPORT)) {
                 $content = preg_replace(
                     '/(use [^;]+;\s*\n)(class \w+ extends Resource)/',
-                    '$1use UnitEnum;'."\n\n$2",
+                    '$1'.self::UNIT_ENUM_IMPORT."\n\n$2",
                     $content,
                 );
             }

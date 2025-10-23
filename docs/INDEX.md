@@ -28,7 +28,7 @@ A curated map of the most useful documents for day-to-day development and operat
 - [REFERRAL_SYSTEM_IMPLEMENTATION](REFERRAL_SYSTEM_IMPLEMENTATION.md) – loyalty and referral programme operations for support teams.
 - [Table Column Resizing](ui/RESIZED_COLUMNS.md) – how column width adjustments are saved, reset, and recovered when troubleshooting.
 - [Admin Translations Guide](analysis/FILAMENT_V4_IMPLEMENTATION_SUMMARY.md#spatie-translatable) – covers plugin registration, persisted locale behaviour, and required traits for locale-aware resources/pages.
-- **Orders resource upkeep** – Order management now relies on Filament Forms namespaces, corrected payment metadata, and permission-aware table actions to keep workflow parity between exports and on-screen transitions.
+- Analytics dashboard table reference – see `resources/lang/*/analytics.php` for the localized column, filter, and summary keys powering the enhanced admin analytics view.
 
 ### 5. Troubleshoot & Maintain
 - [TERMINAL_FREEZING_FIXES](TERMINAL_FREEZING_FIXES.md) – remedies for common local environment hiccups.
