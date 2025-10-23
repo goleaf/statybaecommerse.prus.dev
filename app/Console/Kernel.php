@@ -48,48 +48,18 @@ final class Kernel extends ConsoleKernel
                 Log::info('Weekly code style fix completed successfully');
             });
 
-        $prepareSchedule = (array) config('backup.schedule.prepare', []);
-
-        if (($prepareSchedule['enabled'] ?? true) === true) {
-            $event = $schedule->command('backup:prepare');
-
-            if (! empty($prepareSchedule['cron'])) {
-                $event->cron((string) $prepareSchedule['cron']);
-            } elseif (! empty($prepareSchedule['at'])) {
-                $event->dailyAt((string) $prepareSchedule['at']);
-            } else {
-                $event->daily();
-            }
-
-            $event
-                ->withoutOverlapping()
-                ->runInBackground()
-                ->onOneServer()
-                ->onFailure(static function () {
-                    \Log::error('Scheduled backup:prepare command failed');
-                });
+        if ($prepareCron = config('backup.schedule.prepare')) {
+            $schedule
+                ->command('backup:prepare')
+                ->cron($prepareCron)
+                ->withoutOverlapping();
         }
 
-        $verifySchedule = (array) config('backup.schedule.verify', []);
-
-        if (($verifySchedule['enabled'] ?? true) === true) {
-            $event = $schedule->command('backup:verify');
-
-            if (! empty($verifySchedule['cron'])) {
-                $event->cron((string) $verifySchedule['cron']);
-            } elseif (! empty($verifySchedule['at'])) {
-                $event->dailyAt((string) $verifySchedule['at']);
-            } else {
-                $event->daily();
-            }
-
-            $event
-                ->withoutOverlapping()
-                ->runInBackground()
-                ->onOneServer()
-                ->onFailure(static function () {
-                    \Log::error('Scheduled backup:verify command failed');
-                });
+        if ($verifyCron = config('backup.schedule.verify')) {
+            $schedule
+                ->command('backup:verify')
+                ->cron($verifyCron)
+                ->withoutOverlapping();
         }
     }
 

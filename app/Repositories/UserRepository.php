@@ -10,10 +10,8 @@ final class UserRepository
 {
     public function count(?string $connection = null): int
     {
-        if ($connection !== null) {
-            return User::on($connection)->newQuery()->count();
-        }
+        $builder = $connection ? User::on($connection) : User::query();
 
-        return User::query()->count();
+        return $builder->count();
     }
 }
