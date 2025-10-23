@@ -11,6 +11,13 @@ uses(Tests\TestCase::class)->in('Feature', 'Unit', 'admin', 'frontend', 'Perform
 
 
 beforeAll(function () {
+    $testingDatabasePath = database_path('testing.sqlite');
+
+    if (! file_exists($testingDatabasePath)) {
+        // Ensure the shared SQLite database file is available for all tests.
+        touch($testingDatabasePath);
+    }
+
     $envPath = base_path('.env');
     if (! file_exists($envPath)) {
         file_put_contents($envPath, implode(PHP_EOL, [
@@ -20,12 +27,13 @@ beforeAll(function () {
             'APP_DEBUG=true',
             'LOG_CHANNEL=stack',
             'DB_CONNECTION=sqlite',
-            'DB_DATABASE=:memory:',
+            'DB_DATABASE=database/testing.sqlite',
         ]).PHP_EOL);
     }
 
     config()->set('database.default', 'sqlite');
-    config()->set('database.connections.sqlite.database', ':memory:');
+    config()->set('database.connections.sqlite.database', $testingDatabasePath);
+    \Illuminate\Foundation\Testing\RefreshDatabaseState::$migrated = false;
 
     // Ensure Filament uses the web guard for tests
     config()->set('filament.auth.guard', 'web');

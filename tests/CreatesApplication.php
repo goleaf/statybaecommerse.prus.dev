@@ -56,23 +56,20 @@ trait CreatesApplication
 
         $app->make(Kernel::class)->bootstrap();
 
-        // Configure SQLite to use a real file so that migrations persist across connections.
-        $databasePath = $this->resolveSqliteDatabasePath();
-        if (! $this->sqliteDatabasePreExisted) {
-            register_shutdown_function(static function () use ($databasePath): void {
-                if (file_exists($databasePath)) {
-                    unlink($databasePath);
-                }
-            });
+        // Use a dedicated on-disk SQLite database so migrations persist across connections.
+        $testingDatabasePath = database_path('testing.sqlite');
+
+        if (! file_exists($testingDatabasePath)) {
+            // Create the database file if it has not been initialised yet.
+            touch($testingDatabasePath);
         }
-        Config::set('database.default', 'sqlite');
-        Config::set('database.connections.sqlite.database', $databasePath);
-        Config::set('database.connections.sqlite.foreign_key_constraints', true);
-        // Disable Telescope and Debugbar so tests do not attempt to talk to MySQL.
-        Config::set('telescope.enabled', false);
-        Config::set('telescope.storage.database.connection', 'sqlite');
-        Config::set('activitylog.database_connection', 'sqlite');
-        Config::set('debugbar.enabled', false);
+
+        config()->set('database.default', 'sqlite');
+        config()->set('database.connections.sqlite.database', $testingDatabasePath);
+        // Disable Telescope and force its connection to sqlite during tests to avoid MySQL usage
+        config()->set('telescope.enabled', false);
+        config()->set('telescope.storage.database.connection', 'sqlite');
+        config()->set('debugbar.enabled', false);
 
         return $app;
     }

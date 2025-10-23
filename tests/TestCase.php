@@ -28,21 +28,8 @@ abstract class TestCase extends BaseTestCase
 
     protected function setUp(): void
     {
-        // Calculate and prepare the SQLite database path before booting the application so the
-        // framework picks up the correct connection details during the refresh cycle.
-        $this->sqliteDatabasePath = dirname(__DIR__).'/database/testing.sqlite';
-        if (! file_exists($this->sqliteDatabasePath)) {
-            touch($this->sqliteDatabasePath);
-        }
-
-        // Update environment variables prior to the parent setup call because Laravel resolves
-        // database configuration while bootstrapping the application instance.
-        putenv('DB_CONNECTION=sqlite');
-        putenv('DB_DATABASE='.$this->sqliteDatabasePath);
-        $_ENV['DB_CONNECTION'] = 'sqlite';
-        $_ENV['DB_DATABASE'] = $this->sqliteDatabasePath;
-        $_SERVER['DB_CONNECTION'] = 'sqlite';
-        $_SERVER['DB_DATABASE'] = $this->sqliteDatabasePath;
+        // Reset the RefreshDatabase state so each test run rebuilds the SQLite schema.
+        \Illuminate\Foundation\Testing\RefreshDatabaseState::$migrated = false;
 
         parent::setUp();
 
@@ -56,11 +43,17 @@ abstract class TestCase extends BaseTestCase
             $this->createdEnvFile = false;
         }
 
-        // Ensure runtime configuration stays aligned with the SQLite testing database.
-        $sqliteDatabasePath = $this->resolveSqliteDatabasePath();
+        $testingDatabasePath = database_path('testing.sqlite');
+
+        if (! file_exists($testingDatabasePath)) {
+            // Guarantee the shared SQLite database exists before configuring the connection.
+            touch($testingDatabasePath);
+        }
+
         Config::set('database.default', 'sqlite');
-        Config::set('database.connections.sqlite.database', $sqliteDatabasePath);
-        Config::set('database.connections.sqlite.foreign_key_constraints', true);
+        Config::set('database.connections.sqlite.database', $testingDatabasePath);
+        Config::set('app.key', 'base64:'.base64_encode(random_bytes(32)));
+        // Ensure Telescope doesn't use MySQL during tests and avoid watchers overhead
         Config::set('telescope.enabled', false);
         Config::set('telescope.storage.database.connection', 'sqlite');
         Config::set('activitylog.database_connection', 'sqlite');
