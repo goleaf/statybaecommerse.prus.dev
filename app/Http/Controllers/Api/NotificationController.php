@@ -4,16 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
-use App\Data\Notifications\NotificationFilterData;
-use App\Data\Notifications\NotificationPaginationData;
-use App\Data\Notifications\NotificationPayloadData;
-use App\Data\Notifications\NotificationSearchParametersData;
+use App\Application\DTOs\Notifications\NotificationCollectionData;
+use App\Application\DTOs\Notifications\NotificationData;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\NotificationIndexRequest;
-use App\Http\Requests\Api\NotificationMutationRequest;
-use App\Http\Requests\Api\NotificationSearchRequest;
-use App\Http\Requests\Api\NotificationShowRequest;
-use App\Http\Requests\Api\NotificationStatsRequest;
+use App\Http\Requests\Api\ListNotificationsRequest;
+use App\Http\Requests\Api\SearchNotificationsRequest;
 use App\Models\Notification;
 use App\Services\NotificationService;
 use App\Support\ApiErrorResponse;
@@ -29,23 +24,12 @@ final class NotificationController extends Controller
     /**
      * Display a listing of the resource with pagination and filtering.
      */
-    public function index(NotificationIndexRequest $request): JsonResponse
+    public function index(ListNotificationsRequest $request): JsonResponse
     {
-        $user = Auth::user();
-        $validated = $request->validated();
-        $perPage = (int) ($validated['per_page'] ?? 25);
-        $type = $validated['type'] ?? null;
-        $read = array_key_exists('read', $validated) ? (bool) $validated['read'] : null;
-        $notifications = $this->notificationService->getUserNotifications($user, $perPage, $type, $read);
+        $user = $this->authenticatedUser();
+        $collection = $this->notificationService->getUserNotifications($user, $request->toDto());
 
-        $page = $this->notificationService->getUserNotifications($user, $filters, $pagination);
-
-        return response()->json([
-            'success' => true,
-            'data'    => array_map(static fn (NotificationPayloadData $payload): array => $payload->toArray(), $page->items()),
-            'meta'    => $page->meta(),
-            'links'   => $page->links(),
-        ]);
+        return $this->collectionResponse($collection);
     }
 
     /**
@@ -53,13 +37,10 @@ final class NotificationController extends Controller
      */
     public function stats(NotificationStatsRequest $request): JsonResponse
     {
-        $user = Auth::user();
+        $user = $this->authenticatedUser();
         $stats = $this->notificationService->getUserNotificationStats($user);
 
-        return response()->json([
-            'success' => true,
-            'data'    => $stats->toArray(),
-        ]);
+        return response()->json(['success' => true, 'data' => $stats->toArray()]);
     }
 
     /**
@@ -67,7 +48,12 @@ final class NotificationController extends Controller
      */
     public function markAsRead(NotificationMutationRequest $request, Notification $notification): JsonResponse
     {
-        $user = Auth::user();
+        $user = $this->authenticatedUser();
+        // Ensure the notification belongs to the authenticated user
+        if ($notification->notifiable_id !== $user->id || $notification->notifiable_type !== User::class) {
+            return response()->json(['success' => false, 'message' => 'Notification not found'], 404);
+        }
+        $this->notificationService->markAsRead($notification);
 
         try {
             $payload = $this->notificationService->markAsReadForUser($user, $notification);
@@ -87,7 +73,12 @@ final class NotificationController extends Controller
      */
     public function markAsUnread(NotificationMutationRequest $request, Notification $notification): JsonResponse
     {
-        $user = Auth::user();
+        $user = $this->authenticatedUser();
+        // Ensure the notification belongs to the authenticated user
+        if ($notification->notifiable_id !== $user->id || $notification->notifiable_type !== User::class) {
+            return response()->json(['success' => false, 'message' => 'Notification not found'], 404);
+        }
+        $this->notificationService->markAsUnread($notification);
 
         try {
             $payload = $this->notificationService->markAsUnreadForUser($user, $notification);
@@ -107,13 +98,13 @@ final class NotificationController extends Controller
      */
     public function markAllAsRead(NotificationMutationRequest $request): JsonResponse
     {
-        $user = Auth::user();
-        $count = $this->notificationService->markAllAsReadForUser($user);
+        $user = $this->authenticatedUser();
+        $result = $this->notificationService->markAllAsReadForUser($user);
 
         return response()->json([
             'success' => true,
-            'message' => "Marked {$count} notifications as read",
-            'count'   => $count,
+            'message' => sprintf('Marked %d notifications as read', $result->count()),
+            'count' => $result->count(),
         ]);
     }
 
@@ -122,13 +113,13 @@ final class NotificationController extends Controller
      */
     public function markAllAsUnread(NotificationMutationRequest $request): JsonResponse
     {
-        $user = Auth::user();
-        $count = $this->notificationService->markAllAsUnreadForUser($user);
+        $user = $this->authenticatedUser();
+        $result = $this->notificationService->markAllAsUnreadForUser($user);
 
         return response()->json([
             'success' => true,
-            'message' => "Marked {$count} notifications as unread",
-            'count'   => $count,
+            'message' => sprintf('Marked %d notifications as unread', $result->count()),
+            'count' => $result->count(),
         ]);
     }
 
@@ -137,18 +128,15 @@ final class NotificationController extends Controller
      */
     public function show(NotificationShowRequest $request, Notification $notification): JsonResponse
     {
-        $user = Auth::user();
-
-        try {
-            $payload = $this->notificationService->show($user, $notification);
-        } catch (ModelNotFoundException $exception) {
-            return $this->notFoundResponse();
+        $user = $this->authenticatedUser();
+        // Ensure the notification belongs to the authenticated user
+        if ($notification->notifiable_id !== $user->id || $notification->notifiable_type !== User::class) {
+            return response()->json(['success' => false, 'message' => 'Notification not found'], 404);
         }
 
-        return response()->json([
-            'success' => true,
-            'data'    => $payload->toArray(),
-        ]);
+        $resource = NotificationData::fromModel($notification);
+
+        return response()->json(['success' => true, 'data' => $resource->toArray()]);
     }
 
     /**
@@ -156,7 +144,12 @@ final class NotificationController extends Controller
      */
     public function destroy(NotificationMutationRequest $request, Notification $notification): JsonResponse
     {
-        $user = Auth::user();
+        $user = $this->authenticatedUser();
+        // Ensure the notification belongs to the authenticated user
+        if ($notification->notifiable_id !== $user->id || $notification->notifiable_type !== User::class) {
+            return response()->json(['success' => false, 'message' => 'Notification not found'], 404);
+        }
+        $notification->delete();
 
         try {
             $this->notificationService->deleteForUser($user, $notification);
@@ -173,35 +166,33 @@ final class NotificationController extends Controller
     /**
      * Handle search functionality with proper error handling.
      */
-    public function search(NotificationSearchRequest $request): JsonResponse
+    public function search(SearchNotificationsRequest $request): JsonResponse
+    {
+        $user = $this->authenticatedUser();
+        $collection = $this->notificationService->searchNotifications($user, $request->toDto());
+
+        return $this->collectionResponse($collection);
+    }
+
+    private function authenticatedUser(): User
     {
         $user = Auth::user();
-        $validated = $request->validated();
-        $query = $validated['q'];
-        $type = $validated['type'] ?? null;
-        $read = array_key_exists('read', $validated) ? (bool) $validated['read'] : null;
-        $perPage = (int) ($validated['per_page'] ?? 25);
-        $notifications = $this->notificationService->searchNotifications($query, $user, $type, $read, $perPage);
 
-        $page = $this->notificationService->searchNotifications($user, $search, $pagination);
+        if (! $user instanceof User) {
+            abort(401, 'Unauthenticated.');
+        }
+
+        return $user;
+    }
+
+    private function collectionResponse(NotificationCollectionData $collection): JsonResponse
+    {
+        $payload = $collection->toArray();
 
         return response()->json([
             'success' => true,
-            'data'    => array_map(static fn (NotificationPayloadData $payload): array => $payload->toArray(), $page->items()),
-            'meta'    => $page->meta(),
-            'links'   => $page->links(),
+            'data' => $payload['data'],
+            'pagination' => $payload['pagination'],
         ]);
-    }
-
-    private function notFoundResponse(): JsonResponse
-    {
-        // Normalize missing resource responses to the shared problem+json structure.
-        return ApiErrorResponse::problem(
-            request: request(),
-            errorCode: ErrorCodes::NOT_FOUND,
-            detail: __('notifications.errors.not_found'),
-            status: 404,
-            title: ApiErrorResponse::titleFor(ErrorCodes::NOT_FOUND),
-        );
     }
 }

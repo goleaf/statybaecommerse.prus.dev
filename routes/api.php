@@ -50,8 +50,4 @@ Route::prefix('api/v1')
     }
 })->name('api.autocomplete.search');
 
-Route::middleware(['auth:sanctum'])->prefix('v1')->group(function (): void {
-    Route::get('exports/{export}', ExportDownloadController::class)
-        ->middleware('signed')
-        ->name('api.exports.download');
-});
+require __DIR__.'/api/notifications.php';
