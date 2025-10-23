@@ -61,3 +61,9 @@ Where Redis tags are unavailable, fall back to targeted `Cache::forget()` calls 
 4. Update dependent services or components to consume the new helper before removing legacy keys.
 
 Keeping key composition centralized makes future refactors predictable and prevents cache collisions across modules.
+
+### Filament resource alignment
+
+- Keep admin resources in sync with Filament v4 expectations by returning `Form` and `Table` instances directly from the `form()` and `table()` methods.
+- Document icon usage with PHPDoc annotations when relying on enum-backed Heroicons so cache warmers can reason about icon metadata consistently.
+- Audit legacy resources such as `AddressResource` whenever phpstan surfaces signature mismatches; updating them to the strict `Form`/`Table` return types keeps hook-driven cache warmers runnable during deployments.

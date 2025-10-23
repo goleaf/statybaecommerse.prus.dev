@@ -26,23 +26,19 @@ class EmailCampaignResource extends Resource
     protected static ?string $model = EmailCampaign::class;
 
     /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     * @var string|BackedEnum|null Maintain compatibility with Filament v4 icon expectations.
      */
     protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-
-        $form = $schema; // Preserve legacy variable naming for existing schema definitions.
-
+        // Delegate form configuration to the dedicated schema class for consistency across panels.
         return EmailCampaignForm::configure($form);
     }
 
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Centralize table configuration to ensure column definitions remain reusable.
         return EmailCampaignsTable::configure($table);
     }
 
