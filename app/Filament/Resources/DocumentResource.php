@@ -24,20 +24,14 @@ use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Auth;
 use UnitEnum;
 
 final class DocumentResource extends Resource
 {
-    use HasNav;
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document';
 
     protected static ?string $model = Document::class;
-
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-document';
-    }
 
     protected static ?int $navigationSort = 20;
 
@@ -67,7 +61,7 @@ final class DocumentResource extends Resource
     {
         return $form
             ->schema([
-                Section::make(__('admin.documents.basic_information'))
+                Section::make(__('admin.documents.form.sections.basic_information'))
                     ->schema([
                         Grid::make(2)
                             ->schema([
@@ -108,7 +102,7 @@ final class DocumentResource extends Resource
                                     ->maxLength(65535)
                                     ->nullable(),
                                 Select::make('created_by')
-                                    ->label(__('documents.created_by'))
+                                    ->label(__('admin.documents.form.fields.created_by'))
                                     ->relationship('creator', 'name')
                                     ->searchable()
                                     ->preload()
@@ -119,7 +113,7 @@ final class DocumentResource extends Resource
                                     })
                                     ->nullable(),
                                 Select::make('updated_by')
-                                    ->label(__('documents.updated_by'))
+                                    ->label(__('admin.documents.form.fields.updated_by'))
                                     ->relationship('updater', 'name')
                                     ->searchable()
                                     ->preload()
@@ -151,12 +145,12 @@ final class DocumentResource extends Resource
                     ->searchable()
                     ->limit(30),
                 TextColumn::make('creator.name')
-                    ->label(__('documents.created_by'))
+                    ->label(__('admin.documents.form.fields.created_by'))
                     ->badge()
                     ->color('success')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updater.name')
-                    ->label(__('documents.updated_by'))
+                    ->label(__('admin.documents.form.fields.updated_by'))
                     ->badge()
                     ->color('info')
                     ->toggleable(isToggledHiddenByDefault: true),
