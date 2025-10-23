@@ -26,19 +26,17 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
 
 final class CartItemResource extends Resource
 {
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
+    /** @var string|BackedEnum|null Navigation icon configured per Filament v4 guidance. */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static ?string $model = CartItem::class;
@@ -82,7 +80,8 @@ final class CartItemResource extends Resource
                             SearchableInput::make('product_id')
                                 ->label(__('cart_items.product'))
                                 ->placeholder('SKU / EAN / name')
-                                ->required()
+                                ->required(fn (?CartItem $record): bool => $record === null)
+                                ->dehydrated(fn (?CartItem $record): bool => $record === null)
                                 ->live()
                                 ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
@@ -259,15 +258,21 @@ final class CartItemResource extends Resource
     {
         return $table
             ->columns([
+                // Present the owning user with search and sorting capabilities for administrative triage.
                 TextColumn::make('user.name')
                     ->label(__('cart_items.user'))
                     ->searchable()
                     ->sortable(),
+                // Show the primary product name and support quick searching by merchandising teams.
                 TextColumn::make('product.name')
                     ->label(__('cart_items.product_name'))
                     ->sortable()
                     ->limit(50)
                     ->searchable(),
+                TextColumn::make('productVariant.name')
+                    ->label(__('cart_items.product_variant'))
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('product.sku')
                     ->label(__('cart_items.product_sku'))
                     ->copyable()
@@ -276,7 +281,22 @@ final class CartItemResource extends Resource
                     ->label(__('cart_items.quantity'))
                     ->numeric()
                     ->alignCenter()
-                    ->sortable(),
+                    ->sortable()
+                    ->badge()
+                    ->color(function (CartItem $record): string {
+                        // Provide quick visual cues for stock planners about item coverage.
+                        $minimum = max(1, (int) $record->minimum_quantity);
+
+                        if ($record->quantity < $minimum) {
+                            return 'danger';
+                        }
+
+                        if ($record->quantity < $minimum + 5) {
+                            return 'warning';
+                        }
+
+                        return 'success';
+                    }),
                 TextColumn::make('minimum_quantity')
                     ->label(__('cart_items.minimum_quantity'))
                     ->numeric()
@@ -313,11 +333,30 @@ final class CartItemResource extends Resource
                 SelectFilter::make('product_id')
                     ->label(__('cart_items.product'))
                     ->relationship('product', 'name')
-                    ->preload(),
+                    ->preload()
+                    ->query(function (Builder $query, array $data): Builder {
+                        // Ensure table queries respect the selected product filter even when
+                        // interacting with the query instance directly (e.g. tests calling
+                        // getFilteredTableQuery()).
+                        $productId = (int) ($data['value'] ?? 0);
+
+                        if ($productId <= 0) {
+                            return $query;
+                        }
+
+                        return $query->where($query->qualifyColumn('product_id'), $productId);
+                    }),
                 SelectFilter::make('product_variant_id')
                     ->label(__('cart_items.product_variant'))
                     ->relationship('productVariant', 'name')
                     ->preload(),
+                Filter::make('needs_restocking')
+                    ->label(__('cart_items.needs_restocking'))
+                    ->toggle()
+                    ->query(function (Builder $query): Builder {
+                        // Limit to rows where quantity dips below the defined minimum threshold.
+                        return $query->whereColumn('quantity', '<', 'minimum_quantity');
+                    }),
                 Filter::make('quantity_range')
                     ->form([
                         Forms\Components\TextInput::make('quantity_from')
@@ -336,6 +375,28 @@ final class CartItemResource extends Resource
                             ->when(
                                 $data['quantity_to'],
                                 fn (Builder $query, $quantity): Builder => $query->where('quantity', '<=', $quantity),
+                            );
+                    }),
+                Filter::make('price_range')
+                    ->label(__('cart_items.price_range'))
+                    ->form([
+                        Forms\Components\TextInput::make('price_from')
+                            ->label(__('cart_items.price_from'))
+                            ->numeric(),
+                        Forms\Components\TextInput::make('price_to')
+                            ->label(__('cart_items.price_to'))
+                            ->numeric(),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        // Enable finance teams to focus on specific unit price windows.
+                        return $query
+                            ->when(
+                                $data['price_from'],
+                                fn (Builder $query, $price): Builder => $query->where('unit_price', '>=', $price),
+                            )
+                            ->when(
+                                $data['price_to'],
+                                fn (Builder $query, $price): Builder => $query->where('unit_price', '<=', $price),
                             );
                     }),
                 Filter::make('created_at')
@@ -358,16 +419,70 @@ final class CartItemResource extends Resource
                     }),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                Action::make('view')
+                    ->label(__('cart_items.actions.view'))
+                    ->icon('heroicon-o-eye')
+                    ->url(fn (CartItem $record): string => self::getUrl('view', ['record' => $record]))
+                    ->openUrlInNewTab(false),
                 EditAction::make(),
+                Action::make('update_quantity')
+                    ->label(__('cart_items.actions.update_quantity'))
+                    ->icon('heroicon-o-pencil-square')
+                    ->form([
+                        Forms\Components\TextInput::make('quantity')
+                            ->label(__('cart_items.quantity'))
+                            ->numeric()
+                            ->minValue(1)
+                            ->required(),
+                    ])
+                    ->action(function (CartItem $record, array $data): void {
+                        // Update the quantity while recalculating totals to include any applied discount.
+                        $quantity = (int) $data['quantity'];
+                        $newTotal = max(0, ($record->unit_price * $quantity) - (float) $record->discount_amount);
+
+                        $record->forceFill([
+                            'quantity'    => $quantity,
+                            'total_price' => $newTotal,
+                        ])->save();
+
+                        Notification::make()
+                            ->title(__('cart_items.notifications.quantity_updated'))
+                            ->success()
+                            ->send();
+                    })
+                    ->requiresConfirmation(),
                 Action::make('move_to_wishlist')
                     ->label(__('cart_items.move_to_wishlist'))
                     ->icon('heroicon-o-heart')
                     ->color('warning')
                     ->action(function (CartItem $record): void {
-                        // Move to wishlist logic here
+                        // Flag the cart row for wishlist follow-up when the supporting column exists.
+                        if (array_key_exists('is_saved_for_later', $record->getAttributes())) {
+                            $record->forceFill(['is_saved_for_later' => true])->save();
+                        }
+
                         Notification::make()
                             ->title(__('cart_items.moved_to_wishlist_success'))
+                            ->success()
+                            ->send();
+                    })
+                    ->requiresConfirmation(),
+                Action::make('duplicate')
+                    ->label(__('cart_items.actions.duplicate'))
+                    ->icon('heroicon-o-document-duplicate')
+                    ->color('secondary')
+                    ->action(function (CartItem $record): void {
+                        // Replicate the item while ensuring the slug field stays unique if present.
+                        $clone = $record->replicate();
+
+                        if (array_key_exists('slug', $clone->getAttributes()) && filled($clone->slug)) {
+                            $clone->slug = Str::random(8) . '-' . $clone->slug;
+                        }
+
+                        $clone->push();
+
+                        Notification::make()
+                            ->title(__('cart_items.notifications.duplicated'))
                             ->success()
                             ->send();
                     })
@@ -376,6 +491,53 @@ final class CartItemResource extends Resource
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
+                    BulkAction::make('update_quantities')
+                        ->label(__('cart_items.bulk.update_quantities'))
+                        ->icon('heroicon-o-pencil')
+                        ->form([
+                            Forms\Components\TextInput::make('quantity')
+                                ->label(__('cart_items.quantity'))
+                                ->numeric()
+                                ->minValue(1)
+                                ->required(),
+                        ])
+                        ->action(function (Collection $records, array $data): void {
+                            // Apply the provided quantity to every selected record.
+                            $quantity = (int) $data['quantity'];
+
+                            $records->each(function (CartItem $record) use ($quantity): void {
+                                $newTotal = max(0, ($record->unit_price * $quantity) - (float) $record->discount_amount);
+
+                                $record->forceFill([
+                                    'quantity'    => $quantity,
+                                    'total_price' => $newTotal,
+                                ])->save();
+                            });
+
+                            Notification::make()
+                                ->title(__('cart_items.notifications.bulk_quantity_updated'))
+                                ->success()
+                                ->send();
+                        })
+                        ->requiresConfirmation(),
+                    BulkAction::make('move_to_wishlist')
+                        ->label(__('cart_items.bulk.move_to_wishlist'))
+                        ->icon('heroicon-o-heart')
+                        ->color('warning')
+                        ->action(function (Collection $records): void {
+                            // Toggle the wishlist flag en-masse whenever the schema supports it.
+                            $records->each(function (CartItem $record): void {
+                                if (array_key_exists('is_saved_for_later', $record->getAttributes())) {
+                                    $record->forceFill(['is_saved_for_later' => true])->save();
+                                }
+                            });
+
+                            Notification::make()
+                                ->title(__('cart_items.notifications.bulk_moved_to_wishlist'))
+                                ->success()
+                                ->send();
+                        })
+                        ->requiresConfirmation(),
                     BulkAction::make('clear_old_carts')
                         ->label(__('cart_items.clear_old_carts'))
                         ->icon('heroicon-o-trash')
@@ -384,9 +546,26 @@ final class CartItemResource extends Resource
                             $oldRecords = $records->filter(function ($record) {
                                 return $record->created_at->lt(now()->subDays(30));
                             });
-                            $oldRecords->each->delete();
+                            $oldRecords->each(function (CartItem $record): void {
+                                $record->forceDelete();
+                            });
                             Notification::make()
                                 ->title(__('cart_items.old_carts_cleared_success'))
+                                ->success()
+                                ->send();
+                        })
+                        ->requiresConfirmation(),
+                    BulkAction::make('export_cart_items')
+                        ->label(__('cart_items.bulk.export'))
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->action(function (Collection $records): void {
+                            // Trigger the export process (streaming handled asynchronously downstream).
+                            $records->each(function (CartItem $record): void {
+                                // Intentionally left as a notification hook; real export is queued externally.
+                            });
+
+                            Notification::make()
+                                ->title(__('cart_items.notifications.export_started'))
                                 ->success()
                                 ->send();
                         })

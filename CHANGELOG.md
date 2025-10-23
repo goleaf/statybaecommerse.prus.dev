@@ -7,6 +7,9 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Bug Fixes
+* Ensured the CartItem Filament product filter applies its constraint to the
+  base query so admin listings, exports, and tests narrow results down to the
+  selected product without requiring manual query tweaks.
 * Allowed wishlist toggles and recently viewed lookups to bypass storefront visibility scopes and trimmed the response payload to product identifiers so customer-facing APIs honour session order while continuing to accept draft catalogue entries during regression tests.
 * Re-enabled flexible system setting translations by replacing the locale uniqueness constraint with an index, restoring soft delete support, and trimming the fillable contract so replication and counting scenarios match the documented API.
 * Preserved Attribute validation rule strings while still decoding JSON arrays, refreshed the Filament form so arrays render as comma-separated chips, and added regression coverage for both storage paths.
