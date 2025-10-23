@@ -12,8 +12,8 @@ use App\Models\DiscountCode;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Actions\BulkActionGroup; // Use the Filament v4 bulk action group namespace introduced during the upgrade.
+use Filament\Actions\DeleteBulkAction; // Align delete bulk action import with Filament v4 namespace changes.
 use Filament\Actions\EditAction;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
