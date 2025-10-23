@@ -36,7 +36,7 @@
 - Modernized the CartItem administration surface by adopting Filament v4 form components, preventing non-persisted field dehydration, and wiring the model/migration updates that expose product metadata accessors alongside discount tracking.
 - Updated the Variant Inventory resource to use the Filament v4 `Form` return type and refreshed the navigation icon annotations for consistency across admin resources.
 - Recorded the shared Filament Number percentage helper adoption for Variant Inventory and Analytics resources so reviewers notice the locale-aware formatting upgrade.
-- Migrated the Activity Log resource to the Filament v4 `Form` API and normalized its navigation icon annotation to keep admin resources consistent.
+- Synced the Menu Item resource form and table return types with Filament v4 expectations, refreshed the navigation icon docblock, and documented the shared configurator classes.
 
 ### Fixed
 - Updated Git hook entrypoints to source Husky's new `h` shim and keep the local toolchain PATH exports intact.
