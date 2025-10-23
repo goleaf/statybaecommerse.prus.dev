@@ -46,6 +46,7 @@ class EnumValueFactory extends Factory
             'is_active' => fake()->boolean(80),
             'is_default' => fake()->boolean(10),
             'metadata' => [
+                'usage_count' => fake()->numberBetween(0, 100),
                 'color' => fake()->hexColor(),
                 'icon' => fake()->randomElement(['heroicon-o-star', 'heroicon-o-check', 'heroicon-o-x']),
                 'category' => fake()->word(),
