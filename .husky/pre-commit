@@ -1,19 +1,35 @@
 #!/bin/sh
-set -eu
+. "$(dirname "$0")/_/husky.sh"
 
-if [ ! -x vendor/bin/pint ] || [ ! -x vendor/bin/phpstan ]; then
-    printf '\033[1;31mRequired QA tools are missing. Run composer install before committing.\033[0m\n' >&2
-    exit 1
+set -e
+
+TMP_STAGED_PHP=$(mktemp)
+trap 'rm -f "$TMP_STAGED_PHP"' EXIT
+
+git diff --cached --name-only --diff-filter=ACMR -- '*.php' > "$TMP_STAGED_PHP"
+
+if [ ! -s "$TMP_STAGED_PHP" ]; then
+    exit 0
 fi
 
-printf '\n\033[1;34m→ Running Laravel Pint (fast check)\033[0m\n'
-vendor/bin/pint --test --dirty
+echo "Running Pint (dirty mode) on staged PHP files..."
+vendor/bin/pint --dirty
 
-PHP_DIFF=$(git diff --name-only --cached -- '*.php' '*.pest' '*.phpt')
-if [ -n "$PHP_DIFF" ]; then
-    printf '\n\033[1;34m→ Running PHPStan (fast check)\033[0m\n'
-    git diff --name-only --cached -z -- '*.php' '*.pest' '*.phpt' \
-        | xargs -0 vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G --no-progress
-else
-    printf '\n\033[0;33mNo staged PHP files detected; skipping PHPStan.\033[0m\n'
-fi
+while IFS= read -r file; do
+    if [ -n "$file" ]; then
+        git add "$file"
+    fi
+done < "$TMP_STAGED_PHP"
+
+echo "Running PHPStan on staged PHP files..."
+EXIT_CODE=0
+while IFS= read -r file; do
+    if [ -n "$file" ]; then
+        if ! vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G --no-progress "$file"; then
+            EXIT_CODE=1
+            break
+        fi
+    fi
+done < "$TMP_STAGED_PHP"
+
+exit $EXIT_CODE
