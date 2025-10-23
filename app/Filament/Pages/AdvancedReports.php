@@ -6,16 +6,13 @@ namespace App\Filament\Pages;
 
 use BackedEnum;
 use Filament\Pages\Page;
+use UnitEnum;
+
 final class AdvancedReports extends Page
 {
-    /**
-     * Navigation icon that Filament displays for this page.
-     *
-     * @var string|BackedEnum|null Filament navigation icon identifier.
-     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Analytics';
+    protected static UnitEnum|string|null $navigationGroup = 'Analytics';
 
     protected static ?string $title = 'Advanced Reports';
 
