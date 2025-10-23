@@ -116,12 +116,15 @@ Run the basic application checks to confirm everything is wired correctly:
 composer test
 php artisan test
 npm run lint
+composer test
 ```
 
 `composer test` now proxies to the Pest test runner (`vendor/bin/pest`) so contributors can rely on a single command that works
 across environments without installing a global PHPUnit binary.
 
 You can explore more helper commands in the `Makefile` (`make test`, `make analyse`, `make build`).
+
+> 💡 The `composer test` script proxies to `vendor/bin/pest`, so you do not need a global PHPUnit or Pest binary installed.
 
 ## 8. Common issues & quick fixes (FAQ)
 
