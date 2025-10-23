@@ -28,9 +28,9 @@ final class InventoryManagement extends Page implements HasTable
      */
     protected static $navigationIcon = 'heroicon-o-archive-box';
 
-    public static function getNavigationGroup(): string|UnitEnum|null
+    public static function getNavigationGroup(): BackedEnum|string|null
     {
-        return 'Products';
+        return 'Products'; // Keep stock controls grouped with the rest of the product catalog tools.
     }
 
     public static function getSlug(?\Filament\Panel $panel = null): string
@@ -85,7 +85,6 @@ final class InventoryManagement extends Page implements HasTable
                     }),
             ]);
 
-        // Delegate to the shared helper so column toggle preferences are applied consistently.
-        return $this->applyToggleableTableLayout($table);
+        return $this->applyToggleableTableLayout($table); // Reuse the helper to apply saved column visibility.
     }
 }
