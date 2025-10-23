@@ -48,7 +48,17 @@ return [
         'enhanced_settings' => 'Расширенные настройки',
         'system_settings' => 'Системные настройки',
     ],
-    'menu_items' => require __DIR__.'/admin/menu_items.php',
+    'inventory' => [
+        'actions' => [
+            'create' => 'Создать запись инвентаря',
+        ],
+        'tabs' => [
+            'all' => 'Все записи',
+            'in_stock' => 'В наличии',
+            'low_stock' => 'Мало на складе',
+            'out_of_stock' => 'Нет в наличии',
+        ],
+    ],
     // Table
     'table' => [
         'name' => 'Имя',
