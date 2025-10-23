@@ -1,15 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
+use App\Support\ErrorCodes;
+
 return [
-    'unknown_error' => 'Произошла неизвестная ошибка.',
-    'validation_failed' => 'Переданные данные недействительны.',
-    'authentication_failed' => 'Ошибка аутентификации.',
-    'authorization_failed' => 'У вас нет прав для выполнения этого действия.',
-    'route_not_found' => 'Запрошенный маршрут не найден.',
-    'method_not_allowed' => 'Этот HTTP-метод не поддерживается для данного маршрута.',
-    'model_not_found' => 'Запрошенный ресурс не найден.',
-    'too_many_requests' => 'Слишком много запросов. Попробуйте позже.',
-    'service_unavailable' => 'Сервис временно недоступен. Попробуйте позже.',
-    'runtime_error' => 'При обработке запроса произошла непредвиденная ошибка.',
-    'code_style_violation' => 'Обнаружено нарушение стиля кода.',
+    // @translators: Сообщение при отсутствии страницы или записи (HTTP 404).
+    ErrorCodes::NOT_FOUND => 'Страница не найдена',
+
+    // @translators: Показывается при непредвиденной ошибке сервера (HTTP 500).
+    ErrorCodes::SERVER_ERROR => 'Ошибка сервера',
+
+    // @translators: Используется, когда введённые данные не проходят проверку.
+    ErrorCodes::VALIDATION_FAILED => 'Проверьте введённые данные',
+
+    // @translators: Указывает, что пользователь должен войти в систему.
+    ErrorCodes::UNAUTHORIZED => 'Нет доступа',
+
+    // @translators: Указывает, что у вошедшего пользователя нет прав для действия.
+    ErrorCodes::FORBIDDEN => 'Доступ запрещён',
 ];
