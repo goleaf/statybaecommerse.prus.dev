@@ -16,10 +16,10 @@ use App\Services\Shared\ProductService;
 use App\Support\Cache\CacheKeys;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use PHPUnit\Framework\Attributes\CoversClass;
+use Tests\TestCase;
 
-/**
- * @covers \App\Services\CacheInvalidationService
- */
+#[CoversClass(CacheInvalidationService::class)]
 final class CacheInvalidationTest extends TestCase
 {
     use RefreshDatabase;
