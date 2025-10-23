@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\PostResource\Pages;
 
 use App\Enums\ModerationState;
+use App\Filament\Concerns\InteractsWithJsonTranslationTabs;
 use App\Filament\Resources\PostResource;
 use Filament\Actions;
 use Filament\Forms;
@@ -12,6 +13,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use RuntimeException;
 
 final class EditPost extends EditRecord
 {
@@ -39,9 +41,9 @@ final class EditPost extends EditRecord
                 ->visible(fn (): bool => $this->record->moderation_state === ModerationState::Draft)
                 ->action(function (): void {
                     $this->record->update([
-                        'moderation_state' => ModerationState::Review,
+                        'moderation_state'        => ModerationState::Review,
                         'submitted_for_review_at' => now(),
-                        'status' => 'draft',
+                        'status'                  => 'draft',
                     ]);
 
                     activity()
@@ -72,23 +74,23 @@ final class EditPost extends EditRecord
                     $userId = Auth::id();
 
                     if (! $userId) {
-                        throw new \RuntimeException('Approvals require an authenticated user.');
+                        throw new RuntimeException('Approvals require an authenticated user.');
                     }
 
                     DB::transaction(function () use ($data, $userId): void {
                         $this->record->approvals()->create([
-                            'user_id' => $userId,
-                            'decision' => 'approved',
-                            'notes' => $data['notes'] ?? null,
+                            'user_id'    => $userId,
+                            'decision'   => 'approved',
+                            'notes'      => $data['notes'] ?? null,
                             'decided_at' => now(),
                         ]);
 
                         $this->record->update([
                             'moderation_state' => ModerationState::Published,
-                            'approved_at' => now(),
-                            'approved_by_id' => $userId,
-                            'status' => 'published',
-                            'published_at' => $this->record->published_at ?? now(),
+                            'approved_at'      => now(),
+                            'approved_by_id'   => $userId,
+                            'status'           => 'published',
+                            'published_at'     => $this->record->published_at ?? now(),
                         ]);
                     });
 
@@ -120,23 +122,23 @@ final class EditPost extends EditRecord
                     $userId = Auth::id();
 
                     if (! $userId) {
-                        throw new \RuntimeException('Return to draft requires an authenticated user.');
+                        throw new RuntimeException('Return to draft requires an authenticated user.');
                     }
 
                     DB::transaction(function () use ($data, $userId): void {
                         $this->record->approvals()->create([
-                            'user_id' => $userId,
-                            'decision' => 'returned',
-                            'notes' => $data['notes'] ?? null,
+                            'user_id'    => $userId,
+                            'decision'   => 'returned',
+                            'notes'      => $data['notes'] ?? null,
                             'decided_at' => now(),
                         ]);
 
                         $this->record->update([
-                            'moderation_state' => ModerationState::Draft,
+                            'moderation_state'        => ModerationState::Draft,
                             'submitted_for_review_at' => null,
-                            'approved_at' => null,
-                            'approved_by_id' => null,
-                            'status' => 'draft',
+                            'approved_at'             => null,
+                            'approved_by_id'          => null,
+                            'status'                  => 'draft',
                         ]);
                     });
 
@@ -155,8 +157,21 @@ final class EditPost extends EditRecord
         ];
     }
 
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $this->record->refresh();
+
+        return $this->hydrateFormWithTranslations($this->record, $data);
+    }
+
     protected function mutateFormDataBeforeSave(array $data): array
     {
+        [$data, $translations] = $this->extractTranslationsFromForm($data);
+        $this->languageTabsPayload = $this->filterEmptyTranslations($translations);
+
+        $data = $this->mutateMainDataWithDefaultLocale($data, $this->languageTabsPayload);
+        $data = $this->mergeTranslationsIntoData($data, $this->languageTabsPayload, $this->record);
+
         if ($this->record->moderation_state !== ModerationState::Published) {
             $data['status'] = $data['status'] ?? 'draft';
         }

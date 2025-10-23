@@ -13,7 +13,6 @@ use App\Support\Seo\LocaleUrlGenerator;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
@@ -27,19 +26,14 @@ use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Actions\Action as TableAction;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
@@ -49,12 +43,13 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use RuntimeException;
-use UnitEnum;
 use Maatwebsite\Excel\Excel;
+use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 use pxlrbt\FilamentExcel\Actions\ExportBulkAction as ExcelExportBulkAction;
 use pxlrbt\FilamentExcel\Columns\Column as ExcelColumn;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
+use RuntimeException;
+use UnitEnum;
 
 /**
  * PostResource
@@ -108,38 +103,46 @@ final class PostResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->schema([
+            ->components([
                 Section::make(__('posts.sections.basic_information'))
-                    ->schema([
+                    ->components([
+                        LanguageTabs::make([
+                            TextInput::make('title')
+                                ->label(__('posts.fields.title'))
+                                ->required()
+                                ->maxLength(255)
+                                ->live()
+                                ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set, ?string $state): void {
+                                    if (! $get('slug') && filled($state)) {
+                                        $set('slug', Str::slug($state));
+                                    }
+                                }),
+                            Textarea::make('excerpt')
+                                ->label(__('posts.fields.excerpt'))
+                                ->maxLength(500)
+                                ->rows(3),
+                            RichEditor::make('content')
+                                ->label(__('posts.fields.content'))
+                                ->required()
+                                ->columnSpanFull(),
+                        ]),
                         Grid::make(2)
-                            ->schema([
-                                TextInput::make('title')
-                                    ->label(__('posts.fields.title'))
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->live()
-                                    ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set, ?string $state): void {
-                                        if (! $get('slug') && filled($state)) {
-                                            $set('slug', Str::slug($state));
-                                        }
-                                    }),
+                            ->components([
                                 TextInput::make('slug')
                                     ->label(__('posts.fields.slug'))
                                     ->required()
                                     ->maxLength(255)
                                     ->unique(Post::class, 'slug', ignoreRecord: true),
+                                Select::make('user_id')
+                                    ->label(__('posts.fields.user_id'))
+                                    ->relationship('user', 'name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->required(),
                             ]),
-                        Textarea::make('excerpt')
-                            ->label(__('posts.fields.excerpt'))
-                            ->maxLength(500)
-                            ->rows(3),
-                        RichEditor::make('content')
-                            ->label(__('posts.fields.content'))
-                            ->required()
-                            ->columnSpanFull(),
                     ]),
                 Section::make(__('posts.sections.media'))
-                    ->schema([
+                    ->components([
                         SpatieMediaLibraryFileUpload::make('images')
                             ->label(__('posts.fields.images'))
                             ->collection('images')
@@ -152,40 +155,19 @@ final class PostResource extends Resource
                             ->multiple(),
                     ]),
                 Section::make(__('posts.sections.seo'))
-                    ->schema([
-                        TextInput::make('meta_title')
-                            ->label(__('posts.fields.meta_title'))
-                            ->maxLength(255),
-                        Textarea::make('meta_description')
-                            ->label(__('posts.fields.meta_description'))
-                            ->maxLength(160)
-                            ->rows(3),
+                    ->components([
+                        LanguageTabs::make([
+                            TextInput::make('meta_title')
+                                ->label(__('posts.fields.meta_title'))
+                                ->maxLength(255),
+                            Textarea::make('meta_description')
+                                ->label(__('posts.fields.meta_description'))
+                                ->maxLength(160)
+                                ->rows(3),
+                        ]),
                     ]),
                 Section::make(__('posts.sections.settings'))
-                    ->schema([
-                        Grid::make(2)
-                            ->schema([
-                                Select::make('status')
-                                    ->label(__('posts.fields.status'))
-                                    ->options([
-                                        'draft'     => __('posts.status.draft'),
-                                        'published' => __('posts.status.published'),
-                                        'archived'  => __('posts.status.archived'),
-                                    ])
-                                    ->default('draft')
-                                    ->required()
-                                    ->disableOptionWhen(fn (string $value): bool => $value === 'published')
-                                    ->helperText(__('posts.status_managed_by_workflow')),
-                                Select::make('user_id')
-                                    ->label(__('posts.fields.user_id'))
-                                    ->relationship('user', 'name')
-                                    ->searchable()
-                                    ->preload()
-                                    ->required(),
-                            ]),
-                        DateTimePicker::make('published_at')
-                            ->label(__('posts.fields.published_at'))
-                            ->default(now()),
+                    ->components([
                         Grid::make(2)
                             ->components([
                                 Select::make('status')
@@ -199,7 +181,7 @@ final class PostResource extends Resource
                                     ->required()
                                     ->disableOptionWhen(fn (string $value): bool => $value === 'published')
                                     ->helperText(__('posts.status_managed_by_workflow')),
-                                Flatpickr::makeDateTime('published_at')
+                                DateTimePicker::make('published_at')
                                     ->label(__('posts.fields.published_at'))
                                     ->default(now()),
                             ]),
@@ -281,50 +263,6 @@ final class PostResource extends Resource
                     ->sortable()
                     ->limit(50)
                     ->formatStateUsing(fn (?string $state, Post $record): ?string => $record->getTranslatedTitle()),
-                ViewColumn::make('quick_links')
-                    ->label(__('Quick links'))
-                    ->view('filament.tables.columns.list-group')
-                    ->state(function (Post $record): array {
-                        $localeUrlGenerator = app(LocaleUrlGenerator::class);
-                        $locales = collect($localeUrlGenerator->supportedLocales());
-
-                        return $locales
-                            ->map(function (string $locale) use ($record, $localeUrlGenerator): ?array {
-                                $slug = method_exists($record, 'getTranslation')
-                                    ? ($record->getTranslation('slug', $locale) ?: $record->slug)
-                                    : ($record->slug ?? null);
-
-                                $url = $slug
-                                    ? $localeUrlGenerator->localizedRoute('localized.posts.show', ['post' => $slug], $locale)
-                                    : null;
-
-                                if (! $url && Route::has('frontend.posts.show')) {
-                                    $url = route('frontend.posts.show', $record);
-                                }
-
-                                if (! $url) {
-                                    return null;
-                                }
-
-                                $title = method_exists($record, 'getTranslation')
-                                    ? ($record->getTranslation('title', $locale) ?: $record->title)
-                                    : ($record->getTranslatedTitle($locale) ?: $record->title);
-
-                                return [
-                                    'label' => __('View (:locale): :title', [
-                                        'locale' => strtoupper($locale),
-                                        'title'  => $title,
-                                    ]),
-                                    'url'   => $url,
-                                    'icon'  => 'heroicon-o-document-text',
-                                    'color' => 'primary',
-                                ];
-                            })
-                            ->filter()
-                            ->values()
-                            ->all();
-                    })
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('user.name')
                     ->label(__('posts.fields.user_id'))
                     ->sortable()
