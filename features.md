@@ -131,6 +131,7 @@
 - Product search, catalogue, and detail endpoints resolve via dedicated application use cases, an Eloquent-backed repository, and a presenter that preserves the public contract while filtering hidden or malformed catalogue entries.
 - Problem+JSON responses now include the shared `error.rate_limited` code for HTTP 429 throttling scenarios, helping integrators react uniformly when the throttle middleware triggers.
 - Validation problem responses now deliver localized violation arrays plus a fallback English reason so clients can show consistent messaging while still exposing locale-specific details.
+- Fallback validator replay now forces the translator onto the configured fallback locale, preventing placeholder-filled summaries and reinforcing the guarantee that English problem reasons stay readable for integrators.
 - Access denied HTTP exceptions now keep their explicit denial reason inside `error.context.reason`, aligning Symfony-generated responses with Laravel's authorization handler contract.
 
 ## Documentation consolidation
