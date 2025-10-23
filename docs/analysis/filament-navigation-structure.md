@@ -140,6 +140,8 @@ This document outlines the comprehensive Filament admin navigation structure bas
 ### Navigation Icons
 All resources use consistent Heroicons with appropriate colors for visual distinction.
 
+- ProductHistoryResource now explicitly follows the shared docblock typing rule for `$navigationIcon`, keeping parity with the Filament resource standardization pass.
+
 ### Sort Order
 Resources are ordered by priority within each group, with core functionality appearing first.
 
