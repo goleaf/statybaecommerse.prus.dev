@@ -1,13 +1,11 @@
 # Searchable input hydration helper
 
-`App\\Support\\Filament\\SearchableComponentHelper` centralises how Filament search widgets restore their state after Livewire
-refreshes. Call the helper inside `afterStateHydrated()` or `afterStateUpdated()` hooks so every searchable input reuses the
-same conventions.
+The `App\\Support\\Filament\\Components\\SearchableComponentHelper` centralises the repetitive wiring required to keep [DefStudio's `SearchableInput`](https://github.com/defstudio/filament-searchable-input) fields hydrated with the correct state, options, and payload metadata inside our Filament forms. Use it whenever a Filament form component needs to look up a record, expose a human-readable label, and share structured payload data with sibling inputs.
 
 ## Hydrating from existing records
 
 ```php
-use App\Support\Filament\SearchableComponentHelper;
+use App\Support\Filament\Components\SearchableComponentHelper;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\Hidden;
 
@@ -46,13 +44,16 @@ Hidden::make('user_lookup_payload')
 2. **Canonical payload** – construct the DTO with `SearchResultPayload::normalise()` so the helper reuses the same `{ id, label, payload }` shape that Livewire emits.
 3. **Automatic clearing** – when the resolver returns `null`, the helper resets the component state and options immediately, preventing stale metadata.
 
-## Synchronising state after updates
+The helper converts the `value` to a string, registers it as the component state, and feeds the label through `options()` alongside the payload so downstream closures all read the same structure. When the normaliser returns an `Arrayable` payload (for example, a DTO implementing `toArray()`), the helper coerces it into an array before handing it over to Livewire. Empty or falsy identifiers short-circuit into `clear()` so the UI cannot surface stale metadata.
+
+## Clearing a component
+
+When a lookup is wiped out (for example, in an `afterStateUpdated` hook that receives a blank value), call the `clear()` helper to reset the state, options, and payload. Optional callbacks let you synchronise related form fields at the same time. `syncSelectedRecord()` already delegates to `clear()` when the lookup fails or the state is empty, but the standalone helper remains handy for bespoke flows (such as cascading dropdowns that need to wipe multiple fields).
 
 ```php
-use App\\Models\\User;
-use App\\Support\\Search\\SearchResultPayload;
-use DefStudio\\SearchableInput\\DTO\\SearchResult;
-use Filament\\Forms\\Set;
+use App\Support\Filament\Components\SearchableComponentHelper;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 
 SearchableInput::make('user_lookup')
     ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
@@ -106,8 +107,7 @@ Call `SearchableComponentHelper::clear($component);` whenever you need to wipe a
 ## Resource integration checklist
 
 - Register `afterStateHydrated` closures on your Filament form components to call `SearchableComponentHelper::hydrate()` with a finder closure and normaliser that return the `[value, label, payload]` tuple described above. This keeps edit forms and relation managers aligned when records are re-opened.
-- Pair `afterStateUpdated` hooks with `SearchableComponentHelper::clear()` so clearing the lookup also wipes any dependent state (`Set` helpers for foreign keys, cached payload fields, and related dropdowns).
-- Slider-specific surfaces (the quick actions widget, Slider Management modal, and Slider resource form) follow this pattern so the `button_url` field rehydrates the stored link payload and clears the cached metadata when the lookup is emptied. Use them as templates when wiring additional slider entry points.
+- Pair `afterStateUpdated` hooks with `SearchableComponentHelper::syncSelectedRecord()` so related attributes update automatically and dependent payloads can be cached or cleared through the optional callbacks.
 - Prefer returning a payload array that is already shaped for the downstream Livewire data structure you need. The helper simply forwards the normalised payload, making the component the single source of truth for metadata.
 
 ## Related guidelines
