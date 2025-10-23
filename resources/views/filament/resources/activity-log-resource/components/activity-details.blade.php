@@ -7,9 +7,9 @@
         : __('N/A');
 
     $subjectName = $subject && method_exists($subject, 'getAttribute')
-        ? ($subject->getAttribute('name') ?? $subjectTypeName)
-        : $subjectTypeName;
-    $properties = collect($activity->properties?->toArray() ?? []);
+        ? ($subject->getAttribute('name') ?? class_basename($activity->subject_type))
+        : class_basename((string) $activity->subject_type);
+    $properties = collect($activity->properties ?? []);
 @endphp
 
 <div class="space-y-4">
