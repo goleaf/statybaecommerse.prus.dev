@@ -24,8 +24,7 @@ final class Kernel extends ConsoleKernel
         \App\Console\Commands\GenerateApiSpecCommand::class,
         \App\Console\Commands\GenerateReportsCommand::class,
         \App\Console\Commands\CheckRefreshDatabaseCommand::class,
-        \App\Console\Commands\BackupPrepareCommand::class,
-        \App\Console\Commands\BackupVerifyCommand::class,
+        \App\Console\Commands\I18nAuditCommand::class,
     ];
 
     protected function schedule(Schedule $schedule): void
