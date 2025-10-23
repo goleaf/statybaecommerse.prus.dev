@@ -1,13 +1,7 @@
 <?php
 
-declare(strict_types=1);
-
-use App\Http\Controllers\Api\AuditLogController;
-use App\Http\Controllers\Api\AuthenticatedUserController;
-use App\Http\Controllers\Api\AutocompleteSearchController;
-use App\Http\Controllers\Api\SignedExportDownloadController;
-use App\Http\Controllers\Api\V1\HealthController;
-use App\Http\Controllers\Api\V1\SearchController;
+use App\Http\Controllers\Api\AutocompleteController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')
@@ -17,38 +11,6 @@ Route::prefix('v1')
         Route::get('/health', [HealthController::class, 'health'])
             ->name('health');
 
-        Route::get('/ready', [HealthController::class, 'ready'])
-            ->name('ready');
-
-        Route::get('/search', SearchController::class)
-            ->middleware(['throttle:api.default'])
-            ->name('search');
-
-        Route::middleware('auth:sanctum')->group(function (): void {
-            Route::get('/user', AuthenticatedUserController::class)
-                ->middleware(['abilities:profile.read', 'throttle:api.profile'])
-                ->name('user.show');
-
-            Route::post('/autocomplete-search', AutocompleteSearchController::class)
-                ->middleware(['abilities:system.autocomplete', 'throttle:api.autocomplete'])
-                ->withoutMiddleware('throttle:api.default')
-                ->name('autocomplete.search');
-
-            require __DIR__ . '/api/notifications.php';
-        });
-    });
-
-Route::get('exports/download/{export:uuid}', SignedExportDownloadController::class)
-    ->middleware(['signed'])
-    ->name('exports.signed-download');
-
-Route::prefix('partner')
-    ->middleware(['partner.api.auth', 'partner.api.rate_limit'])
-    ->name('api.partner.')
-    ->group(function (): void {
-        require __DIR__ . '/api/partner.php';
-    });
-
-Route::get('audit-logs', [AuditLogController::class, 'index'])
-    ->middleware(['throttle:api.default'])
-    ->name('api.audit-logs.index');
+// Autocomplete search endpoint for AutocompleteSelect component
+Route::post('/autocomplete-search', [AutocompleteController::class, 'search'])
+    ->name('api.autocomplete.search');
