@@ -7,6 +7,7 @@ namespace App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Concerns\InteractsWithTranslationTabs;
 use App\Filament\Resources\ProductResource;
 use App\Support\Authorization\AuthorizationMatrix;
+use App\Support\Html\HtmlSanitizer;
 use Filament\Actions;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
@@ -90,16 +91,21 @@ final class EditProduct extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        /** @var HtmlSanitizer $sanitizer */
-        $sanitizer = app(HtmlSanitizer::class);
+        [$data, $translations] = $this->extractTranslationsFromForm($data);
+        $this->languageTabsPayload = $this->sanitizeTranslatablePayload($translations);
 
-        if (array_key_exists('description', $data)) {
-            $data['description'] = $sanitizer->sanitize($data['description']);
-        }
+        $data = $this->mutateMainDataWithDefaultLocale($data, $this->languageTabsPayload);
 
-        // Update slug if name changed
-        if (isset($data['name']) && $data['name'] !== $this->record->name) {
-            $data['slug'] = Str::slug($data['name']);
+        $defaultLocale = $this->getDefaultLocale();
+        $defaultName = $this->languageTabsPayload[$defaultLocale]['name'] ?? $data['name'] ?? $this->record->name;
+        $slugFromTranslations = $this->languageTabsPayload[$defaultLocale]['slug'] ?? null;
+
+        if (filled($slugFromTranslations)) {
+            $data['slug'] = $slugFromTranslations;
+        } elseif (filled($defaultName) && $defaultName !== $this->record->name) {
+            $slug = Str::slug($defaultName);
+            $data['slug'] = $slug;
+            $this->languageTabsPayload[$defaultLocale]['slug'] = $slug;
         }
 
         if (($data['is_visible'] ?? $this->record->is_visible) && is_null($this->record->published_at)) {
@@ -117,7 +123,7 @@ final class EditProduct extends EditRecord
     }
 
     /**
-     * @param  array<string, array<string, mixed>> $translations
+     * @param  array<string, array<string, mixed>>  $translations
      * @return array<string, array<string, mixed>>
      */
     private function sanitizeTranslatablePayload(array $translations): array

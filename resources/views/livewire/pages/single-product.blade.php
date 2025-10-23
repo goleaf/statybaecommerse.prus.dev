@@ -228,11 +228,13 @@
                         <div class="space-y-6 p-6 lg:p-8">
                             <h2 class="text-lg font-semibold text-slate-900">
                                 {{ __('product_page.detailed_description') }}</h2>
+                            @php
+                                $fallbackDescription = '<p>' . __('product_page.no_description') . '</p>';
+                                $detailedDescription = $product->trans('description') ?? ($product->description ?? $fallbackDescription);
+                            @endphp
                             <x-sanitized-html
-                                class="prose prose-slate max-w-none text-slate-700"
-                                :content="$product->trans('description') ?? (
-                                    $product->description ?? '<p>' . __('product_page.no_description') . '</p>'
-                                )"
+                                    class="prose prose-slate max-w-none text-slate-700"
+                                    :content="$detailedDescription"
                             />
                         </div>
                     </section>

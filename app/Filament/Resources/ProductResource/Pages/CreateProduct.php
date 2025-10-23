@@ -37,11 +37,19 @@ final class CreateProduct extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        /** @var HtmlSanitizer $sanitizer */
-        $sanitizer = app(HtmlSanitizer::class);
+        [$data, $translations] = $this->extractTranslationsFromForm($data);
+        $this->languageTabsPayload = $this->sanitizeTranslatablePayload($translations);
 
-        if (array_key_exists('description', $data)) {
-            $data['description'] = $sanitizer->sanitize($data['description']);
+        $data = $this->mutateMainDataWithDefaultLocale($data, $this->languageTabsPayload);
+
+        $defaultLocale = $this->getDefaultLocale();
+        $defaultName = $this->languageTabsPayload[$defaultLocale]['name'] ?? $data['name'] ?? null;
+        $defaultSlug = $this->languageTabsPayload[$defaultLocale]['slug'] ?? null;
+
+        if (blank($defaultSlug) && filled($defaultName)) {
+            $slug = Str::slug($defaultName);
+            $this->languageTabsPayload[$defaultLocale]['slug'] = $slug;
+            $data['slug'] = $slug;
         }
 
         // Generate slug if not provided
@@ -64,7 +72,7 @@ final class CreateProduct extends CreateRecord
     }
 
     /**
-     * @param  array<string, array<string, mixed>> $translations
+     * @param  array<string, array<string, mixed>>  $translations
      * @return array<string, array<string, mixed>>
      */
     private function sanitizeTranslatablePayload(array $translations): array

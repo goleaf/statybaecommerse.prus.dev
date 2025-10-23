@@ -16,6 +16,28 @@ use Illuminate\Support\Facades\Log;
 
 final class Kernel extends ConsoleKernel
 {
+    /**
+     * @var array
+     *
+     * @phpstan-ignore-next-line missingType.iterableValue
+     */
+    protected $commands = [
+        \App\Console\Commands\AuditDatabaseIndexesCommand::class,
+        \App\Console\Commands\FixCodeStyleCommand::class,
+        \App\Console\Commands\ValidateCodeStyleCommand::class,
+        \App\Console\Commands\CodeStyleWatchCommand::class,
+        \App\Console\Commands\DemonstrateTimeoutCommand::class,
+        \App\Console\Commands\GenerateApiSpecCommand::class,
+        \App\Console\Commands\GenerateReportsCommand::class,
+        \App\Console\Commands\CheckRefreshDatabaseCommand::class,
+        \App\Console\Commands\BackupPrepareCommand::class,
+        \App\Console\Commands\BackupVerifyCommand::class,
+        \App\Console\Commands\I18nAuditCommand::class,
+        \App\Console\Commands\ValidateContractCommand::class,
+        \App\Console\Commands\ReconcileInventoryCommand::class,
+        \App\Console\Commands\SanitizeHtmlContentCommand::class,
+    ];
+
     protected function schedule(Schedule $schedule): void
     {
         // Run code style validation daily at 2 AM

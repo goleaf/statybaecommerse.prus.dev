@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\LegalResource\RelationManagers;
 
-use Filament\Schemas\Components\Grid;
+use App\Support\Html\HtmlSanitizer;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\RichEditor;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
@@ -32,7 +33,17 @@ class TranslationsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Translations';
 
-    public function form(Form $form): Form
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        return $this->sanitizePayload($data);
+    }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        return $this->sanitizePayload($data);
+    }
+
+    public function form(Form $form): Form|array
     {
         return $schema
             ->schema([
@@ -215,5 +226,23 @@ class TranslationsRelationManager extends BaseRelationManager
                     ->label('Add Translation')
                     ->icon('heroicon-o-plus'),
             ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function sanitizePayload(array $data): array
+    {
+        /** @var HtmlSanitizer $sanitizer */
+        $sanitizer = app(HtmlSanitizer::class);
+
+        $content = $data['content'] ?? null;
+        if (is_string($content) && trim($content) !== '') {
+            // Guarantee that relation-managed updates follow the same sanitization contract.
+            $data['content'] = $sanitizer->sanitize($content);
+        }
+
+        return $data;
     }
 }
