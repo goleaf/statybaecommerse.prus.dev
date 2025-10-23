@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Api;
 
-use App\Rules\ModelClassRule;
-
 final class AutocompleteSearchRequest extends ApiRequest
 {
     protected ?string $requiredAbility = 'system.autocomplete';
@@ -16,7 +14,7 @@ final class AutocompleteSearchRequest extends ApiRequest
     public function rules(): array
     {
         return [
-            'model_class' => ['required', 'string', new ModelClassRule()],
+            'model_class' => ['required', 'string'],
             'search_field' => ['sometimes', 'string'],
             'search_query' => ['required', 'string'],
             'value_field' => ['sometimes', 'string'],

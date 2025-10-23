@@ -14,12 +14,9 @@ final class NotificationIndexRequest extends ApiRequest
     public function rules(): array
     {
         return [
-            'page' => ['sometimes', 'integer', 'min:1'],
             'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
             'type' => ['sometimes', 'string'],
             'read' => ['sometimes', 'boolean'],
-            'sort' => ['sometimes', 'in:created_at,type'],
-            'direction' => ['sometimes', 'in:asc,desc'],
         ];
     }
 }

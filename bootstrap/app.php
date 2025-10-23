@@ -134,24 +134,11 @@ return Application::configure(basePath: dirname(__DIR__))
             ], $status);
         });
     })
-    ->withProviders((function (): array {
-        $providers = [
-            App\Providers\AuthServiceProvider::class,
-            App\Providers\ApiServiceProvider::class,
-            App\Providers\ModelScopeServiceProvider::class,
-        ];
-
-        $appEnvironment = (string) env('APP_ENV', 'production');
-        $queueConnection = (string) env('QUEUE_CONNECTION', 'sync');
-
-        if ($appEnvironment !== 'local' || $queueConnection !== 'sync') {
-            $providers[] = App\Providers\HorizonServiceProvider::class;
-        }
-
-        $providers[] = App\Providers\LocaleServiceProvider::class;
-        $providers[] = App\Providers\Filament\AdminPanelProvider::class;
-        $providers[] = SecurityServiceProvider::class;
-
-        return $providers;
-    })())
+    ->withProviders([
+        App\Providers\AuthServiceProvider::class,
+        App\Providers\ApiServiceProvider::class,
+        App\Providers\HorizonServiceProvider::class,
+        App\Providers\LocaleServiceProvider::class,
+        App\Providers\Filament\AdminPanelProvider::class,
+    ])
     ->create();

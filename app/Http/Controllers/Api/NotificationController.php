@@ -26,12 +26,17 @@ final class NotificationController extends Controller
 {
     public function __construct(private readonly NotificationService $notificationService) {}
 
+    /**
+     * Display a listing of the resource with pagination and filtering.
+     */
     public function index(NotificationIndexRequest $request): JsonResponse
     {
         $user = Auth::user();
-        $input = $request->validated();
-        $filters = NotificationFilterData::fromArray($input);
-        $pagination = NotificationPaginationData::fromArray($input);
+        $validated = $request->validated();
+        $perPage = (int) ($validated['per_page'] ?? 25);
+        $type = $validated['type'] ?? null;
+        $read = array_key_exists('read', $validated) ? (bool) $validated['read'] : null;
+        $notifications = $this->notificationService->getUserNotifications($user, $perPage, $type, $read);
 
         $page = $this->notificationService->getUserNotifications($user, $filters, $pagination);
 
@@ -43,6 +48,9 @@ final class NotificationController extends Controller
         ]);
     }
 
+    /**
+     * Handle stats functionality with proper error handling.
+     */
     public function stats(NotificationStatsRequest $request): JsonResponse
     {
         $user = Auth::user();
@@ -54,6 +62,9 @@ final class NotificationController extends Controller
         ]);
     }
 
+    /**
+     * Handle markAsRead functionality with proper error handling.
+     */
     public function markAsRead(NotificationMutationRequest $request, Notification $notification): JsonResponse
     {
         $user = Auth::user();
@@ -71,6 +82,9 @@ final class NotificationController extends Controller
         ]);
     }
 
+    /**
+     * Handle markAsUnread functionality with proper error handling.
+     */
     public function markAsUnread(NotificationMutationRequest $request, Notification $notification): JsonResponse
     {
         $user = Auth::user();
@@ -88,6 +102,9 @@ final class NotificationController extends Controller
         ]);
     }
 
+    /**
+     * Handle markAllAsRead functionality with proper error handling.
+     */
     public function markAllAsRead(NotificationMutationRequest $request): JsonResponse
     {
         $user = Auth::user();
@@ -100,6 +117,9 @@ final class NotificationController extends Controller
         ]);
     }
 
+    /**
+     * Handle markAllAsUnread functionality with proper error handling.
+     */
     public function markAllAsUnread(NotificationMutationRequest $request): JsonResponse
     {
         $user = Auth::user();
@@ -112,6 +132,9 @@ final class NotificationController extends Controller
         ]);
     }
 
+    /**
+     * Display the specified resource with related data.
+     */
     public function show(NotificationShowRequest $request, Notification $notification): JsonResponse
     {
         $user = Auth::user();
@@ -128,6 +151,9 @@ final class NotificationController extends Controller
         ]);
     }
 
+    /**
+     * Remove the specified resource from storage.
+     */
     public function destroy(NotificationMutationRequest $request, Notification $notification): JsonResponse
     {
         $user = Auth::user();
@@ -144,12 +170,18 @@ final class NotificationController extends Controller
         ]);
     }
 
+    /**
+     * Handle search functionality with proper error handling.
+     */
     public function search(NotificationSearchRequest $request): JsonResponse
     {
         $user = Auth::user();
-        $input = $request->validated();
-        $pagination = NotificationPaginationData::fromArray($input);
-        $search = NotificationSearchParametersData::fromArray($input);
+        $validated = $request->validated();
+        $query = $validated['q'];
+        $type = $validated['type'] ?? null;
+        $read = array_key_exists('read', $validated) ? (bool) $validated['read'] : null;
+        $perPage = (int) ($validated['per_page'] ?? 25);
+        $notifications = $this->notificationService->searchNotifications($query, $user, $type, $read, $perPage);
 
         $page = $this->notificationService->searchNotifications($user, $search, $pagination);
 

@@ -98,89 +98,67 @@ final class NotificationService
         return Notification::markAllAsReadForUser($user->id);
     }
 
+    /**
+     * Handle getUserNotifications functionality with proper error handling.
+     *
+     * @return Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public function getUserNotifications(User $user, int $perPage = 25, ?string $type = null, ?bool $read = null): LengthAwarePaginator
+    {
+        $query = $this->applyFilters(Notification::forUser($user->id), $type, $read);
+
+        return $query->latest()->paginate($perPage);
+    }
+
+    /**
+     * Aggregate statistics for the authenticated user's notifications.
+     */
+    public function getUserNotificationStats(User $user): array
+    {
+        $baseQuery = Notification::forUser($user->id);
+
+        return [
+            'total' => (clone $baseQuery)->count(),
+            'read' => (clone $baseQuery)->read()->count(),
+            'unread' => (clone $baseQuery)->unread()->count(),
+            'urgent' => (clone $baseQuery)->urgent()->count(),
+        ];
+    }
+
+    /**
+     * Mark all notifications as unread for the given user.
+     */
     public function markAllAsUnreadForUser(User $user): int
     {
         return Notification::markAllAsUnreadForUser($user->id);
     }
 
-    public function getUserNotifications(
-        User $user,
-        NotificationFilterData $filters,
-        NotificationPaginationData $pagination
-    ): NotificationPageData {
-        $query = $this->baseQueryForUser($user);
-        $filters->apply($query);
-        $pagination->apply($query);
-
-        $paginator = $this->paginate($query, $pagination);
-        $items = array_map(
-            static fn (Notification $notification): NotificationPayloadData => NotificationPayloadData::fromModel($notification),
-            $paginator->items(),
-        );
-
-        return NotificationPageData::fromPaginator($paginator, $pagination, $filters, null, $items);
-    }
-
-    public function searchNotifications(
-        User $user,
-        NotificationSearchParametersData $search,
-        NotificationPaginationData $pagination
-    ): NotificationPageData {
-        $query = $this->baseQueryForUser($user);
-        $search->apply($query);
-        $pagination->apply($query);
-
-        $paginator = $this->paginate($query, $pagination);
-        $items = array_map(
-            static fn (Notification $notification): NotificationPayloadData => NotificationPayloadData::fromModel($notification),
-            $paginator->items(),
-        );
-
-        return NotificationPageData::fromPaginator($paginator, $pagination, $search->filters(), $search, $items);
-    }
-
-    public function getUserNotificationStats(User $user): NotificationStatsData
+    /**
+     * Search notifications for the authenticated user.
+     */
+    public function searchNotifications(string $query, User $user, ?string $type = null, ?bool $read = null, int $perPage = 25): LengthAwarePaginator
     {
-        $baseQuery = $this->baseQueryForUser($user);
+        $builder = $this->applyFilters(Notification::forUser($user->id), $type, $read)
+            ->where(function (Builder $searchQuery) use ($query): void {
+                $searchQuery->where('data->title', 'like', '%'.$query.'%')
+                    ->orWhere('data->message', 'like', '%'.$query.'%')
+                    ->orWhere('data->type', 'like', '%'.$query.'%');
+            });
 
-        return NotificationStatsData::fromCounts(
-            (clone $baseQuery)->count(),
-            (clone $baseQuery)->read()->count(),
-            (clone $baseQuery)->unread()->count(),
-            (clone $baseQuery)->urgent()->count(),
-        );
+        return $builder->latest()->paginate($perPage);
     }
 
-    public function show(User $user, Notification $notification): NotificationPayloadData
+    private function applyFilters(Builder $query, ?string $type, ?bool $read): Builder
     {
-        $this->guardNotificationOwnership($notification, $user);
-
-        return NotificationPayloadData::fromModel($notification);
-    }
-
-    private function baseQueryForUser(User $user): Builder
-    {
-        return Notification::query()->forUser($user->id)->latest('created_at');
-    }
-
-    private function paginate(Builder $builder, NotificationPaginationData $pagination): LengthAwarePaginator
-    {
-        return $builder->paginate(
-            $pagination->perPage(),
-            ['*'],
-            'page',
-            $pagination->page(),
-        );
-    }
-
-    private function guardNotificationOwnership(Notification $notification, User $user): void
-    {
-        if ($notification->notifiable_id !== $user->id || $notification->notifiable_type !== User::class) {
-            $exception = new ModelNotFoundException('Notification not found for the authenticated user.');
-            $exception->setModel(Notification::class, [$notification->id]);
-
-            throw $exception;
+        if ($type) {
+            $query->byType($type);
         }
+
+        if ($read !== null) {
+            $query = $read ? $query->read() : $query->unread();
+        }
+
+        return $query;
     }
 
     private function getOrderMessage(string $action, array $orderData): string
