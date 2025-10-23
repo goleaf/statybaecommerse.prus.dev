@@ -37,13 +37,11 @@ final class VariantAnalyticsResource extends Resource
 {
     protected static ?string $model = VariantAnalytics::class;
 
-    /**
-     * @var string|BackedEnum|null Flag the analytics icon while staying compatible with Filament v4 conventions.
-     */
-    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-chart-bar-square';
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    /** @var string|\BackedEnum|null Anchor inventory analytics beneath the shared navigation enum. */
-    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::Inventory;
+    /** @var string|\UnitEnum|null */
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Inventory;
 
     public static function getNavigationGroup(): ?string
     {

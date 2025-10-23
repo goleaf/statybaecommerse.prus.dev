@@ -26,7 +26,7 @@ class DiscountRedemptionsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'discountRedemptions';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
         return $schema
             ->components([

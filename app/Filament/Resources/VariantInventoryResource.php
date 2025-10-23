@@ -64,12 +64,11 @@ final class VariantInventoryResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'variant_id';
 
-    /**
-     * @var string|\BackedEnum|null Navigation icon configured for the inventory module.
-     */
-    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-archive-box';
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Inventory';
+    /** @var string|\UnitEnum|null */
+    protected static \UnitEnum|string|null $navigationGroup = 'Inventory';
 
     public static function getNavigationLabel(): string
     {

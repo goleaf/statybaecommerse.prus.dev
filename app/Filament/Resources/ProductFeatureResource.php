@@ -38,13 +38,15 @@ final class ProductFeatureResource extends Resource
 
     protected static ?string $model = ProductFeature::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-star';
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
 
-    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::Products;
+    /** @var string|\UnitEnum|null */
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 17;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema->schema([
             Forms\Components\Select::make('product_id')

@@ -28,7 +28,7 @@ class UserProductInteractionResource extends Resource
         return LegacyUserProductInteractionResource::getNavigationGroup();
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return UserProductInteractionForm::configure($schema);
     }

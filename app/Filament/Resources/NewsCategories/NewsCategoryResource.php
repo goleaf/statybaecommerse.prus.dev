@@ -27,7 +27,8 @@ final class NewsCategoryResource extends Resource
 
     protected static ?string $model = NewsCategory::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     /**
      * @var string|BackedEnum|null Keep the resource grouped with other news modules.
@@ -42,7 +43,7 @@ final class NewsCategoryResource extends Resource
         return $group instanceof NavigationGroup ? $group->label() : $group;
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return NewsCategoryForm::configure($schema);
     }

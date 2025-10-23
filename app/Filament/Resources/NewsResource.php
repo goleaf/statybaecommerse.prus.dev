@@ -33,10 +33,8 @@ class NewsResource extends Resource
 
     protected static ?string $model = News::class;
 
-    /**
-     * @var string|\BackedEnum|null @phpstan-var string|BackedEnum|null
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-newspaper';
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-newspaper';
 
     protected static ?int $navigationSort = 1;
 
@@ -44,7 +42,7 @@ class NewsResource extends Resource
 
     protected static ?string $pluralModelLabel = 'News Articles';
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema->components([
             Forms\Components\Section::make('Article Information')

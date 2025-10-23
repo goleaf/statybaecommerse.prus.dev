@@ -40,9 +40,10 @@ final class ReferralCodeResource extends Resource
 
     protected static ?string $model = ReferralCode::class;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Referral';
+    /** @var string|\UnitEnum|null */
+    protected static \UnitEnum|string|null $navigationGroup = 'Referral';
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema
             ->components([

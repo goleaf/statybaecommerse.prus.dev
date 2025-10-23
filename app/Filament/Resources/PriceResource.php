@@ -34,11 +34,12 @@ final class PriceResource extends Resource
 
     protected static ?string $model = Price::class;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Products';
+    /** @var string|\UnitEnum|null */
+    protected static \UnitEnum|string|null $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 12;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema
             ->schema([

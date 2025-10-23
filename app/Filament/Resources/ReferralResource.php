@@ -36,25 +36,17 @@ final class ReferralResource extends Resource
 
     protected static ?string $model = Referral::class;
 
-    /**
-     * Navigation icon for the resource.
-     *
-     * @var string|BackedEnum|null
-     */
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-share';
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-share';
 
-    /**
-     * Navigation group for organizing the resource in the admin panel.
-     *
-     * @var UnitEnum|string|null
-     */
-    protected static string|\UnitEnum|null $navigationGroup = 'Marketing';
+    /** @var string|\UnitEnum|null */
+    protected static \UnitEnum|string|null $navigationGroup = 'Marketing';
 
     protected static ?int $navigationSort = 17;
 
     protected static ?string $recordTitleAttribute = 'referral_code';
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema
             ->components([

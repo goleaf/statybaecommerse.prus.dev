@@ -42,7 +42,8 @@ final class PriceListResource extends Resource
 
     protected static ?string $model = PriceList::class;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Products';
+    /** @var string|\UnitEnum|null */
+    protected static \UnitEnum|string|null $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 15;
 
@@ -68,7 +69,7 @@ final class PriceListResource extends Resource
         return __('price_lists.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema->schema([
             Section::make(__('price_lists.basic_information'))

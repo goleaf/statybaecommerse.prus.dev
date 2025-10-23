@@ -25,9 +25,10 @@ class ShippingOptionResource extends Resource
 
     protected static ?string $model = ShippingOption::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return ShippingOptionForm::configure($schema);
     }

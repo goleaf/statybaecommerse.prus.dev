@@ -47,7 +47,8 @@ final class StockResource extends Resource
 
     protected static ?string $model = Inventory::class;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Inventory';
+    /** @var string|\UnitEnum|null */
+    protected static \UnitEnum|string|null $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 7;
 
@@ -68,7 +69,7 @@ final class StockResource extends Resource
         return __('inventory.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema->schema([
             Section::make(__('inventory.product_information'))

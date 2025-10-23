@@ -37,9 +37,10 @@ final class ProductHistoryResource extends Resource
     protected static ?string $model = ProductHistory::class;
 
     /** @var string|\BackedEnum|null */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-clock';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-clock';
 
-    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::Products;
+    /** @var string|\UnitEnum|null */
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 11;
 
@@ -58,7 +59,7 @@ final class ProductHistoryResource extends Resource
         return __('product_history.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema->schema([
             Section::make(__('product_history.basic_information'))

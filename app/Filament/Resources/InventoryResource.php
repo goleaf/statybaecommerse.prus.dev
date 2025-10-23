@@ -47,7 +47,8 @@ final class InventoryResource extends Resource
 {
     protected static ?string $model = Inventory::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cube';
+    /** @var string|\BackedEnum|null */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-cube';
 
     protected static ?int $navigationSort = 2;
 
@@ -71,7 +72,7 @@ final class InventoryResource extends Resource
         return __('Inventory');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema->schema([
             Section::make(__('Inventory Details'))

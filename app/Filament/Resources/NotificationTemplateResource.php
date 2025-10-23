@@ -48,7 +48,7 @@ final class NotificationTemplateResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     /** @var string|\UnitEnum|null */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Content;
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Content;
 
     public static function getNavigationLabel(): string
     {
@@ -65,7 +65,7 @@ final class NotificationTemplateResource extends Resource
         return __('admin.notification_templates.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema
             ->schema([

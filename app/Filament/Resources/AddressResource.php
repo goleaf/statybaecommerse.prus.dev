@@ -106,7 +106,7 @@ final class AddressResource extends Resource
      * Keeping the Form wrapper avoids mismatches with auto-discovery checks that expect Filament
      * resource signatures to follow the documented `Form $form` pattern during application boot.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema->schema([
             Section::make(__('translations.address_information'))
