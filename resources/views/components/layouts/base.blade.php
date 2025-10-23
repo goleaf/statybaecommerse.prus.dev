@@ -59,7 +59,21 @@
 
     <!-- Scripts -->
     @php
-        $shouldLoadViteAssets = ! app()->runningUnitTests() || file_exists(public_path('build/manifest.json'));
+        // Decide whether to include compiled Vite assets; during tests the manifest can be empty which
+        // would otherwise trigger rendering errors when Laravel attempts to resolve missing entries.
+        $viteEntries = ['resources/css/app.scss', 'resources/js/app.js'];
+        $shouldLoadViteAssets = ! app()->runningUnitTests();
+
+        if (! $shouldLoadViteAssets) {
+            $manifestPath = public_path('build/manifest.json');
+
+            if (file_exists($manifestPath)) {
+                $manifest = json_decode(file_get_contents($manifestPath), true);
+
+                $shouldLoadViteAssets = is_array($manifest)
+                    && collect($viteEntries)->every(static fn (string $entry): bool => array_key_exists($entry, $manifest));
+            }
+        }
     @endphp
 
     @if ($shouldLoadViteAssets)
