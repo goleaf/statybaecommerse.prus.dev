@@ -350,10 +350,10 @@ final class CityResource extends Resource
                     ->label(__('cities.level'))
                     ->badge()
                     ->color(fn (?int $state): string => match ($state) {
-                        0       => 'blue',
-                        1       => 'green',
-                        2       => 'yellow',
-                        3       => 'orange',
+                        0 => 'blue',
+                        1 => 'green',
+                        2 => 'yellow',
+                        3 => 'orange',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (?int $state): string => $state !== null ? __("cities.levels.{$state}") : '-')
