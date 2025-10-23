@@ -1,85 +1,116 @@
-<x-layouts.base :title="$product->name">
-    <div class="max-w-5xl mx-auto px-4 py-10 space-y-10">
-        <section class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-xl p-6 shadow-sm">
-            <h1 class="text-3xl font-semibold text-gray-900 dark:text-gray-100">{{ $product->name }}</h1>
-            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ $product->brand?->name }}</p>
-            <div class="mt-4 text-2xl font-semibold text-primary-600">{{ app_money_format($product->sale_price ?? $product->price ?? 0) }}</div>
-            <div class="mt-4 prose dark:prose-invert max-w-none">{!! $product->description !!}</div>
-            <div class="mt-4 flex flex-wrap gap-2">
-                @foreach ($product->categories as $category)
-                    <a href="{{ route('frontend.categories.show', $category) }}" class="px-3 py-1 rounded-full bg-primary-50 text-primary-700 text-sm">
-                        {{ $category->name }}
-                    </a>
-                @endforeach
-            </div>
-        </section>
+@extends('frontend.layouts.app')
 
-        <section class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-xl p-6 shadow-sm">
-            <h2 class="text-2xl font-semibold mb-4">{{ __('Customer reviews') }}</h2>
-            <div class="space-y-4">
-                @forelse ($product->reviews as $review)
-                    <article class="border border-gray-200 dark:border-white/10 rounded-lg p-4">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="font-semibold text-gray-900 dark:text-gray-100">{{ $review->reviewer_name }}</p>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Rating: :rating/5', ['rating' => $review->rating]) }}</p>
+@section('title', $product->name)
+
+@section('content')
+    <div class="bg-gray-50 py-12">
+        <div class="mx-auto max-w-6xl space-y-12 px-4 sm:px-6 lg:px-8">
+            <nav class="text-sm text-gray-500" aria-label="Breadcrumb">
+                <ol class="flex flex-wrap items-center gap-2">
+                    <li>
+                        <a href="{{ route('frontend.home') }}" class="text-blue-600 hover:text-blue-700">{{ __('Home') }}</a>
+                    </li>
+                    <li>/</li>
+                    <li>
+                        <a href="{{ route('frontend.products.index') }}" class="text-blue-600 hover:text-blue-700">{{ __('Products') }}</a>
+                    </li>
+                    <li>/</li>
+                    <li class="text-gray-700">{{ $product->name }}</li>
+                </ol>
+            </nav>
+
+            <div class="grid gap-10 lg:grid-cols-2 lg:items-start">
+                <div class="space-y-6">
+                    @php
+                        $image = $product->getFirstMediaUrl('images', 'image-lg') ?: $product->getFirstMediaUrl('images');
+                    @endphp
+                    <div class="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
+                        @if($image)
+                            <img src="{{ $image }}" alt="{{ $product->name }}" class="w-full object-cover" loading="lazy">
+                        @else
+                            <div class="flex h-96 items-center justify-center bg-gray-100 text-gray-400">
+                                <x-untitledui-image class="h-12 w-12" />
                             </div>
-                            <time class="text-xs text-gray-400" datetime="{{ $review->created_at }}">{{ $review->created_at?->format('Y-m-d') }}</time>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="space-y-2">
+                        <span class="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+                            <x-untitledui-check-badge class="h-3.5 w-3.5" />
+                            {{ __('In stock catalogue item') }}
+                        </span>
+                        <h1 class="text-3xl font-bold text-gray-900 sm:text-4xl">{{ $product->name }}</h1>
+                        @if($product->brand)
+                            <div class="text-sm text-gray-500">
+                                {{ __('By :brand', ['brand' => $product->brand->name]) }}
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        @php
+                            $effectivePrice = $product->sale_price && $product->sale_price < $product->price ? $product->sale_price : $product->price;
+                        @endphp
+                        <p class="text-3xl font-semibold text-gray-900">
+                            {{ \Illuminate\Support\Number::currency((float) $effectivePrice, function_exists('current_currency') ? current_currency() : 'EUR', app()->getLocale()) }}
+                        </p>
+                        @if($product->sale_price && $product->sale_price < $product->price)
+                            <p class="text-lg text-gray-400 line-through">
+                                {{ \Illuminate\Support\Number::currency((float) $product->price, function_exists('current_currency') ? current_currency() : 'EUR', app()->getLocale()) }}
+                            </p>
+                        @endif
+                    </div>
+
+                    <div class="space-y-3 text-gray-600">
+                        {!! $product->description ?? '<p>'.e($product->short_description ?? __('Product description coming soon.')) .'</p>' !!}
+                    </div>
+
+                    @if($product->categories->isNotEmpty())
+                        <div class="space-y-2">
+                            <h2 class="text-sm font-semibold text-gray-900">{{ __('Categories') }}</h2>
+                            <div class="flex flex-wrap gap-2">
+                                @foreach($product->categories as $category)
+                                    <a href="{{ route('frontend.categories.show', $category) }}" class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 hover:bg-blue-100">
+                                        {{ $category->name }}
+                                    </a>
+                                @endforeach
+                            </div>
                         </div>
-                        <h3 class="mt-2 text-lg font-semibold">{{ $review->title }}</h3>
-                        <p class="mt-2 text-gray-700 dark:text-gray-300">{{ $review->content }}</p>
-                    </article>
-                @empty
-                    <p class="text-gray-500 dark:text-gray-400">{{ __('Be the first to review this product.') }}</p>
-                @endforelse
+                    @endif
+
+                    @if($product->brand)
+                        <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+                            <h2 class="text-sm font-semibold text-gray-900">{{ __('About the brand') }}</h2>
+                            <p class="mt-2 text-sm text-gray-600">
+                                {{ $product->brand->description ?? __('Trusted construction equipment supplier across the Baltics.') }}
+                            </p>
+                            @if($product->brand->website)
+                                <a href="{{ $product->brand->website }}" class="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700">
+                                    <x-untitledui-globe class="h-4 w-4" />
+                                    {{ __('Visit brand site') }}
+                                </a>
+                            @endif
+                        </div>
+                    @endif
+                </div>
             </div>
-        </section>
 
-        <section class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-xl p-6 shadow-sm">
-            <h2 class="text-2xl font-semibold mb-4">{{ __('Write a review') }}</h2>
-            <form method="POST" action="{{ route('frontend.products.add-review', $product) }}" class="space-y-4">
-                @csrf
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="rating">{{ __('Rating') }}</label>
-                    <input type="number" id="rating" name="rating" min="1" max="5" required value="{{ old('rating', 5) }}"
-                           class="mt-1 w-24 rounded-lg border-gray-300 dark:border-white/10 bg-gray-50 dark:bg-gray-800">
-                    @error('rating')
-                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                    @enderror
+            <section class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-semibold text-gray-900">{{ __('Related products') }}</h2>
+                    <a href="{{ route('frontend.products.index', ['filter' => 'featured']) }}" class="text-sm font-semibold text-blue-600 hover:text-blue-700">
+                        {{ __('View all') }}
+                    </a>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="title">{{ __('Title') }}</label>
-                    <input id="title" name="title" value="{{ old('title') }}"
-                           class="mt-1 block w-full rounded-lg border-gray-300 dark:border-white/10 bg-gray-50 dark:bg-gray-800">
-                    @error('title')
-                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="content">{{ __('Review') }}</label>
-                    <textarea id="content" name="content" rows="4" class="mt-1 block w-full rounded-lg border-gray-300 dark:border-white/10 bg-gray-50 dark:bg-gray-800" required>{{ old('content') }}</textarea>
-                    @error('content')
-                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-                <button type="submit" class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">{{ __('Submit review') }}</button>
-            </form>
-        </section>
-
-        @if ($relatedProducts->isNotEmpty())
-            <section>
-                <h2 class="text-2xl font-semibold mb-4">{{ __('You might also like') }}</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    @foreach ($relatedProducts as $related)
-                        <div class="p-4 border border-gray-200 rounded-xl bg-white shadow-sm dark:bg-gray-900 dark:border-white/10">
-                            <h3 class="text-lg font-semibold">{{ $related->name }}</h3>
-                            <p class="text-sm text-gray-500">{{ $related->brand?->name }}</p>
-                            <div class="mt-2 text-primary-600 font-semibold">{{ app_money_format($related->sale_price ?? $related->price ?? 0) }}</div>
-                            <a href="{{ route('frontend.products.show', $related) }}" class="mt-3 inline-flex items-center text-sm text-primary-700 hover:text-primary-800">{{ __('View product') }}</a>
-                        </div>
-                    @endforeach
-                </div>
+                @include('frontend.catalogue.product-grid', [
+                    'products' => $relatedProducts,
+                    'columns' => 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
+                    'emptyMessage' => __('More related items will appear as the catalogue grows.'),
+                ])
             </section>
-        @endif
+        </div>
     </div>
-</x-layouts.base>
+@endsection
+

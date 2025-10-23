@@ -1,33 +1,88 @@
-<x-layouts.base :title="$brand->name">
-    <div class="max-w-6xl mx-auto px-4 py-10 space-y-8">
-        <header class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-xl p-6 shadow-sm">
-            <h1 class="text-3xl font-semibold text-gray-900 dark:text-gray-100">{{ $brand->name }}</h1>
-            @if ($brand->website)
-                <p class="mt-2 text-sm">
-                    <a href="{{ $brand->website }}" class="text-primary-700 hover:text-primary-800" target="_blank" rel="noopener">{{ $brand->website }}</a>
-                </p>
-            @endif
-            @if ($brand->description)
-                <div class="mt-4 text-sm text-gray-600 dark:text-gray-300">{!! $brand->description !!}</div>
-            @endif
-        </header>
+@extends('frontend.layouts.app')
 
-        <section>
-            <h2 class="text-2xl font-semibold mb-4">{{ __('Products from this brand') }}</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                @forelse ($products as $product)
-                    <div class="p-4 border border-gray-200 rounded-xl bg-white shadow-sm dark:bg-gray-900 dark:border-white/10">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ $product->name }}</h3>
-                        <div class="mt-2 text-primary-600 font-semibold">{{ app_money_format($product->sale_price ?? $product->price ?? 0) }}</div>
-                        <a href="{{ route('frontend.products.show', $product) }}" class="mt-3 inline-flex items-center text-sm text-primary-700 hover:text-primary-800">{{ __('View product') }}</a>
+@section('title', $brand->name)
+
+@section('content')
+    <div class="bg-gray-50 py-12">
+        <div class="mx-auto max-w-7xl space-y-12 px-4 sm:px-6 lg:px-8">
+            <div class="space-y-4">
+                <nav class="text-sm text-gray-500" aria-label="Breadcrumb">
+                    <ol class="flex flex-wrap items-center gap-2">
+                        <li><a href="{{ route('frontend.home') }}" class="text-emerald-600 hover:text-emerald-700">{{ __('Home') }}</a></li>
+                        <li>/</li>
+                        <li><a href="{{ route('frontend.brands.index') }}" class="text-emerald-600 hover:text-emerald-700">{{ __('Brands') }}</a></li>
+                        <li>/</li>
+                        <li class="text-gray-700">{{ $brand->name }}</li>
+                    </ol>
+                </nav>
+                <div class="flex flex-col gap-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+                    <div class="space-y-3">
+                        <span class="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-sm font-semibold text-emerald-700">
+                            <x-untitledui-sparkle class="h-4 w-4" />
+                            {{ __('Brand spotlight') }}
+                        </span>
+                        <h1 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">{{ $brand->name }}</h1>
+                        <p class="text-gray-600">{{ $brand->description ?? __('Premium-grade tools and construction supplies trusted across Europe.') }}</p>
+                        @if($brand->website)
+                            <a href="{{ $brand->website }}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 hover:text-emerald-700">
+                                <x-untitledui-link-05 class="h-4 w-4" />
+                                {{ parse_url($brand->website, PHP_URL_HOST) ?? $brand->website }}
+                            </a>
+                        @endif
                     </div>
-                @empty
-                    <p class="text-gray-500 dark:text-gray-400">{{ __('This brand does not have any products yet.') }}</p>
-                @endforelse
+                    <div class="grid gap-4 rounded-2xl border border-emerald-100 bg-emerald-50 p-6 text-sm text-emerald-900">
+                        <div class="flex items-center gap-3">
+                            <x-untitledui-layers-three class="h-5 w-5" />
+                            {{ __('Active catalogue items: :count', ['count' => method_exists($products, 'total') ? $products->total() : $products->count()]) }}
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <x-untitledui-map-pin class="h-5 w-5" />
+                            {{ __('Preferred across Lithuania and neighbouring markets') }}
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="mt-6">
-                {{ $products->links() }}
+
+            <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+                <form method="GET" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div class="space-y-2">
+                        <label for="brand-sort" class="text-sm font-semibold text-gray-700">{{ __('Sort by') }}</label>
+                        <select id="brand-sort" name="sort" class="w-full rounded-xl border-gray-200 text-sm focus:border-emerald-500 focus:ring-emerald-500">
+                            @foreach($availableSorts as $value => $label)
+                                <option value="{{ $value }}" @selected($appliedSort === $value)>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label for="brand-filter" class="text-sm font-semibold text-gray-700">{{ __('Filter') }}</label>
+                        <select id="brand-filter" name="filter" class="w-full rounded-xl border-gray-200 text-sm focus:border-emerald-500 focus:ring-emerald-500">
+                            @foreach($availableFilters as $value => $label)
+                                <option value="{{ $value }}" @selected($appliedFilter === $value)>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label for="brand-per-page" class="text-sm font-semibold text-gray-700">{{ __('Results per page') }}</label>
+                        <input id="brand-per-page" type="number" min="6" max="60" name="per_page" value="{{ $perPage }}" class="w-full rounded-xl border-gray-200 text-sm focus:border-emerald-500 focus:ring-emerald-500">
+                    </div>
+                    <div class="flex items-end">
+                        <button type="submit" class="inline-flex w-full items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700">
+                            {{ __('Update view') }}
+                        </button>
+                    </div>
+                </form>
             </div>
-        </section>
+
+            <section class="space-y-6">
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <h2 class="text-2xl font-semibold text-gray-900">{{ __('Products by :brand', ['brand' => $brand->name]) }}</h2>
+                    @if($searchTerm)
+                        <p class="text-sm text-gray-500">{{ __('Search term: ":term"', ['term' => $searchTerm]) }}</p>
+                    @endif
+                </div>
+                @include('frontend.catalogue.product-grid', ['products' => $products])
+            </section>
+        </div>
     </div>
-</x-layouts.base>
+@endsection
+

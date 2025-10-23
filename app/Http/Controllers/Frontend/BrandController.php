@@ -6,34 +6,27 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
-use App\Models\Product;
-use Illuminate\View\View;
+use App\Support\Frontend\DataProviders\BrandCatalogueDataProvider;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
 
 final class BrandController extends Controller
 {
-    public function index(): View
+    public function __construct(private readonly BrandCatalogueDataProvider $dataProvider)
     {
-        $brands = Brand::query()
-            ->withCount('products')
-            ->orderBy('name')
-            ->get();
-
-        return view('frontend.brands.index', compact('brands'));
     }
 
-    public function show(Brand $brand): View
+    public function index(Request $request): View
     {
-        $brand->load('products');
+        $data = $this->dataProvider->index();
 
-        $products = Product::query()
-            ->where('brand_id', $brand->getKey())
-            ->with(['brand', 'categories'])
-            ->paginate(12)
-            ->withQueryString();
+        return view('frontend.brands.index', $data);
+    }
 
-        return view('frontend.brands.show', [
-            'brand' => $brand,
-            'products' => $products,
-        ]);
+    public function show(Brand $brand, Request $request): View
+    {
+        $data = $this->dataProvider->show($brand, $request->all());
+
+        return view('frontend.brands.show', $data);
     }
 }

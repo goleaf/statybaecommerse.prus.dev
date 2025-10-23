@@ -1,80 +1,114 @@
-<x-layouts.base title="{{ __('Products') }}">
-    <div class="max-w-7xl mx-auto px-4 py-10 space-y-8">
-        <section class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-white/10 p-6">
-            <form method="GET" action="{{ route('frontend.products.search') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="q">{{ __('Search products') }}</label>
-                    <input id="q" name="q" value="{{ $activeFilters['search'] ?? '' }}"
-                           class="mt-1 block w-full rounded-lg border-gray-300 dark:border-white/10 bg-gray-50 dark:bg-gray-800"
-                           placeholder="{{ __('Search by name or SKU') }}">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="category">{{ __('Category') }}</label>
-                    <select id="category" name="category" class="mt-1 block w-full rounded-lg border-gray-300 dark:border-white/10 bg-gray-50 dark:bg-gray-800">
-                        <option value="">{{ __('All categories') }}</option>
-                        @foreach ($categories as $category)
-                            <option value="{{ $category->slug }}" @selected(($activeFilters['category'] ?? '') === $category->slug)>{{ $category->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="brand">{{ __('Brand') }}</label>
-                    <select id="brand" name="brand" class="mt-1 block w-full rounded-lg border-gray-300 dark:border-white/10 bg-gray-50 dark:bg-gray-800">
-                        <option value="">{{ __('All brands') }}</option>
-                        @foreach ($brands as $brand)
-                            <option value="{{ $brand->slug }}" @selected(($activeFilters['brand'] ?? '') === $brand->slug)>{{ $brand->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="sort">{{ __('Sort by') }}</label>
-                    <select id="sort" name="sort" class="mt-1 block w-full rounded-lg border-gray-300 dark:border-white/10 bg-gray-50 dark:bg-gray-800">
-                        <option value="">{{ __('Most recent') }}</option>
-                        <option value="price-asc" @selected(($activeFilters['sort'] ?? '') === 'price-asc')>{{ __('Price: low to high') }}</option>
-                        <option value="price-desc" @selected(($activeFilters['sort'] ?? '') === 'price-desc')>{{ __('Price: high to low') }}</option>
-                        <option value="newest" @selected(($activeFilters['sort'] ?? '') === 'newest')>{{ __('Newest first') }}</option>
-                    </select>
-                </div>
-                <div class="md:col-span-4 flex items-center gap-4">
-                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">{{ __('Apply filters') }}</button>
-                    <a href="{{ route('frontend.products.index') }}" class="text-sm text-gray-500 hover:text-gray-700">{{ __('Reset') }}</a>
-                </div>
-            </form>
-        </section>
+@extends('frontend.layouts.app')
 
-        @isset($currentCategory)
-            <div class="p-4 bg-primary-50 border border-primary-200 rounded-lg dark:bg-primary-900/10 dark:border-primary-700">
-                <p class="text-sm text-primary-700 dark:text-primary-200">
-                    {{ __('Showing products in :category', ['category' => $currentCategory->name]) }}
-                </p>
-            </div>
-        @endisset
+@section('title', __('Product catalogue'))
 
-        @isset($currentBrand)
-            <div class="p-4 bg-primary-50 border border-primary-200 rounded-lg dark:bg-primary-900/10 dark:border-primary-700">
-                <p class="text-sm text-primary-700 dark:text-primary-200">
-                    {{ __('Filtered by brand :brand', ['brand' => $currentBrand->name]) }}
-                </p>
-            </div>
-        @endisset
-
-        <section>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                @forelse ($products as $product)
-                    <div class="p-4 border border-gray-200 rounded-xl bg-white shadow-sm dark:bg-gray-900 dark:border-white/10">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ $product->name }}</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $product->brand?->name }}</p>
-                        <div class="mt-2 text-primary-600 font-semibold">{{ app_money_format($product->sale_price ?? $product->price ?? 0) }}</div>
-                        <a href="{{ route('frontend.products.show', $product) }}" class="mt-3 inline-flex items-center text-sm text-primary-700 hover:text-primary-800">{{ __('View details') }}</a>
+@section('content')
+    <div class="bg-gray-50 py-12">
+        <div class="mx-auto max-w-7xl space-y-10 px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                <div class="space-y-2">
+                    <p class="inline-flex items-center gap-2 rounded-full bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-700">
+                        <x-untitledui-grid class="h-4 w-4" />
+                        {{ __('Browse the catalogue') }}
+                    </p>
+                    <h1 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                        {{ __('Discover construction essentials') }}
+                    </h1>
+                    <p class="max-w-2xl text-gray-600">
+                        {{ __('Explore the latest tools, materials, and protective equipment sourced from our trusted Lithuanian and European suppliers.') }}
+                    </p>
+                </div>
+                <form method="GET" action="{{ route('frontend.products.index') }}" class="w-full max-w-xl">
+                    <label for="catalogue-search" class="sr-only">{{ __('Search catalogue') }}</label>
+                    <div class="relative rounded-2xl border border-gray-200 bg-white shadow-sm">
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                            <x-untitledui-search-md class="h-5 w-5" />
+                        </div>
+                        <input
+                            id="catalogue-search"
+                            name="q"
+                            type="search"
+                            value="{{ $searchTerm }}"
+                            placeholder="{{ __('Search for drills, insulation, safety gear...') }}"
+                            class="w-full rounded-2xl border-0 py-4 pl-12 pr-4 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                        <button type="submit" class="absolute inset-y-0 right-0 m-2 inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 text-sm font-semibold text-white transition hover:bg-blue-700">
+                            {{ __('Search') }}
+                        </button>
                     </div>
-                @empty
-                    <p class="text-gray-500 dark:text-gray-400">{{ __('No products found for the selected filters.') }}</p>
-                @endforelse
+                </form>
             </div>
 
-            <div class="mt-6">
-                {{ $products->links() }}
+            <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+                <form method="GET" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <input type="hidden" name="q" value="{{ $searchTerm }}">
+                    <div class="space-y-2">
+                        <label for="filter" class="text-sm font-semibold text-gray-700">{{ __('Filter') }}</label>
+                        <select
+                            id="filter"
+                            name="filter"
+                            class="w-full rounded-xl border-gray-200 text-sm focus:border-blue-500 focus:ring-blue-500"
+                        >
+                            @foreach($availableFilters as $value => $label)
+                                <option value="{{ $value }}" @selected($appliedFilter === $value)>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label for="sort" class="text-sm font-semibold text-gray-700">{{ __('Sort by') }}</label>
+                        <select
+                            id="sort"
+                            name="sort"
+                            class="w-full rounded-xl border-gray-200 text-sm focus:border-blue-500 focus:ring-blue-500"
+                        >
+                            @foreach($availableSorts as $value => $label)
+                                <option value="{{ $value }}" @selected($appliedSort === $value)>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label for="per_page" class="text-sm font-semibold text-gray-700">{{ __('Results per page') }}</label>
+                        <input
+                            id="per_page"
+                            name="per_page"
+                            type="number"
+                            min="6"
+                            max="60"
+                            value="{{ $perPage }}"
+                            class="w-full rounded-xl border-gray-200 text-sm focus:border-blue-500 focus:ring-blue-500"
+                        >
+                    </div>
+                    <div class="flex items-end">
+                        <button type="submit" class="inline-flex w-full items-center justify-center rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">
+                            <x-untitledui-adjustments-vertical class="mr-2 h-4 w-4" />
+                            {{ __('Update view') }}
+                        </button>
+                    </div>
+                </form>
             </div>
-        </section>
+
+            <div>
+                <div class="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-900">
+                            {{ __('Showing :count products', ['count' => method_exists($products, 'total') ? $products->total() : $products->count()]) }}
+                        </h2>
+                        @if($appliedFilter)
+                            <p class="text-sm text-gray-500">
+                                {{ __('Filter applied: :filter', ['filter' => $availableFilters[$appliedFilter] ?? $appliedFilter]) }}
+                            </p>
+                        @endif
+                        @if($searchTerm)
+                            <p class="text-sm text-gray-500">
+                                {{ __('Search term: ":term"', ['term' => $searchTerm]) }}
+                            </p>
+                        @endif
+                    </div>
+                </div>
+
+                @include('frontend.catalogue.product-grid', ['products' => $products])
+            </div>
+        </div>
     </div>
-</x-layouts.base>
+@endsection
+
