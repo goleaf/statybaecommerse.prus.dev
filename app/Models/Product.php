@@ -1120,10 +1120,14 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getAverageRatingAttribute(): float
     {
-        if (array_key_exists('approved_reviews_avg_rating', $this->attributes)) {
-            $rating = $this->attributes['approved_reviews_avg_rating'];
+        // When aggregate values are eager loaded (e.g. via loadAvg), prefer the hydrated
+        // attributes so we do not run redundant queries when the value is already known.
+        foreach (['average_rating', 'reviews_avg_rating', 'approved_reviews_avg_rating'] as $attribute) {
+            if (array_key_exists($attribute, $this->attributes)) {
+                $rating = $this->attributes[$attribute];
 
-            return $rating !== null ? (float) $rating : 0.0;
+                return $rating !== null ? (float) $rating : 0.0;
+            }
         }
 
         if ($this->relationLoaded('reviews')) {
@@ -1142,8 +1146,12 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getReviewsCountAttribute(): int
     {
-        if (array_key_exists('approved_reviews_count', $this->attributes)) {
-            return (int) $this->attributes['approved_reviews_count'];
+        // Respect any eager-loaded aggregate counts (loadCount / withCount) to avoid
+        // re-querying the database when the information is already on the model.
+        foreach (['reviews_count', 'approved_reviews_count'] as $attribute) {
+            if (array_key_exists($attribute, $this->attributes)) {
+                return (int) $this->attributes[$attribute];
+            }
         }
 
         if ($this->relationLoaded('reviews')) {
