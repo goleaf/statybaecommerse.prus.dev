@@ -2,75 +2,144 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Support\Forms;
-
 use App\Support\Forms\MatrixFactory;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Get;
 use LaraZeus\MatrixChoice\Components\Matrix;
-use PHPUnit\Framework\TestCase;
 
-final class MatrixFactoryTest extends TestCase
+it('builds a permissions section with module toggle grids', function (): void {
+    $definition = [
+        'orders' => [
+            'view' => 'orders.view',
+            'edit' => 'orders.edit',
+        ],
+        'customers' => [
+            'view' => 'customers.view',
+        ],
+    ];
+
+    $section = MatrixFactory::permissions(
+        definition: $definition,
+        moduleLabelResolver: fn (string $module): string => strtoupper($module),
+        abilityLabelResolver: fn (string $ability): string => ucfirst($ability),
+        sectionLabel: 'Permissions',
+        statePath: 'custom_permissions',
+    );
+
+    expect($section)
+        ->toBeInstanceOf(Section::class)
+        ->and($section->getHeading())->toBe('Permissions')
+        ->and($section->getStatePath())->toBe('custom_permissions');
+
+    $moduleSections = $section->getChildComponents();
+
+    expect($moduleSections)
+        ->toHaveCount(2);
+
+    $ordersSection = $moduleSections[0];
+    expect($ordersSection)
+        ->toBeInstanceOf(Section::class)
+        ->and($ordersSection->getHeading())->toBe('ORDERS');
+
+    $ordersGrid = $ordersSection->getChildComponents()[0];
+
+    expect($ordersGrid)
+        ->toBeInstanceOf(Grid::class);
+
+    $orderToggles = $ordersGrid->getChildComponents();
+
+    expect($orderToggles)
+        ->toHaveCount(2)
+        ->and($orderToggles[0])->toBeInstanceOf(Toggle::class)
+        ->and($orderToggles[0]->getLabel())->toBe('View')
+        ->and($orderToggles[1])->toBeInstanceOf(Toggle::class)
+        ->and($orderToggles[1]->getLabel())->toBe('Edit');
+});
+
+it('builds a radio grid for attribute selection', function (): void {
+    $grid = MatrixFactory::radioGrid(
+        'attributes',
+        fn (Get $get): array => [
+            [
+                'key' => 'attribute_1',
+                'label' => 'Color',
+                'options' => ['red' => 'Red', 'blue' => 'Blue'],
+            ],
+        ],
+    );
+
+    expect($grid)
+        ->toBeInstanceOf(Grid::class);
+
+    $schema = evaluate_grid_schema($grid);
+
+    expect($schema)
+        ->toHaveCount(1);
+
+    $field = $schema[0];
+
+    expect($field)
+        ->toBeInstanceOf(Radio::class)
+        ->and($field->getStatePath())->toBe('attributes.attribute_1')
+        ->and($field->getOptions())
+            ->toMatchArray(['red' => 'Red', 'blue' => 'Blue']);
+});
+
+it('renders a placeholder when no radio rows exist', function (): void {
+    $grid = MatrixFactory::radioGrid('attributes', fn (Get $get): array => []);
+
+    $schema = evaluate_grid_schema($grid);
+
+    expect($schema)
+        ->toHaveCount(1)
+        ->and($schema[0])
+            ->toBeInstanceOf(Placeholder::class)
+            ->and($schema[0]->getLabel())
+            ->toBe(__('No attributes available'));
+});
+
+it('builds a checkbox matrix using the Zeus component', function (): void {
+    $matrix = MatrixFactory::checkboxGrid(
+        'shipping_matrix',
+        ['domestic' => 'Domestic', 'international' => 'International'],
+        ['ground' => 'Ground', 'air' => 'Air'],
+    );
+
+    expect($matrix)
+        ->toBeInstanceOf(Matrix::class)
+        ->and($matrix->getRowData())
+            ->toMatchArray([
+                'domestic' => 'Domestic',
+                'international' => 'International',
+            ])
+        ->and($matrix->getColumnData())
+            ->toMatchArray([
+                'ground' => 'Ground',
+                'air' => 'Air',
+            ])
+        ->and($matrix->getPilColor())
+            ->toBe('checkbox');
+});
+
+/**
+ * @return array<int, mixed>
+ */
+function evaluate_grid_schema(Grid $grid): array
 {
-    public function testPermissionsMatrixUsesCheckboxes(): void
-    {
-        $rows = [
-            'products' => 'Products',
-            'orders' => 'Orders',
-        ];
+    $reflection = new \ReflectionObject($grid);
+    $property = $reflection->getProperty('childComponents');
+    $property->setAccessible(true);
 
-        $columns = [
-            'view' => 'View',
-            'edit' => 'Edit',
-        ];
+    $value = $property->getValue($grid);
 
-        $matrix = MatrixFactory::permissions($rows, $columns);
-
-        self::assertInstanceOf(Matrix::class, $matrix);
-        self::assertSame('permissions', $matrix->getName());
-        self::assertSame($rows, $matrix->getRowData());
-        self::assertSame($columns, $matrix->getColumnData());
-        self::assertSame('checkbox', $matrix->getPilColor());
+    if ($value instanceof \Closure) {
+        return $value(new Get($grid));
     }
 
-    public function testRadioGridConfiguration(): void
-    {
-        $rows = [
-            'shipping' => 'Shipping',
-        ];
-
-        $columns = [
-            'standard' => 'Standard',
-            'express' => 'Express',
-        ];
-
-        $matrix = MatrixFactory::radioGrid('shipping_options', $rows, $columns, 'Shipping Options');
-
-        self::assertInstanceOf(Matrix::class, $matrix);
-        self::assertSame('shipping_options', $matrix->getName());
-        self::assertSame('Shipping Options', $matrix->getLabel());
-        self::assertSame($rows, $matrix->getRowData());
-        self::assertSame($columns, $matrix->getColumnData());
-        self::assertSame('radio', $matrix->getPilColor());
-    }
-
-    public function testCheckboxGridConfiguration(): void
-    {
-        $rows = [
-            'monday' => 'Monday',
-            'tuesday' => 'Tuesday',
-        ];
-
-        $columns = [
-            'morning' => 'Morning',
-            'afternoon' => 'Afternoon',
-        ];
-
-        $matrix = MatrixFactory::checkboxGrid('availability', $rows, $columns, 'Availability');
-
-        self::assertInstanceOf(Matrix::class, $matrix);
-        self::assertSame('availability', $matrix->getName());
-        self::assertSame('Availability', $matrix->getLabel());
-        self::assertSame($rows, $matrix->getRowData());
-        self::assertSame($columns, $matrix->getColumnData());
-        self::assertSame('checkbox', $matrix->getPilColor());
-    }
+    return $value ?? [];
 }
+
