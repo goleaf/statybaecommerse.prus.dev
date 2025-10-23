@@ -6,6 +6,7 @@ namespace App\Logging\Processors;
 
 use DateTimeInterface;
 use DateTimeZone;
+use Monolog\LogRecord;
 
 final class KibanaContextProcessor
 {
@@ -16,31 +17,30 @@ final class KibanaContextProcessor
     ) {
     }
 
-    public function __invoke(array $record): array
+    public function __invoke(LogRecord $record): LogRecord
     {
-        if (($record['datetime'] ?? null) instanceof DateTimeInterface) {
-            /** @var DateTimeInterface $datetime */
-            $datetime = $record['datetime'];
-            $timestamp = $datetime->setTimezone($this->timezone)->format('Y-m-d\TH:i:s.v\Z');
-            $record['datetime'] = $timestamp;
-            $record['extra']['@timestamp'] = $timestamp;
+        $extra = $record->extra;
+
+        if ($record->datetime instanceof DateTimeInterface) {
+            $timestamp = $record->datetime->setTimezone($this->timezone)->format('Y-m-d\TH:i:s.v\Z');
+            $extra['@timestamp'] = $timestamp;
         }
 
         $serviceName = $this->serviceName !== '' ? $this->serviceName : config('app.name', 'laravel');
         $environment = $this->environment !== '' ? $this->environment : (string) config('app.env', 'production');
 
-        $record['extra']['service'] = [
+        $extra['service'] = [
             'name' => $serviceName,
             'environment' => $environment,
         ];
 
         $pid = getmypid();
         if ($pid !== false) {
-            $record['extra']['process'] = [
+            $extra['process'] = [
                 'pid' => $pid,
             ];
         }
 
-        return $record;
+        return $record->with(extra: $extra);
     }
 }

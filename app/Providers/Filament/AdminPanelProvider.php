@@ -84,7 +84,11 @@ final class AdminPanelProvider extends PanelProvider
             ])
             ->discoverResources(in: $this->appPath('Filament/Resources'), for: 'App\Filament\Resources')
             ->resources($resourceClasses)
-            ->pages($pageClasses)
+            ->when(
+                app()->environment('testing'),
+                fn (Panel $p) => $p->pages([]),
+                fn (Panel $p) => $p->pages($pageClasses)
+            )
             ->widgets([
                 AccountWidget::class,
             ])
