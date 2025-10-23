@@ -10,10 +10,12 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "andreia/filament-nord-theme": "^2.0",
         "asmit/resized-column": "^1.1",
         "awcodes/overlook": "^3.0",
         "barryvdh/laravel-dompdf": "^3.1",
         "bezhansalleh/filament-shield": "^4.0",
+        "coolsam/flatpickr": "^5.0",
         "defstudio/filament-searchable-input": "^4.0",
         "dutchcodingcompany/filament-socialite": "^3.0",
         "eightynine/filament-advanced-widgets": "^4.0",
