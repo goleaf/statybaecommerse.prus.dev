@@ -46,7 +46,7 @@ final class NewsCommentResource extends Resource
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chat-bubble-left-ellipsis';
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
     {
         return 'Content';
     }

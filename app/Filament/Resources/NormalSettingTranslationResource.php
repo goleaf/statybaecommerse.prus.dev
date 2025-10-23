@@ -37,7 +37,7 @@ final class NormalSettingTranslationResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::System;
+    protected static \Filament\Navigation\NavigationGroup|array|string|null $navigationGroup = NavigationGroup::System->value;
 
     protected static ?int $navigationSort = 16;
 
@@ -48,9 +48,11 @@ final class NormalSettingTranslationResource extends Resource
         return 'heroicon-o-language';
     }
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
     {
-        return NavigationGroup::System;
+        $group = NavigationGroup::System;
+
+        return $group->label();
     }
 
     public static function getNavigationLabel(): string

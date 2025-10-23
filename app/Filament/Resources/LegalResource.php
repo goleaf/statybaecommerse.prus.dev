@@ -42,7 +42,7 @@ final class LegalResource extends Resource
         return 'heroicon-o-scale';
     }
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
     {
         return __('navigation.groups.documents');
     }

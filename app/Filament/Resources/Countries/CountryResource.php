@@ -35,7 +35,7 @@ final class CountryResource extends Resource
         return 'heroicon-o-globe-alt';
     }
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
     {
         return 'Locations';
     }

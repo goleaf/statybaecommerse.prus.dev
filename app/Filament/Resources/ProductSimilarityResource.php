@@ -36,9 +36,11 @@ final class ProductSimilarityResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
     {
-        return NavigationGroup::Products;
+        $group = NavigationGroup::Products;
+
+        return $group->label();
     }
 
     public static function getNavigationLabel(): string

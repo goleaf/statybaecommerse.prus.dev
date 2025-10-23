@@ -16,7 +16,8 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Navigation\NavigationGroup as FilamentNavigationGroup;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
@@ -39,9 +40,12 @@ final class AttributeResource extends Resource
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
-    public static function getNavigationGroup(): string
+    public static function getNavigationGroup(): FilamentNavigationGroup|array|string|null
     {
-        return 'Products';
+        // Return a descriptive group label while allowing Filament to accept richer group definitions when required.
+        $label = __('navigation.groups.products');
+
+        return $label === 'navigation.groups.products' ? __('Products') : $label;
     }
 
     /**
@@ -63,10 +67,10 @@ final class AttributeResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         // Leveraging the standard Filament Form pipeline keeps Livewire hydration predictable in tests.
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('attributes.basic_information'))
                 ->schema([
                     Grid::make(2)
