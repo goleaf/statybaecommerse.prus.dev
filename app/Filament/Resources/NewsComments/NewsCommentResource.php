@@ -11,10 +11,15 @@ use App\Filament\Resources\NewsComments\Pages\ListNewsComments;
 use App\Filament\Resources\NewsComments\Schemas\NewsCommentForm;
 use App\Filament\Resources\NewsComments\Tables\NewsCommentsTable;
 use App\Models\NewsComment;
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\ApprovedScope;
+use App\Models\Scopes\VisibleScope;
+use BackedEnum;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class NewsCommentResource extends Resource
 {
@@ -22,7 +27,7 @@ class NewsCommentResource extends Resource
 
     protected static ?string $model = NewsComment::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Form $form): Form
     {
@@ -32,6 +37,16 @@ class NewsCommentResource extends Resource
     public static function table(Table $table): Table
     {
         return NewsCommentsTable::configure($table);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes([
+            ActiveScope::class,
+            ApprovedScope::class,
+            VisibleScope::class,
+            'active_flag',
+        ]);
     }
 
     public static function getRelations(): array
