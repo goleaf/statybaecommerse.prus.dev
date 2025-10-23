@@ -33,13 +33,13 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 final class ReferralStatisticsResource extends Resource
 {
-    use HasNav;
-
-    
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Referral';
+    }
 
     protected static ?string $model = ReferralStatistics::class;
 

@@ -43,15 +43,17 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Novadaemon\FilamentCombobox\Combobox;
-use UnitEnum;
 
 final class DiscountConditionResource extends Resource
 {
     protected static ?string $model = DiscountCondition::class;
 
+    /**
+     * Navigation icon override (string|\BackedEnum|null).
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-adjustments-horizontal';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): ?string
     {
         return 'Discounts';
     }

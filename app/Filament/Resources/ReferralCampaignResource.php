@@ -27,8 +27,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as TranslatableResource;
-use UnitEnum;
 
 final class ReferralCampaignResource extends Resource
 {
@@ -36,13 +34,19 @@ final class ReferralCampaignResource extends Resource
 
     protected static ?string $model = ReferralCampaign::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-megaphone';
+    /**
+     * Navigation icon override (string|\BackedEnum|null).
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-megaphone';
 
     protected static ?int $navigationSort = 14;
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    
+    public static function getNavigationGroup(): ?string
+    {
+        return 'System';
+    }
 
     public static function getNavigationLabel(): string
     {

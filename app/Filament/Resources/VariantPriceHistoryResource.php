@@ -8,6 +8,8 @@ use App\Forms\Components\Flatpickr;
 use App\Support\DateRange;
 use App\Filament\Resources\VariantPriceHistoryResource\Pages;
 use App\Models\VariantPriceHistory;
+use App\Support\Filament\Components\Flatpickr;
+use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,7 +17,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 final class VariantPriceHistoryResource extends Resource
 {
@@ -23,14 +24,20 @@ final class VariantPriceHistoryResource extends Resource
 
     protected static ?string $model = VariantPriceHistory::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-currency-euro';
+    /**
+     * Navigation icon override (string|\BackedEnum|null).
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-currency-euro';
 
     /** @var string|BackedEnum|null Navigation grouping centralized via enum. */
     protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 20;
 
-    
+    public static function getNavigationGroup(): ?string
+    {
+        return 'System';
+    }
 
     public static function form(Form $form): Form
     {
@@ -134,15 +141,15 @@ final class VariantPriceHistoryResource extends Resource
                         $direction = $direction === 'asc' ? 'asc' : 'desc';
 
                         return $query->orderByRaw(
-                            '(COALESCE(new_price, 0) - COALESCE(old_price, 0)) '.$direction
+                            '(COALESCE(new_price, 0) - COALESCE(old_price, 0)) ' . $direction
                         );
                     })
                     ->color(fn (VariantPriceHistory $record): string => $record->isIncrease() ? 'success' : ($record->isDecrease() ? 'danger' : 'gray')),
                 Tables\Columns\TextColumn::make('price_type')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'regular' => 'primary',
-                        'sale' => 'success',
+                        'regular'   => 'primary',
+                        'sale'      => 'success',
                         'wholesale' => 'warning',
                         'bulk'      => 'info',
                         default     => 'gray',
@@ -151,10 +158,10 @@ final class VariantPriceHistoryResource extends Resource
                 Tables\Columns\TextColumn::make('change_reason')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'manual' => 'primary',
-                        'automatic' => 'success',
-                        'promotion' => 'warning',
-                        'cost_change' => 'info',
+                        'manual'            => 'primary',
+                        'automatic'         => 'success',
+                        'promotion'         => 'warning',
+                        'cost_change'       => 'info',
                         'market_adjustment' => 'danger',
                         'seasonal'          => 'secondary',
                         default             => 'gray',

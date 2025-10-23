@@ -36,9 +36,9 @@ final class MenuResource extends Resource
     protected static ?string $model = Menu::class;
 
     /**
-     * @var string|\BackedEnum|null
+     * Navigation icon override (string|\BackedEnum|null).
      */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     /**
      * @var string|\UnitEnum|null
@@ -186,11 +186,16 @@ final class MenuResource extends Resource
                     ->action(function (Menu $record): void {
                         // Flip the active flag before Filament resolves the success notification payload.
                         $record->update(['is_active' => ! $record->is_active]);
-                    })
-                    ->successNotificationTitle(fn (Menu $record): string => (string) ($record->is_active
-                        ? __('menus.activated_successfully')
-                        : __('menus.deactivated_successfully')
-                    )),
+
+                        $message = $record->is_active
+                            ? __('menus.activated_successfully')
+                            : __('menus.deactivated_successfully');
+
+                        Notification::make()
+                            ->success()
+                            ->title((string) $message)
+                            ->send();
+                    }),
                 Action::make('duplicate')
                     ->label(__('menus.duplicate'))
                     ->icon('heroicon-o-document-duplicate')
