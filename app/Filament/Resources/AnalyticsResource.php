@@ -88,7 +88,12 @@ final class AnalyticsResource extends Resource
                 ])
             )
             ->columns([
-                TextColumn::make('order_date')->label('order_date')->date()->toggleable(),
+                TextColumn::make('order_date')
+                    ->label(__('analytics.order_date'))
+                    ->date()
+                    ->sortable()
+                    ->getStateUsing(fn (Order $record) => $record->created_at)
+                    ->toggleable(),
                 TextColumn::make('user.name')->label('user.name')->toggleable(),
                 TextColumn::make('items_count')->label('items_count')->getStateUsing(fn (Order $record): int => method_exists($record, 'items') ? (int) $record->items()->count() : 0)->toggleable(),
                 TextColumn::make('total')->label('total')->money('EUR')->toggleable(),
