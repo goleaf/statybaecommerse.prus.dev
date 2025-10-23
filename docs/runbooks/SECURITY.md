@@ -16,13 +16,19 @@ Baseline rate limits also live in `config/security.php` and are registered by `A
 
 ### API limits
 
-| Limiter | Default | Keying strategy |
-| --- | --- | --- |
-| `api.default` | 60 requests/minute | User ID for authenticated calls, otherwise IP address |
-| `api.notifications` | 60 requests/minute | Same as `api.default`, plus `|notifications` suffix |
-| `api.autocomplete` | 30 requests/minute | Same as `api.default`, plus `|autocomplete` suffix |
+All API limiters enforce both per-user and per-IP budgets. Each request consumes from both buckets when a user session is presen
+t; unauthenticated calls only count against the IP budget.
 
-Override the API defaults with the `API_RATE_LIMIT_*` environment variables.
+| Limiter | Per-user | Per-IP | Notes |
+| --- | --- | --- | --- |
+| `api.read` (alias: `api.default`) | 60 requests/minute | 60 requests/minute | Shared by health, readiness, and search endpoints. |
+| `api.write` | 60 requests/minute | 60 requests/minute | Baseline limiter for mutating endpoints. |
+| `api.notifications.read` | 60 requests/minute | 60 requests/minute | Covers notification list, stats, and search endpoints. |
+| `api.notifications.write` | 60 requests/minute | 60 requests/minute | Applies to notification mark-as-read/unread and delete flows. |
+| `api.autocomplete` | 30 requests/minute | 30 requests/minute | Dedicated limiter for the autocomplete POST endpoint. |
+
+Override the API defaults with the `API_RATE_LIMIT_*` environment variables. Exceeding a budget logs a warning with the request'
+s correlation ID for traceability.
 
 ### Authentication limits
 

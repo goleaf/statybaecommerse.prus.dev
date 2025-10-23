@@ -7,8 +7,8 @@ use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\SearchController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('v1')
-    ->middleware('throttle:api.default')
+Route::prefix('api/v1')
+    ->middleware('throttle:api.read')
     ->name('api.v1.')
     ->group(function (): void {
         Route::get('/health', [HealthController::class, 'health'])
@@ -18,7 +18,6 @@ Route::prefix('v1')
             ->name('ready');
 
         Route::get('/search', SearchController::class)
-            ->middleware(['throttle:api.default'])
             ->name('search');
 
         Route::middleware('auth:sanctum')->group(function (): void {
@@ -28,7 +27,7 @@ Route::prefix('v1')
 
             Route::post('/autocomplete-search', AutocompleteSearchController::class)
                 ->middleware(['abilities:system.autocomplete', 'throttle:api.autocomplete'])
-                ->withoutMiddleware('throttle:api.default')
+                ->withoutMiddleware(['throttle:api.default', 'throttle:api.read'])
                 ->name('autocomplete.search');
 
             require __DIR__.'/api/notifications.php';
