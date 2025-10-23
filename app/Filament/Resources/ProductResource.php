@@ -912,16 +912,29 @@ final class ProductResource extends Resource implements DefinesExportColumns
     /**
      * @return array<int, string>
      */
-    private static function skuSuggestions(?string $search = null): array
+    private static function searchProductSuggestions(string $search): array
     {
+        $term = trim($search);
+
+        if ($term === '') {
+            return [];
+        }
+
         return Product::query()
-            ->select('sku')
-            ->whereNotNull('sku')
-            ->when($search !== null, fn (Builder $query): Builder => $query->where('sku', 'like', "%{$search}%"))
-            ->orderBy('sku')
-            ->limit(25)
-            ->pluck('sku')
-            ->filter()
+            ->select(['name', 'sku'])
+            ->where(function (Builder $query) use ($term): void {
+                $query
+                    ->where('name', 'like', "%{$term}%")
+                    ->orWhere('sku', 'like', "%{$term}%");
+            })
+            ->orderBy('name')
+            ->limit(15)
+            ->get()
+            ->map(static function (Product $product): string {
+                $sku = $product->sku;
+
+                return ltrim(($sku ? "[{$sku}] " : '') . $product->name);
+            })
             ->unique()
             ->values()
             ->all();

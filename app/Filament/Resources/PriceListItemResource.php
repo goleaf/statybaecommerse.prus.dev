@@ -267,33 +267,35 @@ final class PriceListItemResource extends Resource
                 SelectFilter::make('price_list_id')
                     ->relationship('priceList', 'name')
                     ->preload(),
-                SelectFilter::make('product_id')
-                    ->relationship('product', 'name')
-                    ->searchable()
-                    ->preload(),
-                Filter::make('product_search')
+                Filter::make('product_lookup')
                     ->label(__('price_list_items.product'))
                     ->form([
-                        SearchableInput::make('product_search')
+                        SearchableInput::make('product_name')
                             ->label(__('price_list_items.product'))
+                            ->placeholder(__('products.filters.product_placeholder'))
                             ->maxLength(255)
-                            ->searchUsing(fn (string $search): array => self::productLookupSuggestions($search))
-                            ->options(fn (): array => self::productLookupSuggestions()),
+                            ->searchUsing(fn (string $search): array => self::searchProductOptions($search)),
                     ])
-                    ->indicateUsing(fn (array $data): array => filled($data['product_search'] ?? null)
-                        ? [__('price_list_items.product') . ': ' . $data['product_search']]
-                        : [])
-                    ->query(function (Builder $query, array $data): Builder {
-                        $term = $data['product_search'] ?? null;
+                    ->indicateUsing(function (array $data): array {
+                        $value = trim((string) ($data['product_name'] ?? ''));
 
-                        if (! filled($term)) {
+                        if ($value === '') {
+                            return [];
+                        }
+
+                        return [__('price_list_items.product') . ': ' . $value];
+                    })
+                    ->query(function (Builder $query, array $data): Builder {
+                        $value = trim((string) ($data['product_name'] ?? ''));
+
+                        if ($value === '') {
                             return $query;
                         }
 
-                        return $query->whereHas('product', function (Builder $productQuery) use ($term): void {
-                            $productQuery
-                                ->where('name', 'like', "%{$term}%")
-                                ->orWhere('sku', 'like', "%{$term}%");
+                        return $query->whereHas('product', function (Builder $relationQuery) use ($value): void {
+                            $relationQuery
+                                ->where('name', 'like', "%{$value}%")
+                                ->orWhere('sku', 'like', "%{$value}%");
                         });
                     }),
                 TernaryFilter::make('is_active')
@@ -442,26 +444,29 @@ final class PriceListItemResource extends Resource
     /**
      * @return array<int, string>
      */
-    private static function productLookupSuggestions(?string $search = null): array
+    private static function searchProductOptions(string $search): array
     {
+        $term = trim($search);
+
+        if ($term === '') {
+            return [];
+        }
+
         return Product::query()
             ->select(['name', 'sku'])
-            ->when($search !== null, function (Builder $query) use ($search): Builder {
-                return $query->where(function (Builder $query) use ($search): void {
-                    $query
-                        ->where('name', 'like', "%{$search}%")
-                        ->orWhere('sku', 'like', "%{$search}%");
-                });
+            ->where(function (Builder $query) use ($term): void {
+                $query
+                    ->where('name', 'like', "%{$term}%")
+                    ->orWhere('sku', 'like', "%{$term}%");
             })
             ->orderBy('name')
-            ->limit(25)
+            ->limit(15)
             ->get()
             ->map(static function (Product $product): string {
-                $sku = $product->sku ? ' (' . $product->sku . ')' : '';
+                $sku = $product->sku;
 
-                return $product->name . $sku;
+                return ltrim(($sku ? "[{$sku}] " : '') . $product->name);
             })
-            ->filter()
             ->unique()
             ->values()
             ->all();

@@ -631,16 +631,29 @@ final class ProductVariantResource extends Resource
     /**
      * @return array<int, string>
      */
-    private static function variantSkuSuggestions(?string $search = null): array
+    private static function searchProductOptions(string $search): array
     {
-        return ProductVariant::query()
-            ->select('sku')
-            ->whereNotNull('sku')
-            ->when($search !== null, fn (Builder $query): Builder => $query->where('sku', 'like', "%{$search}%"))
-            ->orderBy('sku')
-            ->limit(25)
-            ->pluck('sku')
-            ->filter()
+        $term = trim($search);
+
+        if ($term === '') {
+            return [];
+        }
+
+        return Product::query()
+            ->select(['name', 'sku'])
+            ->where(function (Builder $query) use ($term): void {
+                $query
+                    ->where('name', 'like', "%{$term}%")
+                    ->orWhere('sku', 'like', "%{$term}%");
+            })
+            ->orderBy('name')
+            ->limit(15)
+            ->get()
+            ->map(static function (Product $product): string {
+                $sku = $product->sku;
+
+                return ltrim(($sku ? "[{$sku}] " : '') . $product->name);
+            })
             ->unique()
             ->values()
             ->all();
