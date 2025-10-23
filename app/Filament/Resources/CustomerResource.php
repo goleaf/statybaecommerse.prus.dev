@@ -33,10 +33,6 @@ use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ExportAction;
-use Filament\Tables\Actions\ExportBulkAction;
-use Filament\Tables\Actions\Exports\Export;
-use Filament\Tables\Actions\Exports\ExportColumn as Column;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
@@ -46,6 +42,10 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use pxlrbt\FilamentExcel\Columns\Column;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
 
@@ -326,21 +326,7 @@ final class CustomerResource extends Resource
             ->headerActions([
                 ExportAction::make()
                     ->label(__('Export'))
-                    ->exports([
-                        Export::make('customers')
-                            ->fromTable()
-                            ->queue()
-                            ->withChunkSize(500)
-                            ->withColumns([
-                                Column::make('name')->heading(__('customers.name')),
-                                Column::make('email')->heading(__('customers.email')),
-                                Column::make('orders_count')->heading(__('customers.orders_count')),
-                                Column::make('ltv')
-                                    ->heading(__('customers.ltv'))
-                                    ->formatStateUsing(fn (Customer $record) => $record->orders()->sum('total'))
-                                    ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE),
-                            ]),
-                    ]),
+                    ->exports(self::getCustomerExportPresets()),
             ])
             ->actions([
                 EditAction::make(),
@@ -386,21 +372,7 @@ final class CustomerResource extends Resource
                         ->requiresConfirmation(),
                     ExportBulkAction::make()
                         ->label(__('Export selected'))
-                        ->exports([
-                            Export::make('customers')
-                                ->fromTable()
-                                ->queue()
-                                ->withChunkSize(500)
-                                ->withColumns([
-                                    Column::make('name')->heading(__('customers.name')),
-                                    Column::make('email')->heading(__('customers.email')),
-                                    Column::make('orders_count')->heading(__('customers.orders_count')),
-                                    Column::make('ltv')
-                                        ->heading(__('customers.ltv'))
-                                        ->formatStateUsing(fn (Customer $record) => $record->orders()->sum('total'))
-                                        ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE),
-                                ]),
-                        ]),
+                        ->exports(self::getCustomerExportPresets()),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
