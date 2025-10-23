@@ -25,6 +25,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -93,12 +94,14 @@ final class AddressResource extends Resource
     }
 
     /**
-     * Configure the Filament form schema while returning the v4 Form contract explicitly.
+     * Configure the Filament form schema using the Schema contract Filament v4
+     * ships with so we stay compatible with the upstream Resource signature.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Filament 4 expects returning the Form builder instance.
-        return $form->schema([
+        // We configure the passed-in Schema instance directly to respect the
+        // lifecycle hooks Filament expects when building the resource forms.
+        return $schema->schema([
             Section::make(__('translations.address_information'))
                 ->schema([
                     Grid::make(2)->schema([
@@ -324,11 +327,13 @@ final class AddressResource extends Resource
     }
 
     /**
-     * Configure the Filament table with comprehensive columns, filters, and actions.
+     * Configure the Filament table returning the expected Table instance so the
+     * resource signature aligns with the Filament v4 contract.
      */
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Return the same Table instance that Filament passes in to honour the
+        // stricter return typing introduced in the v4 resource base class.
         return $table
             ->columns([
                 TextColumn::make('id')
