@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\AuditLogController;
 use App\Http\Controllers\Api\AuthenticatedUserController;
 use App\Http\Controllers\Api\AutocompleteSearchController;
 use App\Http\Controllers\Api\ExportDownloadController;
@@ -46,3 +47,7 @@ Route::prefix('partner')
     ->group(function (): void {
         require __DIR__ . '/api/partner.php';
     });
+
+Route::get('audit-logs', [AuditLogController::class, 'index'])
+    ->middleware(['throttle:api.default'])
+    ->name('api.audit-logs.index');
