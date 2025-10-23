@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\ReviewResource\Pages;
 use App\Models\Review;
-use BackedEnum;
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\NumericScale;
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\Select as SelectInput;
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Text\TextInput as TextInputInput;
@@ -37,7 +35,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
 
 final class ReviewResource extends Resource
 {
@@ -45,24 +42,15 @@ final class ReviewResource extends Resource
 
     protected static ?string $model = Review::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-star';
+    /** @var string|\BackedEnum|null Provide a consistent star icon for review navigation. */
+    protected static $navigationIcon = 'heroicon-o-star';
 
     protected static ?int $navigationSort = 4;
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    /**
-     * @var string|BackedEnum|null Allow enum-backed navigation grouping.
-     */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::ContentManagement;
-
-    public static function getNavigationGroup(): ?string
-    {
-        // Convert enum-backed navigation groups into translated labels automatically.
-        $group = self::$navigationGroup;
-
-        return $group instanceof NavigationGroup ? $group->label() : $group;
-    }
+    /** @var string|\BackedEnum|null Keep reviews grouped with broader content management tooling. */
+    protected static $navigationGroup = NavigationGroup::ContentManagement;
 
     public static function getNavigationLabel(): string
     {
@@ -184,7 +172,17 @@ final class ReviewResource extends Resource
                     ->label(__('reviews.fields.rating'))
                     ->sortable()
                     ->alignCenter()
-                    ->formatStateUsing(fn (?int $state): string => str_repeat('⭐', max(0, (int) $state))),
+                    ->placeholder(__('reviews.placeholders.no_rating'))
+                    ->formatStateUsing(static function ($state): string {
+                        // Provide a translated placeholder when the rating is missing or effectively zero.
+                        if ($state === null || $state === '' || (int) $state === 0) {
+                            return __('reviews.placeholders.no_rating');
+                        }
+
+                        $normalized = max(0, min(5, (int) $state));
+
+                        return str_repeat('⭐', $normalized);
+                    }),
                 BadgeColumn::make('status')
                     ->label(__('reviews.fields.status'))
                     ->getStateUsing(fn (Review $record): string => $record->getStatus())
@@ -416,13 +414,30 @@ final class ReviewResource extends Resource
                         TextEntry::make('rating')
                             ->label(__('reviews.fields.rating'))
                             ->badge()
-                            ->color(fn (?int $state): string => match ($state) {
-                                1, 2 => 'danger',
-                                3 => 'warning',
-                                4, 5 => 'success',
-                                default => 'gray',
+                            ->placeholder(__('reviews.placeholders.no_rating'))
+                            ->color(static function ($state): string {
+                                // Default to a neutral badge when no rating is available.
+                                if ($state === null || $state === '' || (int) $state === 0) {
+                                    return 'gray';
+                                }
+
+                                return match (max(0, min(5, (int) $state))) {
+                                    1, 2 => 'danger',
+                                    3 => 'warning',
+                                    4, 5 => 'success',
+                                    default => 'gray',
+                                };
                             })
-                            ->formatStateUsing(fn (?int $state): string => str_repeat('⭐', max(0, (int) $state))),
+                            ->formatStateUsing(static function ($state): string {
+                                // Reuse the translated fallback when there is nothing to highlight.
+                                if ($state === null || $state === '' || (int) $state === 0) {
+                                    return __('reviews.placeholders.no_rating');
+                                }
+
+                                $normalized = max(0, min(5, (int) $state));
+
+                                return str_repeat('⭐', $normalized);
+                            }),
                     ])
                     ->columns(2),
                 InfolistSection::make(__('reviews.sections.content'))

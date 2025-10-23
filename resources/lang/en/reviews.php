@@ -81,5 +81,7 @@ return [
         'no_content' => 'No content',
         'no_metadata' => 'No metadata',
         'metadata_json' => 'Enter JSON metadata',
+        // Fallback copy when a review was submitted without an explicit rating value.
+        'no_rating' => 'No rating',
     ],
 ];
