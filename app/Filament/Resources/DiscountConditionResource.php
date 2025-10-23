@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\DiscountConditionResource\Pages;
+use App\Filament\Resources\DiscountConditionResource\Widgets\DiscountConditionChartWidget;
+use App\Filament\Resources\DiscountConditionResource\Widgets\DiscountConditionStatsWidget;
+use App\Filament\Resources\DiscountConditionResource\Widgets\DiscountConditionTableWidget;
 use App\Models\DiscountCondition;
 use BackedEnum;
-use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
@@ -17,33 +19,40 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
+use Filament\Infolists\Components\Grid as InfolistGrid;
+use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\Section as InfolistSection;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Actions\Action as TableAction;
+use Filament\Schemas\Schema;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use UnitEnum;
 
 final class DiscountConditionResource extends Resource
 {
     protected static ?string $model = DiscountCondition::class;
 
-    /** @var string|BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-adjustments-horizontal';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-adjustments-horizontal';
 
-    protected static ?string $navigationGroup = 'Discounts';
-
-    protected static ?int $navigationSort = 2;
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Discounts';
+    }
 
     public static function getNavigationLabel(): string
     {
@@ -62,134 +71,103 @@ final class DiscountConditionResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form->schema([
-            Tabs::make('discount_condition_form')
-                ->tabs([
-                    Tab::make(__('discount_conditions.basic_information'))
-                        ->schema([
-                            Select::make('discount_id')
-                                ->label(__('discount_conditions.discount'))
-                                ->relationship('discount', 'name')
-                                ->searchable()
-                                ->preload()
-                                ->required(),
-                            Repeater::make('translations')
-                                ->label(__('discount_conditions.translations'))
-                                ->relationship('translations')
-                                ->schema([
-                                    Select::make('locale')
-                                        ->label(__('discount_conditions.locale'))
-                                        ->options(self::supportedLocaleOptions())
-                                        ->required(),
-                                    TextInput::make('name')
-                                        ->label(__('discount_conditions.name'))
-                                        ->maxLength(255)
-                                        ->required(),
-                                    Textarea::make('description')
-                                        ->label(__('discount_conditions.description'))
-                                        ->rows(2)
-                                        ->maxLength(1000)
-                                        ->columnSpanFull(),
-                                    KeyValue::make('metadata')
-                                        ->label(__('discount_conditions.metadata'))
-                                        ->keyLabel(__('discount_conditions.metadata_key'))
-                                        ->valueLabel(__('discount_conditions.metadata_value'))
-                                        ->columnSpanFull()
-                                        ->addButtonLabel(__('discount_conditions.add_metadata_item'))
-                                        ->nullable(),
-                                ])
-                                ->columns(2)
-                                ->collapsible()
-                                ->defaultItems(0)
-                                ->itemLabel(fn (array $state): ?string => $state['locale'] ?? null),
-                        ]),
-                    Tab::make(__('discount_conditions.condition_settings'))
-                        ->schema([
-                            Select::make('type')
-                                ->label(__('discount_conditions.type'))
-                                ->options(DiscountCondition::getTypes())
-                                ->searchable()
-                                ->preload()
-                                ->required()
-                                ->live(),
-                            Select::make('operator')
-                                ->label(__('discount_conditions.operator'))
-                                ->options(fn (Get $get): array => DiscountCondition::getOperatorsForType($get('type') ?? 'cart_total'))
-                                ->required()
-                                ->searchable()
-                                ->preload(),
-                            Textarea::make('value')
-                                ->label(__('discount_conditions.value'))
-                                ->rows(3)
-                                ->required()
-                                ->helperText(__('discount_conditions.value_help'))
-                                ->afterStateHydrated(function (Textarea $component, mixed $state): void {
-                                    if (blank($state)) {
-                                        $component->state(null);
-
-                                        return;
-                                    }
-
-                                    $component->state(self::encodeValueForTextarea($state));
-                                })
-                                ->dehydrateStateUsing(fn (mixed $state): mixed => self::normalizeValue($state)),
-                            TextInput::make('priority')
-                                ->label(__('discount_conditions.priority'))
-                                ->numeric()
-                                ->default(0)
-                                ->minValue(0)
-                                ->helperText(__('discount_conditions.priority_help')),
-                            TextInput::make('position')
-                                ->label(__('discount_conditions.position'))
-                                ->numeric()
-                                ->default(0),
-                            Toggle::make('is_active')
-                                ->label(__('discount_conditions.is_active'))
-                                ->default(true),
-                        ])->columns(2),
-                    Tab::make(__('discount_conditions.targeting'))
-                        ->schema([
-                            Select::make('products')
-                                ->label(__('discount_conditions.products'))
-                                ->relationship('products', 'name')
-                                ->multiple()
-                                ->searchable()
-                                ->preload()
-                                ->columnSpanFull(),
-                            Select::make('categories')
-                                ->label(__('discount_conditions.categories'))
-                                ->relationship('categories', 'name')
-                                ->multiple()
-                                ->searchable()
-                                ->preload()
-                                ->columnSpanFull(),
-                        ]),
-                    Tab::make(__('discount_conditions.settings'))
-                        ->schema([
-                            KeyValue::make('metadata')
-                                ->label(__('discount_conditions.metadata'))
-                                ->keyLabel(__('discount_conditions.metadata_key'))
-                                ->valueLabel(__('discount_conditions.metadata_value'))
-                                ->addButtonLabel(__('discount_conditions.add_metadata_item'))
-                                ->nullable()
-                                ->columnSpanFull()
-                                ->helperText(__('discount_conditions.metadata_help')),
-                        ]),
-                ])
-                ->columnSpanFull(),
-        ]);
+        return $form
+            ->schema([
+                Tabs::make('discount_condition')
+                    ->tabs([
+                        Tab::make(__('discount_conditions.basic_information'))
+                            ->schema([
+                                Section::make()
+                                    ->columns(2)
+                                    ->schema([
+                                        Select::make('discount_id')
+                                            ->label(__('discount_conditions.discount'))
+                                            ->relationship('discount', 'name')
+                                            ->searchable()
+                                            ->preload()
+                                            ->required(),
+                                        TextInput::make('position')
+                                            ->label(__('discount_conditions.position'))
+                                            ->numeric()
+                                            ->default(0)
+                                            ->minValue(0),
+                                        TextInput::make('priority')
+                                            ->label(__('discount_conditions.priority'))
+                                            ->numeric()
+                                            ->default(0)
+                                            ->minValue(0)
+                                            ->helperText(__('discount_conditions.priority_help')),
+                                        Toggle::make('is_active')
+                                            ->label(__('discount_conditions.is_active'))
+                                            ->default(true),
+                                    ]),
+                            ]),
+                        Tab::make(__('discount_conditions.condition_settings'))
+                            ->schema([
+                                Section::make()
+                                    ->columns(2)
+                                    ->schema([
+                                        Select::make('type')
+                                            ->label(__('discount_conditions.type'))
+                                            ->options(static fn (): array => DiscountCondition::getTypes())
+                                            ->required()
+                                            ->live(),
+                                        Select::make('operator')
+                                            ->label(__('discount_conditions.operator'))
+                                            ->options(static fn (Get $get): array => DiscountCondition::getOperatorsForType($get('type') ?? ''))
+                                            ->required()
+                                            ->live(),
+                                        Textarea::make('value')
+                                            ->label(__('discount_conditions.value'))
+                                            ->rows(4)
+                                            ->helperText(__('discount_conditions.value_help'))
+                                            ->required()
+                                            ->columnSpanFull()
+                                            ->afterStateHydrated(static function (Textarea $component, mixed $state): void {
+                                                $component->state(self::encodeValueForTextarea($state));
+                                            })
+                                            ->dehydrateStateUsing(static fn (?string $state): mixed => self::decodeValueFromTextarea($state)),
+                                        Textarea::make('metadata')
+                                            ->label(__('discount_conditions.metadata'))
+                                            ->rows(4)
+                                            ->helperText(__('discount_conditions.metadata_help'))
+                                            ->columnSpanFull()
+                                            ->afterStateHydrated(static function (Textarea $component, mixed $state): void {
+                                                $component->state(self::encodeValueForTextarea($state));
+                                            })
+                                            ->dehydrateStateUsing(static fn (?string $state): mixed => self::decodeValueFromTextarea($state)),
+                                    ]),
+                            ]),
+                        Tab::make(__('discount_conditions.targeting'))
+                            ->schema([
+                                Section::make()
+                                    ->columns(2)
+                                    ->schema([
+                                        Select::make('products')
+                                            ->label(__('discount_conditions.products'))
+                                            ->relationship('products', 'name')
+                                            ->preload()
+                                            ->searchable()
+                                            ->multiple()
+                                            ->columnSpanFull(),
+                                        Select::make('categories')
+                                            ->label(__('discount_conditions.categories'))
+                                            ->relationship('categories', 'name')
+                                            ->preload()
+                                            ->searchable()
+                                            ->multiple()
+                                            ->columnSpanFull(),
+                                    ]),
+                            ]),
+                    ])
+                    ->columnSpanFull(),
+            ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('translated_name')
-                    ->label(__('discount_conditions.name'))
-                    ->toggleable()
-                    ->limit(50)
-                    ->placeholder('—')
-                    ->searchable(),
                 TextColumn::make('discount.name')
                     ->label(__('discount_conditions.discount'))
                     ->sortable()
@@ -197,18 +175,17 @@ final class DiscountConditionResource extends Resource
                 TextColumn::make('type')
                     ->label(__('discount_conditions.type'))
                     ->badge()
-                    ->formatStateUsing(fn (string $state): string => __('discount_conditions.types.' . Str::slug($state, '_')))
-                    ->color(fn (string $state): string => self::typeColor($state))
+                    ->formatStateUsing(static fn (?string $state): string => $state ? (DiscountCondition::getTypes()[$state] ?? Str::of($state)->headline()->toString()) : '-')
                     ->sortable(),
                 TextColumn::make('operator')
                     ->label(__('discount_conditions.operator'))
-                    ->formatStateUsing(fn (string $state): string => __('discount_conditions.operators.' . Str::slug($state, '_')))
+                    ->formatStateUsing(static fn (?string $state): string => $state ? (DiscountCondition::getOperators()[$state] ?? Str::of($state)->headline()->toString()) : '-')
                     ->badge()
                     ->sortable(),
                 TextColumn::make('value')
                     ->label(__('discount_conditions.value'))
-                    ->formatStateUsing(fn (mixed $state): string => self::formatValueForDisplay($state))
-                    ->wrap()
+                    ->formatStateUsing(static fn (mixed $state): string => self::formatValueForTable($state))
+                    ->limit(50)
                     ->toggleable(),
                 TextColumn::make('priority')
                     ->label(__('discount_conditions.priority'))
@@ -216,7 +193,7 @@ final class DiscountConditionResource extends Resource
                 TextColumn::make('position')
                     ->label(__('discount_conditions.position'))
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
                 IconColumn::make('is_active')
                     ->label(__('discount_conditions.is_active'))
                     ->boolean()
@@ -226,83 +203,167 @@ final class DiscountConditionResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('updated_at')
+                    ->label(__('discount_conditions.updated_at'))
+                    ->dateTime()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('type')
                     ->label(__('discount_conditions.type'))
-                    ->options(DiscountCondition::getTypes()),
+                    ->options(static fn (): array => DiscountCondition::getTypes())
+                    ->searchable(),
                 SelectFilter::make('discount_id')
                     ->label(__('discount_conditions.discount'))
                     ->relationship('discount', 'name')
                     ->searchable()
                     ->preload(),
-                TernaryFilter::make('is_active')
-                    ->label(__('discount_conditions.status_filter')),
+                SelectFilter::make('is_active')
+                    ->label(__('discount_conditions.is_active'))
+                    ->options([
+                        '1' => __('discount_conditions.active_only'),
+                        '0' => __('discount_conditions.inactive_only'),
+                    ])
+                    ->query(static function (Builder $query, array $data): Builder {
+                        if (! array_key_exists('value', $data) || $data['value'] === null || $data['value'] === '') {
+                            return $query;
+                        }
+
+                        return $query->where('is_active', (bool) (int) $data['value']);
+                    }),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                TableAction::make('toggle_active')
-                    ->label(fn (DiscountCondition $record): string => $record->is_active
-                        ? __('discount_conditions.deactivate')
-                        : __('discount_conditions.activate'))
-                    ->icon(fn (DiscountCondition $record): string => $record->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
-                    ->color(fn (DiscountCondition $record): string => $record->is_active ? 'danger' : 'success')
+                ViewAction::make(),
+                EditAction::make(),
+                Action::make('toggle_active')
+                    ->label(static fn (DiscountCondition $record): string => $record->is_active ? __('discount_conditions.deactivate') : __('discount_conditions.activate'))
+                    ->icon('heroicon-o-power')
+                    ->color(static fn (DiscountCondition $record): string => $record->is_active ? 'danger' : 'success')
                     ->requiresConfirmation()
-                    ->action(function (DiscountCondition $record): void {
-                        $record->is_active = ! $record->is_active;
-                        $record->save();
+                    ->action(static function (DiscountCondition $record): void {
+                        $record->update(['is_active' => ! $record->is_active]);
 
                         Notification::make()
                             ->title($record->is_active ? __('discount_conditions.activated_successfully') : __('discount_conditions.deactivated_successfully'))
                             ->success()
                             ->send();
                     }),
-                Tables\Actions\DeleteAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
                     BulkAction::make('activate')
                         ->label(__('discount_conditions.activate_selected'))
-                        ->icon('heroicon-o-check-circle')
+                        ->icon('heroicon-o-bolt')
                         ->color('success')
                         ->requiresConfirmation()
-                        ->action(function (Collection $records): void {
-                            $records->each(fn (DiscountCondition $record) => $record->update(['is_active' => true]));
-                        })
-                        ->deselectRecordsAfterCompletion(),
+                        ->action(static function (Collection $records): void {
+                            $records->each(static function (DiscountCondition $record): void {
+                                $record->update(['is_active' => true]);
+                            });
+
+                            Notification::make()
+                                ->title(__('discount_conditions.bulk_activated_success'))
+                                ->success()
+                                ->send();
+                        }),
                     BulkAction::make('deactivate')
                         ->label(__('discount_conditions.deactivate_selected'))
-                        ->icon('heroicon-o-x-circle')
+                        ->icon('heroicon-o-no-symbol')
                         ->color('danger')
                         ->requiresConfirmation()
-                        ->action(function (Collection $records): void {
-                            $records->each(fn (DiscountCondition $record) => $record->update(['is_active' => false]));
-                        })
-                        ->deselectRecordsAfterCompletion(),
-                    BulkAction::make('set_priority')
-                        ->label(__('discount_conditions.set_priority'))
-                        ->icon('heroicon-o-arrow-up-tray')
-                        ->form([
-                            TextInput::make('priority')
-                                ->label(__('discount_conditions.priority'))
-                                ->numeric()
-                                ->required()
-                                ->minValue(0),
-                        ])
-                        ->action(function (Collection $records, array $data): void {
-                            $records->each(fn (DiscountCondition $record) => $record->update(['priority' => (int) $data['priority']]));
-                        })
-                        ->deselectRecordsAfterCompletion(),
+                        ->action(static function (Collection $records): void {
+                            $records->each(static function (DiscountCondition $record): void {
+                                $record->update(['is_active' => false]);
+                            });
+
+                            Notification::make()
+                                ->title(__('discount_conditions.bulk_deactivated_success'))
+                                ->success()
+                                ->send();
+                        }),
                     DeleteBulkAction::make(),
                 ]),
             ])
-            ->defaultSort('created_at', 'desc');
+            ->defaultSort('priority', 'asc');
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                InfolistSection::make(__('discount_conditions.basic_information'))
+                    ->schema([
+                        InfolistGrid::make()
+                            ->schema([
+                                TextEntry::make('discount.name')
+                                    ->label(__('discount_conditions.discount')),
+                                TextEntry::make('type')
+                                    ->label(__('discount_conditions.type'))
+                                    ->formatStateUsing(static fn (?string $state): string => $state ? (DiscountCondition::getTypes()[$state] ?? Str::of($state)->headline()->toString()) : '-')
+                                    ->badge(),
+                                TextEntry::make('operator')
+                                    ->label(__('discount_conditions.operator'))
+                                    ->formatStateUsing(static fn (?string $state): string => $state ? (DiscountCondition::getOperators()[$state] ?? Str::of($state)->headline()->toString()) : '-')
+                                    ->badge(),
+                                IconEntry::make('is_active')
+                                    ->label(__('discount_conditions.is_active'))
+                                    ->boolean(),
+                                TextEntry::make('priority')
+                                    ->label(__('discount_conditions.priority')),
+                                TextEntry::make('position')
+                                    ->label(__('discount_conditions.position')),
+                            ])
+                            ->columns(3),
+                    ]),
+                InfolistSection::make(__('discount_conditions.condition_settings'))
+                    ->schema([
+                        TextEntry::make('value')
+                            ->label(__('discount_conditions.value'))
+                            ->formatStateUsing(static fn (mixed $state): string => self::formatValueForTable($state))
+                            ->columnSpanFull(),
+                        TextEntry::make('metadata')
+                            ->label(__('discount_conditions.metadata'))
+                            ->formatStateUsing(static fn (mixed $state): string => self::formatValueForTable($state))
+                            ->columnSpanFull(),
+                    ]),
+                InfolistSection::make(__('discount_conditions.targeting'))
+                    ->schema([
+                        TextEntry::make('products.name')
+                            ->label(__('discount_conditions.products'))
+                            ->badge()
+                            ->separator(', '),
+                        TextEntry::make('categories.name')
+                            ->label(__('discount_conditions.categories'))
+                            ->badge()
+                            ->separator(', '),
+                    ])
+                    ->columns(2),
+                InfolistSection::make(__('discount_conditions.created_at'))
+                    ->schema([
+                        TextEntry::make('created_at')
+                            ->label(__('discount_conditions.created_at'))
+                            ->dateTime(),
+                        TextEntry::make('updated_at')
+                            ->label(__('discount_conditions.updated_at'))
+                            ->dateTime(),
+                    ])
+                    ->columns(2),
+            ]);
     }
 
     public static function getRelations(): array
     {
         return [];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            DiscountConditionStatsWidget::class,
+            DiscountConditionChartWidget::class,
+            DiscountConditionTableWidget::class,
+        ];
     }
 
     public static function getPages(): array
@@ -315,100 +376,82 @@ final class DiscountConditionResource extends Resource
         ];
     }
 
-    public static function getEloquentQuery(): Builder
+    private static function encodeValueForTextarea(mixed $value): ?string
     {
-        return parent::getEloquentQuery()->with(['discount', 'translations']);
-    }
-
-    private static function supportedLocaleOptions(): array
-    {
-        $locales = config('shared.supported_locales') ?? config('app.supported_locales', ['lt', 'en']);
-
-        if (is_string($locales)) {
-            $locales = array_map('trim', explode(',', $locales));
+        if ($value === null || $value === '') {
+            return null;
         }
 
-        return collect($locales)
-            ->filter()
-            ->unique()
-            ->mapWithKeys(static fn (string $locale): array => [$locale => Str::upper($locale)])
-            ->toArray();
-    }
-
-    private static function encodeValueForTextarea(mixed $value): string
-    {
-        if (is_array($value)) {
-            return json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        if (is_string($value)) {
+            return $value;
         }
 
-        if (is_bool($value)) {
-            return $value ? 'true' : 'false';
+        if (is_scalar($value)) {
+            return (string) $value;
         }
 
-        return (string) $value;
+        return json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
-    private static function normalizeValue(mixed $value): mixed
+    private static function decodeValueFromTextarea(?string $value): mixed
     {
         if ($value === null) {
             return null;
         }
 
-        if (is_array($value)) {
-            return $value;
+        $trimmed = trim($value);
+
+        if ($trimmed === '') {
+            return null;
         }
 
-        if (is_bool($value)) {
-            return $value;
-        }
-
-        if (is_numeric($value)) {
-            return $value + 0;
-        }
-
-        $decoded = json_decode((string) $value, true);
+        $decoded = json_decode($trimmed, true);
 
         if (json_last_error() === JSON_ERROR_NONE) {
             return $decoded;
         }
 
-        return (string) $value;
+        if (Str::contains($trimmed, ',')) {
+            return array_map('trim', explode(',', $trimmed));
+        }
+
+        if (is_numeric($trimmed)) {
+            return $trimmed + 0;
+        }
+
+        return $trimmed;
     }
 
-    private static function formatValueForDisplay(mixed $value): string
+    private static function formatValueForTable(mixed $value): string
     {
-        $value = self::normalizeValue($value);
+        if ($value === null) {
+            return '-';
+        }
 
-        if (is_array($value)) {
-            return implode(', ', Arr::flatten($value));
+        if (is_string($value)) {
+            return $value;
         }
 
         if (is_bool($value)) {
-            return $value ? __('discount_conditions.boolean_yes') : __('discount_conditions.boolean_no');
+            return $value ? __('common.yes') : __('common.no');
         }
 
         if (is_numeric($value)) {
             return (string) $value;
         }
 
-        return (string) $value;
-    }
+        if (is_array($value)) {
+            $flattened = Arr::flatten($value);
 
-    private static function typeColor(string $type): string
-    {
-        return match ($type) {
-            'cart_total' => 'primary',
-            'item_qty'   => 'success',
-            'product', 'attribute_value' => 'info',
-            'category', 'collection' => 'warning',
-            'brand' => 'purple',
-            'channel', 'currency' => 'indigo',
-            'customer_group', 'partner_tier' => 'cyan',
-            'user'          => 'teal',
-            'first_order'   => 'emerald',
-            'day_time'      => 'amber',
-            'custom_script' => 'pink',
-            default         => 'gray',
-        };
+            if (count($flattened) === 1) {
+                $single = reset($flattened);
+
+                return is_scalar($single) ? (string) $single : json_encode($single, JSON_UNESCAPED_UNICODE);
+            }
+
+            return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        }
+
+        return (string) $value;
     }
 }
