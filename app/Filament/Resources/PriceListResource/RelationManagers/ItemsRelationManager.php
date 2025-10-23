@@ -20,7 +20,12 @@ final class ItemsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'items';
 
-    public static function getTitle(Model $ownerRecord, string $pageClass): string
+    public static function getTitle(): ?string
+    {
+        return __('price_lists.relation_managers.items.title');
+    }
+
+    public function form(Form $form): Form
     {
         return __('price_lists.relation_managers.items.title');
     }
