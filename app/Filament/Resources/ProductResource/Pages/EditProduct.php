@@ -123,7 +123,7 @@ final class EditProduct extends EditRecord
     }
 
     /**
-     * @param  array<string, array<string, mixed>>  $translations
+     * @param  array<string, array<string, mixed>> $translations
      * @return array<string, array<string, mixed>>
      */
     private function sanitizeTranslatablePayload(array $translations): array

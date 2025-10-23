@@ -98,7 +98,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
 
     protected static function booted(): void
     {
-        static::saving(static function (Product $product): void {
+        self::saving(static function (Product $product): void {
             /** @var HtmlSanitizer $sanitizer */
             $sanitizer = app(HtmlSanitizer::class);
 

@@ -34,9 +34,9 @@ final class SanitizeHtmlContentCommand extends Command
         $this->components->info('Sanitizing product descriptions and legal translations...');
 
         $counters = [
-            'products' => 0,
+            'products'             => 0,
             'product_translations' => 0,
-            'legal_translations' => 0,
+            'legal_translations'   => 0,
         ];
 
         Product::withoutGlobalScopes()
@@ -124,7 +124,7 @@ final class SanitizeHtmlContentCommand extends Command
         $this->components->info('HTML sanitization run finished.');
 
         foreach ($counters as $label => $count) {
-            $this->components->line(Str::headline($label).": {$count} updated");
+            $this->components->line(Str::headline($label) . ": {$count} updated");
         }
 
         if ($dryRun) {

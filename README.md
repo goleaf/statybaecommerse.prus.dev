@@ -17,6 +17,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 ### Latest updates
+- Reusable HTML sanitization now protects product and legal descriptions end-to-end, complete with a maintenance command and storefront Blade helper for rendering cleaned markup.
 - User Product Interaction analytics tables now present rating badges and interaction filters with Filament v4-aligned formatting, keeping admin seeding from tripping PHP concatenation notices observed in upstream PR #1097 testing.
 - Developer tooling regained the full Husky bootstrap shim, ensuring local Git hooks run automatically after installs while still reminding contributors about the upcoming v10 script changes.
 - Shipping option management screens now present accurate delivery windows even when the minimum day value is zero or one side of the range is missing, giving merchandisers clearer expectations when auditing carriers.
