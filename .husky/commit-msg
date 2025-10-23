@@ -1,7 +1,4 @@
-#!/usr/bin/env sh
-# Bootstrap Husky's maintained helper so PATH and environment tweaks remain consistent.
-. "$(dirname -- "$0")/_/h"
-
-set -eu
+#!/bin/sh
+# Husky commit-msg hook runs commitlint without sourcing deprecated helper scripts.
 
 npx --no -- commitlint --edit "$1"
