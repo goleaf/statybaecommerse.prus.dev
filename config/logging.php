@@ -14,6 +14,8 @@ $configuredStackChannels = array_filter(array_map(
     explode(',', (string) env('LOG_STACK', 'daily'))
 ));
 
+$logRetentionDays = (int) config('privacy.retention.logs', (int) env('LOG_DAILY_DAYS', 14));
+
 $stackChannels = $configuredStackChannels === []
     ? ['daily']
     : array_values(array_unique($configuredStackChannels));
@@ -117,13 +119,7 @@ return [
             'driver' => 'daily',
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
-            'days' => env('LOG_DAILY_DAYS', 30),
-            'tap' => [App\Logging\CustomizeFormatter::class],
-            'formatter' => JsonFormatter::class,
-            'formatter_with' => [
-                'batchMode' => JsonFormatter::BATCH_MODE_JSON,
-                'appendNewline' => true,
-            ],
+            'days' => $logRetentionDays > 0 ? $logRetentionDays : 14,
             'replace_placeholders' => true,
             'tap' => [
                 CustomizeFormatter::class,
