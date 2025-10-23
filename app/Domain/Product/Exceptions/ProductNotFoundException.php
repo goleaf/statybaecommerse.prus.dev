@@ -6,6 +6,9 @@ namespace App\Domain\Product\Exceptions;
 
 use RuntimeException;
 
+/**
+ * Domain-specific exception used when a product cannot be located.
+ */
 final class ProductNotFoundException extends RuntimeException
 {
     public static function forSlug(string $slug): self

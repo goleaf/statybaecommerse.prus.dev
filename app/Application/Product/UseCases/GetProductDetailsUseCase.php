@@ -11,9 +11,15 @@ use App\Domain\Product\Exceptions\ProductNotFoundException;
 use App\Domain\Product\Repositories\ProductRepositoryInterface;
 use App\Domain\Product\ValueObjects\ProductSlug;
 
+/**
+ * Retrieves a single product ready for presentation.
+ */
 final class GetProductDetailsUseCase
 {
-    public function __construct(private readonly ProductRepositoryInterface $repository) {}
+    public function __construct(private readonly ProductRepositoryInterface $repository)
+    {
+        // Dependencies injected for easy testing.
+    }
 
     public function execute(GetProductDetailsInputDto $input): ProductDetailsDto
     {

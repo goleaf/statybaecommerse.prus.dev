@@ -6,6 +6,9 @@ namespace App\Application\Product\DTOs;
 
 use App\Domain\Product\Entities\ProductVariant;
 
+/**
+ * DTO describing a single product variant.
+ */
 final class ProductVariantDto
 {
     public function __construct(
@@ -14,7 +17,9 @@ final class ProductVariantDto
         private readonly string $sku,
         private readonly float $price,
         private readonly ?int $stockQuantity,
-    ) {}
+    ) {
+        // All state is captured via constructor promotion for clarity.
+    }
 
     public static function fromDomain(ProductVariant $variant): self
     {

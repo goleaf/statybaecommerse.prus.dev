@@ -21,9 +21,7 @@
 - Raised the floor for `novadaemon/filament-combobox` to `^2.0.1` as part of the scheduled Filament maintenance sweep so we can ship the upstream dropdown focus bugfix in the next admin UI release.
 
 ### Changed
-- Restored the Yarn-driven asset workflow after regressing to npm-only builds in PR #109, ensuring the CI matrix no longer runs the redundant frontend build job and developers continue using the established lockfile.
-  _Comment:_ This note documents the rollback so reviewers understand why the package-lock file disappeared again.
-- Updated the Address admin resource to declare the Filament v4 `Form`/`Table` return contracts so package discovery can load it without signature mismatches during testing.
+- Refactored the product API pipeline to flow through dedicated application use cases and domain DTOs, adding a presenter that keeps the public contract schema intact while filtering non-displayable catalog entries.
 - Documented the Collection Rule resource's Filament v4 form/table signatures, modal reorder workflow, and cache maintenance page alignment to guide future admin updates.
 - Added translation-backed fallbacks for missing review ratings while aligning Filament navigation icon docblocks and shared navigation group helpers across the review, system setting category, and enhanced ecommerce widgets.
 - Swapped Campaign resource schemas to Filament v4 `Section`/`Grid` components, refreshed table action imports, and synced the related translation manager plus Variant Analytics navigation icon docblock with v4 conventions.

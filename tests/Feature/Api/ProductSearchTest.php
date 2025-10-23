@@ -22,7 +22,7 @@ it('returns displayable products from the search use case', function (): void {
     $response = $this->getJson('/api/products/search?q=plaktukas&limit=5');
 
     $response->assertOk()
-        ->assertJsonPath('data.products.0.slug', $matching->slug)
-        ->assertJsonPath('data.products.0.name', $matching->name)
-        ->assertJsonPath('data.query', 'plaktukas');
+        ->assertJsonPath('data.items.0.slug', $matching->slug)
+        ->assertJsonPath('data.items.0.name', $matching->name)
+        ->assertJsonPath('meta.query', 'plaktukas');
 });

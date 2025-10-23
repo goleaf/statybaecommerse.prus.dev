@@ -6,6 +6,9 @@ namespace App\Application\Product\DTOs;
 
 use App\Domain\Product\Collections\ProductImageCollection;
 
+/**
+ * Lightweight collection DTO for serialising product images.
+ */
 final class ProductImageCollectionDto
 {
     /** @var list<ProductImageDto> */
@@ -16,6 +19,7 @@ final class ProductImageCollectionDto
      */
     public function __construct(array $items)
     {
+        // Store a normalised list of DTOs to keep rendering predictable.
         $this->items = $items;
     }
 
@@ -29,6 +33,9 @@ final class ProductImageCollectionDto
         return new self($items);
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     public function toArray(): array
     {
         return array_map(static fn (ProductImageDto $image) => $image->toArray(), $this->items);
