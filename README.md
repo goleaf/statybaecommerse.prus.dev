@@ -17,6 +17,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 ### Latest updates
+- Diagnostics coverage moved from bespoke artisan commands to dedicated PHPUnit suites with a minimum coverage extension and Paratest-ready tooling, making the quality gate observable directly from standard test runs.
 - Security middleware now shares request-scoped CSP nonces with Livewire and Vite, tightens HSTS/permissions policy headers, and updates inline Blade assets to honour nonce-based CSP directives end-to-end.
 - API error handling now exposes a shared `error.rate_limited` problem code for HTTP 429 responses, giving integrators a stable throttle signal documented in [docs/contracts/ERRORS.md](docs/contracts/ERRORS.md).
 - Test bootstrap now registers both `lang/` and `resources/lang/` JSON translation directories so admin navigation labels render localized text during regression tests.
