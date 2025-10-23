@@ -46,7 +46,7 @@
 - OpenAPI documentation now mirrors the lean product meta payload and nullable media thumbnails emitted by the presenter, keeping schema validators and client SDKs in sync with production responses.
 
 ## Admin panel resilience
-- The HTML sanitization maintenance command now honours Laravel 12's component signature changes while reporting chunked progress, keeping CLI invocations error-free as translations and product copy are cleaned in bulk.
+- Category resource in the Filament admin now bypasses storefront scopes, auto-synchronises slugs, and surfaces boolean toggles/filters so QA and merchandisers can manage inactive or hidden categories directly from the list page.
 - Attribute administration keeps validation rule strings verbatim, surfaces array-based rules as comma-separated chips, and pairs with regression tests that prove both paths round-trip correctly through Filament.
 - Collection resource navigation metadata, translations, and fillable casts now mirror the Filament v4 schema so admin menus, factories, and the comprehensive resource tests target the same contract.
 - Filament dashboard access checks now fall back to open access when no

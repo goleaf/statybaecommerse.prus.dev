@@ -33,6 +33,10 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property mixed  $fillable
  * @property mixed  $casts
  * @property mixed  $appends
+ * @property bool   $is_active
+ * @property bool   $is_visible
+ * @property bool   $is_featured
+ * @property bool   $is_enabled
  * @property string $translationModel
  * @property int $id
  * @property string $name
