@@ -136,28 +136,27 @@ final class Index extends Component implements HasSchemas
     /**
      * @return EloquentCollection<int, Brand>
      */
-    /**
-     * @return EloquentCollection<int, Brand>
-     */
     #[Computed]
     public function brands(): EloquentCollection
     {
         $locale = app()->getLocale();
 
+        // Tag caches so we can flush locale-specific data when catalogue data changes.
         return Cache::tags($this->tagsForCategoryIndex([
             CacheTags::brands(),
         ]))->remember(
             CacheKeys::categoryIndexBrands($locale),
             now()->addSeconds(180),
             static function (): EloquentCollection {
-                return Brand::query()->where('is_enabled', true)->orderBy('name')->get(['id', 'name']);
+                return Brand::query()
+                    ->where('is_enabled', true)
+                    ->orderBy('name')
+                    ->get(['id', 'name']);
             }
         );
     }
 
     /**
-     * Handle getBrandOptions functionality with proper error handling.
-     *
      * @return array<int, string>
      */
     private function getBrandOptions(): array
@@ -174,9 +173,6 @@ final class Index extends Component implements HasSchemas
     /**
      * @return EloquentCollection<int, Collection>
      */
-    /**
-     * @return EloquentCollection<int, Collection>
-     */
     #[Computed]
     public function collections(): EloquentCollection
     {
@@ -188,14 +184,14 @@ final class Index extends Component implements HasSchemas
             CacheKeys::categoryIndexCollections($locale),
             now()->addSeconds(180),
             static function (): EloquentCollection {
-                return Collection::query()->visible()->orderBy('name')->get(['id', 'name']);
+                return Collection::query()
+                    ->visible()
+                    ->orderBy('name')
+                    ->get(['id', 'name']);
             }
         );
     }
 
-    /**
-     * @return array<int, array{id: int, name: string, count: int}>
-     */
     /**
      * @return array<int, array{id: int, name: string, count: int}>
      */
@@ -212,10 +208,16 @@ final class Index extends Component implements HasSchemas
             CacheKeys::categoryIndexFacetBrands($locale, $filters),
             now()->addSeconds(180),
             function (): array {
-                $brands = Brand::query()->where('is_enabled', true)->orderBy('name')->get(['id', 'name']);
+                $brands = Brand::query()
+                    ->where('is_enabled', true)
+                    ->orderBy('name')
+                    ->get(['id', 'name']);
+
                 $countsByBrand = [];
                 foreach ($brands as $brand) {
-                    $countsByBrand[$brand->id] = $this->baseProductQuery()->where('brand_id', $brand->id)->count();
+                    $countsByBrand[$brand->id] = $this->baseProductQuery()
+                        ->where('brand_id', $brand->id)
+                        ->count();
                 }
 
                 return $brands
@@ -233,9 +235,6 @@ final class Index extends Component implements HasSchemas
     /**
      * @return array<int, array{id: int, name: string, count: int}>
      */
-    /**
-     * @return array<int, array{id: int, name: string, count: int}>
-     */
     #[Computed]
     public function facetCollections(): array
     {
@@ -249,10 +248,16 @@ final class Index extends Component implements HasSchemas
             CacheKeys::categoryIndexFacetCollections($locale, $filters),
             now()->addSeconds(180),
             function (): array {
-                $collections = Collection::query()->visible()->orderBy('name')->get(['id', 'name']);
+                $collections = Collection::query()
+                    ->visible()
+                    ->orderBy('name')
+                    ->get(['id', 'name']);
+
                 $countsByCollection = [];
-                foreach ($collections as $col) {
-                    $countsByCollection[$col->id] = $this->baseProductQuery()->whereHas('collections', fn (Builder $q) => $q->where('collections.id', $col->id))->count();
+                foreach ($collections as $collection) {
+                    $countsByCollection[$collection->id] = $this->baseProductQuery()
+                        ->whereHas('collections', fn (Builder $q): Builder => $q->where('collections.id', $collection->id))
+                        ->count();
                 }
 
                 return $collections
@@ -270,9 +275,6 @@ final class Index extends Component implements HasSchemas
     /**
      * @return array<int, array{id: int, name: string, count: int}>
      */
-    /**
-     * @return array<int, array{id: int, name: string, count: int}>
-     */
     #[Computed]
     public function facetCategories(): array
     {
@@ -286,17 +288,23 @@ final class Index extends Component implements HasSchemas
             CacheKeys::categoryIndexFacetCategories($locale, $filters),
             now()->addSeconds(180),
             function (): array {
-                $categories = Category::query()->visible()->orderBy('name')->get(['id', 'name']);
-                $counts = [];
-                foreach ($categories as $cat) {
-                    $counts[$cat->id] = $this->baseProductQuery()->whereHas('categories', fn (Builder $q) => $q->where('categories.id', $cat->id))->count();
+                $categories = Category::query()
+                    ->visible()
+                    ->orderBy('name')
+                    ->get(['id', 'name']);
+
+                $countsByCategory = [];
+                foreach ($categories as $category) {
+                    $countsByCategory[$category->id] = $this->baseProductQuery()
+                        ->whereHas('categories', fn (Builder $q): Builder => $q->where('categories.id', $category->id))
+                        ->count();
                 }
 
                 return $categories
                     ->map(static fn (Category $category): array => [
                         'id' => (int) $category->id,
                         'name' => (string) $category->name,
-                        'count' => (int) ($counts[$category->id] ?? 0),
+                        'count' => (int) ($countsByCategory[$category->id] ?? 0),
                     ])
                     ->values()
                     ->all();
@@ -307,20 +315,34 @@ final class Index extends Component implements HasSchemas
     /**
      * @return Builder<Product>
      */
-    /**
-     * @return Builder<Product>
-     */
     private function baseProductQuery(): Builder
     {
-        return Product::query()->visible()->whereNotNull('published_at')->where('published_at', '<=', now())->when(! empty($this->selectedBrandIds), fn (Builder $q) => $q->whereIn('brand_id', $this->selectedBrandIds))->when(! empty($this->selectedCollectionIds), fn (Builder $q) => $q->whereHas('collections', fn (Builder $qq) => $qq->whereIn('collections.id', $this->selectedCollectionIds)))->when($this->priceMin !== null, fn (Builder $q) => $q->where('price', '>=', (float) $this->priceMin))->when($this->priceMax !== null, fn (Builder $q) => $q->where('price', '<=', (float) $this->priceMax))->when($this->inStock, fn (Builder $q) => $q->where('stock_quantity', '>', 0))->when($this->onSale, fn (Builder $q) => $q->whereNotNull('sale_price'))->when($this->search !== '', function (Builder $q): void {
-            $q->where(function (Builder $qq): void {
-                $qq->where('name', 'like', '%'.$this->search.'%')->orWhere('description', 'like', '%'.$this->search.'%')->orWhere('sku', 'like', '%'.$this->search.'%');
+        return Product::query()
+            ->visible()
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->when(! empty($this->selectedBrandIds), fn (Builder $q): Builder => $q->whereIn('brand_id', $this->selectedBrandIds))
+            ->when(
+                ! empty($this->selectedCollectionIds),
+                fn (Builder $q): Builder => $q->whereHas(
+                    'collections',
+                    fn (Builder $inner): Builder => $inner->whereIn('collections.id', $this->selectedCollectionIds)
+                )
+            )
+            ->when($this->priceMin !== null, fn (Builder $q): Builder => $q->where('price', '>=', (float) $this->priceMin))
+            ->when($this->priceMax !== null, fn (Builder $q): Builder => $q->where('price', '<=', (float) $this->priceMax))
+            ->when($this->inStock, fn (Builder $q): Builder => $q->where('stock_quantity', '>', 0))
+            ->when($this->onSale, fn (Builder $q): Builder => $q->whereNotNull('sale_price'))
+            ->when($this->search !== '', function (Builder $q): void {
+                $q->where(function (Builder $inner): void {
+                    $inner
+                        ->where('name', 'like', '%'.$this->search.'%')
+                        ->orWhere('description', 'like', '%'.$this->search.'%')
+                        ->orWhere('sku', 'like', '%'.$this->search.'%');
+                });
             });
     }
 
-    /**
-     * @return EloquentCollection<int, Category>
-     */
     /**
      * @return EloquentCollection<int, Category>
      */
@@ -336,20 +358,33 @@ final class Index extends Component implements HasSchemas
         ]))->remember(
             CacheKeys::categoryIndexCategories($locale, $filters),
             now()->addSeconds(180),
-            function () {
-                $query = Category::query()->with(['media'])->withCount(['products' => function (Builder $q): void {
-                    $q->where('is_visible', true)
-                        ->when(! empty($this->selectedBrandIds), fn (Builder $qq) => $qq->whereIn('brand_id', $this->selectedBrandIds))
-                        ->when(! empty($this->selectedCollectionIds), fn (Builder $qq) => $qq->whereHas('collections', fn (Builder $c) => $c->whereIn('collections.id', $this->selectedCollectionIds)))
-                        ->when($this->priceMin !== null, fn (Builder $qq) => $qq->where('price', '>=', (float) $this->priceMin))
-                        ->when($this->priceMax !== null, fn (Builder $qq) => $qq->where('price', '<=', (float) $this->priceMax))
-                        ->when($this->inStock, fn (Builder $qq) => $qq->where('stock_quantity', '>', 0))
-                        ->when($this->onSale, fn (Builder $qq) => $qq->whereNotNull('sale_price'));
-                }])->where('is_visible', true);
+            function (): EloquentCollection {
+                $query = Category::query()
+                    ->with(['media'])
+                    ->withCount(['products' => function (Builder $q): void {
+                        $q->where('is_visible', true)
+                            ->when(
+                                ! empty($this->selectedBrandIds),
+                                fn (Builder $qq): Builder => $qq->whereIn('brand_id', $this->selectedBrandIds)
+                            )
+                            ->when(
+                                ! empty($this->selectedCollectionIds),
+                                fn (Builder $qq): Builder => $qq->whereHas(
+                                    'collections',
+                                    fn (Builder $c): Builder => $c->whereIn('collections.id', $this->selectedCollectionIds)
+                                )
+                            )
+                            ->when($this->priceMin !== null, fn (Builder $qq): Builder => $qq->where('price', '>=', (float) $this->priceMin))
+                            ->when($this->priceMax !== null, fn (Builder $qq): Builder => $qq->where('price', '<=', (float) $this->priceMax))
+                            ->when($this->inStock, fn (Builder $qq): Builder => $qq->where('stock_quantity', '>', 0))
+                            ->when($this->onSale, fn (Builder $qq): Builder => $qq->whereNotNull('sale_price'));
+                    }])
+                    ->where('is_visible', true);
 
                 if ($this->search !== '') {
-                    $query->where(function ($q): void {
-                        $q->where('name', 'like', '%'.$this->search.'%')->orWhere('description', 'like', '%'.$this->search.'%');
+                    $query->where(function (Builder $q): void {
+                        $q->where('name', 'like', '%'.$this->search.'%')
+                            ->orWhere('description', 'like', '%'.$this->search.'%');
                     });
                 }
 
@@ -359,74 +394,32 @@ final class Index extends Component implements HasSchemas
 
                 if (! empty($this->selectedCategoryIds)) {
                     $query->where(function (Builder $q): void {
-                        $q->whereIn('id', $this->selectedCategoryIds)->orWhereIn('parent_id', $this->selectedCategoryIds);
+                        $q->whereIn('id', $this->selectedCategoryIds)
+                            ->orWhereIn('parent_id', $this->selectedCategoryIds);
                     });
                 }
 
-                $query->when($this->sort === 'name_asc', fn ($q) => $q->orderBy('name'))
-                    ->when($this->sort === 'name_desc', fn ($q) => $q->orderByDesc('name'))
-                    ->when($this->sort === 'products_desc', fn ($q) => $q->orderByDesc('products_count'))
-                    ->when($this->sort === 'products_asc', fn ($q) => $q->orderBy('products_count'))
-                    ->when(! in_array($this->sort, ['name_asc', 'name_desc', 'products_desc', 'products_asc']), fn ($q) => $q->orderBy('name'));
+                $query
+                    ->when($this->sort === 'name_asc', fn (Builder $q): Builder => $q->orderBy('name'))
+                    ->when($this->sort === 'name_desc', fn (Builder $q): Builder => $q->orderByDesc('name'))
+                    ->when($this->sort === 'products_desc', fn (Builder $q): Builder => $q->orderByDesc('products_count'))
+                    ->when($this->sort === 'products_asc', fn (Builder $q): Builder => $q->orderBy('products_count'))
+                    ->when(
+                        ! in_array($this->sort, ['name_asc', 'name_desc', 'products_desc', 'products_asc'], true),
+                        fn (Builder $q): Builder => $q->orderBy('name')
+                    );
 
                 return $query->get();
             }
         );
     }
 
-    /**
-     * @return array<string, mixed>
-     */
     public function render(): View
     {
-        return [
-            'search' => $this->search,
-            'selectedBrandIds' => $this->normalizeIds($this->selectedBrandIds),
-            'selectedCollectionIds' => $this->normalizeIds($this->selectedCollectionIds),
-            'selectedCategoryIds' => $this->normalizeIds($this->selectedCategoryIds),
-            'priceMin' => $this->priceMin,
-            'priceMax' => $this->priceMax,
-            'inStock' => $this->inStock,
-            'onSale' => $this->onSale,
-            'hasProducts' => $this->hasProducts,
-            'sort' => $this->sort,
-        ];
-    }
-
-    /**
-     * @param  array<int, int|string>  $ids
-     * @return array<int, int>
-     */
-    private function normalizeIds(array $ids): array
-    {
-        $normalized = array_map(static fn ($value): int => (int) $value, $ids);
-
-        sort($normalized);
-
-        return $normalized;
-    }
-
-    /**
-     * @param  array<int, string>  $additional
-     * @return array<int, string>
-     */
-    private function tagsForCategoryIndex(array $additional = []): array
-    {
-        $base = [
-            CacheTags::locale(app()->getLocale()),
-            CacheTags::categories(),
-            CacheTags::products(),
-            CacheTags::brands(),
-            CacheTags::collections(),
-        ];
-
-        $dynamic = array_merge(
-            CacheTags::brandIds($this->selectedBrandIds),
-            CacheTags::collectionIds($this->selectedCollectionIds),
-            CacheTags::categoryIds($this->selectedCategoryIds),
-        );
-
-        return array_values(array_unique(array_merge($base, $dynamic, $additional)));
+        return view('livewire.pages.category.index')
+            ->layout('components.layouts.base', [
+                'title' => __('Categories'),
+            ]);
     }
 
     /**

@@ -21,9 +21,6 @@ use Livewire\WithPagination;
  * @property string $sortDirection
  * @property-read LengthAwarePaginatorContract<int, Product> $products
  */
-/**
- * @property-read LengthAwarePaginatorContract<int, Product> $products
- */
 final class Show extends Component
 {
     use WithPagination;
@@ -48,9 +45,6 @@ final class Show extends Component
     /**
      * @return LengthAwarePaginatorContract<int, Product>
      */
-    /**
-     * @return LengthAwarePaginatorContract<int, Product>
-     */
     #[Computed]
     public function products(): LengthAwarePaginatorContract
     {
@@ -71,41 +65,35 @@ final class Show extends Component
             CacheTags::brands(),
         ];
 
-        return Cache::tags($tags)->remember(
-            $cacheKey,
-            now()->addSeconds(180),
-            function () {
-                /** @var \Illuminate\Pagination\LengthAwarePaginator<int, Product> $paginator */
-                $paginator = $this->category->products()
-                    ->where('is_visible', true)
-                    ->with([
-                        'brand:id,name,slug',
-                        'media' => function ($query): void {
-                            $query->select('id', 'model_id', 'model_type', 'name', 'file_name', 'disk', 'conversions_disk', 'size', 'mime_type', 'manipulations', 'custom_properties', 'generated_conversions', 'responsive_images', 'order_column', 'created_at', 'updated_at')
-                                ->where('collection_name', 'images')
-                                ->orderBy('order_column');
-                        },
-                    ])
-                    ->select([
-                        'products.id', 'products.name', 'products.slug', 'products.description', 'products.short_description', 'products.sku', 'products.price', 'products.sale_price',
-                        'products.compare_price', 'products.cost_price', 'products.manage_stock', 'products.stock_quantity', 'products.low_stock_threshold',
-                        'products.weight', 'products.length', 'products.width', 'products.height', 'products.is_visible', 'products.is_enabled', 'products.is_featured',
-                        'products.published_at', 'products.seo_title', 'products.seo_description', 'products.brand_id', 'products.status', 'products.type',
-                        'products.created_at', 'products.updated_at', 'products.deleted_at',
-                    ])
-                    ->withCount('reviews')
-                    ->withAvg('reviews', 'rating')
-                    ->orderBy('products.'.$this->sortBy, $this->sortDirection)
-                    ->paginate(12);
+        // Cache each combination of pagination and sorting for a short window to reduce database pressure.
+        return Cache::tags($tags)->remember($cacheKey, now()->addSeconds(180), function (): LengthAwarePaginatorContract {
+            /** @var LengthAwarePaginatorContract<int, Product> $paginator */
+            $paginator = $this->category->products()
+                ->where('is_visible', true)
+                ->with([
+                    'brand:id,name,slug',
+                    'media' => function ($query): void {
+                        $query->select('id', 'model_id', 'model_type', 'name', 'file_name', 'disk', 'conversions_disk', 'size', 'mime_type', 'manipulations', 'custom_properties', 'generated_conversions', 'responsive_images', 'order_column', 'created_at', 'updated_at')
+                            ->where('collection_name', 'images')
+                            ->orderBy('order_column');
+                    },
+                ])
+                ->select([
+                    'products.id', 'products.name', 'products.slug', 'products.description', 'products.short_description', 'products.sku', 'products.price', 'products.sale_price',
+                    'products.compare_price', 'products.cost_price', 'products.manage_stock', 'products.stock_quantity', 'products.low_stock_threshold',
+                    'products.weight', 'products.length', 'products.width', 'products.height', 'products.is_visible', 'products.is_enabled', 'products.is_featured',
+                    'products.published_at', 'products.seo_title', 'products.seo_description', 'products.brand_id', 'products.status', 'products.type',
+                    'products.created_at', 'products.updated_at', 'products.deleted_at',
+                ])
+                ->withCount('reviews')
+                ->withAvg('reviews', 'rating')
+                ->orderBy('products.'.$this->sortBy, $this->sortDirection)
+                ->paginate(12);
 
-                return $paginator;
-            }
-        );
+            return $paginator;
+        });
     }
 
-    /**
-     * Render the Livewire component view with current state.
-     */
     public function render(): View
     {
         return view('livewire.pages.category.show', [
