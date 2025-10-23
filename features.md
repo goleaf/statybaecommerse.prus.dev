@@ -36,7 +36,8 @@
 - OpenAPI documentation now mirrors the lean product meta payload and nullable media thumbnails emitted by the presenter, keeping schema validators and client SDKs in sync with production responses.
 
 ## Admin panel resilience
-- Campaign click resource now ships with a timestamp picker, defaults conversion values to zero, and backfills missing data on save so marketers can create or import clicks without violating database constraints during tests or UI flows.
+- Customer Management resource now aligns its form/table signatures with Filament v4, restores locale-aware field mappings, and re-enables email/active filters so customer moderation tests cover the intended workflows without runtime errors.
+- Filament top navigation widget surfaces the enum-driven metadata with admin/role checks and deterministic ordering, letting Livewire tests confirm visibility rules without missing groups or inconsistent priorities.
 - Attribute administration keeps validation rule strings verbatim, surfaces array-based rules as comma-separated chips, and pairs with regression tests that prove both paths round-trip correctly through Filament.
 - Attribute group filters, columns, and form selectors now share a translation fallback so legacy group slugs render as readable labels instead of raw keys throughout the Filament admin.
 - Cart item listings now synchronise the product filter with the underlying query builder, so filtered admin views, exports, and regression tests align on the same dataset.
