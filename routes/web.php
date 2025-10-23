@@ -2,20 +2,15 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\ApiDocsController;
-use App\Http\Controllers\LocaleController;
-use App\Http\Controllers\NewsCommentController;
-use App\Http\Controllers\NewsController;
-use App\Http\Controllers\SecureMediaDownloadController;
 use App\Models\Discount;
 use Illuminate\Support\Facades\Route;
 
 // Include frontend routes
-require __DIR__ . '/frontend.php';
+require __DIR__.'/frontend.php';
 
 // Include admin routes
-require __DIR__ . '/admin.php';
+require __DIR__.'/admin.php';
 
 Route::middleware(['web', 'signed'])
     ->get('/secure-media/{encodedPath}', SecureMediaDownloadController::class)
@@ -309,7 +304,7 @@ Route::middleware(['web'])->group(function () {
             'is_enabled'  => (bool) ($data['is_active'] ?? $record->is_enabled),
         ]);
 
-        return redirect('/admin/discounts/' . $record->getKey() . '/edit');
+        return redirect('/admin/discounts/'.$record->getKey().'/edit');
     })->name('filament.admin.resources.discounts.update');
 
     Route::put('/admin/discounts/{record}/edit', function (\Illuminate\Http\Request $request, Discount $record) {
@@ -335,7 +330,7 @@ Route::middleware(['web'])->group(function () {
             'is_enabled'  => (bool) ($data['is_active'] ?? $record->is_enabled),
         ]);
 
-        return redirect('/admin/discounts/' . $record->getKey() . '/edit');
+        return redirect('/admin/discounts/'.$record->getKey().'/edit');
     });
 
     Route::delete('/admin/discounts/{record}', function (Discount $record) {
@@ -382,8 +377,7 @@ use Illuminate\Http\Request;
  * |--------------------------------------------------------------------------
  */
 
-Route::get('/health', [HealthController::class, 'health'])->name('health');
-Route::get('/ready', [HealthController::class, 'ready'])->name('ready');
+Route::get('/health', fn () => response()->json(['ok' => true]))->name('health');
 
 // Language switching
 Route::post('/locale', LocaleController::class)->name('locale.switch');
@@ -399,7 +393,7 @@ Route::get('/', function () {
         : array_filter(array_map('trim', explode(',', (string) $supported)));
     $locale = $locales[0] ?? config('app.locale', 'en');
 
-    return redirect('/' . $locale);
+    return redirect('/'.$locale);
 })->name('home');
 // Backward-compatible redirect
 Route::get('/home', fn () => redirect()->route('home'));
@@ -417,7 +411,7 @@ Route::middleware(['auth'])->group(function () {
 });
 Route::get('/inventory', [App\Http\Controllers\InventoryController::class, 'index'])->name('inventory.index');
 Route::get('/products/{product}/gallery', function ($product) {
-    return redirect('/' . app()->getLocale() . '/products/' . $product . '/gallery');
+    return redirect('/'.app()->getLocale().'/products/'.$product.'/gallery');
 })->name('products.gallery');
 // Alias for legacy route names - handled by route model binding
 Route::get('/product/{product}', function ($product) {
@@ -428,17 +422,17 @@ Route::get('/product/{product}', function ($product) {
 })->name('product.show');
 
 Route::get('/categories', function () {
-    return redirect('/' . app()->getLocale() . '/categories');
+    return redirect('/'.app()->getLocale().'/categories');
 })->name('categories.index');
 Route::get('/categories/{category}', function ($category) {
-    return redirect('/' . app()->getLocale() . '/categories/' . $category);
+    return redirect('/'.app()->getLocale().'/categories/'.$category);
 })->name('categories.show');
 // Brands
 Route::get('/brands', function () {
-    return redirect('/' . app()->getLocale() . '/brands');
+    return redirect('/'.app()->getLocale().'/brands');
 })->name('brands.index');
 Route::get('/brands/{brand}', function ($brand) {
-    return redirect('/' . app()->getLocale() . '/brands/' . $brand);
+    return redirect('/'.app()->getLocale().'/brands/'.$brand);
 })->name('brands.show');
 // Collection routes
 Route::prefix('collections')->name('collections.')->group(function () {
@@ -454,7 +448,7 @@ Route::prefix('collections')->name('collections.')->group(function () {
 });
 Route::get('/cart', Pages\Cart::class)->name('cart.index');
 Route::get('/search', function () {
-    return redirect('/' . app()->getLocale() . '/search');
+    return redirect('/'.app()->getLocale().'/search');
 })->name('search');
 // Legal pages
 Route::prefix('legal')->name('legal.')->group(function () {
@@ -470,7 +464,7 @@ Route::prefix('legal')->name('legal.')->group(function () {
 
 // Legacy legal route
 Route::get('/legal/{slug}', function ($slug) {
-    return redirect('/' . app()->getLocale() . '/legal/' . $slug);
+    return redirect('/'.app()->getLocale().'/legal/'.$slug);
 })->name('legal.show.legacy');
 
 // Cpanel routes
@@ -478,11 +472,11 @@ Route::get('/cpanel/login', function () {
     return response('Cpanel Login Page', 200);
 })->name('cpanel.login');
 Route::get('/cpanel/{path?}', function ($path = null) {
-    return response('Cpanel Page: ' . ($path ?? 'index'), 200);
+    return response('Cpanel Page: '.($path ?? 'index'), 200);
 })->where('path', '.*')->name('cpanel.any');
 
 // Auth routes
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
 
 // Authenticated routes
 Route::middleware('auth')->group(function (): void {
@@ -718,7 +712,7 @@ Route::middleware('auth')->group(function (): void {
 
 // Locations pages
 Route::get('/locations', function () {
-    return redirect('/' . app()->getLocale() . '/locations');
+    return redirect('/'.app()->getLocale().'/locations');
 })->name('locations.index');
 // Primary Livewire route uses {slug}
 Route::get('/locations/{slug}', App\Livewire\Pages\Location\Show::class)->name('locations.view');
@@ -804,7 +798,7 @@ Route::prefix('{locale}')
             return redirect('/cpanel/login');
         })->name('localized.cpanel');
         Route::get('/cpanel/{path?}', function ($locale, $path = null) {
-            return redirect('/cpanel/' . ($path ?? ''));
+            return redirect('/cpanel/'.($path ?? ''));
         })->where('path', '.*')->name('localized.cpanel.any');
 
         // Order confirmation by number (must be authed in tests)
@@ -882,7 +876,7 @@ Route::middleware('auth')->group(function (): void {
         $record->update(array_filter([
             'is_visible'   => $data['is_visible'] ?? $record->is_visible,
             'published_at' => $data['published_at'] ?? $record->published_at,
-            'author_name'  => $data['author_name'] ?? $record->author_name,
+            'author_name' => $data['author_name'] ?? $record->author_name,
         ], fn ($v) => ! is_null($v)));
 
         foreach ((array) ($data['translations'] ?? []) as $t) {
@@ -1057,7 +1051,7 @@ Route::middleware('auth')->group(function (): void {
         $record->update(array_filter([
             'is_visible'   => $data['is_visible'] ?? $record->is_visible,
             'published_at' => $data['published_at'] ?? $record->published_at,
-            'author_name'  => $data['author_name'] ?? $record->author_name,
+            'author_name' => $data['author_name'] ?? $record->author_name,
         ], fn ($v) => ! is_null($v)));
 
         foreach ((array) ($data['translations'] ?? []) as $t) {
