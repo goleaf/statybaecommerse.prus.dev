@@ -19,7 +19,7 @@ The Alpine helper embedded in `filament/components/autocomplete-select.blade.php
 
 On the PHP side, defer to `App\Support\Filament\SearchableComponentHelper` so hydration and clearing logic stays centralised. The helper resolves the record, normalises it into a `[value, label, payload]` tuple, and pushes that shape back into the component while exposing optional callbacks for clearing related form state. See the [Searchable input helper usage](../filament/searchable-inputs.md) note for full examples and the expected normaliser contract.
 
-The shared helper that now powers variant lookups lives at `App\Support\Filament\Forms\SearchableVariantFieldHelper`. Its `hydrate()` method restores the component state/options from a cached `SearchResult`, while `handleUpdated()` either maps the metadata into hidden fields or clears `product_id`, `name`, `sku`, pricing, and totals when the lookup is emptied.【F:app/Support/Filament/Forms/SearchableVariantFieldHelper.php†L15-L109】 Hook new searchable variant inputs into these helper methods so repeaters, relation managers, and regular forms all rely on the same sanitised flow.
+Coordinate the server-side lifecycle with [`SearchableComponentHelper`](../filament/searchable-inputs.md). The helper centralises how Filament search inputs restore their state, inject options, and expose payload metadata, so reference it from your hydration and clearing closures instead of duplicating bespoke logic.
 
 ## Integration examples
 
@@ -33,5 +33,5 @@ Replicate these patterns for any new searchable inputs so metadata remains autho
 
 ## Follow-up checklist
 
-- [x] Adopt the shared helper once it lands and replace bespoke hydration closures.
+- [ ] Use `SearchableComponentHelper` whenever searchable inputs need to hydrate or clear server-side state.
 - [ ] Request a team review of this document whenever the helper contract changes to keep the documentation accurate.

@@ -7,69 +7,73 @@ namespace App\Support\Filament;
 use Closure;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 
-/**
- * Centralises repetitive wiring around DefStudio's SearchableInput component.
- */
 final class SearchableComponentHelper
 {
-    private function __construct() {}
-
     /**
-     * Hydrate a SearchableInput with consistent state, options, and payload assignments.
+     * Hydrate a SearchableInput with deterministic state, options, and payload metadata.
      *
-     * @param Closure(mixed): (object|array|null) $resolveRecord Resolves the selected record from the persisted state.
-     * @param Closure(object|array): array{value: string|int|null, label: string, payload?: array} $normalizePayload Normalises
-     *        the resolved record into the component state + display payload tuple.
+     * @template TRecord of object|array
+     *
+     * @param int|string|null                                                                           $state             Current raw component state from the form.
+     * @param Closure(int|string|null): (?TRecord)                                                      $recordResolver    Callback that resolves the backing record or null when missing.
+     * @param Closure(TRecord): array{value: int|string, label: string, payload?: array<string, mixed>} $payloadNormaliser Shapes the UI payload.
      */
     public static function hydrate(
         SearchableInput $component,
-        mixed $state,
-        Closure $resolveRecord,
-        Closure $normalizePayload,
+        int|string|null $state,
+        Closure $recordResolver,
+        Closure $payloadNormaliser,
     ): void {
-        // Early exit when no state is available so the component falls back to an empty input.
+        // Abort hydration when no identifier is present so stale UI state does not linger.
         if ($state === null || $state === '') {
             self::clear($component);
 
             return;
         }
 
-        $record = $resolveRecord($state);
+        $record = $recordResolver($state);
 
-        // If the lookup fails we still want the UI to behave as if nothing was selected.
+        // Clear the component whenever the lookup misses to avoid exposing mismatched labels.
         if ($record === null) {
             self::clear($component);
 
             return;
         }
 
-        $normalized = $normalizePayload($record);
-        $value = $normalized['value'] ?? $state;
-        $label = $normalized['label'] ?? '';
-        $payload = $normalized['payload'] ?? [];
+        $normalised = $payloadNormaliser($record);
 
-        // Guarantee string state/options to match the SearchableInput expectation.
-        $stringValue = $value === null ? null : (string) $value;
+        $value = (string) ($normalised['value'] ?? $state);
+        $label = (string) ($normalised['label'] ?? $value);
 
+        /** @var array<string, mixed> $payload */
+        $payload = $normalised['payload'] ?? [];
+
+        // Guarantee the payload always surfaces the identifier and label for downstream consumers.
+        $payload['id'] ??= $value;
+        $payload['label'] ??= $label;
+
+        // Apply the canonical state, option label, and metadata payload to the component in one place.
         $component
-            ->state($stringValue)
-            ->options($stringValue === null ? [] : [$stringValue => $label])
-            ->payload($payload);
+            ->state($value)
+            ->options([
+                $value => $label,
+            ])
+            ->meta('payload', $payload);
     }
 
     /**
-     * Reset a SearchableInput to its pristine state while allowing callers to clear related form fields.
+     * Reset the component and optionally let callers clear related form fields via callbacks.
      */
-    public static function clear(SearchableInput $component, Closure ...$clearRelated): void
+    public static function clear(SearchableInput $component, Closure ...$resetCallbacks): void
     {
-        // Wipe the component so Filament renders an empty dropdown and no metadata payload.
+        // Drop any previously selected value, label, or payload so dependent inputs do not see stale state.
         $component
             ->state(null)
             ->options([])
-            ->payload([]);
+            ->meta('payload', []);
 
-        // Execute any downstream clean-up callbacks so surrounding form state stays in sync.
-        foreach ($clearRelated as $callback) {
+        // Allow callers to reset additional form state (e.g. dependent fields, payload mirrors, etc.).
+        foreach ($resetCallbacks as $callback) {
             $callback();
         }
     }
