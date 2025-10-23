@@ -13,6 +13,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use App\Support\Filament\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -111,10 +112,10 @@ final class CampaignResource extends Resource
                 ->schema([
                     Grid::make(2)
                         ->schema([
-                            Flatpickr::make('starts_at')->dateTimePicker()
+                            Flatpickr::make('starts_at')->asDateTime()
                                 ->label(self::label('campaigns.fields.start_date', 'Start date'))
                                 ->seconds(false),
-                            Flatpickr::make('ends_at')->dateTimePicker()
+                            Flatpickr::make('ends_at')->asDateTime()
                                 ->label(self::label('campaigns.fields.end_date', 'End date'))
                                 ->seconds(false),
                             TextInput::make('max_uses')
@@ -302,9 +303,7 @@ final class CampaignResource extends Resource
                     ->form([
                         Flatpickr::make('range')
                             ->label(self::label('campaigns.fields.created_at', 'Created at'))
-                            ->rangePicker()
-                            ->format('Y-m-d')
-                            ->displayFormat('Y-m-d'),
+                            ->asDateRange('Y-m-d'),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,

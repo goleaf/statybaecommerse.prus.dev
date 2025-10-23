@@ -65,7 +65,11 @@ use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use pxlrbt\FilamentExcel\Columns\Column;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 /**
  * ProductResource
@@ -364,7 +368,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                                 Toggle::make('allow_backorder')
                                                     ->label(__('products.fields.allow_backorder')),
                                             ]),
-                                        Flatpickr::make('published_at')->dateTimePicker()
+                                        Flatpickr::make('published_at')->asDateTime()
                                             ->label(__('products.fields.published_at'))
                                             ->default(now()),
                                     ]),
@@ -660,9 +664,9 @@ final class ProductResource extends Resource implements DefinesExportColumns
                     ->query(fn (Builder $query): Builder => $query->where('stock_quantity', '<=', 0)),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::make('created_from')->dateTimePicker()
+                        Flatpickr::make('created_from')->asDateTime()
                             ->label(__('products.filters.created_from')),
-                        Flatpickr::make('created_until')->dateTimePicker()
+                        Flatpickr::make('created_until')->asDateTime()
                             ->label(__('products.filters.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

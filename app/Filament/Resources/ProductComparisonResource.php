@@ -18,7 +18,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use App\Support\Filament\Filters\DateRangeFilter;
-use Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -147,10 +147,9 @@ final class ProductComparisonResource extends Resource
                     ->preload(),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::make('created_from')->datePicker()
-                            ->label(__('product_comparisons.created_from')),
-                        Flatpickr::make('created_until')->datePicker()
-                            ->label(__('product_comparisons.created_until')),
+                        Flatpickr::make('range')
+                            ->label(__('product_comparisons.created_at'))
+                            ->asDateRange('Y-m-d'),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,

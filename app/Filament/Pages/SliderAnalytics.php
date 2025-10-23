@@ -14,7 +14,7 @@ use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Pages\Dashboard\Concerns\HasFiltersAction;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Carbon;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 class SliderAnalytics extends BaseDashboard
 {
@@ -40,14 +40,16 @@ class SliderAnalytics extends BaseDashboard
                 ->label('Filter Analytics')
                 ->icon('heroicon-o-funnel')
                 ->components([
-                    Flatpickr::make('date_range')->dateRangePicker()
-                        ->label('Analytics Date Range')
-                        ->default([
-                            now()->subDays(30),
-                            now(),
-                        ])
+                    Flatpickr::make('startDate')->asDate()
+                        ->label('Start Date')
+                        ->default(now()->subDays(30))
                         ->displayFormat('Y-m-d')
-                        ->helperText('Select the date range for analytics'),
+                        ->helperText('Select the start date for analytics'),
+                    Flatpickr::make('endDate')->asDate()
+                        ->label('End Date')
+                        ->default(now())
+                        ->displayFormat('Y-m-d')
+                        ->helperText('Select the end date for analytics'),
                     Select::make('sliderId')
                         ->label('Specific Slider')
                         ->options(Slider::all()->pluck('title', 'id'))

@@ -15,7 +15,7 @@ use Filament\Tables\Columns\Summaries\Average;
 use Filament\Tables\Columns\Summaries\Sum;
 use Filament\Tables\Columns\TextColumn;
 use App\Support\Filament\Filters\DateRangeFilter;
-use Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Grouping\Group;
@@ -156,10 +156,7 @@ final class AnalyticsResource extends Resource
                     ->form([
                         Flatpickr::make('created_from')->datePicker()
                             ->label(__('analytics.from_date'))
-                            ->placeholder(__('analytics.from_date')),
-                        Flatpickr::make('created_until')->datePicker()
-                            ->label(__('analytics.until_date'))
-                            ->placeholder(__('analytics.until_date')),
+                            ->asDateRange('Y-m-d'),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,

@@ -47,7 +47,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use BackedEnum;
 use UnitEnum;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 /**
  * VariantAnalyticsResource
@@ -121,7 +121,7 @@ final class VariantAnalyticsResource extends Resource
                                                             }
                                                         }
                                                     }),
-                                                Flatpickr::make('date')->datePicker()
+                                                Flatpickr::make('date')->asDate()
                                                     ->label(__('admin.variant_analytics.date'))
                                                     ->required()
                                                     ->default(now())
@@ -494,8 +494,10 @@ final class VariantAnalyticsResource extends Resource
                     ->label(__('admin.variant_analytics.date')),
                 Tables\Filters\Filter::make('date_range')
                     ->form([
-                        Flatpickr::make('date_from')->dateRangePicker()
-                            ->label(sprintf('%s / %s', __('admin.variant_analytics.date_from'), __('admin.variant_analytics.date_until'))),
+                        Flatpickr::make('date_from')->asDate()
+                            ->label(__('admin.variant_analytics.date_from')),
+                        Flatpickr::make('date_until')->asDate()
+                            ->label(__('admin.variant_analytics.date_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         [$dateFrom, $dateUntil] = DateRange::extract($data, 'date_from', 'date_until');

@@ -25,8 +25,8 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Flatpickr;
+use Filament\Forms;
+use App\Support\Filament\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -477,9 +477,9 @@ final class OrderResource extends Resource implements DefinesExportColumns
                 ->schema([
                     Grid::make(2)
                         ->schema([
-                            Flatpickr::make('shipped_at')->dateTimePicker()
+                            Flatpickr::make('shipped_at')->asDateTime()
                                 ->label(__('orders.fields.shipped_at')),
-                            Flatpickr::make('delivered_at')->dateTimePicker()
+                            Flatpickr::make('delivered_at')->asDateTime()
                                 ->label(__('orders.fields.delivered_at')),
                         ]),
                     TextInput::make('tracking_number')
@@ -712,10 +712,9 @@ final class OrderResource extends Resource implements DefinesExportColumns
                     ->label(__('orders.fields.items_count')),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::make('created_from')->datePicker()
-                            ->label(__('orders.created_from')),
-                        Flatpickr::make('created_until')->datePicker()
-                            ->label(__('orders.created_until')),
+                        Flatpickr::make('range')
+                            ->label(__('orders.created_at'))
+                            ->asDateRange('Y-m-d'),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,

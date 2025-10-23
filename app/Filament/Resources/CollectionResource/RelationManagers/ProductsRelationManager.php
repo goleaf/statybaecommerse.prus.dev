@@ -13,7 +13,7 @@ use Filament\Forms\Form;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 final class ProductsRelationManager extends BaseRelationManager
 {
@@ -39,7 +39,7 @@ final class ProductsRelationManager extends BaseRelationManager
                 Forms\Components\Toggle::make('is_featured')
                     ->label(__('admin.collections.fields.is_featured'))
                     ->default(false),
-                Flatpickr::make('featured_until')->dateTimePicker()
+                Flatpickr::make('featured_until')->asDateTime()
                     ->label(__('admin.collections.fields.featured_until'))
                     ->visible(fn (Forms\Get $get): bool => $get('is_featured')),
                 Forms\Components\Textarea::make('notes')
@@ -147,7 +147,7 @@ final class ProductsRelationManager extends BaseRelationManager
                         Forms\Components\Toggle::make('is_featured')
                             ->label(__('admin.collections.fields.is_featured'))
                             ->default(false),
-                        Flatpickr::make('featured_until')->dateTimePicker()
+                        Flatpickr::make('featured_until')->asDateTime()
                             ->label(__('admin.collections.fields.featured_until'))
                             ->visible(fn (Forms\Get $get): bool => $get('is_featured')),
                         Forms\Components\Textarea::make('notes')

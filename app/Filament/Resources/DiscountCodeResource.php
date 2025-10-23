@@ -30,7 +30,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 final class DiscountCodeResource extends Resource
 {
@@ -157,11 +157,11 @@ final class DiscountCodeResource extends Resource
                 ->schema([
                     Grid::make(2)
                         ->schema([
-                            Flatpickr::make('valid_from')->dateTimePicker()
+                            Flatpickr::make('valid_from')->asDateTime()
                                 ->label(__('discount_codes.valid_from'))
                                 ->default(now())
                                 ->displayFormat('d/m/Y H:i'),
-                            Flatpickr::make('valid_until')->dateTimePicker()
+                            Flatpickr::make('valid_until')->asDateTime()
                                 ->label(__('discount_codes.valid_until'))
                                 ->displayFormat('d/m/Y H:i'),
                         ]),

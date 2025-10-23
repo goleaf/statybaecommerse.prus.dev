@@ -38,7 +38,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 final class OrderShippingResource extends Resource
 {
@@ -120,11 +120,11 @@ final class OrderShippingResource extends Resource
                         ]),
                     Grid::make(3)
                         ->schema([
-                            Flatpickr::make('shipped_at')->dateTimePicker()
+                            Flatpickr::make('shipped_at')->asDateTime()
                                 ->label(__('admin.order_shippings.shipped_at')),
-                            Flatpickr::make('estimated_delivery')->dateTimePicker()
+                            Flatpickr::make('estimated_delivery')->asDateTime()
                                 ->label(__('admin.order_shippings.estimated_delivery')),
-                            Flatpickr::make('delivered_at')->dateTimePicker()
+                            Flatpickr::make('delivered_at')->asDateTime()
                                 ->label(__('admin.order_shippings.delivered_at')),
                         ]),
                     Grid::make(3)
@@ -253,9 +253,9 @@ final class OrderShippingResource extends Resource
                 Filter::make('shipped_at')
                     ->label(__('admin.order_shippings.shipped_at'))
                     ->form([
-                        Flatpickr::make('shipped_from')->dateTimePicker()
+                        Flatpickr::make('shipped_from')->asDateTime()
                             ->label(__('admin.order_shippings.shipped_from')),
-                        Flatpickr::make('shipped_until')->dateTimePicker()
+                        Flatpickr::make('shipped_until')->asDateTime()
                             ->label(__('admin.order_shippings.shipped_until')),
                     ])
                     ->query(function ($query, array $data) {

@@ -35,7 +35,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Carbon;
 use UnitEnum;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 final class DiscountRedemptionResource extends Resource
 {
@@ -127,7 +127,7 @@ final class DiscountRedemptionResource extends Resource
                                 ->default(now())
                                 ->required(),
                         ]),
-                    Flatpickr::make('redeemed_at')->dateTimePicker()
+                    Flatpickr::make('redeemed_at')->asDateTime()
                         ->label(__('discount_redemptions.fields.redeemed_at'))
                         ->seconds(false)
                         ->displayFormat('Y-m-d H:i')
@@ -211,9 +211,9 @@ final class DiscountRedemptionResource extends Resource
                 Filter::make('redeemed_at')
                     ->label(__('admin.discount_redemptions.filters.redeemed_at'))
                     ->form([
-                        Flatpickr::make('from')->dateTimePicker()
+                        Flatpickr::make('from')->asDateTime()
                             ->label(__('discount_redemptions.filters.redeemed_from')),
-                        Flatpickr::make('until')->dateTimePicker()
+                        Flatpickr::make('until')->asDateTime()
                             ->label(__('discount_redemptions.filters.redeemed_until')),
                     ])
                     ->query(static function (Builder $query, array $data): Builder {

@@ -38,7 +38,7 @@ use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Forms\Components\Flatpickr;
 
 final class CouponResource extends Resource
 {
@@ -161,11 +161,11 @@ final class CouponResource extends Resource
                 ->schema([
                     Grid::make(2)
                         ->schema([
-                            Flatpickr::make('valid_from')->dateTimePicker()
+                            Flatpickr::make('valid_from')->asDateTime()
                                 ->label(__('coupons.valid_from'))
                                 ->default(now())
                                 ->displayFormat('d/m/Y H:i'),
-                            Flatpickr::make('valid_until')->dateTimePicker()
+                            Flatpickr::make('valid_until')->asDateTime()
                                 ->label(__('coupons.valid_until'))
                                 ->displayFormat('d/m/Y H:i'),
                         ]),
