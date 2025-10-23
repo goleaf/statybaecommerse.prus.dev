@@ -945,10 +945,22 @@ final class CategorySeeder extends Seeder
 
     private function supportedLocales(): array
     {
-        return collect(explode(',', (string) config('app.supported_locales', 'lt')))
-            ->map(fn ($v) => trim((string) $v))
+        // Resolve the supported locales from configuration, handling both array and comma separated formats. This
+        // avoids issues where casting an array to string would return "Array" which then breaks locale detection.
+        $configuredLocales = config('app.supported_locales', ['lt', 'en', 'ru', 'de']);
+
+        // Normalize into an array so we can process the locales consistently regardless of configuration format.
+        $locales = is_string($configuredLocales)
+            ? explode(',', $configuredLocales)
+            : (is_array($configuredLocales) ? $configuredLocales : []);
+
+        // Clean up the locale list by trimming whitespace, removing empty entries, ensuring uniqueness and providing
+        // a sensible fallback set to guarantee all expected translations exist for the seeder.
+        return collect($locales)
+            ->map(fn ($locale) => trim((string) $locale))
             ->filter()
             ->unique()
+            ->whenEmpty(fn ($collection) => collect(['lt', 'en', 'ru', 'de']))
             ->values()
             ->all();
     }
