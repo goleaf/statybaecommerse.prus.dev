@@ -9,7 +9,6 @@ use App\Models\Document;
 use App\Models\DocumentTemplate;
 use App\Models\User;
 use App\Notifications\DocumentGenerated;
-use RuntimeException;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;

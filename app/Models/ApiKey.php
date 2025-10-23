@@ -52,11 +52,11 @@ final class ApiKey extends Model
      */
     public static function generateCredentials(?string $prefix = null): array
     {
-        $plainText = static::generatePlainTextKey($prefix);
+        $plainText = self::generatePlainTextKey($prefix);
 
         return [
             'plain_text' => $plainText,
-            'hashed' => static::hashKey($plainText),
+            'hashed' => self::hashKey($plainText),
         ];
     }
 
@@ -65,8 +65,8 @@ final class ApiKey extends Model
      */
     public static function generatePlainTextKey(?string $prefix = null): string
     {
-        $prefix ??= static::KEY_PREFIX;
-        $random = Str::upper(Str::random(static::KEY_LENGTH));
+        $prefix ??= self::KEY_PREFIX;
+        $random = Str::upper(Str::random(self::KEY_LENGTH));
 
         return sprintf('%s_%s', $prefix, $random);
     }
@@ -88,7 +88,7 @@ final class ApiKey extends Model
     {
         return [
             'plain_text' => $plainText,
-            'hashed' => static::hashKey($plainText),
+            'hashed' => self::hashKey($plainText),
         ];
     }
 
@@ -167,7 +167,9 @@ final class ApiKey extends Model
     }
 
     /**
-     * @return BelongsTo<User, ApiKey>
+     * Determine if the API key has any of the provided scopes.
+     *
+     * @param  array<int, string>  $scopes
      */
     public function user(): BelongsTo
     {
@@ -191,7 +193,7 @@ final class ApiKey extends Model
             return true;
         }
 
-        return [] !== array_intersect($assignedScopes, $scopes);
+        return array_intersect($assignedScopes, $scopes) !== [];
     }
 
     /**

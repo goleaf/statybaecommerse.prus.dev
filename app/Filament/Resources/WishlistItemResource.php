@@ -14,12 +14,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\UserWishlist;
 use App\Models\WishlistItem;
-use App\Support\Filament\Components\Flatpickr;
-use App\Support\Filament\SearchableInputHelper;
-use App\Support\Search\ProductSearch;
 use BackedEnum;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
-use Exception;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction as TableBulkAction;
@@ -46,8 +41,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use RuntimeException;
-use Str;
 use UnitEnum;
 
 /**

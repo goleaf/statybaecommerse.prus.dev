@@ -15,10 +15,10 @@ use App\Filament\Resources\ProductResource\RelationManagers\ReviewsRelationManag
 use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
 use App\Filament\Widgets\InlineCharts\ProductSalesSparkline;
 use App\Models\Product;
-use App\Support\Authorization\AuthorizationMatrix;
 use App\Services\Export\ExportColumn;
-use App\Services\Export\ExportService;
 use App\Services\Export\Exporters\ProductExport;
+use App\Services\Export\ExportService;
+use App\Support\Authorization\AuthorizationMatrix;
 use BackedEnum;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\BulkAction;

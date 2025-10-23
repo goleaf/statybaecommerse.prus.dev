@@ -7,19 +7,17 @@ namespace App\Filament\Resources;
 use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\ActivityLogResource\Pages;
-use App\Models\ActivityLog;
-use App\Support\Filament\Components\Flatpickr;
-use App\Support\Filament\Filters\DateRangeFilter;
 use BackedEnum;
-use Filament\Forms\Form;
+use Filament\Actions\Action;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Support\Htmlable;
+use Spatie\Activitylog\Models\Activity;
+use UnitEnum;
 
 final class ActivityLogResource extends Resource
 {
@@ -104,7 +102,7 @@ final class ActivityLogResource extends Resource
             ->filters([
                 SelectFilter::make('log_name')
                     ->label(__('Log Name'))
-                    ->options(fn (): array => ActivityLog::query()
+                    ->options(fn (): array => \Spatie\Activitylog\Models\Activity::query()
                         ->select('log_name')
                         ->whereNotNull('log_name')
                         ->distinct()
@@ -112,7 +110,7 @@ final class ActivityLogResource extends Resource
                         ->toArray()),
                 SelectFilter::make('subject_type')
                     ->label(__('Subject Type'))
-                    ->options(fn (): array => ActivityLog::query()
+                    ->options(fn (): array => \Spatie\Activitylog\Models\Activity::query()
                         ->select('subject_type')
                         ->whereNotNull('subject_type')
                         ->distinct()
@@ -126,18 +124,18 @@ final class ActivityLogResource extends Resource
                             ->format('Y-m-d')
                             ->displayFormat('Y-m-d'),
                     ])
-                    ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
-                        $query,
-                        $data['range'] ?? null,
-                        'created_at',
-                    )),
+                    ->query(function ($query, array $data) {
+                        return $query
+                            ->when($data['created_from'] ?? null, fn ($q, $date) => $q->whereDate('created_at', '>=', $date))
+                            ->when($data['created_until'] ?? null, fn ($q, $date) => $q->whereDate('created_at', '<=', $date));
+                    }),
             ])
             ->actions([
                 Action::make('view_details')
                     ->label(__('View details'))
-                    ->modalHeading(fn (ActivityLog $record) => (string) ($record->description ?? __('Activity details')))
-                    ->modalSubheading(fn (ActivityLog $record) => (string) ($record->causer?->name ?? __('System')))
-                    ->modalContent(fn (ActivityLog $record) => view(
+                    ->modalHeading(fn (\Spatie\Activitylog\Models\Activity $record) => (string) ($record->description ?? __('Activity details')))
+                    ->modalSubheading(fn (\Spatie\Activitylog\Models\Activity $record) => (string) ($record->causer?->name ?? __('System')))
+                    ->modalContent(fn (\Spatie\Activitylog\Models\Activity $record) => view(
                         'filament.resources.activity-log-resource.components.activity-details',
                         ['activity' => $record->loadMissing('causer', 'subject')]
                     ))

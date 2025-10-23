@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
-use App\Enums\NavigationGroup;
-use App\Enums\NavigationIcon;
 use App\Filament\Resources\ProductVariantResource\Pages;
 use App\Models\Attribute;
 use App\Models\AttributeValue;

@@ -27,7 +27,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
-use Novadaemon\FilamentCombobox\Combobox;
 
 final class RecommendationConfigResourceSimple extends Resource
 {

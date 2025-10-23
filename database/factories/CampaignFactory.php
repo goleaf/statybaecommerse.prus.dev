@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use App\Models\Campaign;
-use App\Models\CampaignCustomerSegment;
-use App\Models\CampaignProductTarget;
-use App\Models\CampaignSchedule;
-use App\Models\CustomerGroup;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -25,10 +21,13 @@ final class CampaignFactory extends Factory
         $name = $this->faker->sentence(3);
         $baseSlug = Str::slug($name);
 
-        // Avoid hitting missing tables when migrations are not loaded yet (e.g. during in-memory tests).
-        $slug = Schema::hasTable('discount_campaigns')
-            ? $this->generateUniqueSlug($baseSlug)
-            : $baseSlug.'-'.Str::random(6);
+        // Ensure unique slug
+        $slug = $baseSlug;
+        $counter = 1;
+        while (\App\Models\Campaign::where('slug', $slug)->exists()) {
+            $slug = $baseSlug.'-'.$counter;
+            $counter++;
+        }
 
         return [
             'name'       => $name,
@@ -137,7 +136,7 @@ final class CampaignFactory extends Factory
     public function active(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status'    => 'active',
+            'status' => 'active',
             'starts_at' => $this->faker->dateTimeBetween('-1 week', 'now'),
             'ends_at'   => $this->faker->dateTimeBetween('now', '+2 months'),
         ]);
@@ -146,7 +145,7 @@ final class CampaignFactory extends Factory
     public function scheduled(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status'    => 'scheduled',
+            'status' => 'scheduled',
             'starts_at' => $this->faker->dateTimeBetween('now', '+1 month'),
             'ends_at'   => $this->faker->dateTimeBetween('+1 month', '+3 months'),
         ]);
@@ -155,7 +154,7 @@ final class CampaignFactory extends Factory
     public function expired(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status'    => 'active',
+            'status' => 'active',
             'starts_at' => $this->faker->dateTimeBetween('-3 months', '-1 month'),
             'ends_at'   => $this->faker->dateTimeBetween('-1 month', '-1 week'),
         ]);
@@ -164,7 +163,7 @@ final class CampaignFactory extends Factory
     public function draft(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status'    => 'draft',
+            'status' => 'draft',
             'starts_at' => null,
             'ends_at'   => null,
         ]);

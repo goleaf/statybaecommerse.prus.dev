@@ -33,7 +33,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
-use Novadaemon\FilamentCombobox\Combobox;
 
 final class CampaignResource extends Resource
 {

@@ -48,7 +48,9 @@ final class CompanyResource extends Resource
     }
 
     /**
-     * Build the form schema for creating and editing companies.
+     * Configure the Filament form schema with fields and validation.
+     *
+     * @param  Form  $schema
      */
     public static function form(Form $form): Form
     {

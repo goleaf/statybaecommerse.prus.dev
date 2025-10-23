@@ -18,7 +18,7 @@ $validPageAncestors = [
 ];
 
 test('each Filament resource page declares its resource property', function () use ($validPageAncestors) {
-    $filesystem = new Filesystem();
+    $filesystem = new Filesystem;
     $resourcesPath = app_path('Filament/Resources');
 
     if (! $filesystem->isDirectory($resourcesPath)) {

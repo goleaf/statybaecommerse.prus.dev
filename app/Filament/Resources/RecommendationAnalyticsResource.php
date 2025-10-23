@@ -24,7 +24,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
+use UnitEnum;
 
 /**
  * RecommendationAnalyticsResource
@@ -169,8 +169,8 @@ final class RecommendationAnalyticsResource extends Resource
                     ->label(__('admin.recommendation_analytics.action'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'view'        => 'info',
-                        'click'       => 'success',
+                        'view' => 'info',
+                        'click' => 'success',
                         'add_to_cart' => 'warning',
                         'purchase'    => 'danger',
                         default       => 'gray',

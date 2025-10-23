@@ -40,7 +40,6 @@ if (! function_exists('app_setting')) {
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
 
 if (! function_exists('current_currency')) {
@@ -411,7 +410,6 @@ if (! function_exists('media_img')) {
         return new HtmlString('<img ' . $attrString . ' />');
     }
 }
-
 
 if (! function_exists('media_img')) {
     /**

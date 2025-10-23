@@ -236,12 +236,12 @@ final class SystemSettingDependency extends Model
             'equals'       => $dependencyValue == $condition['value'],
             'not_equals'   => $dependencyValue != $condition['value'],
             'greater_than' => $dependencyValue > $condition['value'],
-            'less_than'    => $dependencyValue < $condition['value'],
-            'contains'     => str_contains($dependencyValue, $condition['value']),
+            'less_than' => $dependencyValue < $condition['value'],
+            'contains' => str_contains($dependencyValue, $condition['value']),
             'not_contains' => ! str_contains($dependencyValue, $condition['value']),
-            'in'           => in_array($dependencyValue, $condition['value'] ?? []),
-            'not_in'       => ! in_array($dependencyValue, $condition['value'] ?? []),
-            default        => false,
+            'in' => in_array($dependencyValue, $condition['value'] ?? []),
+            'not_in' => ! in_array($dependencyValue, $condition['value'] ?? []),
+            default => false,
         };
     }
 }

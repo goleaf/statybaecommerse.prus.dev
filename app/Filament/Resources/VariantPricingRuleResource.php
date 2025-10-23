@@ -18,13 +18,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -211,11 +205,10 @@ final class VariantPricingRuleResource extends Resource
                     ->numeric()
                     ->formatStateUsing(function ($state, VariantPricingRule $record): string {
                         if ($record->type === 'percentage') {
-                            return $state . '%';
+                            return $state.'%';
                         }
 
-                        // Provide a predictable locale-aware currency string for administrators.
-                        return Number::currency((float) $state, 'EUR', locale: app()->getLocale());
+                        return '€'.number_format($state, 2);
                     }),
                 TextColumn::make('min_quantity')
                     ->label(__('variant_pricing_rules.min_quantity'))

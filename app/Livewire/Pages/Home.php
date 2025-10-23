@@ -167,7 +167,7 @@ final class Home extends Component
             'latestProducts' => $this->latestProducts,
             'latestReviews' => $this->latestReviews,
         ])->layout('components.layouts.base', [
-            'title' => __('Home').' - '.(is_string($appName) ? $appName : ''),
+            'title' => __('Home').' - '.config('app.name'),
         ]);
     }
 }

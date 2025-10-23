@@ -19,9 +19,7 @@ use Illuminate\View\View;
 
 final class ProductController extends Controller
 {
-    public function __construct(private readonly ProductCatalogueDataProvider $dataProvider)
-    {
-    }
+    public function __construct(private readonly ProductCatalogueDataProvider $dataProvider) {}
 
     public function index(Request $request): View
     {

@@ -14,11 +14,7 @@ use Illuminate\Http\Request;
 
 final class BrandController extends Controller
 {
-    public function __construct(
-        private readonly BrandCatalogueDataProvider $brandData,
-        private readonly ProductCatalogueDataProvider $productData,
-    ) {
-    }
+    public function __construct(private readonly BrandCatalogueDataProvider $dataProvider) {}
 
     public function index(Request $request): View
     {

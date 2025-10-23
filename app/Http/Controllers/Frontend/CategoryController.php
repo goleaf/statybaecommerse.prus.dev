@@ -14,11 +14,7 @@ use Illuminate\Http\Request;
 
 final class CategoryController extends Controller
 {
-    public function __construct(
-        private readonly CategoryCatalogueDataProvider $categoryData,
-        private readonly ProductCatalogueDataProvider $productData,
-    ) {
-    }
+    public function __construct(private readonly CategoryCatalogueDataProvider $dataProvider) {}
 
     public function index(Request $request): View
     {

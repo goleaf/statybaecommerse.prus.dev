@@ -11,9 +11,9 @@ use Illuminate\Support\Collection;
 
 final class BrandCatalogueDataProvider
 {
-    public function __construct(private readonly ProductCatalogueDataProvider $products)
-    {
-    }
+    use BuildsProductCatalogueQuery;
+
+    public function __construct(private readonly ProductCatalogueDataProvider $products) {}
 
     public function show(Brand $brand, array $filters = []): array
     {

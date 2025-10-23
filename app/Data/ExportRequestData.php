@@ -41,8 +41,7 @@ final class ExportRequestData extends Data
         public ?int $userId = null,
         #[ArrayType, MaxItems(50)]
         public array $meta = [],
-    ) {
-    }
+    ) {}
 
     /**
      * Prepare sanitized payload for persistence.

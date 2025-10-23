@@ -45,7 +45,7 @@ final class DatabaseSeeder extends Seeder
             DemoStoreSeeder::class,
         ]);
 
-        if (!$wasLoggingDisabled) {
+        if (! $wasLoggingDisabled) {
             activity()->enableLogging();
         }
     }

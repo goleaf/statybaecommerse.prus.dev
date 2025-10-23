@@ -23,23 +23,4 @@ final class Zone extends Model
         'code',
         'is_enabled',
     ];
-
-    /**
-     * Provide the relationship between zones and their shipping options.
-     *
-     * @return HasMany<ShippingOption, static>
-     * Handle shippingOptions functionality with proper error handling.
-     *
-     * @phpstan-return HasMany<ShippingOption, Zone>
-     */
-    public function shippingOptions(): HasMany
-    {
-        // Enable convenient retrieval of shipping options tied to the current zone.
-        /** @var HasMany<ShippingOption, Zone> $relation */
-        $relation = $this->hasMany(ShippingOption::class);
-
-        return $relation;
-        // Provide convenient access to all shipping options configured for this zone.
-        return $this->hasMany(ShippingOption::class);
-    }
 }

@@ -72,7 +72,7 @@ final class PdfExportWriter implements ExportWriter
         $pdf .= "trailer\n";
         $pdf .= sprintf("<< /Size %d /Root 1 0 R >>\n", count($offsets));
         $pdf .= "startxref\n".$xrefPosition."\n";
-        $pdf .= "%%EOF";
+        $pdf .= '%%EOF';
 
         return $pdf;
     }
@@ -82,7 +82,7 @@ final class PdfExportWriter implements ExportWriter
      */
     private function buildContentStream(array $lines): string
     {
-        $chunks = ["BT", "/F1 10 Tf", "72 760 Td"];
+        $chunks = ['BT', '/F1 10 Tf', '72 760 Td'];
 
         foreach ($lines as $index => $line) {
             if ($index > 0) {

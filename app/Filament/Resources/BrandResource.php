@@ -44,8 +44,6 @@ use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
-use Filament\Forms\Form;
-
 final class BrandResource extends Resource
 {
     use HasNav;
