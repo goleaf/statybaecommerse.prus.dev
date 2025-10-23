@@ -11,11 +11,6 @@ use App\Models\Notification;
 use App\Support\Concerns\HasNav;
 use App\Support\Filament\Filters\SingleDateFilter;
 use BackedEnum;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
@@ -27,6 +22,15 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -284,6 +288,7 @@ final class NotificationResource extends Resource
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                DeleteAction::make(),
                 Action::make('mark_as_read')
                     ->label(__('admin.notifications.actions.mark_as_read'))
                     ->icon('heroicon-o-check-circle')
@@ -311,44 +316,36 @@ final class NotificationResource extends Resource
                             ->send();
                     }),
             ])
-            ->groupedBulkActions([
-                DeleteBulkAction::make(),
-                BulkAction::make('bulk_mark_as_read')
-                    ->label(__('admin.notifications.actions.bulk_mark_as_read'))
-                    ->icon('heroicon-o-check-circle')
-                    ->color('success')
-                    ->action(function (Collection $records): void {
-                        $records->each(static function (Model $record): void {
-                            if (! $record instanceof Notification) {
-                                return;
-                            }
-
-                            $record->markAsRead();
-                        });
-
-                        FilamentNotification::make()
-                            ->title(__('admin.notifications.bulk_marked_as_read'))
-                            ->success()
-                            ->send();
-                    }),
-                BulkAction::make('bulk_mark_as_unread')
-                    ->label(__('admin.notifications.actions.bulk_mark_as_unread'))
-                    ->icon('heroicon-o-x-circle')
-                    ->color('gray')
-                    ->action(function (Collection $records): void {
-                        $records->each(static function (Model $record): void {
-                            if (! $record instanceof Notification) {
-                                return;
-                            }
-
-                            $record->markAsUnread();
-                        });
-
-                        FilamentNotification::make()
-                            ->title(__('admin.notifications.bulk_marked_as_unread'))
-                            ->success()
-                            ->send();
-                    }),
+            ->bulkActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    BulkAction::make('bulk_mark_as_read')
+                        ->label(__('admin.notifications.actions.bulk_mark_as_read'))
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->action(function (Collection $records): void {
+                            $records->each(function (Notification $record): void {
+                                $record->update(['is_read' => true, 'read_at' => now()]);
+                            });
+                            FilamentNotification::make()
+                                ->title(__('admin.notifications.bulk_marked_as_read'))
+                                ->success()
+                                ->send();
+                        }),
+                    BulkAction::make('bulk_mark_as_unread')
+                        ->label(__('admin.notifications.actions.bulk_mark_as_unread'))
+                        ->icon('heroicon-o-x-circle')
+                        ->color('gray')
+                        ->action(function (Collection $records): void {
+                            $records->each(function (Notification $record): void {
+                                $record->update(['is_read' => false, 'read_at' => null]);
+                            });
+                            FilamentNotification::make()
+                                ->title(__('admin.notifications.bulk_marked_as_unread'))
+                                ->success()
+                                ->send();
+                        }),
+                ]),
             ])
             ->defaultSort('created_at', 'desc');
     }

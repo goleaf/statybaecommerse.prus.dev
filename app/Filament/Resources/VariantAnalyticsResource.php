@@ -44,6 +44,8 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Support\Htmlable;
+use UnitEnum;
 
 /**
  * VariantAnalyticsResource
@@ -56,20 +58,13 @@ final class VariantAnalyticsResource extends Resource
 
     protected static ?string $model = VariantAnalytics::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
-
     protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 2;
 
-    public static function getNavigationIcon(): \BackedEnum|string|null
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
         return 'heroicon-o-chart-bar-square';
-    }
-
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Inventory';
     }
 
     public static function getNavigationLabel(): string
