@@ -13,6 +13,7 @@ use App\Models\Order;
 use App\Models\Partner;
 use App\Services\Pricing\PriceCalculator;
 use App\Support\Authorization\AuthorizationMatrix;
+use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
 use App\Support\Search\CustomerSearch;
 use App\Support\Seo\LocaleUrlGenerator;
@@ -61,7 +62,6 @@ use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 /**
  * OrderResource
@@ -752,7 +752,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
                     ->form([
                         Flatpickr::makeRange('range')
                             ->label(__('orders.created_at'))
-                            
+
                             ->format('Y-m-d')
                             ->displayFormat('Y-m-d'),
                     ])

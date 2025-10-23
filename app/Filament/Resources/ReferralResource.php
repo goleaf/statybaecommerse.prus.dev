@@ -25,7 +25,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as TranslatableResource;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 final class ReferralResource extends Resource
 {

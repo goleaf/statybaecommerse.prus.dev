@@ -8,6 +8,7 @@ use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\PriceListItemResource\Pages;
 use App\Models\PriceListItem;
 use App\Models\Product;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
@@ -40,7 +41,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as TranslatableResource;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 /**
  * PriceListItemResource

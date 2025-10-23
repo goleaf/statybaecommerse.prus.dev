@@ -32,7 +32,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as TranslatableResource;
 use UnitEnum;
