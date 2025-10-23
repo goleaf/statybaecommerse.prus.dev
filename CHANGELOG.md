@@ -25,7 +25,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Aligned Filament variant pricing and analytics resources with stricter action namespaces, clarified currency formatting, and refreshed navigation icon annotations to streamline BackedEnum usage across admin pages.
 * Synced Collection Rule resource signatures, modal reorder UX, and cache maintenance tooling with Filament v4 to retire legacy array fallbacks.
 * Delivered the Campaign Product Target management resource with localized strings, reinforced widget navigation metadata, and hardened media path migrations for safer marketing workflows.
-* Restored the Husky bootstrap shim and its executable permissions so Git hooks keep executing with the repository's local toolchain while still surfacing the upstream v10 deprecation guidance.
+* Reinstated the Husky bootstrap shim after the upstream deprecation banner overwrote it, restoring the executable bit so Git hooks continue running against the repository toolchain while still surfacing v10 upgrade guidance.
 * Ensured the User Product Interaction Filament resource now returns concrete `Form`/`Table` instances so Filament v4 boots without schema contract errors during analytics validation.
 * Normalized Filament navigation icon overrides to rely on docblocks, consolidated variant stock danger badges, and refreshed the `data:import` command metadata to resolve regressions from PR #1098.
 * Smoothed out User Product Interaction rating badges and filter option spacing so Filament v4 renders the analytics table without concatenation warnings spotted while reviewing PR #1097.
