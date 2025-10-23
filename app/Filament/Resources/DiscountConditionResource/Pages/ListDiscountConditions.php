@@ -6,8 +6,10 @@ namespace App\Filament\Resources\DiscountConditionResource\Pages;
 
 use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\DiscountConditionResource;
-use App\Filament\WidgetTabs\Components\WidgetTab;
-use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
+use App\Filament\Resources\DiscountConditionResource\Widgets\DiscountConditionChartWidget;
+use App\Filament\Resources\DiscountConditionResource\Widgets\DiscountConditionStatsWidget;
+use App\Filament\Resources\DiscountConditionResource\Widgets\DiscountConditionTableWidget;
+use App\Models\DiscountCondition;
 use Filament\Actions;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -27,33 +29,34 @@ final class ListDiscountConditions extends BaseListRecords
     public function getWidgetTabs(): array
     {
         return [
-            'all' => WidgetTab::make(__('discount_conditions.tabs.all'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
-            'active' => WidgetTab::make(__('discount_conditions.tabs.active'))
+            'all'    => Tab::make(__('discount_conditions.tabs.all')),
+            'active' => Tab::make(__('discount_conditions.tabs.active'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_active', true))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_active', true)->count()),
-            'minimum_amount' => WidgetTab::make(__('discount_conditions.tabs.minimum_amount'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'minimum_amount'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'minimum_amount')->count()),
-            'minimum_quantity' => WidgetTab::make(__('discount_conditions.tabs.minimum_quantity'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'minimum_quantity'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'minimum_quantity')->count()),
-            'customer_group' => WidgetTab::make(__('discount_conditions.tabs.customer_group'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'customer_group'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'customer_group')->count()),
-            'product_category' => WidgetTab::make(__('discount_conditions.tabs.product_category'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'product_category'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'product_category')->count()),
-            'date_range' => WidgetTab::make(__('discount_conditions.tabs.date_range'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'date_range'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'date_range')->count()),
-            'current' => WidgetTab::make(__('discount_conditions.tabs.current'))
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('valid_from', '<=', now())->where(function ($q): void {
-                    $q->whereNull('valid_until')->orWhere('valid_until', '>=', now());
-                }))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('valid_from', '<=', now())->where(function ($q): void {
-                    $q->whereNull('valid_until')->orWhere('valid_until', '>=', now());
-                })->count()),
+                ->badge(fn () => DiscountCondition::query()->where('is_active', true)->count()),
+            'inactive' => Tab::make(__('discount_conditions.tabs.inactive'))
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('is_active', false))
+                ->badge(fn () => DiscountCondition::query()->where('is_active', false)->count()),
+            'high_priority' => Tab::make(__('discount_conditions.tabs.high_priority'))
+                ->modifyQueryUsing(fn (Builder $query) => $query->whereNotNull('priority')->orderBy('priority')->where('priority', '<=', 3))
+                ->badge(fn () => DiscountCondition::query()->whereNotNull('priority')->where('priority', '<=', 3)->count()),
+            'low_priority' => Tab::make(__('discount_conditions.tabs.low_priority'))
+                ->modifyQueryUsing(fn (Builder $query) => $query->whereNotNull('priority')->orderByDesc('priority')->where('priority', '>=', 7))
+                ->badge(fn () => DiscountCondition::query()->whereNotNull('priority')->where('priority', '>=', 7)->count()),
+        ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            DiscountConditionStatsWidget::class,
+            DiscountConditionChartWidget::class,
+        ];
+    }
+
+    protected function getFooterWidgets(): array
+    {
+        return [
+            DiscountConditionTableWidget::class,
         ];
     }
 }
