@@ -57,13 +57,15 @@ final class AutocompleteSelect extends Select
         return parent::make($name);
     }
 
-    public function searchable(bool|array|Closure $condition = true): static
+    public function searchable(Closure|array|bool $condition = true): static
     {
         parent::searchable($condition);
 
-        $evaluated = $this->evaluate($condition);
+        $evaluatedCondition = $this->evaluate($condition);
 
-        $this->searchable = is_array($evaluated) ? true : (bool) $evaluated;
+        $this->searchable = is_array($evaluatedCondition)
+            ? true
+            : (bool) $evaluatedCondition;
 
         return $this;
     }
