@@ -18,7 +18,6 @@ export default {
     './vendor/wire-elements/modal/resources/views/*.blade.php',
     './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
     './vendor/lara-zeus/list-group/resources/views/**/*.blade.php',
-    './vendor/lara-zeus/matrix-choice/resources/views/**/*.blade.php',
   ],
   safelist: [
     {
