@@ -156,18 +156,6 @@ final class ShippingOptionResource extends Resource
                                     ->step(0.01),
                             ]),
                     ]),
-                Section::make(__('admin.shipping_options.availability'))
-                    ->schema([
-                        MatrixFactory::checkboxGrid(
-                            'shipping_matrix',
-                            (array) config('shipping.matrix.zones', []),
-                            (array) config('shipping.matrix.methods', []),
-                        )
-                            ->label(__('admin.shipping_options.shipping_matrix'))
-                            ->helperText(__('admin.shipping_options.shipping_matrix_help'))
-                            ->rowSelectRequired(false),
-                    ])
-                    ->collapsible(),
                 Section::make(__('admin.shipping_options.delivery'))
                     ->schema([
                         Grid::make(2)
@@ -239,9 +227,11 @@ final class ShippingOptionResource extends Resource
                     ->sortable(),
                 TextColumn::make('estimated_days_min')
                     ->label(__('admin.shipping_options.estimated_days'))
-                    ->formatStateUsing(fn ($state, ShippingOption $record): string => $state !== null && $record->estimated_days_max !== null
-                        ? "{$state}-{$record->estimated_days_max} " . __('admin.shipping_options.days')
-                        : '-'),
+                    ->formatStateUsing(
+                        fn ($state, ShippingOption $record): string => $record->estimated_days_min && $record->estimated_days_max
+                            ? "{$record->estimated_days_min}-{$record->estimated_days_max} " . __('admin.shipping_options.days')
+                            : '-'
+                    ),
                 IconColumn::make('is_enabled')
                     ->label(__('admin.shipping_options.is_enabled'))
                     ->boolean(),
