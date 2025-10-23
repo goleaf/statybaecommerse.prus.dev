@@ -40,11 +40,14 @@ final class ApiKeyResource extends Resource
 
     protected static ?string $navigationLabel = 'api_keys.navigation.label';
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-key';
-
     protected static UnitEnum|string|null $navigationGroup = null;
 
     protected static ?int $navigationSort = 4;
+
+    public static function getNavigationIcon(): string|BackedEnum|null
+    {
+        return 'heroicon-o-key';
+    }
 
     public static function getNavigationLabel(): string
     {

@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace App\Services\Export;
 
-use App\Data\ExportRequestData;
-use App\Enums\ExportStatus;
-use App\Enums\ExportType;
-use App\Jobs\ProcessExportJob;
+use App\Jobs\ProcessExport;
 use App\Models\Export;
 use App\Models\User;
-use App\Notifications\ExportReadyNotification;
-use Illuminate\Database\Eloquent\Builder;
+use App\Notifications\ExportCompletedNotification;
+use App\Services\Export\Contracts\DefinesExportColumns;
+use App\Services\Export\Writers\ExportWriterFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Throwable;
@@ -23,227 +24,231 @@ final class ExportService
         private readonly ExportWriterFactory $writerFactory,
     ) {}
 
-    public function queueExport(ExportRequestData $request, User $user): Export
-    {
-        $columns = $this->resolveColumns($request->entity, $request->columns ?? []);
+    /**
+     * @param  class-string<\Filament\Resources\Resource&DefinesExportColumns>  $resourceClass
+     * @param  iterable<int, Model|int|string>  $records
+     * @param  array<int, string>  $columnKeys
+     * @param  array<string, mixed>|null  $filters
+     */
+    public function queueResourceExport(
+        string $resourceClass,
+        iterable $records,
+        array $columnKeys,
+        ExportFormat $format,
+        ?User $requestedBy = null,
+        ?string $name = null,
+        ?array $filters = null,
+    ): Export {
+        /** @phpstan-ignore-next-line */
+        if (! is_subclass_of($resourceClass, DefinesExportColumns::class)) {
+            throw new InvalidArgumentException(sprintf('%s must implement %s to support exports.', $resourceClass, DefinesExportColumns::class));
+        }
+
+        /** @phpstan-ignore-next-line */
+        if (! is_subclass_of($resourceClass, \Filament\Resources\Resource::class)) {
+            throw new InvalidArgumentException(sprintf('%s must extend %s to support exports.', $resourceClass, \Filament\Resources\Resource::class));
+        }
+
+        /** @var class-string<\Filament\Resources\Resource&DefinesExportColumns> $resourceClass */
+        $resourceClass = $resourceClass;
+
+        $modelClass = $resourceClass::getModel();
+        /** @phpstan-ignore-next-line */
+        if (! is_string($modelClass) || ! is_subclass_of($modelClass, Model::class)) {
+            throw new InvalidArgumentException(sprintf('Resource %s does not expose a valid model.', $resourceClass));
+        }
+
+        /** @var class-string<Model> $modelClass */
+        $modelClass = $modelClass;
+
+        $recordIds = $this->normalizeRecordIdentifiers($records, $modelClass);
+        $exportName = $name ?? sprintf('%s Export %s', Str::headline(class_basename($modelClass)), now()->format('Y-m-d H:i'));
+
+        $chunkConfig = config('export.chunk_size');
+        $chunkSize = 500;
+        if (is_int($chunkConfig)) {
+            $chunkSize = $chunkConfig;
+        } elseif (is_string($chunkConfig) && is_numeric($chunkConfig)) {
+            $chunkSize = (int) $chunkConfig;
+        }
 
         $export = Export::query()->create([
-            'requested_by' => $user->getKey(),
-            'type' => $request->entity,
-            'format' => $request->format,
-            'status' => ExportStatus::PENDING,
-            'filters' => $this->prepareFilters($request),
-            'columns' => $columns,
-            'locale' => $request->normalizedLocale(),
-            'timezone' => $request->normalizedTimezone(),
+            'user_id' => $requestedBy?->getKey(),
+            'name' => $exportName,
+            'resource' => $resourceClass,
+            'model' => $modelClass,
+            'format' => $format,
+            'columns' => array_values($columnKeys),
+            'selection' => $recordIds,
+            'filters' => $filters,
+            'status' => ExportStatus::Pending,
+            'chunk_size' => $chunkSize,
         ]);
 
-        ProcessExportJob::dispatch($export)->onQueue('exports');
+        ProcessExport::dispatch($export->id);
 
         return $export;
     }
 
-    public function process(Export $export): void
+    public function process(Export|string $export): void
     {
-        $config = $this->entityConfig($export->type);
-        $writer = $this->writerFactory->make($export->format);
-        $timestamp = now()->timezone($export->timezone)->format('Ymd_His');
-        $dateFolder = now()->timezone($export->timezone)->format('Y-m-d');
-        $fileName = sprintf('%s_%s.%s', $export->type->value, $timestamp, $writer->extension());
-        $relativePath = sprintf('exports/%s/%s/%s', $export->type->value, $dateFolder, $fileName);
-
-        $export->forceFill([
-            'status' => ExportStatus::PROCESSING,
-            'file_name' => $fileName,
-            'file_path' => $relativePath,
-            'mime_type' => $writer->mimeType(),
-        ])->save();
-
-        $originalLocale = app()->getLocale();
-        $originalTz = date_default_timezone_get();
-
-        app()->setLocale($export->locale);
-        date_default_timezone_set($export->timezone);
-
-        $columns = $export->columns ?? $this->resolveColumns($export->type, []);
+        $export = $export instanceof Export ? $export : Export::query()->findOrFail($export);
 
         try {
-            $writer->open($export, $columns, $relativePath);
+            $columns = $this->resolveColumns($export->resource, $export->columns);
+            $headers = array_values(array_map(static fn (ExportColumn $column) => $column->label, $columns));
 
-            $query = $this->buildQuery($config, $export);
+            /** @var class-string<Model> $modelClass */
+            $modelClass = $export->model;
+            $model = new $modelClass;
+            $keyName = $model->getKeyName();
 
-            $chunkSize = (int) config('exports.chunk_size', 1000);
-            $totalRows = 0;
+            $query = $modelClass::query();
+            $selection = collect($export->selection ?? []);
+            if ($selection->isNotEmpty()) {
+                $query->whereIn($keyName, $selection->all());
+            }
 
-            $query->chunkById($chunkSize, function ($models) use ($export, $writer, $columns, &$totalRows, $config): void {
-                $rows = [];
+            $totalRows = $selection->isNotEmpty() ? $selection->count() : $query->count();
+            $export->markProcessing($totalRows);
 
-                foreach ($models as $model) {
-                    $rows[] = $this->mapRow($export, $model, $columns, $config);
+            $writer = $this->writerFactory->make($export->format);
+            $writer->open($export, $headers);
+
+            if ($selection->isNotEmpty()) {
+                foreach ($selection->chunk($export->chunk_size) as $chunkedIds) {
+                    $records = $modelClass::query()
+                        ->whereIn($keyName, $chunkedIds->all())
+                        ->orderBy($keyName)
+                        ->get();
+
+                    $rows = $this->mapRecordsToRows($records, $columns);
+                    $writer->appendRows($rows);
+                    $export->incrementProcessedRows($records->count());
                 }
-
-                $writer->append($rows);
-                $totalRows += count($rows);
-            });
-
-            $writer->close();
-
-            $export->forceFill([
-                'status' => ExportStatus::COMPLETED,
-                'total_rows' => $totalRows,
-                'completed_at' => now(),
-                'expires_at' => now()->addMinutes((int) config('exports.ttl_minutes', 1440)),
-            ])->save();
-
-            if ($export->relationLoaded('requester')) {
-                $export->requester->notify(new ExportReadyNotification($export));
             } else {
-                $export->loadMissing('requester')->requester?->notify(new ExportReadyNotification($export));
+                $modelClass::query()
+                    ->orderBy($keyName)
+                    ->chunkById($export->chunk_size, function ($records) use ($writer, $columns, $export): void {
+                        $rows = $this->mapRecordsToRows($records, $columns);
+                        $writer->appendRows($rows);
+                        $export->incrementProcessedRows($records->count());
+                    }, $keyName);
+            }
+
+            $path = $writer->close();
+            $export->markCompleted($path);
+
+            $export->load('user');
+            if ($export->user) {
+                $export->user->notify(new ExportCompletedNotification($export->id));
             }
         } catch (Throwable $exception) {
-            $writer->close();
-            $export->forceFill([
-                'status' => ExportStatus::FAILED,
-            ])->save();
+            $export->markFailed();
+            Log::error('Export processing failed', [
+                'export_id' => $export->id,
+                'exception' => $exception,
+            ]);
 
             throw $exception;
-        } finally {
-            app()->setLocale($originalLocale);
-            date_default_timezone_set($originalTz);
         }
+    }
+
+    public function makeSignedDownloadUrl(Export $export, ?\DateTimeInterface $expiresAt = null): string
+    {
+        $ttlConfig = config('export.download_url_ttl');
+        $ttl = 60;
+        if (is_int($ttlConfig)) {
+            $ttl = $ttlConfig;
+        } elseif (is_string($ttlConfig) && is_numeric($ttlConfig)) {
+            $ttl = (int) $ttlConfig;
+        }
+
+        $expiration = $expiresAt ?? now()->addMinutes($ttl);
+
+        return URL::temporarySignedRoute('api.exports.download', $expiration, [
+            'export' => $export,
+        ]);
     }
 
     /**
-     * @return array<string, mixed>
+     * @param  array<int, string>  $columnKeys
+     * @return array<string, ExportColumn>
      */
-    private function entityConfig(ExportType $entity): array
+    private function resolveColumns(string $resourceClass, array $columnKeys): array
     {
-        $config = config(sprintf('exports.entities.%s', $entity->value));
-
-        if (! is_array($config)) {
-            throw new InvalidArgumentException(sprintf('Export entity [%s] is not configured.', $entity->value));
+        /** @phpstan-ignore-next-line */
+        if (! is_subclass_of($resourceClass, DefinesExportColumns::class)) {
+            throw new InvalidArgumentException(sprintf('%s must implement %s to support exports.', $resourceClass, DefinesExportColumns::class));
         }
 
-        return $config;
+        /** @var array<string, ExportColumn> $available */
+        $available = $resourceClass::availableExportColumns();
+        $columns = [];
+        foreach ($columnKeys as $key) {
+            if (isset($available[$key])) {
+                $columns[$key] = $available[$key];
+            }
+        }
+
+        if ($columns === []) {
+            throw new InvalidArgumentException('At least one export column must be selected.');
+        }
+
+        return $columns;
     }
 
-    private function resolveColumns(ExportType $entity, array $requested): array
+    /**
+     * @param  iterable<int, Model|int|string>  $records
+     * @return array<int, string>
+     */
+    private function normalizeRecordIdentifiers(iterable $records, string $modelClass): array
     {
-        $config = $this->entityConfig($entity);
-        $available = $config['columns'] ?? [];
-
-        if ($available === []) {
-            throw new InvalidArgumentException(sprintf('Export entity [%s] has no columns configured.', $entity->value));
+        $collection = Collection::make($records);
+        if ($collection->isEmpty()) {
+            return [];
         }
 
-        $keys = $requested !== [] ? array_values(array_intersect($requested, array_keys($available))) : array_keys($available);
+        if ($collection->first() instanceof Model) {
+            /** @var Collection<int, Model> $collection */
+            return $collection->map(static function (Model $model): string {
+                $key = $model->getKey();
 
-        if ($keys === []) {
-            $keys = array_keys($available);
+                if (! is_scalar($key)) {
+                    throw new InvalidArgumentException('Export selections must contain scalar identifiers.');
+                }
+
+                /** @var int|string $key */
+                return (string) $key;
+            })->all();
         }
 
-        return array_map(static function (string $key) use ($available): array {
-            $definition = $available[$key];
+        return $collection->map(static function ($id): string {
+            if (! is_scalar($id)) {
+                throw new InvalidArgumentException('Export selections must contain scalar identifiers.');
+            }
 
-            return [
-                'key' => $key,
-                'label' => $definition['label'],
-                'type' => $definition['type'],
-            ];
-        }, $keys);
+            /** @var int|string $id */
+            return (string) $id;
+        })->all();
     }
 
-    private function prepareFilters(ExportRequestData $request): array
+    /**
+     * @param  \Illuminate\Database\Eloquent\Collection<int, Model>|array<int, Model>  $records
+     * @param  array<string, ExportColumn>  $columns
+     * @return array<int, array<int, mixed>>
+     */
+    private function mapRecordsToRows($records, array $columns): array
     {
-        $filters = $request->filters ?? [];
-
-        if (! empty($request->ids)) {
-            $filters['ids'] = array_values($request->ids);
+        $rows = [];
+        foreach ($records as $record) {
+            $row = [];
+            foreach ($columns as $column) {
+                $row[] = $column->resolve($record);
+            }
+            $rows[] = $row;
         }
 
-        return $filters;
-    }
-
-    private function buildQuery(array $config, Export $export): Builder
-    {
-        /** @var class-string<Model> $modelClass */
-        $modelClass = $config['model'];
-
-        /** @var Model $model */
-        $model = new $modelClass();
-
-        $query = $modelClass::query();
-
-        foreach ($config['with'] ?? [] as $relation) {
-            $query->with($relation);
-        }
-
-        foreach ($config['with_count'] ?? [] as $relation) {
-            $query->withCount($relation);
-        }
-
-        $filters = $export->filters ?? [];
-
-        if (! empty($filters['ids'])) {
-            $query->whereIn($model->qualifyColumn('id'), $filters['ids']);
-        }
-
-        foreach ($filters as $key => $value) {
-            if (in_array($key, ['ids'], true)) {
-                continue;
-            }
-
-            if ($value === null || $value === '') {
-                continue;
-            }
-
-            if (Str::endsWith($key, '_from')) {
-                $column = Str::beforeLast($key, '_from');
-                $query->whereDate($model->qualifyColumn($column), '>=', $value);
-
-                continue;
-            }
-
-            if (Str::endsWith($key, '_until')) {
-                $column = Str::beforeLast($key, '_until');
-                $query->whereDate($model->qualifyColumn($column), '<=', $value);
-
-                continue;
-            }
-
-            if (is_array($value)) {
-                $query->whereIn($model->qualifyColumn($key), $value);
-            } else {
-                $query->where($model->qualifyColumn($key), $value);
-            }
-        }
-
-        return $query->orderBy($model->qualifyColumn($model->getKeyName()))
-            ->select($model->getTable().'.*');
-    }
-
-    private function mapRow(Export $export, Model $model, array $columns, array $config): array
-    {
-        $row = [];
-
-        foreach ($columns as $column) {
-            $definition = $config['columns'][$column['key']] ?? null;
-
-            if (! $definition) {
-                continue;
-            }
-
-            $value = $definition['resolver']($model);
-
-            if ($value instanceof \DateTimeInterface) {
-                $value = $value->setTimezone(new \DateTimeZone($export->timezone))->format('Y-m-d H:i:s');
-            } elseif ($definition['type'] === 'currency' && is_numeric($value)) {
-                $value = number_format((float) $value, 2, '.', '');
-            }
-
-            $row[$column['label']] = $value ?? '';
-        }
-
-        return $row;
+        return $rows;
     }
 }

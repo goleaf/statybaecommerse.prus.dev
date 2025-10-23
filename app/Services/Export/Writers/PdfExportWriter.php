@@ -5,62 +5,40 @@ declare(strict_types=1);
 namespace App\Services\Export\Writers;
 
 use App\Models\Export;
-use App\Services\Export\Contracts\ExportWriter;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 
 final class PdfExportWriter implements ExportWriter
 {
+    private array $headers = [];
+
     private array $rows = [];
 
-    private array $columns = [];
+    private string $path;
 
-    private ?Export $export = null;
-
-    private string $path = '';
-
-    public function open(Export $export, array $columns, string $path): void
+    public function open(Export $export, array $headers): void
     {
-        $this->export = $export;
-        $this->columns = $columns;
-        $this->path = $path;
-
-        Storage::disk('local')->makeDirectory(dirname($path));
+        $this->headers = $headers;
+        $this->path = sprintf('exports/%s.%s', $export->id, $export->format->extension());
     }
 
-    public function append(iterable $rows): void
+    public function appendRows(iterable $rows): void
     {
         foreach ($rows as $row) {
             $this->rows[] = $row;
         }
     }
 
-    public function close(): void
+    public function close(): string
     {
-        if (! $this->export instanceof Export) {
-            return;
-        }
-
+        $disk = Storage::disk(config('export.disk'));
+        $disk->makeDirectory('exports');
         $pdf = Pdf::loadView('exports.table', [
-            'export' => $this->export,
-            'columns' => $this->columns,
+            'headers' => $this->headers,
             'rows' => $this->rows,
-        ])->setPaper('a4', 'landscape');
+        ]);
+        $disk->put($this->path, $pdf->output());
 
-        Storage::disk('local')->put($this->path, $pdf->output());
-
-        $this->export = null;
-        $this->rows = [];
-        $this->columns = [];
-    }
-
-    public function extension(): string
-    {
-        return 'pdf';
-    }
-
-    public function mimeType(): string
-    {
-        return 'application/pdf';
+        return $this->path;
     }
 }

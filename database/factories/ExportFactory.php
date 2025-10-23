@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Enums\ExportStatus;
 use App\Models\Export;
-use App\Models\User;
+use App\Models\Order;
+use App\Services\Export\ExportFormat;
+use App\Services\Export\ExportStatus;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
 /**
- * @extends Factory<\App\Models\Export>
+ * @extends Factory<Export>
  */
 final class ExportFactory extends Factory
 {
@@ -20,18 +20,24 @@ final class ExportFactory extends Factory
     public function definition(): array
     {
         return [
-            'uuid' => (string) Str::uuid(),
-            'name' => 'Test Export',
-            'format' => 'csv',
-            'status' => ExportStatus::Queued,
-            'exportable_type' => 'TestExportable',
-            'columns' => ['id', 'name'],
-            'exportable_options' => ['ids' => [1, 2, 3]],
-            'artifact_disk' => 'public',
-            'artifact_path' => null,
-            'artifact_filename' => null,
-            'requested_at' => now(),
-            'requested_by' => User::factory(),
+            'name' => $this->faker->sentence(3),
+            'resource' => \App\Filament\Resources\OrderResource::class,
+            'model' => Order::class,
+            'format' => ExportFormat::Csv,
+            'columns' => ['number'],
+            'selection' => [],
+            'filters' => null,
+            'status' => ExportStatus::Pending,
+            'chunk_size' => (int) config('export.chunk_size', 500),
         ];
+    }
+
+    public function completed(string $path): self
+    {
+        return $this->state(fn () => [
+            'status' => ExportStatus::Completed,
+            'path' => $path,
+            'available_until' => now()->addDay(),
+        ]);
     }
 }

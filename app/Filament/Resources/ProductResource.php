@@ -16,9 +16,10 @@ use App\Filament\Resources\ProductResource\RelationManagers\ReviewsRelationManag
 use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
 use App\Filament\Widgets\InlineCharts\ProductSalesSparkline;
 use App\Models\Product;
-use App\Support\Authorization\AuthorizationMatrix;
-use App\Support\Filament\Components\Flatpickr;
-use App\Support\Seo\LocaleUrlGenerator;
+use App\Services\Export\Contracts\DefinesExportColumns;
+use App\Services\Export\ExportColumn;
+use App\Services\Export\ExportFormat;
+use App\Services\Export\ExportService;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\ActionGroup;
@@ -28,6 +29,8 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\RichEditor;
@@ -65,7 +68,7 @@ use UnitEnum;
  *
  * Filament v4 resource for Product management in the admin panel with comprehensive CRUD operations, filters, and actions.
  */
-final class ProductResource extends Resource
+final class ProductResource extends Resource implements DefinesExportColumns
 {
     use HasNav;
 
@@ -680,7 +683,41 @@ final class ProductResource extends Resource
                                 ->success()
                                 ->send();
                         }),
-                    RequestExportBulkAction::make(ExportType::PRODUCTS),
+                    BulkAction::make('export_products')
+                        ->label(__('exports.actions.export_products'))
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('gray')
+                        ->form([
+                            Select::make('format')
+                                ->label(__('exports.form.format'))
+                                ->options(collect(ExportFormat::cases())->mapWithKeys(fn (ExportFormat $format) => [$format->value => $format->label()])->all())
+                                ->default(ExportFormat::Csv->value)
+                                ->required(),
+                            CheckboxList::make('columns')
+                                ->label(__('exports.form.columns'))
+                                ->options(self::exportColumnOptions())
+                                ->default(array_keys(self::exportColumnOptions()))
+                                ->columns(2)
+                                ->required(),
+                        ])
+                        ->action(function (Collection $records, array $data): void {
+                            /** @var ExportService $exportService */
+                            $exportService = app(ExportService::class);
+
+                            $exportService->queueResourceExport(
+                                resourceClass: self::class,
+                                records: $records,
+                                columnKeys: $data['columns'],
+                                format: ExportFormat::from($data['format']),
+                                requestedBy: auth()->user(),
+                            );
+
+                            Notification::make()
+                                ->title(__('exports.notifications.queued'))
+                                ->body(__('exports.notifications.queued_body'))
+                                ->success()
+                                ->send();
+                        }),
                     DeleteBulkAction::make(),
                 ]),
             ])
@@ -688,94 +725,26 @@ final class ProductResource extends Resource
     }
 
     /**
-     * @return Builder<Product>
+     * @return array<string, ExportColumn>
      */
-    public static function getEloquentQuery(): Builder
+    public static function availableExportColumns(): array
     {
-        return parent::getEloquentQuery()
-            ->with([
-                'brand:id,name',
-                'primaryImage',
-                'categories' => fn ($query) => $query->select([
-                    'categories.id',
-                    'categories.name',
-                    'categories.slug',
-                ])->withPivot('created_at', 'updated_at'),
-                'collections' => fn ($query) => $query->select([
-                    'collections.id',
-                    'collections.name',
-                    'collections.slug',
-                ])->withPivot('created_at', 'updated_at'),
-                'variants' => fn ($query) => $query->select([
-                    'product_variants.id',
-                    'product_variants.product_id',
-                    'product_variants.sku',
-                    'product_variants.name',
-                    'product_variants.variant_name_lt',
-                    'product_variants.variant_name_en',
-                    'product_variants.price',
-                    'product_variants.compare_price',
-                    'product_variants.cost_price',
-                    'product_variants.stock_quantity',
-                    'product_variants.available_quantity',
-                    'product_variants.is_default',
-                    'product_variants.is_enabled',
-                ]),
-                'media' => fn ($query) => $query->select([
-                    'media.id',
-                    'media.model_type',
-                    'media.model_id',
-                    'media.collection_name',
-                    'media.name',
-                    'media.file_name',
-                    'media.disk',
-                    'media.conversions_disk',
-                    'media.mime_type',
-                    'media.size',
-                    'media.custom_properties',
-                    'media.generated_conversions',
-                    'media.responsive_images',
-                    'media.order_column',
-                    'media.created_at',
-                    'media.updated_at',
-                ]),
-            ])
-            ->withCount([
-                'reviews as approved_reviews_count' => fn (Builder $query): Builder => $query->where('is_approved', true),
-                'categories',
-                'collections',
-                'variants',
-                'media',
-            ])
-            ->withAvg([
-                'reviews as approved_reviews_avg_rating' => fn (Builder $query): Builder => $query->where('is_approved', true),
-            ], 'rating');
+        return [
+            'name' => new ExportColumn('name', __('products.fields.name'), fn (Product $product): string => (string) $product->name),
+            'sku' => new ExportColumn('sku', __('products.fields.sku'), fn (Product $product): string => (string) $product->sku),
+            'price' => new ExportColumn('price', __('products.fields.price'), fn (Product $product): string => (string) $product->price),
+            'status' => new ExportColumn('status', __('products.fields.status'), fn (Product $product): string => (string) $product->status),
+            'is_visible' => new ExportColumn('is_visible', __('products.fields.is_visible'), fn (Product $product): string => $product->is_visible ? __('exports.boolean.yes') : __('exports.boolean.no')),
+            'created_at' => new ExportColumn('created_at', __('products.fields.created_at'), fn (Product $product): string => optional($product->created_at)->toDateTimeString() ?? ''),
+        ];
     }
 
     /**
-     * @return array<int, ExcelExport>
+     * @return array<string, string>
      */
-    protected static function getExportPresets(): array
+    private static function exportColumnOptions(): array
     {
-        return [
-            ExcelExport::make('visible_columns')
-                ->fromTable()
-                ->queue()
-                ->withChunkSize(500),
-            ExcelExport::make('price_list_eur')
-                ->only(['sku', 'name', 'price'])
-                ->withColumns([
-                    Column::make('sku')
-                        ->heading(__('products.fields.sku')),
-                    Column::make('name')
-                        ->heading(__('products.fields.name')),
-                    Column::make('price')
-                        ->heading(__('products.fields.price'))
-                        ->formatStateUsing(fn ($state): float => (float) $state)
-                        ->format(NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE),
-                ])
-                ->queue(),
-        ];
+        return array_map(static fn (ExportColumn $column): string => $column->label, self::availableExportColumns());
     }
 
     public static function getRelations(): array
