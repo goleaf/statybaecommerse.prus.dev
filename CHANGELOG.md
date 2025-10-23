@@ -7,6 +7,10 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Bug Fixes
+* Removed the generic ActiveScope from campaign conversion analytics so status-
+  filtered scopes (campaign, type, device, medium, etc.) once again return
+  completed records in unit tests and dashboards instead of being filtered out
+  by a non-existent `is_active` flag.
 * Normalized API validation problem responses to always include a fallback English reason alongside the localized message list so integrators receive consistent messaging even when the initial validation ran before locale negotiation completed.
 * Ensured forbidden problem responses raised through `AccessDeniedHttpException` retain the explicit denial reason in the error context, mirroring the structure used for authorization exceptions and keeping client-side handlers uniform.
 

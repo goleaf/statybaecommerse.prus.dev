@@ -28,7 +28,15 @@
 - OpenAPI documentation now mirrors the lean product meta payload and nullable media thumbnails emitted by the presenter, keeping schema validators and client SDKs in sync with production responses.
 
 ## Admin panel resilience
-- The base test harness now resets Laravel's refresh state before each boot cycle so in-memory SQLite migrations execute for every PHPUnit suite, eliminating the missing table errors that previously surfaced in feature tests.
+- Campaign conversion analytics drop the inherited ActiveScope so the model's
+  own status-aware scopes (campaign, type, device, etc.) surface completed
+  conversions for marketing dashboards and unit coverage without extra query
+  overrides.
+- Toggleable table layout tests now restore the global RefreshDatabase state after seeding bespoke tables and the news category factory defaults to visible records, keeping PHPUnit suites from skipping migrations and ensuring scoped relationships exist for admin coverage.
+- Cart lifecycle unit coverage now builds a dedicated lightweight `cart_items` table per test so checkout cleanup behaviours stay validated without depending on the entire migration suite.
+- Campaign click factories now guard related lookups and PHPUnit targets the shared SQLite database file, eliminating the missing-table exceptions that previously interrupted API campaign listing tests during fresh runs.
+- Reintroduced the core `App\\Exceptions\\Handler` class so the application reports exceptions normally instead of crashing with `Whoops\\Run::handleShutdown()` during bootstrap.
+- Customer and product sparkline widgets now reuse the cached analytics series and expose matching dataset checksums, ensuring inline charts and regression tests evaluate the same trends.
 - The custom Edit Profile page now imports `Filament\\Schemas\\Schema`, keeping the authentication profile form aligned with v4 expectations and preventing namespace-related fatal errors during automated test cycles.
 - Company model unit tests now provision the `companies` schema during setup and relax the global active scope until migrations run, so SQLite suites no longer fail with missing-table errors.
 - Pest test bootstrap helpers now guard the `login()`, `get()`, and `post()` helpers with function-existence checks so repeated includes during `php artisan test` runs no longer trigger fatal redeclaration errors.

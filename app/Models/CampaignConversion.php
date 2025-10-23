@@ -28,6 +28,8 @@ use Illuminate\Support\Carbon;
  *
  * @mixin \Eloquent
  */
+// We avoid the generic ActiveScope because campaign conversions rely on lifecycle
+// statuses like "completed" rather than boolean flags such as "is_active".
 #[ScopedBy([StatusScope::class])]
 final class CampaignConversion extends Model
 {
