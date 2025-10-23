@@ -13,6 +13,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Operational dashboards** for activity logs, analytics, and background job health leveraging Laravel Horizon, Scout, and bespoke widgets.
 - **Zone-aware logistics** that tie shipping options to configurable delivery regions for targeted fulfillment strategies.
 - **Multilingual experience** across storefront and admin via `spatie/laravel-translatable`, Volt-powered Livewire pages, and localized seed data.
+- **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 ### Latest updates
 - Shipping option management screens now present accurate delivery windows even when the minimum day value is zero or one side of the range is missing, giving merchandisers clearer expectations when auditing carriers.
