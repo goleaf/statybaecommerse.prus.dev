@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Scopes\StatusScope;
 use App\Models\Translations\CampaignConversionTranslation;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * CampaignConversion
@@ -26,29 +28,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @mixin \Eloquent
  */
-// Campaign conversions expose analytics across the full lifecycle, so we avoid
-// attaching broad "active" scopes that would hide completed or historical rows.
+#[ScopedBy([StatusScope::class])]
 final class CampaignConversion extends Model
 {
     use HasFactory, HasTranslations;
 
     public $timestamps = false;
 
-    /**
-     * Explicit translation model keeps HasTranslations aware of the pivot table.
-     */
-    public string $translationModel = CampaignConversionTranslation::class;
-
-    /**
-     * Ensure date-range scopes work deterministically during analytics queries.
-     */
-    protected static function booted(): void
-    {
-        self::creating(static function (self $conversion): void {
-            // Tests and reporting expect a value, so seed a sensible default.
-            $conversion->converted_at ??= now();
-        });
-    }
+    protected string $translationModel = CampaignConversionTranslation::class;
 
     protected $fillable = ['campaign_id', 'click_id', 'order_id', 'customer_id', 'conversion_type', 'conversion_value', 'session_id', 'conversion_data', 'converted_at', 'status', 'source', 'medium', 'campaign_name', 'utm_content', 'utm_term', 'referrer', 'ip_address', 'user_agent', 'device_type', 'browser', 'os', 'country', 'city', 'is_mobile', 'is_tablet', 'is_desktop', 'conversion_duration', 'page_views', 'time_on_site', 'bounce_rate', 'exit_page', 'landing_page', 'funnel_step', 'attribution_model', 'conversion_path', 'touchpoints', 'last_click_attribution', 'first_click_attribution', 'linear_attribution', 'time_decay_attribution', 'position_based_attribution', 'data_driven_attribution', 'conversion_window', 'lookback_window', 'assisted_conversions', 'assisted_conversion_value', 'total_conversions', 'total_conversion_value', 'conversion_rate', 'cost_per_conversion', 'roi', 'roas', 'lifetime_value', 'customer_acquisition_cost', 'payback_period', 'notes', 'tags', 'custom_attributes'];
 
@@ -58,6 +45,20 @@ final class CampaignConversion extends Model
     protected function casts(): array
     {
         return ['conversion_value' => 'decimal:2', 'conversion_data' => 'array', 'converted_at' => 'datetime', 'is_mobile' => 'boolean', 'is_tablet' => 'boolean', 'is_desktop' => 'boolean', 'conversion_duration' => 'integer', 'page_views' => 'integer', 'time_on_site' => 'integer', 'bounce_rate' => 'decimal:2', 'assisted_conversion_value' => 'decimal:2', 'total_conversion_value' => 'decimal:2', 'conversion_rate' => 'decimal:4', 'cost_per_conversion' => 'decimal:2', 'roi' => 'decimal:4', 'roas' => 'decimal:4', 'lifetime_value' => 'decimal:2', 'customer_acquisition_cost' => 'decimal:2', 'payback_period' => 'integer', 'tags' => 'array', 'custom_attributes' => 'array', 'touchpoints' => 'array', 'conversion_path' => 'array'];
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $conversion): void {
+            if (empty($conversion->converted_at)) {
+                $conversion->converted_at = now();
+            }
+        });
+    }
+
+    public function getTranslationModelAttribute(): string
+    {
+        return $this->translationModelClass();
     }
 
     // Relationships
@@ -123,7 +124,10 @@ final class CampaignConversion extends Model
      */
     public function scopeByDateRange(Builder $query, string $startDate, string $endDate): Builder
     {
-        return $query->whereBetween('converted_at', [$startDate, $endDate]);
+        $start = Carbon::parse($startDate)->startOfDay();
+        $end = Carbon::parse($endDate)->endOfDay();
+
+        return $query->whereBetween('converted_at', [$start, $end]);
     }
 
     /**

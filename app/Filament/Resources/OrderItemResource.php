@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\OrderItemResource\Pages;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -23,6 +19,9 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -36,9 +35,10 @@ use UnitEnum;
  */
 final class OrderItemResource extends Resource
 {
-    use HasNav;
-
-    
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return NavigationGroup::Orders;
+    }
 
     protected static ?string $model = OrderItem::class;
 
