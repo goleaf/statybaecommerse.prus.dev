@@ -393,8 +393,8 @@ final class UserResource extends Resource implements DefinesExportColumns
         return [
             'index'  => Pages\ListUsers::route('/'),
             'create' => Pages\CreateUser::route('/create'),
-            'view'   => Pages\ViewUser::route('/{record}'),
-            'edit'   => Pages\EditUser::route('/{record}/edit'),
+            'view' => Pages\ViewUser::route('/{record}'),
+            'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
     }
 
