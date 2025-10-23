@@ -9,6 +9,7 @@ use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Services\Pricing\PriceCalculator;
+use App\Services\Cart\CartLifecycleService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -164,10 +165,7 @@ final class CheckoutProcess extends Component
      */
     private function createOrder($cartItems): Order
     {
-        $calculator = app(PriceCalculator::class);
-        $breakdown = $calculator->calculate(
-            $cartItems->map(fn (CartItem $item) => ['price' => (float) $item->price, 'quantity' => (int) $item->quantity])
-        );
+        $breakdown = $this->calculateBreakdown($cartItems);
 
         return Order::create([
             'number' => 'LT-'.strtoupper(uniqid()),
@@ -178,7 +176,7 @@ final class CheckoutProcess extends Component
             'shipping_amount' => $breakdown->shipping,
             'discount_amount' => $breakdown->discount,
             'total' => $breakdown->total,
-            'currency' => current_currency(),
+            'currency' => $breakdown->currency,
             'billing_address' => $this->getBillingAddress(),
             'shipping_address' => $this->getShippingAddress(),
             'notes' => $this->notes,
@@ -233,11 +231,19 @@ final class CheckoutProcess extends Component
      */
     public function render(): View
     {
-        $cartItems = $this->getCartItems();
+        $items = $this->getCartItems();
+        $breakdown = $this->calculateBreakdown($items);
 
         return view('livewire.pages.checkout-process', [
-            'cartItems' => $cartItems,
-            'subtotal' => $cartItems->sum(fn (CartItem $item) => $item->price * $item->quantity),
+            'cartItems' => $items,
+            'summary' => $breakdown->toSummary(),
         ]);
+    }
+
+    private function calculateBreakdown($cartItems): PriceBreakdown
+    {
+        $subtotal = (float) $cartItems->sum(fn ($item) => $item->price * $item->quantity);
+
+        return app(PriceCalculator::class)->breakdown($subtotal);
     }
 }

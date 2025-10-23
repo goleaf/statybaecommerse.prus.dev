@@ -86,8 +86,8 @@ final class CartDataCreator
             ];
         }
 
-        $discount = (float) Session::get('cart_discount', 0.0);
-        $breakdown = $this->priceCalculator->calculate($items, $discount);
+        $discount = (float) Session::get('cart_discount', 0);
+        $breakdown = app(PriceCalculator::class)->breakdown($subtotal, $discount);
 
         return [
             'items' => $items,
@@ -97,7 +97,6 @@ final class CartDataCreator
             'shipping' => $breakdown->shipping,
             'discount' => $breakdown->discount,
             'total' => $breakdown->total,
-            'formatted_totals' => $breakdown->formatted(),
         ];
     }
 }

@@ -10,6 +10,7 @@ use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Address;
 use App\Models\Channel;
 use App\Models\Order;
+use App\Services\Pricing\PriceCalculator;
 use App\Services\Export\ExportColumn;
 use App\Services\Export\Exporters\OrderExport;
 use App\Services\Export\ExportService;

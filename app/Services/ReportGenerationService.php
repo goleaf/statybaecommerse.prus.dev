@@ -25,28 +25,51 @@ final class ReportGenerationService
      */
     public function generateSalesReport(array $filters = []): array
     {
-        $operation = $this->logger->operation('report_sales', [
-            'filters' => $filters,
-        ]);
+        $timeout = now()->addMinutes(5);
+        // 5 minute timeout for sales report generation
+        $query = AnalyticsEvent::where('event_type', 'purchase')->with(['user', 'trackable'])->whereNotNull('value');
+        // Apply filters
+        if (isset($filters['date_from'])) {
+            $query->where('created_at', '>=', $filters['date_from']);
+        }
+        if (isset($filters['date_to'])) {
+            $query->where('created_at', '<=', $filters['date_to']);
+        }
+        if (isset($filters['user_id'])) {
+            $query->where('user_id', $filters['user_id']);
+        }
+        $salesData = [];
+        $totalRevenue = 0;
+        $processedCount = 0;
+        $query->cursor()->takeUntilTimeout($timeout)->each(function ($event) use (&$salesData, &$totalRevenue, &$processedCount) {
+            $processedCount++;
+            $value = (float) ($event->value ?? 0);
+            $totalRevenue += $value;
+            $date = $event->created_at->format('Y-m-d');
+            if (! isset($salesData[$date])) {
+                $salesData[$date] = ['date' => $date, 'revenue' => 0, 'transactions' => 0, 'users' => collect()];
+            }
+            $salesData[$date]['revenue'] += $value;
+            $salesData[$date]['transactions']++;
+            $salesData[$date]['users']->push($event->user_id);
+        });
+        // Calculate unique users per day
+        foreach ($salesData as &$day) {
+            $day['unique_users'] = $day['users']->unique()->count();
+            unset($day['users']);
+        }
+        $calculator = app(PriceCalculator::class);
+        $totals = $calculator->breakdown($totalRevenue);
+        $summary = $totals->toSummary();
 
         foreach ($salesData as &$day) {
-            $day['revenue'] = $this->priceCalculator->round((float) $day['revenue']);
-            $day['revenue_formatted'] = $this->priceCalculator->formatAmount($day['revenue']);
+            $day['formatted_revenue'] = app_money_format($day['revenue'], $summary['currency']);
         }
         unset($day);
 
-        $roundedTotal = $this->priceCalculator->round($totalRevenue);
+        Log::info('Sales report generated', ['processed_events' => $processedCount, 'total_revenue' => $totalRevenue, 'days_covered' => count($salesData), 'timeout_reached' => now()->greaterThan($timeout)]);
 
-        return [
-            'summary' => [
-                'total_revenue' => $roundedTotal,
-                'total_revenue_formatted' => $this->priceCalculator->formatAmount($roundedTotal),
-                'total_transactions' => $processedCount,
-                'days_covered' => count($salesData),
-                'processed_events' => $processedCount,
-            ],
-            'daily_data' => array_values($salesData),
-        ];
+        return ['summary' => $summary + ['total_revenue' => $summary['total'], 'total_transactions' => $processedCount, 'days_covered' => count($salesData), 'processed_events' => $processedCount], 'daily_data' => array_values($salesData)];
     }
 
     /**

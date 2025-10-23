@@ -6,7 +6,9 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
-use Illuminate\Http\RedirectResponse;
+use App\Models\ProductVariant;
+use App\Services\Pricing\PriceCalculator;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Session;
@@ -105,37 +107,9 @@ final class CartController extends Controller
 
     private function saveCart(array $cart): void
     {
-        Session::put('cart', array_filter($cart));
-    }
+        $subtotal = (float) $items->sum(fn (CartItem $item) => $item->calculateSubtotal());
+        $breakdown = app(PriceCalculator::class)->breakdown($subtotal);
 
-    private function buildCartSummary(): array
-    {
-        $cart = $this->getCart();
-        $items = [];
-        $subtotal = 0.0;
-        $count = 0;
-
-        foreach ($cart as $item) {
-            $lineTotal = (float) ($item['price'] ?? 0) * (int) ($item['quantity'] ?? 0);
-            $items[] = array_merge($item, ['total' => round($lineTotal, 2)]);
-            $subtotal += $lineTotal;
-            $count += (int) ($item['quantity'] ?? 0);
-        }
-
-        $taxRate = config('shared.tax.default_rate', 0.21);
-        $tax = $subtotal * $taxRate;
-        $shipping = $subtotal > 50 ? 0 : 5.99;
-        $discount = (float) Session::get('cart_discount', 0);
-        $total = $subtotal + $tax + $shipping - $discount;
-
-        return [
-            'items' => $items,
-            'count' => $count,
-            'subtotal' => round($subtotal, 2),
-            'tax' => round($tax, 2),
-            'shipping' => round($shipping, 2),
-            'discount' => round($discount, 2),
-            'total' => round(max($total, 0), 2),
-        ];
+        return ['item_count' => (int) $items->sum('quantity')] + $breakdown->toSummary();
     }
 }
