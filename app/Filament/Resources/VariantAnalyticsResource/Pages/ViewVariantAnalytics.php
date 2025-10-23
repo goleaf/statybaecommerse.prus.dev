@@ -78,7 +78,7 @@ final class ViewVariantAnalytics extends ViewRecord
 
                                 TextEntry::make('conversion_rate')
                                     ->label(__('admin.variant_analytics.conversion_rate'))
-                                    ->formatStateUsing(fn ($state) => number_format($state, 2) . '%')
+                                    ->formatStateUsing(fn ($state) => number_format($state, 2).'%')
                                     ->columnSpan(1),
                             ]),
                     ]),
