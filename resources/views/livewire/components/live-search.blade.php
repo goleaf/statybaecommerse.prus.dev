@@ -123,6 +123,7 @@
                         <div class="flex items-center space-x-3">
                             {{-- Result Image --}}
                             <div class="flex-shrink-0">
+                                {{-- Pull the best available thumbnail for the live search suggestion. --}}
                                 @php($image = $result['main_image'] ?? $result['thumbnail'] ?? ($result['image'] ?? null))
                                 @if($image)
                                     <img

@@ -122,6 +122,7 @@
                     <div class="space-y-2">
                         @foreach($expensiveAnalytics['top_products'] as $product)
                             <div class="flex items-center space-x-3 bg-white rounded-lg p-3">
+                                {{-- Resolve the richest media asset to showcase the product highlight. --}}
                                 @php($productImage = $product['main_image'] ?? $product['thumbnail'] ?? ($product['image'] ?? null))
                                 @if($productImage)
                                     <img src="{{ $productImage }}" alt="{{ $product['name'] }}"
@@ -142,6 +143,7 @@
                     <div class="space-y-2">
                         @foreach($expensiveAnalytics['top_brands'] as $brand)
                             <div class="flex items-center space-x-3 bg-white rounded-lg p-3">
+                                {{-- Resolve the brand image, preferring the normalized media payload. --}}
                                 @php($brandImage = $brand['main_image'] ?? $brand['thumbnail'] ?? ($brand['image'] ?? null))
                                 @if($brandImage)
                                     <img src="{{ $brandImage }}" alt="{{ $brand['name'] }}"
