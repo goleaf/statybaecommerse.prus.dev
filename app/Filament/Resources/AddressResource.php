@@ -147,7 +147,7 @@ final class AddressResource extends Resource
                             ->label(__('translations.type'))
                             ->options(AddressType::options())
                             ->required()
-                            ->default(AddressType::SHIPPING),
+                            ->default(AddressType::SHIPPING->value),
                     ]),
                     Grid::make(2)->schema([
                         TextInput::make('first_name')
@@ -369,6 +369,10 @@ final class AddressResource extends Resource
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
+                        if (! is_string($state)) {
+                            return null;
+                        }
 
                         return strlen($state) > 50 ? $state : null;
                     }),

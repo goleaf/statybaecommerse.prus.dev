@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AddressResource\Pages;
 
+use App\Enums\AddressType;
 use App\Filament\Resources\AddressResource;
 use Filament\Resources\Pages\CreateRecord;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
@@ -33,7 +34,7 @@ final class CreateAddress extends CreateRecord
         // Set default values
         $data['is_active'] = $data['is_active'] ?? true;
         $data['is_default'] = $data['is_default'] ?? false;
-        $data['type'] = $data['type'] ?? 'shipping';
+        $data['type'] = $data['type'] ?? AddressType::SHIPPING->value;
 
         return $data;
     }
