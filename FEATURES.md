@@ -1,7 +1,5 @@
-# Platform Features Overview
+# Feature Highlights
 
-## Feature Flag Management
-- Admin resource now omits the active and enabled global scopes so teams can review inactive toggles alongside live ones for better governance.
-
-## Additional Capabilities
-- See [README.md](README.md) for the complete overview of storefront, operations, and analytics tooling.
+## Automated Code Quality Safeguards
+- Added a Rector dry-run stage to CI so pull requests surface refactor suggestions before tests execute.
+- Tuned Rector for PHP 8.2 and Laravel 12 with prepared sets covering dead code, quality, and type declarations.
