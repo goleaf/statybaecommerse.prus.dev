@@ -12,15 +12,15 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -28,19 +28,30 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\Rule;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
+use UnitEnum;
 
 final class CustomerGroupResource extends Resource
 {
+    use SpatieTranslatableResource; // Enable the common locale helpers expected by the shared translatable list traits.
+
     protected static ?string $model = CustomerGroup::class;
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static \UnitEnum|string|null $navigationGroup = 'Customers';
+    protected static UnitEnum|string|null $navigationGroup = 'Customers';
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): UnitEnum|string
     {
-        return self::$navigationGroup ?? __('customer_groups.navigation_group');
+        $group = self::$navigationGroup;
+
+        if ($group === null) {
+            // Provide a deterministic fallback so translated labels remain available when no enum is configured.
+            return (string) __('customer_groups.navigation_group');
+        }
+
+        return $group;
     }
 
     public static function getNavigationLabel(): string
@@ -91,6 +102,14 @@ final class CustomerGroupResource extends Resource
                                 ->label(__('customer_groups.is_default'))
                                 ->default(false),
                         ]),
+                    TextInput::make('discount_percentage')
+                        // Surface the legacy percentage field so simple create flows remain backwards compatible.
+                        ->label(__('price_lists.discount_percentage'))
+                        ->numeric()
+                        ->minValue(0)
+                        ->maxValue(100)
+                        ->step(0.01)
+                        ->default(0),
                     SchemaGrid::make(2)
                         ->schema([
                             Select::make('type')
@@ -102,7 +121,9 @@ final class CustomerGroupResource extends Resource
                                     'retail'    => 'Retail',
                                     'corporate' => 'Corporate',
                                 ])
-                                ->nullable()
+                                // Default to the legacy "regular" type so the column never fails strict database constraints.
+                                ->default('regular')
+                                ->required()
                                 ->rules([Rule::in(['regular', 'vip', 'wholesale', 'retail', 'corporate'])]),
                             TextInput::make('sort_order')
                                 ->label(__('customer_groups.sort_order'))
