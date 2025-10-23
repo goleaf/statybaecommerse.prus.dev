@@ -113,6 +113,22 @@ class AppServiceProvider extends ServiceProvider
             class_alias(\Filament\Schemas\Schema::class, \Filament\Forms\Form::class);
         }
 
+        if (! class_exists(\Filament\Forms\Components\Section::class) && class_exists(\Filament\Schemas\Components\Section::class)) {
+            class_alias(\Filament\Schemas\Components\Section::class, \Filament\Forms\Components\Section::class);
+        }
+
+        if (! class_exists(\Filament\Forms\Components\Grid::class) && class_exists(\Filament\Schemas\Components\Grid::class)) {
+            class_alias(\Filament\Schemas\Components\Grid::class, \Filament\Forms\Components\Grid::class);
+        }
+
+        if (! class_exists(\Filament\Forms\Get::class) && class_exists(\Filament\Schemas\Components\Utilities\Get::class)) {
+            class_alias(\Filament\Schemas\Components\Utilities\Get::class, \Filament\Forms\Get::class);
+        }
+
+        if (! class_exists(\Filament\Forms\Set::class) && class_exists(\Filament\Schemas\Components\Utilities\Set::class)) {
+            class_alias(\Filament\Schemas\Components\Utilities\Set::class, \Filament\Forms\Set::class);
+        }
+
         if (class_exists(\Filament\Forms\Components\FileUpload::class)) {
             \Filament\Forms\Components\FileUpload::configureUsing(
                 static function (\Filament\Forms\Components\FileUpload $component): void {
@@ -124,6 +140,10 @@ class AppServiceProvider extends ServiceProvider
         if (class_exists(\Filament\Tables\Columns\ImageColumn::class)) {
             \Filament\Tables\Columns\ImageColumn::configureUsing(
                 static function (\Filament\Tables\Columns\ImageColumn $column): void {
+                    if (! method_exists($column, 'formatStateUsing')) {
+                        return;
+                    }
+
                     $column->formatStateUsing(
                         static function ($state): ?string {
                             if (! is_string($state) || $state === '') {

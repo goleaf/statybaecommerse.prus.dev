@@ -30,6 +30,9 @@ use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
+use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -103,6 +106,39 @@ final class AttributeValueResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->required(),
+                        ]),
+                    Grid::make(2)
+                        ->schema([
+                            Select::make('valueable_type')
+                                ->label(__('attribute_values.valueable_type'))
+                                ->options([
+                                    'product' => __('attribute_values.types.product'),
+                                    'product_variant' => __('attribute_values.types.product_variant'),
+                                ])
+                                ->live()
+                                ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                    $set('valueable_id', null);
+                                }),
+                            Select::make('valueable_id')
+                                ->label(__('attribute_values.valueable_item'))
+                                ->options(function (\Filament\Forms\Get $get) {
+                                    $type = $get('valueable_type');
+                                    if ($type === 'product') {
+                                        return Product::pluck('name', 'id');
+                                    } elseif ($type === 'product_variant') {
+                                        return ProductVariant::pluck('name', 'id');
+                                    }
+
+                                    return [];
+                                })
+                                ->live()
+                                ->searchable(),
+                        ]),
+                ]),
+            Section::make(__('attribute_values.value_information'))
+                ->schema([
+                    Grid::make(2)
+                        ->schema([
                             TextInput::make('value')
                                 ->label(__('attribute_values.value'))
                                 ->maxLength(255)
@@ -129,7 +165,7 @@ final class AttributeValueResource extends Resource
                 ]),
             Section::make(__('attribute_values.settings'))
                 ->schema([
-                    Grid::make(2)
+                    Grid::make(3)
                         ->schema([
                             Toggle::make('is_active')
                                 ->label(__('attribute_values.is_active'))
@@ -139,7 +175,7 @@ final class AttributeValueResource extends Resource
                                 ->label(__('attribute_values.is_default'))
                                 ->helperText(__('attribute_values.is_default_help')),
                         ]),
-                    Grid::make(3)
+                    Grid::make(2)
                         ->schema([
                             TextInput::make('sort_order')
                                 ->label(__('attribute_values.sort_order'))
@@ -184,6 +220,27 @@ final class AttributeValueResource extends Resource
                     ->copyable()
                     ->copyMessage(__('attribute_values.attribute_copied'))
                     ->copyMessageDuration(1500),
+                BadgeColumn::make('valueable_type')
+                    ->label(__('attribute_values.type'))
+                    ->formatStateUsing(fn (string $state): string => __("attribute_values.types.{$state}"))
+                    ->colors([
+                        'success' => 'product',
+                        'warning' => 'product_variant',
+                    ])
+                    ->icons([
+                        'heroicon-o-cube' => 'product',
+                        'heroicon-o-squares-2x2' => 'product_variant',
+                    ]),
+                TextColumn::make('valueable.name')
+                    ->label(__('attribute_values.item'))
+                    ->limit(50)
+                    ->sortable()
+                    ->url(fn (AttributeValue $record): string => match ($record->valueable_type) {
+                        'product' => route('filament.admin.resources.products.view', $record->valueable_id),
+                        'product_variant' => route('filament.admin.resources.product-variants.view', $record->valueable_id),
+                        default => '#',
+                    })
+                    ->openUrlInNewTab(),
                 TextColumn::make('value')
                     ->label(__('attribute_values.value'))
                     ->limit(50)
