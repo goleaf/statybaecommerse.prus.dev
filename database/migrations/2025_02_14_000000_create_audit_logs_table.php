@@ -19,7 +19,6 @@ return new class extends Migration
             $table->json('diff')->nullable();
             $table->timestamps();
 
-            // Common lookups rely on model identification and action filtering.
             $table->index(['entity_type', 'entity_id']);
             $table->index('action');
             $table->index('created_at');
