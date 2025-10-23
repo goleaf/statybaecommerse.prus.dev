@@ -21,12 +21,57 @@ env:
   COMPOSER_FLAGS: --no-interaction --prefer-dist --no-progress
 
 jobs:
+  migration-freeze:
+    name: Migration Freeze Guard
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch base branch
+        if: github.event_name == 'pull_request'
+        run: git fetch origin "${GITHUB_BASE_REF}:${GITHUB_BASE_REF}"
+
+      - name: Ensure historical migrations remain immutable
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
+            base_ref="origin/${GITHUB_BASE_REF}"
+            diff_range="${base_ref}...HEAD"
+          else
+            if git rev-parse --verify HEAD^ >/dev/null 2>&1; then
+              diff_range="HEAD^...HEAD"
+            else
+              echo "No parent commit to compare against; skipping migration freeze check."
+              exit 0
+            fi
+          fi
+
+          changed_files="$(git diff --name-status ${diff_range} -- database/migrations || true)"
+
+          if [[ -z "${changed_files}" ]]; then
+            exit 0
+          fi
+
+          violations="$(echo "${changed_files}" | awk '$1 != "A" && $1 != "?" {print $0}')"
+
+          if [[ -n "${violations}" ]]; then
+            echo "Detected modifications to existing migration files:"
+            echo "${violations}"
+            echo "Add a new forward-only migration instead of editing history."
+            exit 1
+          fi
+
+          echo "Migration freeze check passed."
+
   php-lint-pint:
     name: PHP Lint & Pint
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php-version: ${{ fromJSON(github.event_name == 'pull_request' && startsWith(github.actor, 'renovate') ? '["8.2","8.3"]' : '["8.3"]') }}
+    needs: migration-freeze
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
