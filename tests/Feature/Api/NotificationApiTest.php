@@ -151,9 +151,16 @@ final class NotificationApiTest extends TestCase
         $user = User::factory()->create();
         Notification::factory()->count(2)->forUser($user)->create();
 
-        $originalLimit = config('security.rate_limiting.api.notifications');
-        config(['security.rate_limiting.api.notifications' => 1]);
-        RateLimiter::clear('user:'.$user->id.'|notifications');
+        $originalUserLimit = config('security.rate_limiting.api.notifications.read.per_user');
+        $originalIpLimit = config('security.rate_limiting.api.notifications.read.per_ip');
+
+        config([
+            'security.rate_limiting.api.notifications.read.per_user' => 1,
+            'security.rate_limiting.api.notifications.read.per_ip' => 100,
+        ]);
+
+        RateLimiter::clear('user:'.$user->id.'|api.notifications.read');
+        RateLimiter::clear('ip:127.0.0.1|api.notifications.read');
 
         Sanctum::actingAs($user, ['notifications.read']);
 
@@ -163,8 +170,13 @@ final class NotificationApiTest extends TestCase
         $secondResponse = $this->getJson(route('api.v1.notifications.index'));
         $secondResponse->assertStatus(429);
 
-        config(['security.rate_limiting.api.notifications' => $originalLimit]);
-        RateLimiter::clear('user:'.$user->id.'|notifications');
+        config([
+            'security.rate_limiting.api.notifications.read.per_user' => $originalUserLimit,
+            'security.rate_limiting.api.notifications.read.per_ip' => $originalIpLimit,
+        ]);
+
+        RateLimiter::clear('user:'.$user->id.'|api.notifications.read');
+        RateLimiter::clear('ip:127.0.0.1|api.notifications.read');
     }
 
     public function test_notification_search_requires_query_parameter(): void
