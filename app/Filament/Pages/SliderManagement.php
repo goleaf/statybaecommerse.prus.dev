@@ -6,7 +6,9 @@ namespace App\Filament\Pages;
 
 use App\Forms\Components\Flatpickr;
 use App\Models\Slider;
-use App\Support\Filament\Components\Flatpickr;
+use App\Support\Search\ContentLinkSearch;
+use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -24,6 +26,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
@@ -32,6 +35,7 @@ use Filament\Support\Enums\Width;
 use UnitEnum;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
+use UnitEnum;
 
 class SliderManagement extends Page implements HasActions, HasForms
 {
@@ -114,45 +118,36 @@ class SliderManagement extends Page implements HasActions, HasForms
                             TextInput::make('button_text')
                                 ->label(__('translations.button_text'))
                                 ->maxLength(255),
-                            SearchableInput::make('link_target')
-                                ->label(__('translations.link_target'))
-                                ->placeholder(__('translations.link_target_placeholder'))
-                                ->searchUsing(fn (string $search): array => ContentLinkSearch::suggestions($search))
-                                ->onItemSelected(function (SearchResult $item): void {
-                                    app()->call(function (Set $set) use ($item): void {
-                                        $url = $item->value();
-
-                                        if ($url !== '') {
-                                            $set('button_url', $url);
-                                        }
-                                    });
-                                })
+                            SearchableInput::make('button_url_lookup')
+                                ->label(__('translations.button_link_lookup'))
+                                ->placeholder(__('translations.button_link_lookup_placeholder'))
+                                ->searchUsing(fn (string $search): array => ContentLinkSearch::sliderLinks($search))
                                 ->dehydrated(false)
-                                ->helperText(__('translations.link_target_hint'))
-                                ->suffixIcon('heroicon-o-link'),
-                            TextInput::make('button_url')
-                                ->label(__('translations.button_url'))
-                                ->placeholder(__('translations.slider_link_placeholder'))
-                                ->maxLength(255)
-                                ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
-                                ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
-                                ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                                    // Hydrate via the shared helper so documented metadata rules stay consistent.
-                                    SearchableInputHelper::hydrate(
-                                        $component,
-                                        $state,
-                                        static fn (string $value): ?array => ['value' => $value, 'label' => $value],
-                                    );
-                                })
-                                ->afterStateUpdated(function (?string $state, callable $set): void {
-                                    if ($state !== null && $state !== '') {
+                                ->afterStateUpdated(function (?string $state, Set $set, Get $get): void {
+                                    if ($state === null || $state === '') {
                                         return;
                                     }
 
-                                    // Clearing ensures dependent URL payloads vanish per docs/forms/SEARCHABLE_INPUT_METADATA.md.
-                                    SearchableInputHelper::clear($set, ['button_url' => null]);
+                                    $resolved = ContentLinkSearch::resolve($state);
+
+                                    if ($resolved !== null) {
+                                        $set('button_url', $resolved['url']);
+
+                                        if (($get('button_text') ?? '') === '' && $resolved['title'] !== '') {
+                                            $set('button_text', $resolved['title']);
+                                        }
+
+                                        return;
+                                    }
+
+                                    $set('button_url', $state);
                                 }),
                         ]),
+                        TextInput::make('button_url')
+                            ->label(__('translations.button_url'))
+                            ->url()
+                            ->maxLength(255)
+                            ->columnSpanFull(),
                     ])
                     ->collapsible(),
                 Section::make(__('translations.media'))

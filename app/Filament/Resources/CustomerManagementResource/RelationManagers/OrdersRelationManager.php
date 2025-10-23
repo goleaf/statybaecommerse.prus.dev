@@ -7,8 +7,9 @@ namespace App\Filament\Resources\CustomerManagementResource\RelationManagers;
 use App\Forms\Components\Flatpickr;
 use App\Enums\OrderStatus;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
+use App\Models\Address;
 use App\Models\Order;
-use DefStudio\SearchableInput\DTO\SearchResult;
+use App\Support\Search\AddressSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\AssociateAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -19,6 +20,8 @@ use Filament\Actions\DissociateAction;
 use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -113,12 +116,96 @@ class OrdersRelationManager extends BaseRelationManager
                     ]),
                 Section::make(__('orders.shipping_information'))
                     ->schema([
-                        TextInput::make('shipping_address')
-                            ->label(__('orders.shipping_address'))
-                            ->maxLength(500),
-                        TextInput::make('billing_address')
-                            ->label(__('orders.billing_address'))
-                            ->maxLength(500),
+                        Grid::make(1)
+                            ->schema([
+                                SearchableInput::make('shipping_address_lookup')
+                                    ->label(__('orders.shipping_address_lookup'))
+                                    ->placeholder(__('orders.shipping_address_lookup_placeholder'))
+                                    ->searchUsing(fn (string $search): array => AddressSearch::addressResults($search))
+                                    ->dehydrated(false)
+                                    ->afterStateUpdated(function (?string $state, Set $set): void {
+                                        if ($state === null || $state === '') {
+                                            $set('shipping_address', []);
+
+                                            return;
+                                        }
+
+                                        $address = Address::query()
+                                            ->select([
+                                                'id',
+                                                'first_name',
+                                                'last_name',
+                                                'company',
+                                                'address_line_1',
+                                                'address_line_2',
+                                                'city',
+                                                'state',
+                                                'postal_code',
+                                                'country_code',
+                                                'phone',
+                                                'email',
+                                            ])
+                                            ->find((int) $state);
+
+                                        if (! $address instanceof Address) {
+                                            return;
+                                        }
+
+                                        $set('shipping_address', self::addressPayload($address));
+                                    }),
+                                KeyValue::make('shipping_address')
+                                    ->label(__('orders.shipping_address'))
+                                    ->columnSpan(1)
+                                    ->default([])
+                                    ->disableEditingKeys()
+                                    ->disableDeletingRows()
+                                    ->disableAddingRows(),
+                            ]),
+                        Grid::make(1)
+                            ->schema([
+                                SearchableInput::make('billing_address_lookup')
+                                    ->label(__('orders.billing_address_lookup'))
+                                    ->placeholder(__('orders.billing_address_lookup_placeholder'))
+                                    ->searchUsing(fn (string $search): array => AddressSearch::addressResults($search))
+                                    ->dehydrated(false)
+                                    ->afterStateUpdated(function (?string $state, Set $set): void {
+                                        if ($state === null || $state === '') {
+                                            $set('billing_address', []);
+
+                                            return;
+                                        }
+
+                                        $address = Address::query()
+                                            ->select([
+                                                'id',
+                                                'first_name',
+                                                'last_name',
+                                                'company',
+                                                'address_line_1',
+                                                'address_line_2',
+                                                'city',
+                                                'state',
+                                                'postal_code',
+                                                'country_code',
+                                                'phone',
+                                                'email',
+                                            ])
+                                            ->find((int) $state);
+
+                                        if (! $address instanceof Address) {
+                                            return;
+                                        }
+
+                                        $set('billing_address', self::addressPayload($address));
+                                    }),
+                                KeyValue::make('billing_address')
+                                    ->label(__('orders.billing_address'))
+                                    ->columnSpan(1)
+                                    ->default([])
+                                    ->disableEditingKeys()
+                                    ->disableDeletingRows()
+                                    ->disableAddingRows(),
+                            ]),
                         TextInput::make('tracking_number')
                             ->label(__('orders.tracking_number'))
                             ->maxLength(255),
@@ -369,5 +456,34 @@ class OrdersRelationManager extends BaseRelationManager
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function addressPayload(Address $address): array
+    {
+        $payload = [
+            'id'             => (string) $address->getKey(),
+            'first_name'     => (string) ($address->getAttribute('first_name') ?? ''),
+            'last_name'      => (string) ($address->getAttribute('last_name') ?? ''),
+            'company'        => (string) ($address->getAttribute('company') ?? ''),
+            'address_line_1' => (string) ($address->getAttribute('address_line_1') ?? ''),
+            'address_line_2' => (string) ($address->getAttribute('address_line_2') ?? ''),
+            'city'           => (string) ($address->getAttribute('city') ?? ''),
+            'state'          => (string) ($address->getAttribute('state') ?? ''),
+            'postal_code'    => (string) ($address->getAttribute('postal_code') ?? ''),
+            'country_code'   => (string) ($address->getAttribute('country_code') ?? ''),
+            'phone'          => (string) ($address->getAttribute('phone') ?? ''),
+            'email'          => (string) ($address->getAttribute('email') ?? ''),
+        ];
+
+        foreach ($payload as $key => $value) {
+            if (trim($value) === '') {
+                unset($payload[$key]);
+            }
+        }
+
+        return $payload;
     }
 }

@@ -85,7 +85,7 @@ final class AddressSearch
     /**
      * @return array<int, SearchResult>
      */
-    public static function results(string $term, int $limit = 15): array
+    public static function addressResults(string $term, int $limit = 15): array
     {
         /** @var \Illuminate\Database\Eloquent\Collection<int, Address> $addresses */
         $addresses = self::addressQuery($term)
@@ -93,34 +93,19 @@ final class AddressSearch
             ->get();
 
         return $addresses
-            ->map(static function (Address $address): SearchResult {
+            ->map(function (Address $address): SearchResult {
+                $label = self::formatAddress($address);
                 /** @var int|string|null $identifier */
                 $identifier = $address->getKey();
-                $label = self::formatAddress($address);
-
                 $result = SearchResult::make((string) ($identifier ?? ''), $label);
 
-                // Merge the flattened address fields into the payload alongside the identifier.
-                return SearchResultPayload::normalise($result, array_merge([
-                    'address_id' => $address->getKey(),
-                ], self::payload($address)));
+                $result
+                    ->withData('address', self::addressPayload($address))
+                    ->withData('address_id', $address->getKey());
+
+                return $result;
             })
             ->all();
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    public static function payload(Address $address): array
-    {
-        return [
-            'address_line_1' => self::stringValue($address->getAttribute('address_line_1')),
-            'address_line_2' => self::stringValue($address->getAttribute('address_line_2')),
-            'city'           => self::stringValue($address->getAttribute('city')),
-            'state'          => self::stringValue($address->getAttribute('state')),
-            'postal_code'    => self::stringValue($address->getAttribute('postal_code')),
-            'country_code'   => self::stringValue($address->getAttribute('country_code')),
-        ];
     }
 
     /**
@@ -188,8 +173,29 @@ final class AddressSearch
         return implode(', ', $parts);
     }
 
-    private static function stringValue(mixed $value): string
+    /**
+     * @return array<string, string>
+     */
+    private static function addressPayload(Address $address): array
     {
-        return is_string($value) ? $value : '';
+        $payload = [
+            'name' => trim(implode(' ', array_filter([
+                $address->getAttribute('first_name'),
+                $address->getAttribute('last_name'),
+            ]))),
+            'company'        => (string) ($address->getAttribute('company') ?? ''),
+            'address_line_1' => (string) ($address->getAttribute('address_line_1') ?? ''),
+            'address_line_2' => (string) ($address->getAttribute('address_line_2') ?? ''),
+            'city'           => (string) ($address->getAttribute('city') ?? ''),
+            'state'          => (string) ($address->getAttribute('state') ?? ''),
+            'postal_code'    => (string) ($address->getAttribute('postal_code') ?? ''),
+            'country_code'   => (string) ($address->getAttribute('country_code') ?? ''),
+            'phone'          => (string) ($address->getAttribute('phone') ?? ''),
+            'email'          => (string) ($address->getAttribute('email') ?? ''),
+        ];
+
+        return collect($payload)
+            ->filter(fn (string $value): bool => trim($value) !== '')
+            ->all();
     }
 }

@@ -6,7 +6,8 @@ namespace App\Filament\Resources;
 
 use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\VariantInventoryResource\Pages;
-use App\Models\Partner;
+use App\Models\Location;
+use App\Models\ProductVariant;
 use App\Models\VariantInventory;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\SearchableInputHelper;
@@ -93,18 +94,54 @@ final class VariantInventoryResource extends Resource
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                                Select::make('variant_id')
+                                SearchableInput::make('variant_id')
                                     ->label(__('admin.variant_inventory.variant'))
-                                    ->relationship('variant', 'name')
-                                    ->required()
-                                    ->searchable()
-                                    ->preload(),
-                                Select::make('location_id')
+                                    ->placeholder(__('admin.variant_inventory.placeholders.variant'))
+                                    ->searchUsing(fn (string $search): array => self::searchVariants($search))
+                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
+                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?VariantInventory $record): void {
+                                        if ($state === null || ! $record?->variant) {
+                                            return;
+                                        }
+
+                                        $component
+                                            ->state((string) $state)
+                                            ->options([
+                                                (string) $record->variant_id => self::formatVariantLabel($record->variant),
+                                            ]);
+                                    })
+                                    ->afterStateUpdated(function (?string $state, Set $set): void {
+                                        if ($state === null || $state === '') {
+                                            return;
+                                        }
+
+                                        $set('variant_id', (int) $state);
+                                    })
+                                    ->required(),
+                                SearchableInput::make('location_id')
                                     ->label(__('admin.variant_inventory.location'))
-                                    ->relationship('location', 'name')
-                                    ->required()
-                                    ->searchable()
-                                    ->preload(),
+                                    ->placeholder(__('admin.variant_inventory.placeholders.location'))
+                                    ->searchUsing(fn (string $search): array => self::searchLocations($search))
+                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
+                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?VariantInventory $record): void {
+                                        if ($state === null || ! $record?->location) {
+                                            return;
+                                        }
+
+                                        $component
+                                            ->state((string) $state)
+                                            ->options([
+                                                (string) $record->location_id => self::formatLocationLabel($record->location),
+                                            ]);
+                                    })
+                                    ->afterStateUpdated(function (?string $state, Set $set): void {
+                                        if ($state === null || $state === '') {
+                                            return;
+                                        }
+
+                                        $set('location_id', (int) $state);
+                                    })
+                                    ->required(),
                             ]),
                         Grid::make(2)
                             ->schema([
@@ -292,72 +329,87 @@ final class VariantInventoryResource extends Resource
     }
 
     /**
-     * Normalise the ProductVariant lookup payload into a consistent metadata shape.
-     *
-     * @return array<string, mixed>
+     * @return array<int, SearchResult>
      */
-    private static function normaliseVariantPayload(ProductVariant $variant): array
+    private static function searchVariants(string $term, int $limit = 15): array
     {
-        $product = $variant->getRelationValue('product');
+        /** @var Collection<int, ProductVariant> $variants */
+        $variants = ProductVariant::query()
+            ->select(['id', 'name', 'sku', 'product_id'])
+            ->with(['product:id,name,sku'])
+            ->when($term !== '', static function (Builder $builder) use ($term): void {
+                $builder->where(static function (Builder $query) use ($term): void {
+                    $query
+                        ->where('sku', 'like', "%{$term}%")
+                        ->orWhere('name', 'like', "%{$term}%")
+                        ->orWhereHas('product', static function (Builder $productQuery) use ($term): void {
+                            $productQuery
+                                ->where('name', 'like', "%{$term}%")
+                                ->orWhere('sku', 'like', "%{$term}%");
+                        });
+                });
+            })
+            ->orderBy('name')
+            ->limit($limit)
+            ->get();
 
-        /** @var string|null $rawSku */
-        $rawSku = $variant->getAttribute('sku');
-        /** @var string|null $rawName */
-        $rawName = $variant->getAttribute('name');
-        /** @var float|int|string|null $rawPrice */
-        $rawPrice = $variant->getAttribute('price');
+        return $variants
+            ->map(static function (ProductVariant $variant): SearchResult {
+                return SearchResult::make((string) $variant->getKey(), self::formatVariantLabel($variant));
+            })
+            ->all();
+    }
 
-        $productSku = '';
-        $productName = '';
+    private static function formatVariantLabel(ProductVariant $variant): string
+    {
+        $sku = $variant->getAttribute('sku');
+        $variantName = $variant->getAttribute('name');
+        $productName = $variant->product?->getAttribute('name');
 
-        if ($product instanceof Product) {
-            // Guard against misconfigured relations; fall back to string casts when the product is missing.
-            $productSku = (string) ($product->getAttribute('sku') ?? '');
-            $productName = (string) ($product->getAttribute('name') ?? '');
-        } elseif ($product !== null && method_exists($product, 'getAttribute')) {
-            /** @var mixed $resolvedProductSku */
-            $resolvedProductSku = $product->getAttribute('sku');
-            /** @var mixed $resolvedProductName */
-            $resolvedProductName = $product->getAttribute('name');
+        $parts = [
+            sprintf('[%s]', $sku !== null && $sku !== '' ? $sku : '—'),
+            (string) ($variantName ?? ''),
+        ];
 
-            $productSku = is_string($resolvedProductSku) ? $resolvedProductSku : (string) ($resolvedProductSku ?? '');
-            $productName = is_string($resolvedProductName) ? $resolvedProductName : (string) ($resolvedProductName ?? '');
+        if ($productName) {
+            $parts[] = sprintf('• %s', $productName);
         }
 
-        return [
-            'variant_id'   => $variant->getKey(),
-            'sku'          => is_string($rawSku) ? $rawSku : (string) ($rawSku ?? ''),
-            'name'         => is_string($rawName) ? $rawName : (string) ($rawName ?? ''),
-            'price'        => is_numeric($rawPrice) ? (float) $rawPrice : 0.0,
-            'product_id'   => $variant->getAttribute('product_id'),
-            'product_sku'  => $productSku,
-            'product_name' => $productName,
-        ];
+        return trim(implode(' ', array_filter($parts)));
     }
 
     /**
-     * Normalise the Location lookup payload into the metadata array consumed by dependent inputs.
-     *
-     * @return array<string, mixed>
+     * @return array<int, SearchResult>
      */
-    private static function normaliseLocationPayload(Location $location): array
+    private static function searchLocations(string $term, int $limit = 15): array
     {
-        /** @var string|null $rawName */
-        $rawName = $location->getAttribute('name');
-        /** @var string|null $rawCode */
-        $rawCode = $location->getAttribute('code');
-        /** @var string|null $rawCity */
-        $rawCity = $location->getAttribute('city');
-        /** @var string|null $rawCountry */
-        $rawCountry = $location->getAttribute('country_code');
+        /** @var Collection<int, Location> $locations */
+        $locations = Location::query()
+            ->select(['id', 'name', 'code'])
+            ->when($term !== '', static function (Builder $builder) use ($term): void {
+                $builder->where(static function (Builder $query) use ($term): void {
+                    $query
+                        ->where('name', 'like', "%{$term}%")
+                        ->orWhere('code', 'like', "%{$term}%");
+                });
+            })
+            ->orderBy('name')
+            ->limit($limit)
+            ->get();
 
-        return [
-            'location_id'  => $location->getKey(),
-            'name'         => is_string($rawName) ? $rawName : (string) ($rawName ?? ''),
-            'code'         => is_string($rawCode) ? $rawCode : (string) ($rawCode ?? ''),
-            'city'         => is_string($rawCity) ? $rawCity : (string) ($rawCity ?? ''),
-            'country_code' => is_string($rawCountry) ? $rawCountry : (string) ($rawCountry ?? ''),
-        ];
+        return $locations
+            ->map(static function (Location $location): SearchResult {
+                return SearchResult::make((string) $location->getKey(), self::formatLocationLabel($location));
+            })
+            ->all();
+    }
+
+    private static function formatLocationLabel(Location $location): string
+    {
+        $code = $location->getAttribute('code');
+        $name = $location->getAttribute('name');
+
+        return trim(sprintf('[%s] %s', $code !== null && $code !== '' ? $code : '—', (string) ($name ?? '')));
     }
 
     public static function table(Table $table): Table

@@ -10,7 +10,6 @@ use App\Filament\Resources\SliderResource\Pages;
 use App\Models\Slider;
 use App\Support\Search\ContentLinkSearch;
 use BackedEnum;
-use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
@@ -20,6 +19,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup as TableBulkActionGroup;
@@ -97,22 +97,31 @@ final class SliderResource extends Resource
                         ->rows(3)
                         ->maxLength(500)
                         ->columnSpanFull(),
-                    SearchableInput::make('link_target')
-                        ->label(__('sliders.link_target'))
-                        ->placeholder(__('sliders.link_target_placeholder'))
-                        ->searchUsing(fn (string $search): array => ContentLinkSearch::suggestions($search))
-                        ->onItemSelected(function (SearchResult $item): void {
-                            app()->call(function (Set $set) use ($item): void {
-                                $url = $item->value();
-
-                                if ($url !== '') {
-                                    $set('button_url', $url);
-                                }
-                            });
-                        })
+                    SearchableInput::make('button_url_lookup')
+                        ->label(__('sliders.button_link_lookup'))
+                        ->placeholder(__('sliders.button_link_lookup_placeholder'))
+                        ->searchUsing(fn (string $search): array => ContentLinkSearch::sliderLinks($search))
                         ->dehydrated(false)
-                        ->helperText(__('sliders.link_target_hint'))
-                        ->suffixIcon('heroicon-o-link'),
+                        ->afterStateUpdated(function (?string $state, Set $set, Get $get): void {
+                            if ($state === null || $state === '') {
+                                return;
+                            }
+
+                            $resolved = ContentLinkSearch::resolve($state);
+
+                            if ($resolved !== null) {
+                                $set('button_url', $resolved['url']);
+
+                                if (($get('button_text') ?? '') === '' && $resolved['title'] !== '') {
+                                    $set('button_text', $resolved['title']);
+                                }
+
+                                return;
+                            }
+
+                            $set('button_url', $state);
+                        })
+                        ->columnSpanFull(),
                     TextInput::make('button_url')
                         ->label(__('sliders.button_url'))
                         ->placeholder(__('sliders.link_search.placeholder'))

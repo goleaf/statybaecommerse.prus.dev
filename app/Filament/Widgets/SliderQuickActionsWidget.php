@@ -6,7 +6,6 @@ namespace App\Filament\Widgets;
 
 use App\Models\Slider;
 use App\Support\Search\ContentLinkSearch;
-use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Exception;
 use Filament\Actions\Action;
@@ -18,6 +17,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Widgets\Widget;
@@ -48,22 +48,30 @@ final class SliderQuickActionsWidget extends Widget implements HasActions, HasFo
                 TextInput::make('button_text')
                     ->label(__('translations.button_text'))
                     ->maxLength(255),
-                SearchableInput::make('link_target')
-                    ->label(__('translations.link_target'))
-                    ->placeholder(__('translations.link_target_placeholder'))
-                    ->searchUsing(fn (string $search): array => ContentLinkSearch::suggestions($search))
-                    ->onItemSelected(function (SearchResult $item): void {
-                        app()->call(function (Set $set) use ($item): void {
-                            $url = $item->value();
-
-                            if ($url !== '') {
-                                $set('button_url', $url);
-                            }
-                        });
-                    })
+                SearchableInput::make('button_url_lookup')
+                    ->label(__('translations.button_link_lookup'))
+                    ->placeholder(__('translations.button_link_lookup_placeholder'))
+                    ->searchUsing(fn (string $search): array => ContentLinkSearch::sliderLinks($search))
                     ->dehydrated(false)
-                    ->helperText(__('translations.link_target_hint'))
-                    ->suffixIcon('heroicon-o-link'),
+                    ->afterStateUpdated(function (?string $state, Set $set, Get $get): void {
+                        if ($state === null || $state === '') {
+                            return;
+                        }
+
+                        $resolved = ContentLinkSearch::resolve($state);
+
+                        if ($resolved !== null) {
+                            $set('button_url', $resolved['url']);
+
+                            if (($get('button_text') ?? '') === '' && $resolved['title'] !== '') {
+                                $set('button_text', $resolved['title']);
+                            }
+
+                            return;
+                        }
+
+                        $set('button_url', $state);
+                    }),
                 TextInput::make('button_url')
                     ->label(__('translations.button_url'))
                     ->placeholder(__('translations.slider_link_placeholder'))
