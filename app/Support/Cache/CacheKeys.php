@@ -160,6 +160,14 @@ final class CacheKeys
         return sprintf('navigation:categories:%d:%s', $limit, $locale);
     }
 
+    /**
+     * Cache key for locale-specific featured brand navigation payloads.
+     */
+    public static function navigationFeaturedBrands(string $locale): string
+    {
+        return sprintf('navigation:featured-brands:%s', $locale);
+    }
+
     public static function menuCollectionKey(?string $location, string $locale): string
     {
         return sprintf('menu:collection:%s:%s', $location ?? 'all', $locale);

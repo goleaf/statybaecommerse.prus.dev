@@ -19,6 +19,7 @@ use App\Models\SystemSetting;
 use App\Observers\UserAttributionObserver;
 use App\Services\CacheInvalidationService;
 use App\Services\DocumentService;
+use App\Services\CacheInvalidationService;
 use App\Support\Health\HealthReporter;
 use App\Support\Html\HtmlSanitizer;
 use App\Support\Storage\SecureStorage;
@@ -261,11 +262,13 @@ class AppServiceProvider extends ServiceProvider
         // Legacy Shopper components removed - using native Filament resources
 
         Model::saved(function ($model): void {
+            // Flush cache entries for supported aggregates whenever their models change.
             app(CacheInvalidationService::class)->flushForModel($model);
             $this->flushSitemapIfCatalog($model);
             $this->flushDiscountsIfNeeded($model);
         });
         Model::deleted(function ($model): void {
+            // Ensure deletions purge dependent caches as well.
             app(CacheInvalidationService::class)->flushForModel($model);
             $this->flushSitemapIfCatalog($model);
             $this->flushDiscountsIfNeeded($model);

@@ -7,6 +7,8 @@ namespace App\View\Creators;
 use App\Models\Brand;
 use App\Repositories\CategoryRepository;
 use App\Repositories\MenuRepository;
+use App\Services\Shared\CacheService as SharedCacheService;
+use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTagHelper;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Cache;
@@ -22,6 +24,7 @@ final class NavigationCreator
     public function __construct(
         private readonly CategoryRepository $categoryRepository,
         private readonly MenuRepository $menuRepository,
+        private readonly SharedCacheService $cacheService,
     ) {}
 
     /**
@@ -84,25 +87,28 @@ final class NavigationCreator
      */
     private function getFeaturedBrands()
     {
-        $cacheKey = 'navigation.featured_brands.' . app()->getLocale();
-        $ttl = now()->addMinutes(30);
-        $callback = fn () => Brand::query()
-            ->with(['translations' => function ($q) {
-                $q->where('locale', app()->getLocale());
-            }])
-            ->where('is_enabled', true)
-            ->where('is_featured', true)
-            ->orderBy('sort_order')
-            ->limit(6)
-            ->cursor()
-            ->takeUntilTimeout(now()->addSeconds(5))
-            ->collect();
+        $locale = app()->getLocale();
 
-        if (Cache::supportsTags()) {
-            return Cache::tags(CacheTagHelper::brands())->remember($cacheKey, $ttl, $callback);
-        }
-
-        return Cache::remember($cacheKey, $ttl, $callback);
+        // Cache featured brands with locale-aware tags so the invalidation service
+        // can flush navigation payloads whenever catalogue content changes.
+        return $this->cacheService->rememberDefault(
+            CacheKeys::navigationFeaturedBrands($locale),
+            function () use ($locale) {
+                return Brand::query()
+                    ->with(['translations' => static function ($query) use ($locale): void {
+                        $query->where('locale', $locale);
+                    }])
+                    ->where('is_enabled', true)
+                    ->where('is_featured', true)
+                    ->orderBy('sort_order')
+                    ->limit(6)
+                    ->cursor()
+                    ->takeUntilTimeout(now()->addSeconds(5))
+                    ->collect();
+            },
+            1800,
+            CacheTagHelper::merge(CacheTagHelper::brands(), CacheTagHelper::locale($locale))
+        );
     }
 
     /**
