@@ -1,52 +1,62 @@
-# Matrix Choice Field Usage
+# Matrix choice permission grids
 
-This project integrates the [lara-zeus/matrix-choice](https://github.com/lara-zeus/matrix-choice) Filament component to capture grid-style selections. The component renders an accessible table of radio buttons or checkboxes and stores its state as JSON on the model. Tailwind is configured to scan the package views so that the bundled styling ships with the admin panel build.
+The Filament admin uses a centralised permission matrix to hide or show navigation entries, CRUD actions, and panel access across resources. Each cell in the matrix maps a resource-specific ability (column) to a concrete Spatie permission string, and the resources, seeders, and enums all rely on that structure staying consistent.【F:config/authorization.php†L11-L49】【F:app/Support/Authorization/AuthorizationMatrix.php†L19-L118】
 
-## Where matrices are used
+## Matrix-enabled resources
 
-| Resource | Field | Rows | Columns | Mode |
-| --- | --- | --- | --- | --- |
-| **Users** (`App\Filament\Resources\UserResource`) | `permissions_matrix` | Core modules (Products, Categories, Brands, Orders, Users) | Actions (List, View, Create, Update, Delete) | Checkbox |
-| **Shipping options** (`App\Filament\Resources\ShippingOptionResource`) | `shipping_matrix` | Fulfilment zones (LT, LV, EE, PL, EU) | Service types (Courier, Pickup, Locker, Express, Free over threshold) | Checkbox |
-| **Channels** (`App\Filament\Resources\ChannelResource`) | `payment_matrix` | Customer regions (LT, LV, EE, PL, EU) | Sales touchpoints (Web, POS, Marketplace) | Checkbox |
-| **Products** (`App\Filament\Resources\ProductResource`) | `variant_attribute_matrix` | Variant attributes (Size, Color, Material) | SKU groupings (Primary, Bundle, Limited) | Checkbox |
+| Resource or surface | Why it reads the matrix |
+| --- | --- |
+| Admin panel entry (Filament guard) | `AdminUser::canAccessPanel()` checks the `panel.access` cell before letting a user into Filament at all.【F:app/Models/AdminUser.php†L32-L59】 |
+| ProductResource | Every CRUD gate (`shouldRegisterNavigation`, `canCreate`, etc.) delegates to `AuthorizationMatrix::check('products', …)` so catalogue management follows the matrix.【F:app/Filament/Resources/ProductResource.php†L76-L113】 |
+| CategoryResource | Uses the same matrix-driven checks to guard taxonomy CRUD and navigation registration.【F:app/Filament/Resources/CategoryResource.php†L54-L92】 |
+| BrandResource | Locks list, create, edit, delete, and navigation visibility behind the `brands` row of the matrix.【F:app/Filament/Resources/BrandResource.php†L48-L91】 |
+| OrderResource | Wraps order browsing and mutation in the `orders` row, ensuring support teams get only the actions their role grants.【F:app/Filament/Resources/OrderResource.php†L84-L121】 |
+| UserResource | Defers to the `users` row to decide which operators can manage customers and fellow admins.【F:app/Filament/Resources/UserResource.php†L57-L95】 |
 
-Each matrix is constructed through `App\Support\Forms\MatrixFactory`, which exposes helpers for checkbox and radio grids. Should you need a bespoke grid, call `MatrixFactory::checkboxGrid()` or `::radioGrid()` with your row/column labels and optional custom label text.
+Downstream policies (for example `ProductPolicy`) mirror the same checks so API or background access aligns with the UI, keeping the matrix authoritative across the stack.【F:app/Policies/ProductPolicy.php†L14-L54】
 
-## Data shape
+## Row & column semantics
 
-All matrix columns are persisted as JSON columns and cast to `array` on their models:
+Rows in `config/authorization.php` represent Filament-facing domains (`panel`, `products`, `categories`, `brands`, `orders`, `users`). Columns inside each row enumerate the CRUD-style abilities that a resource exposes, and the value of each cell is the canonical permission string saved to the database (`products.create`, `orders.update`, etc.).【F:config/authorization.php†L11-L49】 The `AuthorizationMatrix::ability()` helper simply looks up those row/column pairs and throws if a resource/ability combination is missing, which prevents typos from leaking into production.【F:app/Support/Authorization/AuthorizationMatrix.php†L19-L47】
 
-```php
-// Example structure for permissions_matrix
+Guards listed under the same config key (`admin`, `web`) control which authentication guards receive seeded permissions, allowing both the Filament guard and the storefront/user guard to share the matrix definitions when necessary.【F:config/authorization.php†L6-L9】【F:app/Support/Authorization/AuthorizationMatrix.php†L163-L172】
+
+## Stored shape & transport
+
+`AuthorizationMatrix::roles()` normalises the config into arrays shaped like:
+
+```json
 [
-    "products" => ["viewAny", "view", "update"],
-    "orders" => ["viewAny", "update"],
-    // ...
-]
-
-// Example structure for shipping_matrix
-[
-    "lt" => ["courier", "pickup", "locker"],
-    "eu" => ["courier", "express"],
+  {
+    "role": "admin",
+    "permissions": [
+      "panel.access.admin",
+      "products.viewAny",
+      "products.view",
+      "products.create",
+      "products.update",
+      "products.delete",
+      "…"
+    ]
+  }
 ]
 ```
 
-For radio-mode matrices the stored value per row is a single string instead of an array.
+The actual helper returns `AuthorizationRole` enums for the `role` key, but anything serialising the structure (seeders, tests, API transformers) receives plain arrays that mirror the JSON above. That keeps downstream consumers deterministic and lets test fixtures assert against a stable contract.【F:app/Support/Authorization/AuthorizationMatrix.php†L96-L155】 Unit coverage in `AuthorizationMatrixTest` exercises that shape for admin/support roles and confirms both guards are exposed.【F:tests/Unit/AuthorizationMatrixTest.php†L13-L35】
 
-## Extending the grids
+## Extending the matrix
 
-* Update the translation files (`lang/en/*.php`, `lang/lt/*.php`) to add new row or column labels so the UI remains multilingual.
-* Adjust the arrays passed to `MatrixFactory` inside the resource form definition to add or remove rows/columns.
-* When persisting additional behaviour (for example syncing Spatie permissions), iterate the decoded array and map row/column pairs to your downstream data.
+1. **Add the resource row or new ability** – extend the `abilities` array in `config/authorization.php`, keeping the permission string naming convention (`resource.ability`).【F:config/authorization.php†L11-L49】
+2. **Grant it to roles** – update the appropriate entries under `roles` in the same config so the matrix keeps role definitions in sync.【F:config/authorization.php†L52-L98】
+3. **Expose the enum** – if you introduce a brand-new role, add it to `App\Enums\AuthorizationRole` so helper methods and seeders stay type-safe.【F:app/Enums/AuthorizationRole.php†L7-L33】
+4. **Refresh coverage** – extend `AuthorizationMatrixTest` (or add a new assertion) so CI verifies the new permissions remain discoverable.【F:tests/Unit/AuthorizationMatrixTest.php†L13-L35】
 
-## Styling & build pipeline
+After editing the config or enum, rerun whichever seeder provisions your environment (see below) so the Spatie permission tables pick up the new mappings.
 
-* Tailwind scans `./vendor/lara-zeus/matrix-choice/resources/views/**/*.blade.php` to compile the plugin styles.
-* Any additional matrices should reuse the existing Filament theme build (`npm run build`) to refresh compiled assets.
+## Pivot sync & seeding responsibilities
 
-## Testing hints
+- `AdminAuthorizationSeeder` is the canonical sync—looping every configured guard, creating each permission string, and calling `syncPermissions()` for each role so the pivot tables match the matrix exactly.【F:database/seeders/AdminAuthorizationSeeder.php†L15-L56】
+- `EnhancedFilamentSeeder` seeds an initial admin user and ensures the admin role pulls the full permission set before layering extra bespoke permissions needed for demo data.【F:database/seeders/EnhancedFilamentSeeder.php†L30-L75】
+- `LithuanianBuilderShopSeeder` mirrors the pattern for the storefront demo, preloading admin/manager roles with matrix-driven permissions and then handing out supplemental abilities like `view_reports`.【F:database/seeders/LithuanianBuilderShopSeeder.php†L52-L105】
 
-* The unit test suite includes `MatrixFieldCastTest` verifying that models cast the JSON columns to arrays.
-* When adding new matrices, extend that test or create a dedicated feature test to cover round-tripping the form data.
-
+Whenever you adjust the matrix, rerun the relevant seeder (or `php artisan db:seed --class=AdminAuthorizationSeeder`) so Spatie’s pivot tables reflect the new state before QA or production smoke tests.
