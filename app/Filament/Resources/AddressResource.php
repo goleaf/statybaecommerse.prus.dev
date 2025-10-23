@@ -99,13 +99,12 @@ final class AddressResource extends Resource
     }
 
     /**
-     * Configure the Filament form schema using the Schema abstraction introduced in Filament v4.
-     * The method keeps the same layout definition while matching the new parent signature.
+     * Configure the Filament schema container so the resource stays compatible with v4 expectations.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        // Returning the provided Form instance satisfies Filament v4 expectations and avoids signature fatals.
-        return $form->schema([
+        // Use the Schema instance to register all form components in one place for consistent hydration.
+        return $schema->schema([
             Section::make(__('translations.address_information'))
                 ->schema([
                     Grid::make(2)->schema([
@@ -331,11 +330,11 @@ final class AddressResource extends Resource
     }
 
     /**
-     * Configure the Filament table definition while aligning with the v4 return type.
+     * Configure the Filament table definition so it matches the stricter return type enforced in v4.
      */
     public static function table(Table $table): Table
     {
-        // Returning the incoming Table ensures compatibility with Filament's table builder lifecycle.
+        // Return the configured Table instance to align with the core Resource contract.
         return $table
             ->columns([
                 TextColumn::make('id')
