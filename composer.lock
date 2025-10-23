@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "645621750b8bada8e92011313d2049b6",
+    "content-hash": "97ede432e37e674e13344c539b7d78a7",
     "packages": [
         {
             "name": "andreia/filament-nord-theme",
@@ -14633,50 +14633,41 @@
             "time": "2025-09-11T10:12:26+00:00"
         },
         {
-            "name": "tapp/filament-value-range-filter",
-            "version": "v2.0.3",
+            "name": "symfony/yaml",
+            "version": "v7.3.3",
             "source": {
                 "type": "git",
-                "url": "https://github.com/TappNetwork/filament-value-range-filter.git",
-                "reference": "381a335b3701df6945d9394fecc346b073eddabc"
+                "url": "https://github.com/symfony/yaml.git",
+                "reference": "d4f4a66866fe2451f61296924767280ab5732d9d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TappNetwork/filament-value-range-filter/zipball/381a335b3701df6945d9394fecc346b073eddabc",
-                "reference": "381a335b3701df6945d9394fecc346b073eddabc",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/d4f4a66866fe2451f61296924767280ab5732d9d",
+                "reference": "d4f4a66866fe2451f61296924767280ab5732d9d",
                 "shasum": ""
             },
             "require": {
-                "filament/filament": "^4.0",
-                "php": "^8.2"
+                "php": ">=8.2",
+                "symfony/deprecation-contracts": "^2.5|^3.0",
+                "symfony/polyfill-ctype": "^1.8"
+            },
+            "conflict": {
+                "symfony/console": "<6.4"
             },
             "require-dev": {
-                "larastan/larastan": "^2.9|^3.0",
-                "laravel/pint": "^1.14",
-                "nunomaduro/collision": "^8.1.1||^7.10.0",
-                "orchestra/testbench": "^8.20|^9.0|^10.0",
-                "pestphp/pest": "^2.0|^3.0",
-                "pestphp/pest-plugin-arch": "^2.0|^3.0",
-                "pestphp/pest-plugin-laravel": "^2.0|^3.0",
-                "phpstan/extension-installer": "^1.3",
-                "phpstan/phpstan-deprecation-rules": "^1.1|^2.0",
-                "phpstan/phpstan-phpunit": "^1.3|^2.0"
+                "symfony/console": "^6.4|^7.0"
             },
+            "bin": [
+                "Resources/bin/yaml-lint"
+            ],
             "type": "library",
-            "extra": {
-                "laravel": {
-                    "aliases": {
-                        "FilamentValueRangeFilter": "Tapp\\FilamentValueRangeFilter\\Facades\\FilamentValueRangeFilter"
-                    },
-                    "providers": [
-                        "Tapp\\FilamentValueRangeFilter\\FilamentValueRangeFilterServiceProvider"
-                    ]
-                }
-            },
             "autoload": {
                 "psr-4": {
-                    "Tapp\\FilamentValueRangeFilter\\": "src"
-                }
+                    "Symfony\\Component\\Yaml\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -14684,36 +14675,38 @@
             ],
             "authors": [
                 {
-                    "name": "Tapp Network",
-                    "email": "steve@tappnetwork.com",
-                    "role": "Developer"
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
                 },
                 {
-                    "name": "Tapp Network",
-                    "email": "andreia.bohner@tappnetwork.com",
-                    "role": "Developer"
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
                 }
             ],
-            "description": "Filament country code field.",
-            "homepage": "https://github.com/TappNetwork/filament-value-range-filter",
-            "keywords": [
-                "filament",
-                "filter",
-                "laravel",
-                "tapp network",
-                "value range"
-            ],
+            "description": "Loads and dumps YAML files",
+            "homepage": "https://symfony.com",
             "support": {
-                "issues": "https://github.com/TappNetwork/filament-value-range-filter/issues",
-                "source": "https://github.com/TappNetwork/filament-value-range-filter"
+                "source": "https://github.com/symfony/yaml/tree/v7.3.3"
             },
             "funding": [
                 {
-                    "url": "https://github.com/TappNetwork",
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
                     "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
                 }
             ],
-            "time": "2025-09-04T16:07:15+00:00"
+            "time": "2025-08-27T11:34:33+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",
@@ -15053,77 +15046,88 @@
                 "issues": "https://github.com/webmozarts/assert/issues",
                 "source": "https://github.com/webmozarts/assert/tree/1.12.0"
             },
-            "time": "2025-10-20T12:43:39+00:00"
+            "time": "2022-06-03T18:03:27+00:00"
         },
         {
-            "name": "zvizvi/relation-manager-repeater",
-            "version": "2.0.0",
+            "name": "zircote/swagger-php",
+            "version": "4.11.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/zvizvi/filament-relation-manager-repeater.git",
-                "reference": "b31ae4f26c00c3adff7f4e88fa5fb3bacf953642"
+                "url": "https://github.com/zircote/swagger-php.git",
+                "reference": "7df10e8ec47db07c031db317a25bef962b4e5de1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zvizvi/filament-relation-manager-repeater/zipball/b31ae4f26c00c3adff7f4e88fa5fb3bacf953642",
-                "reference": "b31ae4f26c00c3adff7f4e88fa5fb3bacf953642",
+                "url": "https://api.github.com/repos/zircote/swagger-php/zipball/7df10e8ec47db07c031db317a25bef962b4e5de1",
+                "reference": "7df10e8ec47db07c031db317a25bef962b4e5de1",
                 "shasum": ""
             },
             "require": {
-                "filament/filament": "^4.0",
-                "php": "^8.1",
-                "spatie/laravel-package-tools": "^1.15.0"
+                "ext-json": "*",
+                "php": ">=7.2",
+                "psr/log": "^1.1 || ^2.0 || ^3.0",
+                "symfony/deprecation-contracts": "^2 || ^3",
+                "symfony/finder": ">=2.2",
+                "symfony/yaml": ">=3.3"
             },
             "require-dev": {
-                "nunomaduro/collision": "^7.9"
+                "composer/package-versions-deprecated": "^1.11",
+                "doctrine/annotations": "^1.7 || ^2.0",
+                "friendsofphp/php-cs-fixer": "^2.17 || 3.62.0",
+                "phpstan/phpstan": "^1.6",
+                "phpunit/phpunit": ">=8",
+                "vimeo/psalm": "^4.23"
             },
+            "suggest": {
+                "doctrine/annotations": "^1.7 || ^2.0"
+            },
+            "bin": [
+                "bin/openapi"
+            ],
             "type": "library",
             "extra": {
-                "laravel": {
-                    "aliases": {
-                        "RelationManagerRepeater": "Zvizvi\\RelationManagerRepeater\\Facades\\RelationManagerRepeater"
-                    },
-                    "providers": [
-                        "Zvizvi\\RelationManagerRepeater\\RelationManagerRepeaterServiceProvider"
-                    ]
+                "branch-alias": {
+                    "dev-master": "4.x-dev"
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "Zvizvi\\RelationManagerRepeater\\": "src/",
-                    "Zvizvi\\RelationManagerRepeater\\Database\\Factories\\": "database/factories/"
+                    "OpenApi\\": "src"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "MIT"
+                "Apache-2.0"
             ],
             "authors": [
                 {
-                    "name": "zvizvi",
-                    "email": "zvizvi5@outlook.com",
-                    "role": "Developer"
+                    "name": "Robert Allen",
+                    "email": "zircote@gmail.com"
+                },
+                {
+                    "name": "Bob Fanger",
+                    "email": "bfanger@gmail.com",
+                    "homepage": "https://bfanger.nl"
+                },
+                {
+                    "name": "Martin Rademacher",
+                    "email": "mano@radebatz.net",
+                    "homepage": "https://radebatz.net"
                 }
             ],
-            "description": "Filament plugin that adds a Repeater form interface for editing relationship records in Filament's relation managers",
-            "homepage": "https://github.com/zvizvi/filament-relation-manager-repeater",
+            "description": "swagger-php - Generate interactive documentation for your RESTful API using phpdoc annotations",
+            "homepage": "https://github.com/zircote/swagger-php/",
             "keywords": [
-                "filament",
-                "laravel",
-                "relation-manager-repeater",
-                "zvizvi"
+                "api",
+                "json",
+                "rest",
+                "service discovery"
             ],
             "support": {
-                "issues": "https://github.com/zvizvi/filament-relation-manager-repeater/issues",
-                "source": "https://github.com/zvizvi/filament-relation-manager-repeater"
+                "issues": "https://github.com/zircote/swagger-php/issues",
+                "source": "https://github.com/zircote/swagger-php/tree/4.11.1"
             },
-            "funding": [
-                {
-                    "url": "https://github.com/zvizvi",
-                    "type": "github"
-                }
-            ],
-            "time": "2025-06-27T01:42:21+00:00"
+            "time": "2024-10-15T19:20:02+00:00"
         }
     ],
     "packages-dev": [
@@ -19352,82 +19356,6 @@
                 }
             ],
             "time": "2024-10-20T05:08:20+00:00"
-        },
-        {
-            "name": "symfony/yaml",
-            "version": "v7.3.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/yaml.git",
-                "reference": "d4f4a66866fe2451f61296924767280ab5732d9d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/d4f4a66866fe2451f61296924767280ab5732d9d",
-                "reference": "d4f4a66866fe2451f61296924767280ab5732d9d",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=8.2",
-                "symfony/deprecation-contracts": "^2.5|^3.0",
-                "symfony/polyfill-ctype": "^1.8"
-            },
-            "conflict": {
-                "symfony/console": "<6.4"
-            },
-            "require-dev": {
-                "symfony/console": "^6.4|^7.0"
-            },
-            "bin": [
-                "Resources/bin/yaml-lint"
-            ],
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\Yaml\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Loads and dumps YAML files",
-            "homepage": "https://symfony.com",
-            "support": {
-                "source": "https://github.com/symfony/yaml/tree/v7.3.3"
-            },
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://github.com/nicolas-grekas",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2025-08-27T11:34:33+00:00"
         },
         {
             "name": "ta-tikoma/phpunit-architecture-test",
