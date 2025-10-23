@@ -20,6 +20,9 @@
 - Search endpoint hardening now rejects suspicious SQL fragments and adds an explicit exact-match boost so precise catalogue queries surface first and malicious payloads return empty buckets.
 - Search type filters now normalise mixed-case identifiers from clients, ensuring storefront queries stay restricted to the requested product, category, or brand buckets instead of ballooning to every result group.
 
+## API contracts
+- OpenAPI documentation now mirrors the lean product meta payload and nullable media thumbnails emitted by the presenter, keeping schema validators and client SDKs in sync with production responses.
+
 ## Admin panel resilience
 - Filament searchable input helpers now register fallback payload macros and include a fake Livewire schema harness so v4 container requirements no longer break standalone unit tests.
 - Cart lifecycle unit coverage now builds a dedicated lightweight `cart_items` table per test so checkout cleanup behaviours stay validated without depending on the entire migration suite.

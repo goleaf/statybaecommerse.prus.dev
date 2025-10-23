@@ -17,8 +17,6 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 ### Latest updates
-- Filament searchable input helpers now auto-register payload macros and ship with a fake Livewire schema host for tests, keeping unit coverage compatible with the v4 container lifecycle.
-- Cart lifecycle regression tests now provision a lightweight `cart_items` schema inside the suite, keeping checkout cleanup coverage reliable without invoking the full migration set.
 - Catalog OpenAPI contract now documents the lean product meta payload and nullable image thumbnails, ensuring schema validation mirrors real API responses.
 - Campaign click factories now guard optional relationships and lean on the dedicated SQLite test database configuration, eliminating the missing-table errors that previously interrupted the API listing regression suite.
 - Restored the missing `App\\Exceptions\\Handler` so Laravel can bootstrap without the fatal `Whoops\\Run::handleShutdown()` error that previously surfaced on every web request and artisan command.
