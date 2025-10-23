@@ -4,122 +4,98 @@ declare(strict_types=1);
 
 namespace App\Data;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use InvalidArgumentException;
+use Illuminate\Support\Str;
+use Spatie\LaravelData\Attributes\Validation\ArrayType;
+use Spatie\LaravelData\Attributes\Validation\FloatType;
+use Spatie\LaravelData\Attributes\Validation\IntegerType;
+use Spatie\LaravelData\Attributes\Validation\Max;
+use Spatie\LaravelData\Attributes\Validation\Min;
+use Spatie\LaravelData\Attributes\Validation\Nullable;
+use Spatie\LaravelData\Attributes\Validation\Required;
+use Spatie\LaravelData\Attributes\Validation\StringType;
+use Spatie\LaravelData\Data;
 
-final class SearchQueryData
+final class SearchQueryData extends Data
 {
-    public const DEFAULT_PER_PAGE = 10;
+    public const MAX_PER_PAGE = 50;
 
-    public const MAX_PER_PAGE = 25;
+    public function __construct(
+        #[Required, StringType, Min(1), Max(255)]
+        public string $q,
+        #[Nullable, FloatType]
+        public ?float $price_min = null,
+        #[Nullable, FloatType]
+        public ?float $price_max = null,
+        #[Nullable, ArrayType]
+        public array $brand_ids = [],
+        #[Nullable, ArrayType]
+        public array $category_ids = [],
+        #[Nullable, StringType]
+        public string $sort = 'relevance',
+        #[Nullable, IntegerType, Min(1)]
+        public int $page = 1,
+        #[Nullable, IntegerType, Min(1), Max(self::MAX_PER_PAGE)]
+        public int $per_page = 10,
+    ) {
+        $this->brand_ids = $this->normalizeIdArray($brand_ids ?? []);
+        $this->category_ids = $this->normalizeIdArray($category_ids ?? []);
+        $this->sort = $this->normalizeSort($sort);
+        $this->page = max(1, $page);
+        $this->per_page = $this->normalizePerPage($per_page);
 
-    private readonly string $query;
-
-    private readonly int $page;
-
-    private readonly int $perPage;
-
-    /**
-     * @var array<int, string>
-     */
-    private readonly array $types;
-
-    /**
-     * @var array<string, mixed>
-     */
-    private readonly array $context;
-
-    /**
-     * @param array<int, string>   $types
-     * @param array<string, mixed> $context
-     */
-    private function __construct(string $query, int $page, int $perPage, array $types, array $context)
-    {
-        $this->query = $query;
-        $this->page = $page;
-        $this->perPage = $perPage;
-        $this->types = $types;
-        $this->context = $context;
+        if ($this->price_min !== null && $this->price_max !== null && $this->price_min > $this->price_max) {
+            [$this->price_min, $this->price_max] = [$this->price_max, $this->price_min];
+        }
     }
 
-    /**
-     * @param array<string, mixed> $input
-     * @param array<string, mixed> $context
-     */
-    public static function fromArray(array $input, array $context = []): self
+    public static function fromRequest(Request $request): self
     {
-        $rawQueryValue = $input['query'] ?? $input['q'] ?? '';
-        if (! is_scalar($rawQueryValue)) {
-            $rawQueryValue = '';
-        }
+        $filters = $request->input('filters', []);
 
-        $rawQuery = (string) $rawQueryValue;
-        $query = trim(preg_replace('/\s+/', ' ', $rawQuery) ?? '');
+        $validated = $request->validate([
+            'q' => ['required', 'string', 'min:1', 'max:255'],
+            'filters.price_min' => ['nullable', 'numeric', 'min:0'],
+            'filters.price_max' => ['nullable', 'numeric', 'min:0'],
+            'filters.brand' => ['nullable', 'array'],
+            'filters.brand.*' => ['integer'],
+            'filters.category' => ['nullable', 'array'],
+            'filters.category.*' => ['integer'],
+            'sort' => ['nullable', 'string', 'in:relevance,price,date'],
+            'page' => ['nullable', 'integer', 'min:1'],
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:'.self::MAX_PER_PAGE],
+        ]);
 
-        if ($query === '') {
-            throw new InvalidArgumentException('Search query must be provided.');
-        }
-
-        $pageValue = $input['page'] ?? 1;
-        if (! is_numeric($pageValue)) {
-            $pageValue = 1;
-        }
-
-        $page = (int) $pageValue;
-        if ($page < 1) {
-            $page = 1;
-        }
-
-        $perPageValue = $input['per_page'] ?? self::DEFAULT_PER_PAGE;
-        if (! is_numeric($perPageValue)) {
-            $perPageValue = self::DEFAULT_PER_PAGE;
-        }
-
-        $perPage = (int) $perPageValue;
-        if ($perPage < 1) {
-            $perPage = 1;
-        }
-
-        $perPage = min($perPage, self::MAX_PER_PAGE);
-
-        $rawTypes = $input['types'] ?? ['product', 'category', 'brand'];
-        if (! is_array($rawTypes)) {
-            $rawTypes = [$rawTypes];
-        }
-
-        $allowedTypes = ['product', 'category', 'brand'];
-        $types = [];
-
-        foreach ($rawTypes as $value) {
-            if (! is_string($value)) {
-                continue;
-            }
-
-            $normalized = mb_strtolower(trim($value));
-
-            // Guard against upstream clients sending empty or unsupported type identifiers (bugfix: normalize case-sensitive values).
-            if ($normalized === '' || ! in_array($normalized, $allowedTypes, true)) {
-                continue;
-            }
-
-            $types[] = $normalized;
-        }
-
-        $types = array_values(array_unique($types));
-
-        if ($types === []) {
-            $types = $allowedTypes;
-        }
-
-        /** @var array<string, mixed> $filteredContext */
-        $filteredContext = Arr::where($context, static fn ($value): bool => $value !== null);
-
-        return new self($query, $page, $perPage, $types, $filteredContext);
+        return new self(
+            q: $validated['q'],
+            price_min: isset($filters['price_min']) ? (float) $filters['price_min'] : null,
+            price_max: isset($filters['price_max']) ? (float) $filters['price_max'] : null,
+            brand_ids: Arr::get($filters, 'brand', []),
+            category_ids: Arr::get($filters, 'category', []),
+            sort: $validated['sort'] ?? 'relevance',
+            page: $validated['page'] ?? 1,
+            per_page: $validated['per_page'] ?? 10,
+        );
     }
 
-    public function query(): string
+    public function normalizedCacheKey(): string
     {
-        return $this->query;
+        return md5(json_encode([
+            'q' => Str::lower(trim($this->q)),
+            'price_min' => $this->price_min,
+            'price_max' => $this->price_max,
+            'brand_ids' => $this->brand_ids,
+            'category_ids' => $this->category_ids,
+            'sort' => $this->sort,
+            'page' => $this->page,
+            'per_page' => $this->per_page,
+        ], JSON_THROW_ON_ERROR));
+    }
+
+    public function perPage(): int
+    {
+        return $this->per_page;
     }
 
     public function page(): int
@@ -127,29 +103,39 @@ final class SearchQueryData
         return $this->page;
     }
 
-    public function perPage(): int
+    public function brandIds(): array
     {
-        return $this->perPage;
+        return $this->brand_ids;
     }
 
-    /**
-     * @return array<int, string>
-     */
-    public function types(): array
+    public function categoryIds(): array
     {
-        return $this->types;
+        return $this->category_ids;
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    public function context(): array
+    public function sort(): string
     {
-        return $this->context;
+        return $this->sort;
     }
 
-    public function offset(): int
+    private function normalizeIdArray(array $ids): array
     {
-        return ($this->page - 1) * $this->perPage;
+        return collect($ids)
+            ->filter(static fn ($value): bool => is_numeric($value))
+            ->map(static fn ($value): int => (int) $value)
+            ->unique()
+            ->sort()
+            ->values()
+            ->all();
+    }
+
+    private function normalizePerPage(int $perPage): int
+    {
+        return (int) min(max($perPage, 1), self::MAX_PER_PAGE);
+    }
+
+    private function normalizeSort(string $sort): string
+    {
+        return in_array($sort, ['relevance', 'price', 'date'], true) ? $sort : 'relevance';
     }
 }

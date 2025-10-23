@@ -5,111 +5,91 @@ declare(strict_types=1);
 namespace App\Repositories\Search;
 
 use App\Data\SearchQueryData;
+use App\Models\Category;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 final class CategorySearchRepository extends AbstractSearchRepository
 {
-    protected function type(): string
+    /**
+     * @return array{items: Collection<int, array<string, mixed>>, total: int}
+     */
+    public function search(SearchQueryData $query, int $limit): array
     {
-        return 'category';
+        $base = Category::query()
+            ->select(['categories.*'])
+            ->where('is_visible', true)
+            ->when($query->categoryIds() !== [], function (EloquentBuilder $builder) use ($query) {
+                $builder->whereIn('id', $query->categoryIds());
+            });
+
+        $total = (clone $base)->count('categories.id');
+
+        $scored = $this->applyScoring(clone $base, $query);
+        $scored = $scored->orderByDesc('total_score');
+        $scored = $this->applyPagination($scored, $query, $limit);
+
+        $items = $scored
+            ->withCount('products')
+            ->get()
+            ->map(function (Category $category) {
+                return [
+                    'id' => $category->id,
+                    'type' => 'category',
+                    'title' => $category->name,
+                    'subtitle' => __('frontend.search.category_with_products', ['count' => $category->products_count]),
+                    'description' => $category->description,
+                    'url' => route('categories.show', $category->slug),
+                    'score' => (float) $category->getAttribute('total_score'),
+                ];
+            });
+
+        return ['items' => $items, 'total' => $total];
     }
 
-    protected function searchStatement(int $limit): string
+    private function applyScoring(EloquentBuilder $builder, SearchQueryData $query): EloquentBuilder
     {
-        $limit = max(1, $limit);
+        $likeOperator = $this->likeOperator();
+        $lowered = Str::lower($query->q);
+        $wildcard = $this->wildcardLower($query->q);
 
-        return <<<SQL
-SELECT
-    c.id,
-    c.name,
-    c.slug,
-    c.description,
-    COUNT(DISTINCT cp.product_id) AS products_count,
-    COALESCE(ct.name, '') AS translated_name,
-    COALESCE(ct.description, '') AS translated_description
-FROM categories AS c
-JOIN category_product AS cp ON cp.category_id = c.id
-LEFT JOIN category_translations AS ct ON ct.category_id = c.id AND ct.locale = ?
-WHERE c.is_visible = 1
-  AND c.slug IS NOT NULL
-  AND (
-        LOWER(c.name) LIKE ?
-        OR LOWER(c.description) LIKE ?
-        OR LOWER(ct.name) LIKE ?
-        OR LOWER(ct.description) LIKE ?
-    )
-GROUP BY c.id, c.name, c.slug, c.description, translated_name, translated_description
-HAVING products_count > 0
-ORDER BY
-    CASE
-        WHEN LOWER(c.name) = ? THEN 0
-        WHEN LOWER(c.name) LIKE ? THEN 1
-        ELSE 2
-    END,
-    products_count DESC
-LIMIT {$limit}
-SQL;
-    }
+        $titleExact = 'CASE WHEN LOWER(categories.name) = ? THEN 100 ELSE 0 END';
+        $titlePartial = "CASE WHEN LOWER(categories.name) {$likeOperator} ? THEN 60 ELSE 0 END";
+        $titleScoreExpr = "({$titleExact} + {$titlePartial})";
+        $builder->selectRaw("{$titleScoreExpr} AS title_score", [$lowered, $wildcard]);
 
-    protected function bindings(SearchQueryData $queryData, int $limit): array
-    {
-        $locale = app()->getLocale();
-        $query = Str::lower($queryData->query());
-        $wildcard = $this->wildcard($query);
+        $descriptionExpr = "CASE WHEN LOWER(COALESCE(categories.description, '')) {$likeOperator} ? THEN 40 ELSE 0 END";
+        $builder->selectRaw("{$descriptionExpr} AS description_score", [$wildcard]);
 
-        return [
-            $locale,
-            $wildcard,
-            $wildcard,
-            $wildcard,
-            $wildcard,
-            $query,
-            $wildcard,
-        ];
-    }
+        $popularityExpr = '(SELECT COUNT(*) FROM product_categories WHERE product_categories.category_id = categories.id) * 3';
+        $builder->selectRaw("{$popularityExpr} AS popularity_score");
 
-    protected function mapRow(object $row, SearchQueryData $queryData): array
-    {
-        $productsCount = (int) $row->products_count;
-        $description = $row->description ?: ($row->translated_description ?: null);
+        $freshnessExpr = 'CASE WHEN categories.created_at >= ? THEN 40 WHEN categories.created_at >= ? THEN 20 ELSE 0 END';
+        $builder->selectRaw(
+            "{$freshnessExpr} AS freshness_score",
+            [now()->subDays(30), now()->subDays(90)]
+        );
 
-        return [
-            'id' => (int) $row->id,
-            'type' => 'category',
-            'title' => (string) $row->name,
-            'subtitle' => __('frontend.search.category_with_products', ['count' => $productsCount]),
-            'description' => $description,
-            'image' => null,
-            'url' => route('categories.show', $row->slug),
-            'products_count' => $productsCount,
-            'relevance_score' => $this->calculateRelevanceScore($row, $queryData->query()),
-        ];
-    }
-
-    private function calculateRelevanceScore(object $row, string $query): int
-    {
-        $score = 0;
-        $normalizedQuery = Str::lower($query);
-        $name = Str::lower((string) $row->name);
-        $description = Str::lower((string) ($row->description ?? ''));
-        $translatedDescription = Str::lower((string) ($row->translated_description ?? ''));
-
-        if ($name === $normalizedQuery) {
-            $score += 100;
-        } elseif (str_contains($name, $normalizedQuery)) {
-            $score += 50;
+        if ($this->supportsFullText()) {
+            $fullTextExpr = 'MATCH(categories.name, categories.description) AGAINST (? IN BOOLEAN MODE)';
+            $booleanTerm = $this->booleanFullTextTerm($query->q);
+            $builder->selectRaw("({$fullTextExpr}) * 80 AS text_score", [$booleanTerm]);
+            $totalExpr = "{$titleScoreExpr} + {$descriptionExpr} + {$popularityExpr} + {$freshnessExpr} + (({$fullTextExpr}) * 80)";
+            $builder->selectRaw(
+                "{$totalExpr} AS total_score",
+                [$lowered, $wildcard, $wildcard, now()->subDays(30), now()->subDays(90), $booleanTerm]
+            );
+        } else {
+            $similarityExpr = 'CASE WHEN LOWER(categories.name) LIKE ? THEN 60 ELSE 0 END';
+            $builder->selectRaw("{$similarityExpr} AS text_score", [$wildcard]);
+            $totalExpr = "{$titleScoreExpr} + {$descriptionExpr} + {$popularityExpr} + {$freshnessExpr} + {$similarityExpr}";
+            $builder->selectRaw(
+                "{$totalExpr} AS total_score",
+                [$lowered, $wildcard, $wildcard, now()->subDays(30), now()->subDays(90), $wildcard]
+            );
         }
 
-        if ($description !== '' && str_contains($description, $normalizedQuery)) {
-            $score += 20;
-        }
-
-        if ($translatedDescription !== '' && str_contains($translatedDescription, $normalizedQuery)) {
-            $score += 10;
-        }
-
-        $score += min((int) $row->products_count, 20);
-
-        return $score;
+        return $builder;
     }
 }

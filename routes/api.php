@@ -1,8 +1,7 @@
 <?php
 
-use App\Http\Controllers\Api\AuthenticatedUserController;
-use App\Http\Controllers\Api\AutocompleteSearchController;
-use App\Http\Controllers\Api\SignedExportDownloadController;
+use App\Http\Controllers\Api\V1\SearchController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['throttle:api'])->group(function (): void {
@@ -10,16 +9,18 @@ Route::middleware(['throttle:api'])->group(function (): void {
         return $request->user();
     })->middleware('auth:sanctum');
 
-    // Autocomplete search endpoint for AutocompleteSelect component
-    Route::post('/autocomplete-search', function (Request $request) {
-        $validated = $request->validate([
-            'model_class' => 'required|string',
-            'search_field' => 'nullable|string',
-            'search_query' => 'required|string',
-            'value_field' => 'nullable|string',
-            'label_field' => 'nullable|string',
-            'limit' => 'nullable|integer|min:1|max:100',
-        ]);
+Route::get('/v1/search', SearchController::class)->name('api.search.aggregate');
+
+// Autocomplete search endpoint for AutocompleteSelect component
+Route::post('/autocomplete-search', function (Request $request) {
+    $validated = $request->validate([
+        'model_class' => 'required|string',
+        'search_field' => 'nullable|string',
+        'search_query' => 'required|string',
+        'value_field' => 'nullable|string',
+        'label_field' => 'nullable|string',
+        'limit' => 'nullable|integer|min:1|max:100',
+    ]);
 
         try {
             $modelClass = $validated['model_class'];
