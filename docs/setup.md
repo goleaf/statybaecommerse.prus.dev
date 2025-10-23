@@ -35,11 +35,10 @@ Optional but helpful: Redis (for queue experiments) and pnpm (mirrors npm comman
  composer install
 
 # 3. Install Node dependencies
- npm install
-
+npm install
 ```
 
-> ✅ Husky hooks install automatically during `npm install`. If hooks ever stop running, execute `npm run prepare` to refresh the modern shim.
+> ✅ Running `npm install` also refreshes the Husky hook shim so older clones keep sourcing the modern `_/h` helper. Re-run `npm run prepare` if hooks stop firing—it reruns the install step and regenerates `.husky/_/husky.sh` via `scripts/ensure-husky-shim.mjs`.
 
 If you prefer the automated route, run `make setup` after cloning—it performs all three steps, copies the `.env`, and prepares the SQLite database.
 

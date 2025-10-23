@@ -24,7 +24,7 @@
         "lint:eslint": "eslint --max-warnings=0 \"resources/js/**/*.{js,jsx,ts,tsx}\"",
         "lint:prettier": "prettier --check \"resources/**/*.{css,js,jsx,ts,tsx,json,md}\"",
         "lint": "npm run lint:prettier && npm run lint:eslint",
-        "prepare": "husky install",
+        "prepare": "husky install && node scripts/ensure-husky-shim.mjs",
         "release": "release-please release --manifest .release-please-manifest.json --config release-please-config.json",
         "release:pr": "release-please release-pr --manifest .release-please-manifest.json --config release-please-config.json"
     },
