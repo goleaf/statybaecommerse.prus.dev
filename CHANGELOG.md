@@ -18,6 +18,9 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ### Bug Fixes
 * Corrected shipping option delivery window formatting so zero-day estimates and partially filled ranges no longer collapse to a placeholder dash in admin tables.
 
+### Bug Fixes
+* Ensured the Feature Flag resource surfaces inactive and disabled toggles so administrators can audit rollout states without adjusting global scopes.
+
 ## [0.1.0] - 2025-10-20
 
 ### Features & Enhancements

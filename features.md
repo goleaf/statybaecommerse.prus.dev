@@ -1,7 +1,7 @@
 # Feature Highlights
 
-## Fulfilment & Logistics
-- Shipping option delivery ranges in the Filament admin now display a precise window even when carriers promise same-day (0 day) service or when only one bound is stored, helping staff quickly spot incomplete data.
+## Latest Updates
+- Surfaced inactive and disabled feature flags within the Filament Feature Flag resource listing so administrators can audit rollout coverage without altering global scopes.
 
 ## Reference
-- Review `app/Filament/Resources/ShippingOptionResource.php` for the table presentation logic and `app/Models/ShippingOption.php` for the accessor reused across storefront components.
+- Explore `app/Filament/Resources/FeatureFlagResource.php` for the resource definition and accompanying tests in `tests/Feature/FeatureFlagResourceTest.php`.
