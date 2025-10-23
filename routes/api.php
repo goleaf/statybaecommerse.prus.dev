@@ -1,26 +1,34 @@
 <?php
 
-use App\Http\Controllers\Api\V1\SearchController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\AuthenticatedUserController;
+use App\Http\Controllers\Api\AutocompleteSearchController;
+use App\Http\Controllers\Api\SignedExportDownloadController;
+use App\Http\Controllers\Api\V1\HealthController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['throttle:api'])->group(function (): void {
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    })->middleware('auth:sanctum');
+Route::prefix('api/v1')
+    ->name('api.v1.')
+    ->group(function (): void {
+        Route::get('/health', [HealthController::class, 'health'])
+            ->middleware(['throttle:api.default'])
+            ->name('health');
 
-Route::get('/v1/search', SearchController::class)->name('api.search.aggregate');
+        Route::get('/ready', [HealthController::class, 'ready'])
+            ->middleware(['throttle:api.default'])
+            ->name('ready');
 
-// Autocomplete search endpoint for AutocompleteSelect component
-Route::post('/autocomplete-search', function (Request $request) {
-    $validated = $request->validate([
-        'model_class' => 'required|string',
-        'search_field' => 'nullable|string',
-        'search_query' => 'required|string',
-        'value_field' => 'nullable|string',
-        'label_field' => 'nullable|string',
-        'limit' => 'nullable|integer|min:1|max:100',
-    ]);
+        Route::middleware('auth:sanctum')->group(function (): void {
+            Route::get('/user', AuthenticatedUserController::class)
+                ->middleware(['abilities:profile.read', 'throttle:api.default'])
+                ->name('user.show');
+
+            Route::post('/autocomplete-search', AutocompleteSearchController::class)
+                ->middleware(['abilities:system.autocomplete', 'throttle:api.autocomplete'])
+                ->name('autocomplete.search');
+
+            require __DIR__.'/api/notifications.php';
+        });
+    });
 
         try {
             $modelClass = $validated['model_class'];

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Domain\Product\Repositories\ProductRepositoryInterface;
+use App\Contracts\HealthReporter as HealthReporterContract;
 use App\Filament\Components\LiveNotificationFeed;
 use App\Models\DiscountCode;
 use App\Models\DiscountRedemption;
@@ -21,6 +21,7 @@ use App\View\Creators\GlobalDataCreator;
 use App\View\Creators\LocalizationCreator;
 use App\View\Creators\NavigationCreator;
 use App\View\Creators\SeoDataCreator;
+use App\Support\Health\HealthReporter;
 use App\View\Creators\UserDataCreator;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Auth\Notifications\ResetPassword;
@@ -62,7 +63,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->singleton(HtmlSanitizer::class);
+        $this->app->singleton(HealthReporterContract::class, HealthReporter::class);
 
         if ($this->app->runningInConsole()) {
             // Register import utilities and override the core db:seed command with a profiled variant.
