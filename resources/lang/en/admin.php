@@ -650,6 +650,8 @@ return [
         'deactivate' => 'Deactivate',
         'enable' => 'Enable',
         'disable' => 'Disable',
+        // Timestamp section label for resource forms
+        'timestamps' => 'Timestamps',
     ],
     'messages' => [
         'created' => 'Successfully created',
