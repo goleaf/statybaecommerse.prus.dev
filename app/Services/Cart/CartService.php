@@ -19,7 +19,7 @@ final class CartService
 
     public function __construct(private readonly Session $session) {}
 
-        $this->clearCartSession($sessionId);
+        $this->clearCartSessions($sessionIds);
         $this->clearCartStorage($userId, $sessionIds);
         $this->clearSessionPayload();
         $this->forgetCachedSummary($userId, $sessionIds);
@@ -51,16 +51,32 @@ final class CartService
         return $this->buildSummaryFromDatabase($userId, $sessionId);
     }
 
-    private function clearCartSession(string $sessionId): void
+    /**
+     * Clear all candidate cart sessions tracked for the user.
+     *
+     * Iterating through all normalized session identifiers avoids a conflict where
+     * the fallback guest session retains items after a merge into an authenticated session.
+     *
+     * @param  array<int, string>  $sessionIds
+     */
+    private function clearCartSessions(array $sessionIds): void
     {
         if (! class_exists(\Darryldecode\Cart\Facades\CartFacade::class)) {
             return;
         }
 
-        try {
-            \Darryldecode\Cart\Facades\CartFacade::session($sessionId)->clear();
-        } catch (Throwable $throwable) {
-            report($throwable);
+        foreach ($sessionIds as $normalizedSessionId) {
+            // Defensive guard in case downstream callers inject unexpected empty values.
+            if ($normalizedSessionId === '') {
+                continue;
+            }
+
+            try {
+                \Darryldecode\Cart\Facades\CartFacade::session($normalizedSessionId)->clear();
+            } catch (Throwable $throwable) {
+                // Report the throwable but continue clearing the remaining sessions to ensure all cart states are reset.
+                report($throwable);
+            }
         }
     }
 
