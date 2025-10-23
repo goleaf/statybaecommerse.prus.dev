@@ -7,6 +7,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CampaignProductTargetResource\Pages;
 use App\Models\CampaignProductTarget;
 use App\Models\Scopes\ActiveScope;
+use BackedEnum;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
@@ -44,7 +45,7 @@ final class CampaignProductTargetResource extends Resource
     protected static ?string $model = CampaignProductTarget::class;
 
     /**
-     * @var string|\BackedEnum|null Keep Filament navigation metadata flexible between enums and plain strings.
+     * @var string|BackedEnum|null Keep Filament navigation metadata flexible between enums and plain strings.
      */
     protected static $navigationIcon = 'heroicon-o-bullseye-arrow';
 
@@ -90,9 +91,9 @@ final class CampaignProductTargetResource extends Resource
                             Select::make('target_type')
                                 ->label(__('campaign_product_targets.target_type'))
                                 ->options([
-                                    'product' => __('campaign_product_targets.types.product'),
-                                    'category' => __('campaign_product_targets.types.category'),
-                                    'brand' => __('campaign_product_targets.types.brand'),
+                                    'product'    => __('campaign_product_targets.types.product'),
+                                    'category'   => __('campaign_product_targets.types.category'),
+                                    'brand'      => __('campaign_product_targets.types.brand'),
                                     'collection' => __('campaign_product_targets.types.collection'),
                                 ])
                                 ->required()
@@ -211,11 +212,11 @@ final class CampaignProductTargetResource extends Resource
                 TextColumn::make('target_name')
                     ->label(__('campaign_product_targets.target_name'))
                     ->formatStateUsing(fn (?string $state, CampaignProductTarget $record): string => $state ?? match ($record->target_type) {
-                        'product' => __('campaign_product_targets.no_product'),
-                        'category' => __('campaign_product_targets.no_category'),
-                        'brand' => __('campaign_product_targets.no_brand'),
+                        'product'    => __('campaign_product_targets.no_product'),
+                        'category'   => __('campaign_product_targets.no_category'),
+                        'brand'      => __('campaign_product_targets.no_brand'),
                         'collection' => __('campaign_product_targets.no_collection'),
-                        default => __('campaign_product_targets.unknown_target'),
+                        default      => __('campaign_product_targets.unknown_target'),
                     })
                     ->wrap()
                     ->searchable(['product.name', 'category.name', 'brand.name', 'collection.name'])
@@ -261,9 +262,9 @@ final class CampaignProductTargetResource extends Resource
                 SelectFilter::make('target_type')
                     ->label(__('campaign_product_targets.target_type'))
                     ->options([
-                        'product' => __('campaign_product_targets.types.product'),
-                        'category' => __('campaign_product_targets.types.category'),
-                        'brand' => __('campaign_product_targets.types.brand'),
+                        'product'    => __('campaign_product_targets.types.product'),
+                        'category'   => __('campaign_product_targets.types.category'),
+                        'brand'      => __('campaign_product_targets.types.brand'),
                         'collection' => __('campaign_product_targets.types.collection'),
                     ]),
                 TernaryFilter::make('is_active')
@@ -421,10 +422,10 @@ final class CampaignProductTargetResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCampaignProductTargets::route('/'),
+            'index'  => Pages\ListCampaignProductTargets::route('/'),
             'create' => Pages\CreateCampaignProductTarget::route('/create'),
-            'view' => Pages\ViewCampaignProductTarget::route('/{record}'),
-            'edit' => Pages\EditCampaignProductTarget::route('/{record}/edit'),
+            'view'   => Pages\ViewCampaignProductTarget::route('/{record}'),
+            'edit'   => Pages\EditCampaignProductTarget::route('/{record}/edit'),
         ];
     }
 

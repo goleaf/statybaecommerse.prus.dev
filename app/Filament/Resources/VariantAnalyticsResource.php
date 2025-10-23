@@ -23,9 +23,9 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Support\Facades\FilamentNumber;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Support\Facades\FilamentNumber;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
@@ -40,20 +40,12 @@ final class VariantAnalyticsResource extends Resource
     protected static ?string $model = VariantAnalytics::class;
 
     /**
-     * Ensure Filament interprets the icon while supporting enums without forcing an import.
+     * @var string|BackedEnum|UnitEnum|null Ensure Filament interprets the icon while supporting enums without forcing an import.
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    /** Ensure inventory analytics stay grouped centrally via typed declaration. */
-    protected static NavigationGroup|string|null $navigationGroup = NavigationGroup::Inventory;
-
-    /**
-     * Resolve the navigation icon through an accessor to support enum-backed overrides.
-     */
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-chart-bar-square';
-    }
+    /** @var string|BackedEnum|UnitEnum|null Ensure inventory analytics stay grouped centrally. */
+    protected static $navigationGroup = NavigationGroup::Inventory;
 
     public static function getNavigationGroup(): ?string
     {
