@@ -26,21 +26,41 @@ return [
     'created_at' => 'Created At',
     'updated_at' => 'Updated At',
 
-    'static_links' => [
-        'home' => 'Home',
-        'products' => 'All Products',
-        'collections' => 'Collections',
-        'news' => 'News',
-        'contact' => 'Contact',
+    'link_search' => [
+        'placeholder' => 'Search products, categories, collections, or paste a URL',
+        'types' => [
+            'static' => 'Static page',
+            'product' => 'Product',
+            'category' => 'Category',
+            'collection' => 'Collection',
+            'post' => 'Blog post',
+        ],
+        'static_links' => [
+            'home' => [
+                'route' => 'home',
+                'label' => 'Homepage',
+                'description' => 'Main storefront landing page.',
+            ],
+            'products' => [
+                'route' => 'frontend.products.index',
+                'label' => 'All products',
+                'description' => 'Browse the full catalogue.',
+            ],
+            'collections' => [
+                'route' => 'frontend.collections.index',
+                'label' => 'Collections overview',
+                'description' => 'Curated product collections.',
+            ],
+            'posts' => [
+                'route' => 'frontend.posts.index',
+                'label' => 'Blog posts',
+                'description' => 'Latest articles from our team.',
+            ],
+            'contact' => [
+                'route' => 'frontend.contact.index',
+                'label' => 'Contact page',
+                'description' => 'Ways for customers to reach support.',
+            ],
+        ],
     ],
-
-    'link_types' => [
-        'static' => 'Storefront Page',
-        'product' => 'Product',
-        'category' => 'Category',
-        'collection' => 'Collection',
-        'news' => 'News Article',
-    ],
-
-    'unknown_title' => 'Untitled Link',
 ];

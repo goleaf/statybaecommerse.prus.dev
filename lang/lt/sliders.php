@@ -26,21 +26,41 @@ return [
     'created_at' => 'Sukurta',
     'updated_at' => 'Atnaujinta',
 
-    'static_links' => [
-        'home' => 'Pagrindinis puslapis',
-        'products' => 'Visi produktai',
-        'collections' => 'Kolekcijos',
-        'news' => 'Naujienos',
-        'contact' => 'Kontaktai',
+    'link_search' => [
+        'placeholder' => 'Ieškokite produktų, kategorijų, kolekcijų arba įklijuokite nuorodą',
+        'types' => [
+            'static' => 'Statinis puslapis',
+            'product' => 'Produktas',
+            'category' => 'Kategorija',
+            'collection' => 'Kolekcija',
+            'post' => 'Tinklaraščio įrašas',
+        ],
+        'static_links' => [
+            'home' => [
+                'route' => 'home',
+                'label' => 'Pagrindinis puslapis',
+                'description' => 'Pagrindinis parduotuvės puslapis.',
+            ],
+            'products' => [
+                'route' => 'frontend.products.index',
+                'label' => 'Visi produktai',
+                'description' => 'Peržiūrėkite visą katalogą.',
+            ],
+            'collections' => [
+                'route' => 'frontend.collections.index',
+                'label' => 'Kolekcijų apžvalga',
+                'description' => 'Kruopščiai atrinktos produktų kolekcijos.',
+            ],
+            'posts' => [
+                'route' => 'frontend.posts.index',
+                'label' => 'Tinklaraštis',
+                'description' => 'Naujausi mūsų komandos straipsniai.',
+            ],
+            'contact' => [
+                'route' => 'frontend.contact.index',
+                'label' => 'Kontaktai',
+                'description' => 'Klientų aptarnavimo kontaktai.',
+            ],
+        ],
     ],
-
-    'link_types' => [
-        'static' => 'Parduotuvės puslapis',
-        'product' => 'Produktas',
-        'category' => 'Kategorija',
-        'collection' => 'Kolekcija',
-        'news' => 'Naujiena',
-    ],
-
-    'unknown_title' => 'Nuoroda be pavadinimo',
 ];

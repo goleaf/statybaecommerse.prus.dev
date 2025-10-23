@@ -8,7 +8,7 @@ use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use DefStudio\SearchableInput\DTO\SearchResult;
+use App\Support\Search\ProductVariantSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -69,28 +69,41 @@ final class OrderItemsRelationManager extends BaseRelationManager
                             ->components([
                                 SearchableInput::make('product_variant_id')
                                     ->label(__('orders.product_variant'))
-                                    ->placeholder(__('orders.placeholders.product_variant'))
-                                    ->searchUsing(fn (string $search): array => self::searchVariants($search))
-                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
-                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?OrderItem $record): void {
-                                        if ($state === null || ! $record?->productVariant) {
+                                    ->placeholder(__('orders.lookups.variant_placeholder'))
+                                    ->required()
+                                    ->reactive()
+                                    ->searchUsing(fn (string $value): array => ProductVariantSearch::results($value))
+                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                        if ($state === null) {
+                                            return;
+                                        }
+
+                                        $variant = ProductVariant::query()
+                                            ->select(['id', 'product_id', 'sku', 'name', 'price'])
+                                            ->with(['product:id,sku,name'])
+                                            ->find($state);
+
+                                        if (! $variant instanceof ProductVariant) {
                                             return;
                                         }
 
                                         $component
                                             ->state((string) $state)
                                             ->options([
-                                                (string) $record->product_variant_id => self::formatVariantLabel($record->productVariant),
+                                                (string) $variant->getKey() => ProductVariantSearch::label($variant),
                                             ]);
                                     })
                                     ->afterStateUpdated(function (?string $state, Set $set, Get $get): void {
                                         if ($state === null || $state === '') {
+                                            $set('product_variant_id', null);
+
                                             return;
                                         }
 
                                         $variant = ProductVariant::query()
-                                            ->select(['id', 'name', 'sku', 'price', 'product_id'])
-                                            ->with(['product:id,name,sku'])
+                                            ->select(['id', 'product_id', 'sku', 'name', 'price'])
+                                            ->with(['product:id,sku,name'])
                                             ->find((int) $state);
 
                                         if (! $variant instanceof ProductVariant) {
@@ -98,18 +111,24 @@ final class OrderItemsRelationManager extends BaseRelationManager
                                         }
 
                                         $set('product_variant_id', $variant->getKey());
-                                        $set('product_id', $variant->product_id);
+                                        $set('product_id', $variant->getAttribute('product_id'));
 
-                                        $name = $variant->name ?? $variant->product?->name ?? '';
-                                        $sku = $variant->sku ?? $variant->product?->sku ?? '';
-                                        $price = (float) ($variant->price ?? 0);
+                                        $name = $variant->getAttribute('name') ?? optional($variant->product)->name ?? '';
+                                        $sku = $variant->getAttribute('sku') ?? optional($variant->product)->sku ?? '';
+
+                                        $set('name', is_string($name) ? $name : '');
+                                        $set('sku', is_string($sku) ? $sku : '');
+
+                                        $price = (float) ($variant->getAttribute('price') ?? 0);
+                                        $set('unit_price', $price);
+
                                         $quantity = (int) ($get('quantity') ?? 1);
-
-                                        $set('name', $name);
-                                        $set('sku', $sku);
-                                        $set('unit_price', number_format($price, 2, '.', ''));
-                                        $set('total', number_format($price * $quantity, 2, '.', ''));
-                                    })
+                                        $discount = (float) ($get('discount_amount') ?? 0);
+                                        $set('total', ($price * $quantity) - $discount);
+                                    }),
+                                TextInput::make('quantity')
+                                    ->label(__('orders.quantity'))
+                                    ->numeric()
                                     ->required()
                                     ->reactive()
                                     ->prefixIcon('heroicon-o-cube'),

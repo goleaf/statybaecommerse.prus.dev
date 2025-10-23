@@ -8,6 +8,7 @@ use App\Forms\Components\Flatpickr;
 use App\Data\ExportRequestData;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
+use App\Models\Address;
 use App\Models\Channel;
 use App\Models\Order;
 use App\Models\Partner;
@@ -15,7 +16,10 @@ use App\Services\Pricing\PriceCalculator;
 use App\Support\Authorization\AuthorizationMatrix;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
+use App\Support\Search\AddressSearch;
+use App\Support\Search\ChannelSearch;
 use App\Support\Search\CustomerSearch;
+use App\Support\Search\PartnerSearch;
 use App\Support\Seo\LocaleUrlGenerator;
 use BackedEnum;
 use DefStudio\SearchableInput\DTO\SearchResult;
@@ -395,19 +399,9 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                 ->placeholder(__('orders.lookups.address_placeholder'))
                                 ->searchUsing(fn (string $value): array => AddressSearch::results($value))
                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                    // Hydrate inline using shared helper to keep metadata lifecycle aligned with docs.
-                                    SearchableInputHelper::hydrate(
-                                        $component,
-                                        $state,
-                                        static fn (int $value): ?array => ['value' => $value, 'label' => (string) $value],
-                                    );
-                                })
-                                // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
                                 ->afterStateUpdated(function (?int $state, Set $set): void {
                                     if ($state === null) {
-                                        // Reset the cached billing payload when cleared.
-                                        SearchableInputHelper::clear($set, ['billing_address' => []]);
+                                        $set('billing_address', []);
 
                                         return;
                                     }
@@ -428,18 +422,9 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                 ->placeholder(__('orders.lookups.address_placeholder'))
                                 ->searchUsing(fn (string $value): array => AddressSearch::results($value))
                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                    // Hydrate via helper for metadata parity across lookups.
-                                    SearchableInputHelper::hydrate(
-                                        $component,
-                                        $state,
-                                        static fn (int $value): ?array => ['value' => $value, 'label' => (string) $value],
-                                    );
-                                })
-                                // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
                                 ->afterStateUpdated(function (?int $state, Set $set): void {
                                     if ($state === null) {
-                                        SearchableInputHelper::clear($set, ['shipping_address' => []]);
+                                        $set('shipping_address', []);
 
                                         return;
                                     }
@@ -502,49 +487,57 @@ final class OrderResource extends Resource implements DefinesExportColumns
                         ->schema([
                             SearchableInput::make('channel_id')
                                 ->label(__('orders.fields.channel'))
-                                ->placeholder(__('orders.placeholders.channel'))
-                                ->searchUsing(fn (string $search): array => self::searchChannels($search))
-                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
-                                ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?Order $record): void {
-                                    if ($state === null || ! $record?->channel) {
+                                ->placeholder(__('orders.lookups.channel_placeholder'))
+                                ->searchUsing(fn (string $value): array => ChannelSearch::results($value))
+                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                    if ($state === null) {
+                                        return;
+                                    }
+
+                                    $channel = Channel::query()
+                                        ->select(['id', 'name', 'code', 'type'])
+                                        ->find($state);
+
+                                    if (! $channel instanceof Channel) {
                                         return;
                                     }
 
                                     $component
                                         ->state((string) $state)
                                         ->options([
-                                            (string) $record->channel_id => self::formatChannelLabel($record->channel),
+                                            (string) $channel->getKey() => ChannelSearch::label($channel),
                                         ]);
                                 })
                                 ->afterStateUpdated(function (?string $state, Set $set): void {
-                                    if ($state === null || $state === '') {
-                                        return;
-                                    }
-
-                                    $set('channel_id', (int) $state);
+                                    $set('channel_id', $state !== null && $state !== '' ? (int) $state : null);
                                 }),
                             SearchableInput::make('partner_id')
                                 ->label(__('orders.fields.partner'))
-                                ->placeholder(__('orders.placeholders.partner'))
-                                ->searchUsing(fn (string $search): array => self::searchPartners($search))
-                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
-                                ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?Order $record): void {
-                                    if ($state === null || ! $record?->partner) {
+                                ->placeholder(__('orders.lookups.partner_placeholder'))
+                                ->searchUsing(fn (string $value): array => PartnerSearch::results($value))
+                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                    if ($state === null) {
+                                        return;
+                                    }
+
+                                    $partner = Partner::query()
+                                        ->select(['id', 'name', 'code', 'contact_email'])
+                                        ->find($state);
+
+                                    if (! $partner instanceof Partner) {
                                         return;
                                     }
 
                                     $component
                                         ->state((string) $state)
                                         ->options([
-                                            (string) $record->partner_id => self::formatPartnerLabel($record->partner),
+                                            (string) $partner->getKey() => PartnerSearch::label($partner),
                                         ]);
                                 })
                                 ->afterStateUpdated(function (?string $state, Set $set): void {
-                                    if ($state === null || $state === '') {
-                                        return;
-                                    }
-
-                                    $set('partner_id', (int) $state);
+                                    $set('partner_id', $state !== null && $state !== '' ? (int) $state : null);
                                 }),
                         ]),
                 ])

@@ -10,11 +10,9 @@ use App\Models\Location;
 use App\Models\ProductVariant;
 use App\Models\VariantInventory;
 use App\Support\Filament\Components\Flatpickr;
-use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\LocationSearch;
 use App\Support\Search\ProductVariantSearch;
 use BackedEnum;
-use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -25,7 +23,6 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -44,7 +41,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 /**
  * VariantInventoryResource
@@ -96,52 +92,61 @@ final class VariantInventoryResource extends Resource
                             ->schema([
                                 SearchableInput::make('variant_id')
                                     ->label(__('admin.variant_inventory.variant'))
-                                    ->placeholder(__('admin.variant_inventory.placeholders.variant'))
-                                    ->searchUsing(fn (string $search): array => self::searchVariants($search))
-                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
-                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?VariantInventory $record): void {
-                                        if ($state === null || ! $record?->variant) {
+                                    ->placeholder(__('admin.variant_inventory.variant_placeholder'))
+                                    ->required()
+                                    ->searchUsing(fn (string $value): array => ProductVariantSearch::results($value))
+                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                        if ($state === null) {
+                                            return;
+                                        }
+
+                                        $variant = ProductVariant::query()
+                                            ->select(['id', 'product_id', 'sku', 'name', 'price'])
+                                            ->with(['product:id,sku,name'])
+                                            ->find($state);
+
+                                        if (! $variant instanceof ProductVariant) {
                                             return;
                                         }
 
                                         $component
                                             ->state((string) $state)
                                             ->options([
-                                                (string) $record->variant_id => self::formatVariantLabel($record->variant),
+                                                (string) $variant->getKey() => ProductVariantSearch::label($variant),
                                             ]);
                                     })
                                     ->afterStateUpdated(function (?string $state, Set $set): void {
-                                        if ($state === null || $state === '') {
-                                            return;
-                                        }
-
-                                        $set('variant_id', (int) $state);
-                                    })
-                                    ->required(),
+                                        $set('variant_id', $state !== null && $state !== '' ? (int) $state : null);
+                                    }),
                                 SearchableInput::make('location_id')
                                     ->label(__('admin.variant_inventory.location'))
-                                    ->placeholder(__('admin.variant_inventory.placeholders.location'))
-                                    ->searchUsing(fn (string $search): array => self::searchLocations($search))
-                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
-                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?VariantInventory $record): void {
-                                        if ($state === null || ! $record?->location) {
+                                    ->placeholder(__('admin.variant_inventory.location_placeholder'))
+                                    ->required()
+                                    ->searchUsing(fn (string $value): array => LocationSearch::results($value))
+                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                        if ($state === null) {
+                                            return;
+                                        }
+
+                                        $location = Location::query()
+                                            ->select(['id', 'name', 'code', 'city', 'country_code'])
+                                            ->find($state);
+
+                                        if (! $location instanceof Location) {
                                             return;
                                         }
 
                                         $component
                                             ->state((string) $state)
                                             ->options([
-                                                (string) $record->location_id => self::formatLocationLabel($record->location),
+                                                (string) $location->getKey() => LocationSearch::label($location),
                                             ]);
                                     })
                                     ->afterStateUpdated(function (?string $state, Set $set): void {
-                                        if ($state === null || $state === '') {
-                                            return;
-                                        }
-
-                                        $set('location_id', (int) $state);
-                                    })
-                                    ->required(),
+                                        $set('location_id', $state !== null && $state !== '' ? (int) $state : null);
+                                    }),
                             ]),
                         Grid::make(2)
                             ->schema([

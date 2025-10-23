@@ -97,52 +97,20 @@ final class SliderResource extends Resource
                         ->rows(3)
                         ->maxLength(500)
                         ->columnSpanFull(),
-                    SearchableInput::make('button_url_lookup')
-                        ->label(__('sliders.button_link_lookup'))
-                        ->placeholder(__('sliders.button_link_lookup_placeholder'))
-                        ->searchUsing(fn (string $search): array => ContentLinkSearch::sliderLinks($search))
-                        ->dehydrated(false)
-                        ->afterStateUpdated(function (?string $state, Set $set, Get $get): void {
-                            if ($state === null || $state === '') {
-                                return;
-                            }
-
-                            $resolved = ContentLinkSearch::resolve($state);
-
-                            if ($resolved !== null) {
-                                $set('button_url', $resolved['url']);
-
-                                if (($get('button_text') ?? '') === '' && $resolved['title'] !== '') {
-                                    $set('button_text', $resolved['title']);
-                                }
-
-                                return;
-                            }
-
-                            $set('button_url', $state);
-                        })
-                        ->columnSpanFull(),
-                    TextInput::make('button_url')
+                    SearchableInput::make('button_url')
                         ->label(__('sliders.button_url'))
                         ->placeholder(__('sliders.link_search.placeholder'))
                         ->maxLength(255)
                         ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                         ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
                         ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                            // Hydrate through helper to stay aligned with docs/forms/SEARCHABLE_INPUT_METADATA.md guidance.
-                            SearchableInputHelper::hydrate(
-                                $component,
-                                $state,
-                                static fn (string $value): ?array => ['value' => $value, 'label' => $value],
-                            );
-                        })
-                        ->afterStateUpdated(function (?string $state, callable $set): void {
-                            if ($state !== null && $state !== '') {
+                            if ($state === null || $state === '') {
                                 return;
                             }
 
-                            // Clear button URL metadata whenever the selection resets.
-                            SearchableInputHelper::clear($set, ['button_url' => null]);
+                            $component
+                                ->state($state)
+                                ->options([$state => $state]);
                         })
                         ->columnSpanFull(),
                 ]),
