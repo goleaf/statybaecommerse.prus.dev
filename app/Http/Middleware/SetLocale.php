@@ -47,6 +47,17 @@ final class SetLocale
             $preferred = $request->getPreferredLanguage($supportedLocales);
             if (is_string($preferred) && $preferred !== '') {
                 $headerLocale = $preferred;
+            } else {
+                // Manually inspect the header to gracefully handle regional variants (e.g., en-GB).
+                foreach ($request->getLanguages() as $language) {
+                    $primary = strtolower(str_replace('_', '-', $language));
+                    $segment = explode('-', $primary)[0] ?? '';
+
+                    if ($segment !== '' && in_array($segment, $supportedLocales, true)) {
+                        $headerLocale = $segment;
+                        break;
+                    }
+                }
             }
         }
 
