@@ -3,23 +3,25 @@
 This snapshot complements the changelog by listing functional capabilities that ship with the storefront and admin panel.
 
 ## Core Commerce Platform
+
 - Laravel 12 + Filament v4 admin with multilingual product, pricing, discount, and order management flows.
 - Customer loyalty, referral tracking, and recommendation engines with configurable targeting rules.
 - Automated media processing, queue orchestration, and analytics dashboards for store operators.
 
 ## Storefront Experience
+
 - Livewire-powered storefront pages with localisation, SEO metadata, and responsive catalogue browsing.
 - Checkout, cart persistence, and account management journeys wired to the same aggregates used in the admin UI.
 
 ## Operational Tooling
+
 - Queue, cache, and deployment runbooks collected under [`docs/runbooks/`](docs/runbooks/) for production readiness.
 - API contracts, payload samples, and integration notes organised in [`docs/contracts/`](docs/contracts/).
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
-- Activity Log administration now loads table data eagerly for the Filament list page while feature tests authenticate via the admin guard and assert IDs, keeping monitoring views accurate even when fresh activity rows are appended during test runs.
-- Brands page now features a light-themed layout, shared card components, and refreshed translations so the partner directory feels consistent across locales.
-- Attribute group selectors now rely on a shared translation helper so historical slugs show friendly labels across Filament forms, tables, and filters instead of exposing raw keys.
+
+- Filament address workflows now include translation-aware plugins, offline-safe asset loading, and streamlined widget tabs so admin operators and regression tests share the same reliable editing experience.
 - Region-to-city lookups and the dedicated customers table are restored for the SQLite harness, ensuring analytics sparklines, customer factories, and Filament resources can attach geographic metadata without migration errors.
 - Localized product/category routing plus collection seeding were hardened, ensuring homepage product links, category landing pages, and collection showcases load without 404s or empty states.
 - PHPUnit harness now boots a shared `database/testing.sqlite` schema (including Spatie permission tables and variant attribute pivots) and registers Filament SearchableInput payload macros so admin feature suites stay v4-compatible while reusing deterministic migrations.

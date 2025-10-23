@@ -12,14 +12,12 @@ use App\Filament\WidgetTabs\Components\Concerns\HasTheme;
 use App\Filament\WidgetTabs\Components\Concerns\HasValue;
 use Closure;
 use Filament\Support\Components\Component;
-use Filament\Support\Concerns\Configurable;
 use Filament\Support\Concerns\EvaluatesClosures;
 use Filament\Support\Concerns\HasExtraAttributes;
 use Illuminate\Database\Eloquent\Builder;
 
 class WidgetTab extends Component
 {
-    use Configurable;
     use EvaluatesClosures;
     use HasExtraAttributes;
     use HasIcon;

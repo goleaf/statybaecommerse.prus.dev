@@ -184,17 +184,13 @@ final class AdminPanelProvider extends PanelProvider
                     ]))
                     ->icon('heroicon-o-language'),
             ])
-            ->when(
-                app()->environment('testing'),
-                fn (Panel $p) => $p->plugins(array_values(array_filter(
-                    $this->configuredPlugins(),
-                    static fn (FilamentPlugin $plugin): bool => $plugin instanceof SpatieTranslatablePlugin,
-                ))),
-                fn (Panel $p) => $p->plugins($this->configuredPlugins()),
-            )
-            // Enable the custom Filament theme so third-party plugin views (like the searchable input)
-            // are compiled with Tailwind during the build step.
-            ->viteTheme('resources/css/filament/admin/theme.css')
+            ->when(app()->environment('testing'),
+                fn (Panel $p) => $p->plugins($this->testingPlugins()),
+                fn (Panel $p) => $p->plugins($this->configuredPlugins()))
+            // Avoid referencing a missing Vite manifest while running the test suite by disabling the
+            // theme override, but keep the compiled theme for every other environment.
+            ->when(! app()->environment('testing'),
+                fn (Panel $p) => $p->viteTheme('resources/css/filament/admin/theme.css'))
             ->spa();
     }
 
@@ -237,17 +233,8 @@ final class AdminPanelProvider extends PanelProvider
             $plugins[] = FilamentNordThemePlugin::make();
         }
 
-        if (class_exists(SpatieTranslatablePlugin::class)) {
-            $supportedLocales = array_values(array_filter(
-                (array) config('shared.localization.supported_locales', []),
-                static fn (mixed $locale): bool => is_string($locale) && $locale !== '',
-            ));
-
-            // Persist the admin locale switcher so users return to their last
-            // editing language across Filament sessions.
-            $plugins[] = SpatieTranslatablePlugin::make()
-                ->defaultLocales($supportedLocales !== [] ? $supportedLocales : null)
-                ->persist();
+        if ($translatablePlugin = $this->makeTranslatablePlugin()) {
+            $plugins[] = $translatablePlugin;
         }
 
         if (class_exists(ResizedColumnPlugin::class)) {
@@ -255,6 +242,39 @@ final class AdminPanelProvider extends PanelProvider
         }
 
         return array_values($plugins);
+    }
+
+    /**
+     * @return array<int, FilamentPlugin>
+     */
+    private function testingPlugins(): array
+    {
+        $plugins = [];
+
+        if ($translatablePlugin = $this->makeTranslatablePlugin()) {
+            // Reuse the same plugin wiring in tests so resources depending on translation-aware
+            // components stay functional inside Livewire-powered feature tests.
+            $plugins[] = $translatablePlugin;
+        }
+
+        return $plugins;
+    }
+
+    private function makeTranslatablePlugin(): ?FilamentPlugin
+    {
+        if (! class_exists(SpatieTranslatablePlugin::class)) {
+            return null;
+        }
+
+        $supportedLocales = array_values(array_filter(
+            (array) config('shared.localization.supported_locales', []),
+            static fn (mixed $locale): bool => is_string($locale) && $locale !== '',
+        ));
+
+        // Persist the admin locale switcher so users return to their last editing language across sessions.
+        return SpatieTranslatablePlugin::make()
+            ->defaultLocales($supportedLocales !== [] ? $supportedLocales : null)
+            ->persist();
     }
 
     /**
