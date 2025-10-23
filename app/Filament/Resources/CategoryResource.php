@@ -18,8 +18,8 @@ use App\Support\Concerns\HasNav;
 use BackedEnum;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -28,7 +28,6 @@ use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -47,16 +46,20 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
+use UnitEnum;
 
 final class CategoryResource extends Resource
 {
     use HasNav;
 
-    /** Aligns the navigation icon with Filament's expectations. */
+    /**
+     * Aligns the navigation icon with Filament's expectations while keeping the
+     * property compatible with enum values when needed.
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
     /** Align the resource under the Products navigation section. */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 3;
 
@@ -114,10 +117,10 @@ final class CategoryResource extends Resource
         return __('categories.single');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
-            SchemaSection::make(__('categories.basic_information'))
+        return $form->schema([
+            Section::make(__('categories.basic_information'))
                 ->components([
                     LanguageTabs::make([
                         TextInput::make('name')
@@ -163,7 +166,7 @@ final class CategoryResource extends Resource
                                 ->maxLength(255),
                         ]),
                 ]),
-            SchemaSection::make(__('categories.media'))
+            Section::make(__('categories.media'))
                 ->components([
                     FileUpload::make('image')
                         ->label(__('categories.image'))
@@ -186,9 +189,9 @@ final class CategoryResource extends Resource
                         ->directory('categories/banners')
                         ->visibility('private'),
                 ]),
-            SchemaSection::make(__('categories.appearance'))
+            Section::make(__('categories.appearance'))
                 ->components([
-                    SchemaGrid::make(2)
+                    Grid::make(2)
                         ->components([
                             ColorPicker::make('color')
                                 ->label(__('categories.color'))
@@ -200,7 +203,7 @@ final class CategoryResource extends Resource
                                 ->minValue(0),
                         ]),
                 ]),
-            SchemaSection::make(__('categories.seo'))
+            Section::make(__('categories.seo'))
                 ->components([
                     LanguageTabs::make([
                         TextInput::make('seo_title')
@@ -212,9 +215,9 @@ final class CategoryResource extends Resource
                             ->maxLength(500),
                     ]),
                 ]),
-            SchemaSection::make(__('categories.settings'))
+            Section::make(__('categories.settings'))
                 ->components([
-                    SchemaGrid::make(2)
+                    Grid::make(2)
                         ->components([
                             Toggle::make('is_active')
                                 ->label(__('categories.is_active'))
@@ -232,7 +235,7 @@ final class CategoryResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
