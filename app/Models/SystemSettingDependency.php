@@ -27,9 +27,19 @@ final class SystemSettingDependency extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['setting_id', 'depends_on_setting_id', 'condition', 'is_active'];
+    protected $fillable = [
+        'setting_id',
+        'depends_on_setting_id',
+        'condition',
+        'condition_value',
+        'is_active',
+    ];
 
-    protected $casts = ['is_active' => 'boolean'];
+    protected $casts = [
+        'condition'       => 'string',
+        'condition_value' => 'string',
+        'is_active'       => 'boolean',
+    ];
 
     /**
      * Handle setting functionality with proper error handling.
@@ -105,7 +115,10 @@ final class SystemSettingDependency extends Model
      */
     public function scopeWithCondition($query, $condition)
     {
-        return $query->where('condition', 'like', "%{$condition}%");
+        return $query->where(function ($q) use ($condition) {
+            $q->where('condition', 'like', "%{$condition}%")
+                ->orWhere('condition_value', 'like', "%{$condition}%");
+        });
     }
 
     public function scopeByCondition(Builder $query, string $operator): Builder
@@ -185,7 +198,8 @@ final class SystemSettingDependency extends Model
         return $query->where(function ($q) use ($search): void {
             $q
                 ->where('condition', 'like', "%{$search}%")
-                ->orWhereHas('setting', function ($q) use ($search): void {
+                ->orWhere('condition_value', 'like', "%{$search}%")
+                ->orWhereHas('setting', function ($q) use ($search) {
                     $q
                         ->where('key', 'like', "%{$search}%")
                         ->orWhere('name', 'like', "%{$search}%");
@@ -247,18 +261,104 @@ final class SystemSettingDependency extends Model
             return false;
         }
         $dependencyValue = $this->dependsOn->value;
-        $condition = $this->condition;
+        $operator = strtolower(trim((string) ($this->condition ?? '')));
+        $expected = $this->condition_value;
 
-        return match ($condition['operator'] ?? 'equals') {
-            'equals'       => $dependencyValue == $condition['value'],
-            'not_equals'   => $dependencyValue != $condition['value'],
-            'greater_than' => $dependencyValue > $condition['value'],
-            'less_than'    => $dependencyValue < $condition['value'],
-            'contains'     => str_contains($dependencyValue, $condition['value']),
-            'not_contains' => ! str_contains($dependencyValue, $condition['value']),
-            'in'           => in_array($dependencyValue, $condition['value'] ?? []),
-            'not_in'       => ! in_array($dependencyValue, $condition['value'] ?? []),
-            default        => false,
+        if ($operator === '') {
+            return false;
+        }
+
+        $normalizedValue = is_string($dependencyValue) ? trim($dependencyValue) : $dependencyValue;
+        $expectedValue = is_string($expected) ? trim($expected) : $expected;
+
+        $operatorsRequiringValue = [
+            'equals',
+            'not_equals',
+            'greater_than',
+            'greater_or_equals',
+            'less_than',
+            'less_or_equals',
+            'contains',
+            'not_contains',
+            'starts_with',
+            'ends_with',
+            'in',
+            'not_in',
+        ];
+
+        if (in_array($operator, $operatorsRequiringValue, true) && ($expectedValue === null || (is_string($expectedValue) && $expectedValue === ''))) {
+            return false;
+        }
+
+        return match ($operator) {
+            'equals'            => $this->compareValues($normalizedValue, $expectedValue) === 0,
+            'not_equals'        => $this->compareValues($normalizedValue, $expectedValue) !== 0,
+            'greater_than'      => $this->compareValues($normalizedValue, $expectedValue) === 1,
+            'greater_or_equals' => $this->compareValues($normalizedValue, $expectedValue) >= 0,
+            'less_than'         => $this->compareValues($normalizedValue, $expectedValue) === -1,
+            'less_or_equals'    => $this->compareValues($normalizedValue, $expectedValue) <= 0,
+            'contains'          => is_string($normalizedValue) && is_string($expectedValue) && str_contains($normalizedValue, $expectedValue),
+            'not_contains'      => is_string($normalizedValue) && is_string($expectedValue) && ! str_contains($normalizedValue, $expectedValue),
+            'starts_with'       => is_string($normalizedValue) && is_string($expectedValue) && str_starts_with($normalizedValue, $expectedValue),
+            'ends_with'         => is_string($normalizedValue) && is_string($expectedValue) && str_ends_with($normalizedValue, $expectedValue),
+            'in'                => $this->isInList($normalizedValue, $expectedValue),
+            'not_in'            => ! $this->isInList($normalizedValue, $expectedValue),
+            'is_empty'          => blank($normalizedValue),
+            'is_not_empty'      => filled($normalizedValue),
+            'is_true'           => $this->toBoolean($normalizedValue) === true,
+            'is_false'          => $this->toBoolean($normalizedValue) === false,
+            default             => false,
         };
+    }
+
+    private function compareValues(mixed $actual, mixed $expected): int
+    {
+        if (is_null($actual) || is_null($expected)) {
+            return $actual === $expected ? 0 : (is_null($actual) ? -1 : 1);
+        }
+
+        if (is_numeric($actual) && is_numeric($expected)) {
+            return $actual <=> $expected;
+        }
+
+        return strcmp((string) $actual, (string) $expected);
+    }
+
+    private function isInList(mixed $actual, mixed $expected): bool
+    {
+        if (is_null($expected)) {
+            return false;
+        }
+
+        if (is_string($expected)) {
+            $decoded = json_decode($expected, true);
+
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                $expected = $decoded;
+            } else {
+                $expected = array_map('trim', array_filter(explode(',', $expected), fn ($item) => $item !== ''));
+            }
+        }
+
+        if (! is_array($expected)) {
+            return false;
+        }
+
+        return in_array($actual, $expected, ! is_string($actual));
+    }
+
+    private function toBoolean(mixed $value): ?bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        if ($value === null) {
+            return null;
+        }
+
+        $filtered = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
+        return $filtered;
     }
 }
