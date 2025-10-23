@@ -17,6 +17,7 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
+- Discount redemption management screens now respect their full status lifecycle after widening the shared status scope, ensuring Filament listings, filters, and widgets display pending through cancelled records for administrators.
 - Campaign click tracking screens now provide a configurable click timestamp, zero-default conversion values, and automatic fallbacks so operators can capture marketing signals without manual database edits.
 - Brands page now features a light-themed layout, shared card components, and refreshed translations so the partner directory feels consistent across locales.
 - Attribute group selectors now rely on a shared translation helper so historical slugs show friendly labels across Filament forms, tables, and filters instead of exposing raw keys.
