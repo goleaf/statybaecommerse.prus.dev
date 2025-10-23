@@ -17,6 +17,8 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 ### Latest updates
+- Restored the missing `App\\Exceptions\\Handler` so Laravel can bootstrap without the fatal `Whoops\\Run::handleShutdown()` error that previously surfaced on every web request and artisan command.
+- Test runs now provision an on-disk SQLite database and guard customer group metadata seeding, eliminating the intermittent `no such table: users` failure encountered by the user attribution observer suite.
 - Shipping options now expose explicit zone relationships and fillable references, letting orders and delivery zones surface
   carrier data consistently during automated regression runs.
 - HTML sanitization now strips entire `<script>`, `<style>`, and `<template>` elements instead of unwrapping them, ensuring

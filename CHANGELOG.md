@@ -39,6 +39,8 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Introduced a reusable HTML sanitization pipeline with a maintenance command, model hooks, and storefront renderer updates to harden product and legal content.
 
 ### Bug Fixes
+- Restored the application exception handler so requests and artisan commands stop crashing with `Whoops\\Run::handleShutdown()` when Laravel bootstraps without the class.
+* Stabilized the SQLite-powered test bootstrap by forcing an on-disk database, guarding factories against optional columns, and eliminating the `no such table: users` regression that blocked the user attribution observer suite.
 * Stabilized analytics event tracking by skipping the user-owned scope in console contexts, gracefully handling missing request/session data, enriching event type listings, and returning float-safe stats so regression suites can assert conversions reliably.
 * Made administrative rate limiting, authorization matrix lookups, and brand metadata diagnostics console-friendly by avoiding container-bound config calls and explicitly removing visibility scopes, which restores the targeted unit tests.
 * Restored the shipping option ↔ zone relationship so orders, factories, and zone aggregations attach carriers without manual
