@@ -24,7 +24,8 @@ final class DashboardMetricsRepository
 
             return Order::query()
                 ->withoutGlobalScopes([ActiveScope::class])
-                ->whereBetween('created_at', [$startOfDay, $endOfDay])
+                // Wrap the daily window in the created_at scope to leverage the standalone index.
+                ->createdBetween($startOfDay, $endOfDay)
                 ->whereNull('deleted_at')
                 ->count();
         }, [CacheKeys::orderAggregateTag()]);
@@ -40,7 +41,8 @@ final class DashboardMetricsRepository
             $total = Order::query()
                 ->withoutGlobalScopes([ActiveScope::class])
                 ->when($statuses !== [], fn ($query) => $query->whereIn('status', $statuses))
-                ->where('created_at', '>=', $startDate)
+                // Pivot to the createdSince scope so the revenue rollup stays aligned with the index.
+                ->createdSince($startDate)
                 ->whereNull('deleted_at')
                 ->sum('total');
 
@@ -71,12 +73,12 @@ final class DashboardMetricsRepository
                 ->withoutGlobalScopes([ActiveScope::class])
                 ->where('manage_stock', true)
                 ->whereNull('deleted_at')
-                ->where(function ($query) use ($threshold) {
-                    $query->where(function ($innerQuery) {
+                ->where(function ($query) use ($threshold): void {
+                    $query->where(function ($innerQuery): void {
                         $innerQuery
                             ->whereNotNull('low_stock_threshold')
                             ->whereColumn('stock_quantity', '<=', 'low_stock_threshold');
-                    })->orWhere(function ($innerQuery) use ($threshold) {
+                    })->orWhere(function ($innerQuery) use ($threshold): void {
                         $innerQuery
                             ->whereNull('low_stock_threshold')
                             ->where('stock_quantity', '<=', $threshold);
