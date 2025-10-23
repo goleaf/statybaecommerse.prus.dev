@@ -17,13 +17,23 @@ class ChannelFactory extends Factory
 
     public function definition(): array
     {
-        static $sequence = 0;
-
         $name = $this->faker->unique()->company() . ' Channel';
 
-        // Generate a ULID-backed identifier to guarantee uniqueness even when
-        // diagnostics seeders run concurrently across multiple processes.
-        $code = sprintf('chn-%s-%d', Str::lower((string) Str::ulid()), $sequence++);
+        $baseCode = Str::of($name)
+            ->snake()
+            ->upper()
+            ->replaceMatches('/[^A-Z0-9_]/', '')
+            ->replaceMatches('/_{2,}/', '_')
+            ->trim('_')
+            ->substr(0, 12)
+            ->toString();
+
+        if ($baseCode === '') {
+            $baseCode = 'CHANNEL';
+        }
+
+        $suffix = strtoupper(Str::random(4));
+        $code = sprintf('%s_%s', $baseCode, $suffix);
 
         return [
             // Identity and descriptive metadata.

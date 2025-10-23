@@ -30,9 +30,9 @@ final class NewsCategoryResource extends Resource
     /**
      * @var string|BackedEnum|null Keep the resource grouped with other news modules.
      */
-    protected static $navigationGroup = NavigationGroup::News->value;
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::News->value;
 
-    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
+    public static function getNavigationGroup(): \UnitEnum|string|null
     {
         // Delegate to the enum label for localisation support.
         $group = self::$navigationGroup;

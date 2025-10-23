@@ -68,7 +68,7 @@ final class WishlistItemResource extends Resource
      */
     protected static ?int $navigationSort = 10;
 
-    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
+    public static function getNavigationGroup(): \UnitEnum|string|null
     {
         return 'Customers';
     }

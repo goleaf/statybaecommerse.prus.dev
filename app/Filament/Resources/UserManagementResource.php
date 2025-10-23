@@ -30,7 +30,7 @@ final class UserManagementResource extends Resource
 
     protected static ?int $navigationSort = 3;
 
-    protected static \Filament\Navigation\NavigationGroup|array|string|null $navigationGroup = 'Users';
+    protected static \UnitEnum|string|null $navigationGroup = 'Users';
 
     public static function shouldRegisterNavigation(): bool
     {
@@ -77,7 +77,7 @@ final class UserManagementResource extends Resource
         return __('users.title');
     }
 
-    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
+    public static function getNavigationGroup(): \UnitEnum|string|null
     {
         return static::$navigationGroup;
     }

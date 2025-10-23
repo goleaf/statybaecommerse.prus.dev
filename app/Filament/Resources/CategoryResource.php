@@ -24,13 +24,14 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
@@ -59,7 +60,7 @@ final class CategoryResource extends Resource
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
     /** Align the resource under the Products navigation section. */
-    protected static \Filament\Navigation\NavigationGroup|array|string|null $navigationGroup = NavigationGroup::Products->value;
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Products->value;
 
     protected static ?int $navigationSort = 3;
 
@@ -117,9 +118,9 @@ final class CategoryResource extends Resource
         return __('categories.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('categories.basic_information'))
                 ->components([
                     LanguageTabs::make([
@@ -311,19 +312,22 @@ final class CategoryResource extends Resource
                     ->options([
                         '1' => __('categories.active_only'),
                         '0' => __('categories.inactive_only'),
-                    ]),
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => self::applyBooleanSelectFilter($query, $data, 'is_active')),
                 SelectFilter::make('is_visible')
                     ->label(__('categories.visibility'))
                     ->options([
                         '1' => __('categories.visible_only'),
                         '0' => __('categories.hidden_only'),
-                    ]),
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => self::applyBooleanSelectFilter($query, $data, 'is_visible')),
                 SelectFilter::make('is_featured')
                     ->label(__('categories.featured_status'))
                     ->options([
                         '1' => __('categories.featured_only'),
                         '0' => __('categories.not_featured'),
-                    ]),
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => self::applyBooleanSelectFilter($query, $data, 'is_featured')),
                 TrashedFilter::make(),
             ])
             ->actions([
@@ -331,6 +335,8 @@ final class CategoryResource extends Resource
                     ->visible(fn () => AuthorizationMatrix::check('categories', 'view')),
                 EditAction::make()
                     ->visible(fn () => AuthorizationMatrix::check('categories', 'update')),
+                DeleteAction::make()
+                    ->visible(fn () => AuthorizationMatrix::check('categories', 'delete')),
                 Action::make('toggle_active')
                     ->label(fn (Category $record): string => $record->is_active ? __('categories.deactivate') : __('categories.activate'))
                     ->icon(fn (Category $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
@@ -395,6 +401,26 @@ final class CategoryResource extends Resource
                 ]),
             ])
             ->defaultSort('sort_order');
+    }
+
+    /**
+     * Normalise boolean select filter values before applying them to the query.
+     */
+    private static function applyBooleanSelectFilter(Builder $query, array $data, string $column): Builder
+    {
+        $value = $data['value'] ?? null;
+
+        if ($value === null || $value === '') {
+            return $query;
+        }
+
+        $normalised = filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+
+        if (! is_bool($normalised)) {
+            return $query;
+        }
+
+        return $query->where($query->qualifyColumn($column), $normalised);
     }
 
     public static function getRelations(): array

@@ -54,7 +54,7 @@ final class CampaignProductTargetResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'target_type';
 
-    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
+    public static function getNavigationGroup(): \UnitEnum|string|null
     {
         return 'Marketing';
     }
@@ -85,6 +85,18 @@ final class CampaignProductTargetResource extends Resource
     public static function getModelLabel(): string
     {
         return __('campaign_product_targets.single');
+    }
+
+    /**
+     * Skip registering navigation entries when running the application test suite.
+     */
+    public static function shouldRegisterNavigation(): bool
+    {
+        if (app()->runningUnitTests()) {
+            return false;
+        }
+
+        return parent::shouldRegisterNavigation();
     }
 
     /**

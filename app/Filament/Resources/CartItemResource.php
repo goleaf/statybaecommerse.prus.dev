@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\CartItemResource\Pages;
 use App\Models\CartItem;
 use App\Models\Product;
@@ -22,10 +20,12 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
@@ -66,12 +66,12 @@ final class CartItemResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
-            SchemaSection::make(__('cart_items.basic_information'))
+        return $form->schema([
+            Section::make(__('cart_items.basic_information'))
                 ->schema([
-                    SchemaGrid::make(2)
+                    Grid::make(2)
                         ->schema([
                             Select::make('user_id')
                                 ->label(__('cart_items.user'))
@@ -169,12 +169,12 @@ final class CartItemResource extends Resource
                         ->readOnly()
                         ->dehydrated(false)
                         ->maxLength(255),
-                    SchemaGrid::make(2)
+                    Grid::make(2)
                         ->schema([
                             TextInput::make('quantity')
                                 ->label(__('cart_items.quantity'))
                                 ->minValue(1)
-                                ->steps(1)
+                                ->step(1)
                                 ->default(1)
                                 ->required()
                                 ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set): void {
@@ -186,21 +186,21 @@ final class CartItemResource extends Resource
                             Quantity::make('minimum_quantity')
                                 ->label(__('cart_items.minimum_quantity'))
                                 ->minValue(1)
-                                ->steps(1)
+                                ->step(1)
                                 ->default(1),
                         ]),
                     TextInput::make('session_id')
                         ->label(__('cart_items.session_id'))
                         ->maxLength(255)
                         ->helperText(__('cart_items.session_id_help')),
-                    Forms\Components\Textarea::make('notes')
+                    Textarea::make('notes')
                         ->label(__('cart_items.notes'))
                         ->rows(3)
                         ->maxLength(1000),
                 ]),
-            SchemaSection::make(__('cart_items.pricing'))
+            Section::make(__('cart_items.pricing'))
                 ->schema([
-                    SchemaGrid::make(3)
+                    Grid::make(3)
                         ->schema([
                             TextInput::make('unit_price')
                                 ->label(__('cart_items.unit_price'))
@@ -235,7 +235,7 @@ final class CartItemResource extends Resource
                                 ->dehydrated(),
                         ]),
                 ]),
-            SchemaSection::make(__('cart_items.additional_info'))
+            Section::make(__('cart_items.additional_info'))
                 ->schema([
                     Forms\Components\KeyValue::make('attributes')
                         ->label(__('cart_items.attributes'))

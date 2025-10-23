@@ -55,7 +55,7 @@ final class SeoDataResource extends Resource
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
     /** @var \Filament\Navigation\NavigationGroup|array|string|null */
-    protected static \Filament\Navigation\NavigationGroup|array|string|null $navigationGroup = NavigationGroup::Content->value;
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Content->value;
 
     public static function getNavigationLabel(): string
     {

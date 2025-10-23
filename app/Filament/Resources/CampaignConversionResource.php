@@ -39,11 +39,17 @@ final class CampaignConversionResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static \Filament\Navigation\NavigationGroup|array|string|null $navigationGroup = NavigationGroup::Campaigns->value;
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Campaigns->value;
 
     public static function getNavigationLabel(): string
     {
-        return __('campaign_conversions.title');
+        $label = __('campaign_conversions.navigation.label');
+
+        if (is_array($label) || ! is_string($label) || $label === '') {
+            $label = __('campaign_conversions.title');
+        }
+
+        return is_string($label) && $label !== '' ? $label : 'Campaign Conversions';
     }
 
     public static function getNavigationGroup(): string|UnitEnum|null

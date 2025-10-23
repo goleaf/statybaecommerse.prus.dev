@@ -30,7 +30,7 @@ final class CollectionResource extends Resource
      * Group the resource under the "Products" navigation entry.
      */
     /** @var \Filament\Navigation\NavigationGroup|array|string|null */
-    protected static \Filament\Navigation\NavigationGroup|array|string|null $navigationGroup = 'Products';
+    protected static \UnitEnum|string|null $navigationGroup = 'Products';
 
     /**
      * Display icon used by Filament's sidebar.
@@ -129,7 +129,7 @@ final class CollectionResource extends Resource
      * Return the navigation group configured for the resource so
      * the test-suite can confirm it matches the Nav helper output.
      */
-    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
+    public static function getNavigationGroup(): \UnitEnum|string|null
     {
         return static::$navigationGroup;
     }

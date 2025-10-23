@@ -115,7 +115,12 @@ final class CampaignViewResource extends Resource
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
-                        if (strlen($state) <= 50) {
+
+                        if (! is_string($state)) {
+                            return null;
+                        }
+
+                        if (mb_strlen($state) <= 50) {
                             return null;
                         }
 
@@ -127,7 +132,12 @@ final class CampaignViewResource extends Resource
                     ->limit(30)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
-                        if (strlen($state) <= 30) {
+
+                        if (! is_string($state)) {
+                            return null;
+                        }
+
+                        if (mb_strlen($state) <= 30) {
                             return null;
                         }
 
@@ -152,11 +162,12 @@ final class CampaignViewResource extends Resource
                     ->preload(),
                 SelectFilter::make('ip_address')
                     ->label(__('campaign_views.ip_address'))
-                    ->options(function () {
-                        return CampaignView::distinct('ip_address')
-                            ->pluck('ip_address', 'ip_address')
-                            ->toArray();
-                    })
+                    ->options(fn (): array => CampaignView::query()
+                        ->whereNotNull('ip_address')
+                        ->distinct('ip_address')
+                        ->orderBy('ip_address')
+                        ->pluck('ip_address', 'ip_address')
+                        ->toArray())
                     ->searchable(),
             ])
             ->actions([

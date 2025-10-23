@@ -41,7 +41,7 @@ final class ReferralResource extends Resource
     /**
      * Navigation group for organizing the resource in the admin panel.
      */
-    protected static \Filament\Navigation\NavigationGroup|array|string|null $navigationGroup = NavigationGroup::Marketing->value; // Keep referrals with other marketing touchpoints.
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Marketing->value; // Keep referrals with other marketing touchpoints.
 
     protected static ?int $navigationSort = 17;
 

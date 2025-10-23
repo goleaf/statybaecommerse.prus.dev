@@ -48,7 +48,7 @@ final class UserProductInteractionResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static \Filament\Navigation\NavigationGroup|array|string|null $navigationGroup = 'Users';
+    protected static \UnitEnum|string|null $navigationGroup = 'Users';
 
     public static function getNavigationLabel(): string
     {

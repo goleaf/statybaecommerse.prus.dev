@@ -62,7 +62,7 @@ final class CustomerResource extends Resource
         return 'heroicon-o-users';
     }
 
-    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
+    public static function getNavigationGroup(): \UnitEnum|string|null
     {
         return 'Users';
     }

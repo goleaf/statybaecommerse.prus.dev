@@ -29,11 +29,11 @@ final class VariantPriceHistoryResource extends Resource
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-currency-euro';
 
     /** @var string|BackedEnum|null Navigation grouping centralized via enum. */
-    protected static \Filament\Navigation\NavigationGroup|array|string|null $navigationGroup = NavigationGroup::System->value;
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::System->value;
 
     protected static ?int $navigationSort = 20;
 
-    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
+    public static function getNavigationGroup(): \UnitEnum|string|null
     {
         // Resolve enum-backed navigation label so the sidebar remains localized.
         $group = self::$navigationGroup;

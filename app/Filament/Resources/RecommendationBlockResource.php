@@ -46,7 +46,7 @@ final class RecommendationBlockResource extends Resource
     /**
      * @var string|BackedEnum|null Tracks the navigation group while remaining Filament compatible.
      */
-    protected static \Filament\Navigation\NavigationGroup|array|string|null $navigationGroup = NavigationGroup::Products->value;
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Products->value;
 
     protected static ?int $navigationSort = 13;
 
@@ -60,7 +60,7 @@ final class RecommendationBlockResource extends Resource
         return __('recommendation_blocks.title');
     }
 
-    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
+    public static function getNavigationGroup(): \UnitEnum|string|null
     {
         // Delegates to the enum value so Filament keeps grouping consistent while still
         // accepting plain strings when Filament expects a literal label.

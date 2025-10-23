@@ -59,23 +59,24 @@
 
     <!-- Scripts -->
     @php
-        // Load Vite assets only when the build manifest exists and contains a
-        // valid JSON structure; this keeps Blade safe during tests where the
-        // build step is intentionally skipped.
-        $manifestPath = public_path('build/manifest.json');
-        $hasManifest = false;
+        // Load Vite assets only when a manifest is available and the test suite is not running.
+        $shouldLoadViteAssets = false;
 
-        if (is_file($manifestPath) && is_readable($manifestPath)) {
-            $manifestContents = file_get_contents($manifestPath);
+        if (! app()->runningUnitTests()) {
+            $manifestPath = public_path('build/manifest.json');
 
-            if ($manifestContents !== false) {
-                $manifestData = json_decode($manifestContents, true);
-                $hasManifest = is_array($manifestData) && $manifestData !== [];
+            if (is_file($manifestPath) && is_readable($manifestPath)) {
+                $manifestContents = file_get_contents($manifestPath);
+
+                if ($manifestContents !== false) {
+                    $manifestData = json_decode($manifestContents, true);
+                    $shouldLoadViteAssets = is_array($manifestData) && $manifestData !== [];
+                }
             }
         }
     @endphp
 
-    @if ($hasManifest)
+    @if ($shouldLoadViteAssets)
         @vite(['resources/css/app.scss', 'resources/js/app.js'])
     @else
         {{-- Fall back to the precompiled asset pipeline when Vite has not built a manifest yet. --}}

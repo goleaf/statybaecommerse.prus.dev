@@ -52,7 +52,7 @@ final class ReferralRewardResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static \Filament\Navigation\NavigationGroup|array|string|null $navigationGroup = 'Referral';
+    protected static \UnitEnum|string|null $navigationGroup = 'Referral';
 
     public static function form(Schema $schema): Schema   
     {
@@ -325,7 +325,7 @@ final class ReferralRewardResource extends Resource
         return $icon;
     }
 
-    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
+    public static function getNavigationGroup(): \UnitEnum|string|null
     {
         $group = self::$navigationGroup;
 
