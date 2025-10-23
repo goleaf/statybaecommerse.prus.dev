@@ -29,6 +29,7 @@
    use UnitEnum;
 
    // Remove duplicates if found
+   // Drop stray imports on pages/resources without a navigation group property
    ```
 
    > The `scripts/fix_filament_navigation_group.php` helper now also scans Filament pages and widgets that do not declare a
