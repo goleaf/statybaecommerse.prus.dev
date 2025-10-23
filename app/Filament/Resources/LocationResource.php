@@ -90,12 +90,42 @@ final class LocationResource extends Resource
                 ->components([
                     Grid::make(2)
                         ->components([
-                            Select::make('country_code')
-                                ->label(__('locations.country'))
+                            Select::make('country_id')
+                                ->label(__('locations.fields.country'))
                                 ->relationship('country', 'name')
                                 ->searchable()
                                 ->preload()
-                                ->live(),
+                                ->live()
+                                ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                    if ($state) {
+                                        $country = Country::find($state);
+                                        if ($country) {
+                                            $set('country_code', $country->code);
+                                        }
+                                    }
+                                }),
+                            Select::make('city_id')
+                                ->label(__('locations.fields.city'))
+                                ->relationship('city', 'name')
+                                ->searchable()
+                                ->preload()
+                                ->live()
+                                ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                    if ($state) {
+                                        $city = City::find($state);
+                                        if ($city) {
+                                            $set('city_code', $city->code);
+                                        }
+                                    }
+                                }),
+                            TextInput::make('country_code')
+                                ->label(__('locations.fields.country_code'))
+                                ->maxLength(3)
+                                ->disabled(),
+                            TextInput::make('city_code')
+                                ->label(__('locations.fields.city_code'))
+                                ->maxLength(10)
+                                ->disabled(),
                         ]),
                 ]),
             Section::make(__('locations.coordinates'))
@@ -169,22 +199,22 @@ final class LocationResource extends Resource
                             Select::make('day')
                                 ->label(__('locations.fields.day'))
                                 ->options([
-                                    'monday'    => __('locations.days.monday'),
-                                    'tuesday'   => __('locations.days.tuesday'),
-                                    'wednesday' => __('locations.days.wednesday'),
-                                    'thursday'  => __('locations.days.thursday'),
-                                    'friday'    => __('locations.days.friday'),
-                                    'saturday'  => __('locations.days.saturday'),
-                                    'sunday'    => __('locations.days.sunday'),
+                                    'monday' => __('locations.monday'),
+                                    'tuesday' => __('locations.tuesday'),
+                                    'wednesday' => __('locations.wednesday'),
+                                    'thursday' => __('locations.thursday'),
+                                    'friday' => __('locations.friday'),
+                                    'saturday' => __('locations.saturday'),
+                                    'sunday' => __('locations.sunday'),
                                 ])
                                 ->required(),
                             Toggle::make('is_closed')
                                 ->label(__('locations.fields.is_closed'))
                                 ->live(),
-                            Flatpickr::makeTime('open_time')
+                            TimePicker::make('open_time')
                                 ->label(__('locations.fields.open_time'))
                                 ->visible(fn ($get) => ! $get('is_closed')),
-                            Flatpickr::makeTime('close_time')
+                            TimePicker::make('close_time')
                                 ->label(__('locations.fields.close_time'))
                                 ->visible(fn ($get) => ! $get('is_closed')),
                         ])
@@ -203,8 +233,8 @@ final class LocationResource extends Resource
                 ->components([
                     Grid::make(2)
                         ->components([
-                            Toggle::make('is_enabled')
-                                ->label(__('locations.is_enabled'))
+                            Toggle::make('is_active')
+                                ->label(__('locations.fields.is_enabled'))
                                 ->default(true),
                             Toggle::make('is_default')
                                 ->label(__('locations.fields.is_default')),
@@ -216,11 +246,11 @@ final class LocationResource extends Resource
                             Select::make('type')
                                 ->label(__('locations.fields.type'))
                                 ->options([
-                                    'warehouse'           => __('locations.types.warehouse'),
-                                    'store'               => __('locations.types.store'),
-                                    'office'              => __('locations.types.office'),
-                                    'distribution_center' => __('locations.types.distribution_center'),
-                                    'pickup_point'        => __('locations.types.pickup_point'),
+                                    'warehouse' => __('locations.type_warehouse'),
+                                    'store' => __('locations.type_store'),
+                                    'office' => __('locations.type_office'),
+                                    'distribution_center' => __('locations.type_distribution_center'),
+                                    'pickup_point' => __('locations.type_pickup_point'),
                                 ])
                                 ->default('warehouse'),
                         ]),
@@ -248,8 +278,8 @@ final class LocationResource extends Resource
                 TextColumn::make('country.name')
                     ->label(__('locations.fields.country'))
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('city')
-                    ->label(__('locations.city'))
+                TextColumn::make('city.name')
+                    ->label(__('locations.fields.city'))
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('type')
                     ->label(__('locations.fields.type'))
@@ -268,8 +298,8 @@ final class LocationResource extends Resource
                 TextColumn::make('email')
                     ->label(__('locations.fields.email'))
                     ->toggleable(isToggledHiddenByDefault: true),
-                IconColumn::make('is_enabled')
-                    ->label(__('locations.is_enabled'))
+                IconColumn::make('is_active')
+                    ->label(__('locations.fields.is_enabled'))
                     ->boolean()
                     ->sortable(),
                 IconColumn::make('is_default')
@@ -307,15 +337,15 @@ final class LocationResource extends Resource
                     ->preload(),
                 SelectFilter::make('type')
                     ->options([
-                        'warehouse'           => __('locations.types.warehouse'),
-                        'store'               => __('locations.types.store'),
-                        'office'              => __('locations.types.office'),
-                        'distribution_center' => __('locations.types.distribution_center'),
-                        'pickup_point'        => __('locations.types.pickup_point'),
+                        'warehouse' => __('locations.type_warehouse'),
+                        'store' => __('locations.type_store'),
+                        'office' => __('locations.type_office'),
+                        'distribution_center' => __('locations.type_distribution_center'),
+                        'pickup_point' => __('locations.type_pickup_point'),
                     ]),
-                TernaryFilter::make('is_enabled')
-                    ->trueLabel(__('locations.filter_enabled'))
-                    ->falseLabel(__('locations.filter_disabled'))
+                TernaryFilter::make('is_active')
+                    ->trueLabel(__('locations.filters.active_only'))
+                    ->falseLabel(__('locations.filters.inactive_only'))
                     ->native(false),
                 TernaryFilter::make('is_default')
                     ->trueLabel(__('locations.filters.default_only'))
@@ -324,8 +354,8 @@ final class LocationResource extends Resource
                 SelectFilter::make('has_coordinates')
                     ->label(__('locations.filters.has_coordinates'))
                     ->options([
-                        'yes' => __('locations.with_coordinates'),
-                        'no'  => __('locations.without_coordinates'),
+                        'yes' => __('locations.filters.with_coordinates'),
+                        'no' => __('locations.filters.without_coordinates'),
                     ])
                     ->query(function (Builder $query, array $data): void {
                         $value = $data['value'] ?? null;
@@ -341,8 +371,8 @@ final class LocationResource extends Resource
                 SelectFilter::make('has_opening_hours')
                     ->label(__('locations.filters.has_opening_hours'))
                     ->options([
-                        'yes' => __('locations.with_opening_hours'),
-                        'no'  => __('locations.without_opening_hours'),
+                        'yes' => __('locations.filters.with_opening_hours'),
+                        'no' => __('locations.filters.without_opening_hours'),
                     ])
                     ->query(function (Builder $query, array $data): void {
                         $value = $data['value'] ?? null;
@@ -357,14 +387,14 @@ final class LocationResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 EditAction::make(),
-                Action::make('toggle_enabled')
-                    ->label(fn (Location $record): string => $record->is_enabled ? __('locations.deactivate') : __('locations.activate'))
-                    ->icon(fn (Location $record): string => $record->is_enabled ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn (Location $record): string => $record->is_enabled ? 'warning' : 'success')
+                Action::make('toggle_active')
+                    ->label(fn (Location $record): string => $record->is_active ? __('locations.actions.deactivate') : __('locations.actions.activate'))
+                    ->icon(fn (Location $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn (Location $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (Location $record): void {
                         $record->update(['is_enabled' => ! $record->is_enabled]);
                         Notification::make()
-                            ->title($record->is_enabled ? __('locations.activated_successfully') : __('locations.deactivated_successfully'))
+                            ->title($record->is_active ? __('locations.messages.activated') : __('locations.messages.deactivated'))
                             ->success()
                             ->send();
                     })
