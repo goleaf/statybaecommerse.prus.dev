@@ -76,6 +76,7 @@
 - Legacy diagnostics artisan commands were retired in favour of PHPUnit suites guarded by a configurable coverage extension and Paratest-aware composer scripts, making quality checks part of every test run.
 
 ## API experience
+- Contract validation endpoints now mirror the published schemas thanks to the persistent SQLite test bootstrap and trimmed response envelopes, ensuring the API suite passes on fresh installs.
 - Product search, catalogue, and detail endpoints resolve via dedicated application use cases, an Eloquent-backed repository, and a presenter that preserves the public contract while filtering hidden or malformed catalogue entries.
 - Problem+JSON responses now include the shared `error.rate_limited` code for HTTP 429 throttling scenarios, helping integrators react uniformly when the throttle middleware triggers.
 - Validation problem responses now deliver localized violation arrays plus a fallback English reason so clients can show consistent messaging while still exposing locale-specific details.

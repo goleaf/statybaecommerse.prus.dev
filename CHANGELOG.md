@@ -49,16 +49,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Introduced a reusable HTML sanitization pipeline with a maintenance command, model hooks, and storefront renderer updates to harden product and legal content.
 
 ### Bug Fixes
-* Added the missing coupon schema columns (maximum discount caps, per-user limits, and scoped product/category JSON fields) so Laravel migrations and factories align, restoring the API coupon application test suite.
-* Rounded coupon discount calculations inside the application service to prevent `Number::parseFloat` type errors when returning pricing payloads during checkout flows.
-- Restored the application exception handler so requests and artisan commands stop crashing with `Whoops\\Run::handleShutdown()` when Laravel bootstraps without the class.
-* Stabilized the SQLite-powered test bootstrap by forcing an on-disk database, guarding factories against optional columns, and eliminating the `no such table: users` regression that blocked the user attribution observer suite.
-* Stabilized analytics event tracking by skipping the user-owned scope in console contexts, gracefully handling missing request/session data, enriching event type listings, and returning float-safe stats so regression suites can assert conversions reliably.
-* Made administrative rate limiting, authorization matrix lookups, and brand metadata diagnostics console-friendly by avoiding container-bound config calls and explicitly removing visibility scopes, which restores the targeted unit tests.
-* Restored the shipping option ↔ zone relationship so orders, factories, and zone aggregations attach carriers without manual
-  attribute overrides during tests.
-* Hardened the API search endpoint to short-circuit suspicious payloads and ensure exact-title matches outrank fuzzy results, keeping injection attempts empty while surfacing precise catalogue hits first.
-- Ensured the customer and product inline sparkline widgets reuse the cached series datasets and publish matching checksums so Filament tables render the same analytics payload verified by unit tests.
+* Stabilized the API contract suite by wiring tests to a persistent SQLite database, aligning factories with published visibility scopes, and trimming response envelopes to the documented schemas.
 * Normalized search type filters to treat mixed-case input from clients as valid bucket selectors, keeping aggregated storefront results scoped correctly instead of silently reverting to every result category.
 * Prevented missing-table SQLite errors by provisioning the `companies` schema during test bootstrapping and softening the company active scope when migrations have not yet executed.
 * Prevented Pest test helper redeclaration errors by wrapping the `login()`, `get()`, and `post()` helpers in existence guards so repeated bootstrap phases during `php artisan test` succeed.

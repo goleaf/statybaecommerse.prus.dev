@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\Scopes;
 
+use App\Models\Order;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
@@ -20,6 +21,14 @@ final class ActiveScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
+        if ($model instanceof Order) {
+            // Orders rely on rich status transitions (pending, processing, etc.) and
+            // should not inherit the generic "active" filtering that other lookup
+            // tables require.
+            return;
+        }
+
+        // Prefer stricter check when both flags exist
         $schema = $model->getConnection()->getSchemaBuilder();
         $table = $model->getTable();
 
