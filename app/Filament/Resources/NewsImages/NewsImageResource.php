@@ -8,7 +8,7 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\NewsImages\Pages\CreateNewsImage;
 use App\Filament\Resources\NewsImages\Pages\EditNewsImage;
 use App\Filament\Resources\NewsImages\Pages\ListNewsImages;
-use App\Filament\Resources\NewsImages\Pages\ViewNewsImage;
+use App\Models\News;
 use App\Models\NewsImage;
 use App\Support\Storage\SecureStorage;
 use BackedEnum;
@@ -34,6 +34,8 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 class NewsImageResource extends Resource
 {
