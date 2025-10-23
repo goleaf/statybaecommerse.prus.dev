@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Enums\ExportType;
+use App\Filament\Actions\RequestExportBulkAction;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers\AttributesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\CategoriesRelationManager;
@@ -662,10 +662,9 @@ final class ProductResource extends Resource
                                 ->title(__('products.notifications.prices_updated'))
                                 ->success()
                                 ->send();
-                        })
-                        ->visible(fn () => AuthorizationMatrix::check('products', 'update')),
-                    DeleteBulkAction::make()
-                        ->visible(fn () => AuthorizationMatrix::check('products', 'delete')),
+                        }),
+                    RequestExportBulkAction::make(ExportType::PRODUCTS),
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');

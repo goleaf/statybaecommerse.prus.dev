@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Enums\ExportType;
+use App\Filament\Actions\RequestExportBulkAction;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Address;
@@ -848,20 +848,8 @@ final class OrderResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->requiresConfirmation()
-                        ->visible(fn () => AuthorizationMatrix::check('orders', 'update')),
-                    BulkAction::make('export_orders')
-                        ->label(__('orders.export'))
-                        ->icon('heroicon-o-arrow-down-tray')
-                        ->color('gray')
-                        ->action(function (Collection $records): void {
-                            Notification::make()
-                                ->title(__('orders.export_success'))
-                                ->success()
-                                ->send();
-                        })
-                        ->requiresConfirmation()
-                        ->visible(fn () => AuthorizationMatrix::check('orders', 'viewAny')),
+                        ->requiresConfirmation(),
+                    RequestExportBulkAction::make(ExportType::ORDERS),
                 ]),
             ])
             ->defaultSort('created_at', 'desc')

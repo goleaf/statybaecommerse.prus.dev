@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Enums\ExportType;
+use App\Filament\Actions\RequestExportBulkAction;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
 use App\Services\Export\ExportColumn;
@@ -313,10 +313,9 @@ final class UserResource extends Resource
                                 ->title(__('users.messages.bulk_deactivate_success'))
                                 ->success()
                                 ->send();
-                        })
-                        ->visible(fn () => AuthorizationMatrix::check('users', 'update')),
-                    DeleteBulkAction::make()
-                        ->visible(fn () => AuthorizationMatrix::check('users', 'delete')),
+                        }),
+                    RequestExportBulkAction::make(ExportType::USERS),
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
