@@ -42,7 +42,9 @@ final class ViewOrder extends ViewRecord
         return $infolist->schema([
             ListEntry::make('orderQuickLinks')
                 ->heading(__('Quick links'))
+                ->list()
                 ->state(function (Order $record): array {
+                    // Keep money formatting and translations consistent across quick link items.
                     $currency = $record->currency ?? config('shared.localization.default_currency', 'EUR');
 
                     return [
@@ -71,15 +73,17 @@ final class ViewOrder extends ViewRecord
                 ->heading(__('discount_redemptions.title'))
                 ->list()
                 ->state(function (Order $record): array {
+                    // Ensure translated discount and code data is available for every redemption item.
+                    $locale = app()->getLocale();
                     $record->loadMissing(['discountRedemptions.discount', 'discountRedemptions.code']);
                     $currency = $record->currency ?? config('shared.localization.default_currency', 'EUR');
 
                     return $record->discountRedemptions
-                        ->map(function (DiscountRedemption $redemption) use ($currency): array {
+                        ->map(function (DiscountRedemption $redemption) use ($currency, $locale): array {
                             $discount = $redemption->discount;
                             $code = $redemption->code;
-                            $discountName = $discount?->getTranslation('name') ?? $discount?->name ?? __('discount_redemptions.single');
-                            $codeValue = $code?->code ?? $redemption->getTranslation('status_description');
+                            $discountName = $discount?->getTranslation('name', $locale) ?? $discount?->name ?? __('discount_redemptions.single');
+                            $codeValue = $code?->code ?? $redemption->getTranslation('status_description', $locale);
 
                             return ListItem::make()
                                 ->id('order-discount-redemption-' . $redemption->getKey())
@@ -99,11 +103,17 @@ final class ViewOrder extends ViewRecord
                 ->heading(__('orders.documents'))
                 ->list()
                 ->state(function (Order $record): array {
+                    // Documents may include localized titles; capture them for the active locale.
+                    $locale = app()->getLocale();
                     $record->loadMissing(['documents.template']);
 
                     return $record->documents
-                        ->map(function (Document $document): array {
-                            $title = $document->title ?? $document->name ?? __('orders.document');
+                        ->map(function (Document $document) use ($locale): array {
+                            // Some document templates expose translated titles, while others remain plain strings.
+                            $title = method_exists($document, 'getTranslation')
+                                ? ($document->getTranslation('title', $locale) ?? $document->title)
+                                : $document->title;
+                            $title ??= $document->name ?? __('orders.document');
 
                             return ListItem::make()
                                 ->id('order-document-' . $document->getKey())
@@ -122,13 +132,15 @@ final class ViewOrder extends ViewRecord
                 ->heading(__('orders.order_items'))
                 ->list()
                 ->state(function (Order $record): array {
+                    // Order items need translated product names for localized admins.
+                    $locale = app()->getLocale();
                     $record->loadMissing(['items.product']);
                     $currency = $record->currency ?? config('shared.localization.default_currency', 'EUR');
 
                     return $record->items
-                        ->map(function (OrderItem $item) use ($currency): array {
+                        ->map(function (OrderItem $item) use ($currency, $locale): array {
                             $product = $item->product;
-                            $productName = $product?->getTranslation('name') ?? $item->name;
+                            $productName = $product?->getTranslation('name', $locale) ?? $item->name;
                             $productUrl = $product !== null
                                 ? route('frontend.products.show', $product)
                                 : route('frontend.products.index');

@@ -35,7 +35,10 @@ final class ViewProduct extends ViewRecord
         return $infolist->schema([
             ListEntry::make('productQuickLinks')
                 ->heading(__('Quick links'))
+                ->list()
                 ->state(function (Product $record): array {
+                    // Resolve the locale once so translated attributes render with the expected language.
+                    $locale = app()->getLocale();
                     $record->loadMissing(['brand']);
 
                     $items = [
@@ -46,13 +49,13 @@ final class ViewProduct extends ViewRecord
                             ->color('primary')
                             ->url(route('frontend.products.show', $record))
                             ->tooltip(__('Open the storefront page for :product', [
-                                'product' => $record->getTranslation('name'),
+                                'product' => $record->getTranslation('name', $locale),
                             ]))
                             ->toArray(),
                     ];
 
                     if ($record->brand !== null) {
-                        $brandName = $record->brand->getTranslation('name');
+                        $brandName = $record->brand->getTranslation('name', $locale);
 
                         $items[] = ListItem::make()
                             ->id('product-brand-' . $record->brand->getKey())
@@ -70,11 +73,13 @@ final class ViewProduct extends ViewRecord
                 ->heading(__('products.related_categories'))
                 ->list()
                 ->state(function (Product $record): array {
+                    // Eager load categories and respect translations for each rendered list item.
+                    $locale = app()->getLocale();
                     $record->loadMissing(['categories']);
 
                     return $record->categories
-                        ->map(function (Category $category): array {
-                            $categoryName = $category->getTranslation('name');
+                        ->map(function (Category $category) use ($locale): array {
+                            $categoryName = $category->getTranslation('name', $locale);
 
                             return ListItem::make()
                                 ->id('product-category-' . $category->getKey())
@@ -91,11 +96,13 @@ final class ViewProduct extends ViewRecord
                 ->heading(__('products.related_collections'))
                 ->list()
                 ->state(function (Product $record): array {
+                    // Display related collections with localized labels for the active locale.
+                    $locale = app()->getLocale();
                     $record->loadMissing(['collections']);
 
                     return $record->collections
-                        ->map(function (Collection $collection): array {
-                            $collectionName = $collection->getTranslation('name');
+                        ->map(function (Collection $collection) use ($locale): array {
+                            $collectionName = $collection->getTranslation('name', $locale);
 
                             return ListItem::make()
                                 ->id('product-collection-' . $collection->getKey())
