@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ListCampaignProductTargets extends BaseListRecords
 {
-        use HasWidgetTabs;
+    use HasWidgetTabs;
 
     protected static string $resource = CampaignProductTargetResource::class;
 
@@ -27,8 +27,9 @@ class ListCampaignProductTargets extends BaseListRecords
     public function getWidgetTabs(): array
     {
         return [
-            'all'     => SchemaTab::make(__('campaign_product_targets.tabs.all')),
-            'product' => SchemaTab::make(__('campaign_product_targets.tabs.product'))
+            // Use the project-specific widget tabs to keep the list view consistent across resources.
+            'all'     => WidgetTab::make(__('campaign_product_targets.tabs.all')),
+            'product' => WidgetTab::make(__('campaign_product_targets.tabs.product'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('target_type', 'product'))
                 ->value(fn () => $this->getResource()::getEloquentQuery()->where('target_type', 'product')->count()),
             'category' => WidgetTab::make(__('campaign_product_targets.tabs.category'))
