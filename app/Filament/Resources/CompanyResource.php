@@ -8,16 +8,16 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\CompanyResource\Pages;
 use App\Models\Company;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -47,11 +47,6 @@ final class CompanyResource extends Resource
         return __('companies.single');
     }
 
-    /**
-     * Configure the Filament form schema with fields and validation.
-     *
-     * @param Form $schema
-     */
     public static function form(Form $form): Form
     {
         return $form->schema([
@@ -135,13 +130,21 @@ final class CompanyResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('size')
                     ->label(__('companies.size'))
-                    ->formatStateUsing(fn (?string $state): ?string => $state === null ? null : __('companies.sizes.' . $state))
+                    ->formatStateUsing(static function (?string $state): string {
+                        if ($state === null || $state === '') {
+                            return __('filament::common.none');
+                        }
+
+                        return __("companies.sizes.{$state}");
+                    })
                     ->badge()
-                    ->color(fn (?string $state): string => match ($state) {
-                        'small'  => 'green',
-                        'medium' => 'blue',
-                        'large'  => 'purple',
-                        default  => 'gray',
+                    ->color(static function (?string $state): string {
+                        return match ($state) {
+                            'small'  => 'green',
+                            'medium' => 'blue',
+                            'large'  => 'purple',
+                            default  => 'gray',
+                        };
                     }),
                 IconColumn::make('is_active')
                     ->label(__('companies.is_active'))
