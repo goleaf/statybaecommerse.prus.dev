@@ -227,15 +227,15 @@ final class FeatureFlagResourceTest extends TestCase
     public function test_feature_flags_resource_can_create_feature_flag(): void
     {
         $featureFlagData = [
-            'name'        => 'Another Feature',
-            'key'         => 'another_feature',
+            'name' => 'Another Feature',
+            'key' => 'another_feature',
             'description' => 'Another feature flag',
-            'is_active'   => true,
-            'is_enabled'  => false,
-            'is_global'   => false,
+            'is_active' => true,
+            'is_enabled' => false,
+            'is_global' => false,
             'environment' => 'staging',
-            'category'    => 'backend',
-            'priority'    => 10,
+            'category' => 'backend',
+            'priority' => 10,
         ];
 
         Livewire::test('App\Filament\Resources\FeatureFlags\Pages\CreateFeatureFlag')
@@ -244,11 +244,11 @@ final class FeatureFlagResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('feature_flags', [
-            'name'            => 'Another Feature',
-            'key'             => 'another_feature',
-            'created_by'      => $this->adminUser->id,
+            'name' => 'Another Feature',
+            'key' => 'another_feature',
+            'created_by' => $this->adminUser->id,
             'created_by_name' => $this->adminUser->name,
-            'updated_by'      => $this->adminUser->id,
+            'updated_by' => $this->adminUser->id,
             'updated_by_name' => $this->adminUser->name,
         ]);
     }
@@ -257,11 +257,11 @@ final class FeatureFlagResourceTest extends TestCase
     {
         Livewire::test('App\Filament\Resources\FeatureFlags\Pages\CreateFeatureFlag')
             ->fillForm([
-                'name'       => 'Invalid Feature',
-                'key'        => 'invalid key!',
-                'is_active'  => true,
+                'name' => 'Invalid Feature',
+                'key' => 'invalid key!',
+                'is_active' => true,
                 'is_enabled' => false,
-                'is_global'  => false,
+                'is_global' => false,
             ])
             ->call('create')
             ->assertHasFormErrors(['key']);
