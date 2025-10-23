@@ -25,7 +25,7 @@ Route::middleware(['web'])->group(function () {
         Route::get('/search', [App\Http\Controllers\Frontend\ProductController::class, 'search'])->name('search');
         Route::get('/category/{category}', [App\Http\Controllers\Frontend\ProductController::class, 'byCategory'])->name('by-category');
         Route::get('/brand/{brand}', [App\Http\Controllers\Frontend\ProductController::class, 'byBrand'])->name('by-brand');
-        Route::get('/{product}', [App\Http\Controllers\Frontend\ProductController::class, 'show'])->name('show');
+        Route::get('/{product:slug}', [App\Http\Controllers\Frontend\ProductController::class, 'show'])->name('show');
         Route::post('/{product}/review', [App\Http\Controllers\Frontend\ProductController::class, 'addReview'])->name('add-review');
     });
 
