@@ -20,6 +20,7 @@ final class ProductSummaryDto
         private readonly ?float $salePrice,
         private readonly ?array $brand,
         private readonly ?array $category,
+        private readonly array $categories,
         private readonly ?string $description,
         private readonly ?string $shortDescription,
         private readonly ProductImageCollectionDto $images,
@@ -44,6 +45,7 @@ final class ProductSummaryDto
             $product->getSalePrice(),
             $product->getBrand(),
             $product->getCategory(),
+            $product->getCategories(),
             $product->getDescription(),
             $product->getShortDescription(),
             ProductImageCollectionDto::fromDomainCollection($product->getImages()),
@@ -60,30 +62,35 @@ final class ProductSummaryDto
     {
         // Compose the contract structure required by public consumers.
         return [
-            'id' => $this->id,
-            'slug' => $this->slug,
-            'name' => $this->name,
-            'sku' => $this->sku,
-            'description' => $this->description,
+            'id'                => $this->id,
+            'slug'              => $this->slug,
+            'name'              => $this->name,
+            'sku'               => $this->sku,
+            'description'       => $this->description,
             'short_description' => $this->shortDescription,
-            'pricing' => [
-                'amount' => $this->price,
+            'pricing'           => [
+                'amount'      => $this->price,
                 'sale_amount' => $this->salePrice,
-                'currency' => config('app.currency', 'EUR'),
+                'currency'    => config('app.currency', 'EUR'),
             ],
-            'brand' => $this->brand,
-            'category' => $this->category,
+            // Keep the public contract ergonomic by exposing a simple brand name string.
+            'brand'      => $this->brand['name'] ?? null,
+            'categories' => array_map(
+                // Surface category labels while preserving their order from the repository.
+                static fn (array $category): string => $category['name'],
+                $this->categories,
+            ),
             'media' => [
                 'images' => $this->images->toArray(),
             ],
-            'variants' => $this->variants->toArray(),
+            'variants'  => $this->variants->toArray(),
             'inventory' => [
-                'manage_stock' => $this->manageStock,
+                'manage_stock'   => $this->manageStock,
                 'stock_quantity' => $this->stockQuantity,
-                'is_in_stock' => $this->isInStock,
+                'is_in_stock'    => $this->isInStock,
             ],
             'status' => [
-                'is_visible' => $this->isVisible,
+                'is_visible'  => $this->isVisible,
                 'is_featured' => $this->isFeatured,
             ],
             'links' => [

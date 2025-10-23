@@ -130,6 +130,19 @@ final class EloquentProductRepository implements ProductRepositoryInterface
             'slug' => (string) $primaryCategory->slug,
         ] : null;
 
+        $categories = $product->categories
+            ->filter(static fn ($category): bool => $category?->exists)
+            ->map(static function ($category): array {
+                // Normalise the category payload so the domain entity gets a consistent structure.
+                return [
+                    'id'   => $category->getKey(),
+                    'name' => (string) $category->name,
+                    'slug' => (string) $category->slug,
+                ];
+            })
+            ->values()
+            ->all();
+
         return new DomainProduct(
             $product->id,
             (string) $product->name,
@@ -139,6 +152,7 @@ final class EloquentProductRepository implements ProductRepositoryInterface
             $product->sale_price !== null ? (float) $product->sale_price : null,
             $brand,
             $category,
+            $categories,
             (bool) $product->is_visible,
             (bool) $product->is_featured,
             (bool) $product->manage_stock,

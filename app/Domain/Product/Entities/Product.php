@@ -13,8 +13,9 @@ use App\Domain\Product\Collections\ProductVariantCollection;
 final class Product
 {
     /**
-     * @param array{id:int,name:string,slug:string}|null $brand
-     * @param array{id:int,name:string,slug:string}|null $category
+     * @param array{id:int,name:string,slug:string}|null  $brand
+     * @param array{id:int,name:string,slug:string}|null  $category
+     * @param list<array{id:int,name:string,slug:string}> $categories
      */
     public function __construct(
         private readonly int $id,
@@ -25,6 +26,7 @@ final class Product
         private readonly ?float $salePrice,
         private readonly ?array $brand,
         private readonly ?array $category,
+        private readonly array $categories,
         private readonly bool $isVisible,
         private readonly bool $isFeatured,
         private readonly bool $manageStock,
@@ -89,9 +91,29 @@ final class Product
         return $this->category;
     }
 
+    /**
+     * @return list<array{id:int,name:string,slug:string}>
+     */
+    public function getCategories(): array
+    {
+        return $this->categories;
+    }
+
     public function getCategoryName(): ?string
     {
         return $this->category['name'] ?? null;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getCategoryNames(): array
+    {
+        return array_map(
+            // Extract the human readable title for each attached category.
+            static fn (array $category): string => $category['name'],
+            $this->categories,
+        );
     }
 
     public function isVisible(): bool

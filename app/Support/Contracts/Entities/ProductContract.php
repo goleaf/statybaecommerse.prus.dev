@@ -44,9 +44,9 @@ final class ProductContract
         if ($paginator instanceof LengthAwarePaginator) {
             $data['pagination'] = [
                 'current_page' => $paginator->currentPage(),
-                'last_page' => $paginator->lastPage(),
-                'per_page' => $paginator->perPage(),
-                'total' => $paginator->total(),
+                'last_page'    => $paginator->lastPage(),
+                'per_page'     => $paginator->perPage(),
+                'total'        => $paginator->total(),
             ];
         }
 
@@ -56,51 +56,49 @@ final class ProductContract
     private static function mapProduct(Product $product): array
     {
         $product->loadMissing(['brand', 'categories', 'media', 'variants']);
-        $primaryCategory = $product->categories->first();
+        $categoryNames = $product->categories
+            ->map(static function ($category): string {
+                // Provide a simple category label for lightweight storefront clients.
+                return (string) $category->name;
+            })
+            ->values()
+            ->all();
 
         return [
-            'id' => $product->getKey(),
-            'slug' => (string) $product->slug,
-            'name' => (string) $product->name,
-            'sku' => (string) $product->sku,
-            'description' => $product->description,
+            'id'                => $product->getKey(),
+            'slug'              => (string) $product->slug,
+            'name'              => (string) $product->name,
+            'sku'               => (string) $product->sku,
+            'description'       => $product->description,
             'short_description' => $product->short_description,
-            'pricing' => [
-                'amount' => (float) $product->price,
+            'pricing'           => [
+                'amount'      => (float) $product->price,
                 'sale_amount' => $product->sale_price !== null ? (float) $product->sale_price : null,
-                'currency' => config('app.currency', 'EUR'),
+                'currency'    => config('app.currency', 'EUR'),
             ],
-            'brand' => $product->brand?->exists ? [
-                'id' => $product->brand->getKey(),
-                'name' => (string) $product->brand->name,
-                'slug' => (string) $product->brand->slug,
-            ] : null,
-            'category' => $primaryCategory ? [
-                'id' => $primaryCategory->getKey(),
-                'name' => (string) $primaryCategory->name,
-                'slug' => (string) $primaryCategory->slug,
-            ] : null,
-            'media' => [
+            'brand'      => $product->brand?->exists ? (string) $product->brand->name : null,
+            'categories' => $categoryNames,
+            'media'      => [
                 'images' => $product->getMedia('images')->map(static fn ($media): array => [
-                    'url' => $media->getUrl(),
+                    'url'       => $media->getUrl(),
                     'thumbnail' => $media->getUrl('thumb'),
-                    'alt' => (string) $media->getCustomProperty('alt', ''),
+                    'alt'       => (string) $media->getCustomProperty('alt', ''),
                 ])->all(),
             ],
             'variants' => $product->variants->map(static fn ($variant): array => [
-                'id' => $variant->getKey(),
-                'name' => (string) $variant->name,
-                'sku' => (string) $variant->sku,
-                'price' => (float) $variant->price,
+                'id'             => $variant->getKey(),
+                'name'           => (string) $variant->name,
+                'sku'            => (string) $variant->sku,
+                'price'          => (float) $variant->price,
                 'stock_quantity' => $variant->stock_quantity,
             ])->all(),
             'inventory' => [
-                'manage_stock' => (bool) $product->manage_stock,
+                'manage_stock'   => (bool) $product->manage_stock,
                 'stock_quantity' => $product->stock_quantity,
-                'is_in_stock' => $product->isInStock(),
+                'is_in_stock'    => $product->isInStock(),
             ],
             'status' => [
-                'is_visible' => (bool) $product->is_visible,
+                'is_visible'  => (bool) $product->is_visible,
                 'is_featured' => (bool) $product->is_featured,
             ],
             'links' => [
@@ -117,9 +115,9 @@ final class ProductContract
 
         return [
             'contract' => self::CONTRACT,
-            'version' => self::VERSION,
-            'data' => $data,
-            'meta' => $meta,
+            'version'  => self::VERSION,
+            'data'     => $data,
+            'meta'     => $meta,
         ];
     }
 }

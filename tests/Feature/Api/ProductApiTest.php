@@ -24,33 +24,31 @@ final class ProductApiTest extends TestCase
         $product = Product::factory()
             ->hasAttached($category, [], 'categories')
             ->create([
-                'brand_id' => $brand->id,
-                'is_visible' => true,
+                'brand_id'     => $brand->id,
+                'is_visible'   => true,
                 'published_at' => now()->subDay(),
-                'status' => 'published',
+                'status'       => 'published',
             ]);
 
         $product->load(['brand', 'categories']);
 
-        $payload = [
-            'id' => $product->id,
-            'name' => $product->name,
-            'slug' => $product->slug,
-            'price' => $product->price,
-            'brand' => $product->brand?->name,
-            'categories' => $product->categories->pluck('name')->all(),
-        ];
+        $response = $this->getJson(route('api.products.catalog'));
+        $response->assertOk();
 
-        $this->assertSame($product->id, $payload['id']);
-        $this->assertSame($product->name, $payload['name']);
-        $this->assertContains($category->name, $payload['categories']);
+        $item = $response->json('data.items.0');
+
+        // Ensure the lightweight product contract exposes the expected scalar values for clients.
+        $this->assertSame($product->id, $item['id']);
+        $this->assertSame($product->name, $item['name']);
+        $this->assertSame($brand->name, $item['brand']);
+        $this->assertContains($category->name, $item['categories']);
     }
 
     public function test_product_availability_helpers(): void
     {
         $product = Product::factory()->create([
-            'manage_stock' => true,
-            'stock_quantity' => 10,
+            'manage_stock'        => true,
+            'stock_quantity'      => 10,
             'low_stock_threshold' => 5,
         ]);
 
@@ -72,7 +70,7 @@ final class ProductApiTest extends TestCase
 
         Review::factory()->approved()->count(2)->create([
             'product_id' => $product->id,
-            'rating' => 4,
+            'rating'     => 4,
         ]);
 
         $product->loadCount(['images', 'reviews']);
