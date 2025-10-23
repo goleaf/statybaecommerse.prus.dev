@@ -9,17 +9,18 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\ReferralCodeStatisticsResource\Pages;
 use App\Models\ReferralCode;
 use App\Models\ReferralCodeStatistics;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Grid as FormGrid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -66,7 +67,7 @@ final class ReferralCodeStatisticsResource extends Resource
             ->schema([
                 Section::make(__('admin.referral_code_statistics.basic_information'))
                     ->schema([
-                        Grid::make(2)
+                        FormGrid::make(2)
                             ->schema([
                                 Select::make('referral_code_id')
                                     ->label(__('admin.referral_code_statistics.referral_code'))
@@ -81,7 +82,7 @@ final class ReferralCodeStatisticsResource extends Resource
                     ]),
                 Section::make(__('admin.referral_code_statistics.metrics'))
                     ->schema([
-                        Grid::make(2)
+                        FormGrid::make(2)
                             ->schema([
                                 TextInput::make('total_views')
                                     ->label(__('admin.referral_code_statistics.total_views'))
