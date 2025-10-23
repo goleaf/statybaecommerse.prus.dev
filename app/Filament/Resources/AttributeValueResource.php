@@ -111,10 +111,7 @@ final class AttributeValueResource extends Resource
                         ->schema([
                             Select::make('valueable_type')
                                 ->label(__('attribute_values.valueable_type'))
-                                ->options([
-                                    'product' => __('attribute_values.types.product'),
-                                    'product_variant' => __('attribute_values.types.product_variant'),
-                                ])
+                                ->options(self::getValueableTypeOptions())
                                 ->live()
                                 ->afterStateUpdated(function ($state, Forms\Set $set) {
                                     $set('valueable_id', null);
@@ -123,9 +120,9 @@ final class AttributeValueResource extends Resource
                                 ->label(__('attribute_values.valueable_item'))
                                 ->options(function (\Filament\Forms\Get $get) {
                                     $type = $get('valueable_type');
-                                    if ($type === 'product') {
+                                    if ($type === Product::class) {
                                         return Product::pluck('name', 'id');
-                                    } elseif ($type === 'product_variant') {
+                                    } elseif ($type === ProductVariant::class) {
                                         return ProductVariant::pluck('name', 'id');
                                     }
 
@@ -222,23 +219,29 @@ final class AttributeValueResource extends Resource
                     ->copyMessageDuration(1500),
                 BadgeColumn::make('valueable_type')
                     ->label(__('attribute_values.type'))
-                    ->formatStateUsing(fn (string $state): string => __("attribute_values.types.{$state}"))
+                    ->formatStateUsing(fn (?string $state): string => self::getValueableTypeLabel($state))
                     ->colors([
-                        'success' => 'product',
-                        'warning' => 'product_variant',
+                        'success' => Product::class,
+                        'warning' => ProductVariant::class,
                     ])
                     ->icons([
-                        'heroicon-o-cube' => 'product',
-                        'heroicon-o-squares-2x2' => 'product_variant',
+                        'heroicon-o-cube' => Product::class,
+                        'heroicon-o-squares-2x2' => ProductVariant::class,
                     ]),
                 TextColumn::make('valueable.name')
                     ->label(__('attribute_values.item'))
                     ->limit(50)
                     ->sortable()
-                    ->url(fn (AttributeValue $record): string => match ($record->valueable_type) {
-                        'product' => route('filament.admin.resources.products.view', $record->valueable_id),
-                        'product_variant' => route('filament.admin.resources.product-variants.view', $record->valueable_id),
-                        default => '#',
+                    ->url(function (AttributeValue $record): string {
+                        if (! $record->valueable_type || ! $record->valueable_id) {
+                            return '#';
+                        }
+
+                        return match ($record->valueable_type) {
+                            Product::class => route('filament.admin.resources.products.view', $record->valueable_id),
+                            ProductVariant::class => route('filament.admin.resources.product-variants.view', $record->valueable_id),
+                            default => '#',
+                        };
                     })
                     ->openUrlInNewTab(),
                 TextColumn::make('value')
@@ -309,6 +312,10 @@ final class AttributeValueResource extends Resource
                     ->relationship('attribute', 'name')
                     ->preload()
                     ->searchable()
+                    ->multiple(),
+                SelectFilter::make('valueable_type')
+                    ->label(__('attribute_values.valueable_type'))
+                    ->options(self::getValueableTypeOptions())
                     ->multiple(),
                 TernaryFilter::make('is_active')
                     ->label(__('attribute_values.is_active'))
@@ -389,7 +396,31 @@ final class AttributeValueResource extends Resource
                     ->color('warning')
                     ->visible(fn (AttributeValue $record): bool => ! $record->is_default)
                     ->action(function (AttributeValue $record): void {
-                        self::setAsDefault($record);
+                        // Remove default from other values for the same attribute and item
+                        $query = AttributeValue::query()
+                            ->where('attribute_id', $record->attribute_id);
+
+                        if ($record->valueable_type) {
+                            $query->where('valueable_type', $record->valueable_type);
+                        } else {
+                            $query->whereNull('valueable_type');
+                        }
+
+                        if ($record->valueable_id) {
+                            $query->where('valueable_id', $record->valueable_id);
+                        } else {
+                            $query->whereNull('valueable_id');
+                        }
+
+                        $query->where('is_default', true)->update(['is_default' => false]);
+
+                        // Set this value as default
+                        $record->update(['is_default' => true]);
+
+                        Notification::make()
+                            ->title(__('attribute_values.set_as_default_successfully'))
+                            ->success()
+                            ->send();
                     })
                     ->requiresConfirmation(),
                 Action::make('duplicate')
@@ -466,115 +497,20 @@ final class AttributeValueResource extends Resource
         ];
     }
 
-    public static function toggleActiveState(AttributeValue $record): void
+    private static function getValueableTypeOptions(): array
     {
-        // Refresh the record via an unscoped query so we can safely flip the
-        // active flag even when the global scopes would normally hide it.
-        $unscopedRecord = AttributeValue::withoutGlobalScopes([
-            ActiveScope::class,
-            EnabledScope::class,
-        ])->findOrFail($record->getKey());
-
-        $newActiveState = ! $unscopedRecord->is_active;
-
-        $unscopedRecord->forceFill([
-            'is_active' => $newActiveState,
-        ])->save();
-
-        // Mirror the in-memory instance so callers immediately see the
-        // updated state without waiting for a manual refresh.
-        $record->is_active = $newActiveState;
-
-        Notification::make()
-            ->title($newActiveState
-                ? __('attribute_values.activated_successfully')
-                : __('attribute_values.deactivated_successfully'))
-            ->success()
-            ->send();
+        return [
+            Product::class => __('attribute_values.types.product'),
+            ProductVariant::class => __('attribute_values.types.product_variant'),
+        ];
     }
 
-    public static function setAsDefault(AttributeValue $record): void
+    private static function getValueableTypeLabel(?string $type): string
     {
-        // Clear the default flag on sibling records without the storefront
-        // scopes so previously inactive defaults are also reset.
-        AttributeValue::withoutGlobalScopes([
-            ActiveScope::class,
-            EnabledScope::class,
-        ])
-            ->where('attribute_id', $record->attribute_id)
-            ->whereKeyNot($record->getKey())
-            ->update([
-                'is_default' => false,
-            ]);
-
-        AttributeValue::withoutGlobalScopes([
-            ActiveScope::class,
-            EnabledScope::class,
-        ])
-            ->whereKey($record->getKey())
-            ->update([
-                'is_default' => true,
-            ]);
-
-        // Keep the current instance in sync with the persisted value so
-        // assertions and UI refreshes see the toggle immediately.
-        $record->is_default = true;
-
-        Notification::make()
-            ->title(__('attribute_values.set_as_default_successfully'))
-            ->success()
-            ->send();
-    }
-
-    public static function duplicateAttributeValue(AttributeValue $record, bool $notify = true): AttributeValue
-    {
-        $duplicate = AttributeValue::withoutGlobalScopes([
-            ActiveScope::class,
-            EnabledScope::class,
-        ])
-            ->findOrFail($record->getKey())
-            ->replicate([
-                'products_count',
-                'variants_count',
-            ]);
-
-        $duplicate->value = $record->value . ' (Copy)';
-        $duplicate->slug = Str::slug($duplicate->value . '-' . Str::random(6));
-        $duplicate->is_default = false;
-        $duplicate->save();
-
-        if ($notify) {
-            Notification::make()
-                ->title(__('attribute_values.duplicated_successfully'))
-                ->success()
-                ->send();
-        }
-
-        return $duplicate;
-    }
-
-    public static function activateRecords(Collection $records): void
-    {
-        // Operate on a fresh query so even currently hidden records receive the
-        // activation flag update in bulk.
-        AttributeValue::withoutGlobalScopes([
-            ActiveScope::class,
-            EnabledScope::class,
-        ])
-            ->whereIn('id', $records->modelKeys())
-            ->update([
-                'is_active' => true,
-            ]);
-
-        // Sync in-memory models so Filament bulk actions don't require a full
-        // table refresh to display the new state.
-        $records->each(function (AttributeValue $value): void {
-            $value->is_active = true;
-        });
-
-        Notification::make()
-            ->title(__('attribute_values.bulk_activated_success'))
-            ->success()
-            ->send();
+        return match ($type) {
+            Product::class => __('attribute_values.types.product'),
+            ProductVariant::class => __('attribute_values.types.product_variant'),
+            default => '—',
+        };
     }
 }
