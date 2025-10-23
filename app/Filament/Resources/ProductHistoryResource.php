@@ -17,8 +17,9 @@ use DateTimeInterface;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\Select as SelectInput;
 use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
@@ -119,12 +120,7 @@ final class ProductHistoryResource extends Resource
                 TextColumn::make('action')
                     ->label(__('product_history.action'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'created' => 'success',
-                        'updated' => 'warning',
-                        'deleted' => 'danger',
-                        default => 'gray',
-                    })
+                    ->color(fn (string $state): string => self::actionColor($state))
                     ->sortable(),
                 TextColumn::make('field_name')
                     ->label(__('product_history.field_name'))

@@ -75,7 +75,8 @@ return [
         'description' => 'Aprašymas',
         'button_text' => 'Mygtuko tekstas',
     ],
-    'email_campaigns' => require __DIR__.'/admin/email_campaigns.php',
+    'menu_items' => require __DIR__ . '/admin/menu_items.php',
+    'product_history' => require __DIR__ . '/admin/product_history.php',
     'variant_combinations' => [
         'navigation_label' => 'Variantų kombinacijos',
         'plural_model_label' => 'Variantų kombinacijos',

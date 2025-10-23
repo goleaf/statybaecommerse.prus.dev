@@ -75,7 +75,8 @@ return [
         'description' => 'Description',
         'button_text' => 'Button Text',
     ],
-    'email_campaigns' => require __DIR__.'/admin/email_campaigns.php',
+    'menu_items' => require __DIR__ . '/admin/menu_items.php',
+    'product_history' => require __DIR__ . '/admin/product_history.php',
     'variant_combinations' => [
         'navigation_label' => 'Variant Combinations',
         'plural_model_label' => 'Variant Combinations',
