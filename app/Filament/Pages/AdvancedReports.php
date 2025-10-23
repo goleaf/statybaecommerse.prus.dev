@@ -7,7 +7,6 @@ namespace App\Filament\Pages;
 use BackedEnum;
 use UnitEnum;
 use Filament\Pages\Page;
-
 final class AdvancedReports extends Page
 {
     /**
