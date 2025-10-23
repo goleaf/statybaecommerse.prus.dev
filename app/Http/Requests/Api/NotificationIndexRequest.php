@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Api;
 
+use App\Data\Notifications\NotificationFilterData;
+use App\Data\Notifications\NotificationPaginationOptions;
+
 final class NotificationIndexRequest extends ApiRequest
 {
     protected ?string $requiredAbility = 'notifications.read';
@@ -18,5 +21,15 @@ final class NotificationIndexRequest extends ApiRequest
             'type' => ['sometimes', 'string'],
             'read' => ['sometimes', 'boolean'],
         ];
+    }
+
+    public function filters(): NotificationFilterData
+    {
+        return NotificationFilterData::fromArray($this->validated());
+    }
+
+    public function paginationOptions(): NotificationPaginationOptions
+    {
+        return NotificationPaginationOptions::fromArray($this->validated());
     }
 }

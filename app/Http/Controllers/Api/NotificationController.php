@@ -4,19 +4,18 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
-use App\Application\DTOs\Notifications\NotificationCollectionData;
-use App\Application\DTOs\Notifications\NotificationData;
+use App\Data\Notifications\NotificationPayloadData;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\ListNotificationsRequest;
-use App\Http\Requests\Api\SearchNotificationsRequest;
+use App\Http\Requests\Api\ApiRequest;
+use App\Http\Requests\Api\NotificationIndexRequest;
+use App\Http\Requests\Api\NotificationMutationRequest;
+use App\Http\Requests\Api\NotificationSearchRequest;
+use App\Http\Requests\Api\NotificationShowRequest;
+use App\Http\Requests\Api\NotificationStatsRequest;
 use App\Models\Notification;
 use App\Services\NotificationService;
-use App\Support\ListQuery\ListQueryDefinition;
-use App\Support\ListQuery\ListQueryValidator;
-use App\Support\ListQuery\ListResponse;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Database\Eloquent\Builder;
 
 final class NotificationController extends Controller
 {
@@ -27,17 +26,10 @@ final class NotificationController extends Controller
      */
     public function index(ListNotificationsRequest $request): JsonResponse
     {
-        $user = Auth::user();
-        $input = array_merge($request->query(), $request->validated());
-        $listQuery = ListQueryValidator::fromArray($input, $this->notificationListDefinition());
-        $notifications = $this->notificationService->getUserNotifications($user, $listQuery);
+        $user = $this->requireUser($request);
+        $result = $this->notificationService->getUserNotifications($user, $request->filters(), $request->paginationOptions());
 
-        return response()->json([
-            'success' => true,
-            'data' => $notifications->items(),
-            'meta' => ListResponse::meta($listQuery, $notifications),
-            'links' => ListResponse::links($notifications),
-        ]);
+        return response()->json(array_merge(['success' => true], $result->toArray()));
     }
 
     /**
@@ -45,7 +37,7 @@ final class NotificationController extends Controller
      */
     public function stats(NotificationStatsRequest $request): JsonResponse
     {
-        $user = $this->authenticatedUser();
+        $user = $this->requireUser($request);
         $stats = $this->notificationService->getUserNotificationStats($user);
 
         return response()->json(['success' => true, 'data' => $stats->toArray()]);
@@ -56,24 +48,14 @@ final class NotificationController extends Controller
      */
     public function markAsRead(NotificationMutationRequest $request, Notification $notification): JsonResponse
     {
-        $user = $this->authenticatedUser();
-        // Ensure the notification belongs to the authenticated user
-        if ($notification->notifiable_id !== $user->id || $notification->notifiable_type !== User::class) {
-            return response()->json(['success' => false, 'message' => 'Notification not found'], 404);
-        }
-        $this->notificationService->markAsRead($notification);
-
-        try {
-            $payload = $this->notificationService->markAsReadForUser($user, $notification);
-        } catch (ModelNotFoundException $exception) {
-            return $this->notFoundResponse();
+        $user = $this->requireUser($request);
+        if ($response = $this->guardNotificationOwnership($user, $notification)) {
+            return $response;
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Notification marked as read',
-            'data'    => $payload->toArray(),
-        ]);
+        $payload = $this->notificationService->markAsRead($notification);
+
+        return response()->json(['success' => true, 'message' => 'Notification marked as read', 'data' => $payload->toArray()]);
     }
 
     /**
@@ -81,24 +63,14 @@ final class NotificationController extends Controller
      */
     public function markAsUnread(NotificationMutationRequest $request, Notification $notification): JsonResponse
     {
-        $user = $this->authenticatedUser();
-        // Ensure the notification belongs to the authenticated user
-        if ($notification->notifiable_id !== $user->id || $notification->notifiable_type !== User::class) {
-            return response()->json(['success' => false, 'message' => 'Notification not found'], 404);
-        }
-        $this->notificationService->markAsUnread($notification);
-
-        try {
-            $payload = $this->notificationService->markAsUnreadForUser($user, $notification);
-        } catch (ModelNotFoundException $exception) {
-            return $this->notFoundResponse();
+        $user = $this->requireUser($request);
+        if ($response = $this->guardNotificationOwnership($user, $notification)) {
+            return $response;
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Notification marked as unread',
-            'data'    => $payload->toArray(),
-        ]);
+        $payload = $this->notificationService->markAsUnread($notification);
+
+        return response()->json(['success' => true, 'message' => 'Notification marked as unread', 'data' => $payload->toArray()]);
     }
 
     /**
@@ -106,8 +78,8 @@ final class NotificationController extends Controller
      */
     public function markAllAsRead(NotificationMutationRequest $request): JsonResponse
     {
-        $user = $this->authenticatedUser();
-        $result = $this->notificationService->markAllAsReadForUser($user);
+        $user = $this->requireUser($request);
+        $count = $this->notificationService->markAllAsReadForUser($user);
 
         return response()->json([
             'success' => true,
@@ -121,8 +93,8 @@ final class NotificationController extends Controller
      */
     public function markAllAsUnread(NotificationMutationRequest $request): JsonResponse
     {
-        $user = $this->authenticatedUser();
-        $result = $this->notificationService->markAllAsUnreadForUser($user);
+        $user = $this->requireUser($request);
+        $count = $this->notificationService->markAllAsUnreadForUser($user);
 
         return response()->json([
             'success' => true,
@@ -136,15 +108,15 @@ final class NotificationController extends Controller
      */
     public function show(NotificationShowRequest $request, Notification $notification): JsonResponse
     {
-        $user = $this->authenticatedUser();
-        // Ensure the notification belongs to the authenticated user
-        if ($notification->notifiable_id !== $user->id || $notification->notifiable_type !== User::class) {
-            return response()->json(['success' => false, 'message' => 'Notification not found'], 404);
+        $user = $this->requireUser($request);
+        if ($response = $this->guardNotificationOwnership($user, $notification)) {
+            return $response;
         }
 
-        $resource = NotificationData::fromModel($notification);
-
-        return response()->json(['success' => true, 'data' => $resource->toArray()]);
+        return response()->json([
+            'success' => true,
+            'data' => NotificationPayloadData::fromModel($notification)->toArray(),
+        ]);
     }
 
     /**
@@ -152,11 +124,11 @@ final class NotificationController extends Controller
      */
     public function destroy(NotificationMutationRequest $request, Notification $notification): JsonResponse
     {
-        $user = $this->authenticatedUser();
-        // Ensure the notification belongs to the authenticated user
-        if ($notification->notifiable_id !== $user->id || $notification->notifiable_type !== User::class) {
-            return response()->json(['success' => false, 'message' => 'Notification not found'], 404);
+        $user = $this->requireUser($request);
+        if ($response = $this->guardNotificationOwnership($user, $notification)) {
+            return $response;
         }
+
         $notification->delete();
 
         try {
@@ -184,60 +156,32 @@ final class NotificationController extends Controller
 
     private function authenticatedUser(): User
     {
-        $user = Auth::user();
-        $input = array_merge($request->query(), $request->validated());
-        $listQuery = ListQueryValidator::fromArray($input, $this->notificationListDefinition(includeSearch: true));
-        $notifications = $this->notificationService->searchNotifications($user, $listQuery);
+        $user = $this->requireUser($request);
+        $result = $this->notificationService->searchNotifications($user, $request->parameters());
 
-        return response()->json([
-            'success' => true,
-            'data' => $notifications->items(),
-            'meta' => ListResponse::meta($listQuery, $notifications),
-            'links' => ListResponse::links($notifications),
-        ]);
+        return response()->json(array_merge(['success' => true], $result->toArray()));
     }
 
-    private function notificationListDefinition(bool $includeSearch = false): ListQueryDefinition
+    private function guardNotificationOwnership(User $user, Notification $notification): ?JsonResponse
     {
-        $filters = [
-            'type' => [
-                'type' => 'string',
-                'callback' => static function (Builder $builder, string $type): void {
-                    $builder->byType($type);
-                },
-            ],
-            'read' => [
-                'type' => 'bool',
-                'nullable' => true,
-                'callback' => static function (Builder $builder, bool $read): void {
-                    $read ? $builder->read() : $builder->unread();
-                },
-            ],
-        ];
-
-        if ($includeSearch) {
-            $filters['q'] = [
-                'type' => 'string',
-                'callback' => static function (Builder $builder, string $term): void {
-                    $builder->where(function (Builder $query) use ($term): void {
-                        $query->where('data->title', 'like', '%'.$term.'%')
-                            ->orWhere('data->message', 'like', '%'.$term.'%')
-                            ->orWhere('data->type', 'like', '%'.$term.'%');
-                    });
-                },
-            ];
+        if ($notification->notifiable_id !== $user->getKey() || $notification->notifiable_type !== User::class) {
+            return response()->json(['success' => false, 'message' => 'Notification not found'], 404);
         }
 
-        return new ListQueryDefinition(
-            filters: $filters,
-            sortable: [
-                'created_at' => ['column' => 'notifications.created_at', 'default_direction' => 'desc'],
-                'type' => ['column' => 'notifications.type'],
-            ],
-            defaultSort: 'created_at',
-            defaultDirection: 'desc',
-            defaultPerPage: 25,
-            maxPerPage: 100,
-        );
+        return null;
+    }
+
+    private function requireUser(ApiRequest $request): User
+    {
+        $user = $request->user();
+
+        if (! $user instanceof User) {
+            throw new HttpResponseException(response()->json([
+                'success' => false,
+                'message' => 'Authentication required.',
+            ], 401));
+        }
+
+        return $user;
     }
 }
