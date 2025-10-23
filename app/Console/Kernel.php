@@ -24,7 +24,7 @@ final class Kernel extends ConsoleKernel
             ->dailyAt('02:00')
             ->withoutOverlapping()
             ->runInBackground()
-            ->onFailure(function () {
+            ->onFailure(function (): void {
                 Log::error('Daily code style validation failed');
             });
 
@@ -34,7 +34,7 @@ final class Kernel extends ConsoleKernel
             ->weeklyOn(0, '03:00')
             ->withoutOverlapping()
             ->runInBackground()
-            ->onSuccess(function () {
+            ->onSuccess(function (): void {
                 Log::info('Weekly code style fix completed successfully');
             });
 
@@ -58,7 +58,7 @@ final class Kernel extends ConsoleKernel
                 ->withoutOverlapping()
                 ->runInBackground()
                 ->onOneServer()
-                ->onFailure(static function () {
+                ->onFailure(static function (): void {
                     Log::error('Scheduled backup:prepare command failed');
                 });
         }
@@ -83,7 +83,7 @@ final class Kernel extends ConsoleKernel
                 ->withoutOverlapping()
                 ->runInBackground()
                 ->onOneServer()
-                ->onFailure(static function () {
+                ->onFailure(static function (): void {
                     Log::error('Scheduled backup:verify command failed');
                 });
         }
