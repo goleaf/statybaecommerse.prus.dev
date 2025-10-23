@@ -10,7 +10,6 @@ use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\VisibleScope;
 use App\Observers\CategoryObserver;
 use App\Traits\HasTranslations;
-use DB;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -43,7 +42,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  */
 #[ObservedBy([CategoryObserver::class])]
 #[ScopedBy([ActiveScope::class, EnabledScope::class, VisibleScope::class])]
-final class Category extends Model implements HasMedia, TranslatableRecord
+#[ObservedBy([CategoryObserver::class])]
+final class Category extends Model implements HasMedia
 {
     use HasFactory, HasTranslations, InteractsWithMedia, SoftDeletes;
 

@@ -6,7 +6,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
-use App\Support\Contracts\Entities\CategoryContract;
+use App\Repositories\CategoryRepository;
 use App\Traits\HandlesContentNegotiation;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -23,17 +23,16 @@ final class CategoryController extends Controller
 {
     use HandlesContentNegotiation;
 
+    public function __construct(private readonly CategoryRepository $categories)
+    {
+    }
+
     /**
      * Handle tree functionality with proper error handling.
      */
     public function tree(Request $request): JsonResponse|View|Response
     {
-        $categories = Category::query()->where('is_visible', true)->with(['children' => function ($query) {
-            $query->where('is_visible', true)->orderBy('sort_order')->orderBy('name');
-        }])->whereNull('parent_id')->orderBy('sort_order')->orderBy('name')->get()->skipWhile(function (Category $category) {
-            // Skip categories that are not properly configured
-            return empty($category->name) || ! $category->is_visible || empty($category->slug);
-        });
+        $categories = $this->categories->getVisibleTree();
 
         $payload = CategoryContract::forCollection($categories, ['context' => 'tree']);
 
@@ -45,27 +44,9 @@ final class CategoryController extends Controller
      */
     public function index(Request $request): JsonResponse|View|Response
     {
-        $definition = new ListQueryDefinition(
-            filters: [
-                'search' => [
-                    'type' => 'string',
-                    'callback' => static function (Builder $builder, string $term): void {
-                        $builder->where(function (Builder $query) use ($term): void {
-                            $query->where('name', 'like', "%{$term}%")
-                                ->orWhere('description', 'like', "%{$term}%");
-                        });
-                    },
-                ],
-            ],
-            sortable: [
-                'name' => ['column' => 'categories.name'],
-                'sort_order' => ['column' => 'categories.sort_order'],
-            ],
-            defaultSort: 'sort_order',
-            defaultDirection: 'asc',
-            defaultPerPage: 20,
-            maxPerPage: 100,
-        );
+        $perPage = min((int) $request->get('per_page', 20), 100);
+        $search = $request->get('search');
+        $categories = $this->categories->paginateVisible(['search' => $search], $perPage);
 
         $listQuery = ListQueryValidator::fromRequest($request, $definition);
 
@@ -93,8 +74,10 @@ final class CategoryController extends Controller
      */
     public function show(Request $request, Category $category): JsonResponse|View|Response
     {
-        $category->load(['children', 'parent']);
-        $data = ['category' => CategoryContract::fromModel($category)];
+        $category = $this->categories->loadForShow($category);
+        $data = ['category' => ['id' => $category->id, 'name' => $category->name, 'slug' => $category->slug, 'description' => $category->description, 'parent' => $category->parent ? ['id' => $category->parent->id, 'name' => $category->parent->name, 'slug' => $category->parent->slug] : null, 'children' => $category->children->map(function ($child) {
+            return ['id' => $child->id, 'name' => $child->name, 'slug' => $child->slug, 'description' => $child->description];
+        })->toArray(), 'url' => route('category.show', $category->slug), 'product_count' => $category->products_count ?? 0]];
 
         return $this->respondWithContract($request, $payload);
     }

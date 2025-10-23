@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Menu;
 use App\Repositories\MenuRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,9 +17,9 @@ use Illuminate\Http\Request;
  */
 final class MenuController extends Controller
 {
-    public function __construct(
-        private readonly MenuRepository $menuRepository,
-    ) {}
+    public function __construct(private readonly MenuRepository $menus)
+    {
+    }
 
     /**
      * Display a listing of the resource with pagination and filtering.
@@ -26,9 +27,9 @@ final class MenuController extends Controller
     public function index(Request $request): JsonResponse
     {
         $location = $request->get('location');
-        $menus = $this->menuRepository->all($location, app()->getLocale())
-            ->filter(static fn (array $menu): bool => ! empty($menu['items']))
-            ->values();
+        $menus = $this->menus->getActiveMenus($location)->filter(function (Menu $menu) {
+            return ! empty($menu->name) && ! empty($menu->key) && $menu->allItems->isNotEmpty();
+        })->values();
 
         return response()->json([
             'success' => true,
@@ -41,9 +42,8 @@ final class MenuController extends Controller
      */
     public function show(string $key): JsonResponse
     {
-        $menu = $this->menuRepository->byKey($key, app()->getLocale());
-
-        if ($menu === null || empty($menu['items'])) {
+        $menu = $this->menus->findActiveMenuByKey($key);
+        if (! $menu) {
             return response()->json(['success' => false, 'message' => __('api.menu_not_found')], 404);
         }
 
@@ -55,9 +55,8 @@ final class MenuController extends Controller
      */
     public function byLocation(string $location): JsonResponse
     {
-        $menu = $this->menuRepository->byLocation($location, app()->getLocale());
-
-        if ($menu === null || empty($menu['items'])) {
+        $menu = $this->menus->findActiveMenuByLocation($location);
+        if (! $menu) {
             return response()->json(['success' => false, 'message' => __('api.menu_not_found_for_location')], 404);
         }
 

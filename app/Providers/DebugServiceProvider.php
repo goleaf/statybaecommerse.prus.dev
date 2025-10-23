@@ -9,6 +9,7 @@ use App\Services\Debug\EcommerceDebugCollector;
 use App\Services\Debug\LivewireDebugCollector;
 use App\Services\Debug\NPlusOneDetector;
 use App\Services\Debug\TranslationDebugCollector;
+use App\Support\Debug\NPlusOneDetector;
 use Illuminate\Support\ServiceProvider;
 
 class DebugServiceProvider extends ServiceProvider
@@ -20,6 +21,12 @@ class DebugServiceProvider extends ServiceProvider
             $this->app->singleton('debugbar.translation', fn () => new TranslationDebugCollector);
             $this->app->singleton('debugbar.livewire', fn () => new LivewireDebugCollector);
             $this->app->singleton('debugbar.ecommerce', fn () => new EcommerceDebugCollector);
+            $this->app->singleton(NPlusOneDetector::class, function () {
+                $detector = new NPlusOneDetector;
+                $detector->boot();
+
+                return $detector;
+            });
         }
 
         if ($this->app->environment('local')) {
@@ -34,7 +41,7 @@ class DebugServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        if ($this->app->environment('local')) {
+        if ($this->app->environment('local', 'staging')) {
             $this->app->make(NPlusOneDetector::class);
         }
     }
