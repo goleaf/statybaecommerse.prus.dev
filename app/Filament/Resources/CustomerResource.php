@@ -11,12 +11,6 @@ use App\Models\City;
 use App\Models\Customer;
 use App\Models\Scopes\ActiveScope;
 use BackedEnum;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Forms;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -24,16 +18,21 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Gate;
@@ -41,39 +40,12 @@ use UnitEnum;
 
 final class CustomerResource extends Resource
 {
-    use HasNav;
+    /**
+     * Icon displayed in the navigation menu.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-users';
 
     protected static ?string $model = Customer::class;
-
-    public static function canViewAny(): bool
-    {
-        return Gate::allows('viewAny', Customer::class);
-    }
-
-    public static function canView(Customer $record): bool
-    {
-        return Gate::allows('view', $record);
-    }
-
-    public static function canCreate(): bool
-    {
-        return Gate::allows('create', Customer::class);
-    }
-
-    public static function canEdit(Customer $record): bool
-    {
-        return Gate::allows('update', $record);
-    }
-
-    public static function canDelete(Customer $record): bool
-    {
-        return Gate::allows('delete', $record);
-    }
-
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-users';
-    }
 
     
 
@@ -150,7 +122,7 @@ final class CustomerResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Set $set): void {
+                                ->afterStateUpdated(function ($state, Set $set): void {
                                     if ($state) {
                                         $set('city_id', null);
                                     }
@@ -160,15 +132,16 @@ final class CustomerResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->modifyOptionsQueryUsing(function (Builder $query, Forms\Get $get): void {
-                                    $countryId = $get('country_id');
-                                    if ($countryId) {
+                                ->options(function (Get $get): array {
+                                    $query = City::query()->orderBy('name');
+
+                                    if ($countryId = $get('country_id')) {
                                         $query->where('country_id', $countryId);
                                     }
 
                                     return $query->pluck('name', 'id')->all();
                                 })
-                                ->getSearchResultsUsing(function (Forms\Get|SchemaGet $get, string $search): array {
+                                ->getSearchResultsUsing(function (Get $get, string $search): array {
                                     return City::query()
                                         ->where('name', 'like', "%{$search}%")
                                         ->when($get('country_id'), fn (Builder $query, $countryId): Builder => $query->where('country_id', $countryId))
