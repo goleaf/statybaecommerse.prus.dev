@@ -21,7 +21,7 @@ final class ValuesRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Attribute Values';
 
-    public function form(Form $form): Form
+    public function form(Schema $form): Schema
     {
         return $schema
             ->schema([

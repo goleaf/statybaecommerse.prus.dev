@@ -24,7 +24,7 @@ final class ProductTargetsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Product Targets';
 
-    public function form(Form $form): Form
+    public function form(Schema $form): Schema
     {
         return $schema->schema([
             Select::make('product_id')

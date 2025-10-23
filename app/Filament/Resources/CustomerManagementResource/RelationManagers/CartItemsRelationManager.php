@@ -26,7 +26,7 @@ class CartItemsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'cartItems';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $form): Schema
     {
         return $schema
             ->schema([
@@ -39,7 +39,7 @@ class CartItemsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function infolist(Schema $schema): Schema
+    public function infolist(Schema $infolist): Schema
     {
         return $schema
             ->schema([

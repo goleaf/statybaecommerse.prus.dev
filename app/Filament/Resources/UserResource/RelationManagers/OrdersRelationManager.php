@@ -8,6 +8,7 @@ use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 class OrdersRelationManager extends BaseRelationManager
 {

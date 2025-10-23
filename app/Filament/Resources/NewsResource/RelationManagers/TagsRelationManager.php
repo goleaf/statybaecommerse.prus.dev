@@ -22,7 +22,7 @@ final class TagsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Tags';
 
-    public function form(Form $form): Form
+    public function form(Schema $form): Schema
     {
         return $schema
             ->components([

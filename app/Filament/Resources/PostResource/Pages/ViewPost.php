@@ -27,7 +27,7 @@ final class ViewPost extends ViewRecord
         ];
     }
 
-    public function infolist(Infolist $infolist): Infolist
+    public function infolist(Schema $infolist): Schema
     {
         return $schema->schema([
             ListEntry::make('postQuickLinks')

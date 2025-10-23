@@ -42,6 +42,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
@@ -66,7 +67,7 @@ final class VariantInventoryResource extends Resource
     /**
      * @var string|\BackedEnum|null Navigation icon configured for the inventory module.
      */
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-archive-box';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Inventory';
 
@@ -88,7 +89,7 @@ final class VariantInventoryResource extends Resource
     /**
      * Configure the Variant Inventory form schema for Filament administrators.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         return $schema
             ->schema([
