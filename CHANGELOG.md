@@ -10,8 +10,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Aligned Filament variant pricing and analytics resources with stricter action namespaces, clarified currency formatting, and refreshed navigation icon annotations to streamline BackedEnum usage across admin pages.
 * Synced Collection Rule resource signatures, modal reorder UX, and cache maintenance tooling with Filament v4 to retire legacy array fallbacks.
 * Delivered the Campaign Product Target management resource with localized strings, reinforced widget navigation metadata, and hardened media path migrations for safer marketing workflows.
-* Corrected Composer test scripts to rely on the bundled Pest runner, ensuring local environments without global PHPUnit installs can execute the suite reliably.
-* Restored the Address resource's Filament v4 method signatures and navigation icon so admin address management pages and tests run without fatal errors.
+* Updated the Feature Flag resource to bypass active/enabled scopes so administrators can review inactive toggles directly from the listing view.
 
 ## [0.1.0] - 2025-10-20
 
