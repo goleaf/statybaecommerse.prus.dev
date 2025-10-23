@@ -11,10 +11,6 @@ use App\Models\Post;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Seo\LocaleUrlGenerator;
 use BackedEnum;
-use Filament\Actions\Action;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
@@ -31,8 +27,9 @@ use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\Action as TableAction;
 use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\BadgeColumn;
@@ -46,9 +43,10 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use RuntimeException;
 use UnitEnum;
 use Maatwebsite\Excel\Excel;
 use pxlrbt\FilamentExcel\Actions\ExportBulkAction as ExcelExportBulkAction;
@@ -119,7 +117,7 @@ final class PostResource extends Resource
                                     ->live()
                                     ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set, ?string $state): void {
                                         if (! $get('slug') && filled($state)) {
-                                            $set('slug', \Str::slug($state));
+                                            $set('slug', Str::slug($state));
                                         }
                                     }),
                                 TextInput::make('slug')
@@ -167,9 +165,9 @@ final class PostResource extends Resource
                                 Select::make('status')
                                     ->label(__('posts.fields.status'))
                                     ->options([
-                                        'draft' => __('posts.status.draft'),
+                                        'draft'     => __('posts.status.draft'),
                                         'published' => __('posts.status.published'),
-                                        'archived' => __('posts.status.archived'),
+                                        'archived'  => __('posts.status.archived'),
                                     ])
                                     ->default('draft')
                                     ->required()
@@ -333,7 +331,7 @@ final class PostResource extends Resource
                     ->formatStateUsing(fn (?ModerationState $state): ?string => $state?->label())
                     ->colors([
                         'warning' => fn (?ModerationState $state): bool => $state === ModerationState::Draft,
-                        'info' => fn (?ModerationState $state): bool => $state === ModerationState::Review,
+                        'info'    => fn (?ModerationState $state): bool => $state === ModerationState::Review,
                         'success' => fn (?ModerationState $state): bool => $state === ModerationState::Published,
                     ])
                     ->sortable(),
@@ -416,7 +414,7 @@ final class PostResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 EditAction::make(),
-                Action::make('submit_for_review')
+                TableAction::make('submit_for_review')
                     ->label(__('moderation.actions.submit_for_review'))
                     ->icon('heroicon-o-paper-airplane')
                     ->color('info')
@@ -424,9 +422,9 @@ final class PostResource extends Resource
                     ->visible(fn (Post $record): bool => $record->moderation_state === ModerationState::Draft)
                     ->action(function (Post $record): void {
                         $record->update([
-                            'moderation_state' => ModerationState::Review,
+                            'moderation_state'        => ModerationState::Review,
                             'submitted_for_review_at' => now(),
-                            'status' => 'draft',
+                            'status'                  => 'draft',
                         ]);
 
                         activity()
@@ -440,7 +438,7 @@ final class PostResource extends Resource
                             ->success()
                             ->send();
                     }),
-                Action::make('approve')
+                TableAction::make('approve')
                     ->label(__('moderation.actions.approve'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
@@ -457,23 +455,23 @@ final class PostResource extends Resource
                         $userId = Auth::id();
 
                         if (! $userId) {
-                            throw new \RuntimeException('Approvals require an authenticated user.');
+                            throw new RuntimeException('Approvals require an authenticated user.');
                         }
 
                         DB::transaction(function () use ($record, $data, $userId): void {
                             $record->approvals()->create([
-                                'user_id' => $userId,
-                                'decision' => 'approved',
-                                'notes' => $data['notes'] ?? null,
+                                'user_id'    => $userId,
+                                'decision'   => 'approved',
+                                'notes'      => $data['notes'] ?? null,
                                 'decided_at' => now(),
                             ]);
 
                             $record->update([
                                 'moderation_state' => ModerationState::Published,
-                                'approved_at' => now(),
-                                'approved_by_id' => $userId,
-                                'status' => 'published',
-                                'published_at' => $record->published_at ?? now(),
+                                'approved_at'      => now(),
+                                'approved_by_id'   => $userId,
+                                'status'           => 'published',
+                                'published_at'     => $record->published_at ?? now(),
                             ]);
                         });
 
@@ -488,7 +486,7 @@ final class PostResource extends Resource
                             ->success()
                             ->send();
                     }),
-                Action::make('request_changes')
+                TableAction::make('request_changes')
                     ->label(__('moderation.actions.return_to_draft'))
                     ->icon('heroicon-o-arrow-uturn-left')
                     ->color('warning')
@@ -505,23 +503,23 @@ final class PostResource extends Resource
                         $userId = Auth::id();
 
                         if (! $userId) {
-                            throw new \RuntimeException('Return to draft requires an authenticated user.');
+                            throw new RuntimeException('Return to draft requires an authenticated user.');
                         }
 
                         DB::transaction(function () use ($record, $data, $userId): void {
                             $record->approvals()->create([
-                                'user_id' => $userId,
-                                'decision' => 'returned',
-                                'notes' => $data['notes'] ?? null,
+                                'user_id'    => $userId,
+                                'decision'   => 'returned',
+                                'notes'      => $data['notes'] ?? null,
                                 'decided_at' => now(),
                             ]);
 
                             $record->update([
-                                'moderation_state' => ModerationState::Draft,
+                                'moderation_state'        => ModerationState::Draft,
                                 'submitted_for_review_at' => null,
-                                'approved_at' => null,
-                                'approved_by_id' => null,
-                                'status' => 'draft',
+                                'approved_at'             => null,
+                                'approved_by_id'          => null,
+                                'status'                  => 'draft',
                             ]);
                         });
 
@@ -536,6 +534,133 @@ final class PostResource extends Resource
                             ->warning()
                             ->send();
                     }),
+                TableAction::make('publish')
+                    ->label(__('posts.actions.publish'))
+                    ->icon('heroicon-o-megaphone')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->visible(fn (Post $record): bool => ! $record->isPublished() && ! $record->isArchived())
+                    ->action(function (Post $record): void {
+                        $userId = Auth::id();
+
+                        $record->update([
+                            'status'                  => 'published',
+                            'moderation_state'        => ModerationState::Published,
+                            'submitted_for_review_at' => $record->submitted_for_review_at ?? now(),
+                            'approved_at'             => $record->approved_at ?? now(),
+                            'approved_by_id'          => $record->approved_by_id ?? $userId,
+                            'published_at'            => $record->published_at ?? now(),
+                        ]);
+
+                        activity()
+                            ->performedOn($record)
+                            ->causedBy(Auth::user())
+                            ->event('published')
+                            ->log('Post manually published');
+
+                        Notification::make()
+                            ->title(__('posts.messages.published'))
+                            ->success()
+                            ->send();
+                    }),
+                TableAction::make('unpublish')
+                    ->label(__('posts.actions.unpublish'))
+                    ->icon('heroicon-o-eye-slash')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->visible(fn (Post $record): bool => $record->isPublished())
+                    ->action(function (Post $record): void {
+                        $record->update([
+                            'status'                  => 'draft',
+                            'moderation_state'        => ModerationState::Draft,
+                            'submitted_for_review_at' => null,
+                            'approved_at'             => null,
+                            'approved_by_id'          => null,
+                            'published_at'            => null,
+                        ]);
+
+                        activity()
+                            ->performedOn($record)
+                            ->causedBy(Auth::user())
+                            ->event('unpublished')
+                            ->log('Post manually unpublished');
+
+                        Notification::make()
+                            ->title(__('posts.messages.unpublished'))
+                            ->warning()
+                            ->send();
+                    }),
+                TableAction::make('archive')
+                    ->label(__('posts.actions.archive'))
+                    ->icon('heroicon-o-archive-box')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->visible(fn (Post $record): bool => ! $record->isArchived())
+                    ->action(function (Post $record): void {
+                        $record->update([
+                            'status'                  => 'archived',
+                            'moderation_state'        => ModerationState::Draft,
+                            'submitted_for_review_at' => null,
+                            'approved_at'             => null,
+                            'approved_by_id'          => null,
+                        ]);
+
+                        activity()
+                            ->performedOn($record)
+                            ->causedBy(Auth::user())
+                            ->event('archived')
+                            ->log('Post archived');
+
+                        Notification::make()
+                            ->title(__('posts.messages.archived'))
+                            ->success()
+                            ->send();
+                    }),
+                TableAction::make('feature')
+                    ->label(__('posts.actions.feature'))
+                    ->icon('heroicon-o-star')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->visible(fn (Post $record): bool => ! $record->featured)
+                    ->action(function (Post $record): void {
+                        $record->update([
+                            'featured' => true,
+                        ]);
+
+                        activity()
+                            ->performedOn($record)
+                            ->causedBy(Auth::user())
+                            ->event('featured')
+                            ->log('Post marked as featured');
+
+                        Notification::make()
+                            ->title(__('posts.messages.featured'))
+                            ->success()
+                            ->send();
+                    }),
+                TableAction::make('unfeature')
+                    ->label(__('posts.actions.unfeature'))
+                    ->icon('heroicon-o-star')
+                    ->color('gray')
+                    ->requiresConfirmation()
+                    ->visible(fn (Post $record): bool => $record->featured)
+                    ->action(function (Post $record): void {
+                        $record->update([
+                            'featured' => false,
+                        ]);
+
+                        activity()
+                            ->performedOn($record)
+                            ->causedBy(Auth::user())
+                            ->event('unfeatured')
+                            ->log('Post unmarked as featured');
+
+                        Notification::make()
+                            ->title(__('posts.messages.unfeatured'))
+                            ->info()
+                            ->send();
+                    }),
+                DeleteAction::make(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
