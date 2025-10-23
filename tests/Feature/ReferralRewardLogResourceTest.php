@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\ReferralRewardLogResource\Pages\ListReferralRewardLogs;
+use App\Filament\Resources\ReferralRewardLogs\Pages\ListReferralRewardLogs;
 use App\Models\ReferralReward;
 use App\Models\ReferralRewardLog;
 use App\Models\User;
