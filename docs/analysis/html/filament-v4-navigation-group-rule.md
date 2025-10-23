@@ -59,6 +59,7 @@
 - Check and fix on file save
 - Validate during linting
 - Ensure zero tolerance for navigation group type errors
+- ✅ `App\\Filament\\Resources\\ReferralResource` now conforms to the docblock navigation icon/group standard, uses the schema-based APIs after the compatibility sweep, and pins its group to `NavigationGroup::Marketing` for consistency with the enum-first conventions.
 
 **EXAMPLES OF CORRECT IMPLEMENTATION**:
 
