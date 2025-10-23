@@ -44,20 +44,12 @@ $providers[] = App\Providers\LocaleServiceProvider::class;
 $providers[] = App\Providers\Filament\AdminPanelProvider::class;
 $providers[] = SecurityServiceProvider::class;
 
-return Application::configure(basePath: dirname(__DIR__))
-    ->registered(function (Application $app): void {
-        if (! $app->bound('request')) {
-            $app->singleton('request', static fn (): Request => Request::capture());
-        }
-
-        if (! $app->bound(Request::class)) {
-            $app->singleton(Request::class, static fn (Application $app): Request => $app->make('request'));
-        }
-    })
-    ->withRouting(
-        web: __DIR__ . '/../routes/web.php',
-        api: __DIR__ . '/../routes/api.php',
-        commands: __DIR__ . '/../routes/console.php',
+return tap(
+    Application::configure(basePath: dirname(__DIR__))
+        ->withRouting(
+        web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php',
+        commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function (): void {
             Route::middleware('web')
@@ -415,5 +407,18 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->header('Content-Language', $locale);
         });
     })
-    ->withProviders($providers)
-    ->create();
+    ->withProviders([
+        App\Providers\AuthServiceProvider::class,
+        App\Providers\ApiServiceProvider::class,
+        ...((env('APP_ENV', 'production') !== 'local' || env('QUEUE_CONNECTION', 'sync') !== 'sync')
+            ? [App\Providers\HorizonServiceProvider::class]
+            : []),
+        App\Providers\LocaleServiceProvider::class,
+        App\Providers\Filament\AdminPanelProvider::class,
+        SecurityServiceProvider::class,
+    ])
+    ->create(),
+    static function (Application $app): void {
+        $app->instance('request', Request::capture());
+    }
+);

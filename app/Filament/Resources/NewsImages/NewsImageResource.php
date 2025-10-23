@@ -8,7 +8,7 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\NewsImages\Pages\CreateNewsImage;
 use App\Filament\Resources\NewsImages\Pages\EditNewsImage;
 use App\Filament\Resources\NewsImages\Pages\ListNewsImages;
-use App\Models\News;
+use App\Filament\Resources\NewsImages\Pages\ViewNewsImage;
 use App\Models\NewsImage;
 use App\Support\Storage\SecureStorage;
 use BackedEnum;
@@ -284,7 +284,7 @@ class NewsImageResource extends Resource
         return [
             'index'  => ListNewsImages::route('/'),
             'create' => CreateNewsImage::route('/create'),
-            // 'view' page does not exist; removing mapping to avoid errors
+            'view' => ViewNewsImage::route('/{record}'),
             'edit' => EditNewsImage::route('/{record}/edit'),
         ];
     }
