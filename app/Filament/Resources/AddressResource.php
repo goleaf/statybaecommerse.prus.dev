@@ -135,10 +135,10 @@ final class AddressResource extends Resource
                                     },
                                 );
                             })
-                            ->afterStateUpdated(function (?string $state, Set $set): void {
+                            ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
                                 if ($state === null || $state === '') {
                                     // Reset the stored relation id when the lookup clears.
-                                    SearchableInputHelper::clear($set, ['user_id' => null]);
+                                    SearchableInputHelper::clear($component, $set, ['user_id' => null]);
 
                                     return;
                                 }
@@ -238,10 +238,10 @@ final class AddressResource extends Resource
                                     },
                                 );
                             })
-                            ->afterStateUpdated(function (?string $state, Set $set): void {
+                            ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
                                 if ($state === null || $state === '') {
                                     // Clear cached identifiers when the lookup resets.
-                                    SearchableInputHelper::clear($set, [
+                                    SearchableInputHelper::clear($component, $set, [
                                         'city_id' => null,
                                     ]);
 

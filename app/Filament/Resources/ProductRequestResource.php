@@ -92,9 +92,9 @@ final class ProductRequestResource extends Resource
                             },
                         );
                     })
-                    ->afterStateUpdated(function (?string $state, Set $set): void {
+                    ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
                         if ($state === null || $state === '') {
-                            SearchableInputHelper::clear($set, ['product_id' => null]);
+                            SearchableInputHelper::clear($component, $set, ['product_id' => null]);
 
                             return;
                         }

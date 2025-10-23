@@ -96,10 +96,10 @@ class OrdersRelationManager extends BaseRelationManager
                                     },
                                 );
                             })
-                            ->afterStateUpdated(function (?string $state, Set $set): void {
+                            ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
                                 if ($state === null || $state === '') {
                                     // Clear persisted status when wiped.
-                                    SearchableInputHelper::clear($set, ['status' => null]);
+                                    SearchableInputHelper::clear($component, $set, ['status' => null]);
 
                                     return;
                                 }

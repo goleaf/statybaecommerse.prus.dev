@@ -237,7 +237,6 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                                     ->find($value);
                                             }
 
-                        
                                             if (! $user instanceof User) {
                                                 return null;
                                             }
@@ -251,10 +250,10 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                         },
                                     );
                                 })
-                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
                                     if ($state === null || $state === '') {
                                         // Reset relation when lookup clears.
-                                        SearchableInputHelper::clear($set, ['user_id' => null]);
+                                        SearchableInputHelper::clear($component, $set, ['user_id' => null]);
 
                                         return;
                                     }
@@ -413,14 +412,28 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                     SearchableInputHelper::hydrate(
                                         $component,
                                         $state,
-                                        static fn (int $value): ?array => ['value' => $value, 'label' => (string) $value],
+                                        static function (int $value): ?array {
+                                            $address = Address::query()
+                                                ->select(['id', 'address_line_1', 'address_line_2', 'city', 'state', 'postal_code', 'country_code'])
+                                                ->find($value);
+
+                                            if (! $address instanceof Address) {
+                                                return null;
+                                            }
+
+                                            return [
+                                                'value'   => $address->getKey(),
+                                                'label'   => self::formatAddress($address),
+                                                'payload' => AddressSearch::payload($address),
+                                            ];
+                                        },
                                     );
                                 })
                                 // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
-                                ->afterStateUpdated(function (?int $state, Set $set): void {
+                                ->afterStateUpdated(function (SearchableInput $component, ?int $state, Set $set): void {
                                     if ($state === null) {
                                         // Reset the cached billing payload when cleared.
-                                        SearchableInputHelper::clear($set, ['billing_address' => []]);
+                                        SearchableInputHelper::clear($component, $set, ['billing_address' => []]);
 
                                         return;
                                     }
@@ -430,6 +443,8 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                         ->find($state);
 
                                     if (! $address instanceof Address) {
+                                        SearchableInputHelper::clear($component, $set, ['billing_address' => []]);
+
                                         return;
                                     }
 
@@ -446,13 +461,27 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                     SearchableInputHelper::hydrate(
                                         $component,
                                         $state,
-                                        static fn (int $value): ?array => ['value' => $value, 'label' => (string) $value],
+                                        static function (int $value): ?array {
+                                            $address = Address::query()
+                                                ->select(['id', 'address_line_1', 'address_line_2', 'city', 'state', 'postal_code', 'country_code'])
+                                                ->find($value);
+
+                                            if (! $address instanceof Address) {
+                                                return null;
+                                            }
+
+                                            return [
+                                                'value'   => $address->getKey(),
+                                                'label'   => self::formatAddress($address),
+                                                'payload' => AddressSearch::payload($address),
+                                            ];
+                                        },
                                     );
                                 })
                                 // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
-                                ->afterStateUpdated(function (?int $state, Set $set): void {
+                                ->afterStateUpdated(function (SearchableInput $component, ?int $state, Set $set): void {
                                     if ($state === null) {
-                                        SearchableInputHelper::clear($set, ['shipping_address' => []]);
+                                        SearchableInputHelper::clear($component, $set, ['shipping_address' => []]);
 
                                         return;
                                     }
@@ -462,6 +491,8 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                         ->find($state);
 
                                     if (! $address instanceof Address) {
+                                        SearchableInputHelper::clear($component, $set, ['shipping_address' => []]);
+
                                         return;
                                     }
 
@@ -539,9 +570,9 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                         },
                                     );
                                 })
-                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
                                     if ($state === null || $state === '') {
-                                        SearchableInputHelper::clear($set, ['channel_id' => null]);
+                                        SearchableInputHelper::clear($component, $set, ['channel_id' => null]);
 
                                         return;
                                     }
@@ -573,9 +604,9 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                         },
                                     );
                                 })
-                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
                                     if ($state === null || $state === '') {
-                                        SearchableInputHelper::clear($set, ['partner_id' => null]);
+                                        SearchableInputHelper::clear($component, $set, ['partner_id' => null]);
 
                                         return;
                                     }
