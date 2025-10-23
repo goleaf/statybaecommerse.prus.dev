@@ -7,6 +7,8 @@ namespace App\Livewire\Pages;
 use App\Livewire\Concerns\WithCart;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Support\Cache\CacheKeys;
+use App\Support\Cache\CacheTags;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Facades\Cache;
@@ -74,10 +76,11 @@ final class SingleProduct extends Component
             [CacheTags::categories(), CacheTags::brands()]
         );
 
+        // Cache the heavy product aggregate to avoid repeating the eager-loading work.
         $this->product = Cache::tags($productTags)->remember(
             CacheKeys::productDetail($productId, $locale),
             now()->addSeconds(180),
-            static function () use ($product) {
+            static function () use ($product): Product {
                 return Product::query()
                     ->whereKey($product)
                     ->with([
@@ -109,7 +112,7 @@ final class SingleProduct extends Component
         $this->recentHistoriesCollection = Cache::tags($productTags)->remember(
             CacheKeys::productRecentHistories($productId),
             now()->addSeconds(120),
-            function () {
+            function (): SupportCollection {
                 return $this->product
                     ->recentHistories()
                     ->orderByDesc('created_at')
@@ -126,7 +129,7 @@ final class SingleProduct extends Component
         ])->remember(
             CacheKeys::productRecentReviews($productId),
             now()->addSeconds(120),
-            function () {
+            function (): SupportCollection {
                 return $this->product
                     ->reviews()
                     ->latest('id')

@@ -26,6 +26,14 @@ Use the helper when attaching cache tags to keep invalidation consistent:
 - `CacheKeys::homeTag()` and `CacheKeys::dashboardTag()` for broad UI groupings
 - `CacheKeys::productAggregateTag()` / `CacheKeys::userAggregateTag()` / `CacheKeys::orderAggregateTag()` for repository- or metric-level aggregates
 
+### Cache tag helper
+
+The dedicated `App\Support\Cache\CacheTags` class now generates locale-, resource-, and identifier-specific tag names. Prefer the helper when tagging caches:
+
+- `CacheTags::locale($locale)` ensures translated storefront fragments clear correctly.
+- `CacheTags::products()`, `CacheTags::categories()`, `CacheTags::brands()`, `CacheTags::collections()` scope invalidation to catalogue resources.
+- `CacheTags::productIds([$id])`, `CacheTags::categoryIds([$id])`, etc., collapse identifier arrays into deterministic tag names for Livewire filters and show pages.
+
 Tagging ensures that refreshing a product or category can invalidate related home and dashboard fragments without manual key enumeration.
 
 ## Invalidation Rules
@@ -45,6 +53,12 @@ Where Redis tags are unavailable, fall back to targeted `Cache::forget()` calls 
   - `new_users_today` → `CacheKeys::userAggregateTag()`
   - `low_stock_items` → `CacheKeys::productAggregateTag()`
 - The observers described above provide deterministic invalidation so cached values refresh immediately after underlying data changes.
+
+### Livewire storefront fragments
+
+- `CacheKeys::categoryIndex*` builders scope cache entries for the category listing page. Pair them with `CacheTags::brandIds()`, `CacheTags::collectionIds()`, and `CacheTags::categoryIds()` so filters stay in sync with catalogue updates.
+- `CacheKeys::categoryShowProducts()` caches paginated product responses per locale, page, and sort mode; tags include the specific category id for targeted flushes.
+- `CacheKeys::productDetail()`, `CacheKeys::productRecentHistories()`, and `CacheKeys::productRecentReviews()` wrap the Single Product page queries. Tag them with `CacheTags::products()` and `CacheTags::productIds()` so product updates invalidate all related fragments.
 
 ## Extending `CacheKeys`
 

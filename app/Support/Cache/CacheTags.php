@@ -4,6 +4,13 @@ declare(strict_types=1);
 
 namespace App\Support\Cache;
 
+/**
+ * Centralised cache tag helper used across the storefront and dashboard.
+ *
+ * The helper keeps tag values consistent so that cache invalidation actions
+ * (for example the Filament cache maintenance screen) can flush partial caches
+ * without guessing tag names.
+ */
 final class CacheTags
 {
     public static function home(): string
@@ -103,12 +110,15 @@ final class CacheTags
     }
 
     /**
+     * Collapse identifiers into deterministic tag names while stripping
+     * duplicates to avoid redundant cache tagging.
+     *
      * @param  array<int, int|string>  $ids
      * @return array<int, string>
      */
     private static function mapIds(string $prefix, array $ids): array
     {
-        $ids = array_map(static fn ($id) => (int) $id, $ids);
+        $ids = array_map(static fn ($id): int => (int) $id, $ids);
         $ids = array_values(array_unique($ids));
 
         return array_map(static fn (int $id): string => sprintf('%s:%d', $prefix, $id), $ids);
