@@ -36,6 +36,9 @@ use Filament\Forms\Get;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
@@ -47,6 +50,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
 
 /**
@@ -697,30 +701,9 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                 fn (Builder $q, $date): Builder => $q->whereDate('created_at', '<=', $date),
                             );
                     }),
-                Filter::make('total_range')
-                    ->form([
-                        TextInput::make('total_from')
-                            ->label(__('orders.total_from'))
-                            ->numeric()
-                            ->prefix('€'),
-                        TextInput::make('total_until')
-                            ->label(__('orders.total_until'))
-                            ->numeric()
-                            ->prefix('€'),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['total_from'],
-                                fn (Builder $query, $amount): Builder => $query->where('total', '>=', $amount),
-                            )
-                            ->when(
-                                $data['total_until'],
-                                fn (Builder $query, $amount): Builder => $query->where('total', '<=', $amount),
-                            );
-                    }),
                 TrashedFilter::make(),
             ])
+            ->filtersFormWidth(MaxWidth::Large)
             ->actions([
                 ViewAction::make()
                     ->color('info')
