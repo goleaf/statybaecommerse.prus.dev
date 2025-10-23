@@ -57,7 +57,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Database\Eloquent\Model;
 use UnitEnum;
 
 /**
@@ -74,6 +74,41 @@ final class ProductResource extends Resource implements DefinesExportColumns
     public static function shouldRegisterNavigation(): bool
     {
         return AuthorizationMatrix::check('products', 'viewAny');
+    }
+
+    public static function canViewAny(): bool
+    {
+        return AuthorizationMatrix::check('products', 'viewAny');
+    }
+
+    public static function canView(Model $record): bool
+    {
+        return AuthorizationMatrix::check('products', 'view');
+    }
+
+    public static function canCreate(): bool
+    {
+        return AuthorizationMatrix::check('products', 'create');
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return AuthorizationMatrix::check('products', 'update');
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return AuthorizationMatrix::check('products', 'delete');
+    }
+
+    public static function canForceDelete(Model $record): bool
+    {
+        return AuthorizationMatrix::check('products', 'delete');
+    }
+
+    public static function canRestore(Model $record): bool
+    {
+        return AuthorizationMatrix::check('products', 'update');
     }
 
     public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
@@ -568,12 +603,6 @@ final class ProductResource extends Resource implements DefinesExportColumns
                             );
                     }),
                 TrashedFilter::make(),
-            ])
-            ->filtersFormWidth(MaxWidth::Large)
-            ->headerActions([
-                ExportAction::make()
-                    ->label(__('Export'))
-                    ->exports(self::getExportPresets()),
             ])
             ->actions([
                 ActionGroup::make([

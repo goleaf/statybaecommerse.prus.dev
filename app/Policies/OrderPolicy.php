@@ -13,9 +13,11 @@ final class OrderPolicy
 {
     public function viewAny(AdminUser|User $user): bool
     {
-        return $user instanceof AdminUser
-            ? AuthorizationMatrix::check('orders', 'viewAny', $user)
-            : (bool) ($user->is_admin ?? false);
+        if (! $user instanceof AdminUser) {
+            return false;
+        }
+
+        return AuthorizationMatrix::check('orders', 'viewAny', $user);
     }
 
     public function view(AdminUser|User $user, Order $order): bool
@@ -24,7 +26,7 @@ final class OrderPolicy
             return AuthorizationMatrix::check('orders', 'view', $user);
         }
 
-        if ($user->is_admin ?? false) {
+        if (AuthorizationMatrix::check('orders', 'view', $user)) {
             return true;
         }
 
@@ -42,7 +44,7 @@ final class OrderPolicy
             return AuthorizationMatrix::check('orders', 'update', $user);
         }
 
-        if ($user->is_admin ?? false) {
+        if (AuthorizationMatrix::check('orders', 'update', $user)) {
             return true;
         }
 

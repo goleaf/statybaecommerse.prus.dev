@@ -36,8 +36,6 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Hash;
-use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
 use UnitEnum;
 
 /**
@@ -63,6 +61,41 @@ final class UserResource extends Resource implements DefinesExportColumns
     public static function shouldRegisterNavigation(): bool
     {
         return AuthorizationMatrix::check('users', 'viewAny');
+    }
+
+    public static function canViewAny(): bool
+    {
+        return AuthorizationMatrix::check('users', 'viewAny');
+    }
+
+    public static function canView(Model $record): bool
+    {
+        return AuthorizationMatrix::check('users', 'view');
+    }
+
+    public static function canCreate(): bool
+    {
+        return AuthorizationMatrix::check('users', 'create');
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return AuthorizationMatrix::check('users', 'update');
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return AuthorizationMatrix::check('users', 'delete');
+    }
+
+    public static function canForceDelete(Model $record): bool
+    {
+        return AuthorizationMatrix::check('users', 'delete');
+    }
+
+    public static function canRestore(Model $record): bool
+    {
+        return AuthorizationMatrix::check('users', 'update');
     }
 
     /**
