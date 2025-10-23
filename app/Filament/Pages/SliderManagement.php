@@ -50,10 +50,7 @@ class SliderManagement extends Page implements HasActions, HasForms
 
     protected static ?int $navigationSort = 1;
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Content';
-    }
+    protected static \UnitEnum|string|null $navigationGroup = 'Content';
 
     public Collection $sliders;
 

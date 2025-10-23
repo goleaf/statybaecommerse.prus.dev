@@ -14,15 +14,15 @@ use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -62,9 +62,9 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
                 Section::make(__('orders.document_information'))
                     ->description(__('orders.document_information_description'))
                     ->icon('heroicon-o-document')
-                    ->components([
+                    ->schema([
                         Grid::make(2)
-                            ->components([
+                            ->schema([
                                 Select::make('document_template_id')
                                     ->label(__('orders.document_template'))
                                     ->relationship('template', 'name')
@@ -90,7 +90,7 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
                                     ->required(),
                             ]),
                         Grid::make(2)
-                            ->components([
+                            ->schema([
                                 TextInput::make('version')
                                     ->label(__('orders.document_version'))
                                     ->maxLength(50)
@@ -112,7 +112,7 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
                 Section::make(__('orders.file_upload'))
                     ->description(__('orders.file_upload_description'))
                     ->icon('heroicon-o-cloud-arrow-up')
-                    ->components([
+                    ->schema([
                         FileUpload::make('file_path')
                             ->label(__('orders.document_file'))
                             ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png', 'image/gif', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
@@ -120,7 +120,7 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
                             ->directory('order-documents')
                             ->visibility('private'),
                         Grid::make(2)
-                            ->components([
+                            ->schema([
                                 TextInput::make('file_size')
                                     ->label(__('orders.file_size'))
                                     ->numeric()
@@ -134,9 +134,9 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
                 Section::make(__('orders.access_control'))
                     ->description(__('orders.access_control_description'))
                     ->icon('heroicon-o-shield-check')
-                    ->components([
+                    ->schema([
                         Grid::make(2)
-                            ->components([
+                            ->schema([
                                 Toggle::make('is_public')
                                     ->label(__('orders.is_public'))
                                     ->default(false)
@@ -147,7 +147,7 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
                                     ->helperText(__('orders.is_downloadable_help')),
                             ]),
                         Grid::make(2)
-                            ->components([
+                            ->schema([
                                 TextInput::make('access_password')
                                     ->label(__('orders.access_password'))
                                     ->password()
@@ -160,7 +160,7 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
                 Section::make(__('orders.additional_details'))
                     ->description(__('orders.additional_details_description'))
                     ->icon('heroicon-o-document-text')
-                    ->components([
+                    ->schema([
                         Textarea::make('description')
                             ->label(__('orders.document_description'))
                             ->rows(3)
@@ -238,7 +238,7 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
                     ->trueColor('success')
                     ->falseColor('danger'),
                 TextColumn::make('created_at')
-                    ->label(__('orders.created_at'))
+                    ->label(__('orders.fields.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

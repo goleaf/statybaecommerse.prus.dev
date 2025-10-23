@@ -11,18 +11,19 @@ use App\Support\Search\ProductVariantSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Get;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -62,10 +63,10 @@ final class OrderItemsRelationManager extends BaseRelationManager
                 Section::make(__('orders.item_information'))
                     ->description(__('orders.item_information_description'))
                     ->icon('heroicon-o-cube')
-                    ->components([
+                    ->schema([
                         Grid::make(2)
-                            ->components([
-                                SearchableInput::make('product_variant_id')
+                            ->schema([
+                                Select::make('product_variant_id')
                                     ->label(__('orders.product_variant'))
                                     ->placeholder(__('orders.lookups.variant_placeholder'))
                                     ->required()
@@ -94,7 +95,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
                                         ProductVariantFieldHelper::handleVariantSelection($state, $set, $get);
                                     }),
                                 TextInput::make('quantity')
-                                    ->label(__('orders.quantity'))
+                                    ->label(__('orders.fields.quantity'))
                                     ->numeric()
                                     ->required()
                                     ->default(1)
@@ -107,9 +108,9 @@ final class OrderItemsRelationManager extends BaseRelationManager
                                     ->prefixIcon('heroicon-o-hashtag'),
                             ]),
                         Grid::make(3)
-                            ->components([
+                            ->schema([
                                 TextInput::make('unit_price')
-                                    ->label(__('orders.unit_price'))
+                                    ->label(__('orders.fields.unit_price'))
                                     ->numeric()
                                     ->required()
                                     ->prefix('€')
@@ -121,7 +122,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
                                     })
                                     ->prefixIcon('heroicon-o-currency-euro'),
                                 TextInput::make('discount_amount')
-                                    ->label(__('orders.discount_amount'))
+                                    ->label(__('orders.fields.discount_amount'))
                                     ->numeric()
                                     ->default(0)
                                     ->prefix('€')
@@ -135,8 +136,8 @@ final class OrderItemsRelationManager extends BaseRelationManager
                                     })
                                     ->prefixIcon('heroicon-o-tag'),
                                 Placeholder::make('total')
-                                    ->label(__('orders.total'))
-                                    ->content(function ($get): string {
+                                    ->label(__('orders.fields.total'))
+                                    ->content(function (Get $get): string {
                                         $unitPrice = (float) $get('unit_price') ?? 0;
                                         $quantity = (int) $get('quantity') ?? 1;
                                         $discount = (float) $get('discount_amount') ?? 0;
@@ -153,7 +154,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
                         Hidden::make('sku')
                             ->required(),
                         Hidden::make('total')
-                            ->default(function ($get): float {
+                            ->default(function (Get $get): float {
                                 $unitPrice = (float) $get('unit_price') ?? 0;
                                 $quantity = (int) $get('quantity') ?? 1;
                                 $discount = (float) $get('discount_amount') ?? 0;
@@ -165,7 +166,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
                 Section::make(__('orders.additional_details'))
                     ->description(__('orders.additional_details_description'))
                     ->icon('heroicon-o-document-text')
-                    ->components([
+                    ->schema([
                         Textarea::make('notes')
                             ->label(__('orders.item_notes'))
                             ->rows(3)
@@ -328,18 +329,18 @@ final class OrderItemsRelationManager extends BaseRelationManager
                                 ->send();
                         })
                         ->requiresConfirmation(),
-                    BulkAction::make('apply_discount')
-                        ->label(__('orders.bulk_apply_discount'))
-                        ->icon('heroicon-o-tag')
-                        ->color('info')
-                        ->form([
-                            TextInput::make('discount_amount')
-                                ->label(__('orders.discount_amount'))
-                                ->numeric()
-                                ->required()
-                                ->prefix('€')
-                                ->step(0.01),
-                        ])
+                        BulkAction::make('apply_discount')
+                            ->label(__('orders.bulk_apply_discount'))
+                            ->icon('heroicon-o-tag')
+                            ->color('info')
+                            ->form([
+                                TextInput::make('discount_amount')
+                                ->label(__('orders.fields.discount_amount'))
+                                    ->numeric()
+                                    ->required()
+                                    ->prefix('€')
+                                    ->step(0.01),
+                            ])
                         ->action(function (Collection $records, array $data): void {
                             $records->each->update(['discount_amount' => $data['discount_amount']]);
 

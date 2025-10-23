@@ -444,75 +444,16 @@ final class OrderResource extends Resource implements DefinesExportColumns
                         ->helperText(__('orders.fields.internal_notes')),
                     Grid::make(3)
                         ->schema([
-                            SearchableInput::make('channel_id')
+                            Select::make('channel_id')
                                 ->label(__('orders.fields.channel'))
-                                ->placeholder(__('orders.lookups.channel_placeholder'))
-                                ->searchUsing(fn (string $value): array => ChannelSearch::results($value))
-                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                // Helper guidance documented in docs/forms/SEARCHABLE_INPUT_METADATA.md.
-                                ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                    SearchableInputHelper::hydrate(
-                                        $component,
-                                        $state,
-                                        static function (int $value): ?array {
-                                            $channel = Channel::query()
-                                                ->select(['id', 'name', 'code', 'type'])
-                                                ->find($value);
-
-                                            if (! $channel instanceof Channel) {
-                                                return null;
-                                            }
-
-                                            return [
-                                                'value' => $channel->getKey(),
-                                                'label' => ChannelSearch::label($channel),
-                                            ];
-                                        },
-                                    );
-                                })
-                                ->afterStateUpdated(function (?string $state, Set $set): void {
-                                    if ($state === null || $state === '') {
-                                        SearchableInputHelper::clear($set, ['channel_id' => null]);
-
-                                        return;
-                                    }
-
-                                    $set('channel_id', (int) $state);
-                                }),
-                            SearchableInput::make('partner_id')
+                                ->relationship('channel', 'name')
+                                ->searchable()
+                                ->preload(),
+                            Select::make('partner_id')
                                 ->label(__('orders.fields.partner'))
-                                ->placeholder(__('orders.lookups.partner_placeholder'))
-                                ->searchUsing(fn (string $value): array => PartnerSearch::results($value))
-                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                    SearchableInputHelper::hydrate(
-                                        $component,
-                                        $state,
-                                        static function (int $value): ?array {
-                                            $partner = Partner::query()
-                                                ->select(['id', 'name', 'code', 'contact_email'])
-                                                ->find($value);
-
-                                            if (! $partner instanceof Partner) {
-                                                return null;
-                                            }
-
-                                            return [
-                                                'value' => $partner->getKey(),
-                                                'label' => PartnerSearch::label($partner),
-                                            ];
-                                        },
-                                    );
-                                })
-                                ->afterStateUpdated(function (?string $state, Set $set): void {
-                                    if ($state === null || $state === '') {
-                                        SearchableInputHelper::clear($set, ['partner_id' => null]);
-
-                                        return;
-                                    }
-
-                                    $set('partner_id', (int) $state);
-                                }),
+                                ->relationship('partner', 'name')
+                                ->searchable()
+                                ->preload(),
                         ]),
                 ])
                 ->collapsible(),
@@ -659,7 +600,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->sortable(),
                 TextColumn::make('channel.name')
-                    ->label(__('orders.fields.customer'))
+                    ->label(__('orders.fields.channel'))
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->sortable(),
                 TextColumn::make('created_at')
