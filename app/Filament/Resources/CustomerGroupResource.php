@@ -8,7 +8,6 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\CustomerGroupResource\Pages;
 use App\Models\CustomerGroup;
-use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -31,13 +30,20 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Validation\Rule;
+use UnitEnum;
 
 final class CustomerGroupResource extends Resource
 {
     use HasNav;
 
     protected static ?string $model = CustomerGroup::class;
+
+    protected static UnitEnum|string|null $navigationGroup = null;
+
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return self::$navigationGroup ?? __('navigation.groups.customers');
+    }
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
