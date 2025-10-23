@@ -340,13 +340,10 @@ final class SliderResourceTest extends TestCase
 
     public function test_slider_resource_has_correct_navigation_properties(): void
     {
-        $this->assertSame(
-            Nav::iconForResource(SliderResource::class),
-            SliderResource::getNavigationIcon(),
-        );
-        $this->assertSame(
-            Nav::groupForResource(SliderResource::class),
-            SliderResource::getNavigationGroup(),
+        $this->assertEquals('heroicon-o-rectangle-stack', \App\Filament\Resources\Sliders\SliderResource::getNavigationIcon());
+        $this->assertEquals(
+            Nav::groupForResource(\App\Filament\Resources\Sliders\SliderResource::class),
+            \App\Filament\Resources\Sliders\SliderResource::getNavigationGroup()
         );
     }
 

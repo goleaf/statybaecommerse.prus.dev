@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Filament\Resources\DocumentTemplateResource;
+use App\Support\Nav;
 use App\Models\DocumentTemplate;
 use App\Support\Nav;
 

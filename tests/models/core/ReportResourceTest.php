@@ -48,7 +48,7 @@ class ReportResourceTest extends TestCase
     #[\PHPUnit\Framework\Attributes\Test]
     public function it_has_correct_navigation_group(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             Nav::groupForResource(ReportResource::class),
             ReportResource::getNavigationGroup(),
         );

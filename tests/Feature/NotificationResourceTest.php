@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Support\Nav;
 use App\Models\Notification;
 use App\Models\User;
 use App\Support\Nav;
@@ -351,7 +350,7 @@ final class NotificationResourceTest extends TestCase
     {
         $this->assertEquals(
             Nav::groupForResource(\App\Filament\Resources\NotificationResource::class),
-            \App\Filament\Resources\NotificationResource::getNavigationGroup(),
+            \App\Filament\Resources\NotificationResource::getNavigationGroup()
         );
     }
 
@@ -359,7 +358,7 @@ final class NotificationResourceTest extends TestCase
     {
         $this->assertEquals(
             Nav::sortForResource(\App\Filament\Resources\NotificationResource::class),
-            \App\Filament\Resources\NotificationResource::getNavigationSort(),
+            \App\Filament\Resources\NotificationResource::getNavigationSort()
         );
     }
 
@@ -367,7 +366,7 @@ final class NotificationResourceTest extends TestCase
     {
         $this->assertEquals(
             Nav::iconForResource(\App\Filament\Resources\NotificationResource::class),
-            \App\Filament\Resources\NotificationResource::getNavigationIcon(),
+            \App\Filament\Resources\NotificationResource::getNavigationIcon()
         );
     }
 }

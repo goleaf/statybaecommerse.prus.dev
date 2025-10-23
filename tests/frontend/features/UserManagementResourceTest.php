@@ -188,10 +188,9 @@ class UserManagementResourceTest extends TestCase
 
     public function test_user_management_resource_has_correct_navigation_group(): void
     {
-        $this->assertSame(
-            Nav::groupForResource(UserManagementResource::class),
-            UserManagementResource::getNavigationGroup(),
-        );
+        $navigationGroup = UserManagementResource::getNavigationGroup();
+
+        $this->assertSame(Nav::groupForResource(UserManagementResource::class), $navigationGroup);
     }
 
     public function test_user_management_resource_has_correct_navigation_icon(): void

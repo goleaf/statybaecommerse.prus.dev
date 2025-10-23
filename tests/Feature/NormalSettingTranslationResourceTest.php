@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Support\Nav;
 use App\Models\NormalSetting;
 use App\Models\NormalSettingTranslation;
 use App\Models\User;
+use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -225,7 +225,7 @@ final class NormalSettingTranslationResourceTest extends TestCase
     {
         $this->assertEquals(
             Nav::groupForResource(\App\Filament\Resources\NormalSettingTranslationResource::class),
-            \App\Filament\Resources\NormalSettingTranslationResource::getNavigationGroup(),
+            \App\Filament\Resources\NormalSettingTranslationResource::getNavigationGroup()
         );
     }
 

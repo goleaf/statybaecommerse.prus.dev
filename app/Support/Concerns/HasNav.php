@@ -10,16 +10,12 @@ use Illuminate\Contracts\Support\Htmlable;
 use UnitEnum;
 
 /**
- * Trait that proxies Filament navigation lookups through the shared {@see Nav} helper.
- *
- * Applying this trait to a resource allows us to gradually migrate legacy resources
- * without rewriting their existing navigation metadata declarations. The trait simply
- * delegates to the helper which already handles reflection and caching.
+ * Trait that exposes centralised navigation metadata helpers to Filament resources.
  */
 trait HasNav
 {
     /**
-     * Proxy the navigation group lookup through the helper.
+     * Delegate group resolution to the shared navigation helper.
      */
     public static function getNavigationGroup(): UnitEnum|string|null
     {
@@ -27,7 +23,7 @@ trait HasNav
     }
 
     /**
-     * Proxy the navigation icon lookup through the helper.
+     * Delegate icon resolution to the shared navigation helper.
      */
     public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
@@ -35,7 +31,7 @@ trait HasNav
     }
 
     /**
-     * Proxy the navigation sort lookup through the helper.
+     * Delegate sort resolution to the shared navigation helper.
      */
     public static function getNavigationSort(): ?int
     {

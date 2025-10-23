@@ -27,14 +27,8 @@ final class ProductResourceFrontendTest extends TestCase
 
     public function test_navigation_configuration(): void
     {
-        $this->assertSame(
-            Nav::groupForResource(ProductResource::class),
-            ProductResource::getNavigationGroup()
-        );
-        $this->assertSame(
-            Nav::iconForResource(ProductResource::class),
-            ProductResource::getNavigationIcon()
-        );
+        $this->assertSame(Nav::groupForResource(ProductResource::class), ProductResource::getNavigationGroup());
+        $this->assertSame(Nav::iconForResource(ProductResource::class), ProductResource::getNavigationIcon());
         $this->assertSame(__('products.title'), ProductResource::getNavigationLabel());
     }
 

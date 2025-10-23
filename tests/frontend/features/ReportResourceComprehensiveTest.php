@@ -680,14 +680,8 @@ class ReportResourceComprehensiveTest extends TestCase
         $this->actingAs($this->adminUser);
 
         // Test navigation properties
-        $this->assertEquals(
-            Nav::iconForResource(ReportResource::class),
-            ReportResource::getNavigationIcon(),
-        );
-        $this->assertEquals(
-            Nav::groupForResource(ReportResource::class),
-            ReportResource::getNavigationGroup(),
-        );
+        $this->assertEquals('heroicon-o-document-chart-bar', ReportResource::getNavigationIcon());
+        $this->assertEquals(Nav::groupForResource(ReportResource::class), ReportResource::getNavigationGroup());
         $this->assertEquals(__('admin.navigation.reports'), ReportResource::getNavigationLabel());
         $this->assertEquals(__('admin.models.report'), ReportResource::getModelLabel());
         $this->assertEquals(__('admin.models.reports'), ReportResource::getPluralModelLabel());

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Support\Nav;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\User;
+use App\Support\Nav;
 use App\Support\Filament\ProductVariantFieldHelper;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -459,7 +459,7 @@ final class OrderItemResourceTest extends TestCase
     {
         $this->assertEquals(
             Nav::groupForResource(\App\Filament\Resources\OrderItemResource::class),
-            \App\Filament\Resources\OrderItemResource::getNavigationGroup(),
+            \App\Filament\Resources\OrderItemResource::getNavigationGroup()
         );
     }
 
