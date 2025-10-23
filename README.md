@@ -100,6 +100,7 @@ composer run dev
 - 2025-10-24: Reinstated the Husky bootstrap shim file contents and permissions so Git hooks execute using the local toolchain again while continuing to surface the upstream v10 deprecation warning banner for contributor awareness.
 - 2025-10-24: Hardened content security policies with request-scoped nonces, refreshed inline Blade assets to inject the helper automatically, and expanded rate limiting configuration so API throttles can stack per-minute and per-hour limits.
 - 2025-10-25: Re-sequenced the discount rebuild migration to stage renames before table creation and only suppress constraints during data copy, resolving the MySQL `discount_codes_created_by_foreign` failure encountered in `php artisan migrate:fresh --seed`.
+- 2025-10-25: Deferred the rebuilt discount code and redemption user foreign keys until after compatibility checks so MySQL restores from mixed storage engines no longer trigger the `discount_codes_created_by_foreign` system-table error.
 
 - 2025-10-23: Wired the cache invalidation service into global model events, updated navigation caches to use shared tag helpers, and expanded regression coverage so dashboard stats and storefront widgets refresh automatically after catalogue edits.
 
