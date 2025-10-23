@@ -45,10 +45,11 @@ final class VariantAnalyticsResource extends Resource
 {
     protected static ?string $model = VariantAnalytics::class;
 
-    /** @var string|BackedEnum|null Typed via docblock to align with Filament v4 navigation expectations. */
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    /** @var string|BackedEnum|null Keep analytics grouped without redundant UnitEnum imports. */
+    // Ensure inventory analytics stay grouped centrally for merchandising reviewers.
+    /** @var string|BackedEnum|null */
     protected static $navigationGroup = NavigationGroup::Inventory;
 
     public static function getNavigationGroup(): BackedEnum|string|null

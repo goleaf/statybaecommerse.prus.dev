@@ -44,18 +44,11 @@ final class SystemSettingCategoryTranslationResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
+    /** @var string|BackedEnum|null */
     protected static $navigationIcon = 'heroicon-o-language';
 
-    /**
-     * Navigation group for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
+    // Keep translation utilities alongside the broader settings area for discoverability.
+    /** @var string|BackedEnum|null */
     protected static $navigationGroup = 'Settings';
 
     protected static bool $shouldRegisterNavigation = false;
