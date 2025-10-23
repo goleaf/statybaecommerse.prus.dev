@@ -8,11 +8,11 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
-use App\Support\Cache\CacheKeys;
-use App\Support\Cache\CacheTags;
+use App\Support\Cache\CacheTagHelper;
 use Carbon\Carbon;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Cache\TaggableStore;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -139,11 +139,7 @@ class SimplifiedStatsWidget extends BaseWidget
             $endDate->toDateString()
         );
 
-        $chartData = Cache::tags([
-            CacheTags::dashboard(),
-            CacheTags::orders(),
-            CacheTags::products(),
-        ])->remember($cacheKey, now()->addSeconds(180), function () use ($startDate, $endDate, $now) {
+        $chartData = $this->rememberDashboard($cacheKey, 60, function () use ($startDate, $endDate, $now) {
             $dateKeys = [];
             for ($i = 6; $i >= 0; $i--) {
                 $dateKeys[] = $now->copy()->subDays($i)->toDateString();
@@ -210,15 +206,7 @@ class SimplifiedStatsWidget extends BaseWidget
         $now = $this->getReferenceTime();
         $lastMonth = $now->copy()->subMonth();
 
-        return Cache::tags([
-            CacheTags::dashboard(),
-            CacheTags::orders(),
-            CacheTags::users(),
-            CacheTags::products(),
-            CacheTags::categories(),
-            CacheTags::brands(),
-            CacheTags::reviews(),
-        ])->remember(CacheKeys::dashboardSimplifiedSummary(), now()->addSeconds(300), function () use ($lastMonth) {
+        return $this->rememberDashboard('dashboard.simplified-stats.summary', 60, function () use ($lastMonth) {
             $orderStats = Order::query()
                 ->selectRaw('
                     SUM(CASE WHEN status != ? THEN total ELSE 0 END) as total_revenue,
@@ -283,6 +271,17 @@ class SimplifiedStatsWidget extends BaseWidget
                 ],
             ];
         });
+    }
+
+    private function rememberDashboard(string $key, int $ttl, callable $callback): array
+    {
+        $store = Cache::getStore();
+
+        if ($store instanceof TaggableStore) {
+            return Cache::tags(CacheTagHelper::dashboards())->remember($key, $ttl, $callback);
+        }
+
+        return Cache::remember($key, $ttl, $callback);
     }
 
     protected function getReferenceTime(): Carbon

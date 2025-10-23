@@ -8,8 +8,6 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Collection;
 use App\Models\Product;
-use App\Observers\Concerns\ResolvesSupportedLocales;
-use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTagHelper;
 use Illuminate\Cache\TaggableStore;
 use Illuminate\Database\Eloquent\Model;
@@ -17,144 +15,73 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-/**
- * Centralised cache invalidation orchestrator for storefront and dashboard data.
- *
- * The legacy observers relied on bespoke cache clearing routines which made it
- * difficult to guarantee consistency across the various widgets. By funnelling
- * everything through this service we can invalidate tag-aware stores eagerly
- * while still providing deterministic fallbacks for array/file stores used in
- * tests.
- */
 final class CacheInvalidationService
 {
-    use ResolvesSupportedLocales;
+    /**
+     * Map of model classes to their associated cache tags.
+     *
+     * @var array<class-string, array<int, string>>
+     */
+    private const MODEL_TAGS = [
+        Product::class => [
+            CacheTagHelper::PRODUCTS,
+            CacheTagHelper::CATEGORIES,
+            CacheTagHelper::BRANDS,
+            CacheTagHelper::COLLECTIONS,
+            CacheTagHelper::DASHBOARDS,
+        ],
+        Category::class => [
+            CacheTagHelper::CATEGORIES,
+            CacheTagHelper::PRODUCTS,
+            CacheTagHelper::DASHBOARDS,
+        ],
+        Brand::class => [
+            CacheTagHelper::BRANDS,
+            CacheTagHelper::PRODUCTS,
+            CacheTagHelper::DASHBOARDS,
+        ],
+        Collection::class => [
+            CacheTagHelper::COLLECTIONS,
+            CacheTagHelper::PRODUCTS,
+            CacheTagHelper::DASHBOARDS,
+        ],
+    ];
 
     /**
      * Flush cache tags for a specific model instance.
      */
     public function flushForModel(Model $model): void
     {
-        if ($model instanceof Product) {
-            $this->flushProducts();
-
-            return;
-        }
-
-        if ($model instanceof Category) {
-            $this->flushCategories();
-
-            return;
-        }
-
-        if ($model instanceof Brand) {
-            $this->flushBrands();
-
-            return;
-        }
-
-        if ($model instanceof Collection) {
-            $this->flushCollections();
+        foreach (self::MODEL_TAGS as $class => $tags) {
+            if ($model instanceof $class) {
+                $this->flushTags($tags);
+            }
         }
     }
 
-    /**
-     * Flush storefront caches that depend on product listings.
-     */
     public function flushProducts(): void
     {
-        // Include shared home/navigation tags so both storefront widgets and
-        // menu payloads flush together when product data changes.
-        $productTags = CacheTagHelper::merge(
-            CacheTagHelper::products(),
-            [CacheKeys::homeTag()],
-            [CacheKeys::navigationTag()]
-        );
-
-        if ($this->flushTags($productTags)) {
-            return;
-        }
-
-        app(\App\UseCases\Cache\InvalidateProductCache::class)();
+        $this->flushTags(CacheTagHelper::products());
     }
 
-    /**
-     * Flush storefront caches that depend on category hierarchies.
-     */
     public function flushCategories(): void
     {
-        // Categories influence both storefront widgets and navigation menus.
-        $categoryTags = CacheTagHelper::merge(
-            CacheTagHelper::categories(),
-            [CacheKeys::homeTag()],
-            [CacheKeys::navigationTag()]
-        );
-
-        if ($this->flushTags($categoryTags)) {
-            return;
-        }
-
-        app(\App\UseCases\Cache\InvalidateCategoryCache::class)();
+        $this->flushTags(CacheTagHelper::categories());
     }
 
-    /**
-     * Flush cached brand highlights when the catalogue changes.
-     */
     public function flushBrands(): void
     {
-        // Featured brand carousels live in storefront sections, so share the home tag.
-        $brandTags = CacheTagHelper::merge(
-            CacheTagHelper::brands(),
-            [CacheKeys::homeTag()]
-        );
-
-        if ($this->flushTags($brandTags)) {
-            return;
-        }
-
-        foreach ([6, 8, 10, 12] as $limit) {
-            Cache::forget(CacheKeys::brandTopList($limit));
-        }
+        $this->flushTags(CacheTagHelper::brands());
     }
 
-    /**
-     * Flush curated collection widgets for the storefront home page.
-     */
     public function flushCollections(): void
     {
-        // Collections feed the home page carousels; merge with the shared home tag.
-        $collectionTags = CacheTagHelper::merge(
-            CacheTagHelper::collections(),
-            [CacheKeys::homeTag()]
-        );
-
-        if ($this->flushTags($collectionTags)) {
-            return;
-        }
-
-        foreach ($this->supportedLocales() as $locale) {
-            Cache::forget(CacheKeys::homeCollections($locale));
-        }
+        $this->flushTags(CacheTagHelper::collections());
     }
 
-    /**
-     * Flush dashboard widgets and Livewire stats caches.
-     */
     public function flushDashboards(): void
     {
-        if ($this->flushTags(CacheTagHelper::dashboards())) {
-            return;
-        }
-
-        $ranges = ['1h', '24h', '7d', '30d'];
-
-        foreach ($ranges as $range) {
-            Cache::forget(CacheKeys::dashboardStats($range));
-            Cache::forget(CacheKeys::dashboardActivity($range));
-            Cache::forget(CacheKeys::dashboardPerformance($range));
-        }
-
-        Cache::forget(CacheKeys::dashboardSimplifiedSummary());
+        $this->flushTags(CacheTagHelper::dashboards());
     }
 
     /**
@@ -162,34 +89,27 @@ final class CacheInvalidationService
      *
      * @param  array<int, string>  $tags
      */
-    private function flushTags(array $tags): bool
+    private function flushTags(array $tags): void
     {
         if ($tags === []) {
-            return false;
+            return;
         }
 
         $store = Cache::getStore();
 
-        if (! $store instanceof TaggableStore) {
-            Log::warning('Cache tags unavailable; performing full cache flush', [
-                'tags' => $tags,
-                'reason' => 'no_tags',
-            ]);
+        if ($store instanceof TaggableStore) {
+            try {
+                Cache::tags($tags)->flush();
 
-            return false;
+                return;
+            } catch (Throwable $exception) {
+                Log::warning('Failed to flush cache tags', [
+                    'tags' => $tags,
+                    'error' => $exception->getMessage(),
+                ]);
+            }
         }
 
-        try {
-            Cache::tags($tags)->flush();
-
-            return true;
-        } catch (Throwable $exception) {
-            Log::warning('Failed to flush cache tags', [
-                'tags' => $tags,
-                'error' => $exception->getMessage(),
-            ]);
-        }
-
-        return false;
+        Cache::flush();
     }
 }
