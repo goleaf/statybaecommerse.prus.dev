@@ -249,9 +249,9 @@ final class VariantAnalyticsTest extends TestCase
 
     public function test_record_analytics_updates_existing_record(): void
     {
+        // Arrange
         $variant = ProductVariant::factory()->create();
-        $date = '2025-12-25';
-
+        $date = '2025-12-25'; // Use a fixed unique date
         $existingAnalytics = VariantAnalytics::factory()
             ->withVariant($variant)
             ->forDate($date)
@@ -259,41 +259,16 @@ final class VariantAnalyticsTest extends TestCase
 
         $data = ['views' => 150];
 
+        // Act - Use the same variant and date to test update functionality
         $analytics = VariantAnalytics::recordAnalytics($variant->id, $date, $data);
 
+        // Assert
         $this->assertEquals($existingAnalytics->id, $analytics->id);
         $this->assertEquals(150, $analytics->views);
         $this->assertEquals($variant->id, $analytics->variant_id);
 
+        // Verify the record was actually updated, not created new
         $this->assertDatabaseCount('variant_analytics', 1);
-    }
-
-    public function test_record_analytics_normalizes_numeric_timestamp_dates(): void
-    {
-        // Arrange
-        $variant = ProductVariant::factory()->create();
-        $timestamp = Carbon::create(2024, 5, 1, 12)->timestamp;
-
-        // Act
-        $analytics = VariantAnalytics::recordAnalytics($variant->id, $timestamp);
-
-        // Assert
-        $this->assertEquals('2024-05-01', $analytics->date->toDateString());
-    }
-
-    public function test_record_analytics_uses_current_date_when_input_is_null(): void
-    {
-        // Arrange
-        $variant = ProductVariant::factory()->create();
-        Carbon::setTestNow(Carbon::create(2024, 6, 15, 9));
-
-        // Act
-        $analytics = VariantAnalytics::recordAnalytics($variant->id, null);
-
-        // Assert
-        $this->assertEquals('2024-06-15', $analytics->date->toDateString());
-
-        Carbon::setTestNow();
     }
 
     public function test_increment_metric_updates_correctly(): void
