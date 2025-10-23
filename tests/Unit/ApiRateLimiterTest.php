@@ -7,16 +7,15 @@ namespace Tests\Unit;
 use App\Providers\ApiServiceProvider;
 use Illuminate\Cache\RateLimiting\Limit;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
-use ReflectionMethod;
 
 final class ApiRateLimiterTest extends TestCase
 {
     public function testResolveLimitReturnsExpectedDecayAndMaxAttempts(): void
     {
-        $provider = (new ReflectionClass(ApiServiceProvider::class))->newInstanceWithoutConstructor();
+        $provider = (new \ReflectionClass(ApiServiceProvider::class))->newInstanceWithoutConstructor();
 
-        $method = new ReflectionMethod(ApiServiceProvider::class, 'resolveLimit');
+        // Reflecting over the provider allows us to exercise the internal limit resolution logic without altering visibility.
+        $method = new \ReflectionMethod(ApiServiceProvider::class, 'resolveLimit');
         $method->setAccessible(true);
 
         /** @var array<int, Limit> $limits */
