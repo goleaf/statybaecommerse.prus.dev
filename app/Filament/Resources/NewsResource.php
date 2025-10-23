@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Enums\ModerationState;
+use App\Filament\Components\Combobox;
 use App\Filament\Resources\NewsResource\Pages;
 use App\Filament\Resources\NewsResource\RelationManagers;
 use App\Models\News;
@@ -147,21 +148,15 @@ class NewsResource extends Resource
                         ->helperText(__('news.podcast.field_help')),
                 ]),
             Forms\Components\Section::make('Categories & Tags')
-                ->components([
+                ->schema([
                     Combobox::make('categories')
                         ->label(__('news.fields.categories'))
                         ->relationship('categories', 'name')
-                        ->boxSearchs()
-                        ->height('320px')
-                        ->optionsLabel(__('news.combobox.categories.available'))
-                        ->selectedLabel(__('news.combobox.categories.selected')),
+                        ->preload(),
                     Combobox::make('tags')
                         ->label(__('news.fields.tags'))
                         ->relationship('tags', 'name')
-                        ->boxSearchs()
-                        ->height('320px')
-                        ->optionsLabel(__('news.combobox.tags.available'))
-                        ->selectedLabel(__('news.combobox.tags.selected')),
+                        ->preload(),
                 ])
                 ->columns(2),
         ]);

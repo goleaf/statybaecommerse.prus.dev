@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Filament\Components\Combobox;
 use App\Filament\Resources\RecommendationBlockResource\Pages;
 use App\Models\RecommendationBlock;
 use App\Models\Scopes\ActiveScope;
@@ -96,24 +95,33 @@ final class RecommendationBlockResource extends Resource
                         ->maxLength(1000)
                         ->rows(3),
                     Select::make('type')
-                        ->label(__('recommendation_blocks.fields.type'))
-                        ->options(self::getTypeOptions())
+                        ->label(__('recommendation_blocks.type'))
+                        ->options([
+                            'featured' => __('recommendation_blocks.featured'),
+                            'related'  => __('recommendation_blocks.related'),
+                            'similar'  => __('recommendation_blocks.similar'),
+                            'trending' => __('recommendation_blocks.trending'),
+                            'recent'   => __('recommendation_blocks.recent'),
+                        ])
                         ->required()
                         ->native(false),
                     Select::make('position')
-                        ->label(__('recommendation_blocks.fields.position'))
-                        ->options(self::getPositionOptions())
+                        ->label(__('recommendation_blocks.position'))
+                        ->options([
+                            'top'     => __('recommendation_blocks.top'),
+                            'bottom'  => __('recommendation_blocks.bottom'),
+                            'sidebar' => __('recommendation_blocks.sidebar'),
+                            'inline'  => __('recommendation_blocks.inline'),
+                        ])
                         ->required()
                         ->native(false),
                 ]),
             Section::make(__('recommendation_blocks.sections.products'))
                 ->schema([
-                    Select::make('product_ids')
-                        ->label(__('recommendation_blocks.fields.products'))
-                        ->multiple()
+                    Combobox::make('product_ids')
+                        ->label(__('recommendation_blocks.products'))
                         ->relationship('products', 'name', fn (Builder $query) => $query->withoutGlobalScopes())
-                        ->boxSearchs()
-                        ->height('320px')
+                        ->preload()
                         ->afterStateHydrated(function ($state, callable $set): void {
                             $set('products', collect($state)->sort()->values()->all());
                         })
@@ -215,11 +223,22 @@ final class RecommendationBlockResource extends Resource
             ])
             ->filters([
                 SelectFilter::make('type')
-                    ->label(__('recommendation_blocks.fields.type'))
-                    ->options(self::getTypeOptions()),
+                    ->label(__('recommendation_blocks.type'))
+                    ->options([
+                        'featured' => __('recommendation_blocks.featured'),
+                        'related'  => __('recommendation_blocks.related'),
+                        'similar'  => __('recommendation_blocks.similar'),
+                        'trending' => __('recommendation_blocks.trending'),
+                        'recent'   => __('recommendation_blocks.recent'),
+                    ]),
                 SelectFilter::make('position')
-                    ->label(__('recommendation_blocks.fields.position'))
-                    ->options(self::getPositionOptions()),
+                    ->label(__('recommendation_blocks.position'))
+                    ->options([
+                        'top'     => __('recommendation_blocks.top'),
+                        'bottom'  => __('recommendation_blocks.bottom'),
+                        'sidebar' => __('recommendation_blocks.sidebar'),
+                        'inline'  => __('recommendation_blocks.inline'),
+                    ]),
                 TernaryFilter::make('is_active')
                     ->label(__('recommendation_blocks.fields.is_active'))
                     ->placeholder(__('recommendation_blocks.filters.all_records'))
