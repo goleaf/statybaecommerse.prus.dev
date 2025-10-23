@@ -43,8 +43,8 @@ final class RealtimeAnalyticsWidget extends ChartWidget
         $today = Carbon::today();
         $yesterday = (clone $today)->subDay();
 
-        $ordersToday = $this->orders()->createdOn($today)->count();
-        $ordersYesterday = $this->orders()->createdOn($yesterday)->count();
+        $ordersToday = $this->orders()->createdOnDate($today)->count();
+        $ordersYesterday = $this->orders()->createdOnDate($yesterday)->count();
         $ordersChange = $ordersYesterday > 0
             ? (($ordersToday - $ordersYesterday) / $ordersYesterday) * 100
             : ($ordersToday > 0 ? 100 : 0);
@@ -52,12 +52,12 @@ final class RealtimeAnalyticsWidget extends ChartWidget
         $revenueToday = (float) ($this
             ->orders()
             ->where('status', '!=', 'cancelled')
-            ->createdOn($today)
+            ->createdOnDate($today)
             ->sum('total') ?? 0);
         $revenueYesterday = (float) ($this
             ->orders()
             ->where('status', '!=', 'cancelled')
-            ->createdOn($yesterday)
+            ->createdOnDate($yesterday)
             ->sum('total') ?? 0);
         $revenueChange = $revenueYesterday > 0
             ? (($revenueToday - $revenueYesterday) / $revenueYesterday) * 100

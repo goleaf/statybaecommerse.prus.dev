@@ -42,9 +42,8 @@ use Spatie\Translatable\HasTranslations;
  * @method static \Illuminate\Database\Eloquent\Builder|Order query()
  * @method static \Illuminate\Database\Eloquent\Builder|Order createdBetween(CarbonInterface|DateTimeInterface|string $start, CarbonInterface|DateTimeInterface|string $end)
  * @method static \Illuminate\Database\Eloquent\Builder|Order createdSince(CarbonInterface|DateTimeInterface|string $start)
- * @method static \Illuminate\Database\Eloquent\Builder|Order createdOn(CarbonInterface|DateTimeInterface|string $date)
- * @method static \Illuminate\Database\Eloquent\Builder|Order createdToday()
- * @method static \Illuminate\Database\Eloquent\Builder|Order createdThisMonth()
+ * @method static \Illuminate\Database\Eloquent\Builder|Order createdUntil(CarbonInterface|DateTimeInterface|string $end)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order createdOnDate(CarbonInterface|DateTimeInterface|string $date)
  *
  * @mixin \Eloquent
  */
@@ -270,8 +269,11 @@ final class Order extends Model
     public function scopeCreatedBetween(Builder $query, CarbonInterface|DateTimeInterface|string $start, CarbonInterface|DateTimeInterface|string $end): Builder
     {
         [$startAt, $endAt] = self::normalizeRange($start, $end);
+        $column = $this->qualifyCreatedAtColumn();
 
-        return $query->whereBetween($query->qualifyColumn('created_at'), [$startAt, $endAt]);
+        // Constrain the query using the normalized range so the standalone
+        // orders_created_at_index can accelerate analytics workloads.
+        return $query->whereBetween($column, [$startAt, $endAt]);
     }
 
     /**
@@ -280,7 +282,9 @@ final class Order extends Model
      */
     public function scopeCreatedSince(Builder $query, CarbonInterface|DateTimeInterface|string $start): Builder
     {
-        return $query->where($query->qualifyColumn('created_at'), '>=', self::toImmutableCarbon($start));
+        $column = $this->qualifyCreatedAtColumn();
+
+        return $query->where($column, '>=', self::toImmutableCarbon($start)->startOfSecond());
     }
 
     /**
@@ -289,7 +293,9 @@ final class Order extends Model
      */
     public function scopeCreatedUntil(Builder $query, CarbonInterface|DateTimeInterface|string $end): Builder
     {
-        return $query->where($query->qualifyColumn('created_at'), '<=', self::toImmutableCarbon($end));
+        $column = $this->qualifyCreatedAtColumn();
+
+        return $query->where($column, '<=', self::toImmutableCarbon($end)->endOfSecond());
     }
 
     /**
@@ -298,9 +304,18 @@ final class Order extends Model
      */
     public function scopeCreatedOn(Builder $query, CarbonInterface|DateTimeInterface|string $date): Builder
     {
-        $day = self::toImmutableCarbon($date);
+        [$startOfDay, $endOfDay] = self::normalizeDayRange($date);
 
-        return $query->whereBetween($query->qualifyColumn('created_at'), [$day->copy()->startOfDay(), $day->copy()->endOfDay()]);
+        return $this->scopeCreatedBetween($query, $startOfDay, $endOfDay);
+    }
+
+    /**
+     * Provide an alias that keeps backwards compatibility with the analytics PR that
+     * introduced the created_at indexes.
+     */
+    public function scopeCreatedOnDate(Builder $query, CarbonInterface|DateTimeInterface|string $date): Builder
+    {
+        return $this->scopeCreatedOn($query, $date);
     }
 
     public function scopeCreatedToday(Builder $query): Builder
@@ -433,17 +448,24 @@ final class Order extends Model
         return number_format((float) $this->total, 2) . ' ' . $this->currency;
     }
 
+    private function qualifyCreatedAtColumn(): string
+    {
+        return $this->qualifyColumn($this->getCreatedAtColumn());
+    }
+
     private static function toImmutableCarbon(CarbonInterface|DateTimeInterface|string $value): Carbon
     {
         if ($value instanceof CarbonInterface) {
-            return $value->copy();
+            return $value->toImmutable();
         }
 
         if ($value instanceof DateTimeInterface) {
-            return Carbon::make($value)?->copy() ?? Carbon::parse($value->format('Y-m-d H:i:s.u'), $value->getTimezone());
+            $carbon = Carbon::make($value) ?? Carbon::parse($value->format('Y-m-d H:i:s.u'), $value->getTimezone());
+
+            return $carbon->toImmutable();
         }
 
-        return Carbon::parse((string) $value);
+        return Carbon::parse((string) $value)->toImmutable();
     }
 
     /**
@@ -451,13 +473,23 @@ final class Order extends Model
      */
     private static function normalizeRange(CarbonInterface|DateTimeInterface|string $start, CarbonInterface|DateTimeInterface|string $end): array
     {
-        $startAt = self::toImmutableCarbon($start);
-        $endAt = self::toImmutableCarbon($end);
+        $startAt = self::toImmutableCarbon($start)->startOfSecond();
+        $endAt = self::toImmutableCarbon($end)->endOfSecond();
 
         if ($startAt->greaterThan($endAt)) {
             [$startAt, $endAt] = [$endAt, $startAt];
         }
 
         return [$startAt, $endAt];
+    }
+
+    /**
+     * @return array{0: Carbon, 1: Carbon}
+     */
+    private static function normalizeDayRange(CarbonInterface|DateTimeInterface|string $date): array
+    {
+        $day = self::toImmutableCarbon($date);
+
+        return [$day->startOfDay(), $day->endOfDay()];
     }
 }
