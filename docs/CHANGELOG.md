@@ -19,7 +19,7 @@
 - Raised the floor for `novadaemon/filament-combobox` to `^2.0.1` as part of the scheduled Filament maintenance sweep so we can ship the upstream dropdown focus bugfix in the next admin UI release.
 
 ### Changed
-- Documented the Collection Rule navigation icon hook, refreshed its Filament v4 form/table signatures, and converted reorder to a modal action while updating admin pages to drop legacy form array returns.
+- Documented the Collection Rule resource's Filament v4 form/table signatures, modal reorder workflow, and cache maintenance page alignment to guide future admin updates.
 - Added translation-backed fallbacks for missing review ratings while aligning Filament navigation icon docblocks and shared navigation group helpers across the review, system setting category, and enhanced ecommerce widgets.
 - Swapped Campaign resource schemas to Filament v4 `Section`/`Grid` components, refreshed table action imports, and synced the related translation manager plus Variant Analytics navigation icon docblock with v4 conventions.
 - Refined the Variant Inventory resource form to rely on section column layouts instead of nested grids, improving readability while keeping bespoke spans for operational notes and ensuring importer select components remain organized.

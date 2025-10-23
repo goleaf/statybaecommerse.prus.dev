@@ -40,12 +40,12 @@ final class VariantAnalyticsResource extends Resource
     protected static ?string $model = VariantAnalytics::class;
 
     /**
-     * Ensure Filament interprets the icon while supporting enums without forcing an import.
+     * @var string|\BackedEnum|null Flag the analytics icon while staying compatible with Filament v4 conventions.
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    /** Ensure inventory analytics stay grouped centrally via typed declaration. */
-    protected static NavigationGroup|string|null $navigationGroup = NavigationGroup::Inventory;
+    /** @var string|\BackedEnum|null Anchor inventory analytics beneath the shared navigation enum. */
+    protected static $navigationGroup = NavigationGroup::Inventory;
 
     public static function getNavigationGroup(): ?string
     {

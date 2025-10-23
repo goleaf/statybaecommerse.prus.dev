@@ -85,7 +85,7 @@ final class CacheMaintenance extends Page
 
     public function form(Form $form): Form
     {
-        // Adopt the Filament v4 form contract without the legacy array fallback.
+        // Embrace the Filament v4 return contract so downstream tooling can rely on a `Form` instance.
         return $form
             ->schema([
                 Section::make('Targeted Cache Operations')
