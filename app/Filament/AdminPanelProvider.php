@@ -92,7 +92,12 @@ class AdminPanelProvider extends PanelProvider
                 ->authMiddleware([
                     \Illuminate\Auth\Middleware\Authenticate::class,
                 ])
-                ->viteTheme('resources/css/filament/admin/theme.scss');
+                // Register the admin theme and companion JavaScript so plugin assets (including the combobox)
+                // are built for local testing environments.
+                ->viteTheme([
+                    'resources/css/filament/admin/theme.css',
+                    'resources/js/filament/admin/theme.js',
+                ]);
         }
 
         return $panel
@@ -118,6 +123,22 @@ class AdminPanelProvider extends PanelProvider
                 GeneralStatsOverview::class,
                 SalesByMonthChart::class,
                 StatsOverviewWidget::class,
+            ])
+            ->middleware([
+                \Illuminate\Session\Middleware\StartSession::class,
+                \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+                \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
+                \Illuminate\Routing\Middleware\SubstituteBindings::class,
+                \Illuminate\Auth\Middleware\Authenticate::class,
+            ])
+            ->authMiddleware([
+                \Illuminate\Auth\Middleware\Authenticate::class,
+            ])
+            // Register the admin theme and companion JavaScript so plugin assets (including the combobox)
+            // are available throughout the production panel.
+            ->viteTheme([
+                'resources/css/filament/admin/theme.css',
+                'resources/js/filament/admin/theme.js',
             ]);
     }
 
