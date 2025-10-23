@@ -71,16 +71,16 @@ final class CampaignClickController extends Controller
     {
         $definition = new ListQueryDefinition(
             filters: [
-                'campaign_id' => ['type' => 'int', 'column' => 'campaign_clicks.campaign_id'],
-                'click_type' => ['type' => 'string', 'column' => 'campaign_clicks.click_type'],
-                'device_type' => ['type' => 'string', 'column' => 'campaign_clicks.device_type'],
+                'campaign_id'  => ['type' => 'int', 'column' => 'campaign_clicks.campaign_id'],
+                'click_type'   => ['type' => 'string', 'column' => 'campaign_clicks.click_type'],
+                'device_type'  => ['type' => 'string', 'column' => 'campaign_clicks.device_type'],
                 'is_converted' => ['type' => 'bool', 'column' => 'campaign_clicks.is_converted'],
-                'country' => ['type' => 'string', 'column' => 'campaign_clicks.country'],
-                'utm_source' => ['type' => 'string', 'column' => 'campaign_clicks.utm_source'],
-                'date_from' => ['type' => 'datetime', 'column' => 'campaign_clicks.clicked_at', 'operator' => '>='],
-                'date_to' => ['type' => 'datetime', 'column' => 'campaign_clicks.clicked_at', 'operator' => '<='],
-                'search' => [
-                    'type' => 'string',
+                'country'      => ['type' => 'string', 'column' => 'campaign_clicks.country'],
+                'utm_source'   => ['type' => 'string', 'column' => 'campaign_clicks.utm_source'],
+                'date_from'    => ['type' => 'datetime', 'column' => 'campaign_clicks.clicked_at', 'operator' => '>='],
+                'date_to'      => ['type' => 'datetime', 'column' => 'campaign_clicks.clicked_at', 'operator' => '<='],
+                'search'       => [
+                    'type'     => 'string',
                     'callback' => static function (Builder $builder, string $value): void {
                         $builder->where(function (Builder $query) use ($value): void {
                             $query->where('utm_source', 'like', "%{$value}%")
@@ -92,7 +92,7 @@ final class CampaignClickController extends Controller
                 ],
             ],
             sortable: [
-                'clicked_at' => ['column' => 'campaign_clicks.clicked_at', 'default_direction' => 'desc'],
+                'clicked_at'       => ['column' => 'campaign_clicks.clicked_at', 'default_direction' => 'desc'],
                 'conversion_value' => ['column' => 'campaign_clicks.conversion_value'],
             ],
             defaultSort: 'clicked_at',

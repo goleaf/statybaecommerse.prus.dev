@@ -16,21 +16,36 @@ use OpenApi\Attributes as OA;
 final class AutocompleteSearchController extends Controller
 {
     #[OA\Post(
-        path: '/api/v1/autocomplete-search',
-        summary: 'Perform a generic autocomplete lookup for the requested model.',
+        path: '/v1/autocomplete-search',
+        summary: 'Generic autocomplete endpoint',
+        description: 'Resolve autocomplete suggestions for arbitrary models using a validated configuration payload.',
         tags: ['Autocomplete'],
-        security: [
-            ['SanctumToken' => []],
-        ],
         requestBody: new OA\RequestBody(
             required: true,
-            content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteSearchRequest'),
+            content: new OA\JsonContent(
+                type: 'object',
+                required: ['model_class', 'search_query'],
+                properties: [
+                    new OA\Property(property: 'model_class', type: 'string', description: 'Fully qualified model class to query.'),
+                    new OA\Property(property: 'search_query', type: 'string', description: 'Query string to search for.'),
+                    new OA\Property(property: 'search_field', type: 'string', nullable: true),
+                    new OA\Property(property: 'label_field', type: 'string', nullable: true),
+                    new OA\Property(property: 'value_field', type: 'string', nullable: true),
+                    new OA\Property(property: 'limit', type: 'integer', minimum: 1, maximum: 100, nullable: true),
+                ]
+            )
         ),
         responses: [
-            new OA\Response(response: 200, ref: '#/components/responses/AutocompleteSearchResults'),
-            new OA\Response(response: 401, ref: '#/components/responses/AuthenticationError'),
-            new OA\Response(response: 422, ref: '#/components/responses/AutocompleteValidationError'),
-            new OA\Response(response: 500, ref: '#/components/responses/AutocompleteFailure'),
+            new OA\Response(
+                response: 200,
+                description: 'Autocomplete results returned successfully.',
+                content: new OA\JsonContent(ref: '#/components/schemas/AutocompleteSearchResponse')
+            ),
+            new OA\Response(
+                response: 422,
+                description: 'Validation failed.',
+                content: new OA\JsonContent(ref: '#/components/schemas/ValidationProblemDetails')
+            ),
         ]
     )]
     public function __invoke(AutocompleteSearchRequest $request): JsonResponse

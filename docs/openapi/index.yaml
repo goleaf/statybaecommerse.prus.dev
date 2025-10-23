@@ -1,335 +1,467 @@
-openapi: 3.1.0
-info:
-  title: Statyba Commerce API
-  description: |
-    Shared OpenAPI components for the Statyba commerce platform. The PHP controllers
-    reference these components through `OpenApi\Attributes` so the `zircote/swagger-php`
-    scanner can assemble a complete specification.
-  version: "1.0.0"
-servers:
-  - url: https://api.prus.dev
-    description: Production
-  - url: http://localhost
-    description: Local development
-tags:
-  - name: Campaigns
-    description: Campaign engagement tracking and analytics endpoints.
-  - name: System Settings
-    description: Public system configuration lookup endpoints.
-  - name: Discount Conditions
-    description: Discount condition evaluation and metadata endpoints.
-  - name: Autocomplete
-    description: Autocomplete search, export, and insight endpoints.
 components:
-  securitySchemes:
-    SanctumToken:
-      type: http
-      scheme: bearer
-      bearerFormat: Token
   schemas:
-    SuccessMessage:
+    CampaignClick:
       type: object
-      required: [success, message]
+      required:
+        - id
+        - campaign_id
+        - customer_id
+        - click_type
+        - clicked_at
       properties:
-        success:
-          type: boolean
-          example: true
-        message:
-          type: string
-          example: Click recorded
-    ErrorResponse:
-      type: object
-      required: [success, message]
-      properties:
-        success:
-          type: boolean
-          example: false
-        message:
-          type: string
-          example: Validation failed
-        error:
-          type: string
+        id:
+          type: integer
+          format: int64
+        campaign_id:
+          type: integer
+          format: int64
+        campaign:
+          type: object
           nullable: true
-    ValidationErrorResponse:
-      allOf:
-        - $ref: '#/components/schemas/ErrorResponse'
-        - type: object
           properties:
-            errors:
-              type: object
-              additionalProperties: true
-    CampaignInteractionRequest:
-      type: object
-      properties:
-        type:
-          type: string
-          example: cta
-        url:
-          type: string
-          format: uri
+            id:
+              type: integer
+              format: int64
+              nullable: true
+            name:
+              type: string
+              nullable: true
+            slug:
+              type: string
+              nullable: true
+        customer_id:
+          type: integer
+          format: int64
           nullable: true
-    CampaignConversionRequest:
-      type: object
-      properties:
-        type:
+        customer:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+              format: int64
+              nullable: true
+            name:
+              type: string
+              nullable: true
+            email:
+              type: string
+              nullable: true
+        session_id:
           type: string
-          example: purchase
-        value:
+          nullable: true
+        ip_address:
+          type: string
+          nullable: true
+        user_agent:
+          type: string
+          nullable: true
+        click_type:
+          type: string
+        click_type_label:
+          type: string
+          nullable: true
+        clicked_url:
+          type: string
+          nullable: true
+        clicked_at:
+          type: string
+          format: date-time
+          nullable: true
+        referer:
+          type: string
+          nullable: true
+        device_type:
+          type: string
+          nullable: true
+        device_type_label:
+          type: string
+          nullable: true
+        browser:
+          type: string
+          nullable: true
+        browser_label:
+          type: string
+          nullable: true
+        os:
+          type: string
+          nullable: true
+        os_label:
+          type: string
+          nullable: true
+        country:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+        utm_source:
+          type: string
+          nullable: true
+        utm_medium:
+          type: string
+          nullable: true
+        utm_campaign:
+          type: string
+          nullable: true
+        utm_term:
+          type: string
+          nullable: true
+        utm_content:
+          type: string
+          nullable: true
+        conversion_value:
           type: number
           format: float
-          example: 49.9
-        order_id:
+          nullable: true
+        is_converted:
+          type: boolean
+        conversion_data:
+          type: object
+          nullable: true
+        conversions_count:
+          type: integer
+          format: int64
+          nullable: true
+        total_conversion_value:
+          type: number
+          format: float
+          nullable: true
+        conversion_rate:
+          type: number
+          format: float
+          nullable: true
+        utm_params:
+          type: object
+          nullable: true
+        location_info:
+          type: object
+          nullable: true
+        device_info:
+          type: object
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+    CampaignClickCollectionResponse:
+      type: object
+      required:
+        - data
+        - meta
+        - links
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CampaignClick'
+        meta:
+          allOf:
+            - $ref: '#/components/schemas/PaginationMeta'
+        links:
+          $ref: '#/components/schemas/PaginationLinks'
+    CampaignClickResourceResponse:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/CampaignClick'
+        message:
           type: string
           nullable: true
-        data:
-          type: object
-          additionalProperties: true
-    CampaignStatistics:
+    CampaignClickStatistics:
       type: object
-      required: [success, data]
+      required:
+        - total_clicks
+        - converted_clicks
+        - conversion_rate
+        - total_conversion_value
+        - today_clicks
+        - this_week_clicks
       properties:
-        success:
-          type: boolean
-        data:
-          type: object
-          properties:
-            total_campaigns:
-              type: integer
-            active_campaigns:
-              type: integer
-            scheduled_campaigns:
-              type: integer
-            completed_campaigns:
-              type: integer
-            total_views:
-              type: integer
-            total_clicks:
-              type: integer
-            total_conversions:
-              type: integer
-            total_revenue:
-              type: number
-              format: float
-            average_conversion_rate:
-              type: number
-              format: float
-            average_click_through_rate:
-              type: number
-              format: float
-            average_roi:
-              type: number
-              format: float
-    CampaignTypes:
+        total_clicks:
+          type: integer
+          format: int64
+        converted_clicks:
+          type: integer
+          format: int64
+        conversion_rate:
+          type: number
+          format: float
+        total_conversion_value:
+          type: number
+          format: float
+        today_clicks:
+          type: integer
+          format: int64
+        this_week_clicks:
+          type: integer
+          format: int64
+    CampaignClickAnalytics:
       type: object
-      required: [success, data]
+      required:
+        - clicks_over_time
+        - device_types
+        - browsers
+        - countries
+        - utm_sources
       properties:
-        success:
-          type: boolean
-        data:
+        clicks_over_time:
           type: array
           items:
             type: object
             properties:
-              type:
-                type: string
-              label:
+              date:
                 type: string
               count:
                 type: integer
-              icon:
+                format: int64
+        device_types:
+          type: array
+          items:
+            type: object
+            properties:
+              device_type:
                 type: string
-              color:
+                nullable: true
+              count:
+                type: integer
+                format: int64
+        browsers:
+          type: array
+          items:
+            type: object
+            properties:
+              browser:
                 type: string
-    CampaignPerformance:
+                nullable: true
+              count:
+                type: integer
+                format: int64
+        countries:
+          type: array
+          items:
+            type: object
+            properties:
+              country:
+                type: string
+                nullable: true
+              count:
+                type: integer
+                format: int64
+        utm_sources:
+          type: array
+          items:
+            type: object
+            properties:
+              utm_source:
+                type: string
+                nullable: true
+              count:
+                type: integer
+                format: int64
+    AutocompleteResult:
       type: object
-      required: [success, data]
+      required:
+        - value
+        - label
+      properties:
+        value:
+          oneOf:
+            - type: string
+            - type: integer
+        label:
+          type: string
+        data:
+          type: object
+          nullable: true
+    AutocompleteResponse:
+      type: object
+      required:
+        - success
+        - data
+        - meta
       properties:
         success:
           type: boolean
         data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AutocompleteResult'
+        meta:
+          type: object
+          properties:
+            query:
+              type: string
+              nullable: true
+            total:
+              type: integer
+              format: int64
+            limit:
+              type: integer
+              format: int64
+            type:
+              type: string
+              nullable: true
+            types:
+              type: array
+              items:
+                type: string
+              nullable: true
+    AutocompleteErrorResponse:
+      type: object
+      required:
+        - success
+        - message
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        errors:
           type: object
           additionalProperties:
-            type: integer
-    CampaignAnalytics:
+            type: array
+            items:
+              type: string
+          nullable: true
+    AutocompleteSuggestionsResponse:
       type: object
-      required: [success, data]
+      required:
+        - success
+        - data
+        - meta
       properties:
         success:
           type: boolean
         data:
           type: object
           properties:
-            period:
-              type: string
-            start_date:
-              type: string
-              format: date
-            end_date:
-              type: string
-              format: date
-            campaigns_created:
-              type: integer
-            campaigns_started:
-              type: integer
-            campaigns_completed:
-              type: integer
-            total_views:
-              type: integer
-            total_clicks:
-              type: integer
-            total_conversions:
-              type: integer
-            total_revenue:
-              type: number
-              format: float
-            top_performing_campaigns:
+            popular:
               type: array
               items:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                  name:
-                    type: string
-                  type:
-                    type: string
-                  conversion_rate:
-                    type: number
-                    format: float
-                  total_revenue:
-                    type: number
-                    format: float
-            campaign_types_breakdown:
+                type: string
+            recent:
               type: array
               items:
-                type: object
-                properties:
-                  type:
-                    type: string
-                  count:
-                    type: integer
-                  avg_conversion_rate:
-                    type: number
-                    format: float
-    CampaignComparison:
+                type: string
+            combined:
+              type: array
+              items:
+                type: string
+        meta:
+          type: object
+          properties:
+            limit:
+              type: integer
+              format: int64
+    AutocompleteSearchResult:
       type: object
-      required: [success, data]
+      required:
+        - value
+        - label
+        - data
       properties:
-        success:
-          type: boolean
-        data:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: integer
-              name:
-                type: string
-              type:
-                type: string
-              status:
-                type: string
-              views:
-                type: integer
-              clicks:
-                type: integer
-              conversions:
-                type: integer
-              revenue:
-                type: number
-                format: float
-              conversion_rate:
-                type: number
-                format: float
-              click_through_rate:
-                type: number
-                format: float
-              roi:
-                type: number
-                format: float
-              performance_score:
-                type: number
-                format: float
-    CampaignRecommendations:
-      type: object
-      required: [success, data]
-      properties:
-        success:
-          type: boolean
-        data:
-          type: array
-          items:
-            type: object
-            properties:
-              type:
-                type: string
-              priority:
-                type: string
-              title:
-                type: string
-              description:
-                type: string
-              action:
-                type: string
-    SystemSettingsIndex:
-      type: object
-      required: [success, data]
-      properties:
-        success:
-          type: boolean
+        value:
+          oneOf:
+            - type: string
+            - type: integer
+        label:
+          type: string
         data:
           type: object
-          additionalProperties: true
-    SystemSettingItem:
+    AutocompleteSearchResponse:
       type: object
-      required: [success]
+      required:
+        - success
+        - results
       properties:
         success:
           type: boolean
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AutocompleteSearchResult'
+    SystemSettingValueMap:
+      type: object
+      additionalProperties:
+        oneOf:
+          - type: string
+          - type: number
+          - type: boolean
+          - type: array
+          - type: object
+          - type: 'null'
+    SystemSettingEntry:
+      type: object
+      required:
+        - key
+        - name
+        - value
+        - type
+        - group
+      properties:
         key:
           type: string
         name:
           type: string
         value:
-          nullable: true
+          oneOf:
+            - type: string
+            - type: number
+            - type: boolean
+            - type: array
+            - type: object
+            - type: 'null'
         type:
           type: string
         group:
           type: string
+          nullable: true
         description:
           type: string
+          nullable: true
         help_text:
           type: string
+          nullable: true
     SystemSettingCategory:
       type: object
+      required:
+        - id
+        - name
+        - slug
+        - settings_count
       properties:
         id:
           type: integer
+          format: int64
         name:
           type: string
         slug:
           type: string
         description:
           type: string
+          nullable: true
         icon:
           type: string
+          nullable: true
         color:
           type: string
+          nullable: true
         settings_count:
           type: integer
-    SystemSettingCategories:
-      type: object
-      required: [success, data]
-      properties:
-        success:
-          type: boolean
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/SystemSettingCategory'
+          format: int64
     SystemSettingGroup:
       type: object
+      required:
+        - name
+        - label
+        - settings_count
       properties:
         name:
           type: string
@@ -337,19 +469,66 @@ components:
           type: string
         settings_count:
           type: integer
-    SystemSettingGroups:
+          format: int64
+    DiscountConditionSummary:
       type: object
-      required: [success, data]
+      required:
+        - id
+        - type
+        - operator
+        - value
       properties:
-        success:
-          type: boolean
-        data:
+        id:
+          type: integer
+          format: int64
+        type:
+          type: string
+        type_label:
+          type: string
+          nullable: true
+        operator:
+          type: string
+        operator_label:
+          type: string
+          nullable: true
+        value:
+          oneOf:
+            - type: string
+            - type: number
+            - type: boolean
+            - type: array
+            - type: object
+            - type: 'null'
+        priority:
+          type: integer
+          format: int64
+          nullable: true
+        position:
+          type: integer
+          format: int64
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+    DiscountConditionCollection:
+      type: object
+      required:
+        - conditions
+      properties:
+        conditions:
           type: array
           items:
-            $ref: '#/components/schemas/SystemSettingGroup'
-    DiscountConditionTest:
+            $ref: '#/components/schemas/DiscountConditionSummary'
+    DiscountConditionTestResponse:
       type: object
-      required: [matches, is_valid, condition_description]
+      required:
+        - matches
+        - is_valid
+        - condition_description
+        - message
       properties:
         matches:
           type: boolean
@@ -359,40 +538,10 @@ components:
           type: string
         message:
           type: string
-    DiscountConditionItem:
+    DiscountConditionOperatorsResponse:
       type: object
-      properties:
-        id:
-          type: integer
-        type:
-          type: string
-        type_label:
-          type: string
-        operator:
-          type: string
-        operator_label:
-          type: string
-        value:
-          nullable: true
-        priority:
-          type: integer
-        position:
-          type: integer
-        description:
-          type: string
-        name:
-          type: string
-    DiscountConditions:
-      type: object
-      required: [conditions]
-      properties:
-        conditions:
-          type: array
-          items:
-            $ref: '#/components/schemas/DiscountConditionItem'
-    DiscountConditionOperators:
-      type: object
-      required: [operators]
+      required:
+        - operators
       properties:
         operators:
           type: array
@@ -400,402 +549,187 @@ components:
             type: string
     DiscountConditionStatistics:
       type: object
-      required: [total, active, inactive]
+      required:
+        - total
+        - active
+        - inactive
+        - by_type
+        - by_operator
       properties:
         total:
           type: integer
+          format: int64
         active:
           type: integer
+          format: int64
         inactive:
           type: integer
+          format: int64
         by_type:
           type: object
           additionalProperties:
             type: integer
+            format: int64
         by_operator:
           type: object
           additionalProperties:
             type: integer
-    AutocompleteResult:
+            format: int64
+    CampaignClickCreate:
       type: object
-      required: [value, label]
+      required:
+        - campaign_id
+        - click_type
       properties:
-        value:
-          oneOf:
-            - type: integer
-            - type: string
-        label:
-          type: string
-        data:
-          type: object
-          additionalProperties: true
-    AutocompleteResults:
-      type: object
-      required: [success, data]
-      properties:
-        success:
-          type: boolean
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/AutocompleteResult'
-        meta:
-          type: object
-          additionalProperties: true
-    AutocompleteSuggestions:
-      type: object
-      required: [success, data]
-      properties:
-        success:
-          type: boolean
-        data:
-          type: array
-          items:
-            type: object
-            additionalProperties: true
-        meta:
-          type: object
-          additionalProperties: true
-    AutocompletePersonalized:
-      allOf:
-        - $ref: '#/components/schemas/AutocompleteSuggestions'
-    AutocompletePaginatedResults:
-      type: object
-      required: [success, data, pagination]
-      properties:
-        success:
-          type: boolean
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/AutocompleteResult'
-        pagination:
-          type: object
-          additionalProperties: true
-        infinite_scroll:
-          type: object
-          additionalProperties: true
-        filters:
-          type: object
-          additionalProperties: true
-        query:
-          type: string
-    AutocompleteExport:
-      type: object
-      required: [success]
-      properties:
-        success:
-          type: boolean
-        message:
+        campaign_id:
+          type: integer
+          format: int64
+        session_id:
           type: string
           nullable: true
-        export_id:
+        ip_address:
           type: string
           nullable: true
-        download_url:
+        user_agent:
           type: string
-          format: uri
           nullable: true
-    AutocompleteShare:
-      type: object
-      required: [success, share_id]
-      properties:
-        success:
-          type: boolean
-        share_id:
+        click_type:
           type: string
-        expires_at:
+          enum:
+            - cta
+            - banner
+            - link
+            - button
+            - image
+        clicked_url:
+          type: string
+          nullable: true
+        customer_id:
+          type: integer
+          format: int64
+          nullable: true
+        clicked_at:
           type: string
           format: date-time
-        url:
+          nullable: true
+        referer:
           type: string
-          format: uri
-    AutocompleteShareView:
-      type: object
-      required: [success, share_data]
-      properties:
-        success:
+          nullable: true
+        device_type:
+          type: string
+          nullable: true
+        browser:
+          type: string
+          nullable: true
+        os:
+          type: string
+          nullable: true
+        country:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+        utm_source:
+          type: string
+          nullable: true
+        utm_medium:
+          type: string
+          nullable: true
+        utm_campaign:
+          type: string
+          nullable: true
+        utm_term:
+          type: string
+          nullable: true
+        utm_content:
+          type: string
+          nullable: true
+        conversion_value:
+          type: number
+          format: float
+          nullable: true
+        is_converted:
           type: boolean
-        share_data:
+          nullable: true
+        conversion_data:
           type: object
-          additionalProperties: true
-    AutocompleteFilters:
+          nullable: true
+    CampaignClickUpdate:
       type: object
-      required: [success, filters]
       properties:
-        success:
-          type: boolean
-        filters:
-          type: object
-          additionalProperties: true
-        query:
-          type: string
-    AutocompleteInsights:
-      type: object
-      required: [success, insights]
-      properties:
-        success:
-          type: boolean
-        insights:
-          type: object
-          additionalProperties: true
-        query:
-          type: string
-    AutocompleteRecommendations:
-      type: object
-      required: [success, recommendations]
-      properties:
-        success:
-          type: boolean
-        recommendations:
-          type: array
-          items:
-            type: object
-            additionalProperties: true
-        query:
-          type: string
-    AutocompleteAnalytics:
-      type: object
-      required: [success, analytics]
-      properties:
-        success:
-          type: boolean
-        analytics:
-          type: object
-          additionalProperties: true
-    AutocompleteSearchRequest:
-      type: object
-      required: [model_class, search_query]
-      properties:
-        model_class:
-          type: string
-        search_query:
-          type: string
-        search_field:
-          type: string
-        value_field:
-          type: string
-        label_field:
-          type: string
-        limit:
+        campaign_id:
           type: integer
-    AutocompleteSearchResults:
-      allOf:
-        - $ref: '#/components/schemas/AutocompleteResults'
-  responses:
-    SuccessMessage:
-      description: Generic success response.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SuccessMessage'
-    CampaignAcknowledgement:
-      description: Campaign interaction recorded.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SuccessMessage'
-    CampaignStatistics:
-      description: Aggregated campaign statistics.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/CampaignStatistics'
-    CampaignTypes:
-      description: Campaign types summary.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/CampaignTypes'
-    CampaignPerformance:
-      description: Campaign performance buckets.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/CampaignPerformance'
-    CampaignAnalytics:
-      description: Campaign analytics payload.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/CampaignAnalytics'
-    CampaignComparison:
-      description: Campaign comparison dataset.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/CampaignComparison'
-    CampaignComparisonError:
-      description: Missing campaign identifiers.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    CampaignRecommendations:
-      description: Campaign recommendation list.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/CampaignRecommendations'
-    SystemSettingsIndex:
-      description: Key/value map of system settings.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SystemSettingsIndex'
-    SystemSettingItem:
-      description: Detailed system setting.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SystemSettingItem'
-    SystemSettingNotFound:
-      description: System setting missing.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    SystemSettingCategories:
-      description: Collection of system setting categories.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SystemSettingCategories'
-    SystemSettingGroups:
-      description: Collection of system setting groups.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SystemSettingGroups'
-    DiscountConditionTest:
-      description: Discount condition evaluation result.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/DiscountConditionTest'
-    ValidationError:
-      description: Request validation failed.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ValidationErrorResponse'
-    DiscountConditions:
-      description: Discount conditions for a discount.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/DiscountConditions'
-    DiscountConditionOperators:
-      description: Operator list for a discount condition type.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/DiscountConditionOperators'
-    DiscountConditionStatistics:
-      description: Discount condition statistics.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/DiscountConditionStatistics'
-    AutocompleteResults:
-      description: Autocomplete results payload.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/AutocompleteResults'
-    AutocompleteSuggestions:
-      description: Autocomplete suggestion payload.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/AutocompleteSuggestions'
-    AutocompletePersonalized:
-      description: Personalized autocomplete suggestions.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/AutocompletePersonalized'
-    AutocompletePaginatedResults:
-      description: Paginated autocomplete response.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/AutocompletePaginatedResults'
-    AutocompleteExport:
-      description: Autocomplete export metadata.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/AutocompleteExport'
-    AutocompleteExportNotFound:
-      description: Autocomplete export not found.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    AutocompleteShare:
-      description: Shareable search descriptor.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/AutocompleteShare'
-    AutocompleteShareView:
-      description: Shared search payload.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/AutocompleteShareView'
-    AutocompleteShareNotFound:
-      description: Shared search not found.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    AutocompleteFilters:
-      description: Available filters derived from search results.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/AutocompleteFilters'
-    AutocompleteInsights:
-      description: Search insight payload.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/AutocompleteInsights'
-    AutocompleteRecommendations:
-      description: Search recommendation payload.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/AutocompleteRecommendations'
-    AutocompleteAnalytics:
-      description: Search analytics payload.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/AutocompleteAnalytics'
-    AutocompleteSearchResults:
-      description: Generic autocomplete search response.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/AutocompleteSearchResults'
-    AutocompleteValidationError:
-      description: Autocomplete validation failure.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ValidationErrorResponse'
-    AutocompleteFailure:
-      description: Autocomplete processing error.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    AuthenticationError:
-      description: Authentication is required to access the resource.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
+          format: int64
+        session_id:
+          type: string
+          nullable: true
+        ip_address:
+          type: string
+          nullable: true
+        user_agent:
+          type: string
+          nullable: true
+        click_type:
+          type: string
+          nullable: true
+          enum:
+            - cta
+            - banner
+            - link
+            - button
+            - image
+        clicked_url:
+          type: string
+          nullable: true
+        customer_id:
+          type: integer
+          format: int64
+          nullable: true
+        clicked_at:
+          type: string
+          format: date-time
+          nullable: true
+        referer:
+          type: string
+          nullable: true
+        device_type:
+          type: string
+          nullable: true
+        browser:
+          type: string
+          nullable: true
+        os:
+          type: string
+          nullable: true
+        country:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+        utm_source:
+          type: string
+          nullable: true
+        utm_medium:
+          type: string
+          nullable: true
+        utm_campaign:
+          type: string
+          nullable: true
+        utm_term:
+          type: string
+          nullable: true
+        utm_content:
+          type: string
+          nullable: true
+        conversion_value:
+          type: number
+          format: float
+          nullable: true
+        is_converted:
+          type: boolean
+          nullable: true
+        conversion_data:
+          type: object
+          nullable: true
