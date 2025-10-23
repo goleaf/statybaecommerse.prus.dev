@@ -8,6 +8,9 @@ namespace App\Filament\Resources;
 use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\CategoryResource\Pages;
+use App\Filament\Resources\CategoryResource\RelationManagers\ChildrenRelationManager;
+use App\Filament\Resources\CategoryResource\RelationManagers\ProductsRelationManager;
+use App\Filament\Resources\CategoryResource\RelationManagers\TranslationsRelationManager;
 use App\Models\Category;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
@@ -429,7 +432,12 @@ final class CategoryResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            // Expose child taxonomy management for hierarchical structures.
+            ChildrenRelationManager::class,
+            // Surface product linkage management to keep catalog assignments inline.
+            ProductsRelationManager::class,
+            // Provide localized content editors to manage translated attributes.
+            TranslationsRelationManager::class,
         ];
     }
 
