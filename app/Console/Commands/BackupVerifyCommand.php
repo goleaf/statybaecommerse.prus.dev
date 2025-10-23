@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Support\Backup\RepositoryRegistry;
+use App\Repositories\ProductRepository;
+use App\Repositories\UserRepository;
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -25,7 +25,7 @@ final class BackupVerifyCommand extends Command
 
     protected $description = 'Restore the most recent backup into an ephemeral database and run sanity checks.';
 
-    public function handle(): int
+    public function handle(UserRepository $userRepository, ProductRepository $productRepository): int
     {
         $defaultStorage = config('backup.storage_path', storage_path('app/backups'));
         $storageRoot = $this->normalizePath($this->optionString('storage-path', is_string($defaultStorage) ? $defaultStorage : storage_path('app/backups')));
@@ -46,14 +46,14 @@ final class BackupVerifyCommand extends Command
 
             $metadata = $this->readMetadata($latestBackup);
 
-            $databaseArtifact = $latestBackup . '/' . $metadata['artifacts']['database']['filename'];
-            $mediaArtifact = $latestBackup . '/' . $metadata['artifacts']['media']['filename'];
+            $databaseArtifact = $latestBackup.'/'.$metadata['artifacts']['database']['filename'];
+            $mediaArtifact = $latestBackup.'/'.$metadata['artifacts']['media']['filename'];
 
             $this->assertChecksum($databaseArtifact, $metadata['artifacts']['database']['checksum'] ?? null, 'database');
             $this->assertChecksum($mediaArtifact, $metadata['artifacts']['media']['checksum'] ?? null, 'media');
 
             $this->components->info('Extracting media archive...');
-            $mediaExtractionPath = $workingPath . '/media';
+            $mediaExtractionPath = $workingPath.'/media';
             $this->prepareWorkingDirectory($workingPath, $mediaExtractionPath);
             $this->extractArchive($mediaArtifact, $mediaExtractionPath);
 
@@ -74,51 +74,24 @@ final class BackupVerifyCommand extends Command
             DB::reconnect($connectionName);
 
             $this->components->info('Running sanity checks...');
+            $userCount = $userRepository->count($connectionName);
+            $productCount = $productRepository->count($connectionName);
 
-            $metadataRepositories = $metadata['repositories'] ?? [];
-            $repositoryRegistry = $metadataRepositories !== []
-                ? RepositoryRegistry::fromDefinitions($this->container(), $metadataRepositories)
-                : RepositoryRegistry::fromConfig($this->container());
             $expectedCounts = $metadata['counts'] ?? [];
+            $expectedUsers = $expectedCounts['users'] ?? null;
+            $expectedProducts = $expectedCounts['products'] ?? null;
 
-            if ($repositoryRegistry->isEmpty()) {
-                $this->components->warn('No repository counts were recorded in the backup metadata.');
-            } else {
-                $actualCounts = $repositoryRegistry->counts($connectionName);
-                $results = [];
+            $this->compareCounts('users', $expectedUsers, $userCount);
+            $this->compareCounts('products', $expectedProducts, $productCount);
 
-                $labels = array_unique(array_merge(
-                    array_keys($repositoryRegistry->definitions()),
-                    array_keys($expectedCounts),
-                ));
-
-                foreach ($labels as $label) {
-                    $expected = $expectedCounts[$label] ?? null;
-                    $actualCount = $actualCounts[$label] ?? null;
-
-                    if ($actualCount === null) {
-                        throw new RuntimeException(sprintf('Backup repository [%s] is not available for verification.', $label));
-                    }
-
-                    $this->compareCounts($label, $expected, $actualCount);
-
-                    $results[$label] = [
-                        'expected' => $expected,
-                        'actual'   => $actualCount,
-                    ];
-                }
-
-                foreach ($results as $label => $comparison) {
-                    $this->components->twoColumnDetail(
-                        sprintf('%s (expected/actual)', Str::headline($label)),
-                        sprintf(
-                            '%s / %s',
-                            $comparison['expected'] !== null ? (string) $comparison['expected'] : 'n/a',
-                            (string) $comparison['actual'],
-                        ),
-                    );
-                }
-            }
+            $this->components->twoColumnDetail(
+                'Users (expected/actual)',
+                sprintf('%s / %s', $expectedUsers !== null ? (string) $expectedUsers : 'n/a', (string) $userCount),
+            );
+            $this->components->twoColumnDetail(
+                'Products (expected/actual)',
+                sprintf('%s / %s', $expectedProducts !== null ? (string) $expectedProducts : 'n/a', (string) $productCount),
+            );
 
             $this->components->info('Backup verification completed successfully.');
 
@@ -153,19 +126,15 @@ final class BackupVerifyCommand extends Command
             return null;
         }
 
-        $directories = array_values(array_filter(
-            File::directories($storageRoot),
-            static fn ($path): bool => is_string($path) && File::isDirectory($path),
-        ));
+        $directories = array_values(array_filter(File::directories($storageRoot), static fn (string $path): bool => File::isDirectory($path)));
 
         if ($directories === []) {
             return null;
         }
 
-        /** @var array<int, string> $directories */
         rsort($directories);
 
-        return $directories[0] ?? null;
+        return $directories[0];
     }
 
     /**
@@ -175,13 +144,12 @@ final class BackupVerifyCommand extends Command
      *         media: array{filename: string, checksum?: string|null}
      *     },
      *     connection?: array{driver?: string|null},
-     *     counts?: array<string, int|null>,
-     *     repositories?: array<string, string>
+     *     counts?: array{users?: int|null, products?: int|null}
      * }
      */
     private function readMetadata(string $backupPath): array
     {
-        $metadataPath = $backupPath . '/metadata.json';
+        $metadataPath = $backupPath.'/metadata.json';
 
         if (! File::exists($metadataPath)) {
             throw new RuntimeException('Backup metadata file is missing.');
@@ -191,7 +159,7 @@ final class BackupVerifyCommand extends Command
             /** @var array<string, mixed> $decoded */
             $decoded = json_decode(File::get($metadataPath), true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $exception) {
-            throw new RuntimeException('Failed to parse backup metadata: ' . $exception->getMessage(), 0, $exception);
+            throw new RuntimeException('Failed to parse backup metadata: '.$exception->getMessage(), 0, $exception);
         }
 
         if (! isset($decoded['artifacts']) || ! is_array($decoded['artifacts'])) {
@@ -259,7 +227,7 @@ final class BackupVerifyCommand extends Command
         $result = [
             'artifacts' => [
                 'database' => $databaseInfo,
-                'media'    => $mediaInfo,
+                'media' => $mediaInfo,
             ],
         ];
 
@@ -286,50 +254,34 @@ final class BackupVerifyCommand extends Command
         }
 
         if (isset($decoded['counts'])) {
-            if (! is_array($decoded['counts']) || array_is_list($decoded['counts'])) {
-                throw new RuntimeException('Backup metadata counts must be an associative array.');
+            if (! is_array($decoded['counts'])) {
+                throw new RuntimeException('Backup metadata counts must be an array.');
             }
 
             $countsInfo = [];
 
-            foreach ($decoded['counts'] as $label => $value) {
-                if (! is_string($label) || $label === '') {
-                    throw new RuntimeException('Backup metadata count keys must be non-empty strings.');
+            if (array_key_exists('users', $decoded['counts'])) {
+                $users = $decoded['counts']['users'];
+
+                if ($users !== null && ! is_int($users)) {
+                    throw new RuntimeException('Backup metadata user count must be an integer or null.');
                 }
 
-                if ($value !== null && ! is_int($value)) {
-                    throw new RuntimeException(sprintf('Backup metadata count for [%s] must be an integer or null.', $label));
+                $countsInfo['users'] = $users;
+            }
+
+            if (array_key_exists('products', $decoded['counts'])) {
+                $products = $decoded['counts']['products'];
+
+                if ($products !== null && ! is_int($products)) {
+                    throw new RuntimeException('Backup metadata product count must be an integer or null.');
                 }
 
-                $countsInfo[$label] = $value;
+                $countsInfo['products'] = $products;
             }
 
             if ($countsInfo !== []) {
                 $result['counts'] = $countsInfo;
-            }
-        }
-
-        if (isset($decoded['repositories'])) {
-            if (! is_array($decoded['repositories']) || array_is_list($decoded['repositories'])) {
-                throw new RuntimeException('Backup metadata repositories must be an associative array.');
-            }
-
-            $repositoryInfo = [];
-
-            foreach ($decoded['repositories'] as $label => $class) {
-                if (! is_string($label) || $label === '') {
-                    throw new RuntimeException('Backup metadata repository keys must be non-empty strings.');
-                }
-
-                if (! is_string($class) || $class === '') {
-                    throw new RuntimeException(sprintf('Backup metadata repository [%s] must reference a class name.', $label));
-                }
-
-                $repositoryInfo[$label] = $class;
-            }
-
-            if ($repositoryInfo !== []) {
-                $result['repositories'] = $repositoryInfo;
             }
         }
 
@@ -374,20 +326,10 @@ final class BackupVerifyCommand extends Command
             return;
         }
 
-        $tarBinary = $this->binary('tar', 'tar');
-        $flags = $this->archiveFlags('extract_flags', '-xzf');
-        $command = sprintf('%s %s %s -C %s', escapeshellarg($tarBinary), $flags, escapeshellarg($archive), escapeshellarg($destination));
+        $command = sprintf('tar -xzf %s -C %s', escapeshellarg($archive), escapeshellarg($destination));
         $process = Process::fromShellCommandline($command);
         $process->setTimeout(null);
         $process->mustRun();
-    }
-
-    private function container(): Container
-    {
-        /** @var Container $container */
-        $container = $this->laravel;
-
-        return $container;
     }
 
     /**
@@ -421,7 +363,7 @@ final class BackupVerifyCommand extends Command
     }
 
     /**
-     * @param array<string, mixed> $connectionConfig
+     * @param  array<string, mixed>  $connectionConfig
      */
     private function restoreDatabase(string $driver, array $connectionConfig, string $artifactPath): void
     {
@@ -434,7 +376,7 @@ final class BackupVerifyCommand extends Command
     }
 
     /**
-     * @param array<string, mixed> $connectionConfig
+     * @param  array<string, mixed>  $connectionConfig
      */
     private function restoreSqliteDatabase(array $connectionConfig, string $artifactPath): void
     {
@@ -453,15 +395,14 @@ final class BackupVerifyCommand extends Command
             return;
         }
 
-        $sqliteBinary = $this->binary('sqlite3', 'sqlite3');
-        $command = sprintf('%s %s < %s', escapeshellarg($sqliteBinary), escapeshellarg($databasePath), escapeshellarg($artifactPath));
+        $command = sprintf('sqlite3 %s < %s', escapeshellarg($databasePath), escapeshellarg($artifactPath));
         $process = Process::fromShellCommandline($command);
         $process->setTimeout(null);
         $process->mustRun();
     }
 
     /**
-     * @param array<string, mixed> $connectionConfig
+     * @param  array<string, mixed>  $connectionConfig
      */
     private function restoreMysqlDatabase(array $connectionConfig, string $artifactPath): void
     {
@@ -479,10 +420,8 @@ final class BackupVerifyCommand extends Command
             throw new RuntimeException('MySQL verification username is not configured.');
         }
 
-        $mysqlBinary = $this->binary('mysql', 'mysql');
         $createCommand = sprintf(
-            '%s --host=%s --port=%s --user=%s -e %s',
-            escapeshellarg($mysqlBinary),
+            'mysql --host=%s --port=%s --user=%s -e %s',
             escapeshellarg($host),
             escapeshellarg($port),
             escapeshellarg($username),
@@ -496,8 +435,7 @@ final class BackupVerifyCommand extends Command
         $createProcess->mustRun();
 
         $importCommand = sprintf(
-            '%s --host=%s --port=%s --user=%s %s < %s',
-            escapeshellarg($mysqlBinary),
+            'mysql --host=%s --port=%s --user=%s %s < %s',
             escapeshellarg($host),
             escapeshellarg($port),
             escapeshellarg($username),
@@ -511,7 +449,7 @@ final class BackupVerifyCommand extends Command
     }
 
     /**
-     * @param array<string, mixed> $connectionConfig
+     * @param  array<string, mixed>  $connectionConfig
      */
     private function restorePostgresDatabase(array $connectionConfig, string $artifactPath): void
     {
@@ -529,10 +467,8 @@ final class BackupVerifyCommand extends Command
             throw new RuntimeException('PostgreSQL verification username is not configured.');
         }
 
-        $psqlBinary = $this->binary('psql', 'psql');
         $dropCommand = sprintf(
-            '%s --host=%s --port=%s --username=%s --command %s',
-            escapeshellarg($psqlBinary),
+            'psql --host=%s --port=%s --username=%s --command %s',
             escapeshellarg($host),
             escapeshellarg($port),
             escapeshellarg($username),
@@ -540,8 +476,7 @@ final class BackupVerifyCommand extends Command
         );
 
         $createCommand = sprintf(
-            '%s --host=%s --port=%s --username=%s --command %s',
-            escapeshellarg($psqlBinary),
+            'psql --host=%s --port=%s --username=%s --command %s',
             escapeshellarg($host),
             escapeshellarg($port),
             escapeshellarg($username),
@@ -559,8 +494,7 @@ final class BackupVerifyCommand extends Command
         $createProcess->mustRun();
 
         $importCommand = sprintf(
-            '%s --host=%s --port=%s --username=%s --dbname=%s -f %s',
-            escapeshellarg($psqlBinary),
+            'psql --host=%s --port=%s --username=%s --dbname=%s -f %s',
             escapeshellarg($host),
             escapeshellarg($port),
             escapeshellarg($username),
@@ -574,7 +508,7 @@ final class BackupVerifyCommand extends Command
     }
 
     /**
-     * @param array<string, mixed> $config
+     * @param  array<string, mixed>  $config
      */
     private function connectionValue(array $config, string $key, ?string $default = null): ?string
     {
@@ -613,29 +547,5 @@ final class BackupVerifyCommand extends Command
         $value = $this->option($name);
 
         return is_string($value) && $value !== '' ? $value : $default;
-    }
-
-    private function binary(string $key, string $default): string
-    {
-        $configured = config("backup.binaries.{$key}");
-
-        if (! is_string($configured) || $configured === '') {
-            return $default;
-        }
-
-        return $configured;
-    }
-
-    private function archiveFlags(string $key, string $default): string
-    {
-        $flags = config("backup.archive.{$key}", $default);
-
-        if (! is_string($flags)) {
-            return $default;
-        }
-
-        $trimmed = trim($flags);
-
-        return $trimmed !== '' ? $trimmed : $default;
     }
 }
