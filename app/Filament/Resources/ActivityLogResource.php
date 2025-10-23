@@ -23,8 +23,10 @@ use Illuminate\Database\Eloquent\Model;
 final class ActivityLogResource extends Resource
 {
     protected static ?string $model = ActivityLog::class;
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-document-text';
+    /**
+     * Use a union type to satisfy the Filament Resource contract while retaining the heroicon identifier.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
 
     protected static ?int $navigationSort = 9;
 
