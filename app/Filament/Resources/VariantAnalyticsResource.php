@@ -50,15 +50,21 @@ final class VariantAnalyticsResource extends Resource
     protected static ?string $model = VariantAnalytics::class;
 
     /**
-     * Typed navigation icon ensures the analytics section resolves enum-backed overrides cleanly.
+     * Display the analytics icon while supporting BackedEnum navigation icons.
+     *
+     * @var string|\BackedEnum|null
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    protected static string|\UnitEnum|null $navigationGroup = null;
+    /**
+     * Default navigation group leveraging BackedEnum support for Filament 4.
+     */
+    protected static string|BackedEnum|null $navigationGroup = NavigationGroup::Inventory;
 
     public static function getNavigationGroup(): string|UnitEnum|null
     {
-        return NavigationGroup::Inventory;
+        // Map the enum to its localized label so navigation remains translated.
+        return NavigationGroup::Inventory->label();
     }
 
     protected static ?int $navigationSort = 2;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\EnumManagementResource\Pages;
 use App\Models\EnumValue;
 use Filament\Actions\Action;
@@ -48,15 +49,23 @@ final class EnumManagementResource extends Resource
     protected static ?string $model = EnumValue::class;
 
     /**
-     * Keep the navigation icon typed so Filament surfaces enum-backed icons reliably.
+     * Provide an enum-friendly icon definition for the enum management area.
+     *
+     * @var string|\BackedEnum|null
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static $navigationIcon = 'heroicon-o-squares-2x2';
+
+    /**
+     * Keep the resource inside the system navigation group using a BackedEnum.
+     */
+    protected static string|BackedEnum|null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 2;
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): ?string
     {
-        return trans('admin.enums.navigation_groups.system');
+        // Translate the enum label so the navigation heading remains localized.
+        return NavigationGroup::System->label();
     }
 
     public static function getNavigationLabel(): string
