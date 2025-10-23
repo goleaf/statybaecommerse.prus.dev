@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\ApiDocsController;
+use App\Http\Controllers\LocaleController;
 use App\Models\Discount;
 use Illuminate\Support\Facades\Route;
 
