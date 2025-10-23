@@ -50,6 +50,17 @@ it('converts a cart into an order during checkout', function (): void {
         ])
         ->assertCreated();
 
+    $sessionId = session()->getId();
+
+    CartItem::factory()
+        ->guest()
+        ->forProduct($product)
+        ->forSession($sessionId)
+        ->create();
+
+    expect(CartItem::query()->where('user_id', $user->id)->exists())->toBeTrue();
+    expect(CartItem::query()->where('session_id', $sessionId)->exists())->toBeTrue();
+
     $response = $this->actingAs($user)->post(route('frontend.checkout.process'), [
         'payment_method' => 'card',
         'confirm' => true,
@@ -68,5 +79,7 @@ it('converts a cart into an order during checkout', function (): void {
     expect($order->items)->toHaveCount(1);
     expect($order->items->first()->quantity)->toBe(3);
     expect($order->total)->toEqualWithDelta(59.97, 0.01);
+    expect(CartItem::query()->where('user_id', $user->id)->exists())->toBeFalse();
+    expect(CartItem::query()->where('session_id', $sessionId)->exists())->toBeFalse();
     expect(CartItem::query()->count())->toBe(0);
 });
