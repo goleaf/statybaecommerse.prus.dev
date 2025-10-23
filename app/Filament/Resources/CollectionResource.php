@@ -40,16 +40,35 @@ use Filament\Schemas\Schema;
 use Filament\Schemas\Schema;
 final class CollectionResource extends Resource
 {
-    use HasNav;
+    /**
+     * @var string|null Navigation group displayed in the Filament sidebar.
+     */
+    protected static ?string $navigationGroup = 'Products';
+
+    /**
+     * @var string|null Explicit navigation label to avoid relying on defaults.
+     */
+    protected static ?string $navigationLabel = 'Collections';
 
     protected static ?string $model = Collection::class;
 
-    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
+    /**
+     * Provide the localized navigation label for the resource menu entry.
+     */
+    public static function getNavigationLabel(): string
+    {
+        return __('collections.navigation_label');
+    }
+
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
         return 'heroicon-o-folder';
     }
 
-    protected static UnitEnum|string|null $navigationGroup = 'Products';
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return static::$navigationGroup;
+    }
 
     protected static ?int $navigationSort = 2;
 
