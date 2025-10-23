@@ -4,35 +4,36 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Filament\Components\Combobox;
 use App\Filament\Resources\DiscountConditionResource\Pages;
 use App\Filament\Resources\DiscountConditionResource\Widgets\DiscountConditionChartWidget;
 use App\Filament\Resources\DiscountConditionResource\Widgets\DiscountConditionStatsWidget;
 use App\Filament\Resources\DiscountConditionResource\Widgets\DiscountConditionTableWidget;
 use App\Models\DiscountCondition;
+use App\Models\Scopes\ActiveScope;
 use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Forms\Get;
-use Filament\Infolists\Components\Grid as InfolistGrid;
 use Filament\Infolists\Components\IconEntry;
-use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as InfolistGrid;
+use Filament\Schemas\Components\Section as InfolistSection;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -41,7 +42,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Novadaemon\FilamentCombobox\Combobox;
 
 final class DiscountConditionResource extends Resource
 {
@@ -72,9 +72,9 @@ final class DiscountConditionResource extends Resource
         return __('discount_conditions.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Tabs::make('discount_condition')
                     ->tabs([
@@ -150,20 +150,22 @@ final class DiscountConditionResource extends Resource
                                             ->label(__('discount_conditions.products'))
                                             ->relationship('products', 'name')
                                             ->preload()
-                                            ->boxSearchs()
                                             ->height('340px')
-                                            ->optionsLabel(__('discount_conditions.products_options_label'))
-                                            ->selectedLabel(__('discount_conditions.products_selected_label'))
+                                            ->translatedLabels(
+                                                'discount_conditions.products_options_label',
+                                                'discount_conditions.products_selected_label',
+                                            )
                                             ->multiple()
                                             ->columnSpanFull(),
                                         Combobox::make('categories')
                                             ->label(__('discount_conditions.categories'))
                                             ->relationship('categories', 'name')
                                             ->preload()
-                                            ->boxSearchs()
                                             ->height('340px')
-                                            ->optionsLabel(__('discount_conditions.categories_options_label'))
-                                            ->selectedLabel(__('discount_conditions.categories_selected_label'))
+                                            ->translatedLabels(
+                                                'discount_conditions.categories_options_label',
+                                                'discount_conditions.categories_selected_label',
+                                            )
                                             ->multiple()
                                             ->columnSpanFull(),
                                     ]),
@@ -173,8 +175,9 @@ final class DiscountConditionResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('discount.name')
@@ -297,8 +300,9 @@ final class DiscountConditionResource extends Resource
             ->defaultSort('priority', 'asc');
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Schema $schema): Schema   
     {
+        // Provide the infolist schema using the Filament v4 return type.
         return $schema
             ->components([
                 InfolistSection::make(__('discount_conditions.basic_information'))
@@ -383,6 +387,19 @@ final class DiscountConditionResource extends Resource
             'view'   => Pages\ViewDiscountCondition::route('/{record}'),
             'edit'   => Pages\EditDiscountCondition::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * Allow administrators to manage both active and inactive records inside Filament.
+     *
+     * The model applies an ActiveScope globally for storefront queries, so we explicitly
+     * remove it here to ensure table filters and bulk actions can work with every record.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes([
+            ActiveScope::class,
+        ]);
     }
 
     private static function encodeValueForTextarea(mixed $value): ?string

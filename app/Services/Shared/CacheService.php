@@ -195,4 +195,22 @@ final class CacheService
             }
         }
     }
+
+    /**
+     * Helper to remember cache values while conditionally applying tags.
+     *
+     * @template TCacheValue
+     *
+     * @param  array<int, string>     $tags
+     * @param  Closure(): TCacheValue $callback
+     * @return TCacheValue
+     */
+    private function rememberWithTags(array $tags, string $key, int|DateInterval $ttl, Closure $callback): mixed
+    {
+        if ($tags !== [] && $this->supportsTags) {
+            return Cache::tags($tags)->remember($key, $ttl, $callback);
+        }
+
+        return Cache::remember($key, $ttl, $callback);
+    }
 }

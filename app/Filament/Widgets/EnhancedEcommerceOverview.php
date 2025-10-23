@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
+use UnitEnum;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
@@ -14,6 +15,7 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Carbon;
 use UnitEnum;
 
+use UnitEnum;
 final class EnhancedEcommerceOverview extends StatsOverviewWidget
 {
     /**
@@ -27,6 +29,11 @@ final class EnhancedEcommerceOverview extends StatsOverviewWidget
     /**
      * Localize the navigation label to align with analytics translations.
      */
+    public static function getNavigationLabel(): string
+    {
+        return __('analytics.enhanced_overview.navigation_label');
+    }
+
     public static function getNavigationLabel(): string
     {
         return __('analytics.enhanced_overview.navigation_label');

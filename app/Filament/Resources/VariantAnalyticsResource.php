@@ -4,18 +4,24 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
+use BackedEnum;
+use UnitEnum;
 use App\Filament\Resources\VariantAnalyticsResource\Pages;
+use App\Models\ProductVariant;
 use App\Models\VariantAnalytics;
 use App\Support\Filament\Components\Flatpickr;
-use BackedEnum;
+use UnitEnum;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Facades\FilamentNumber;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
@@ -39,10 +45,15 @@ final class VariantAnalyticsResource extends Resource
         // Centralize the NavigationGroup handling to leverage enum labels.
         $group = self::$navigationGroup;
 
-        return $group instanceof NavigationGroup ? $group->label() : $group;
+        return $group instanceof NavigationGroup ? $group->label() : $group; // Provide Filament with the concrete navigation label.
     }
 
     protected static ?int $navigationSort = 2;
+
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-chart-bar-square';
+    }
 
     public static function getNavigationLabel(): string
     {
@@ -59,9 +70,9 @@ final class VariantAnalyticsResource extends Resource
         return __('admin.variant_analytics.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Tabs::make(__('admin.variant_analytics.tabs'))
                     ->tabs([
@@ -78,20 +89,7 @@ final class VariantAnalyticsResource extends Resource
                                                     ->required()
                                                     ->searchable()
                                                     ->preload()
-                                                    ->live()
-                                                    ->afterStateUpdated(static function (int|string|null $state, callable $set): void {
-                                                        if ($state === null || $state === '') {
-                                                            return;
-                                                        }
-
-                                                        $variant = \App\Models\ProductVariant::find($state);
-                                                        if ($variant === null) {
-                                                            return;
-                                                        }
-
-                                                        $set('variant_name', $variant->name);
-                                                        $set('product_name', $variant->product->name ?? '');
-                                                    }),
+                                                    ->live(),
                                                 Flatpickr::makeDate('date')
                                                     ->label(__('admin.variant_analytics.date'))
                                                     ->required()
@@ -103,12 +101,38 @@ final class VariantAnalyticsResource extends Resource
                                             ->schema([
                                                 Forms\Components\Placeholder::make('variant_name')
                                                     ->label(__('admin.variant_analytics.variant_name'))
-                                                    ->content(static fn (?VariantAnalytics $record): string => $record?->variant?->name ?? '')
-                                                    ->visible(static fn (?VariantAnalytics $record): bool => $record !== null),
+                                                    ->content(static function (callable $get, ?VariantAnalytics $record): string {
+                                                        if ($record !== null) {
+                                                            return $record->variant?->name ?? '';
+                                                        }
+                                                        $variantId = $get('variant_id');
+                                                        if (! $variantId) {
+                                                            return '';
+                                                        }
+                                                        $variant = \App\Models\ProductVariant::query()->with('product:id,name')->find($variantId);
+                                                        return $variant?->name ?? '';
+                                                    })
+                                                    ->visible(static function (callable $get, ?VariantAnalytics $record): bool {
+                                                        return ($record !== null) || (bool) $get('variant_id');
+                                                    })
+                                                    ->reactive(),
                                                 Forms\Components\Placeholder::make('product_name')
                                                     ->label(__('admin.variant_analytics.product_name'))
-                                                    ->content(static fn (?VariantAnalytics $record): string => $record?->variant?->product?->name ?? '')
-                                                    ->visible(static fn (?VariantAnalytics $record): bool => $record !== null),
+                                                    ->content(static function (callable $get, ?VariantAnalytics $record): string {
+                                                        if ($record !== null) {
+                                                            return $record->product?->name ?? ($record->variant?->product?->name ?? '');
+                                                        }
+                                                        $variantId = $get('variant_id');
+                                                        if (! $variantId) {
+                                                            return '';
+                                                        }
+                                                        $variant = \App\Models\ProductVariant::query()->with('product:id,name')->find($variantId);
+                                                        return $variant?->product?->name ?? '';
+                                                    })
+                                                    ->visible(static function (callable $get, ?VariantAnalytics $record): bool {
+                                                        return ($record !== null) || (bool) $get('variant_id');
+                                                    })
+                                                    ->reactive(),
                                             ]),
                                     ]),
                             ]),
@@ -242,8 +266,9 @@ final class VariantAnalyticsResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('variant.name')
@@ -252,7 +277,7 @@ final class VariantAnalyticsResource extends Resource
                     ->sortable()
                     ->toggleable()
                     ->copyable()
-                    ->description(static fn (?VariantAnalytics $record): ?string => $record?->variant?->product?->name),
+                    ->description(static fn (?VariantAnalytics $record): ?string => $record?->product?->name ?? $record?->variant?->product?->name),
                 Tables\Columns\TextColumn::make('variant.sku')
                     ->label(__('admin.variant_analytics.sku'))
                     ->searchable()
@@ -453,7 +478,7 @@ final class VariantAnalyticsResource extends Resource
                     ->multiple(),
                 Tables\Filters\SelectFilter::make('product_id')
                     ->label(__('admin.variant_analytics.product'))
-                    ->relationship('variant.product', 'name')
+                    ->relationship('product', 'name')
                     ->searchable()
                     ->preload()
                     ->multiple(),
@@ -467,8 +492,7 @@ final class VariantAnalyticsResource extends Resource
                             ->label(__('admin.variant_analytics.date_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
-                        $dateFrom = $data['date_from'] ?? null;
-                        $dateUntil = $data['date_until'] ?? null;
+                        [$dateFrom, $dateUntil] = DateRange::extract($data, 'date_from', 'date_until');
 
                         return $query
                             ->when(
@@ -678,6 +702,15 @@ final class VariantAnalyticsResource extends Resource
             ])
             ->defaultSort('date', 'desc')
             ->poll('30s');
+    }
+
+    /**
+     * Keep percentage formatting consistent between table columns and placeholders.
+     */
+    protected static function formatPercentage(float|int|null $value): string
+    {
+        // Fall back to zero for null entries while preserving decimal precision.
+        return number_format((float) $value, 2) . '%';
     }
 
     public static function getRelations(): array

@@ -154,5 +154,37 @@ final class ProductHistoryController extends Controller
         $history->load(['user:id,name,email']);
 
         return response()->json(['data' => $history, 'message' => 'History entry created successfully'], 201);
+}
+
+    private function productHistoryListDefinition(): ListQueryDefinition
+    {
+        return ListQueryDefinition::make()
+            ->defaultPerPage(15)
+            ->maxPerPage(100)
+            ->defaultSort('created_at', 'desc')
+            ->allowedSorts([
+                'created_at' => ['column' => 'created_at'],
+                'action' => ['column' => ['action', 'id']],
+                'field_name' => ['column' => ['field_name', 'id']],
+                'user' => ['column' => 'user_id'],
+            ])
+            ->filters([
+                'action' => ['type' => 'string', 'nullable' => true, 'scope' => 'byAction'],
+                'field_name' => ['type' => 'string', 'nullable' => true, 'scope' => 'byField'],
+                'user_id' => ['type' => 'int', 'nullable' => true, 'scope' => 'byUser'],
+                'date_from' => ['type' => 'date', 'column' => 'created_at', 'operator' => '>='],
+                'date_to' => ['type' => 'date', 'column' => 'created_at', 'operator' => '<='],
+                'search' => [
+                    'type' => 'string',
+                    'nullable' => true,
+                    'callback' => static function (Builder $builder, string $search): void {
+                        $builder->where(static function (Builder $query) use ($search): void {
+                            $query->where('description', 'like', '%'.$search.'%')
+                                ->orWhere('action', 'like', '%'.$search.'%')
+                                ->orWhere('field_name', 'like', '%'.$search.'%');
+                        });
+                    },
+                ],
+            ]);
     }
 }

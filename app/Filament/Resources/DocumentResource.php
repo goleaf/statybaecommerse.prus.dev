@@ -4,27 +4,31 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\DocumentResource\Pages;
 use App\Models\Document;
-use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class DocumentResource extends Resource
 {
     /**
@@ -58,9 +62,9 @@ final class DocumentResource extends Resource
         return __('admin.documents.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.documents.form.sections.basic_information'))
                     ->schema([
@@ -95,8 +99,16 @@ final class DocumentResource extends Resource
                                         'image/jpeg',
                                         'image/png',
                                         'image/webp',
+                                        '.pdf',
+                                        '.doc',
+                                        '.docx',
+                                        '.xls',
+                                        '.xlsx',
+                                        '.jpg',
+                                        '.jpeg',
+                                        '.png',
+                                        '.webp',
                                     ])
-                                    ->allowedFileExtensions(['pdf', 'doc', 'docx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png', 'webp'])
                                     ->maxSize(10 * 1024),
                                 Textarea::make('description')
                                     ->label(__('admin.documents.form.fields.description'))
@@ -124,8 +136,9 @@ final class DocumentResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('name')
@@ -213,8 +226,10 @@ final class DocumentResource extends Resource
         return ['name', 'description'];
     }
 
-    public static function getNavigationBadge(): string
+    public static function getNavigationBadge(): ?string
     {
-        return (string) Document::count();
+        $count = (int) Document::count();
+
+        return $count > 0 ? (string) $count : null;
     }
 }

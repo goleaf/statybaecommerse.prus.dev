@@ -10,12 +10,14 @@ use Filament\Actions\CreateAction;
 
 class ListNewsComments extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = NewsCommentResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            Actions\CreateAction::make(),
         ];
     }
 }

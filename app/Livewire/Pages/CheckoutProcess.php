@@ -198,6 +198,9 @@ final class CheckoutProcess extends Component
     /**
      * Handle getCartItems functionality with proper error handling.
      */
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection<int, CartItem>
+     */
     private function getCartItems()
     {
         return CartItem::with('product')->where('session_id', Session::getId())->get();

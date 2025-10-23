@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use BackedEnum;
 use App\Models\Slider;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\SearchableInputHelper;
@@ -16,24 +17,28 @@ use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Support\Enums\Size;
 use Filament\Support\Enums\Width;
+use UnitEnum;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
+use BackedEnum;
 
+use BackedEnum;
 class SliderManagement extends Page implements HasActions, HasForms
 {
     use InteractsWithActions, InteractsWithForms;
@@ -51,12 +56,10 @@ class SliderManagement extends Page implements HasActions, HasForms
 
     protected static ?int $navigationSort = 1;
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): BackedEnum|string|null
     {
-        return 'Content';
+        return 'Content'; // Keep slider tooling with the rest of the content curation pages.
     }
-
-    public Collection $sliders;
 
     public function mount(): void
     {
@@ -116,7 +119,7 @@ class SliderManagement extends Page implements HasActions, HasForms
                                 'amber'   => '#f59e0b',
                                 'slate'   => '#475569',
                             ]),
-                        Grid::make(2)->components([
+                        Grid::make(3)->components([
                             TextInput::make('button_text')
                                 ->label(__('translations.button_text'))
                                 ->maxLength(255),
@@ -134,15 +137,20 @@ class SliderManagement extends Page implements HasActions, HasForms
                                         static fn (string $value): ?array => ['value' => $value, 'label' => $value],
                                     );
                                 })
-                                ->afterStateUpdated(function (?string $state, callable $set): void {
+                                ->afterStateUpdated(function (SearchableInput $component, ?string $state, callable $set): void {
                                     if ($state !== null && $state !== '') {
                                         return;
                                     }
 
                                     // Clearing ensures dependent URL payloads vanish per docs/forms/SEARCHABLE_INPUT_METADATA.md.
-                                    SearchableInputHelper::clear($set, ['button_url' => null]);
+                                    SearchableInputHelper::clear($component, $set, ['button_url' => null]);
                                 }),
                         ]),
+                        TextInput::make('button_url')
+                            ->label(__('translations.button_url'))
+                            ->url()
+                            ->maxLength(255)
+                            ->columnSpanFull(),
                     ])
                     ->collapsible(),
                 Section::make(__('translations.media'))
@@ -314,13 +322,13 @@ class SliderManagement extends Page implements HasActions, HasForms
                                             static fn (string $value): ?array => ['value' => $value, 'label' => $value],
                                         );
                                     })
-                                    ->afterStateUpdated(function (?string $state, callable $set): void {
+                                    ->afterStateUpdated(function (SearchableInput $component, ?string $state, callable $set): void {
                                         if ($state !== null && $state !== '') {
                                             return;
                                         }
 
                                         // Reset slide-specific URLs when selections clear via the helper.
-                                        SearchableInputHelper::clear($set, ['link' => null]);
+                                        SearchableInputHelper::clear($component, $set, ['link' => null]);
                                     }),
                             ])
                             ->collapsible()

@@ -10,6 +10,7 @@ use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 class WishlistRelationManager extends BaseRelationManager
 {
@@ -21,8 +22,9 @@ class WishlistRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Wishlist Items';
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->columns([
                 ImageColumn::make('product.main_image')

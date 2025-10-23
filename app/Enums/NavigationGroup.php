@@ -33,110 +33,110 @@ enum NavigationGroup: string
     public function label(): string
     {
         return match ($this) {
-            self::Referral => __('translations.nav_group_referral'),
-            self::Products => __('translations.nav_group_products'),
-            self::Orders => __('translations.nav_group_orders'),
-            self::Users => __('translations.nav_group_users'),
-            self::Settings => __('translations.nav_group_settings'),
-            self::Analytics => __('translations.nav_group_analytics'),
-            self::Content => __('translations.nav_group_content'),
+            self::Referral          => __('translations.nav_group_referral'),
+            self::Products          => __('translations.nav_group_products'),
+            self::Orders            => __('translations.nav_group_orders'),
+            self::Users             => __('translations.nav_group_users'),
+            self::Settings          => __('translations.nav_group_settings'),
+            self::Analytics         => __('translations.nav_group_analytics'),
+            self::Content           => __('translations.nav_group_content'),
             self::ContentManagement => __('translations.nav_group_content_management'),
-            self::System => __('translations.nav_group_system'),
-            self::Marketing => __('translations.nav_group_marketing'),
-            self::Inventory => __('translations.nav_group_inventory'),
-            self::Reports => __('translations.nav_group_reports'),
-            self::Locations => __('translations.nav_group_locations'),
-            self::Discounts => __('translations.nav_group_discounts'),
-            self::Campaigns => __('translations.nav_group_campaigns'),
-            self::News => __('news.title'),
+            self::System            => __('translations.nav_group_system'),
+            self::Marketing         => __('translations.nav_group_marketing'),
+            self::Inventory         => __('translations.nav_group_inventory'),
+            self::Reports           => __('translations.nav_group_reports'),
+            self::Locations         => __('translations.nav_group_locations'),
+            self::Discounts         => __('translations.nav_group_discounts'),
+            self::Campaigns         => __('translations.nav_group_campaigns'),
+            self::News              => __('news.title'),
         };
     }
 
     public function description(): string
     {
         return match ($this) {
-            self::Referral => __('translations.nav_group_referral_description'),
-            self::Products => __('translations.nav_group_products_description'),
-            self::Orders => __('translations.nav_group_orders_description'),
-            self::Users => __('translations.nav_group_users_description'),
-            self::Settings => __('translations.nav_group_settings_description'),
-            self::Analytics => __('translations.nav_group_analytics_description'),
-            self::Content => __('translations.nav_group_content_description'),
+            self::Referral          => __('translations.nav_group_referral_description'),
+            self::Products          => __('translations.nav_group_products_description'),
+            self::Orders            => __('translations.nav_group_orders_description'),
+            self::Users             => __('translations.nav_group_users_description'),
+            self::Settings          => __('translations.nav_group_settings_description'),
+            self::Analytics         => __('translations.nav_group_analytics_description'),
+            self::Content           => __('translations.nav_group_content_description'),
             self::ContentManagement => __('translations.nav_group_content_management_description'),
-            self::System => __('translations.nav_group_system_description'),
-            self::Marketing => __('translations.nav_group_marketing_description'),
-            self::Inventory => __('translations.nav_group_inventory_description'),
-            self::Reports => __('translations.nav_group_reports_description'),
-            self::Locations => __('translations.nav_group_locations_description'),
-            self::Discounts => __('translations.nav_group_discounts_description'),
-            self::Campaigns => __('translations.nav_group_campaigns_description'),
-            self::News => __('news.navigation_group'),
+            self::System            => __('translations.nav_group_system_description'),
+            self::Marketing         => __('translations.nav_group_marketing_description'),
+            self::Inventory         => __('translations.nav_group_inventory_description'),
+            self::Reports           => __('translations.nav_group_reports_description'),
+            self::Locations         => __('translations.nav_group_locations_description'),
+            self::Discounts         => __('translations.nav_group_discounts_description'),
+            self::Campaigns         => __('translations.nav_group_campaigns_description'),
+            self::News              => __('news.navigation_group'),
         };
     }
 
     public function icon(): string
     {
         return match ($this) {
-            self::Referral => 'gift',
-            self::Products => 'cube',
-            self::Orders => 'shopping-bag',
-            self::Users => 'users',
-            self::Settings => 'cog-6-tooth',
-            self::Analytics => 'chart-bar',
-            self::Content => 'document-text',
+            self::Referral          => 'gift',
+            self::Products          => 'cube',
+            self::Orders            => 'shopping-bag',
+            self::Users             => 'users',
+            self::Settings          => 'cog-6-tooth',
+            self::Analytics         => 'chart-bar',
+            self::Content           => 'document-text',
             self::ContentManagement => 'document-duplicate',
-            self::System => 'computer-desktop',
-            self::Marketing => 'megaphone',
-            self::Inventory => 'archive-box',
-            self::Reports => 'document-chart-bar',
-            self::Locations => 'globe-alt',
-            self::Discounts => 'tag',
-            self::Campaigns => 'megaphone',
-            self::News => 'newspaper',
+            self::System            => 'computer-desktop',
+            self::Marketing         => 'megaphone',
+            self::Inventory         => 'archive-box',
+            self::Reports           => 'document-chart-bar',
+            self::Locations         => 'globe-alt',
+            self::Discounts         => 'tag',
+            self::Campaigns         => 'megaphone',
+            self::News              => 'newspaper',
         };
     }
 
     public function color(): string
     {
         return match ($this) {
-            self::Referral => 'purple',
-            self::Products => 'blue',
-            self::Orders => 'green',
-            self::Users => 'indigo',
-            self::Settings => 'gray',
-            self::Analytics => 'yellow',
-            self::Content => 'pink',
+            self::Referral          => 'purple',
+            self::Products          => 'blue',
+            self::Orders            => 'green',
+            self::Users             => 'indigo',
+            self::Settings          => 'gray',
+            self::Analytics         => 'yellow',
+            self::Content           => 'pink',
             self::ContentManagement => 'purple',
-            self::System => 'red',
-            self::Marketing => 'orange',
-            self::Inventory => 'teal',
-            self::Reports => 'cyan',
-            self::Locations => 'emerald',
-            self::Discounts => 'rose',
-            self::Campaigns => 'orange',
-            self::News => 'blue',
+            self::System            => 'red',
+            self::Marketing         => 'orange',
+            self::Inventory         => 'teal',
+            self::Reports           => 'cyan',
+            self::Locations         => 'emerald',
+            self::Discounts         => 'rose',
+            self::Campaigns         => 'orange',
+            self::News              => 'blue',
         };
     }
 
     public function priority(): int
     {
         return match ($this) {
-            self::Products => 1,
-            self::Orders => 2,
-            self::Users => 3,
-            self::Inventory => 4,
-            self::Locations => 5,
-            self::Discounts => 6,
-            self::Campaigns => 7,
-            self::News => 8,
-            self::Marketing => 9,
-            self::Analytics => 10,
-            self::Reports => 11,
-            self::Content => 12,
+            self::Products          => 1,
+            self::Orders            => 2,
+            self::Users             => 3,
+            self::Inventory         => 4,
+            self::Locations         => 5,
+            self::Discounts         => 6,
+            self::Campaigns         => 7,
+            self::News              => 8,
+            self::Marketing         => 9,
+            self::Analytics         => 10,
+            self::Reports           => 11,
+            self::Content           => 12,
             self::ContentManagement => 13,
-            self::Referral => 14,
-            self::Settings => 15,
-            self::System => 16,
+            self::Referral          => 14,
+            self::Settings          => 15,
+            self::System            => 16,
         };
     }
 
@@ -175,12 +175,12 @@ enum NavigationGroup: string
     public function getPermission(): string
     {
         return match ($this) {
-            self::Users => 'manage_users',
-            self::Settings => 'manage_settings',
-            self::System => 'manage_system',
+            self::Users     => 'manage_users',
+            self::Settings  => 'manage_settings',
+            self::System    => 'manage_system',
             self::Analytics => 'view_analytics',
-            self::Reports => 'view_reports',
-            default => 'view_'.strtolower($this->value),
+            self::Reports   => 'view_reports',
+            default         => 'view_' . strtolower($this->value),
         };
     }
 
@@ -216,7 +216,10 @@ enum NavigationGroup: string
 
     public static function ordered(): Collection
     {
-        return collect(self::cases())->sortBy('priority');
+        return collect(self::cases())
+            // Sort explicitly by the computed priority for deterministic ordering.
+            ->sortBy(fn (self $case) => $case->priority())
+            ->values();
     }
 
     public static function fromLabel(string $label): ?self

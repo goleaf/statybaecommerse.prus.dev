@@ -9,6 +9,11 @@ use Illuminate\Console\Command;
 
 final class FixAllNavigationGroupsCommand extends Command
 {
+    /**
+     * Shared "use UnitEnum;" literal to avoid emitting duplicate imports during rewrites.
+     */
+    private const UNIT_ENUM_IMPORT = 'use UnitEnum;';
+
     protected $signature = 'filament:navigation-groups:fix-all';
 
     protected $description = 'Apply comprehensive navigation group fixes to Filament resources in the root directory.';

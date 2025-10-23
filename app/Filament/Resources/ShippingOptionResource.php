@@ -4,33 +4,38 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\ShippingOptionResource\Pages;
 use App\Models\ShippingOption;
 use App\Support\Forms\MatrixFactory;
 use BackedEnum;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 /**
  * ShippingOptionResource
  *
@@ -38,12 +43,9 @@ use UnitEnum;
  */
 final class ShippingOptionResource extends Resource
 {
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Settings';
-    }
+    use HasNav;
 
-    public static function getNavigationIcon(): BackedEnum|string|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|string|null
     {
         return 'heroicon-o-truck';
     }
@@ -69,9 +71,9 @@ final class ShippingOptionResource extends Resource
         return __('admin.shipping_options.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.shipping_options.basic_information'))
                     ->schema([
@@ -92,6 +94,13 @@ final class ShippingOptionResource extends Resource
                                 TextInput::make('carrier_name')
                                     ->label(__('admin.shipping_options.carrier_name'))
                                     ->maxLength(255),
+                                // Allow shipping options to be attached to a geographic zone for targeted availability.
+                                Select::make('zone_id')
+                                    ->label(__('admin.shipping_options.zone'))
+                                    ->relationship('zone', 'name')
+                                    ->preload()
+                                    ->searchable()
+                                    ->helperText(__('admin.shipping_options.zone_help')),
                                 Select::make('service_type')
                                     ->label(__('admin.shipping_options.service_type'))
                                     ->options([
@@ -202,8 +211,9 @@ final class ShippingOptionResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('name')
@@ -232,6 +242,12 @@ final class ShippingOptionResource extends Resource
                             : Number::currency((float) $state, $record->currency_code ?? 'EUR', app()->getLocale())
                     )
                     ->sortable(),
+                // Surface the assigned zone so operators can audit coverage quickly.
+                TextColumn::make('zone.name')
+                    ->label(__('admin.shipping_options.zone'))
+                    ->badge()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('estimated_days_min')
                     ->label(__('admin.shipping_options.estimated_days'))
                     ->formatStateUsing(
@@ -272,6 +288,10 @@ final class ShippingOptionResource extends Resource
                         'overnight' => __('admin.shipping_options.service_types.overnight'),
                         'economy'   => __('admin.shipping_options.service_types.economy'),
                     ]),
+                // Filter by zone to narrow down shipping options for a specific market.
+                SelectFilter::make('zone_id')
+                    ->label(__('admin.shipping_options.zone'))
+                    ->relationship('zone', 'name'),
                 ValueRangeFilter::make('price')
                     ->label(__('admin.shipping_options.price'))
                     ->currency()

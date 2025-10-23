@@ -6,7 +6,7 @@ namespace App\Livewire\Components;
 
 use App\Models\Category;
 use App\Support\Cache\CacheKeys;
-use Illuminate\Support\Facades\Cache;
+use App\Support\Cache\TagAwareCache;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -26,14 +26,14 @@ final class HomeSidebar extends Component
     {
         $locale = app()->getLocale();
 
-        return Cache::remember(CacheKeys::homeCategoryTree($locale), now()->addMinutes(30), function () {
+        return TagAwareCache::remember(CacheKeys::homeCategoryTree($locale), now()->addMinutes(30), function () {
             $roots = Category::query()->with(['translations' => fn ($q) => $q->where('locale', app()->getLocale()), 'children.translations'])->visible()->roots()->ordered()->get();
             $mapNode = function ($cat) use (&$mapNode) {
                 return ['id' => $cat->id, 'slug' => method_exists($cat, 'trans') ? $cat->trans('slug') ?? $cat->slug : $cat->slug, 'name' => method_exists($cat, 'trans') ? $cat->trans('name') ?? $cat->name : $cat->name, 'children' => $cat->children->map(fn ($ch) => $mapNode($ch))];
             };
 
             return $roots->map(fn ($root) => $mapNode($root));
-        });
+        }, [CacheKeys::homeTag()]);
     }
 
     /**

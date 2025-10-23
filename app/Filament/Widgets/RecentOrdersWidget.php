@@ -16,8 +16,9 @@ final class RecentOrdersWidget extends BaseWidget
 
     protected static ?int $sort = 2;
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the widget table to meet the Filament v4 return type contract.
         return $table
             ->query(fn (): Builder => Order::query()
                 ->withoutGlobalScopes()

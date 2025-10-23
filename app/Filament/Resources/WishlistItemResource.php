@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\WishlistItemResource\Pages;
 use App\Models\Brand;
 use App\Models\CartItem;
@@ -15,7 +17,6 @@ use App\Models\WishlistItem;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;
-use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Exception;
 use Filament\Actions\Action;
@@ -25,16 +26,16 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid as FormGrid;
+use Filament\Schemas\Components\Grid as FormGrid;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section as FormSection;
+use Filament\Schemas\Components\Section as FormSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -44,10 +45,14 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
 use RuntimeException;
 use Str;
 use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 /**
  * WishlistItemResource
  *
@@ -58,7 +63,7 @@ final class WishlistItemResource extends Resource
     protected static ?string $model = WishlistItem::class;
 
     /**
-     * @var string|BackedEnum|null Navigation icon used for the sidebar entry.
+     * @var string|\BackedEnum|null Navigation icon used for the sidebar entry.
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-heart';
 
@@ -85,10 +90,7 @@ final class WishlistItemResource extends Resource
     /**
      * Handle getNavigationGroup functionality with proper error handling.
      */
-    public static function getNavigationGroupLabel(): string
-    {
-        return 'Customers';
-    }
+    
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -109,9 +111,9 @@ final class WishlistItemResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 FormSection::make(__('admin.wishlist_items.sections.basic_info'))
                     ->description(__('admin.wishlist_items.sections.basic_info_description'))
@@ -188,9 +190,9 @@ final class WishlistItemResource extends Resource
                                         );
                                     })
                                     // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
-                                    ->afterStateUpdated(function (?string $state, callable $set): void {
+                                    ->afterStateUpdated(function (SearchableInput $component, ?string $state, callable $set): void {
                                         if ($state === null || $state === '') {
-                                            SearchableInputHelper::clear($set, [
+                                            SearchableInputHelper::clear($component, $set, [
                                                 'product_id' => null,
                                                 'variant_id' => null,
                                             ]);
@@ -324,8 +326,9 @@ final class WishlistItemResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 ImageColumn::make('product.featured_image')

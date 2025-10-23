@@ -4,19 +4,25 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountCodeResource\RelationManagers;
 
+
+use Filament\Schemas\Schema;
+use Filament\Forms;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class OrdersRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'orders';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $schema): Schema   
     {
         return $schema
             ->components([
@@ -42,8 +48,9 @@ final class OrdersRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->recordTitleAttribute('order_number')
             ->columns([
@@ -89,10 +96,11 @@ final class OrdersRelationManager extends BaseRelationManager
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\AttachAction::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 Tables\Actions\DetachAction::make(),
             ])
             ->bulkActions([

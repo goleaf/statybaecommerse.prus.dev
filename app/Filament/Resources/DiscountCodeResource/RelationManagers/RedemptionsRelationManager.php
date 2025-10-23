@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountCodeResource\RelationManagers;
 
-use App\Filament\RelationManagers\Support\BaseRelationManager;
-use App\Support\Filament\Components\Flatpickr;
+
+use Filament\Schemas\Schema;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -13,14 +13,18 @@ use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class RedemptionsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'redemptions';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $schema): Schema   
     {
         return $schema
             ->schema([
@@ -46,8 +50,9 @@ final class RedemptionsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->recordTitleAttribute('id')
             ->columns([
@@ -74,10 +79,19 @@ final class RedemptionsRelationManager extends BaseRelationManager
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit ' . $this->getPluralModelLabel())
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        // Provide a quick-edit modal for managing records inline.
+                        return $repeater->schema($this->getQuickEditSchema());
+                    }),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])

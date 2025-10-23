@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\VariantAnalyticsResource\Pages;
 
 use App\Filament\Resources\VariantAnalyticsResource;
+use App\Models\VariantAnalytics;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
@@ -25,8 +26,9 @@ final class ViewVariantAnalytics extends ViewRecord
         ];
     }
 
-    public function infolist(Schema $schema): Schema
+    public function infolist(Schema $schema): Schema   
     {
+        // Provide the infolist schema using the Filament v4 return type.
         return $schema
             ->components([
                 Section::make(__('admin.variant_analytics.basic_info'))
@@ -107,7 +109,7 @@ final class ViewVariantAnalytics extends ViewRecord
 
                                 TextEntry::make('average_revenue_per_purchase')
                                     ->label(__('admin.variant_analytics.avg_revenue'))
-                                    ->getStateUsing(fn ($record) => $record->average_revenue_per_purchase)
+                                    ->getStateUsing(fn (VariantAnalytics $record) => $record->average_revenue_per_purchase)
                                     ->money('EUR')
                                     ->columnSpan(1),
                             ]),

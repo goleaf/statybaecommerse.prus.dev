@@ -9,9 +9,9 @@ use App\Models\Product;
 use App\Models\Scopes\ActiveScope;
 use App\Models\User;
 use App\Support\Cache\CacheKeys;
+use App\Support\Cache\TagAwareCache;
 use Carbon\CarbonImmutable;
 use Closure;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 
 final class DashboardMetricsRepository
@@ -88,18 +88,14 @@ final class DashboardMetricsRepository
         }, [CacheKeys::productAggregateTag()]);
     }
 
-    private function remember(string $key, Closure $callback, array $tags = []): mixed
+    private function remember(string $key, Closure $callback, array $tags = [])
     {
         $ttl = (int) Config::get('dashboard.cache_ttl', CacheKeys::TTL_MINUTE);
         $ttl = $ttl > 0 ? $ttl : CacheKeys::TTL_MINUTE;
         $cacheKey = CacheKeys::dashboardMetric($key, app()->getLocale());
 
-        if (Cache::supportsTags()) {
-            $tagSet = array_values(array_unique(array_merge([CacheKeys::dashboardTag()], $tags)));
+        $tagSet = array_values(array_unique(array_merge([CacheKeys::dashboardTag()], $tags)));
 
-            return Cache::tags($tagSet)->remember($cacheKey, now()->addSeconds($ttl), $callback);
-        }
-
-        return Cache::remember($cacheKey, now()->addSeconds($ttl), $callback);
+        return TagAwareCache::remember($cacheKey, now()->addSeconds($ttl), $callback, $tagSet);
     }
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -23,19 +22,27 @@ final class ApiKey extends Model
     protected $guarded = ['id'];
 
     protected $fillable = [
-        'key',
         'name',
-        'scopes',
+        'key',
+        'secret',
+        'permissions',
+        'rate_limits',
         'rate_limit',
-        'active',
+        'user_id',
         'last_used_at',
+        'expires_at',
+        'is_active',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
-        'scopes' => 'array',
-        'rate_limit' => 'integer',
-        'active' => 'boolean',
+        'permissions' => 'array',
+        'rate_limits' => 'array',
         'last_used_at' => 'datetime',
+        'expires_at' => 'datetime',
+        'is_active' => 'boolean',
     ];
 
     /**
@@ -118,8 +125,42 @@ final class ApiKey extends Model
     {
         $scopes = $this->resolvedScopes();
 
-        if ($scope === '*') {
-            return true;
+    /**
+     * @var list<string>
+     */
+    protected $hidden = [
+        'secret',
+    ];
+
+    public static function booted(): void
+    {
+        self::creating(static function (self $apiKey): void {
+            if (blank($apiKey->key)) {
+                $apiKey->key = self::generatePlainTextKey();
+            }
+
+            if (blank($apiKey->secret)) {
+                $apiKey->secret = self::generatePlainTextSecret();
+            }
+        });
+    }
+
+    public static function generatePlainTextKey(): string
+    {
+        return Str::random(40);
+    }
+
+    public static function generatePlainTextSecret(): string
+    {
+        return Str::random(64);
+    }
+
+    public function getRateLimitAttribute(): ?int
+    {
+        $rateLimits = $this->rate_limits;
+
+        if ($rateLimits === null) {
+            return null;
         }
 
         return in_array('*', $scopes, true) || in_array($scope, $scopes, true);
@@ -130,10 +171,20 @@ final class ApiKey extends Model
      *
      * @param  array<int, string>  $scopes
      */
-    public function hasAnyScope(array $scopes): bool
+    public function user(): BelongsTo
     {
-        if ($scopes === []) {
-            return true;
+        /** @var BelongsTo<User, ApiKey> $relation */
+        $relation = $this->belongsTo(User::class);
+
+        return $relation;
+    }
+
+    public function maskKey(): string
+    {
+        $key = (string) $this->key;
+
+        if (strlen($key) <= 8) {
+            return Str::mask($key, '*', 0);
         }
 
         $assignedScopes = $this->resolvedScopes();
@@ -162,25 +213,30 @@ final class ApiKey extends Model
     /**
      * Determine if the API key meets its configured rate limit for the given request count.
      */
-    public function withinRateLimit(int $requestedCalls = 1): bool
+    public function regenerateCredentials(): array
     {
-        $limit = $this->rate_limit;
+        $plainKey = self::generatePlainTextKey();
+        $plainSecret = self::generatePlainTextSecret();
 
-        if ($limit === null || $limit <= 0) {
-            return true;
-        }
+        $this->forceFill([
+            'key' => $plainKey,
+            'secret' => $plainSecret,
+        ])->save();
 
-        return $requestedCalls <= $limit;
+        return [
+            'key' => $plainKey,
+            'secret' => $plainSecret,
+        ];
     }
 
     /**
-     * Determine if the API key has a finite rate limit configured.
+     * Retrieve the scopes as a collection for easier handling in Filament.
+     *
+     * @return Collection<int, string>
      */
-    public function hasRateLimit(): bool
+    public function scopesAsCollection(): Collection
     {
-        $limit = $this->rate_limit;
-
-        return $limit !== null && $limit > 0;
+        return Collection::make(Arr::wrap($this->scopes))->filter()->values();
     }
 
     /**

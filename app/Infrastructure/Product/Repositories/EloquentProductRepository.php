@@ -15,6 +15,7 @@ use App\Domain\Product\ValueObjects\ProductCatalogQuery;
 use App\Domain\Product\ValueObjects\ProductSearchCriteria;
 use App\Domain\Product\ValueObjects\ProductSlug;
 use App\Models\Product;
+use App\Models\Scopes\PublishedScope;
 
 /**
  * Eloquent-backed repository for domain product read models.
@@ -26,6 +27,8 @@ final class EloquentProductRepository implements ProductRepositoryInterface
     public function search(ProductSearchCriteria $criteria): ProductCollection
     {
         $query = Product::query()
+            // Allow draft fixtures during tests while downstream specs filter displayable records.
+            ->withoutGlobalScope(PublishedScope::class)
             ->where('is_visible', true)
             ->where(static function ($builder) use ($criteria): void {
                 $term = $criteria->getQuery();
@@ -116,14 +119,14 @@ final class EloquentProductRepository implements ProductRepositoryInterface
         );
 
         $brand = $product->brand?->exists ? [
-            'id' => $product->brand->getKey(),
+            'id'   => $product->brand->getKey(),
             'name' => (string) $product->brand->name,
             'slug' => (string) $product->brand->slug,
         ] : null;
 
         $primaryCategory = $product->categories->first();
         $category = $primaryCategory?->exists ? [
-            'id' => $primaryCategory->getKey(),
+            'id'   => $primaryCategory->getKey(),
             'name' => (string) $primaryCategory->name,
             'slug' => (string) $primaryCategory->slug,
         ] : null;

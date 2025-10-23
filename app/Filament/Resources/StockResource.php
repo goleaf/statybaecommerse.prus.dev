@@ -4,33 +4,38 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\StockResource\Pages;
 use App\Models\Inventory;
 use App\Models\Product;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 /**
  * StockResource
  *
@@ -38,6 +43,8 @@ use UnitEnum;
  */
 final class StockResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Inventory::class;
 
     /**
@@ -64,9 +71,9 @@ final class StockResource extends Resource
         return __('inventory.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('inventory.product_information'))
                 ->schema([
                     Grid::make(2)
@@ -103,29 +110,29 @@ final class StockResource extends Resource
                 ->schema([
                     Grid::make(3)
                         ->schema([
-                            TextInput::make('quantity')
+                            Quantity::make('quantity')
                                 ->label(__('inventory.quantity'))
-                                ->numeric()
                                 ->minValue(0)
+                                ->steps(1)
                                 ->default(0)
                                 ->required(),
-                            TextInput::make('reserved')
+                            Quantity::make('reserved')
                                 ->label(__('inventory.reserved'))
-                                ->numeric()
                                 ->minValue(0)
+                                ->steps(1)
                                 ->default(0),
-                            TextInput::make('incoming')
+                            Quantity::make('incoming')
                                 ->label(__('inventory.incoming'))
-                                ->numeric()
                                 ->minValue(0)
+                                ->steps(1)
                                 ->default(0),
                         ]),
                     Grid::make(2)
                         ->schema([
-                            TextInput::make('threshold')
+                            Quantity::make('threshold')
                                 ->label(__('inventory.threshold'))
-                                ->numeric()
                                 ->minValue(0)
+                                ->steps(1)
                                 ->default(0),
                             Toggle::make('is_tracked')
                                 ->label(__('inventory.is_tracked'))
@@ -135,8 +142,9 @@ final class StockResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('product.name')
@@ -216,9 +224,11 @@ final class StockResource extends Resource
                     ->icon('heroicon-o-adjustments-horizontal')
                     ->color('warning')
                     ->form([
-                        TextInput::make('adjustment_quantity')
+                        Quantity::make('adjustment_quantity')
                             ->label(__('inventory.adjustment_quantity'))
-                            ->numeric()
+                            ->steps(1)
+                            ->minValue(-1000000)
+                            ->default(0)
                             ->required()
                             ->helperText(__('inventory.adjustment_help')),
                     ])

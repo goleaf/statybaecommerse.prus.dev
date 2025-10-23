@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Exceptions\Domain;
 
-use App\Support\ErrorCodes;
+use App\Support\ErrorCode;
+use Illuminate\Http\Response;
 
 final class OrderNotFoundException extends DomainException
 {
     public function __construct(string $orderNumber)
     {
         parent::__construct(
-            errorCode: ErrorCodes::ORDER_NOT_FOUND,
-            translationKey: 'exceptions.orders.not_found',
+            errorCode: ErrorCode::OrderNotFound,
             context: ['order' => $orderNumber],
-            status: 404,
+            status: Response::HTTP_NOT_FOUND,
         );
     }
 }

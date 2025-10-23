@@ -10,6 +10,8 @@ use Filament\Actions;
 
 final class ListCities extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = CityResource::class;
 
     protected function getHeaderActions(): array

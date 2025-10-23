@@ -4,39 +4,48 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
+use BackedEnum;
+use UnitEnum;
 use App\Filament\Resources\EnumValueResource\Pages;
+use BackedEnum;
 use App\Models\EnumValue;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
+use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
+use Filament\Schemas\Schema;
+use BackedEnum;
+use UnitEnum;
 final class EnumValueResource extends Resource
 {
-    protected static ?string $model = EnumValue::class;
+    use HasNav;
 
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
@@ -71,9 +80,9 @@ final class EnumValueResource extends Resource
         return __('admin.enum_values.navigation_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('admin.enum_values.form.sections.basic_information'))
                 ->schema([
                     Select::make('type')
@@ -148,8 +157,9 @@ final class EnumValueResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('type')
@@ -242,7 +252,7 @@ final class EnumValueResource extends Resource
                     ->query(fn (Builder $query): Builder => $query->where('is_default', true)),
                 Filter::make('high_usage')
                     ->label(__('admin.enum_values.filters.high_usage'))
-                    ->query(fn (Builder $query): Builder => $query->where('usage_count', '>', 50)),
+                    ->query(fn (Builder $query): Builder => $query->where('metadata->usage_count', '>', 50)),
             ])
             ->actions([
                 Action::make('activate')
@@ -298,7 +308,7 @@ final class EnumValueResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    BulkAction::make('activate')
+                    BulkAction::make('bulk_activate')
                         ->label(__('admin.enum_values.actions.bulk_activate'))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
@@ -309,7 +319,7 @@ final class EnumValueResource extends Resource
                                 ->success()
                                 ->send();
                         }),
-                    BulkAction::make('deactivate')
+                    BulkAction::make('bulk_deactivate')
                         ->label(__('admin.enum_values.actions.bulk_deactivate'))
                         ->icon('heroicon-o-x-circle')
                         ->color('gray')
@@ -320,6 +330,18 @@ final class EnumValueResource extends Resource
                                 ->success()
                                 ->send();
                         }),
+                    BulkAction::make('set_default')
+                        ->label(__('admin.enum_values.actions.set_default'))
+                        ->icon('heroicon-o-star')
+                        ->color('warning')
+                        ->action(function (Collection $records): void {
+                            $records->each->setAsDefault();
+                            Notification::make()
+                                ->title(__('admin.enum_values.set_as_default_successfully'))
+                                ->success()
+                                ->send();
+                        })
+                        ->requiresConfirmation(),
                     BulkAction::make('cleanup_unused')
                         ->label(__('admin.enum_values.actions.cleanup_unused'))
                         ->icon('heroicon-o-trash')
@@ -374,7 +396,7 @@ final class EnumValueResource extends Resource
         return $activeCount === $count ? (string) $count : "{$activeCount}/{$count}";
     }
 
-    public static function getNavigationBadgeColor(): ?string
+    public static function getNavigationBadgeColor(): string|array|null
     {
         $count = self::getModel()::count();
         $activeCount = self::getModel()::where('is_active', true)->count();

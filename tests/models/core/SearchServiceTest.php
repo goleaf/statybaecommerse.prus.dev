@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Services\SearchService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 final class SearchServiceTest extends TestCase
@@ -23,6 +24,14 @@ final class SearchServiceTest extends TestCase
         parent::setUp();
         $this->searchService = app(SearchService::class);
         Cache::flush();
+        config([
+            'search.driver' => 'database',
+            'search.scout.enabled' => false,
+            'scout.driver' => 'collection',
+            'cache.default' => 'array',
+            'cache.stores.array' => ['driver' => 'array'],
+            'database.redis.client' => 'predis',
+        ]);
     }
 
     public function test_search_returns_empty_array_when_no_results(): void
@@ -35,10 +44,8 @@ final class SearchServiceTest extends TestCase
 
     public function test_search_returns_products_when_found(): void
     {
-        $product = Product::factory()->create([
+        $product = $this->createPublishedProduct([
             'name' => 'Test Product',
-            'is_visible' => true,
-            'published_at' => now()->subDay(),
         ]);
 
         $results = $this->searchService->search('Test', 10);
@@ -54,16 +61,12 @@ final class SearchServiceTest extends TestCase
 
     public function test_search_returns_categories_when_found(): void
     {
-        $category = Category::factory()->create([
+        $category = $this->createSearchableCategory([
             'name' => 'Test Category',
-            'is_visible' => true,
         ]);
 
         // Create a product in this category to satisfy the products_count > 0 condition
-        $product = Product::factory()->create([
-            'is_visible' => true,
-            'published_at' => now()->subDay(),
-        ]);
+        $product = $this->createPublishedProduct();
         $category->products()->attach($product);
 
         $results = $this->searchService->search('Test', 10);
@@ -78,17 +81,14 @@ final class SearchServiceTest extends TestCase
 
     public function test_search_returns_brands_when_found(): void
     {
-        $brand = Brand::factory()->create([
+        $brand = $this->createSearchableBrand([
             'name' => 'Test Brand',
-            'is_enabled' => true,
         ]);
 
         // Create a product for this brand to satisfy the products_count > 0 condition
-        Product::factory()->create([
+        $this->createPublishedProduct([
             'name' => 'Brand Product',
             'brand_id' => $brand->id,
-            'is_visible' => true,
-            'published_at' => now()->subDay(),
         ]);
 
         $results = $this->searchService->search('Test', 10);
@@ -105,10 +105,8 @@ final class SearchServiceTest extends TestCase
     {
         // Create multiple products
         for ($i = 1; $i <= 5; $i++) {
-            Product::factory()->create([
+            $this->createPublishedProduct([
                 'name' => "Test Product {$i}",
-                'is_visible' => true,
-                'published_at' => now()->subDay(),
             ]);
         }
 
@@ -121,22 +119,16 @@ final class SearchServiceTest extends TestCase
     public function test_search_prioritizes_exact_matches(): void
     {
         // Create products with different match types
-        Product::factory()->create([
+        $this->createPublishedProduct([
             'name' => 'Test Product',
-            'is_visible' => true,
-            'published_at' => now()->subDay(),
         ]);
 
-        Product::factory()->create([
+        $this->createPublishedProduct([
             'name' => 'Some Test Product',
-            'is_visible' => true,
-            'published_at' => now()->subDay(),
         ]);
 
-        Product::factory()->create([
+        $this->createPublishedProduct([
             'name' => 'Test',
-            'is_visible' => true,
-            'published_at' => now()->subDay(),
         ]);
 
         $results = $this->searchService->search('Test', 10);
@@ -153,18 +145,14 @@ final class SearchServiceTest extends TestCase
 
     public function test_search_includes_featured_products_bonus(): void
     {
-        $regularProduct = Product::factory()->create([
+        $regularProduct = $this->createPublishedProduct([
             'name' => 'Regular Test Product',
-            'is_visible' => true,
             'is_featured' => false,
-            'published_at' => now()->subDay(),
         ]);
 
-        $featuredProduct = Product::factory()->create([
+        $featuredProduct = $this->createPublishedProduct([
             'name' => 'Featured Test Product',
-            'is_visible' => true,
             'is_featured' => true,
-            'published_at' => now()->subDay(),
         ]);
 
         $results = $this->searchService->search('Test', 10);
@@ -182,10 +170,8 @@ final class SearchServiceTest extends TestCase
 
     public function test_search_handles_special_characters(): void
     {
-        Product::factory()->create([
+        $this->createPublishedProduct([
             'name' => 'Product with % special chars',
-            'is_visible' => true,
-            'published_at' => now()->subDay(),
         ]);
 
         // Test with a simpler search term that should match
@@ -196,12 +182,47 @@ final class SearchServiceTest extends TestCase
         $this->assertEquals('Product with % special chars', $results[0]['title']);
     }
 
+    public function test_search_uses_scout_when_enabled(): void
+    {
+        config([
+            'search.driver' => 'scout',
+            'search.scout.enabled' => true,
+            'scout.driver' => 'collection',
+        ]);
+
+        $brand = $this->createSearchableBrand([
+            'name' => 'Scout Brand',
+        ]);
+
+        $category = $this->createSearchableCategory([
+            'name' => 'Scout Category',
+            'slug' => 'scout-category',
+        ]);
+
+        $product = $this->createPublishedProduct([
+            'name' => 'Scout Drill',
+            'brand_id' => $brand->id,
+            'price' => 199.00,
+        ]);
+
+        $category->products()->attach($product);
+
+        Product::makeAllSearchable();
+        Category::makeAllSearchable();
+        Brand::makeAllSearchable();
+
+        $results = $this->searchService->search('Scout', 10);
+
+        $this->assertNotEmpty($results);
+        $this->assertNotNull(collect($results)->firstWhere('id', $product->id));
+        $this->assertNotNull(collect($results)->firstWhere('id', $category->id));
+        $this->assertNotNull(collect($results)->firstWhere('id', $brand->id));
+    }
+
     public function test_search_caches_results(): void
     {
-        Product::factory()->create([
+        $this->createPublishedProduct([
             'name' => 'Cached Test Product',
-            'is_visible' => true,
-            'published_at' => now()->subDay(),
         ]);
 
         // First search
@@ -216,10 +237,8 @@ final class SearchServiceTest extends TestCase
 
     public function test_clear_cache_removes_cached_results(): void
     {
-        Product::factory()->create([
+        $this->createPublishedProduct([
             'name' => 'Cache Test Product',
-            'is_visible' => true,
-            'published_at' => now()->subDay(),
         ]);
 
         // Search and cache results
@@ -234,10 +253,8 @@ final class SearchServiceTest extends TestCase
 
     public function test_search_returns_proper_result_structure(): void
     {
-        $product = Product::factory()->create([
+        $product = $this->createPublishedProduct([
             'name' => 'Structure Test Product',
-            'is_visible' => true,
-            'published_at' => now()->subDay(),
         ]);
 
         $results = $this->searchService->search('Structure', 10);
@@ -266,13 +283,12 @@ final class SearchServiceTest extends TestCase
         Product::factory()->create([
             'name' => 'Invisible Test Product',
             'is_visible' => false,
+            'status' => 'published',
             'published_at' => now()->subDay(),
         ]);
 
-        Product::factory()->create([
+        $this->createPublishedProduct([
             'name' => 'Visible Test Product',
-            'is_visible' => true,
-            'published_at' => now()->subDay(),
         ]);
 
         $results = $this->searchService->search('Test', 10);
@@ -287,13 +303,12 @@ final class SearchServiceTest extends TestCase
         Product::factory()->create([
             'name' => 'Future Test Product',
             'is_visible' => true,
+            'status' => 'published',
             'published_at' => now()->addDay(),
         ]);
 
-        Product::factory()->create([
+        $this->createPublishedProduct([
             'name' => 'Published Test Product',
-            'is_visible' => true,
-            'published_at' => now()->subDay(),
         ]);
 
         $results = $this->searchService->search('Test', 10);
@@ -301,5 +316,51 @@ final class SearchServiceTest extends TestCase
         $this->assertNotEmpty($results);
         $this->assertCount(1, $results);
         $this->assertEquals('Published Test Product', $results[0]['title']);
+    }
+
+    private function createPublishedProduct(array $attributes = []): Product
+    {
+        return Product::factory()->create(array_merge([
+            'is_visible' => true,
+            'status' => 'published',
+            'published_at' => now()->subDay(),
+        ], $attributes));
+    }
+
+    private function createSearchableCategory(array $attributes = []): Category
+    {
+        $defaults = $this->filterAttributesForTable('categories', [
+            'is_visible' => true,
+            'is_enabled' => true,
+            'is_active' => true,
+        ]);
+
+        return Category::factory()->create(array_merge($defaults, $attributes));
+    }
+
+    private function createSearchableBrand(array $attributes = []): Brand
+    {
+        $defaults = $this->filterAttributesForTable('brands', [
+            'is_enabled' => true,
+            'is_active' => true,
+            'is_visible' => true,
+        ]);
+
+        return Brand::factory()->create(array_merge($defaults, $attributes));
+    }
+
+    /**
+     * @param  array<string, mixed>  $attributes
+     * @return array<string, mixed>
+     */
+    private function filterAttributesForTable(string $table, array $attributes): array
+    {
+        foreach (array_keys($attributes) as $column) {
+            if (! Schema::hasColumn($table, $column)) {
+                unset($attributes[$column]);
+            }
+        }
+
+        return $attributes;
     }
 }

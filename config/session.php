@@ -18,7 +18,11 @@ return [
     |
     */
 
-    'driver' => env('SESSION_DRIVER', 'database'),
+    'driver' => value(static function () {
+        $driver = env('SESSION_DRIVER', 'database');
+
+        return is_string($driver) && $driver !== '' ? $driver : 'database';
+    }),
 
     /*
     |--------------------------------------------------------------------------
@@ -73,7 +77,11 @@ return [
     |
     */
 
-    'connection' => env('SESSION_CONNECTION'),
+    'connection' => value(static function () {
+        $connection = env('SESSION_CONNECTION');
+
+        return is_string($connection) && $connection !== '' ? $connection : null;
+    }),
 
     /*
     |--------------------------------------------------------------------------
@@ -86,7 +94,11 @@ return [
     |
     */
 
-    'table' => env('SESSION_TABLE', 'sessions'),
+    'table' => value(static function () {
+        $table = env('SESSION_TABLE', 'sessions');
+
+        return is_string($table) && $table !== '' ? $table : 'sessions';
+    }),
 
     /*
     |--------------------------------------------------------------------------
@@ -101,7 +113,11 @@ return [
     |
     */
 
-    'store' => env('SESSION_STORE'),
+    'store' => value(static function () {
+        $store = env('SESSION_STORE');
+
+        return is_string($store) && $store !== '' ? $store : null;
+    }),
 
     /*
     |--------------------------------------------------------------------------
@@ -127,10 +143,18 @@ return [
     |
     */
 
-    'cookie' => env(
-        'SESSION_COOKIE',
-        Str::slug(env('APP_NAME', 'laravel')).'-session'
-    ),
+    'cookie' => value(static function () {
+        $cookie = env('SESSION_COOKIE');
+
+        if (is_string($cookie) && $cookie !== '') {
+            return $cookie;
+        }
+
+        $appName = env('APP_NAME', 'laravel');
+        $baseName = is_string($appName) && $appName !== '' ? $appName : 'laravel';
+
+        return Str::slug($baseName).'-session';
+    }),
 
     /*
     |--------------------------------------------------------------------------
@@ -143,7 +167,11 @@ return [
     |
     */
 
-    'path' => env('SESSION_PATH', '/'),
+    'path' => value(static function () {
+        $path = env('SESSION_PATH', '/');
+
+        return is_string($path) && $path !== '' ? $path : '/';
+    }),
 
     /*
     |--------------------------------------------------------------------------
@@ -156,7 +184,11 @@ return [
     |
     */
 
-    'domain' => env('SESSION_DOMAIN'),
+    'domain' => value(static function () {
+        $domain = env('SESSION_DOMAIN');
+
+        return is_string($domain) && $domain !== '' ? $domain : null;
+    }),
 
     /*
     |--------------------------------------------------------------------------
@@ -202,7 +234,23 @@ return [
     |
     */
 
-    'same_site' => env('SESSION_SAME_SITE', 'lax'),
+    'same_site' => value(static function () {
+        /** @var string|null $sameSite */
+        $sameSite = env('SESSION_SAME_SITE', 'lax');
+
+        if ($sameSite === null) {
+            return null;
+        }
+
+        if ($sameSite === '') {
+            return 'lax';
+        }
+
+        $normalized = strtolower($sameSite);
+        $valid = ['lax', 'strict', 'none'];
+
+        return in_array($normalized, $valid, true) ? $normalized : 'lax';
+    }),
 
     /*
     |--------------------------------------------------------------------------

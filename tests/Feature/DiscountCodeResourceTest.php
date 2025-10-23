@@ -13,7 +13,9 @@ use App\Models\Discount;
 use App\Models\DiscountCode;
 use App\Models\Order;
 use App\Models\User;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Schema;
 use Livewire\Livewire;
 
 final class DiscountCodeResourceTest extends TestCase
@@ -25,11 +27,37 @@ final class DiscountCodeResourceTest extends TestCase
         parent::setUp();
 
         $adminUser = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
 
         $this->actingAs($adminUser);
+
+        // Create lightweight pivot tables when running under SQLite-based test migrations.
+        if (! Schema::hasTable('discount_redemptions')) {
+            Schema::create('discount_redemptions', function ($table): void {
+                $table->id();
+                $table->unsignedBigInteger('discount_id')->nullable();
+                $table->unsignedBigInteger('code_id')->nullable();
+                $table->unsignedBigInteger('order_id')->nullable();
+                $table->unsignedBigInteger('user_id')->nullable();
+                $table->decimal('amount_saved', 12, 2)->default(0);
+                $table->string('redemption_status')->default('pending');
+                $table->timestamps();
+            });
+        }
+
+        if (! Schema::hasTable('discount_redemption_translations')) {
+            Schema::create('discount_redemption_translations', function ($table): void {
+                $table->id();
+                $table->unsignedBigInteger('discount_redemption_id')->nullable();
+                $table->string('locale', 5);
+                $table->text('notes')->nullable();
+                $table->string('status_description')->nullable();
+                $table->json('metadata_description')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     public function test_can_load_discount_code_list_page(): void
@@ -47,45 +75,45 @@ final class DiscountCodeResourceTest extends TestCase
     public function test_can_create_discount_code(): void
     {
         $discount = Discount::factory()->create();
-        $customerGroup = CustomerGroup::factory()->create();
+        $customerGroup = CustomerGroup::factory()->active()->create();
         $newDiscountCodeData = DiscountCode::factory()->make([
             'discount_id' => $discount->id,
-            'code' => 'TEST10',
-            'name' => 'Test Discount',
-            'type' => 'percentage',
-            'value' => 10.00,
-            'is_active' => true,
-            'is_public' => false,
+            'code'        => 'TEST10',
+            'name'        => 'Test Discount',
+            'type'        => 'percentage',
+            'value'       => 10.00,
+            'is_active'   => true,
+            'is_public'   => false,
         ]);
 
         Livewire::test(CreateDiscountCode::class)
             ->fillForm([
-                'discount_id' => $newDiscountCodeData->discount_id,
-                'code' => $newDiscountCodeData->code,
-                'name' => $newDiscountCodeData->name,
-                'type' => $newDiscountCodeData->type,
-                'value' => $newDiscountCodeData->value,
-                'minimum_amount' => 50.00,
-                'maximum_discount' => 100.00,
-                'usage_limit' => 100,
+                'discount_id'          => $newDiscountCodeData->discount_id,
+                'code'                 => $newDiscountCodeData->code,
+                'name'                 => $newDiscountCodeData->name,
+                'type'                 => $newDiscountCodeData->type,
+                'value'                => $newDiscountCodeData->value,
+                'minimum_amount'       => 50.00,
+                'maximum_discount'     => 100.00,
+                'usage_limit'          => 100,
                 'usage_limit_per_user' => 1,
-                'valid_from' => now(),
-                'valid_until' => now()->addMonth(),
-                'is_active' => true,
-                'is_public' => false,
-                'is_auto_apply' => false,
-                'is_stackable' => false,
-                'is_first_time_only' => false,
-                'customer_group_id' => $customerGroup->id,
+                'valid_from'           => now(),
+                'valid_until'          => now()->addMonth(),
+                'is_active'            => true,
+                'is_public'            => false,
+                'is_auto_apply'        => false,
+                'is_stackable'         => false,
+                'is_first_time_only'   => false,
+                'customer_group_id'    => $customerGroup->id,
             ])
             ->call('create')
             ->assertNotified();
 
         $this->assertDatabaseHas('discount_codes', [
-            'code' => $newDiscountCodeData->code,
-            'name' => $newDiscountCodeData->name,
-            'type' => $newDiscountCodeData->type,
-            'value' => $newDiscountCodeData->value,
+            'code'      => $newDiscountCodeData->code,
+            'name'      => $newDiscountCodeData->name,
+            'type'      => $newDiscountCodeData->type,
+            'value'     => $newDiscountCodeData->value,
             'is_active' => true,
             'is_public' => false,
         ]);
@@ -96,8 +124,8 @@ final class DiscountCodeResourceTest extends TestCase
         $discount = Discount::factory()->create();
         $discountCode = DiscountCode::factory()->create([
             'discount_id' => $discount->id,
-            'is_active' => true,
-            'value' => 10.00,
+            'is_active'   => true,
+            'value'       => 10.00,
         ]);
 
         Livewire::test(EditDiscountCode::class, [
@@ -105,16 +133,16 @@ final class DiscountCodeResourceTest extends TestCase
         ])
             ->fillForm([
                 'is_active' => false,
-                'value' => 15.00,
+                'value'     => 15.00,
                 'is_public' => true,
             ])
             ->call('save')
             ->assertNotified();
 
         $this->assertDatabaseHas('discount_codes', [
-            'id' => $discountCode->id,
+            'id'        => $discountCode->id,
             'is_active' => false,
-            'value' => 15.00,
+            'value'     => 15.00,
             'is_public' => true,
         ]);
     }
@@ -137,11 +165,11 @@ final class DiscountCodeResourceTest extends TestCase
         $discount = Discount::factory()->create();
         $percentageCode = DiscountCode::factory()->create([
             'discount_id' => $discount->id,
-            'type' => 'percentage',
+            'type'        => 'percentage',
         ]);
         $fixedCode = DiscountCode::factory()->create([
             'discount_id' => $discount->id,
-            'type' => 'fixed',
+            'type'        => 'fixed',
         ]);
 
         Livewire::test(ListDiscountCodes::class)
@@ -153,15 +181,15 @@ final class DiscountCodeResourceTest extends TestCase
     public function test_can_filter_discount_codes_by_customer_group(): void
     {
         $discount = Discount::factory()->create();
-        $customerGroup1 = CustomerGroup::factory()->create(['name' => 'VIP']);
-        $customerGroup2 = CustomerGroup::factory()->create(['name' => 'Regular']);
+        $customerGroup1 = CustomerGroup::factory()->active()->create(['name' => 'VIP']);
+        $customerGroup2 = CustomerGroup::factory()->active()->create(['name' => 'Regular']);
 
         $code1 = DiscountCode::factory()->create([
-            'discount_id' => $discount->id,
+            'discount_id'       => $discount->id,
             'customer_group_id' => $customerGroup1->id,
         ]);
         $code2 = DiscountCode::factory()->create([
-            'discount_id' => $discount->id,
+            'discount_id'       => $discount->id,
             'customer_group_id' => $customerGroup2->id,
         ]);
 
@@ -176,11 +204,11 @@ final class DiscountCodeResourceTest extends TestCase
         $discount = Discount::factory()->create();
         $activeCode = DiscountCode::factory()->create([
             'discount_id' => $discount->id,
-            'is_active' => true,
+            'is_active'   => true,
         ]);
         $inactiveCode = DiscountCode::factory()->create([
             'discount_id' => $discount->id,
-            'is_active' => false,
+            'is_active'   => false,
         ]);
 
         Livewire::test(ListDiscountCodes::class)
@@ -194,11 +222,11 @@ final class DiscountCodeResourceTest extends TestCase
         $discount = Discount::factory()->create();
         $publicCode = DiscountCode::factory()->create([
             'discount_id' => $discount->id,
-            'is_public' => true,
+            'is_public'   => true,
         ]);
         $privateCode = DiscountCode::factory()->create([
             'discount_id' => $discount->id,
-            'is_public' => false,
+            'is_public'   => false,
         ]);
 
         Livewire::test(ListDiscountCodes::class)
@@ -212,14 +240,14 @@ final class DiscountCodeResourceTest extends TestCase
         $discount = Discount::factory()->create();
         $discountCode = DiscountCode::factory()->create([
             'discount_id' => $discount->id,
-            'is_active' => true,
+            'is_active'   => true,
         ]);
 
         Livewire::test(ListDiscountCodes::class)
             ->callTableAction('toggle_active', $discountCode);
 
         $this->assertDatabaseHas('discount_codes', [
-            'id' => $discountCode->id,
+            'id'        => $discountCode->id,
             'is_active' => false,
         ]);
     }
@@ -229,19 +257,22 @@ final class DiscountCodeResourceTest extends TestCase
         $discount = Discount::factory()->create();
         $discountCode = DiscountCode::factory()->create([
             'discount_id' => $discount->id,
-            'code' => 'ORIGINAL',
-            'name' => 'Original Code',
+            'code'        => 'ORIGINAL',
+            'name'        => 'Original Code',
             'usage_count' => 5,
         ]);
 
         Livewire::test(ListDiscountCodes::class)
             ->callTableAction('duplicate', $discountCode);
 
-        $this->assertDatabaseHas('discount_codes', [
-            'code' => 'ORIGINAL_copy_'.time(),
-            'name' => 'Original Code (Copy)',
-            'usage_count' => 0,
-        ]);
+        $duplicated = DiscountCode::withoutGlobalScopes()
+            ->where('code', 'like', 'ORIGINAL_copy_%')
+            ->latest('id')
+            ->first();
+
+        $this->assertNotNull($duplicated);
+        $this->assertSame('Original Code (Copy)', $duplicated->name);
+        $this->assertSame(0, $duplicated->usage_count);
     }
 
     public function test_can_bulk_activate_discount_codes(): void
@@ -249,7 +280,7 @@ final class DiscountCodeResourceTest extends TestCase
         $discount = Discount::factory()->create();
         $discountCodes = DiscountCode::factory()->count(3)->create([
             'discount_id' => $discount->id,
-            'is_active' => false,
+            'is_active'   => false,
         ]);
 
         Livewire::test(ListDiscountCodes::class)
@@ -257,7 +288,7 @@ final class DiscountCodeResourceTest extends TestCase
 
         foreach ($discountCodes as $code) {
             $this->assertDatabaseHas('discount_codes', [
-                'id' => $code->id,
+                'id'        => $code->id,
                 'is_active' => true,
             ]);
         }
@@ -268,7 +299,7 @@ final class DiscountCodeResourceTest extends TestCase
         $discount = Discount::factory()->create();
         $discountCodes = DiscountCode::factory()->count(3)->create([
             'discount_id' => $discount->id,
-            'is_active' => true,
+            'is_active'   => true,
         ]);
 
         Livewire::test(ListDiscountCodes::class)
@@ -276,7 +307,7 @@ final class DiscountCodeResourceTest extends TestCase
 
         foreach ($discountCodes as $code) {
             $this->assertDatabaseHas('discount_codes', [
-                'id' => $code->id,
+                'id'        => $code->id,
                 'is_active' => false,
             ]);
         }
@@ -286,8 +317,8 @@ final class DiscountCodeResourceTest extends TestCase
     {
         Livewire::test(CreateDiscountCode::class)
             ->fillForm([
-                'code' => '',
-                'type' => '',
+                'code'  => '',
+                'type'  => '',
                 'value' => -1,
             ])
             ->call('create')
@@ -297,9 +328,9 @@ final class DiscountCodeResourceTest extends TestCase
     public function test_discount_code_relationships(): void
     {
         $discount = Discount::factory()->create();
-        $customerGroup = CustomerGroup::factory()->create();
+        $customerGroup = CustomerGroup::factory()->active()->create();
         $discountCode = DiscountCode::factory()->create([
-            'discount_id' => $discount->id,
+            'discount_id'       => $discount->id,
             'customer_group_id' => $customerGroup->id,
         ]);
 
@@ -321,13 +352,13 @@ final class DiscountCodeResourceTest extends TestCase
         $discount = Discount::factory()->create();
         $code1 = DiscountCode::factory()->create([
             'discount_id' => $discount->id,
-            'code' => 'SUMMER10',
-            'name' => 'Summer Sale',
+            'code'        => 'SUMMER10',
+            'name'        => 'Summer Sale',
         ]);
         $code2 = DiscountCode::factory()->create([
             'discount_id' => $discount->id,
-            'code' => 'WINTER20',
-            'name' => 'Winter Sale',
+            'code'        => 'WINTER20',
+            'name'        => 'Winter Sale',
         ]);
 
         Livewire::test(ListDiscountCodes::class)
@@ -341,11 +372,11 @@ final class DiscountCodeResourceTest extends TestCase
         $discount = Discount::factory()->create();
         $code1 = DiscountCode::factory()->create([
             'discount_id' => $discount->id,
-            'code' => 'A_CODE',
+            'code'        => 'A_CODE',
         ]);
         $code2 = DiscountCode::factory()->create([
             'discount_id' => $discount->id,
-            'code' => 'B_CODE',
+            'code'        => 'B_CODE',
         ]);
 
         Livewire::test(ListDiscountCodes::class)
@@ -358,20 +389,20 @@ final class DiscountCodeResourceTest extends TestCase
         $discount = Discount::factory()->create();
         $percentageCode = DiscountCode::factory()->create([
             'discount_id' => $discount->id,
-            'type' => 'percentage',
-            'value' => 10.00,
+            'type'        => 'percentage',
+            'value'       => 10.00,
         ]);
         $fixedCode = DiscountCode::factory()->create([
             'discount_id' => $discount->id,
-            'type' => 'fixed',
-            'value' => 25.50,
+            'type'        => 'fixed',
+            'value'       => 25.50,
         ]);
 
         // Test that percentage codes show with % symbol
-        $this->assertEquals('10%', $percentageCode->value.'%');
+        $this->assertEquals('10%', $percentageCode->value . '%');
 
         // Test that fixed codes show with € symbol
-        $this->assertEquals('€25.50', '€'.number_format($fixedCode->value, 2));
+        $this->assertEquals('€25.50', '€' . number_format($fixedCode->value, 2));
     }
 
     public function test_discount_code_usage_tracking(): void

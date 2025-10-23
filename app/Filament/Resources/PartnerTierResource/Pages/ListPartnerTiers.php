@@ -10,6 +10,8 @@ use Filament\Actions;
 
 final class ListPartnerTiers extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = PartnerTierResource::class;
 
     protected function getHeaderActions(): array

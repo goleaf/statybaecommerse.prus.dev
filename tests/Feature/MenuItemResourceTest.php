@@ -7,8 +7,8 @@ namespace Tests\Feature;
 use App\Models\Menu;
 use App\Models\MenuItem;
 use App\Models\User;
-use Filament\Forms\Components\Field;
-use Filament\Forms\Components\Select as SelectComponent;
+use Filament\Forms\Components\Select as SelectField;
+use Filament\Tables\Filters\SelectFilter as TableSelectFilter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -480,11 +480,25 @@ class MenuItemResourceTest extends TestCase
         ]);
 
         Livewire::test(\App\Filament\Resources\MenuItemResource\Pages\ListMenuItems::class)
+            ->assertTableFilterExists('menu_id', function (TableSelectFilter $filter) use ($inactiveMenu): bool {
+                return array_key_exists($inactiveMenu->id, $filter->getOptions());
+            })
+            ->assertTableFilterExists('parent_id', function (TableSelectFilter $filter) use ($hiddenParent): bool {
+                return array_key_exists($hiddenParent->id, $filter->getOptions());
+            })
             ->assertCanSeeTableRecords([$hiddenChild])
             ->filterTable('menu_id', $inactiveMenu->id)
             ->assertCanSeeTableRecords([$hiddenChild])
             ->filterTable('parent_id', $hiddenParent->id)
             ->assertCanSeeTableRecords([$hiddenChild]);
+
+        Livewire::test(\App\Filament\Resources\MenuItemResource\Pages\CreateMenuItem::class)
+            ->assertFormFieldExists('menu_id', function (SelectField $field) use ($inactiveMenu): bool {
+                return array_key_exists($inactiveMenu->id, $field->getOptions());
+            })
+            ->assertFormFieldExists('parent_id', function (SelectField $field) use ($hiddenParent): bool {
+                return array_key_exists($hiddenParent->id, $field->getOptions());
+            });
 
         Livewire::test(\App\Filament\Resources\MenuItemResource\Pages\EditMenuItem::class, [
             'record' => $hiddenChild->getRouteKey(),

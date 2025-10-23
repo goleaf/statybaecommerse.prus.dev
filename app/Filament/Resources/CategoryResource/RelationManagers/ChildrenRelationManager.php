@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CategoryResource\RelationManagers;
 
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+
+use Filament\Schemas\Schema;
 use Filament\Forms\Components\ColorPicker;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -22,8 +23,9 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Str;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class ChildrenRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'children';
@@ -34,7 +36,7 @@ final class ChildrenRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Subcategories';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $schema): Schema   
     {
         return $schema->schema([
             Section::make(__('categories.basic_information'))
@@ -108,8 +110,9 @@ final class ChildrenRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->columns([
                 TextColumn::make('name')
@@ -193,6 +196,15 @@ final class ChildrenRelationManager extends BaseRelationManager
                     ->native(false),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit ' . $this->getPluralModelLabel())
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        // Provide a quick-edit modal for managing records inline.
+                        return $repeater->schema($this->getQuickEditSchema());
+                    }),
                 CreateAction::make(),
             ])
             ->actions([

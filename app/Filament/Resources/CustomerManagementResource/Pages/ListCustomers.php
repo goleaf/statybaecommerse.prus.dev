@@ -10,11 +10,14 @@ use Filament\Actions;
 
 final class ListCustomers extends BaseListRecords
 {
+    use TranslatableListRecords;
+
     protected static string $resource = CustomerManagementResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
+            LocaleSwitcher::make(),
             Actions\CreateAction::make(),
         ];
     }

@@ -3,8 +3,10 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\Sliders;
+use App\Support\Concerns\HasNav;
 
-use App\Enums\NavigationGroup;
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\Sliders\Pages\CreateSlider;
 use App\Filament\Resources\Sliders\Pages\EditSlider;
 use App\Filament\Resources\Sliders\Pages\ListSliders;
@@ -12,15 +14,18 @@ use App\Filament\Resources\Sliders\Schemas\SliderForm;
 use App\Filament\Resources\Sliders\Tables\SlidersTable;
 use App\Models\Slider;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class SliderResource extends Resource
 {
-    protected static ?string $model = Slider::class;
+    use HasNav;
 
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
@@ -33,19 +38,20 @@ final class SliderResource extends Resource
     protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Content;
 
     /**
-     * @var UnitEnum|string|null
+     * @var \UnitEnum|string|null
      */
     protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return SliderForm::configure($form);
+        return SliderForm::configure($schema);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return SlidersTable::configure($table);
     }
 

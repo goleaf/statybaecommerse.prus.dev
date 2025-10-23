@@ -7,6 +7,10 @@ namespace App\Filament\Widgets;
 use App\Models\Slider;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ContentLinkSearch;
+use App\Support\Search\SearchResultPayload;
+
+use function collect;
+
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Exception;
 use Filament\Actions\Action;
@@ -18,6 +22,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Widgets\Widget;
 
@@ -61,13 +66,13 @@ final class SliderQuickActionsWidget extends Widget implements HasActions, HasFo
                             static fn (string $value): ?array => ['value' => $value, 'label' => $value],
                         );
                     })
-                    ->afterStateUpdated(function (?string $state, callable $set): void {
+                    ->afterStateUpdated(function (SearchableInput $component, ?string $state, callable $set): void {
                         if ($state !== null && $state !== '') {
                             return;
                         }
 
                         // Clear persisted URLs when the lookup resets to avoid stale metadata.
-                        SearchableInputHelper::clear($set, ['button_url' => null]);
+                        SearchableInputHelper::clear($component, $set, ['button_url' => null]);
                     }),
                 ColorPicker::make('background_color')
                     ->label(__('translations.background_color'))

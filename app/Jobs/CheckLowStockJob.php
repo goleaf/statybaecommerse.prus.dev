@@ -26,6 +26,21 @@ final class CheckLowStockJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
+     * Number of job attempts before failing.
+     */
+    public int $tries = 2;
+
+    /**
+     * Define retry backoff windows (in seconds).
+     *
+     * @return array<int, int>
+     */
+    public function backoff(): array
+    {
+        return [60, 300];
+    }
+
+    /**
      * Handle the job, event, or request processing.
      */
     public function handle(): void
@@ -34,20 +49,20 @@ final class CheckLowStockJob implements ShouldQueue
         // Use LazyCollection with timeout to prevent long-running operations
         $timeout = now()->addMinutes(5);
         // 5 minute timeout for low stock checks
-        $lowStockProducts = Product::where('is_visible', true)->where('manage_stock', true)->where('stock_quantity', '<=', DB::raw('low_stock_threshold'))->whereDoesntHave('notifications', function ($query) {
+        $lowStockProducts = Product::where('is_visible', true)->where('manage_stock', true)->where('stock_quantity', '<=', DB::raw('low_stock_threshold'))->whereDoesntHave('notifications', function ($query): void {
             $query->where('type', LowStockAlert::class)->where('created_at', '>=', now()->subHours(24));
         })->cursor()->takeUntilTimeout($timeout);
         $processedCount = 0;
         $alertCount = 0;
         // Get admin users with inventory management permissions
-        $adminUsers = User::whereHas('roles', function ($query) {
-            $query->whereHas('permissions', function ($q) {
+        $adminUsers = User::whereHas('roles', function ($query): void {
+            $query->whereHas('permissions', function ($q): void {
                 $q->where('name', 'manage_inventory');
             });
         })->get();
         if ($adminUsers->isEmpty()) {
             // Fallback to users with admin role
-            $adminUsers = User::whereHas('roles', function ($query) {
+            $adminUsers = User::whereHas('roles', function ($query): void {
                 $query->where('name', 'admin');
             })->get();
         }

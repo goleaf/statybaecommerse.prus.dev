@@ -12,8 +12,6 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -106,7 +104,7 @@ final class SystemSettingHistoriesTable
                     ->requiresConfirmation()
                     ->visible(fn (SystemSettingHistory $record): bool => ! empty($record->old_value)),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     BulkAction::make('export_history')

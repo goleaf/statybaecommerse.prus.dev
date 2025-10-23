@@ -6,6 +6,7 @@ namespace Tests\Unit\Filament;
 
 use App\Filament\Resources\ReportResource;
 use App\Models\Report;
+use App\Support\Nav;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -38,13 +39,19 @@ class ReportResourceTest extends TestCase
     #[\PHPUnit\Framework\Attributes\Test]
     public function it_has_correct_navigation_icon(): void
     {
-        $this->assertEquals('heroicon-o-document-chart-bar', ReportResource::getNavigationIcon());
+        $this->assertEquals(
+            Nav::iconForResource(ReportResource::class),
+            ReportResource::getNavigationIcon(),
+        );
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
     public function it_has_correct_navigation_group(): void
     {
-        $this->assertEquals(__('navigation.groups.analytics'), ReportResource::getNavigationGroup());
+        $this->assertSame(
+            Nav::groupForResource(ReportResource::class),
+            ReportResource::getNavigationGroup(),
+        );
     }
 
     #[\PHPUnit\Framework\Attributes\Test]

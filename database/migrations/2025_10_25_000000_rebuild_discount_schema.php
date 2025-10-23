@@ -41,6 +41,16 @@ return new class extends Migration
 
         $legacyTable = 'discount_codes_legacy';
 
+        $this->dropSqliteIndexes('discount_codes', [
+            'discount_codes_code_unique',
+            'discount_codes_active_window_idx',
+            'discount_codes_discount_code_idx',
+            'discount_codes_customer_status_idx',
+            'discount_codes_valid_window_idx',
+            'discount_codes_created_by_index',
+            'discount_codes_updated_by_index',
+        ]);
+
         Schema::disableForeignKeyConstraints();
 
         try {
@@ -111,6 +121,34 @@ return new class extends Migration
     private function rebuildDiscountRedemptions(): void
     {
         if (! Schema::hasTable('discount_redemptions')) {
+            Schema::create('discount_redemptions', function (Blueprint $table): void {
+                $table->id();
+                $table->foreignId('discount_id')->nullable()->constrained('discounts')->nullOnDelete();
+                $table->foreignId('code_id')->nullable()->constrained('discount_codes')->nullOnDelete();
+                $table->foreignId('order_id')->nullable()->constrained('orders')->nullOnDelete();
+                $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+                $table->decimal('amount_saved', 12, 2)->default(0);
+                $table->char('currency_code', 3)->nullable();
+                $table->timestamp('redeemed_at')->nullable();
+                $table->string('status')->default('pending');
+                $table->string('notes')->nullable();
+                $table->ipAddress('ip_address')->nullable();
+                $table->string('user_agent')->nullable();
+                $table->json('metadata')->nullable();
+                $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+                $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+                $table->timestamps();
+                $table->softDeletes();
+
+                $table->index(['discount_id', 'status'], 'discount_redemptions_discount_status_idx');
+                $table->index(['code_id', 'user_id'], 'discount_redemptions_code_user_idx');
+                $table->index(['user_id', 'status'], 'discount_redemptions_user_status_idx');
+                $table->index(['order_id', 'status'], 'discount_redemptions_order_status_idx');
+                $table->index(['redeemed_at']);
+                $table->index(['created_by']);
+                $table->index(['updated_by']);
+            });
+
             return;
         }
 
@@ -127,6 +165,16 @@ return new class extends Migration
         $legacyTranslations = 'discount_redemption_translations_legacy';
         $hasTranslations = Schema::hasTable('discount_redemption_translations');
 
+        $this->dropSqliteIndexes('discount_redemptions', [
+            'discount_redemptions_discount_status_idx',
+            'discount_redemptions_code_user_idx',
+            'discount_redemptions_user_status_idx',
+            'discount_redemptions_order_status_idx',
+            'discount_redemptions_redeemed_at_index',
+            'discount_redemptions_created_by_index',
+            'discount_redemptions_updated_by_index',
+        ]);
+
         Schema::disableForeignKeyConstraints();
 
         try {
@@ -134,6 +182,11 @@ return new class extends Migration
             Schema::dropIfExists($legacyTable);
 
             if ($hasTranslations) {
+                $this->dropSqliteIndexes('discount_redemption_translations', [
+                    'discount_redemption_translations_discount_redemption_id_locale_unique',
+                    'discount_redemption_translations_locale_index',
+                ]);
+
                 Schema::rename('discount_redemption_translations', $legacyTranslations);
             }
 

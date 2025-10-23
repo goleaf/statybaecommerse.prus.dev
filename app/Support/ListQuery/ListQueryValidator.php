@@ -17,7 +17,7 @@ final class ListQueryValidator
     }
 
     /**
-     * @param array<string, mixed> $input
+     * @param  array<string, mixed>  $input
      */
     public static function fromArray(array $input, ListQueryDefinition $definition): ListQuery
     {
@@ -50,7 +50,7 @@ final class ListQueryValidator
     }
 
     /**
-     * @param array<string, mixed> $input
+     * @param  array<string, mixed>  $input
      * @return array{0: array<int, array{key: string, value: mixed, column: string|null, operator: string, callback: (callable)|null}>, 1: array<string, mixed>}
      */
     private static function prepareFilters(array $input, ListQueryDefinition $definition): array
@@ -96,7 +96,7 @@ final class ListQueryValidator
     }
 
     /**
-     * @param array<string, mixed> $input
+     * @param  array<string, mixed>  $input
      * @return array{0: array<int, array{key: string, column: string, direction: string}>, 1: array<int, array{key: string, direction: string}>}
      */
     private static function prepareSorts(array $input, ListQueryDefinition $definition): array
@@ -146,7 +146,7 @@ final class ListQueryValidator
     }
 
     /**
-     * @param array<string, mixed> $input
+     * @param  array<string, mixed>  $input
      * @return array<string, string>
      */
     private static function extractSorts(array $input): array

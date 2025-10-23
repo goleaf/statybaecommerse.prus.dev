@@ -11,6 +11,8 @@ use Filament\Notifications\Notification;
 
 final class AnalyticsDashboard extends BaseListRecords
 {
+    use TranslatableListRecords;
+
     protected static string $resource = AnalyticsResource::class;
 
     /**
@@ -19,6 +21,7 @@ final class AnalyticsDashboard extends BaseListRecords
     protected function getHeaderActions(): array
     {
         return [
+            LocaleSwitcher::make(),
             Action::make('export_report')
                 ->label(__('analytics.export_report'))
                 ->icon('heroicon-m-arrow-down-tray')

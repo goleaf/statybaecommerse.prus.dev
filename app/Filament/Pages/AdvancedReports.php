@@ -6,7 +6,9 @@ namespace App\Filament\Pages;
 
 use BackedEnum;
 use Filament\Pages\Page;
+use BackedEnum;
 
+use BackedEnum;
 final class AdvancedReports extends Page
 {
     /**
@@ -14,9 +16,11 @@ final class AdvancedReports extends Page
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    public static function getNavigationGroup(): ?string
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar-square';
+
+    public static function getNavigationGroup(): BackedEnum|string|null
     {
-        return 'Analytics';
+        return 'Analytics'; // Ensure advanced analytics live with the rest of the reporting suite.
     }
 
     protected static ?string $title = 'Advanced Reports';

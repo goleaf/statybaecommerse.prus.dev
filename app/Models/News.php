@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -44,6 +45,7 @@ final class News extends Model implements TranslatableRecord
     use HasFactory;
     use HasTranslations;
     use LogsActivity;
+    use SoftDeletes;
 
     protected $table = 'news';
 
@@ -259,7 +261,7 @@ final class News extends Model implements TranslatableRecord
      */
     public function getSlugAttribute(): string
     {
-        return $this->getTranslation('slug', app()->getLocale());
+        return (string) ($this->getTranslation('slug', app()->getLocale()) ?? '');
     }
 
     /**
@@ -267,7 +269,7 @@ final class News extends Model implements TranslatableRecord
      */
     public function getTitleAttribute(): string
     {
-        return $this->getTranslation('title', app()->getLocale());
+        return (string) ($this->getTranslation('title', app()->getLocale()) ?? '');
     }
 
     /**

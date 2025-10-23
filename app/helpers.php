@@ -36,6 +36,27 @@ if (! function_exists('app_setting')) {
     }
 }
 
+if (! function_exists('csp_nonce')) {
+    function csp_nonce(): string
+    {
+        $request = app()->bound('request') ? request() : null;
+
+        if ($request instanceof \Illuminate\Http\Request) {
+            return \App\Support\Security\CspNonce::resolve($request);
+        }
+
+        $current = \App\Support\Security\CspNonce::current();
+        if (is_string($current) && $current !== '') {
+            return $current;
+        }
+
+        $nonce = \App\Support\Security\CspNonce::generate();
+        \App\Support\Security\CspNonce::storeGlobally($nonce);
+
+        return $nonce;
+    }
+}
+
 // Removed legacy shopper_setting - use app_setting instead
 
 use Illuminate\Support\Arr;
@@ -296,16 +317,28 @@ if (! function_exists('safe_asset')) {
             return '/' . ltrim($path, '/');
         }
 
-        return asset($path);
+        if (! method_exists($app, 'bound') || ! $app->bound('url') || ! $app->bound('request')) {
+            return $relativePath;
+        }
+
+        try {
+            return asset($path);
+        } catch (\Throwable $exception) {
+            return $relativePath;
+        }
     }
 }
 
 if (! function_exists('media_placeholder_url')) {
     function media_placeholder_url(string $key, ?string $variant = null, ?string $default = null): string
     {
-        $resolver = app(App\Support\Media\PlaceholderResolver::class);
+        try {
+            $resolver = app(App\Support\Media\PlaceholderResolver::class);
 
-        return $resolver->resolve($key, $variant, $default) ?? ($default ?? '');
+            return $resolver->resolve($key, $variant, $default) ?? ($default ?? '');
+        } catch (\Throwable $exception) {
+            return $default ?? '';
+        }
     }
 }
 

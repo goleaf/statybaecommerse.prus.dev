@@ -16,13 +16,21 @@ Baseline rate limits also live in `config/security.php` and are registered by `A
 
 ### API limits
 
-| Limiter | Default | Keying strategy |
-| --- | --- | --- |
-| `api.default` | 60 requests/minute | User ID for authenticated calls, otherwise IP address |
-| `api.notifications` | 60 requests/minute | Same as `api.default`, plus `|notifications` suffix |
-| `api.autocomplete` | 30 requests/minute | Same as `api.default`, plus `|autocomplete` suffix |
+Layered limiters now protect each surface with a per-user and per-IP budget. The throttle middleware raises a JSON
+`429 Too Many Requests` response and emits a structured warning log whenever either layer is exceeded.
 
-Override the API defaults with the `API_RATE_LIMIT_*` environment variables.
+| Limiter | Per-user default | Per-IP default | Notes |
+| --- | --- | --- | --- |
+| `api.read` (alias `api.default`) | 60 requests/minute | 60 requests/minute | Applies to the entire `/api/v1` namespace unless overridden. |
+| `api.write` | 60 requests/minute | 60 requests/minute | Use for mutating operations outside the notifications module. |
+| `api.notifications.read` | 60 requests/minute | 60 requests/minute | Guard read-only notification calls. |
+| `api.notifications.write` | 60 requests/minute | 60 requests/minute | Guard mark-as-read/unread/delete calls. |
+| `api.autocomplete` | 30 requests/minute | 30 requests/minute | Detached from the read limiter so search suggestions stay responsive. |
+| `api.profile` | 60 requests/minute | 60 requests/minute | Additional layer on top of the read limiter for `/api/v1/user`. |
+| `frontend.checkout` | 10 requests/minute | 10 requests/minute | Applies to storefront checkout APIs. |
+
+Tune the thresholds with the new `*_PER_USER` and `*_PER_IP` environment variables described in `config/security.php`.
+Setting a value to `0` or `null` disables that layer while keeping the other intact.
 
 ### Authentication limits
 

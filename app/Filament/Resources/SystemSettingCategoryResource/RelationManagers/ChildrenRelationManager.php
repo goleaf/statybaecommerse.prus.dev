@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingCategoryResource\RelationManagers;
 
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+
+use Filament\Schemas\Schema;
 use Filament\Forms\Components\ColorPicker;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -22,8 +23,9 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Str;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class ChildrenRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'children';
@@ -34,7 +36,7 @@ final class ChildrenRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Sub Categories';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $schema): Schema   
     {
         return $schema->schema([
             Section::make(__('system_setting_categories.children.basic_information'))
@@ -91,8 +93,9 @@ final class ChildrenRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->columns([
                 TextColumn::make('name')
@@ -109,15 +112,15 @@ final class ChildrenRelationManager extends BaseRelationManager
                 TextColumn::make('description')
                     ->label(__('system_setting_categories.children.description'))
                     ->limit(50)
-                    ->tooltip(function (TextColumn $column): ?string {
+                    ->tooltip(static function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        return strlen($state) > 50 ? $state : null;
+                        return is_string($state) && mb_strlen($state) > 50 ? $state : null;
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('icon')
                     ->label(__('system_setting_categories.children.icon'))
-                    ->formatStateUsing(fn ($state) => $state ?: 'heroicon-o-cog-6-tooth')
+                    ->formatStateUsing(static fn (?string $state): string => $state ?: 'heroicon-o-cog-6-tooth')
                     ->toggleable(isToggledHiddenByDefault: true),
                 ColorColumn::make('color')
                     ->label(__('system_setting_categories.children.color'))
@@ -130,7 +133,7 @@ final class ChildrenRelationManager extends BaseRelationManager
                     ->color('primary'),
                 TextColumn::make('active_settings_count')
                     ->label(__('system_setting_categories.children.active_settings_count'))
-                    ->counts(['settings' => fn ($query) => $query->where('is_active', true)])
+                    ->counts(['settings' => static fn (Builder $query): Builder => $query->where('is_active', true)])
                     ->sortable()
                     ->badge()
                     ->color('success'),
@@ -160,15 +163,15 @@ final class ChildrenRelationManager extends BaseRelationManager
                     ->native(false),
             ])
             ->headerActions([
-                CreateAction::make(),
+                Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-                ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                DeleteBulkAction::make(),
+                Tables\Actions\DeleteBulkAction::make(),
             ])
             ->defaultSort('sort_order');
     }

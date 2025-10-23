@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Support\Frontend\DataProviders\HomepageCatalogueDataProvider;
+use App\Support\Frontend\DataProviders\HomePageDataProvider;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
@@ -15,8 +15,6 @@ final class HomeController extends Controller
 
     public function index(Request $request): View
     {
-        $data = $this->dataProvider->get();
-
-        return view('frontend.home.index', $data);
+        return view('frontend.home.index', $this->dataProvider->get());
     }
 }

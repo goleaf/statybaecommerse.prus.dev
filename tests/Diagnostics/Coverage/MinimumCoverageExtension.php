@@ -4,15 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Diagnostics\Coverage;
 
-use function array_map;
-use function explode;
-use function extension_loaded;
-use function getenv;
 use function in_array;
-use function ini_get;
-
-use const PHP_SAPI;
-
+use function sprintf;
+use function strtolower;
 use PHPUnit\Event\TestRunner\ExecutionFinished;
 use PHPUnit\Event\TestRunner\ExecutionFinishedSubscriber;
 use PHPUnit\Runner\CodeCoverage as RunnerCoverage;
@@ -22,10 +16,6 @@ use PHPUnit\Runner\Extension\ParameterCollection;
 use PHPUnit\TextUI\Configuration\Configuration;
 use RuntimeException;
 use SebastianBergmann\CodeCoverage\Util\Percentage;
-
-use function sprintf;
-use function strtolower;
-use function trim;
 
 /**
  * PHPUnit extension that enforces a configurable minimum line coverage percentage.
@@ -39,19 +29,16 @@ final class MinimumCoverageExtension implements Extension
 
     public function bootstrap(Configuration $configuration, Facade $facade, ParameterCollection $parameters): void
     {
-        if (! self::coverageDriverAvailable()) {
-            return;
-        }
-
         // Parse the default threshold passed from phpunit.xml and fall back to a conservative 65% when missing.
         $this->defaultThreshold = $parameters->has('threshold')
             ? (float) $parameters->get('threshold')
             : 65.0;
 
         // Register the subscriber that checks the aggregated coverage once execution finishes.
-        $facade->registerSubscriber(new class($this->defaultThreshold) implements ExecutionFinishedSubscriber
-        {
-            public function __construct(private readonly float $defaultThreshold) {}
+        $facade->registerSubscriber(new class($this->defaultThreshold) implements ExecutionFinishedSubscriber {
+            public function __construct(private readonly float $defaultThreshold)
+            {
+            }
 
             public function notify(ExecutionFinished $event): void
             {
@@ -107,34 +94,5 @@ final class MinimumCoverageExtension implements Extension
 
         // Ensure coverage is collected so the subscriber can evaluate the final metrics.
         $facade->requireCodeCoverageCollection();
-    }
-
-    private static function coverageDriverAvailable(): bool
-    {
-        if (PHP_SAPI === 'phpdbg') {
-            return true;
-        }
-
-        if (extension_loaded('pcov')) {
-            return true;
-        }
-
-        if (! extension_loaded('xdebug')) {
-            return false;
-        }
-
-        $mode = ini_get('xdebug.mode');
-
-        if ($mode === false || $mode === '') {
-            // Xdebug < 3 or default configuration assumes coverage is available.
-            return true;
-        }
-
-        $modes = array_map(
-            static fn (string $segment): string => trim($segment),
-            explode(',', strtolower($mode)),
-        );
-
-        return in_array('coverage', $modes, true);
     }
 }

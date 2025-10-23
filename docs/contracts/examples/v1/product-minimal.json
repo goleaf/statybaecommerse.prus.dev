@@ -1,0 +1,13 @@
+{
+  "id": 1,
+  "sku": "LT-ABC12345",
+  "title": "Elektrinis perforatorius",
+  "description": "Profesionalus įrankis betono gręžimui.",
+  "price": 129.99,
+  "currency": "EUR",
+  "stock": 50,
+  "media": [],
+  "categories": [],
+  "attributes": {},
+  "status": "active"
+}

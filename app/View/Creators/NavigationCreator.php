@@ -11,6 +11,7 @@ use App\Services\Shared\CacheService as SharedCacheService;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTagHelper;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * NavigationCreator
@@ -40,12 +41,12 @@ final class NavigationCreator
             $menus = $this->menuRepository->all(locale: app()->getLocale());
 
             $view->with([
-                'topCategories' => $topCategories,
+                'topCategories'  => $topCategories,
                 'featuredBrands' => $featuredBrands,
                 'navigationMenu' => [
                     'categories' => $topCategories,
-                    'brands' => $featuredBrands,
-                    'menus' => $menus,
+                    'brands'     => $featuredBrands,
+                    'menus'      => $menus,
                 ],
             ]);
         }

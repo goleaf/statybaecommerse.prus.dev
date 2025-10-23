@@ -10,7 +10,6 @@ return [
     'availability' => 'Availability & Conditions',
     'settings' => 'Settings',
 
-    // Fields
     'name' => 'Name',
     'code' => 'Code',
     'currency' => 'Currency',
@@ -30,7 +29,9 @@ return [
     'created_at' => 'Created At',
     'updated_at' => 'Updated At',
 
-    // Filters & options
+    'created_at' => 'Created at',
+    'updated_at' => 'Updated at',
+
     'all_records' => 'All records',
     'enabled_only' => 'Enabled only',
     'disabled_only' => 'Disabled only',
@@ -48,9 +49,8 @@ return [
     'phone' => 'Phone',
     'commission_rate' => 'Commission Rate',
 
-    // Tabs
     'tabs' => [
-        'all' => 'All Price Lists',
+        'all' => 'All price lists',
         'active' => 'Active',
         'default' => 'Default',
         'auto_apply' => 'Auto-apply',
@@ -69,7 +69,6 @@ return [
         ],
     ],
 
-    // Widgets & stats
     'stats' => [
         'total_price_lists' => 'Total Price Lists',
         'total_price_lists_description' => 'All price lists in the catalogue',

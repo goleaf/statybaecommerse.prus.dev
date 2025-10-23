@@ -11,6 +11,8 @@ use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Livewire\Livewire;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Tests\TestCase;
 
 final class NotificationResourceTest extends TestCase
@@ -162,7 +164,7 @@ final class NotificationResourceTest extends TestCase
         ]);
 
         Livewire::test(\App\Filament\Resources\NotificationResource\Pages\ListNotifications::class)
-            ->filterTable('user_id', $user1->id)
+            ->filterTable(SelectFilter::make('user_id'), $user1->id)
             ->assertCanSeeTableRecords([$notification1])
             ->assertCanNotSeeTableRecords([$notification2]);
     }
@@ -183,7 +185,7 @@ final class NotificationResourceTest extends TestCase
         ]);
 
         Livewire::test(\App\Filament\Resources\NotificationResource\Pages\ListNotifications::class)
-            ->filterTable('type', 'info')
+            ->filterTable(SelectFilter::make('notification_type'), 'info')
             ->assertCanSeeTableRecords([$infoNotification])
             ->assertCanNotSeeTableRecords([$successNotification]);
     }

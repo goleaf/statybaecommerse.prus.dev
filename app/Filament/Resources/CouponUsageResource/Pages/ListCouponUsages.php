@@ -10,6 +10,8 @@ use Filament\Actions;
 
 class ListCouponUsages extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = CouponUsageResource::class;
 
     protected function getHeaderActions(): array

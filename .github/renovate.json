@@ -1,0 +1,63 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base"
+  ],
+  "schedule": ["before 4am on monday"],
+  "dependencyDashboard": true,
+  "prHourlyLimit": 0,
+  "constraints": {
+    "php": "8.2"
+  },
+  "composerIgnorePlatformReqs": false,
+  "ignoreUnstable": true,
+  "packageRules": [
+    {
+      "matchManagers": ["composer"],
+      "groupName": "PHP dependency updates",
+      "groupSlug": "php-dependencies",
+      "labels": ["dependencies", "php"],
+      "stabilityDays": 3
+    },
+    {
+      "matchManagers": ["npm"],
+      "groupName": "Node dependency updates",
+      "groupSlug": "node-dependencies",
+      "labels": ["dependencies", "node"],
+      "stabilityDays": 3
+    },
+    {
+      "matchManagers": ["composer"],
+      "matchPackageNames": [
+        "filament/filament",
+        "filament/forms",
+        "filament/infolists",
+        "filament/tables",
+        "laravel/framework",
+        "laravel/horizon",
+        "laravel/scout",
+        "spatie/laravel-medialibrary",
+        "spatie/laravel-permission"
+      ],
+      "rangeStrategy": "pin",
+      "prPriority": 50
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchPackageNames": [
+        "vite",
+        "laravel-vite-plugin"
+      ],
+      "rangeStrategy": "pin",
+      "prPriority": 50
+    },
+    {
+      "matchManagers": ["composer"],
+      "allowedVersions": "/^(?!.*(alpha|beta|rc|dev)).*$/"
+    },
+    {
+      "matchManagers": ["npm"],
+      "allowedVersions": "/^(?!.*(alpha|beta|rc)).*$/"
+    }
+  ]
+}

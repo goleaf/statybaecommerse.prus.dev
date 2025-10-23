@@ -14,17 +14,19 @@ final class DiscountFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->words(3, true),
-            'slug' => fake()->slug(),
+            'name'        => fake()->words(3, true),
+            'slug'        => fake()->slug(),
             'description' => fake()->sentence(),
-            'type' => fake()->randomElement(['percentage', 'fixed']),
-            'value' => fake()->randomFloat(2, 5, 50),
-            'is_active' => true,
-            'is_enabled' => true,
-            'starts_at' => now()->subDays(1),
-            'ends_at' => now()->addDays(30),
-            'usage_limit' => fake()->numberBetween(10, 100),
-            'usage_count' => 0,
+            'type'        => fake()->randomElement(['percentage', 'fixed']),
+            'value'       => fake()->randomFloat(2, 5, 50),
+            'is_active'   => true,
+            'is_enabled'  => true,
+            // Setting a baseline status ensures admin forms load with a valid value.
+            'status'         => 'draft',
+            'starts_at'      => now()->subDays(1),
+            'ends_at'        => now()->addDays(30),
+            'usage_limit'    => fake()->numberBetween(10, 100),
+            'usage_count'    => 0,
             'minimum_amount' => fake()->randomFloat(2, 0, 100),
         ];
     }
@@ -32,7 +34,7 @@ final class DiscountFactory extends Factory
     public function percentage(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'percentage',
+            'type'  => 'percentage',
             'value' => $this->faker->randomFloat(2, 5, 30),
         ]);
     }
@@ -40,7 +42,7 @@ final class DiscountFactory extends Factory
     public function fixed(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'fixed',
+            'type'  => 'fixed',
             'value' => $this->faker->randomFloat(2, 5, 100),
         ]);
     }
@@ -49,8 +51,8 @@ final class DiscountFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'is_enabled' => true,
-            'starts_at' => now()->subDays(1),
-            'ends_at' => now()->addDays(30),
+            'starts_at'  => now()->subDays(1),
+            'ends_at'    => now()->addDays(30),
         ]);
     }
 
@@ -58,7 +60,7 @@ final class DiscountFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'starts_at' => now()->subDays(30),
-            'ends_at' => now()->subDays(1),
+            'ends_at'   => now()->subDays(1),
         ]);
     }
 }

@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\StockResource\RelationManagers;
 
-use App\Filament\RelationManagers\Support\BaseRelationManager;
-use App\Support\Filament\Components\Flatpickr;
+
+use Filament\Schemas\Schema;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -20,9 +21,13 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 class StockMovementsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'stockMovements';
@@ -50,13 +55,15 @@ class StockMovementsRelationManager extends BaseRelationManager
         return __('inventory.stock_movements');
     }
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $schema): Schema   
     {
         return $schema
             ->components([
-                TextInput::make('quantity')
+                Quantity::make('quantity')
                     ->label(__('inventory.quantity'))
-                    ->numeric()
+                    ->minValue(1)
+                    ->steps(1)
+                    ->default(1)
                     ->required()
                     ->helperText(__('inventory.quantity_help')),
                 Select::make('type')
@@ -96,8 +103,9 @@ class StockMovementsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->recordTitleAttribute('reference')
             ->columns([
@@ -181,6 +189,15 @@ class StockMovementsRelationManager extends BaseRelationManager
                     ->query(fn (Builder $query): Builder => $query->where('moved_at', '>=', now()->startOfYear())),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit ' . $this->getPluralModelLabel())
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        // Provide a quick-edit modal for managing records inline.
+                        return $repeater->schema($this->getQuickEditSchema());
+                    }),
                 Tables\Actions\CreateAction::make()
                     ->mutateFormDataUsing(function (array $data): array {
                         $data['user_id'] = auth()->id();

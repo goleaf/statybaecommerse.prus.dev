@@ -4,51 +4,59 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\NewsTagResource\Pages;
 use App\Models\NewsTag;
+use App\Models\Translations\NewsTagTranslation;
 use BackedEnum;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\ColorPicker;
-use Filament\Forms\Components\Grid as FormGrid;
+use Filament\Schemas\Components\Grid as FormGrid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section as FormSection;
+use Filament\Schemas\Components\Section as FormSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction as TableBulkAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction as TableBulkAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Str;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class NewsTagResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = NewsTag::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
     {
         return 'heroicon-o-tag';
     }
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): BackedEnum|string|null
     {
+        // Returning the enum directly keeps Filament aware of the localization metadata without redundant UnitEnum imports.
         return NavigationGroup::News;
     }
 
@@ -64,9 +72,9 @@ final class NewsTagResource extends Resource
         return __('admin.news_tags.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             FormSection::make(__('admin.news_tags.form.sections.basic_information'))
                 ->schema([
                     TextInput::make('name')
@@ -79,7 +87,7 @@ final class NewsTagResource extends Resource
                         ->label(__('admin.news_tags.form.fields.slug'))
                         ->required()
                         ->maxLength(255)
-                        ->unique(ignoreRecord: true),
+                        ->unique(NewsTag::class, 'slug', ignoreRecord: true),
                     Textarea::make('description')
                         ->label(__('admin.news_tags.form.fields.description'))
                         ->rows(3)
@@ -106,6 +114,7 @@ final class NewsTagResource extends Resource
                 ->schema([
                     Repeater::make('translations')
                         ->label(__('admin.news_tags.form.fields.translations'))
+                        ->relationship('translations')
                         ->schema([
                             Select::make('locale')
                                 ->label(__('admin.news_tags.form.fields.locale'))
@@ -126,6 +135,7 @@ final class NewsTagResource extends Resource
                         ])
                         ->columns(2)
                         ->collapsible()
+                        ->defaultItems(1)
                         ->itemLabel(fn (array $state): ?string => $state['locale'] ?? null),
                 ])
                 ->columns(1)
@@ -147,8 +157,9 @@ final class NewsTagResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('name')

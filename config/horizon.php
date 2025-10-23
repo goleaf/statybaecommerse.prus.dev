@@ -28,7 +28,11 @@ return [
     |
     */
 
-    'path' => env('HORIZON_PATH', 'horizon'),
+    'path' => value(static function () {
+        $path = env('HORIZON_PATH', 'horizon');
+
+        return is_string($path) && $path !== '' ? $path : 'horizon';
+    }),
 
     /*
     |--------------------------------------------------------------------------
@@ -54,10 +58,18 @@ return [
     |
     */
 
-    'prefix' => env(
-        'HORIZON_PREFIX',
-        Str::slug(env('APP_NAME', 'laravel'), '_').'_horizon:'
-    ),
+    'prefix' => value(static function () {
+        $prefix = env('HORIZON_PREFIX');
+
+        if (is_string($prefix) && $prefix !== '') {
+            return $prefix;
+        }
+
+        $appName = env('APP_NAME', 'laravel');
+        $baseName = is_string($appName) && $appName !== '' ? $appName : 'laravel';
+
+        return Str::slug($baseName, '_').'_horizon:';
+    }),
 
     /*
     |--------------------------------------------------------------------------

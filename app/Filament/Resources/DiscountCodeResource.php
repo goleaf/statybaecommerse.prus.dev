@@ -4,44 +4,56 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\DiscountCodeResource\Pages;
 use App\Models\DiscountCode;
 use App\Support\Filament\Components\Flatpickr;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
+use Filament\Schemas\Schema;
 final class DiscountCodeResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = DiscountCode::class;
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    /**
+     * Ensure administrative listings ignore front-end global scopes.
+     *
+     * @return Builder<DiscountCode>
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes();
+    }
+
+    public static function getNavigationGroup(): string
     {
         return 'Marketing';
     }
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): string
     {
         return 'heroicon-o-tag';
     }
@@ -65,13 +77,21 @@ final class DiscountCodeResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('discount_codes.basic_information'))
                 ->schema([
                     Grid::make(2)
                         ->schema([
+                            Select::make('discount_id')
+                                ->label(__('discount_codes.discount'))
+                                ->relationship('discount', 'name')
+                                ->searchable()
+                                ->preload()
+                                ->required()
+                                // Ensure administrators always link a code to a discount.
+                                ->helperText(__('discount_codes.discount_help')),
                             TextInput::make('code')
                                 ->label(__('discount_codes.code'))
                                 ->required()
@@ -102,6 +122,9 @@ final class DiscountCodeResource extends Resource
                                     'buy_x_get_y'   => __('discount_codes.types.buy_x_get_y'),
                                 ])
                                 ->default('percentage')
+                                ->required()
+                                // Guard against empty submissions so validation in tests passes.
+                                ->helperText(__('discount_codes.type_help'))
                                 ->live(),
                             TextInput::make('value')
                                 ->label(__('discount_codes.value'))
@@ -139,14 +162,17 @@ final class DiscountCodeResource extends Resource
                         ]),
                     Grid::make(2)
                         ->schema([
-                            TextInput::make('used_count')
+                            TextInput::make('usage_count')
                                 ->label(__('discount_codes.used_count'))
                                 ->numeric()
                                 ->default(0)
+                                // Disabled so it reflects tracked usage without manual edits.
                                 ->disabled(),
                             TextInput::make('remaining_uses')
                                 ->label(__('discount_codes.remaining_uses'))
                                 ->numeric()
+                                ->dehydrated(false)
+                                // Remaining uses is computed on the model; avoid persisting raw values.
                                 ->disabled(),
                         ]),
                 ]),
@@ -208,8 +234,9 @@ final class DiscountCodeResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('code')
@@ -236,14 +263,16 @@ final class DiscountCodeResource extends Resource
                     }),
                 TextColumn::make('value')
                     ->label(__('discount_codes.value'))
-                    ->formatStateUsing(function ($state, $record): string {
+                    ->formatStateUsing(function (float|int|string|null $state, DiscountCode $record): string {
                         if ($record->type === 'percentage') {
-                            return $state . '%';
-                        } elseif ($record->type === 'free_shipping') {
+                            return (string) ($state ?? 0) . '%';
+                        }
+
+                        if ($record->type === 'free_shipping') {
                             return __('discount_codes.free_shipping');
                         }
 
-                        return '€' . number_format($state, 2);
+                        return '€' . number_format((float) ($state ?? 0), 2);
                     })
                     ->sortable(),
                 TextColumn::make('usage_limit')
@@ -251,21 +280,25 @@ final class DiscountCodeResource extends Resource
                     ->numeric()
                     ->alignCenter()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('used_count')
+                TextColumn::make('usage_count')
                     ->label(__('discount_codes.used_count'))
                     ->numeric()
-                    ->color(fn ($state, $record): string => $record->usage_limit && $state >= $record->usage_limit ? 'danger' : 'success'),
+                    ->color(fn (?int $state, DiscountCode $record): string => $record->usage_limit && ($state ?? 0) >= $record->usage_limit ? 'danger' : 'success'),
                 TextColumn::make('remaining_uses')
                     ->label(__('discount_codes.remaining_uses'))
                     ->numeric()
-                    ->color(fn ($state): string => $state <= 0 ? 'danger' : 'success'),
+                    ->color(fn (?int $state): string => ($state ?? 0) <= 0 ? 'danger' : 'success'),
                 TextColumn::make('customerGroup.name')
                     ->label(__('discount_codes.customer_group'))
                     ->color('gray')
                     ->searchable(),
                 TextColumn::make('is_active')
                     ->label(__('discount_codes.status'))
-                    ->formatStateUsing(fn (bool $state): string => $state ? __('discount_codes.active') : __('discount_codes.inactive'))
+                    ->formatStateUsing(
+                        fn (bool $state): string => $state
+                            ? __('discount_codes.active')
+                            : __('discount_codes.inactive')
+                    )
                     ->badge()
                     ->color(fn (bool $state): string => $state ? 'success' : 'danger'),
                 IconColumn::make('is_public')
@@ -307,33 +340,71 @@ final class DiscountCodeResource extends Resource
                 SelectFilter::make('customer_group_id')
                     ->relationship('customerGroup', 'name')
                     ->preload(),
-                TernaryFilter::make('is_active')
+                SelectFilter::make('is_active')
                     ->label(__('discount_codes.is_active'))
-                    ->trueLabel(__('discount_codes.active_only'))
-                    ->falseLabel(__('discount_codes.inactive_only'))
-                    ->native(false),
-                TernaryFilter::make('is_public')
+                    ->options([
+                        '1' => __('discount_codes.active_only'),
+                        '0' => __('discount_codes.inactive_only'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        $value = $data['value'] ?? null;
+
+                        if (! is_string($value)) {
+                            return $query;
+                        }
+
+                        return $query->where('is_active', $value === '1');
+                    }),
+                SelectFilter::make('is_public')
                     ->label(__('discount_codes.is_public'))
-                    ->trueLabel(__('discount_codes.public_only'))
-                    ->falseLabel(__('discount_codes.private_only'))
-                    ->native(false),
-                TernaryFilter::make('is_auto_apply')
+                    ->options([
+                        '1' => __('discount_codes.public_only'),
+                        '0' => __('discount_codes.private_only'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        $value = $data['value'] ?? null;
+
+                        if (! is_string($value)) {
+                            return $query;
+                        }
+
+                        return $query->where('is_public', $value === '1');
+                    }),
+                SelectFilter::make('is_auto_apply')
                     ->label(__('discount_codes.is_auto_apply'))
-                    ->trueLabel(__('discount_codes.auto_apply_only'))
-                    ->falseLabel(__('discount_codes.manual_apply_only'))
-                    ->native(false),
+                    ->options([
+                        '1' => __('discount_codes.auto_apply_only'),
+                        '0' => __('discount_codes.manual_apply_only'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        $value = $data['value'] ?? null;
+
+                        if (! is_string($value)) {
+                            return $query;
+                        }
+
+                        return $query->where('is_auto_apply', $value === '1');
+                    }),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                Action::make('view')
+                    ->label(__('discount_codes.view'))
+                    ->icon('heroicon-o-eye')
+                    ->color('gray')
+                    ->url(fn (DiscountCode $record): string => self::getUrl('view', ['record' => $record])),
                 EditAction::make(),
                 Action::make('toggle_active')
                     ->label(fn (DiscountCode $record): string => $record->is_active ? __('discount_codes.deactivate') : __('discount_codes.activate'))
                     ->icon(fn (DiscountCode $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                     ->color(fn (DiscountCode $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (DiscountCode $record): void {
-                        $record->update(['is_active' => ! $record->is_active]);
+                        // Persist the new active flag even when storefront scopes would normally hide the record.
+                        $newState = ! $record->is_active;
+
+                        self::updateRecordWithoutScopes($record, ['is_active' => $newState]);
+
                         Notification::make()
-                            ->title($record->is_active ? __('discount_codes.activated_successfully') : __('discount_codes.deactivated_successfully'))
+                            ->title($newState ? __('discount_codes.activated_successfully') : __('discount_codes.deactivated_successfully'))
                             ->success()
                             ->send();
                     })
@@ -346,7 +417,8 @@ final class DiscountCodeResource extends Resource
                         $newDiscountCode = $record->replicate();
                         $newDiscountCode->code = $record->code . '_copy_' . time();
                         $newDiscountCode->name = $record->name . ' (Copy)';
-                        $newDiscountCode->used_count = 0;
+                        // Reset usage tracking on duplicated codes to avoid inheriting historical metrics.
+                        $newDiscountCode->usage_count = 0;
                         $newDiscountCode->save();
 
                         Notification::make()
@@ -364,7 +436,12 @@ final class DiscountCodeResource extends Resource
                         ->icon('heroicon-o-eye')
                         ->color('success')
                         ->action(function (Collection $records): void {
-                            $records->each->update(['is_active' => true]);
+                            // Ensure each record updates even if storefront scopes would exclude it.
+                            /** @var DiscountCode $record */
+                            foreach ($records as $record) {
+                                self::updateRecordWithoutScopes($record, ['is_active' => true]);
+                            }
+
                             Notification::make()
                                 ->title(__('discount_codes.bulk_activated_success'))
                                 ->success()
@@ -376,7 +453,12 @@ final class DiscountCodeResource extends Resource
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
                         ->action(function (Collection $records): void {
-                            $records->each->update(['is_active' => false]);
+                            // Deactivate records without losing access to those hidden by global scopes.
+                            /** @var DiscountCode $record */
+                            foreach ($records as $record) {
+                                self::updateRecordWithoutScopes($record, ['is_active' => false]);
+                            }
+
                             Notification::make()
                                 ->title(__('discount_codes.bulk_deactivated_success'))
                                 ->success()
@@ -409,5 +491,35 @@ final class DiscountCodeResource extends Resource
             'view'   => Pages\ViewDiscountCode::route('/{record}'),
             'edit'   => Pages\EditDiscountCode::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * Update the given discount code without storefront global scopes blocking persistence.
+     *
+     * @param array<string, mixed> $attributes
+     */
+    public static function updateRecordWithoutScopes(DiscountCode $record, array $attributes): void
+    {
+        if ($attributes === []) {
+            return;
+        }
+
+        if ($record->usesTimestamps()) {
+            // Keep timestamps current when bypassing Eloquent's default save flow.
+            $attributes[$record->getUpdatedAtColumn()] = Carbon::now();
+        }
+
+        $connection = $record->getConnectionName();
+        $table = $record->getTable();
+
+        DB::connection($connection)
+            ->table($table)
+            ->where($record->getKeyName(), $record->getKey())
+            ->update($attributes);
+
+        // Synchronize the in-memory model so Filament sees the latest values.
+        $record->forceFill($attributes);
+        $record->syncChanges();
+        $record->syncOriginalAttributes(array_keys($attributes));
     }
 }

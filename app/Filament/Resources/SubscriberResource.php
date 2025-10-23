@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\SubscriberResource\Pages;
 use App\Models\Subscriber;
 use App\Support\Filament\Components\Flatpickr;
@@ -18,21 +20,25 @@ use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 /**
  * SubscriberResource
  *
@@ -40,6 +46,8 @@ use UnitEnum;
  */
 final class SubscriberResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Subscriber::class;
 
     /**
@@ -83,9 +91,9 @@ final class SubscriberResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('subscribers.personal_information'))
                     ->schema([
@@ -162,7 +170,7 @@ final class SubscriberResource extends Resource
                             ]),
                         Flatpickr::makeDateTime('subscribed_at')
                             ->label(__('subscribers.subscribed_at'))
-                            ->default(now()),
+                            ->default(fn () => now()),
                     ]),
                 Section::make(__('subscribers.additional_information'))
                     ->schema([
@@ -180,8 +188,9 @@ final class SubscriberResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('email')
@@ -275,12 +284,12 @@ final class SubscriberResource extends Resource
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
                             ->when(
-                                $data['subscribed_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('subscribed_at', '>=', $date),
+                                $from = $data['subscribed_from'] ?? null,
+                                fn (Builder $query, string $date): Builder => $query->whereDate('subscribed_at', '>=', $date),
                             )
                             ->when(
-                                $data['subscribed_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('subscribed_at', '<=', $date),
+                                $until = $data['subscribed_until'] ?? null,
+                                fn (Builder $query, string $date): Builder => $query->whereDate('subscribed_at', '<=', $date),
                             );
                     }),
             ])
@@ -293,7 +302,7 @@ final class SubscriberResource extends Resource
                     ->color('success')
                     ->visible(fn (Subscriber $record): bool => ! $record->is_verified)
                     ->action(function (Subscriber $record): void {
-                        \App\Models\Subscriber::withoutGlobalScopes()
+                        Subscriber::withoutGlobalScopes()
                             ->whereKey($record->getKey())
                             ->update(['is_verified' => true]);
                         Notification::make()
@@ -342,7 +351,7 @@ final class SubscriberResource extends Resource
                         ->color('success')
                         ->action(function (Collection $records): void {
                             $ids = $records->pluck('id');
-                            \App\Models\Subscriber::withoutGlobalScopes()
+                            Subscriber::withoutGlobalScopes()
                                 ->whereIn('id', $ids)
                                 ->update(['is_verified' => true]);
                             Notification::make()
@@ -356,7 +365,7 @@ final class SubscriberResource extends Resource
                         ->color('danger')
                         ->action(function (Collection $records): void {
                             $ids = $records->pluck('id');
-                            \App\Models\Subscriber::withoutGlobalScopes()
+                            Subscriber::withoutGlobalScopes()
                                 ->whereIn('id', $ids)
                                 ->update([
                                     'status'          => 'unsubscribed',

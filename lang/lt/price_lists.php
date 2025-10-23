@@ -1,16 +1,14 @@
 <?php
 
 return [
-    'title' => 'Kainų sąrašai',
-    'plural' => 'Kainų sąrašai',
-    'single' => 'Kainų sąrašas',
+    'title' => 'Kainoraščiai',
+    'plural' => 'Kainoraščiai',
+    'single' => 'Kainoraštis',
 
-    // Sections
     'basic_information' => 'Pagrindinė informacija',
     'availability' => 'Prieinamumas ir sąlygos',
     'settings' => 'Nustatymai',
 
-    // Fields
     'name' => 'Pavadinimas',
     'code' => 'Kodas',
     'currency' => 'Valiuta',
@@ -30,7 +28,9 @@ return [
     'created_at' => 'Sukurta',
     'updated_at' => 'Atnaujinta',
 
-    // Filters & options
+    'created_at' => 'Sukurta',
+    'updated_at' => 'Atnaujinta',
+
     'all_records' => 'Visi įrašai',
     'enabled_only' => 'Tik įjungti',
     'disabled_only' => 'Tik išjungti',
@@ -48,9 +48,8 @@ return [
     'phone' => 'Telefonas',
     'commission_rate' => 'Komisinio tarifas',
 
-    // Tabs
     'tabs' => [
-        'all' => 'Visi kainų sąrašai',
+        'all' => 'Visi kainoraščiai',
         'active' => 'Aktyvūs',
         'default' => 'Numatytieji',
         'auto_apply' => 'Automatiškai taikomi',
@@ -69,7 +68,6 @@ return [
         ],
     ],
 
-    // Widgets & stats
     'stats' => [
         'total_price_lists' => 'Iš viso kainų sąrašų',
         'total_price_lists_description' => 'Visi kataloge esantys kainų sąrašai',

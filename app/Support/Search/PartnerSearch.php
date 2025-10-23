@@ -6,7 +6,9 @@ namespace App\Support\Search;
 
 use App\Models\Partner;
 use DefStudio\SearchableInput\DTO\SearchResult;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 final class PartnerSearch
 {
@@ -15,8 +17,18 @@ final class PartnerSearch
      */
     public static function results(string $term, int $limit = 15): array
     {
-        /** @var \Illuminate\Database\Eloquent\Collection<int, Partner> $partners */
-        $partners = self::query($term)
+        /** @var EloquentCollection<int, Partner> $partners */
+        $partners = Partner::query()
+            ->select(['id', 'name', 'code', 'contact_email'])
+            ->when(trim($term) !== '', function (Builder $builder) use ($term): void {
+                $builder->where(function (Builder $query) use ($term): void {
+                    $query
+                        ->where('name', 'like', "%{$term}%")
+                        ->orWhere('code', 'like', "%{$term}%")
+                        ->orWhere('contact_email', 'like', "%{$term}%");
+                });
+            })
+            ->orderBy('name')
             ->limit($limit)
             ->get();
 
@@ -42,22 +54,36 @@ final class PartnerSearch
 
     public static function label(Partner $partner): string
     {
-        /** @var string|null $rawName */
-        $rawName = $partner->getAttribute('name');
         /** @var string|null $rawCode */
         $rawCode = $partner->getAttribute('code');
+        /** @var string|null $rawName */
+        $rawName = $partner->getAttribute('name');
         /** @var string|null $rawEmail */
         $rawEmail = $partner->getAttribute('contact_email');
 
+        $code = $rawCode ?: '—';
         $name = $rawName ?? '';
-        $code = $rawCode ?? '';
         $email = $rawEmail ?? '';
 
-        return trim(implode(' • ', array_filter([
-            $name !== '' ? $name : __('orders.lookups.partner_unknown'),
-            $code !== '' ? $code : null,
-            $email !== '' ? $email : null,
-        ])));
+        $suffix = $email !== '' ? sprintf('<%s>', $email) : '';
+
+    public static function hydrateComponent(SearchableInput $component, int|string|null $state): void
+    {
+        if ($state === null || $state === '') {
+            SearchableComponentHelper::forget($component);
+
+            return;
+        }
+
+        $partner = Partner::query()
+            ->select(['id', 'name', 'code', 'contact_email'])
+            ->find($state);
+
+        if (! $partner instanceof Partner) {
+            return;
+        }
+
+        SearchableComponentHelper::apply($component, self::toResult($partner));
     }
 
     /**

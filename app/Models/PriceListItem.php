@@ -34,7 +34,7 @@ final class PriceListItem extends Model
 
     protected $table = 'price_list_items';
 
-    protected $fillable = ['price_list_id', 'product_id', 'variant_id', 'net_amount', 'compare_amount', 'name', 'description', 'notes', 'is_active', 'priority', 'min_quantity', 'max_quantity', 'valid_from', 'valid_until'];
+    protected $fillable = ['price_list_id', 'product_id', 'variant_id', 'net_amount', 'compare_amount', 'name', 'description', 'notes', 'is_active', 'is_featured', 'priority', 'min_quantity', 'max_quantity', 'valid_from', 'valid_until'];
 
     public array $translatable = ['name', 'description', 'notes'];
 
@@ -43,7 +43,7 @@ final class PriceListItem extends Model
      */
     protected function casts(): array
     {
-        return ['net_amount' => 'decimal:4', 'compare_amount' => 'decimal:4', 'is_active' => 'boolean', 'priority' => 'integer', 'min_quantity' => 'integer', 'max_quantity' => 'integer', 'valid_from' => 'datetime', 'valid_until' => 'datetime'];
+        return ['net_amount' => 'decimal:4', 'compare_amount' => 'decimal:4', 'is_active' => 'boolean', 'is_featured' => 'boolean', 'priority' => 'integer', 'min_quantity' => 'integer', 'max_quantity' => 'integer', 'valid_from' => 'datetime', 'valid_until' => 'datetime'];
     }
 
     /**
@@ -97,7 +97,7 @@ final class PriceListItem extends Model
             return $this->product->trans('name') ?: $this->product->name;
         }
 
-        return 'Price List Item #'.$this->id;
+        return 'Price List Item #' . $this->id;
     }
 
     /**
@@ -158,7 +158,7 @@ final class PriceListItem extends Model
     /**
      * Handle scopeActive functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeActive($query)
     {
@@ -168,15 +168,15 @@ final class PriceListItem extends Model
     /**
      * Handle scopeValid functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeValid($query)
     {
         $now = now();
 
-        return $query->where('is_active', true)->where(function ($q) use ($now) {
+        return $query->where('is_active', true)->where(function ($q) use ($now): void {
             $q->whereNull('valid_from')->orWhere('valid_from', '<=', $now);
-        })->where(function ($q) use ($now) {
+        })->where(function ($q) use ($now): void {
             $q->whereNull('valid_until')->orWhere('valid_until', '>=', $now);
         });
     }
@@ -184,7 +184,7 @@ final class PriceListItem extends Model
     /**
      * Handle scopeByPriority functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByPriority($query, string $direction = 'asc')
     {
@@ -194,7 +194,7 @@ final class PriceListItem extends Model
     /**
      * Handle scopeForProduct functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeForProduct($query, int $productId)
     {
@@ -204,7 +204,7 @@ final class PriceListItem extends Model
     /**
      * Handle scopeForVariant functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeForVariant($query, int $variantId)
     {
@@ -214,7 +214,7 @@ final class PriceListItem extends Model
     /**
      * Handle scopeInPriceRange functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeInPriceRange($query, float $minPrice, float $maxPrice)
     {
@@ -224,7 +224,7 @@ final class PriceListItem extends Model
     /**
      * Handle scopeWithDiscount functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithDiscount($query)
     {

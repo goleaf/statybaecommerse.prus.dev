@@ -41,11 +41,14 @@ final class BrandContract
         $data = ['items' => $mapped];
 
         if ($paginator instanceof LengthAwarePaginator) {
-            $data['pagination'] = [
+            // Surface pagination details alongside other metadata to respect the
+            // published JSON schema that disallows arbitrary members under the
+            // data payload for collection responses.
+            $meta['pagination'] = [
                 'current_page' => $paginator->currentPage(),
-                'last_page' => $paginator->lastPage(),
-                'per_page' => $paginator->perPage(),
-                'total' => $paginator->total(),
+                'last_page'    => $paginator->lastPage(),
+                'per_page'     => $paginator->perPage(),
+                'total'        => $paginator->total(),
             ];
             $meta['total'] = $paginator->total();
         } else {
@@ -58,13 +61,13 @@ final class BrandContract
     private static function mapBrand(Brand $brand): array
     {
         return [
-            'id' => $brand->getKey(),
-            'slug' => (string) $brand->slug,
-            'name' => (string) $brand->name,
-            'description' => $brand->description,
-            'website' => $brand->website ? (string) $brand->website : null,
+            'id'             => $brand->getKey(),
+            'slug'           => (string) $brand->slug,
+            'name'           => (string) $brand->name,
+            'description'    => $brand->description,
+            'website'        => $brand->website ? (string) $brand->website : null,
             'products_count' => $brand->products_count ?? null,
-            'links' => [
+            'links'          => [
                 'self' => route('brands.show', $brand->slug),
             ],
         ];
@@ -78,9 +81,9 @@ final class BrandContract
 
         return [
             'contract' => self::CONTRACT,
-            'version' => self::VERSION,
-            'data' => $data,
-            'meta' => $meta,
+            'version'  => self::VERSION,
+            'data'     => $data,
+            'meta'     => $meta,
         ];
     }
 }

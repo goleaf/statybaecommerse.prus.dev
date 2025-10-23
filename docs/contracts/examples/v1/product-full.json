@@ -1,0 +1,51 @@
+{
+  "id": 42,
+  "sku": "LT-PRO-9876",
+  "title": "Profesionalus kampinis šlifuoklis",
+  "description": "Galingas 1500W įrankis su vibracijos kontrole ir dulkių nutraukimu.",
+  "price": 249.5,
+  "currency": "EUR",
+  "stock": 12,
+  "media": [
+    {
+      "type": "image",
+      "url": "https://cdn.example.com/products/lt-pro-9876/main.jpg",
+      "alt": "Profesionalus kampinis šlifuoklis",
+      "primary": true,
+      "variants": {
+        "thumb": "https://cdn.example.com/products/lt-pro-9876/thumb.jpg",
+        "zoom": "https://cdn.example.com/products/lt-pro-9876/zoom.jpg"
+      }
+    }
+  ],
+  "categories": [
+    {
+      "id": 7,
+      "slug": "elektriniai-irankiai",
+      "title": "Elektriniai įrankiai"
+    },
+    {
+      "id": 15,
+      "slug": "kampiniai-slifavimai",
+      "title": "Kampiniai šlifuokliai"
+    }
+  ],
+  "attributes": {
+    "galia": "1500W",
+    "diskas": "125mm",
+    "apsukos": 11000,
+    "svoris": 2.8,
+    "funkcijos": [
+      "Reguliuojami apsukos",
+      "Greitas disko keitimas"
+    ]
+  },
+  "status": "active",
+  "slug": "profesionalus-kampinis-slifuoklis",
+  "brand": {
+    "id": 3,
+    "slug": "bosch",
+    "name": "Bosch",
+    "logo": "https://cdn.example.com/brands/bosch/logo.svg"
+  }
+}

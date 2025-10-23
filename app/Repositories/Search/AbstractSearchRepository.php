@@ -13,8 +13,7 @@ abstract class AbstractSearchRepository
     public function __construct(
         protected ConnectionInterface $connection,
         protected SearchCacheService $cache
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<int, array<string, mixed>>

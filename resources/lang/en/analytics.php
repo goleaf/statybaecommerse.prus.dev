@@ -16,6 +16,7 @@ return [
     'status' => 'Status',
     'pending' => 'Pending',
     'processing' => 'Processing',
+    'completed' => 'Completed',
     'shipped' => 'Shipped',
     'delivered' => 'Delivered',
     'cancelled' => 'Cancelled',
@@ -88,6 +89,11 @@ return [
     'featured' => 'featured',
     'report_exported_successfully' => 'Report exported successfully',
     'data_refreshed_successfully' => 'Data refreshed successfully',
+    'summary' => [
+        'orders_count' => 'Orders',
+        'total_revenue' => 'Total revenue',
+        'average_order_value' => 'Average order value',
+    ],
     'enhanced_overview' => [
         'title' => 'Enhanced E-commerce Overview',
         'navigation_label' => 'Enhanced E-commerce Overview',

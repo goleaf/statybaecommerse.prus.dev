@@ -4,31 +4,36 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\RecommendationConfigResourceSimple\Pages;
 use App\Models\RecommendationConfigSimple;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Novadaemon\FilamentCombobox\Combobox;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Collection;
-use Novadaemon\FilamentCombobox\Combobox;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class RecommendationConfigResourceSimple extends Resource
 {
     protected static ?string $model = RecommendationConfigSimple::class;
@@ -52,13 +57,13 @@ final class RecommendationConfigResourceSimple extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->components([
+        return $schema->components([
             Section::make(__('recommendation_configs_simple.basic_information'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('name')
                                 ->label(__('recommendation_configs_simple.name'))
                                 ->required()
@@ -77,9 +82,9 @@ final class RecommendationConfigResourceSimple extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make(__('recommendation_configs_simple.algorithm_settings'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             Select::make('algorithm_type')
                                 ->label(__('recommendation_configs_simple.algorithm_type'))
                                 ->options([
@@ -103,7 +108,7 @@ final class RecommendationConfigResourceSimple extends Resource
                                 ->helperText(__('recommendation_configs_simple.min_score_help')),
                         ]),
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('max_results')
                                 ->label(__('recommendation_configs_simple.max_results'))
                                 ->numeric()
@@ -122,7 +127,7 @@ final class RecommendationConfigResourceSimple extends Resource
                         ]),
                 ]),
             Section::make(__('recommendation_configs_simple.filtering'))
-                ->components([
+                ->schema([
                     Grid::make(2)
                         ->components([
                             Combobox::make('products')
@@ -131,7 +136,6 @@ final class RecommendationConfigResourceSimple extends Resource
                                 ->multiple()
                                 ->searchable()
                                 ->boxSearchs(true)
-                                ->height('360px')
                                 ->preload()
                                 ->afterStateHydrated(fn (Combobox $component, ?array $state) => $component->state(collect($state)->filter()->sort()->values()->toArray()))
                                 ->dehydrateStateUsing(fn (?array $state) => collect($state)->filter()->sort()->values()->toArray())
@@ -148,7 +152,6 @@ final class RecommendationConfigResourceSimple extends Resource
                                 ->multiple()
                                 ->searchable()
                                 ->boxSearchs(true)
-                                ->height('360px')
                                 ->preload()
                                 ->afterStateHydrated(fn (Combobox $component, ?array $state) => $component->state(collect($state)->filter()->sort()->values()->toArray()))
                                 ->dehydrateStateUsing(fn (?array $state) => collect($state)->filter()->sort()->values()->toArray())
@@ -161,7 +164,7 @@ final class RecommendationConfigResourceSimple extends Resource
                                 ]),
                         ]),
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             Toggle::make('exclude_out_of_stock')
                                 ->label(__('recommendation_configs_simple.exclude_out_of_stock'))
                                 ->default(true),
@@ -171,9 +174,9 @@ final class RecommendationConfigResourceSimple extends Resource
                         ]),
                 ]),
             Section::make(__('recommendation_configs_simple.weighting'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('price_weight')
                                 ->label(__('recommendation_configs_simple.price_weight'))
                                 ->numeric()
@@ -192,7 +195,7 @@ final class RecommendationConfigResourceSimple extends Resource
                                 ->helperText(__('recommendation_configs_simple.rating_weight_help')),
                         ]),
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('popularity_weight')
                                 ->label(__('recommendation_configs_simple.popularity_weight'))
                                 ->numeric()
@@ -211,7 +214,7 @@ final class RecommendationConfigResourceSimple extends Resource
                                 ->helperText(__('recommendation_configs_simple.recency_weight_help')),
                         ]),
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('category_weight')
                                 ->label(__('recommendation_configs_simple.category_weight'))
                                 ->numeric()
@@ -231,9 +234,9 @@ final class RecommendationConfigResourceSimple extends Resource
                         ]),
                 ]),
             Section::make(__('recommendation_configs_simple.settings'))
-                ->components([
+                ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             Toggle::make('is_active')
                                 ->label(__('recommendation_configs_simple.is_active'))
                                 ->default(true),
@@ -241,7 +244,7 @@ final class RecommendationConfigResourceSimple extends Resource
                                 ->label(__('recommendation_configs_simple.is_default')),
                         ]),
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             TextInput::make('cache_duration')
                                 ->label(__('recommendation_configs_simple.cache_duration'))
                                 ->numeric()
@@ -268,8 +271,9 @@ final class RecommendationConfigResourceSimple extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('name')

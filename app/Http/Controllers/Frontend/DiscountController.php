@@ -5,66 +5,125 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ApplyCouponRequest;
-use App\Services\Discounts\CouponApplicationService;
-use App\Services\Discounts\DiscountContextBuilder;
-use Illuminate\Http\JsonResponse;
+use App\Models\Coupon;
+use App\Models\Discount;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
 
 final class DiscountController extends Controller
 {
-    public function __construct(
-        private readonly CouponApplicationService $couponService,
-        private readonly DiscountContextBuilder $contextBuilder,
-    ) {}
-
-    public function index(Request $request): JsonResponse
+    public function index(): View
     {
-        $context = $this->contextBuilder->fromRequest($request);
+        $discounts = Discount::query()
+            ->active()
+            ->orderByDesc('priority')
+            ->paginate(12);
 
-        return response()->json([
-            'coupons' => $this->couponService->getAvailableCoupons($context),
-        ]);
+        return view('frontend.discounts.index', compact('discounts'));
     }
 
-    public function coupons(Request $request): View|JsonResponse
+    public function coupons(): View
     {
-        $context = $this->contextBuilder->fromRequest($request);
-        $coupons = $this->couponService->getAvailableCoupons($context);
+        $coupons = Coupon::query()
+            ->valid()
+            ->orderByDesc('created_at')
+            ->paginate(12);
 
-        if ($request->wantsJson()) {
-            return response()->json(['coupons' => $coupons]);
+        return view('frontend.discounts.coupons', compact('coupons'));
+    }
+
+    public function applyCoupon(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'code' => ['required', 'string'],
+        ]);
+
+        $cart = Session::get('cart', []);
+        if (empty($cart)) {
+            return redirect()->route('frontend.cart.index')->withErrors([
+                'cart' => __('Add items to your cart before applying a coupon.'),
+            ]);
         }
 
-        return view('frontend.discounts.coupons', [
-            'coupons' => $coupons,
-            'hasAppliedCoupon' => $request->session()->has('checkout.coupon.code'),
+        $coupon = Coupon::query()->valid()->byCode($validated['code'])->first();
+
+        if (! $coupon) {
+            return redirect()->back()->withErrors([
+                'code' => __('The provided coupon code is not valid.'),
+            ]);
+        }
+
+        $summary = $this->buildCartSummary();
+
+        if ($coupon->minimum_amount && $summary['subtotal'] < $coupon->minimum_amount) {
+            return redirect()->back()->withErrors([
+                'code' => __('This coupon requires a minimum order amount of :amount.', ['amount' => app_money_format($coupon->minimum_amount ?? 0)]),
+            ]);
+        }
+
+        $discountAmount = $this->calculateDiscount($coupon, $summary['subtotal']);
+
+        Session::put('cart_discount', $discountAmount);
+        Session::put('applied_coupon', [
+            'id' => $coupon->getKey(),
+            'code' => $coupon->code,
         ]);
+
+        return redirect()->route('frontend.cart.index')->with('status', 'coupon-applied');
     }
 
-    public function applyCoupon(ApplyCouponRequest $request): JsonResponse
+    public function removeCoupon(): RedirectResponse
     {
-        $context = $this->contextBuilder->fromRequest($request, $request->validated('code'));
-        $result = $this->couponService->apply($request->validated('code'), $context);
+        Session::forget('cart_discount');
+        Session::forget('applied_coupon');
 
-        return response()->json($result, $result['success'] ? 200 : 422);
+        return redirect()->route('frontend.cart.index')->with('status', 'coupon-removed');
     }
 
-    public function removeCoupon(Request $request): JsonResponse
+    private function calculateDiscount(Coupon $coupon, float $subtotal): float
     {
-        $context = $this->contextBuilder->fromRequest($request);
+        $discount = 0.0;
 
-        return response()->json($this->couponService->remove($context));
+        if ($coupon->type === 'percentage') {
+            $discount = $subtotal * ((float) $coupon->value / 100);
+        } else {
+            $discount = (float) $coupon->value;
+        }
+
+        if ($coupon->maximum_discount) {
+            $discount = min($discount, (float) $coupon->maximum_discount);
+        }
+
+        if ($coupon->type === 'fixed') {
+            $discount = min($discount, $subtotal);
+        }
+
+        return round(max($discount, 0), 2);
     }
 
-    public function show(string $id): JsonResponse
+    private function buildCartSummary(): array
     {
-        return response()->json(['message' => 'Discount details not implemented yet', 'id' => $id]);
-    }
+        $cart = Session::get('cart', []);
+        $subtotal = 0.0;
 
-    public function validate(Request $request): JsonResponse
-    {
-        return response()->json(['message' => 'Discount validation not implemented yet']);
+        foreach ($cart as $item) {
+            $subtotal += (float) ($item['price'] ?? 0) * (int) ($item['quantity'] ?? 0);
+        }
+
+        $taxRate = config('shared.tax.default_rate', 0.21);
+        $tax = $subtotal * $taxRate;
+        $shipping = $subtotal > 50 ? 0 : 5.99;
+        $discount = (float) Session::get('cart_discount', 0);
+        $total = $subtotal + $tax + $shipping - $discount;
+
+        return [
+            'subtotal' => round($subtotal, 2),
+            'tax' => round($tax, 2),
+            'shipping' => round($shipping, 2),
+            'discount' => round($discount, 2),
+            'total' => round(max($total, 0), 2),
+        ];
     }
 }

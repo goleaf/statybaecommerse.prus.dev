@@ -9,5 +9,7 @@ use App\Filament\Resources\EnumManagementResource;
 
 final class ListEnums extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = EnumManagementResource::class;
 }

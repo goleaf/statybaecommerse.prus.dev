@@ -11,9 +11,9 @@ use App\Models\User;
 use App\Support\ListQuery\ListQueryDefinition;
 use App\Support\ListQuery\ListQueryValidator;
 use App\Support\ListQuery\ListResponse;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Database\Eloquent\Builder;
 
 /**
  * UserController
@@ -146,5 +146,49 @@ class UserController extends Controller
         $activity = ['user_id' => $user->id, 'user_name' => $user->name, 'last_login_at' => $user->last_login_at?->toISOString(), 'last_activity_at' => $user->last_activity_at?->toISOString(), 'login_count' => $user->login_count, 'orders_count' => $user->orders()->count(), 'reviews_count' => $user->reviews()->count(), 'wishlist_count' => $user->wishlist()->count(), 'addresses_count' => $user->addresses()->count(), 'total_spent' => $user->total_spent, 'average_order_value' => $user->average_order_value, 'last_order_date' => $user->last_order_date, 'is_on_trial' => $user->isOnTrial(), 'has_active_subscription' => $user->hasActiveSubscription(), 'subscription_status' => $user->subscription_status, 'referral_stats' => $user->referral_stats];
 
         return response()->json(['success' => true, 'data' => $activity, 'timestamp' => now()->toISOString()]);
+}
+
+    private function userListDefinition(): ListQueryDefinition
+    {
+        return ListQueryDefinition::make()
+            ->defaultPerPage(15)
+            ->maxPerPage(100)
+            ->defaultSort('created_at', 'desc')
+            ->allowedSorts([
+                'created_at' => ['column' => 'created_at'],
+                'name' => ['column' => ['name', 'id']],
+                'email' => ['column' => ['email', 'id']],
+                'last_login_at' => ['column' => 'last_login_at'],
+            ])
+            ->filters([
+                'search' => [
+                    'type' => 'string',
+                    'nullable' => true,
+                    'callback' => static function (Builder $builder, string $search): void {
+                        $builder->where(static function (Builder $query) use ($search): void {
+                            $query->where('name', 'like', '%'.$search.'%')
+                                ->orWhere('email', 'like', '%'.$search.'%')
+                                ->orWhere('first_name', 'like', '%'.$search.'%')
+                                ->orWhere('last_name', 'like', '%'.$search.'%');
+                        });
+                    },
+                ],
+                'status' => [
+                    'type' => 'bool',
+                    'nullable' => true,
+                    'callback' => static function (Builder $builder, bool $status): void {
+                        $builder->where('is_active', $status);
+                    },
+                ],
+                'role' => [
+                    'type' => 'string',
+                    'nullable' => true,
+                    'callback' => static function (Builder $builder, string $role): void {
+                        $builder->whereHas('roles', static function (Builder $query) use ($role): void {
+                            $query->where('name', $role);
+                        });
+                    },
+                ],
+            ]);
     }
 }

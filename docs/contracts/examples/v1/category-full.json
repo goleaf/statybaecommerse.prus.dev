@@ -1,0 +1,28 @@
+{
+  "id": 12,
+  "slug": "elektriniai-irankiai",
+  "title": "Elektriniai įrankiai",
+  "parent_id": 5,
+  "path": ["statyba", "irankiai", "elektriniai-irankiai"],
+  "order": 3,
+  "children": [
+    {
+      "id": 13,
+      "slug": "kampiniai-slifavimai",
+      "title": "Kampiniai šlifuokliai",
+      "parent_id": 12,
+      "path": ["statyba", "irankiai", "elektriniai-irankiai", "kampiniai-slifavimai"],
+      "order": 1,
+      "children": []
+    },
+    {
+      "id": 14,
+      "slug": "gręzimo-irankiai",
+      "title": "Gręžimo įrankiai",
+      "parent_id": 12,
+      "path": ["statyba", "irankiai", "elektriniai-irankiai", "grezimo-irankiai"],
+      "order": 2,
+      "children": []
+    }
+  ]
+}

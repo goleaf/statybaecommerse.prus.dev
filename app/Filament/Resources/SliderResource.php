@@ -4,21 +4,27 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\SliderResource\Pages;
 use App\Models\Slider;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ContentLinkSearch;
+use App\Support\Search\SearchResultPayload;
 use BackedEnum;
+
+use function collect;
+
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\BulkActionGroup as TableBulkActionGroup;
 use Filament\Tables\Actions\DeleteAction as TableDeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction as TableDeleteBulkAction;
@@ -29,15 +35,21 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use UnitEnum;
 
 final class SliderResource extends Resource
 {
     protected static ?string $model = Slider::class;
 
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    /** @var UnitEnum|string|null */
+    /**
+     * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
+     */
     protected static UnitEnum|string|null $navigationGroup = 'Content';
 
     protected static ?int $navigationSort = 4;
@@ -68,9 +80,9 @@ final class SliderResource extends Resource
         return __('sliders.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('sliders.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -90,7 +102,9 @@ final class SliderResource extends Resource
                         ->columnSpanFull(),
                     SearchableInput::make('button_url')
                         ->label(__('sliders.button_url'))
-                        ->placeholder(__('sliders.link_search.placeholder'))
+                        ->placeholder(__('sliders.button_url_placeholder'))
+                        ->helperText(__('sliders.button_url_helper'))
+                        ->searchUsing(fn (string $term): array => ContentLinkSearch::suggest($term))
                         ->maxLength(255)
                         ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                         ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
@@ -102,13 +116,13 @@ final class SliderResource extends Resource
                                 static fn (string $value): ?array => ['value' => $value, 'label' => $value],
                             );
                         })
-                        ->afterStateUpdated(function (?string $state, callable $set): void {
+                        ->afterStateUpdated(function (SearchableInput $component, ?string $state, callable $set): void {
                             if ($state !== null && $state !== '') {
                                 return;
                             }
 
                             // Clear button URL metadata whenever the selection resets.
-                            SearchableInputHelper::clear($set, ['button_url' => null]);
+                            SearchableInputHelper::clear($component, $set, ['button_url' => null]);
                         })
                         ->columnSpanFull(),
                 ]),
@@ -150,8 +164,9 @@ final class SliderResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 ImageColumn::make('image')

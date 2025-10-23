@@ -4,39 +4,43 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\LocationResource\Pages;
-use App\Models\City;
-use App\Models\Country;
 use App\Models\Location;
-use App\Support\Filament\Components\Flatpickr;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Tables;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class LocationResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Location::class;
 
     /**
@@ -58,9 +62,9 @@ final class LocationResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('locations.basic_information'))
                 ->components([
                     Grid::make(2)
@@ -97,6 +101,13 @@ final class LocationResource extends Resource
                                             $set('country_code', $country->code);
                                         }
                                     }
+
+                                    $country = Country::find($state);
+                                    if ($country === null) {
+                                        return;
+                                    }
+
+                                    $set('country_code', $country->code);
                                 }),
                             Select::make('city_id')
                                 ->label(__('locations.fields.city'))
@@ -111,6 +122,13 @@ final class LocationResource extends Resource
                                             $set('city_code', $city->code);
                                         }
                                     }
+
+                                    $city = City::find($state);
+                                    if ($city === null) {
+                                        return;
+                                    }
+
+                                    $set('city_code', $city->code);
                                 }),
                             TextInput::make('country_code')
                                 ->label(__('locations.fields.country_code'))
@@ -255,8 +273,9 @@ final class LocationResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('name')
@@ -326,11 +345,8 @@ final class LocationResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('country_id')
+                SelectFilter::make('country_code')
                     ->relationship('country', 'name')
-                    ->preload(),
-                SelectFilter::make('city_id')
-                    ->relationship('city', 'name')
                     ->preload(),
                 SelectFilter::make('type')
                     ->options([
@@ -389,7 +405,7 @@ final class LocationResource extends Resource
                     ->icon(fn (Location $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                     ->color(fn (Location $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (Location $record): void {
-                        $record->update(['is_active' => ! $record->is_active]);
+                        $record->update(['is_enabled' => ! $record->is_enabled]);
                         Notification::make()
                             ->title($record->is_active ? __('locations.messages.activated') : __('locations.messages.deactivated'))
                             ->success()
@@ -443,7 +459,7 @@ final class LocationResource extends Resource
                         ->icon('heroicon-o-eye')
                         ->color('success')
                         ->action(function (Collection $records): void {
-                            $records->each->update(['is_active' => true]);
+                            $records->each->update(['is_enabled' => true]);
                             Notification::make()
                                 ->title(__('locations.messages.bulk_activated_success'))
                                 ->success()
@@ -455,7 +471,7 @@ final class LocationResource extends Resource
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
                         ->action(function (Collection $records): void {
-                            $records->each->update(['is_active' => false]);
+                            $records->each->update(['is_enabled' => false]);
                             Notification::make()
                                 ->title(__('locations.messages.bulk_deactivated_success'))
                                 ->success()

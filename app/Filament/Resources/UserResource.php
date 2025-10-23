@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Data\ExportRequestData;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
@@ -11,22 +13,23 @@ use App\Services\Export\ExportColumn;
 use App\Services\Export\Exporters\UserExport;
 use App\Services\Export\ExportService;
 use App\Support\Authorization\AuthorizationMatrix;
+use App\Support\Forms\MatrixFactory;
 use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
+use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -34,18 +37,20 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
-use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 /**
  * UserResource
  *
  * Filament v4 resource for User management in the admin panel with comprehensive CRUD operations, filters, and actions.
  */
-final class UserResource extends Resource
+final class UserResource extends Resource implements DefinesExportColumns
 {
     use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
 
@@ -129,9 +134,9 @@ final class UserResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('users.sections.basic_info'))
                     ->schema([
@@ -172,6 +177,30 @@ final class UserResource extends Resource
                             ->default(true),
                     ])
                     ->columns(1),
+                Section::make(__('users.sections.permissions'))
+                    ->schema([
+                        MatrixFactory::permissions(
+                            [
+                                'products'   => __('users.permissions.rows.products'),
+                                'categories' => __('users.permissions.rows.categories'),
+                                'brands'     => __('users.permissions.rows.brands'),
+                                'orders'     => __('users.permissions.rows.orders'),
+                                'users'      => __('users.permissions.rows.users'),
+                            ],
+                            [
+                                'viewAny' => __('users.permissions.columns.view_any'),
+                                'view'    => __('users.permissions.columns.view'),
+                                'create'  => __('users.permissions.columns.create'),
+                                'update'  => __('users.permissions.columns.update'),
+                                'delete'  => __('users.permissions.columns.delete'),
+                            ],
+                        )
+                            ->label(__('users.fields.permissions_matrix'))
+                            ->helperText(__('users.permissions.helper_text'))
+                            ->columnSpanFull()
+                            ->live(),
+                    ])
+                    ->columns(1),
                 Section::make(__('users.sections.profile'))
                     ->schema([
                         FileUpload::make('avatar_url')
@@ -191,8 +220,9 @@ final class UserResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 ImageColumn::make('avatar_url')
@@ -249,7 +279,9 @@ final class UserResource extends Resource
             ->bulkActions([
                 BulkActionGroup::make([
                     BulkAction::make('export_selected')
-                        ->label(__('Export selected'))
+                        ->label(__('exports.filament.bulk_action.label'))
+                        ->modalHeading(__('exports.filament.bulk_action.modal_heading', ['label' => self::getPluralModelLabel()]))
+                        ->modalDescription(__('exports.filament.bulk_action.modal_description'))
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('success')
                         ->form([
@@ -263,10 +295,11 @@ final class UserResource extends Resource
                                 ->default('csv')
                                 ->required(),
                             CheckboxList::make('columns')
-                                ->label(__('Columns'))
+                                ->label(__('exports.filament.bulk_action.columns_label'))
                                 ->options(fn () => collect(app(UserExport::class)->columns())->mapWithKeys(fn (ExportColumn $column) => [$column->key => $column->label])->all())
                                 ->default(fn () => app(UserExport::class)->defaultColumns())
                                 ->columns(2)
+                                ->helperText(__('exports.filament.bulk_action.columns_help'))
                                 ->required(),
                         ])
                         ->action(function (Collection $records, array $data): void {
@@ -285,8 +318,8 @@ final class UserResource extends Resource
                             $service->queue($request);
 
                             Notification::make()
-                                ->title(__('Export queued'))
-                                ->body(__('You will receive a notification once the export has finished.'))
+                                ->title(__('exports.filament.bulk_action.success'))
+                                ->body(__('exports.filament.bulk_action.success_body'))
                                 ->success()
                                 ->send();
                         })
@@ -319,6 +352,64 @@ final class UserResource extends Resource
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::canViewAny();
+    }
+
+    public static function canViewAny(): bool
+    {
+        return static::authorizeUser(null, 'viewAny');
+    }
+
+    public static function canCreate(): bool
+    {
+        return static::authorizeUser(null, 'create');
+    }
+
+    public static function canView(User $record): bool
+    {
+        return static::authorizeUser($record, 'view');
+    }
+
+    public static function canEdit(User $record): bool
+    {
+        return static::authorizeUser($record, 'update');
+    }
+
+    public static function canDelete(User $record): bool
+    {
+        return static::authorizeUser($record, 'delete');
+    }
+
+    public static function canRestore(User $record): bool
+    {
+        return static::authorizeUser($record, 'restore');
+    }
+
+    /**
+     * @return array<string, ExportColumn>
+     */
+    public static function availableExportColumns(): array
+    {
+        return [
+            'name' => new ExportColumn('name', __('users.fields.name'), fn (User $user): string => (string) $user->name),
+            'email' => new ExportColumn('email', __('users.fields.email'), fn (User $user): string => (string) $user->email),
+            'is_active' => new ExportColumn('is_active', __('users.fields.is_active'), fn (User $user): string => $user->is_active ? __('exports.boolean.yes') : __('exports.boolean.no')),
+            'is_verified' => new ExportColumn('is_verified', __('users.fields.is_verified'), fn (User $user): string => $user->is_verified ? __('exports.boolean.yes') : __('exports.boolean.no')),
+            'roles' => new ExportColumn('roles', __('users.fields.roles'), fn (User $user): string => (string) $user->roles_label),
+            'created_at' => new ExportColumn('created_at', __('users.fields.created_at'), fn (User $user): string => optional($user->created_at)->toDateTimeString() ?? ''),
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function exportColumnOptions(): array
+    {
+        return array_map(static fn (ExportColumn $column): string => $column->label, self::availableExportColumns());
     }
 
     /**

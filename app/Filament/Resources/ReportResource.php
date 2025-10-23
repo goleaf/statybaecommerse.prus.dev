@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\ReportResource\Pages;
 use App\Models\Report;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
+use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\KeyValue;
@@ -20,7 +21,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\RepeatableEntry\TableColumn;
@@ -78,9 +78,9 @@ final class ReportResource extends Resource
         return __('reports.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->columns(3)
             ->schema([
                 Section::make(__('reports.sections.basic_info'))
@@ -89,6 +89,8 @@ final class ReportResource extends Resource
                     ->schema([
                         TextInput::make('name')
                             ->label(__('reports.fields.name'))
+                            ->translateLabel()
+                            ->translatable()
                             ->required()
                             ->maxLength(255)
                             ->live()
@@ -130,12 +132,16 @@ final class ReportResource extends Resource
                     ->schema([
                         Textarea::make('description')
                             ->label(__('reports.fields.description'))
+                            ->translateLabel()
+                            ->translatable()
                             ->maxLength(65535)
                             ->nullable()
                             ->rows(3)
                             ->columnSpanFull(),
                         Textarea::make('content')
                             ->label(__('reports.fields.content'))
+                            ->translateLabel()
+                            ->translatable()
                             ->maxLength(65535)
                             ->nullable()
                             ->rows(5)
@@ -214,8 +220,9 @@ final class ReportResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('name')
@@ -468,8 +475,9 @@ final class ReportResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Schema $schema): Schema   
     {
+        // Provide the infolist schema using the Filament v4 return type.
         return $schema
             ->schema([
                 Section::make(__('reports.sections.basic_info'))
@@ -536,13 +544,9 @@ final class ReportResource extends Resource
                         TextEntry::make('schedule_frequency')
                             ->label(__('reports.fields.schedule_frequency'))
                             ->formatStateUsing(
-                                function (?string $state): ?string {
-                                    if (blank($state)) {
-                                        return null;
-                                    }
-
-                                    return __("reports.frequencies.{$state}");
-                                }
+                                fn (?string $state): ?string => blank($state)
+                                    ? null
+                                    : __("reports.frequencies.{$state}")
                             )
                             ->placeholder(__('reports.placeholders.no_schedule')),
                     ])

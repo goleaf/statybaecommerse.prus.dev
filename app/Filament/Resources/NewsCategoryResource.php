@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\NewsCategoryResource\Pages;
 use App\Models\NewsCategory;
 use BackedEnum;
@@ -12,7 +13,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Infolists;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
@@ -32,20 +32,22 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
 
 final class NewsCategoryResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = NewsCategory::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
     {
         return 'heroicon-o-tag';
     }
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): ?string
     {
-        return 'Content';
+        // Leverage the enum label to keep the group consistent across locales.
+        return NavigationGroup::Content->label();
     }
 
     protected static ?int $navigationSort = 2;
@@ -54,9 +56,9 @@ final class NewsCategoryResource extends Resource
 
     protected static ?string $pluralModelLabel = 'News Categories';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('news_categories.sections.category_information'))
                 ->schema([
                     TextInput::make('name')
@@ -64,7 +66,7 @@ final class NewsCategoryResource extends Resource
                         ->required()
                         ->maxLength(255)
                         ->live()
-                        ->afterStateUpdated(fn ($state, callable $set) => $set('slug', \Illuminate\Support\Str::slug($state)))
+                        ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state)))
                         ->placeholder(__('news_categories.fields.name'))
                         ->helperText(__('news_categories.fields.name') . ' ' . __('for all languages')),
                     TextInput::make('slug')
@@ -139,8 +141,9 @@ final class NewsCategoryResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('name')
@@ -265,14 +268,15 @@ final class NewsCategoryResource extends Resource
             ->defaultSort('sort_order')
             ->reorderable('sort_order')
             ->striped()
-            ->paginated([10, 25, 50, 100]);
+            ->paginationPageOptions([10, 25, 50, 100]);
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Schema $schema): Schema   
     {
+        // Provide the infolist schema using the Filament v4 return type.
         return $schema
             ->schema([
-                Infolists\Components\Section::make(__('news_categories.sections.category_details'))
+                Section::make(__('news_categories.sections.category_details'))
                     ->schema([
                         TextEntry::make('name')
                             ->label(__('news_categories.fields.name'))
@@ -296,7 +300,7 @@ final class NewsCategoryResource extends Resource
                             ->color('primary'),
                     ])
                     ->columns(2),
-                Infolists\Components\Section::make(__('news_categories.sections.display_settings'))
+                Section::make(__('news_categories.sections.display_settings'))
                     ->schema([
                         TextEntry::make('sort_order')
                             ->label(__('news_categories.fields.sort_order'))
@@ -322,7 +326,7 @@ final class NewsCategoryResource extends Resource
                             ->falseColor('danger'),
                     ])
                     ->columns(2),
-                Infolists\Components\Section::make(__('news_categories.sections.statistics'))
+                Section::make(__('news_categories.sections.statistics'))
                     ->schema([
                         TextEntry::make('news_count')
                             ->label(__('news_categories.fields.news_count'))

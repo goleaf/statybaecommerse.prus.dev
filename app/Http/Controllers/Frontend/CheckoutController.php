@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Services\Cart\CartLifecycleService;
@@ -16,14 +15,21 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Stringable;
+use Throwable;
 
 final class CheckoutController extends Controller
 {
     public function index(Request $request): View
     {
+        /** @var Collection<int, CartItem> $items */
+        /** @var Collection<int, CartItem> $items */
         $items = $this->getCartItems($request);
 
         return view('frontend.checkout.index', [
@@ -34,6 +40,32 @@ final class CheckoutController extends Controller
 
     public function process(Request $request, CartLifecycleService $cartLifecycleService): RedirectResponse|JsonResponse
     {
+        $throttleKey = $this->checkoutThrottleKey($request);
+        $maxAttempts = Config::get('checkout.rate_limit.attempts', 3);
+        if (! is_int($maxAttempts)) {
+            $maxAttempts = is_numeric($maxAttempts) ? (int) $maxAttempts : 3;
+        }
+
+        $decaySeconds = Config::get('checkout.rate_limit.decay_seconds', 60);
+        if (! is_int($decaySeconds)) {
+            $decaySeconds = is_numeric($decaySeconds) ? (int) $decaySeconds : 60;
+        }
+
+        if (RateLimiter::tooManyAttempts($throttleKey, $maxAttempts)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+
+            return $this->respondError(
+                $request,
+                __('auth.throttle', [
+                    'seconds' => $seconds,
+                    'minutes' => (int) ceil($seconds / 60),
+                ]),
+                429
+            );
+        }
+
+        RateLimiter::hit($throttleKey, $decaySeconds);
+
         $items = $this->getCartItems($request);
         if ($items->isEmpty()) {
             if ($request->expectsJson()) {
@@ -91,8 +123,18 @@ final class CheckoutController extends Controller
                 ]);
             }
 
-            return $order;
-        });
+                    OrderItem::query()->create([
+                        'order_id' => $order->getKey(),
+                        'product_id' => $item->product_id,
+                        'product_variant_id' => $item->product_variant_id,
+                        'name' => $snapshot['name'] ?? $product?->name,
+                        'sku' => $snapshot['sku'] ?? $product?->sku,
+                        'quantity' => $item->quantity,
+                        'unit_price' => (float) $item->price,
+                        'price' => (float) $item->price,
+                        'total' => $item->calculateSubtotal(),
+                        'notes' => $item->notes,
+                    ]);
 
         $cartLifecycleService->clearAfterCheckout(
             $request->user()?->id,
@@ -120,14 +162,37 @@ final class CheckoutController extends Controller
         return redirect()->route('frontend.checkout.success')->with('status', __('Order placed successfully.'));
     }
 
-    public function success(Request $request): View|RedirectResponse
-    {
-        $orderId = $request->session()->pull('checkout.last_order_id');
-        if (! $orderId) {
-            return redirect()->route('frontend.cart.index')->with('info', __('No recent checkout found.'));
+            return $this->respondError($request, __('ecommerce.payment_failed'), 500);
         }
 
+        RateLimiter::clear($throttleKey);
+
+        Session::forget('cart');
+        Session::forget('cart_discount');
+        Session::forget('applied_coupon');
+        Session::put('checkout_order_id', $order->getKey());
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('ecommerce.order_placed_successfully'),
+                'order_id' => $order->getKey(),
+            ]);
+        }
+
+        return redirect()->route('frontend.checkout.success')->with('status', __('ecommerce.order_placed_successfully'));
+    }
+
+    public function success(): View
+    {
+        $orderId = Session::get('checkout_order_id');
+
+        /** @var Order $order */
         $order = Order::withoutGlobalScopes()->with('items')->findOrFail($orderId);
+
+        if ($order->user_id !== null && $request->user()?->getKey() !== $order->user_id) {
+            abort(403);
+        }
 
         return view('frontend.checkout.success', [
             'order' => $order,
@@ -141,6 +206,9 @@ final class CheckoutController extends Controller
         return view('frontend.checkout.cancel');
     }
 
+    /**
+     * @return Collection<int, CartItem>
+     */
     private function getCartItems(Request $request): Collection
     {
         $sessionId = (string) $request->session()->getId();
@@ -173,11 +241,49 @@ final class CheckoutController extends Controller
             ->get();
     }
 
+    /**
+     * @param  Collection<int, CartItem>  $items
+     * @return array{item_count:int, subtotal:float, formatted_subtotal:string}
+     */
     private function summarize(Collection $items): array
     {
         $subtotal = (float) $items->sum(fn (CartItem $item) => $item->calculateSubtotal());
         $breakdown = app(PriceCalculator::class)->breakdown($subtotal);
 
         return ['item_count' => (int) $items->sum('quantity')] + $breakdown->toSummary();
+    }
+
+    private function respondError(Request $request, string $message, int $status, ?string $redirectRoute = null): RedirectResponse|JsonResponse
+    {
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => $message,
+            ], $status);
+        }
+
+        $flashKey = $status >= 500 ? 'error' : ($status === 429 ? 'warning' : 'error');
+
+        return redirect()->route($redirectRoute ?? 'frontend.checkout.index')->with($flashKey, $message);
+    }
+
+    private function checkoutThrottleKey(Request $request): string
+    {
+        $userId = $request->user()?->getAuthIdentifier();
+
+        if (is_int($userId) || is_string($userId)) {
+            return 'checkout:user:'.$userId;
+        }
+
+        if ($userId instanceof Stringable) {
+            return 'checkout:user:'.$userId->__toString();
+        }
+
+        $sessionId = (string) $request->session()->getId();
+        if ($sessionId === '') {
+            $sessionId = 'guest';
+        }
+
+        return sprintf('checkout:session:%s', $sessionId);
     }
 }

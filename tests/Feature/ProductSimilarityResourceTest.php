@@ -37,7 +37,7 @@ class ProductSimilarityResourceTest extends TestCase
             'similarity_score' => 0.85,
         ]);
 
-        Livewire::test(\App\Filament\Resources\ProductSimilarities\Pages\ListProductSimilarities::class)
+        Livewire::test(\App\Filament\Resources\ProductSimilarityResource\Pages\ListProductSimilarities::class)
             ->assertCanSeeTableRecords(ProductSimilarity::all());
     }
 
@@ -46,7 +46,7 @@ class ProductSimilarityResourceTest extends TestCase
         $product1 = Product::factory()->create();
         $product2 = Product::factory()->create();
 
-        Livewire::test(\App\Filament\Resources\ProductSimilarities\Pages\CreateProductSimilarity::class)
+        Livewire::test(\App\Filament\Resources\ProductSimilarityResource\Pages\CreateProductSimilarity::class)
             ->fillForm([
                 'product_id' => $product1->id,
                 'similar_product_id' => $product2->id,
@@ -77,7 +77,7 @@ class ProductSimilarityResourceTest extends TestCase
             'similarity_score' => 0.85,
         ]);
 
-        Livewire::test(\App\Filament\Resources\ProductSimilarities\Pages\EditProductSimilarity::class, [
+        Livewire::test(\App\Filament\Resources\ProductSimilarityResource\Pages\EditProductSimilarity::class, [
             'record' => $similarity->getRouteKey(),
         ])
             ->fillForm([
@@ -93,7 +93,23 @@ class ProductSimilarityResourceTest extends TestCase
         ]);
     }
 
-    // View page is not defined for this resource; skipping view test
+    public function test_can_view_product_similarity(): void
+    {
+        $product1 = Product::factory()->create(['name' => 'Product A']);
+        $product2 = Product::factory()->create(['name' => 'Product B']);
+
+        $similarity = ProductSimilarity::factory()->create([
+            'product_id' => $product1->id,
+            'similar_product_id' => $product2->id,
+            'algorithm_type' => 'cosine_similarity',
+            'similarity_score' => 0.9,
+        ]);
+
+        Livewire::test(\App\Filament\Resources\ProductSimilarityResource\Pages\ViewProductSimilarity::class, [
+            'record' => $similarity->getRouteKey(),
+        ])
+            ->assertSuccessful();
+    }
 
     public function test_can_filter_by_algorithm_type(): void
     {
@@ -115,7 +131,7 @@ class ProductSimilarityResourceTest extends TestCase
             'similarity_score' => 0.75,
         ]);
 
-        Livewire::test(\App\Filament\Resources\ProductSimilarities\Pages\ListProductSimilarities::class)
+        Livewire::test(\App\Filament\Resources\ProductSimilarityResource\Pages\ListProductSimilarities::class)
             ->filterTable('algorithm_type', 'cosine_similarity')
             ->assertCanSeeTableRecords(ProductSimilarity::where('algorithm_type', 'cosine_similarity')->get())
             ->assertCanNotSeeTableRecords(ProductSimilarity::where('algorithm_type', 'jaccard_similarity')->get());
@@ -139,7 +155,7 @@ class ProductSimilarityResourceTest extends TestCase
             'similarity_score' => 0.5,
         ]);
 
-        Livewire::test(\App\Filament\Resources\ProductSimilarities\Pages\ListProductSimilarities::class)
+        Livewire::test(\App\Filament\Resources\ProductSimilarityResource\Pages\ListProductSimilarities::class)
             ->filterTable('similarity_score_range', [
                 'min_score' => 0.8,
                 'max_score' => 1.0,
@@ -159,7 +175,7 @@ class ProductSimilarityResourceTest extends TestCase
             'algorithm_type' => 'cosine_similarity',
         ]);
 
-        Livewire::test(\App\Filament\Resources\ProductSimilarities\Pages\ListProductSimilarities::class)
+        Livewire::test(\App\Filament\Resources\ProductSimilarityResource\Pages\ListProductSimilarities::class)
             ->searchTable('Test Product 1')
             ->assertCanSeeTableRecords(ProductSimilarity::whereHas('product', function ($query) {
                 $query->where('name', 'like', '%Test Product 1%');
@@ -183,7 +199,7 @@ class ProductSimilarityResourceTest extends TestCase
             ]),
         ]);
 
-        Livewire::test(\App\Filament\Resources\ProductSimilarities\Pages\ListProductSimilarities::class)
+        Livewire::test(\App\Filament\Resources\ProductSimilarityResource\Pages\ListProductSimilarities::class)
             ->callTableBulkAction('delete', $similarities->pluck('id')->all())
             ->assertHasNoTableBulkActionErrors();
 

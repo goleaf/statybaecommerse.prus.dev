@@ -4,24 +4,37 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ProductFeatureResource\Pages;
 use App\Models\ProductFeature;
 use BackedEnum;
+use Filament\Actions\BulkActionGroup as TablesBulkActionGroup;
+use Filament\Actions\DeleteAction as TablesDeleteAction;
+use Filament\Actions\DeleteBulkAction as TablesDeleteBulkAction;
+use Filament\Actions\EditAction as TablesEditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Actions\BulkActionGroup as TablesBulkActionGroup;
-use Filament\Tables\Actions\DeleteAction as TablesDeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction as TablesDeleteBulkAction;
-use Filament\Tables\Actions\EditAction as TablesEditAction;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class ProductFeatureResource extends Resource
 {
-    protected static ?string $model = ProductFeature::class;
+    /**
+     * @var array<string, string>
+     */
+    private const FEATURE_TYPE_OPTIONS = [
+        'specification' => 'Specification',
+        'benefit' => 'Benefit',
+        'feature' => 'Feature',
+        'technical' => 'Technical',
+        'performance' => 'Performance',
+    ];
 
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
@@ -35,9 +48,9 @@ final class ProductFeatureResource extends Resource
 
     protected static ?int $navigationSort = 17;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Forms\Components\Select::make('product_id')
                 ->label('Product')
                 ->relationship('product', 'name')
@@ -73,8 +86,9 @@ final class ProductFeatureResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('product.name')
@@ -118,7 +132,7 @@ final class ProductFeatureResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('feature_type')
-                    ->options(self::getFeatureTypeOptions()),
+                    ->options(self::FEATURE_TYPE_OPTIONS),
                 Tables\Filters\SelectFilter::make('product_id')
                     ->relationship('product', 'name'),
                 Tables\Filters\TernaryFilter::make('is_active')

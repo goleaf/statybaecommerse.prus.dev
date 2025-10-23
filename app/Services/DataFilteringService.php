@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use ArrayAccess;
 use Illuminate\Support\Collection;
 
 /**
@@ -18,10 +19,19 @@ final class DataFilteringService
      */
     public function filterQualityProducts(Collection $products): Collection
     {
-        return $products->skipWhile(function ($product) {
-            // Skip products that don't meet quality standards
-            return empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug) || $product->stock_quantity <= 0 || ! $product->is_published;
-        });
+        return $products
+            ->filter(function ($product) {
+                // Keep only products that satisfy every quality requirement regardless of their position in the collection.
+                $name = (string) ($this->extractValue($product, 'name') ?? '');
+                $isVisible = (bool) ($this->extractValue($product, 'is_visible') ?? false);
+                $price = (float) ($this->extractValue($product, 'price') ?? 0.0);
+                $slug = (string) ($this->extractValue($product, 'slug') ?? '');
+                $stock = (int) ($this->extractValue($product, 'stock_quantity') ?? 0);
+                $isPublished = (bool) ($this->extractValue($product, 'is_published') ?? false);
+
+                return $name !== '' && $isVisible && $price > 0 && $slug !== '' && $stock > 0 && $isPublished;
+            })
+            ->values(); // Reindex results so pagination helpers receive tidy sequential keys.
     }
 
     /**
@@ -29,10 +39,17 @@ final class DataFilteringService
      */
     public function filterValidCollections(Collection $collections): Collection
     {
-        return $collections->skipWhile(function ($collection) {
-            // Skip collections that are not properly configured
-            return empty($collection->name) || ! $collection->is_visible || empty($collection->slug) || $collection->products_count <= 0;
-        });
+        return $collections
+            ->filter(function ($collection) {
+                // Retain only collections that have the required metadata and at least one product.
+                $name = (string) ($this->extractValue($collection, 'name') ?? '');
+                $isVisible = (bool) ($this->extractValue($collection, 'is_visible') ?? false);
+                $slug = (string) ($this->extractValue($collection, 'slug') ?? '');
+                $productsCount = (int) ($this->extractValue($collection, 'products_count') ?? 0);
+
+                return $name !== '' && $isVisible && $slug !== '' && $productsCount > 0;
+            })
+            ->values();
     }
 
     /**
@@ -40,12 +57,14 @@ final class DataFilteringService
      */
     public function filterRelevantResults(Collection $results, float $minRelevanceScore = 0.5): Collection
     {
-        return $results->skipWhile(function ($result) use ($minRelevanceScore) {
-            // Skip results with low relevance scores
-            $relevanceScore = $result['relevance_score'] ?? 0;
+        return $results
+            ->filter(function ($result) use ($minRelevanceScore) {
+                // Keep results that meet or exceed the configured relevance threshold.
+                $relevanceScore = (float) ($this->extractValue($result, 'relevance_score') ?? 0.0);
 
-            return $relevanceScore < $minRelevanceScore;
-        });
+                return $relevanceScore >= $minRelevanceScore;
+            })
+            ->values();
     }
 
     /**
@@ -53,12 +72,18 @@ final class DataFilteringService
      */
     public function filterNewRecommendations(Collection $recommendations, array $userInteractions = []): Collection
     {
-        return $recommendations->skipWhile(function ($recommendation) use ($userInteractions) {
-            // Skip recommendations for products user has already viewed/purchased
-            $productId = $recommendation->id ?? $recommendation['id'] ?? null;
+        return $recommendations
+            ->filter(function ($recommendation) use ($userInteractions) {
+                // Keep recommendations for products the user has not interacted with.
+                $productId = $this->extractValue($recommendation, 'id');
 
-            return in_array($productId, $userInteractions);
-        });
+                if ($productId === null) {
+                    return false;
+                }
+
+                return ! in_array($productId, $userInteractions, true);
+            })
+            ->values();
     }
 
     /**
@@ -66,10 +91,17 @@ final class DataFilteringService
      */
     public function filterActiveCategories(Collection $categories): Collection
     {
-        return $categories->skipWhile(function ($category) {
-            // Skip categories that have no products or are not visible
-            return ! $category->is_visible || empty($category->name) || empty($category->slug) || $category->products_count <= 0;
-        });
+        return $categories
+            ->filter(function ($category) {
+                // Keep categories that are visible, named, and contain products.
+                $isVisible = (bool) ($this->extractValue($category, 'is_visible') ?? false);
+                $name = (string) ($this->extractValue($category, 'name') ?? '');
+                $slug = (string) ($this->extractValue($category, 'slug') ?? '');
+                $productsCount = (int) ($this->extractValue($category, 'products_count') ?? 0);
+
+                return $isVisible && $name !== '' && $slug !== '' && $productsCount > 0;
+            })
+            ->values();
     }
 
     /**
@@ -77,10 +109,17 @@ final class DataFilteringService
      */
     public function filterActiveBrands(Collection $brands): Collection
     {
-        return $brands->skipWhile(function ($brand) {
-            // Skip brands that have no products or are not visible
-            return ! $brand->is_visible || empty($brand->name) || empty($brand->slug) || $brand->products_count <= 0;
-        });
+        return $brands
+            ->filter(function ($brand) {
+                // Keep brands that can be displayed on the storefront and contain products.
+                $isVisible = (bool) ($this->extractValue($brand, 'is_visible') ?? false);
+                $name = (string) ($this->extractValue($brand, 'name') ?? '');
+                $slug = (string) ($this->extractValue($brand, 'slug') ?? '');
+                $productsCount = (int) ($this->extractValue($brand, 'products_count') ?? 0);
+
+                return $isVisible && $name !== '' && $slug !== '' && $productsCount > 0;
+            })
+            ->values();
     }
 
     /**
@@ -88,10 +127,17 @@ final class DataFilteringService
      */
     public function filterActiveAttributes(Collection $attributes): Collection
     {
-        return $attributes->skipWhile(function ($attribute) {
-            // Skip attributes that have no values or are not visible
-            return ! $attribute->is_visible || empty($attribute->name) || empty($attribute->slug) || $attribute->values_count <= 0;
-        });
+        return $attributes
+            ->filter(function ($attribute) {
+                // Keep attributes that are visible and have at least one configured value.
+                $isVisible = (bool) ($this->extractValue($attribute, 'is_visible') ?? false);
+                $name = (string) ($this->extractValue($attribute, 'name') ?? '');
+                $slug = (string) ($this->extractValue($attribute, 'slug') ?? '');
+                $valuesCount = (int) ($this->extractValue($attribute, 'values_count') ?? 0);
+
+                return $isVisible && $name !== '' && $slug !== '' && $valuesCount > 0;
+            })
+            ->values();
     }
 
     /**
@@ -99,18 +145,23 @@ final class DataFilteringService
      */
     public function filterProductsByPriceRange(Collection $products, float $minPrice = 0, ?float $maxPrice = null): Collection
     {
-        return $products->filter(function ($product) use ($minPrice, $maxPrice) {
-            $price = $product->price ?? $product['price'] ?? 0;
-            // Include products within price range
-            if ($price < $minPrice) {
-                return false;
-            }
-            if ($maxPrice !== null && $price > $maxPrice) {
-                return false;
-            }
+        return $products
+            ->filter(function ($product) use ($minPrice, $maxPrice) {
+                // Normalise the price regardless of whether we receive arrays, objects, or ArrayAccess instances.
+                $price = (float) ($this->extractValue($product, 'price') ?? 0.0);
 
-            return true;
-        });
+                // Include only products that fit within the defined price range.
+                if ($price < $minPrice) {
+                    return false;
+                }
+
+                if ($maxPrice !== null && $price > $maxPrice) {
+                    return false;
+                }
+
+                return true;
+            })
+            ->values();
     }
 
     /**
@@ -118,12 +169,14 @@ final class DataFilteringService
      */
     public function filterInStockProducts(Collection $products): Collection
     {
-        return $products->skipWhile(function ($product) {
-            // Skip products that are out of stock
-            $stockQuantity = $product->stock_quantity ?? $product['stock_quantity'] ?? 0;
+        return $products
+            ->filter(function ($product) {
+                // Keep products with a positive stock quantity regardless of their placement in the dataset.
+                $stockQuantity = (int) ($this->extractValue($product, 'stock_quantity') ?? 0);
 
-            return $stockQuantity <= 0;
-        });
+                return $stockQuantity > 0;
+            })
+            ->values();
     }
 
     /**
@@ -131,10 +184,15 @@ final class DataFilteringService
      */
     public function filterPublishedProducts(Collection $products): Collection
     {
-        return $products->skipWhile(function ($product) {
-            // Skip products that are not published
-            return ! ($product->is_published ?? $product['is_published'] ?? false) || empty($product->published_at ?? $product['published_at'] ?? null);
-        });
+        return $products
+            ->filter(function ($product) {
+                // Keep products that have been published and expose a publication timestamp.
+                $isPublished = (bool) ($this->extractValue($product, 'is_published') ?? false);
+                $publishedAt = $this->extractValue($product, 'published_at');
+
+                return $isPublished && ! empty($publishedAt);
+            })
+            ->values();
     }
 
     /**
@@ -142,30 +200,49 @@ final class DataFilteringService
      */
     public function filterWithMultipleCriteria(Collection $items, array $criteria = []): Collection
     {
-        return $items->skipWhile(function ($item) use ($criteria) {
-            // Apply multiple filtering criteria
-            foreach ($criteria as $field => $condition) {
-                $value = $item->{$field} ?? $item[$field] ?? null;
-                if (is_array($condition)) {
-                    // Array condition: ['min' => 0, 'max' => 100]
-                    if (isset($condition['min']) && $value < $condition['min']) {
-                        return true;
+        return $items
+            ->filter(function ($item) use ($criteria) {
+                // Keep items that meet every provided criterion, even when invalid entries are interleaved.
+                foreach ($criteria as $field => $condition) {
+                    $value = $this->extractValue($item, $field);
+                    if (is_array($condition)) {
+                        if (array_key_exists('min', $condition) && $value < $condition['min']) {
+                            return false;
+                        }
+                        if (array_key_exists('max', $condition) && $value > $condition['max']) {
+                            return false;
+                        }
+                        if (array_key_exists('in', $condition) && ! in_array($value, $condition['in'])) {
+                            return false;
+                        }
+                        if (array_key_exists('not_in', $condition) && in_array($value, $condition['not_in'])) {
+                            return false;
+                        }
+                    } elseif ($value !== $condition) {
+                        return false;
                     }
-                    if (isset($condition['max']) && $value > $condition['max']) {
-                        return true;
-                    }
-                    if (isset($condition['in']) && ! in_array($value, $condition['in'])) {
-                        return true;
-                    }
-                    if (isset($condition['not_in']) && in_array($value, $condition['not_in'])) {
-                        return true;
-                    }
-                } elseif ($value !== $condition) {
-                    return true;
                 }
-            }
 
-            return false;
-        });
+                return true;
+            })
+            ->values();
+    }
+
+    private function extractValue(mixed $item, string $key): mixed
+    {
+        // Gracefully support array-like, ArrayAccess, and object payloads that surface throughout the service test suite.
+        if (is_array($item)) {
+            return $item[$key] ?? null;
+        }
+
+        if ($item instanceof ArrayAccess) {
+            return $item->offsetExists($key) ? $item[$key] : null;
+        }
+
+        if (is_object($item)) {
+            return $item->{$key} ?? null;
+        }
+
+        return null;
     }
 }

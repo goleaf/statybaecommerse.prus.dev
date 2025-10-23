@@ -15,6 +15,13 @@ class CreateUser extends CreateRecord
 
     protected static string $resource = UserResource::class;
 
+    protected function getHeaderActions(): array
+    {
+        return [
+            LocaleSwitcher::make(),
+        ];
+    }
+
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         return $data;

@@ -17,7 +17,8 @@ use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
+use Filament\Forms\Set;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -174,18 +175,18 @@ final class CalendarWidget extends FullCalendarWidget
     {
         return [
             Actions\CreateAction::make()
-                ->mountUsing(function (?Form $form, array $arguments = []): void {
-                    if (! $form) {
+                ->mountUsing(function (?Form $schema, array $arguments = []): void {
+                    if (! $schema) {
                         return;
                     }
 
-                    $form->fill();
+                    $schema->fill();
 
                     if (($arguments['type'] ?? null) !== 'select') {
                         return;
                     }
 
-                    $state = $this->normaliseFormState($form);
+                    $state = $this->normaliseFormState($schema);
                     $state = $this->prepareStateWithDateRange(
                         $state,
                         $arguments['start'] ?? null,
@@ -193,7 +194,7 @@ final class CalendarWidget extends FullCalendarWidget
                         array_key_exists('end', $arguments),
                     );
 
-                    $form->fill($state);
+                    $schema->fill($state);
                 })
                 ->mutateFormDataUsing(fn (array $data): array => $this->ensureSlug($data)),
         ];
@@ -203,14 +204,14 @@ final class CalendarWidget extends FullCalendarWidget
     {
         return [
             Actions\EditAction::make()
-                ->mountUsing(function (?Form $form, array $arguments = []): void {
-                    if (! $form) {
+                ->mountUsing(function (?Form $schema, array $arguments = []): void {
+                    if (! $schema) {
                         return;
                     }
 
-                    $form->fill();
+                    $schema->fill();
 
-                    $state = $this->normaliseFormState($form);
+                    $state = $this->normaliseFormState($schema);
 
                     if (in_array($arguments['type'] ?? null, ['drop', 'resize'], true)) {
                         $state = $this->prepareStateWithDateRange(
@@ -221,7 +222,7 @@ final class CalendarWidget extends FullCalendarWidget
                         );
                     }
 
-                    $form->fill($state);
+                    $schema->fill($state);
                 })
                 ->mutateFormDataUsing(fn (array $data): array => $this->ensureSlug($data)),
             Actions\DeleteAction::make(),
@@ -304,9 +305,9 @@ final class CalendarWidget extends FullCalendarWidget
     /**
      * @return array<string, mixed>
      */
-    private function normaliseFormState(Form $form): array
+    private function normaliseFormState(Form $schema): array
     {
-        $state = $form->getRawState();
+        $state = $schema->getRawState();
 
         if ($state instanceof Arrayable) {
             $state = $state->toArray();

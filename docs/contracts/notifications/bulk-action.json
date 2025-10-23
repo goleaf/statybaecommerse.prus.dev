@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "NotificationsBulkActionResponse",
+  "type": "object",
+  "required": ["success", "message", "count"],
+  "properties": {
+    "success": {
+      "type": "boolean",
+      "const": true
+    },
+    "message": {
+      "type": "string"
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 0
+    }
+  },
+  "examples": [
+    {
+      "success": true,
+      "message": "Marked 3 notifications as read",
+      "count": 3
+    }
+  ]
+}

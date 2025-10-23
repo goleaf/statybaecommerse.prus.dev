@@ -16,6 +16,7 @@ use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatabl
 
 final class ListAddresses extends BaseListRecords
 {
+    use HasResizableColumns;
     use HasWidgetTabs;
     use SpatieTranslatableListRecords; // Track the active locale for listing translated records.
 

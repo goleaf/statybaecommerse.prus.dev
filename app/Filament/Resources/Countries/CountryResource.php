@@ -3,7 +3,10 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\Countries;
+use App\Support\Concerns\HasNav;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\Countries\Pages\CreateCountry;
 use App\Filament\Resources\Countries\Pages\EditCountry;
 use App\Filament\Resources\Countries\Pages\ListCountries;
@@ -11,14 +14,15 @@ use App\Filament\Resources\Countries\Pages\ViewCountry;
 use App\Filament\Resources\Countries\Schemas\CountryForm;
 use App\Filament\Resources\Countries\Tables\CountriesTable;
 use App\Models\Country;
-use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 /**
  * CountryResource
  *
@@ -26,6 +30,8 @@ use UnitEnum;
  */
 final class CountryResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Country::class;
 
     public static function getNavigationIcon(): BackedEnum|string|null
@@ -42,13 +48,14 @@ final class CountryResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return CountryForm::configure($form);
+        return CountryForm::configure($schema);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return CountriesTable::configure($table);
     }
 

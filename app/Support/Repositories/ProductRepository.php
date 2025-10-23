@@ -10,6 +10,15 @@ final class ProductRepository
 {
     public function count(?string $connection = null): int
     {
-        return (int) DB::connection($connection)->table('products')->count();
+        $configuredDefault = config('database.default', 'sqlite');
+        $defaultConnection = is_string($configuredDefault) && $configuredDefault !== ''
+            ? $configuredDefault
+            : 'sqlite';
+
+        $connectionName = $connection !== null && $connection !== ''
+            ? $connection
+            : $defaultConnection;
+
+        return (int) DB::connection($connectionName)->table('products')->count();
     }
 }

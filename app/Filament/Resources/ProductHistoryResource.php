@@ -4,32 +4,36 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ProductHistoryResource\Pages;
 use App\Filament\Resources\ProductHistoryResource\Widgets\ProductHistoryStatsWidget;
 use App\Filament\Resources\ProductHistoryResource\Widgets\RecentProductChangesWidget;
 use App\Models\ProductHistory;
 use App\Support\Filament\Components\Flatpickr; // Custom Flatpickr helper keeps date filters consistent with the admin UI
-use BackedEnum;
 use DateTimeInterface;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\Select as SelectInput;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class ProductHistoryResource extends Resource
 {
-    protected static ?string $model = ProductHistory::class;
+    use HasNav;
 
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
@@ -58,9 +62,9 @@ final class ProductHistoryResource extends Resource
         return __('product_history.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('product_history.basic_information'))
                 ->columns(2)
                 ->schema([
@@ -103,8 +107,9 @@ final class ProductHistoryResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('product.name')
@@ -151,6 +156,24 @@ final class ProductHistoryResource extends Resource
                     ->label(__('product_history.user'))
                     ->relationship('user', 'name')
                     ->preload(),
+                Filter::make('field_name')
+                    ->label(__('product_history.field_name'))
+                    ->form([
+                        SearchableInput::make('field_name')
+                            ->label(__('product_history.field_name'))
+                            ->maxLength(255)
+                            ->searchUsing(fn (string $search): array => self::fieldNameSuggestions($search))
+                            ->options(fn (): array => self::fieldNameSuggestions()),
+                    ])
+                    ->indicateUsing(fn (array $data): array => filled($data['field_name'] ?? null)
+                        ? [__('product_history.field_name') . ': ' . $data['field_name']]
+                        : [])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query->when(
+                            filled($data['field_name'] ?? null),
+                            fn (Builder $query, string $fieldName): Builder => $query->where('field_name', $fieldName),
+                        );
+                    }),
                 Filter::make('date')
                     ->label(__('product_history.date'))
                     ->form([
@@ -161,13 +184,11 @@ final class ProductHistoryResource extends Resource
                     ])
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
-                        $from = self::formatDateFilterValue($data['from'] ?? null);
-                        if ($from !== null) {
-                            $indicators[] = __('product_history.from') . ': ' . $from;
+                        if ($data['from'] ?? null) {
+                            $indicators[] = __('product_history.from') . ': ' . $data['from'];
                         }
-                        $until = self::formatDateFilterValue($data['until'] ?? null);
-                        if ($until !== null) {
-                            $indicators[] = __('product_history.until') . ': ' . $until;
+                        if ($data['until'] ?? null) {
+                            $indicators[] = __('product_history.until') . ': ' . $data['until'];
                         }
 
                         return $indicators;
@@ -243,6 +264,22 @@ final class ProductHistoryResource extends Resource
             'status_changed' => 'purple',
             default          => 'secondary',
         };
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function fieldNameSuggestions(?string $search = null): array
+    {
+        return ProductHistory::query()
+            ->select('field_name')
+            ->whereNotNull('field_name')
+            ->when($search !== null, fn (Builder $query): Builder => $query->where('field_name', 'like', "%{$search}%"))
+            ->distinct()
+            ->orderBy('field_name')
+            ->limit(20)
+            ->pluck('field_name')
+            ->all();
     }
 
     private static function encodeJsonForTextarea(mixed $value): ?string

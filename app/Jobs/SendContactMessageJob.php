@@ -19,6 +19,21 @@ final class SendContactMessageJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    /**
+     * Number of job attempts before failing.
+     */
+    public int $tries = 3;
+
+    /**
+     * Define retry backoff windows (in seconds).
+     *
+     * @return array<int, int>
+     */
+    public function backoff(): array
+    {
+        return [60, 120, 240];
+    }
+
     public function __construct(public ContactMessage $contactMessage) {}
 
     public function handle(): void

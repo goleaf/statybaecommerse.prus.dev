@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Traits;
 
+use App\Support\Contracts\Entities\CategoryContract;
+use App\Support\Contracts\Entities\ProductContract;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -84,11 +86,25 @@ trait HandlesContentNegotiation
     protected function formatProductData($products): array
     {
         if ($products instanceof \Illuminate\Pagination\LengthAwarePaginator) {
-            return ['products' => $products->items(), 'pagination' => ['current_page' => $products->currentPage(), 'last_page' => $products->lastPage(), 'per_page' => $products->perPage(), 'total' => $products->total(), 'from' => $products->firstItem(), 'to' => $products->lastItem()]];
+            $items = collect($products->items())->map(static function ($product) {
+                return is_array($product) ? $product : ProductContract::fromModel($product);
+            })->toArray();
+
+            return [
+                'products' => $items,
+                'pagination' => [
+                    'current_page' => $products->currentPage(),
+                    'last_page' => $products->lastPage(),
+                    'per_page' => $products->perPage(),
+                    'total' => $products->total(),
+                    'from' => $products->firstItem(),
+                    'to' => $products->lastItem(),
+                ],
+            ];
         }
         if (is_iterable($products)) {
-            return ['products' => collect($products)->map(function ($product) {
-                return ['id' => $product->id, 'name' => $product->name, 'slug' => $product->slug, 'sku' => $product->sku, 'price' => $product->price, 'sale_price' => $product->sale_price, 'brand' => $product->brand?->name, 'category' => $product->category?->name, 'image' => $product->getFirstMediaUrl('images', 'thumb'), 'url' => route('product.show', $product->slug), 'stock_quantity' => $product->stock_quantity ?? 0, 'is_visible' => $product->is_visible];
+            return ['products' => collect($products)->map(static function ($product) {
+                return is_array($product) ? $product : ProductContract::fromModel($product);
             })->toArray()];
         }
 
@@ -101,8 +117,8 @@ trait HandlesContentNegotiation
     protected function formatCategoryData($categories): array
     {
         if (is_iterable($categories)) {
-            return ['categories' => collect($categories)->map(function ($category) {
-                return ['id' => $category->id, 'name' => $category->name, 'slug' => $category->slug, 'description' => $category->description, 'url' => route('category.show', $category->slug), 'children' => $category->children ?? [], 'product_count' => $category->products_count ?? 0];
+            return ['categories' => collect($categories)->map(static function ($category) {
+                return is_array($category) ? $category : CategoryContract::fromModel($category);
             })->toArray()];
         }
 

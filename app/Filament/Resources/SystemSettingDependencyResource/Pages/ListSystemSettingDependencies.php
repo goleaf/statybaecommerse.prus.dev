@@ -10,6 +10,8 @@ use Filament\Actions\CreateAction;
 
 final class ListSystemSettingDependencies extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = SystemSettingDependencyResource::class;
 
     protected function getHeaderActions(): array

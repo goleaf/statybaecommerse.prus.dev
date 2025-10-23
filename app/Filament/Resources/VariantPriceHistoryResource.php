@@ -4,22 +4,30 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
+use BackedEnum;
+use UnitEnum;
 use App\Filament\Resources\VariantPriceHistoryResource\Pages;
 use App\Models\VariantPriceHistory;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
+use Filament\Schemas\Schema;
+use BackedEnum;
+use UnitEnum;
 final class VariantPriceHistoryResource extends Resource
 {
-    protected static ?string $model = VariantPriceHistory::class;
+    use HasNav;
 
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
@@ -39,9 +47,9 @@ final class VariantPriceHistoryResource extends Resource
         return $group instanceof NavigationGroup ? $group->label() : $group;
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Select::make('variant_id')
                     ->relationship('variant', 'name')
@@ -94,8 +102,9 @@ final class VariantPriceHistoryResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('variant.name')
@@ -112,14 +121,15 @@ final class VariantPriceHistoryResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('price_change')
                     ->label('Change')
-                    ->state(function (VariantPriceHistory $record): ?float {
+                    // Use strict typing to keep Filament 4 column callbacks predictable.
+                    ->state(static function (VariantPriceHistory $record): ?float {
                         if ($record->old_price === null || $record->new_price === null) {
                             return null;
                         }
 
                         return (float) ($record->new_price - $record->old_price);
                     })
-                    ->formatStateUsing(function (?float $state, VariantPriceHistory $record): string {
+                    ->formatStateUsing(static function (?float $state, VariantPriceHistory $record): string {
                         if ($state === null) {
                             return '-';
                         }

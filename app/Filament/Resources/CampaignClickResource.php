@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\CampaignClickResource\Pages;
 use App\Models\Campaign;
 use App\Models\CampaignClick;
@@ -11,8 +13,8 @@ use App\Models\User;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
@@ -22,23 +24,30 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class CampaignClickResource extends Resource
 {
+    /** @phpstan-var string|\BackedEnum|null */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
+
     protected static ?string $model = CampaignClick::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
     {
         return 'heroicon-o-chart-bar';
     }
@@ -67,12 +76,12 @@ final class CampaignClickResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      *
-     * @param  Forms\Form $schema
-     * @return Forms\Form
+     * @param  Forms\Form  $schema
+     * @return Schemas\Form
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('campaign_clicks.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -92,6 +101,15 @@ final class CampaignClickResource extends Resource
                                             $set('campaign_code', $campaign->code);
                                         }
                                     }
+
+                                    $campaign = Campaign::find($state);
+
+                                    if ($campaign === null) {
+                                        return;
+                                    }
+
+                                    $set('campaign_name', $campaign->name);
+                                    $set('campaign_code', $campaign->code);
                                 }),
                             TextInput::make('campaign_name')
                                 ->label(__('campaign_clicks.campaign_name'))
@@ -113,6 +131,15 @@ final class CampaignClickResource extends Resource
                                     $set('customer_email', $user->email);
                                 }
                             }
+
+                            $user = User::find($state);
+
+                            if ($user === null) {
+                                return;
+                            }
+
+                            $set('customer_name', $user->name);
+                            $set('customer_email', $user->email);
                         }),
                     TextInput::make('customer_name')
                         ->label(__('campaign_clicks.customer_name'))
@@ -199,8 +226,9 @@ final class CampaignClickResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('campaign.name')

@@ -19,10 +19,16 @@ python main.py
 pytest test_main.py
 ```
 
+### Recent Maintenance
+
+- Autocomplete selects in the Filament admin now bypass model-level global scopes when searching so freshly created products and supporting records appear immediately in the dropdown suggestions.
+
 ## What it is
+
 A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing construction-product catalogues, analytics, and operations for statybaecommerse.prus.dev. The repository ships extensive Filament resources, analytics dashboards, and seeders so you can explore the platform locally without extra setup.
 
 ### Key capabilities at a glance
+
 - **Product catalogue management** with rich attribute, variant, bundle, and availability tooling powered by Filament resources.
 - **Customer- and order-centric workflows** including loyalty, referral, and recommendation engines surfaced through reusable services and widgets.
 - **Content & marketing** features such as news, landing pages, SEO metadata, and email campaign tooling with automated translations.
@@ -30,19 +36,21 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Operational dashboards** for activity logs, analytics, and background job health leveraging Laravel Horizon, Scout, and bespoke widgets.
 - **Feature flag governance** with Filament listings that expose inactive and disabled toggles for quick rollout audits and remediation.
 - **Multilingual experience** across storefront and admin via `spatie/laravel-translatable`, Volt-powered Livewire pages, and localized seed data.
+- **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 -### Latest updates
-- Cart item management in the Filament admin now honours the selected product filter across list views and exports, ensuring QA and debugging sessions see only the intended product rows.
-- Recently viewed storefront API calls now bypass visibility scopes and return session-ordered product IDs, keeping wishlist toggles and customer history widgets consistent even when draft catalogue entries populate the session during automated tests.
+- Graceful filesystem shim now powers test backups, automatically running `backup:prepare`/`backup:verify` when fresh directories are created so artisan exit-code assertions no longer flake during metadata checks.
+- Database index audit regression coverage spins up an isolated SQLite database file per run, avoiding collisions with the shared testing connection while still exercising duplicate detection and cleanup.
+- Filament top navigation widget now derives navigation groups from the enum metadata with permission and role awareness, giving Livewire tests deterministic ordering and complete coverage of admin/public sections.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
-- Attribute group selectors now reuse a shared translation helper so historical slugs render as human-readable labels across Filament forms, filters, and tables instead of exposing raw keys.
 - Region-aware address tables and the dedicated `customers` dataset are back online for the SQLite harness, letting factories and
   analytics widgets build customer journeys without missing foreign keys during PHPUnit runs.
 - SearchableInput payload macros are registered lazily with safer fallbacks, and the SQLite testing harness now spins up one
   database per parallel worker so hydrate/clear flows avoid TypeErrors and filesystem locks during `php artisan test --parallel`.
-- Currency management screens now accept extended ISO codes, expose inactive rows for Filament workflows, and honour custom separators when formatting prices in admin tables.
 - System setting translation records can once again be soft deleted, restored, and replicated thanks to the relaxed locale index and leaner fillable list that align with the documented API expectations.
+- Product review aggregates in the API now reuse eager-loaded counts and averages, eliminating redundant queries and
+  keeping cached storefront metrics intact for the Product API regression suite.
 - Campaign conversion analytics now keep their translation model, timestamps, and
   scope filters aligned so ROI/ROAS dashboards and PHPUnit coverage see the same
   completed conversions without fighting `is_active` guards.
@@ -65,6 +73,10 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
   scopes, ensuring inactive or disabled options stay editable and helper
   actions (activate, duplicate, default toggles) behave consistently during
   regression tests and live admin sessions.
+- Collection management resource navigation and translations were
+  synchronized with the Filament v4 schema, keeping the admin sidebar readable
+  in EN/LT and aligning the comprehensive resource regression suite with the
+  model's fillable contract.
 - Cart lifecycle regression tests now provision a lightweight `cart_items` schema inside the suite, keeping checkout cleanup coverage reliable without invoking the full migration set.
 - Catalog OpenAPI contract now documents the lean product meta payload and nullable image thumbnails, ensuring schema validation mirrors real API responses.
 - Campaign click factories now guard optional relationships and lean on the dedicated SQLite test database configuration, eliminating the missing-table errors that previously interrupted the API listing regression suite.
@@ -77,14 +89,16 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - Search API now detects suspicious injection fragments, skips database execution, and keeps exact-title matches at the top of result sets so precise catalogue lookups stay reliable while hostile payloads return empty responses.
 - Customer and product inline sparklines now reuse the cached analytics series and publish stable dataset checksums, keeping Filament tables and unit tests aligned on the same Chart.js payloads.
 - Search endpoints now respect mixed-case `types[]` filters by normalizing them server-side, preventing fallback to all buckets when storefront clients request specific result categories.
-- Data import regression coverage now uses reflection to exercise the protected truncation helper on the final Artisan command, keeping foreign key enforcement tests intact without weakening the command's contract.
+- Company model unit tests now bootstrap the SQLite `companies` table and defer the active scope until migrations complete, eliminating missing-table crashes during `php artisan test` runs.
 - Storefront autocomplete now trims and caches queries, reuses injected services for faster bucket lookups, and delivers safe highlight markup so Live Search suggestions no longer show raw `<mark>` tags.
 - Analytics event tracking now skips restrictive user scopes during console execution, tolerates missing request data, and reports float-safe revenue totals so dashboards and regression suites stay in sync.
 - API rate limiting and authorization helpers now fall back to raw configuration files when container bindings are unavailable, allowing console diagnostics and unit tests to execute without fatal bindings.
 - Localized search results now ship with a guided hero, contextual metrics, and improved empty states so catalog lookups (like Makita) surface faster insights and next steps.
+- PHPUnit now bootstraps a persistent SQLite database and reroutes Telescope migrations to SQLite, keeping `php artisan test` green without provisioning a MySQL service.
 - Corrected the custom Filament edit profile form to import `Filament\\Schemas\\Schema`, preventing namespace resolution fatals during profile updates and automated test runs.
 - Discount Redemption admin navigation now lives in the Marketing cluster with a warning badge and Filament v4 badge styling, and its Pest harness boots a lightweight `HasTable` stub so table schemas construct cleanly during unit tests.
 - Pest test helpers now guard the `login()`, `get()`, and `post()` helpers with existence checks, preventing redeclaration fatals during repeated `php artisan test` bootstrap cycles.
+- PHPUnit now provisions a persistent `database/testing.sqlite` database and points Telescope/Activity Log to the SQLite connection before migrations run, keeping catalog integrity checks from tripping missing table errors during local CI loops.
 - Order seeding now uses the expanded `orders.status` enum (`confirmed`, `completed`, and return-friendly values) so `php artisan migrate:fresh --seed` no longer trips MySQL truncation warnings when loading the demo store checkout history.
 - Hardened the `2025_02_15_120000_add_created_at_indexes` migration with case-insensitive index detection and information schema fallbacks, eliminating duplicate key errors during repeated deploys or fresh seeds.
 - Expanded the currency schema and demo country seeder so multilingual fields, activation flags, and translation records stay in sync, keeping `php artisan migrate:fresh --seed` reliable on both SQLite and MySQL setups.
@@ -116,14 +130,19 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - Developer tooling regained the full Husky bootstrap shim with its executable bit restored, ensuring local Git hooks run automatically after installs while still reminding contributors about the upcoming v10 script changes.
 - Shipping option management screens now present accurate delivery windows even when the minimum day value is zero or one side of the range is missing, giving merchandisers clearer expectations when auditing carriers.
 - Filament admin navigation icons once again rely on docblock-based overrides, preventing BackedEnum collisions, while variant stock history badges group destructive events under the shared danger palette and the `data:import` command advertises its purpose directly in Artisan listings.
-- Analytics dashboard navigation now uses the documented docblock override and `Form` signature so Filament v4 boots without the BackedEnum type collision previously raised by the resource.
+
+### Latest updates
+- Tightened the Filament price list discount filter so that only products with a genuine markdown (compare price greater than the selling price) appear when toggled.
+- Added a feature test that exercises the discount filter to ensure future changes keep the behaviour intact.
 
 ## Documentation
+
 - Start with the curated [documentation index](docs/INDEX.md) for the setup → deploy → data model → admin guide → troubleshooting path.
 - Follow the living [documentation style guide](docs/STYLE_GUIDE.md) when adding reports, runbooks, or contracts so navigation stays predictable.
 - Browse the rest of the knowledge base directly in [docs/](docs/), especially the dedicated [analysis](docs/analysis), [runbooks](docs/runbooks), and [contracts](docs/contracts) directories introduced during the consolidation effort.
 
 ## Requirements
+
 - PHP 8.2+ with `ext-sqlite3`, `ext-fileinfo`, and `ext-gd`
 - Composer 2.6+
 - Node.js 20+ with npm 10+
@@ -131,32 +150,40 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - Make (optional but recommended for the helper targets below)
 
 ## Quick start (3 commands)
+
 1. **Bootstrap dependencies and environment**
-   ```bash
-   make setup
-   ```
-   Installs Composer and npm dependencies, copies `.env`, prepares the SQLite database, and links storage.
+    ```bash
+    make setup
+    ```
+    Installs Composer and npm dependencies, copies `.env`, prepares the SQLite database, and links storage.
 2. **Reset the database and seed demo data**
-   ```bash
-   composer seed:fresh
-   ```
-   Runs `php artisan migrate:fresh --seed` so you get the admin user (`admin@statybaecommerse.prus.dev` / `admin123`) and sample content in one shot.
 
-   Seeder profiles are centralized in `config/seeds.php` so you can control how much demo data is loaded:
-   - `php artisan db:seed --profile=minimal` seeds only the essentials for admin access and catalog metadata.
-   - `php artisan db:seed --profile=full` (default) includes all demo storefront content on top of the minimal set.
+    ```bash
+    composer seed:fresh
+    ```
 
-   Set `DB_SEED_PROFILE=minimal` in `.env` to change the default profile used by seeding commands.
+    Runs `php artisan migrate:fresh --seed` so you get the admin user (`admin@statybaecommerse.prus.dev` / `admin123`) and sample content in one shot.
+
+    Seeder profiles are centralized in `config/seeds.php` so you can control how much demo data is loaded:
+    - `php artisan db:seed --profile=minimal` seeds only the essentials for admin access and catalog metadata.
+    - `php artisan db:seed --profile=full` (default) includes all demo storefront content on top of the minimal set.
+
+    Set `DB_SEED_PROFILE=minimal` in `.env` to change the default profile used by seeding commands.
+
 3. **Serve the application**
-   ```bash
-   composer serve
-   ```
-   Visit the storefront at http://127.0.0.1:8000/ or the admin panel at http://127.0.0.1:8000/admin.
+    ```bash
+    composer serve
+    ```
+    Visit the storefront at http://127.0.0.1:8000/ or the admin panel at http://127.0.0.1:8000/admin.
 
 Need background workers, logs, and Vite in one go? Use the existing dev loop:
+
 ```bash
 composer run dev
 ```
+
+### Testing & contract validation
+- Run `php artisan test --filter=ContractValidationTest` to verify the public product, category, brand, order, and user contracts. The bootstrap now creates `database/testing.sqlite` automatically so migrations and model factories align with the published schemas even on clean machines.
 
 ## Latest maintenance
 
@@ -176,49 +203,60 @@ composer run dev
 
 ## Architecture cheatsheet
 
-| Area | Location(s) | Notes |
-| --- | --- | --- |
-| HTTP entrypoints | `routes/web.php`, `routes/api.php`, `routes/admin.php` | Inertia/Volt storefront routes live in `web.php`; Filament registers admin routes in `AdminPanelProvider`. |
-| Filament admin | `app/Filament/**` | Resources, widgets, custom pages, and global actions follow Filament v4 conventions outlined in [docs/analysis/FILAMENT_V4_IMPLEMENTATION_SUMMARY.md](docs/analysis/FILAMENT_V4_IMPLEMENTATION_SUMMARY.md). |
-| Domain models & data | `app/Models`, `app/Data`, `database/migrations`, `database/factories`, `database/seeders` | Data objects use `spatie/laravel-data`; factories and multilingual seeders ensure parity between Lithuanian and English content. |
-| Business services | `app/Services`, `app/Actions`, `app/Support` | Encapsulated workflows (pricing, availability, marketing, search) with helper traits for caching and localization. |
-| Background processing | `app/Jobs`, `app/Listeners`, `app/Notifications`, `app/Console` | Horizon manages queues; recurring tasks registered through `Console/Kernel.php`. |
-| Frontend assets | `resources/views`, `resources/js`, `resources/css`, `tailwind.config.js`, `vite.config.js` | Uses Tailwind v4 + Vite; Livewire Volt pages bridge server-driven UI to the storefront. |
-| Quality & automation | `Makefile`, `composer.json` scripts, `package.json` scripts, `scripts/*.mjs`, `autofix-realtime.sh` | Make targets wrap Composer/NPM scripts; MCP tooling (`mcp/filament-docs-server.js`) serves Filament component docs locally. |
+| Area                  | Location(s)                                                                                         | Notes                                                                                                                                                                                                       |
+| --------------------- | --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| HTTP entrypoints      | `routes/web.php`, `routes/api.php`, `routes/admin.php`                                              | Inertia/Volt storefront routes live in `web.php`; Filament registers admin routes in `AdminPanelProvider`.                                                                                                  |
+| Filament admin        | `app/Filament/**`                                                                                   | Resources, widgets, custom pages, and global actions follow Filament v4 conventions outlined in [docs/analysis/FILAMENT_V4_IMPLEMENTATION_SUMMARY.md](docs/analysis/FILAMENT_V4_IMPLEMENTATION_SUMMARY.md). |
+| Domain models & data  | `app/Models`, `app/Data`, `database/migrations`, `database/factories`, `database/seeders`           | Data objects use `spatie/laravel-data`; factories and multilingual seeders ensure parity between Lithuanian and English content.                                                                            |
+| Business services     | `app/Services`, `app/Actions`, `app/Support`                                                        | Encapsulated workflows (pricing, availability, marketing, search) with helper traits for caching and localization.                                                                                          |
+| Background processing | `app/Jobs`, `app/Listeners`, `app/Notifications`, `app/Console`                                     | Horizon manages queues; recurring tasks registered through `Console/Kernel.php`.                                                                                                                            |
+| Frontend assets       | `resources/views`, `resources/js`, `resources/css`, `tailwind.config.js`, `vite.config.js`          | Uses Tailwind v4 + Vite; Livewire Volt pages bridge server-driven UI to the storefront.                                                                                                                     |
+| Quality & automation  | `Makefile`, `composer.json` scripts, `package.json` scripts, `scripts/*.mjs`, `autofix-realtime.sh` | Make targets wrap Composer/NPM scripts; MCP tooling (`mcp/filament-docs-server.js`) serves Filament component docs locally.                                                                                 |
 
 ## Data and integration dependencies
+
 - **Caching & queues**: Redis (or Predis) backing Horizon for real-time metrics and queue execution.
-- **Search**: Laravel Scout ready for Algolia/Meilisearch; disable or swap drivers via `.env`.
+- **Search**: Toggle between database and Laravel Scout engines with `SEARCH_DRIVER`; keep `SCOUT_ENABLED=false` locally for SQL fallback, or enable Scout for Algolia/Meilisearch and rebuild indexes via `php artisan search:index`.
 - **Media**: `spatie/laravel-medialibrary` manages product imagery, generated conversions, and downloads.
 - **PDF & exports**: `barryvdh/laravel-dompdf` and `pxlrbt/filament-excel` power report exports from the admin panel.
 
 ## One-liners for build, quality, and tests
-| Task | Command |
-| --- | --- |
-| Run feature & unit tests | `make test` |
-| Static analysis | `make analyse` |
-| PHP formatting | `make format` |
-| Build production assets | `make build` |
+
+| Task                      | Command                       |
+| ------------------------- | ----------------------------- |
+| Run feature & unit tests  | `make test`                   |
+| Static analysis           | `make analyse`                |
+| PHP formatting            | `make format`                 |
+| Build production assets   | `make build`                  |
 | Generate coverage locally | `php artisan test --coverage` |
 
+## Latest maintenance notes
+- Re-applied the documented docblock pattern for Filament navigation icons to stay aligned with v4 schema upgrades after the #533 regression.
+- Consolidated variant stock history danger badge mappings so both damage and theft events share the intended styling.
+- Clarified the `data:import` command metadata with typed properties to improve Artisan list readability.
+
 ## Composer script quick reference
-| Script | What it does |
-| --- | --- |
-| `composer ci` | Runs PHPStan (`phpstan analyse`) then executes the CI-friendly PHPUnit suite (`phpunit --log-junit ...`). |
-| `composer analyse` | Alias of `composer analyze` for PHPStan static analysis. |
-| `composer seed:fresh` | Proxies `php artisan migrate:fresh --seed --ansi` to rebuild the database with demo data. |
-| `composer build` | Calls `php artisan optimize --ansi` before `npm run build` to prep caches and assets. |
-| `composer serve` | Uses `php artisan serve --ansi` for a local HTTP server. |
+
+| Script                | What it does                                                                                              |
+| --------------------- | --------------------------------------------------------------------------------------------------------- |
+| `composer ci`         | Runs PHPStan (`phpstan analyse`) then executes the CI-friendly PHPUnit suite (`phpunit --log-junit ...`). |
+| `composer analyse`    | Alias of `composer analyze` for PHPStan static analysis.                                                  |
+| `composer seed:fresh` | Proxies `php artisan migrate:fresh --seed --ansi` to rebuild the database with demo data.                 |
+| `composer build`      | Calls `php artisan optimize --ansi` before `npm run build` to prep caches and assets.                     |
+| `composer serve`      | Uses `php artisan serve --ansi` for a local HTTP server.                                                  |
 
 ## Configuration notes
+
 - Environment defaults live in `.env.example`; copy it to `.env` to tweak database/queue/mail settings.
 - SQLite is enabled by default for fast onboarding—switch `DB_CONNECTION` in `.env` if you need MySQL/PostgreSQL.
 - PHPUnit test runs now target the shared `database/testing.sqlite` file by default for persistent schema reuse; override `DB_DATABASE` locally if you prefer transient in-memory databases.
 - Storage symlink (`public/storage`) is created by `make setup`; re-run `php artisan storage:link` if you remove it.
-- Horizon, Scout, and media-processing queues expect Redis; local installs default to the sync driver (`QUEUE_CONNECTION=sync`). Update `QUEUE_CONNECTION` to `redis` (or your chosen queue backend) once Redis is available to re-enable Horizon workers.
+- Horizon, Scout, and media-processing queues expect Redis; fall back to the sync driver for local smoke testing by setting `QUEUE_CONNECTION=sync`.
+- Rebuild search indexes for Scout with `php artisan search:index --fresh` or schedule zero-downtime refreshes through `php artisan search:index:rebuild`.
 - Frontend assets rely on modern Node (20+) with native ESM; ensure `npm install` runs before invoking Vite or Playwright scripts.
 
 ## Further reading
+
 - Start with [docs/INDEX.md](docs/INDEX.md) for a curated guide to deployment runbooks, feature deep-dives, and historical archives.
 - Need domain-level context? Check [docs/analysis/COMPANY_RESOURCE_ANALYSIS.md](docs/analysis/COMPANY_RESOURCE_ANALYSIS.md) and the project summaries collected under [docs/analysis/](docs/analysis/).
 - Want a system tour? Review [docs/ARCHITECTURE_OVERVIEW.md](docs/ARCHITECTURE_OVERVIEW.md) for component breakdowns and integration diagrams, then keep the runbooks in [docs/runbooks/](docs/runbooks/) close for operational workflows.

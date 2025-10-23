@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\SystemSettingDependencyResource\Pages;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingDependency;
@@ -11,44 +13,50 @@ use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\Rule;
 use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class SystemSettingDependencyResource extends Resource
 {
     protected static ?string $model = SystemSettingDependency::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
     {
         return 'heroicon-o-link';
     }
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Settings';
-    }
+    
+
+    
 
     public static function getNavigationLabel(): string
     {
@@ -65,9 +73,9 @@ final class SystemSettingDependencyResource extends Resource
         return __('admin.system_setting_dependencies.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('admin.system_setting_dependencies.basic_information'))
                 ->description(__('admin.system_setting_dependencies.basic_information_description'))
                 ->schema([
@@ -90,12 +98,44 @@ final class SystemSettingDependencyResource extends Resource
                                 ->preload()
                                 ->helperText(__('admin.system_setting_dependencies.depends_on_setting_help')),
                         ]),
-                    Textarea::make('condition')
-                        ->label(__('admin.system_setting_dependencies.condition'))
-                        ->rows(5)
-                        ->helperText(__('admin.system_setting_dependencies.condition_help'))
-                        ->columnSpanFull()
-                        ->required(),
+                    // Allow operators and value-based conditions to be configured separately for clarity.
+                    Grid::make(2)
+                        ->schema([
+                            Select::make('condition')
+                                ->label(__('admin.system_setting_dependencies.condition'))
+                                ->options([
+                                    'equals' => __('admin.system_settings.equals'),
+                                    'not_equals' => __('admin.system_settings.not_equals'),
+                                    'greater_than' => __('admin.system_settings.greater_than'),
+                                    'less_than' => __('admin.system_settings.less_than'),
+                                    'contains' => __('admin.system_settings.contains'),
+                                    'not_contains' => __('admin.system_settings.not_contains'),
+                                    'is_empty' => __('admin.system_settings.is_empty'),
+                                    'is_not_empty' => __('admin.system_settings.is_not_empty'),
+                                    'is_true' => __('admin.system_settings.is_true'),
+                                    'is_false' => __('admin.system_settings.is_false'),
+                                ])
+                                ->required()
+                                ->native(false)
+                                ->helperText(__('admin.system_setting_dependencies.condition_help')),
+                            TextInput::make('condition_value')
+                                ->label(__('admin.system_settings.condition_value'))
+                                ->maxLength(255)
+                                ->nullable()
+                                ->required(fn (Get $get): bool => $get('condition') !== null && ! in_array($get('condition'), [
+                                    'is_empty',
+                                    'is_not_empty',
+                                    'is_true',
+                                    'is_false',
+                                ], true))
+                                ->hidden(fn (Get $get): bool => in_array($get('condition'), [
+                                    'is_empty',
+                                    'is_not_empty',
+                                    'is_true',
+                                    'is_false',
+                                ], true)),
+                        ])
+                        ->columnSpanFull(),
                     Grid::make(2)
                         ->schema([
                             Toggle::make('is_active')
@@ -117,8 +157,9 @@ final class SystemSettingDependencyResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('id')
@@ -155,15 +196,30 @@ final class SystemSettingDependencyResource extends Resource
                     ->limit(30),
                 TextColumn::make('condition')
                     ->label(__('admin.system_setting_dependencies.condition'))
+                    ->badge()
+                    ->formatStateUsing(function (?string $state): string {
+                        if ($state === null) {
+                            return __('admin.common.not_set');
+                        }
+
+                        $translationKey = "admin.system_settings.{$state}";
+
+                        return __($translationKey) !== $translationKey
+                            ? __($translationKey)
+                            : ucfirst(str_replace('_', ' ', $state));
+                    })
+                    ->sortable(),
+                TextColumn::make('condition_value')
+                    ->label(__('admin.system_settings.condition_value'))
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
-                        $state = $column->getState();
+                        $state = (string) ($column->getState() ?? '');
 
-                        if (! is_string($state) || $state === '') {
+                        if ($state === '') {
                             return null;
                         }
 
-                        return strlen($state) > 50 ? $state : null;
+                        return is_string($state) && strlen($state) > 50 ? $state : null;
                     })
                     ->searchable()
                     ->sortable(),
@@ -243,7 +299,7 @@ final class SystemSettingDependencyResource extends Resource
                             );
                     }),
             ])
-            ->searchable(['condition', 'setting.key', 'dependsOnSetting.key'])
+            ->searchable(['condition', 'condition_value', 'setting.key', 'dependsOnSetting.key'])
             ->actions([
                 ViewAction::make()
                     ->label(__('admin.common.view'))
@@ -271,7 +327,6 @@ final class SystemSettingDependencyResource extends Resource
                     ->color('info')
                     ->action(function (SystemSettingDependency $record): void {
                         $newRecord = $record->replicate();
-                        $newRecord->condition = $record->condition . ' (Copy)';
                         $newRecord->is_active = false;
                         $newRecord->save();
 
@@ -328,7 +383,6 @@ final class SystemSettingDependencyResource extends Resource
                         ->action(function (Collection $records): void {
                             $records->each(function (SystemSettingDependency $record): void {
                                 $newRecord = $record->replicate();
-                                $newRecord->condition = $record->condition . ' (Copy)';
                                 $newRecord->is_active = false;
                                 $newRecord->save();
                             });

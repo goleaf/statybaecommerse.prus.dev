@@ -114,7 +114,7 @@
                         <div class="flex items-center space-x-3">
                             {{-- Product Image --}}
                             <div class="flex-shrink-0">
-                                {{-- Determine the image to show in the autocomplete dropdown, respecting new media attributes. --}}
+                                {{-- Respect refreshed API fields when rendering product suggestions. --}}
                                 @php($image = $result['main_image'] ?? $result['thumbnail'] ?? ($result['image'] ?? null))
                                 @if($image)
                                     <img

@@ -3,7 +3,10 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\ReferralStatistics;
+use App\Support\Concerns\HasNav;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\ReferralStatistics\Pages\CreateReferralStatistics;
 use App\Filament\Resources\ReferralStatistics\Pages\EditReferralStatistics;
 use App\Filament\Resources\ReferralStatistics\Pages\ListReferralStatistics;
@@ -11,27 +14,30 @@ use App\Filament\Resources\ReferralStatistics\Schemas\ReferralStatisticsForm;
 use App\Filament\Resources\ReferralStatistics\Tables\ReferralStatisticsTable;
 use App\Models\ReferralStatistics;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 class ReferralStatisticsResource extends Resource
 {
-    protected static ?string $model = ReferralStatistics::class;
+    use HasNav;
 
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
      */
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return ReferralStatisticsForm::configure($form);
+        return ReferralStatisticsForm::configure($schema);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return ReferralStatisticsTable::configure($table);
     }
 

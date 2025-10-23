@@ -10,6 +10,9 @@ return [
     'website' => 'Svetainė',
     'industry' => 'Pramonės šaka',
     'size' => 'Dydis',
+    // Suteikiame paaiškinimų, kad būtų lengviau palikti dydį nepriskirtą.
+    'size_placeholder' => 'Pasirinkite dydį (nebūtina)',
+    'size_filter_placeholder' => 'Visi dydžiai',
     'description' => 'Aprašymas',
     'is_active' => 'Aktyvus',
     'created_at' => 'Sukurta',

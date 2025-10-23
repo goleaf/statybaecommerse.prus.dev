@@ -10,6 +10,8 @@ use Filament\Actions;
 
 final class ListLocations extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = LocationResource::class;
 
     protected function getHeaderActions(): array

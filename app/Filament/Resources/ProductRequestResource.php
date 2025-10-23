@@ -4,32 +4,39 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\ProductRequestResource\Pages;
 use App\Models\Product;
 use App\Models\ProductRequest;
 use App\Support\Filament\Components\Flatpickr;
-use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class ProductRequestResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = ProductRequest::class;
 
-    public static function getNavigationIcon(): BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|\Illuminate\Contracts\Support\Htmlable|string|null
     {
         return 'heroicon-o-clipboard-document-list';
     }
@@ -56,9 +63,9 @@ final class ProductRequestResource extends Resource
         return __('product_requests.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 SearchableInput::make('product_id')
                     ->label(__('product_requests.fields.product'))
@@ -87,9 +94,9 @@ final class ProductRequestResource extends Resource
                             },
                         );
                     })
-                    ->afterStateUpdated(function (?string $state, Set $set): void {
+                    ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
                         if ($state === null || $state === '') {
-                            SearchableInputHelper::clear($set, ['product_id' => null]);
+                            SearchableInputHelper::clear($component, $set, ['product_id' => null]);
 
                             return;
                         }
@@ -149,8 +156,9 @@ final class ProductRequestResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('product.name')

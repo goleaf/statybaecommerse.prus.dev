@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
+use BackedEnum;
+use UnitEnum;
 use App\Filament\Resources\EnumManagementResource\Pages;
 use App\Models\EnumValue;
 use BackedEnum;
@@ -15,29 +19,34 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
+use BackedEnum;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
+use Filament\Schemas\Schema;
+use BackedEnum;
+use UnitEnum;
 final class EnumManagementResource extends Resource
 {
     protected static ?string $model = EnumValue::class;
@@ -75,9 +84,9 @@ final class EnumManagementResource extends Resource
         return trans('admin.enums.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Tabs::make('enum_management_tabs')
                 ->tabs([
                     Tab::make(trans('admin.enums.form.tabs.basic_information'))
@@ -159,8 +168,9 @@ final class EnumManagementResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('type')
@@ -359,7 +369,7 @@ final class EnumManagementResource extends Resource
         return $activeCount === $count ? (string) $count : "{$activeCount}/{$count}";
     }
 
-    public static function getNavigationBadgeColor(): ?string
+    public static function getNavigationBadgeColor(): string|array|null
     {
         $count = self::getModel()::count();
         $activeCount = self::getModel()::where('is_active', true)->count();

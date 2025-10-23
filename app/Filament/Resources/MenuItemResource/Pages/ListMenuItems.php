@@ -10,6 +10,8 @@ use Filament\Actions\CreateAction;
 
 final class ListMenuItems extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = MenuItemResource::class;
 
     protected function getHeaderActions(): array

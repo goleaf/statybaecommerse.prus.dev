@@ -20,8 +20,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * Eloquent model representing the DiscountCondition entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
  * @property string $translationModel
- * @property mixed $table
- * @property mixed $fillable
+ * @property mixed  $table
+ * @property mixed  $fillable
  *
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountCondition newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|DiscountCondition newQuery()
@@ -69,7 +69,8 @@ final class DiscountCondition extends Model
      */
     public function products(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class, 'discount_condition_products');
+        // Make sure administrative tools can attach any product regardless of storefront scopes.
+        return $this->belongsToMany(Product::class, 'discount_condition_products')->withoutGlobalScopes();
     }
 
     /**
@@ -77,13 +78,14 @@ final class DiscountCondition extends Model
      */
     public function categories(): BelongsToMany
     {
-        return $this->belongsToMany(Category::class, 'discount_condition_categories');
+        // Expose every category option for discount targeting within the control panel.
+        return $this->belongsToMany(Category::class, 'discount_condition_categories')->withoutGlobalScopes();
     }
 
     /**
      * Handle scopeActive functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeActive($query)
     {
@@ -93,7 +95,7 @@ final class DiscountCondition extends Model
     /**
      * Handle scopeByType functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByType($query, string $type)
     {
@@ -103,7 +105,7 @@ final class DiscountCondition extends Model
     /**
      * Handle scopeByOperator functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByOperator($query, string $operator)
     {
@@ -113,7 +115,7 @@ final class DiscountCondition extends Model
     /**
      * Handle scopeByPriority functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByPriority($query, string $direction = 'asc')
     {
@@ -139,7 +141,7 @@ final class DiscountCondition extends Model
     /**
      * Handle matches functionality with proper error handling.
      *
-     * @param  mixed  $testValue
+     * @param mixed $testValue
      */
     public function matches($testValue): bool
     {
@@ -149,21 +151,21 @@ final class DiscountCondition extends Model
         $conditionValue = $this->value;
 
         return match ($this->operator) {
-            'equals_to' => $testValue == $conditionValue,
-            'not_equals_to' => $testValue != $conditionValue,
-            'less_than' => $testValue < $conditionValue,
-            'greater_than' => $testValue > $conditionValue,
-            'less_than_or_equal' => $testValue <= $conditionValue,
+            'equals_to'             => $testValue == $conditionValue,
+            'not_equals_to'         => $testValue != $conditionValue,
+            'less_than'             => $testValue < $conditionValue,
+            'greater_than'          => $testValue > $conditionValue,
+            'less_than_or_equal'    => $testValue <= $conditionValue,
             'greater_than_or_equal' => $testValue >= $conditionValue,
-            'starts_with' => str_starts_with((string) $testValue, (string) $conditionValue),
-            'ends_with' => str_ends_with((string) $testValue, (string) $conditionValue),
-            'contains' => str_contains((string) $testValue, (string) $conditionValue),
-            'not_contains' => ! str_contains((string) $testValue, (string) $conditionValue),
-            'in_array' => is_array($conditionValue) && in_array($testValue, $conditionValue),
-            'not_in_array' => is_array($conditionValue) && ! in_array($testValue, $conditionValue),
-            'regex' => preg_match($conditionValue, (string) $testValue),
-            'not_regex' => ! preg_match($conditionValue, (string) $testValue),
-            default => false,
+            'starts_with'           => str_starts_with((string) $testValue, (string) $conditionValue),
+            'ends_with'             => str_ends_with((string) $testValue, (string) $conditionValue),
+            'contains'              => str_contains((string) $testValue, (string) $conditionValue),
+            'not_contains'          => ! str_contains((string) $testValue, (string) $conditionValue),
+            'in_array'              => is_array($conditionValue) && in_array($testValue, $conditionValue),
+            'not_in_array'          => is_array($conditionValue) && ! in_array($testValue, $conditionValue),
+            'regex'                 => preg_match($conditionValue, (string) $testValue),
+            'not_regex'             => ! preg_match($conditionValue, (string) $testValue),
+            default                 => false,
         };
     }
 
@@ -201,22 +203,22 @@ final class DiscountCondition extends Model
     public function getTypeLabel(): string
     {
         return match ($this->type) {
-            'product' => __('discount_conditions.types.product'),
-            'category' => __('discount_conditions.types.category'),
-            'brand' => __('discount_conditions.types.brand'),
-            'collection' => __('discount_conditions.types.collection'),
+            'product'         => __('discount_conditions.types.product'),
+            'category'        => __('discount_conditions.types.category'),
+            'brand'           => __('discount_conditions.types.brand'),
+            'collection'      => __('discount_conditions.types.collection'),
             'attribute_value' => __('discount_conditions.types.attribute_value'),
-            'cart_total' => __('discount_conditions.types.cart_total'),
-            'item_qty' => __('discount_conditions.types.item_qty'),
-            'channel' => __('discount_conditions.types.channel'),
-            'currency' => __('discount_conditions.types.currency'),
-            'customer_group' => __('discount_conditions.types.customer_group'),
-            'user' => __('discount_conditions.types.user'),
-            'partner_tier' => __('discount_conditions.types.partner_tier'),
-            'first_order' => __('discount_conditions.types.first_order'),
-            'day_time' => __('discount_conditions.types.day_time'),
-            'custom_script' => __('discount_conditions.types.custom_script'),
-            default => $this->type,
+            'cart_total'      => __('discount_conditions.types.cart_total'),
+            'item_qty'        => __('discount_conditions.types.item_qty'),
+            'channel'         => __('discount_conditions.types.channel'),
+            'currency'        => __('discount_conditions.types.currency'),
+            'customer_group'  => __('discount_conditions.types.customer_group'),
+            'user'            => __('discount_conditions.types.user'),
+            'partner_tier'    => __('discount_conditions.types.partner_tier'),
+            'first_order'     => __('discount_conditions.types.first_order'),
+            'day_time'        => __('discount_conditions.types.day_time'),
+            'custom_script'   => __('discount_conditions.types.custom_script'),
+            default           => $this->type,
         };
     }
 
@@ -226,21 +228,21 @@ final class DiscountCondition extends Model
     public function getOperatorLabel(): string
     {
         return match ($this->operator) {
-            'equals_to' => __('discount_conditions.operators.equals_to'),
-            'not_equals_to' => __('discount_conditions.operators.not_equals_to'),
-            'less_than' => __('discount_conditions.operators.less_than'),
-            'greater_than' => __('discount_conditions.operators.greater_than'),
-            'less_than_or_equal' => __('discount_conditions.operators.less_than_or_equal'),
+            'equals_to'             => __('discount_conditions.operators.equals_to'),
+            'not_equals_to'         => __('discount_conditions.operators.not_equals_to'),
+            'less_than'             => __('discount_conditions.operators.less_than'),
+            'greater_than'          => __('discount_conditions.operators.greater_than'),
+            'less_than_or_equal'    => __('discount_conditions.operators.less_than_or_equal'),
             'greater_than_or_equal' => __('discount_conditions.operators.greater_than_or_equal'),
-            'starts_with' => __('discount_conditions.operators.starts_with'),
-            'ends_with' => __('discount_conditions.operators.ends_with'),
-            'contains' => __('discount_conditions.operators.contains'),
-            'not_contains' => __('discount_conditions.operators.not_contains'),
-            'in_array' => __('discount_conditions.operators.in_array'),
-            'not_in_array' => __('discount_conditions.operators.not_in_array'),
-            'regex' => __('discount_conditions.operators.regex'),
-            'not_regex' => __('discount_conditions.operators.not_regex'),
-            default => $this->operator,
+            'starts_with'           => __('discount_conditions.operators.starts_with'),
+            'ends_with'             => __('discount_conditions.operators.ends_with'),
+            'contains'              => __('discount_conditions.operators.contains'),
+            'not_contains'          => __('discount_conditions.operators.not_contains'),
+            'in_array'              => __('discount_conditions.operators.in_array'),
+            'not_in_array'          => __('discount_conditions.operators.not_in_array'),
+            'regex'                 => __('discount_conditions.operators.regex'),
+            'not_regex'             => __('discount_conditions.operators.not_regex'),
+            default                 => $this->operator,
         };
     }
 

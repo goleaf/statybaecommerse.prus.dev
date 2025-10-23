@@ -10,6 +10,8 @@ use Filament\Actions;
 
 final class ListNormalSettingTranslations extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = NormalSettingTranslationResource::class;
 
     protected function getHeaderActions(): array

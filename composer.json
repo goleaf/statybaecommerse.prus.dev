@@ -32,6 +32,7 @@
         "lara-zeus/matrix-choice": "*",
         "lara-zeus/spatie-translatable": "*",
         "laravel/framework": "^12.0",
+        "laravel/sanctum": "^4.1",
         "laravel/horizon": "^5.33",
         "laravel/sanctum": "^4.0",
         "laravel/scout": "^10.19",
@@ -54,6 +55,7 @@
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.16",
+        "brianium/paratest": "^7.8",
         "fakerphp/faker": "^1.24",
         "brianium/paratest": "^7.8",
         "filament/upgrade": "^4.0",
@@ -133,8 +135,8 @@
         "analyze": "vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G",
         "rector": "vendor/bin/rector process --ansi",
         "blade:format": "php artisan view:clear && php artisan view:cache",
-        "test": "@php vendor/bin/pest --configuration=phpunit.xml",
-        "test:ci": "@php vendor/bin/pest --log-junit build/junit.xml --coverage-clover build/coverage.xml --configuration=phpunit.xml",
+        "test": "@php vendor/bin/pest",
+        "test:ci": "phpunit --log-junit build/junit.xml --coverage-clover build/coverage.xml",
         "tests:check-refresh": [
             "@php artisan tests:check-refresh-database --path=tests/Feature --fail-on-find"
         ],
@@ -254,7 +256,8 @@
         },
         "allow-plugins": {
             "pestphp/pest-plugin": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "tbachert/spi": true
         }
     },
     "minimum-stability": "stable",

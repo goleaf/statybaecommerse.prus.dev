@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\MenuResource\RelationManagers;
 
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+
+use Filament\Schemas\Schema;
 use App\Models\MenuItem;
 use App\Models\Scopes\VisibleScope;
-use Filament\Forms\Components\Grid;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -18,13 +19,16 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class MenuItemsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'allItems';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $schema): Schema   
     {
         return $schema->schema([
             Grid::make(2)
@@ -63,8 +67,9 @@ final class MenuItemsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->columns([
                 TextColumn::make('label')
@@ -84,6 +89,15 @@ final class MenuItemsRelationManager extends BaseRelationManager
             ])
             ->defaultSort('sort_order')
             ->headerActions([
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit ' . $this->getPluralModelLabel())
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        // Provide a quick-edit modal for managing records inline.
+                        return $repeater->schema($this->getQuickEditSchema());
+                    }),
                 CreateAction::make(),
             ])
             ->actions([

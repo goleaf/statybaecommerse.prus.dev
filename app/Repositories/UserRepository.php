@@ -6,7 +6,7 @@ namespace App\Repositories;
 
 use App\Models\User;
 use App\Support\Cache\CacheKeys;
-use Illuminate\Support\Facades\Cache;
+use App\Support\Cache\TagAwareCache;
 
 final class UserRepository
 {
@@ -18,19 +18,11 @@ final class UserRepository
             return User::on($connection)->newQuery()->count();
         }
 
-        if (! Cache::supportsTags()) {
-            return Cache::remember(
-                CacheKeys::userTotalCount(),
-                now()->addSeconds(CacheKeys::TTL_MINUTE),
-                static fn (): int => User::query()->count(),
-            );
-        }
-
-        return Cache::tags([CacheKeys::userAggregateTag(), CacheKeys::dashboardTag()])
-            ->remember(
-                CacheKeys::userTotalCount(),
-                now()->addSeconds(CacheKeys::TTL_MINUTE),
-                static fn (): int => User::query()->count(),
-            );
+        return TagAwareCache::remember(
+            CacheKeys::userTotalCount(),
+            now()->addSeconds(CacheKeys::TTL_MINUTE),
+            static fn (): int => User::query()->count(),
+            [CacheKeys::userAggregateTag(), CacheKeys::dashboardTag()]
+        );
     }
 }

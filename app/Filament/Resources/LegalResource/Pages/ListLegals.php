@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ListLegals extends BaseListRecords
 {
+    use HasResizableColumns;
     use HasWidgetTabs;
 
     protected static string $resource = LegalResource::class;

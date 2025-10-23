@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import '../../filament-enhancements.css';
+@import '../../../../vendor/saade/filament-fullcalendar/resources/css/filament-fullcalendar.css';
+/* Include the combobox plugin styles so the admin theme builds the vendor UI correctly. */
+@reference '../../../../vendor/filament/filament/resources/css/theme.css';
+@import '../../../../vendor/novadaemon/filament-combobox/resources/dist/filament-combobox.css';
+
+@source '../../../../app/Filament';
+@source '../../../../resources/views/filament';
+@source '../../../../vendor/defstudio/filament-searchable-input/resources/**/*.blade.php';
+@source '../../../../vendor/saade/filament-fullcalendar/resources/views/**/*.blade.php';
+/* Scan the combobox plugin views so Tailwind preserves any utility classes referenced within the package. */
+@source '../../../../vendor/novadaemon/filament-combobox/resources/views/**/*.blade.php';

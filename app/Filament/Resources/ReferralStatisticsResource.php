@@ -4,21 +4,22 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Forms\Components\Flatpickr;
+use App\Support\DateRange;
 use App\Filament\Resources\ReferralStatisticsResource\Pages;
 use App\Models\ReferralStatistics;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
+use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -41,7 +42,7 @@ final class ReferralStatisticsResource extends Resource
 
     protected static ?string $model = ReferralStatistics::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
     {
         return 'heroicon-o-chart-bar-square';
     }
@@ -65,9 +66,9 @@ final class ReferralStatisticsResource extends Resource
         return __('referral_statistics.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->columns(3)
             ->schema([
                 Section::make(__('referral_statistics.sections.basic_info'))
@@ -145,8 +146,9 @@ final class ReferralStatisticsResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('user.name')
@@ -220,13 +222,15 @@ final class ReferralStatisticsResource extends Resource
                             ->label(__('referral_statistics.filters.until_date')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
+                        [$from, $until] = DateRange::extract($data, 'from', 'until');
+
                         return $query
                             ->when(
-                                $data['from'] ?? null,
+                                $from,
                                 fn (Builder $query, $date): Builder => $query->whereDate('date', '>=', $date),
                             )
                             ->when(
-                                $data['until'] ?? null,
+                                $until,
                                 fn (Builder $query, $date): Builder => $query->whereDate('date', '<=', $date),
                             );
                     }),
@@ -272,8 +276,9 @@ final class ReferralStatisticsResource extends Resource
             ->defaultSort('date', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Schema $schema): Schema   
     {
+        // Provide the infolist schema using the Filament v4 return type.
         return $schema
             ->schema([
                 Section::make(__('referral_statistics.sections.basic_info'))
@@ -371,6 +376,8 @@ final class ReferralStatisticsResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) self::$model::count();
+        $count = (int) self::$model::count();
+
+        return $count > 0 ? (string) $count : null;
     }
 }

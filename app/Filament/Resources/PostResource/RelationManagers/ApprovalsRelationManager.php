@@ -7,6 +7,7 @@ namespace App\Filament\Resources\PostResource\RelationManagers;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 final class ApprovalsRelationManager extends BaseRelationManager
 {
@@ -14,8 +15,9 @@ final class ApprovalsRelationManager extends BaseRelationManager
 
     protected static ?string $recordTitleAttribute = 'decision';
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->columns([
                 TextColumn::make('decided_at')

@@ -7,6 +7,7 @@ namespace App\Support\Search;
 use App\Models\Address;
 use App\Models\City;
 use DefStudio\SearchableInput\DTO\SearchResult;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 
@@ -108,19 +109,112 @@ final class AddressSearch
             ->all();
     }
 
+    public static function hydrateComponent(SearchableInput $component, ?int $state): void
+    {
+        if ($state === null) {
+            SearchableComponentHelper::forget($component);
+
+            return;
+        }
+
+        $address = Address::query()
+            ->select(['id', 'address_line_1', 'address_line_2', 'city', 'state', 'postal_code', 'country_code'])
+            ->find($state);
+
+        if (! $address instanceof Address) {
+            return;
+        }
+
+        SearchableComponentHelper::apply($component, self::toResult($address));
+    }
+
     /**
      * @return array<string, string>
      */
     public static function payload(Address $address): array
     {
+        /** @var string|null $line1 */
+        $line1 = $address->getAttribute('address_line_1');
+        /** @var string|null $line2 */
+        $line2 = $address->getAttribute('address_line_2');
+        /** @var string|null $city */
+        $city = $address->getAttribute('city');
+        /** @var string|null $state */
+        $state = $address->getAttribute('state');
+        /** @var string|null $postal */
+        $postal = $address->getAttribute('postal_code');
+        /** @var string|null $country */
+        $country = $address->getAttribute('country_code');
+        /** @var string|null $firstName */
+        $firstName = $address->getAttribute('first_name');
+        /** @var string|null $lastName */
+        $lastName = $address->getAttribute('last_name');
+        /** @var string|null $company */
+        $company = $address->getAttribute('company_name');
+        /** @var string|null $phone */
+        $phone = $address->getAttribute('phone');
+
+        $label = self::formatAddress($address);
+
         return [
-            'address_line_1' => self::stringValue($address->getAttribute('address_line_1')),
-            'address_line_2' => self::stringValue($address->getAttribute('address_line_2')),
-            'city'           => self::stringValue($address->getAttribute('city')),
-            'state'          => self::stringValue($address->getAttribute('state')),
-            'postal_code'    => self::stringValue($address->getAttribute('postal_code')),
-            'country_code'   => self::stringValue($address->getAttribute('country_code')),
+            'address_id'     => $address->getKey(),
+            'label'          => $label,
+            'formatted'      => $label,
+            'first_name'     => $firstName ?? '',
+            'last_name'      => $lastName ?? '',
+            'company_name'   => $company ?? '',
+            'address_line_1' => $line1 ?? '',
+            'address_line_2' => $line2 ?? '',
+            'city'           => $city ?? '',
+            'state'          => $state ?? '',
+            'postal_code'    => $postal ?? '',
+            'country_code'   => $country ?? '',
+            'phone'          => $phone ?? '',
+            'city_id'        => $address->getAttribute('city_id'),
         ];
+    }
+
+    public static function payloadFromId(int $addressId): ?array
+    {
+        $address = Address::query()
+            ->select([
+                'id',
+                'first_name',
+                'last_name',
+                'company_name',
+                'address_line_1',
+                'address_line_2',
+                'city',
+                'state',
+                'postal_code',
+                'country_code',
+                'phone',
+                'city_id',
+            ])
+            ->find($addressId);
+
+        if (! $address instanceof Address) {
+            return null;
+        }
+
+        return self::payload($address);
+    }
+
+    public static function formatPayload(array $payload): string
+    {
+        $parts = array_filter([
+            (string) ($payload['address_line_1'] ?? ''),
+            (string) ($payload['city'] ?? ''),
+            (string) ($payload['state'] ?? ''),
+            (string) ($payload['postal_code'] ?? ''),
+            Str::upper((string) ($payload['country_code'] ?? '')),
+        ], fn (string $value): bool => $value !== '');
+
+        if ($parts === []) {
+            return (string) ($payload['label'] ?? '');
+        }
+
+        return implode(', ', $parts);
     }
 
     /**
@@ -191,5 +285,20 @@ final class AddressSearch
     private static function stringValue(mixed $value): string
     {
         return is_string($value) ? $value : '';
+    }
+
+    private static function toResult(Address $address): SearchResult
+    {
+        /** @var int|string|null $identifier */
+        $identifier = $address->getKey();
+        $label = self::formatAddress($address);
+
+        $result = SearchResult::make((string) ($identifier ?? ''), $label);
+
+        $result
+            ->withData('address_id', $address->getKey())
+            ->withData('payload', self::payload($address));
+
+        return $result;
     }
 }

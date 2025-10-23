@@ -7,6 +7,7 @@ namespace Tests\Feature\Filament;
 use App\Filament\Resources\ProductResource;
 use App\Models\Product;
 use App\Models\User;
+use App\Support\Nav;
 use Filament\Schemas\Schema;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -26,8 +27,8 @@ final class ProductResourceFrontendTest extends TestCase
 
     public function test_navigation_configuration(): void
     {
-        $this->assertSame('Products', ProductResource::getNavigationGroup());
-        $this->assertSame('heroicon-o-cube', ProductResource::getNavigationIcon());
+        $this->assertSame(Nav::groupForResource(ProductResource::class), ProductResource::getNavigationGroup());
+        $this->assertSame(Nav::iconForResource(ProductResource::class), ProductResource::getNavigationIcon());
         $this->assertSame(__('products.title'), ProductResource::getNavigationLabel());
     }
 

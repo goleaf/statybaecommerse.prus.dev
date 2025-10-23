@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\SliderTranslationResource\Pages;
-use App\Models\Slider;
-use BackedEnum;
+use App\Models\SliderTranslation;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -14,13 +15,14 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use UnitEnum;
 
 final class SliderTranslationResource extends Resource
@@ -56,17 +58,18 @@ final class SliderTranslationResource extends Resource
         return __('admin.slider_translations.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             SchemaSection::make(__('admin.slider_translations.basic_information'))
                 ->components([
-                    SchemaGrid::make(2)
+                    Grid::make(2)
                         ->components([
                             Select::make('slider_id')
                                 ->label(__('admin.slider_translations.slider'))
-                                ->options(Slider::pluck('name', 'id'))
+                                ->relationship('slider', 'name')
                                 ->required()
+                                ->preload()
                                 ->searchable(),
                             Select::make('locale')
                                 ->label(__('admin.slider_translations.locale'))
@@ -95,8 +98,9 @@ final class SliderTranslationResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('slider.name')
@@ -121,25 +125,37 @@ final class SliderTranslationResource extends Resource
                     ->sortable()
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
-                        $state = $column->getState();
+                        $state = (string) $column->getState();
 
-                        return strlen($state) > 50 ? $state : null;
+                        if (! is_string($state)) {
+                            return null;
+                        }
+
+                        return Str::length($state) > 50 ? $state : null;
                     }),
                 TextColumn::make('description')
                     ->label(__('admin.slider_translations.description'))
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
-                        $state = $column->getState();
+                        $state = (string) $column->getState();
 
-                        return strlen($state) > 50 ? $state : null;
+                        if (! is_string($state)) {
+                            return null;
+                        }
+
+                        return Str::length($state) > 50 ? $state : null;
                     }),
                 TextColumn::make('button_text')
                     ->label(__('admin.slider_translations.button_text'))
                     ->limit(30)
                     ->tooltip(function (TextColumn $column): ?string {
-                        $state = $column->getState();
+                        $state = (string) $column->getState();
 
-                        return strlen($state) > 30 ? $state : null;
+                        if (! is_string($state)) {
+                            return null;
+                        }
+
+                        return Str::length($state) > 30 ? $state : null;
                     }),
                 TextColumn::make('created_at')
                     ->label(__('admin.common.created_at'))
@@ -148,9 +164,10 @@ final class SliderTranslationResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('slider_id')
+                SelectFilter::make('slider')
                     ->label(__('admin.slider_translations.slider'))
-                    ->options(Slider::pluck('name', 'id'))
+                    ->relationship('slider', 'name')
+                    ->preload()
                     ->searchable(),
                 SelectFilter::make('locale')
                     ->label(__('admin.slider_translations.locale'))

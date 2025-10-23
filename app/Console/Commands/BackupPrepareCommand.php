@@ -9,6 +9,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use RuntimeException;
@@ -17,26 +18,23 @@ use Throwable;
 
 final class BackupPrepareCommand extends Command
 {
-    protected $signature = 'backup:prepare
-                            {--connection= : Database connection name to dump}
-                            {--storage-path= : Override the backup storage root}
-                            {--media-paths=* : Additional media paths to include}
-                            {--tag= : Optional suffix for the backup directory}';
+    protected $signature = 'backup:prepare {--disk=backups : Storage disk to persist artifacts on} {--path=artifacts/backup.json : Relative path on the disk for the backup payload}';
 
-    protected $description = 'Create a timestamped backup containing the database dump and media assets.';
+    protected $description = 'Prepare sanitized backup artifacts for critical catalog tables.';
 
     public function handle(): int
     {
-        $databaseDefault = config('database.default', 'sqlite');
-        $databaseDefaultString = is_string($databaseDefault) ? $databaseDefault : 'sqlite';
-        $connectionDefault = config('backup.connection', $databaseDefaultString);
-        $connectionName = $this->optionString('connection', is_string($connectionDefault) ? $connectionDefault : $databaseDefaultString);
+        $diskName = (string) $this->option('disk');
+        $path = (string) $this->option('path');
 
-        $storageDefault = config('backup.storage_path', storage_path('app/backups'));
-        $storageRoot = $this->normalizePath($this->optionString('storage-path', is_string($storageDefault) ? $storageDefault : storage_path('app/backups')));
+        $disk = Storage::disk($diskName);
 
-        $extraMediaOption = (array) $this->option('media-paths');
-        $additionalMediaPaths = array_values(array_filter($extraMediaOption, static fn ($value): bool => is_string($value)));
+        $users = User::query()
+            ->select(['id', 'name', 'email', 'locale', 'created_at', 'updated_at'])
+            ->orderBy('id')
+            ->get()
+            ->map(static fn (User $user): array => Arr::only($user->toArray(), ['id', 'name', 'email', 'locale', 'created_at', 'updated_at']))
+            ->values();
 
         $mediaPaths = $this->resolveMediaPaths($additionalMediaPaths);
         $timestamp = CarbonImmutable::now()->format('Ymd_His');
@@ -44,9 +42,17 @@ final class BackupPrepareCommand extends Command
         $directoryName = $tag !== null ? sprintf('%s_%s', $timestamp, Str::slug($tag)) : $timestamp;
         $backupPath = $storageRoot . DIRECTORY_SEPARATOR . $directoryName;
 
-        $this->components->info(sprintf('Starting backup for connection [%s] into %s', $connectionName, $backupPath));
+        $payload = [
+            'generated_at' => now()->toIso8601String(),
+            'metadata' => [
+                'user_count' => $users->count(),
+                'product_count' => $products->count(),
+            ],
+            'users' => $users,
+            'products' => $products,
+        ];
 
-        File::ensureDirectoryExists($backupPath);
+        $encodedPayload = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
         try {
             $databaseConfig = config("database.connections.{$connectionName}");
@@ -62,11 +68,20 @@ final class BackupPrepareCommand extends Command
             /** @var array<string, mixed> $databaseConfig */
             $databaseConfig = $databaseConfig;
 
+            if (($databaseConfig['driver'] ?? null) === 'sqlite') {
+                // Surface both the configured and active database paths for debugging.
+                logger()->info('backup.sqlite_connection', [
+                    'connection' => $connectionName,
+                    'configured' => $databaseConfig['database'] ?? null,
+                    'active'     => DB::connection($connectionName)->getDatabaseName(),
+                ]);
+            }
+
             $databaseArtifact = $this->dumpDatabase($connectionName, $databaseConfig, $backupPath);
             $mediaArtifact = $this->archiveMedia($mediaPaths, $backupPath);
             $commitHash = $this->resolveCommitHash();
 
-            $databaseChecksum = hash_file('sha256', $databaseArtifact['path']);
+            $databaseChecksum = hash_file('sha256', $databasePath);
             $mediaChecksum = hash_file('sha256', $mediaArtifact);
 
             if ($databaseChecksum === false || $mediaChecksum === false) {
@@ -111,7 +126,7 @@ final class BackupPrepareCommand extends Command
 
             $this->components->info('Backup created successfully.');
             $this->newLine();
-            $this->components->twoColumnDetail('Database artifact', $databaseArtifact['path']);
+            $this->components->twoColumnDetail('Database artifact', $databasePath);
             $this->components->twoColumnDetail('Media archive', $mediaArtifact);
             $this->components->twoColumnDetail('Metadata', $backupPath . '/metadata.json');
 
@@ -125,11 +140,12 @@ final class BackupPrepareCommand extends Command
             return self::SUCCESS;
         } catch (Throwable $exception) {
             $this->components->error($exception->getMessage());
+            // Record the exception so debugging backup failures in tests is straightforward.
+            logger()->error('backup.prepare_failed', ['exception' => $exception]);
             File::deleteDirectory($backupPath);
 
             return self::FAILURE;
         }
-    }
 
     /**
      * @param  array<int, string>|null $extraMediaPaths
@@ -142,7 +158,7 @@ final class BackupPrepareCommand extends Command
             static fn ($value): bool => is_string($value),
         ));
 
-        $candidates = [];
+        $this->components->info(sprintf('Backup prepared on disk [%s] with %d users and %d products.', $diskName, $users->count(), $products->count()));
 
         foreach (array_merge($configured, $extraMediaPaths ?? []) as $path) {
             if ($path === '') {
@@ -152,17 +168,19 @@ final class BackupPrepareCommand extends Command
             $candidates[] = $this->normalizePath($path);
         }
 
+        /** @var array<int, string> $uniquePaths */
         $uniquePaths = array_values(array_unique($candidates));
         $existing = [];
 
         foreach ($uniquePaths as $candidate) {
+            /** @var string $candidate */
             if (File::exists($candidate)) {
                 $existing[] = $candidate;
 
                 continue;
             }
 
-            $this->components->warn(sprintf('Media path [%s] does not exist and will be skipped.', $candidate));
+            $this->components->warn(sprintf('Media path [%s] does not exist and will be skipped.', (string) $candidate));
         }
 
         return $existing;
@@ -194,7 +212,7 @@ final class BackupPrepareCommand extends Command
         }
 
         return match ($driver) {
-            'sqlite' => $this->dumpSqliteDatabase($config, $backupPath),
+            'sqlite' => $this->dumpSqliteDatabase($connection, $config, $backupPath),
             'mysql', 'mariadb' => $this->dumpMysqlDatabase($config, $backupPath),
             'pgsql' => $this->dumpPostgresDatabase($config, $backupPath),
             default => throw new RuntimeException("Dumping for driver [{$driver}] is not supported."),
@@ -205,7 +223,7 @@ final class BackupPrepareCommand extends Command
      * @param  array<string, mixed>                $config
      * @return array{path: string, driver: string}
      */
-    private function dumpSqliteDatabase(array $config, string $backupPath): array
+    private function dumpSqliteDatabase(string $connection, array $config, string $backupPath): array
     {
         $databasePath = $config['database'] ?? null;
 
@@ -213,12 +231,35 @@ final class BackupPrepareCommand extends Command
             throw new RuntimeException('SQLite database path is not configured.');
         }
 
-        if (! File::exists($databasePath)) {
-            throw new FileNotFoundException("SQLite database [{$databasePath}] not found.");
-        }
+        // Emit a breadcrumb so failing tests surface the evaluated database path.
+        logger()->info('backup.sqlite_source', [
+            'database' => $databasePath,
+            'exists'   => File::exists($databasePath),
+        ]);
+
+        clearstatcache(true, $databasePath);
 
         $targetPath = $backupPath . '/database.sqlite';
-        File::copy($databasePath, $targetPath);
+
+        if (! File::exists($databasePath)) {
+            try {
+                // Fallback to exporting the active connection via SQLite's VACUUM INTO command.
+                DB::connection($connection)->getPdo()->exec(sprintf(
+                    "VACUUM INTO '%s'",
+                    str_replace("'", "''", $targetPath)
+                ));
+
+                logger()->warning('backup.sqlite_vacuum_fallback', [
+                    'connection' => $connection,
+                    'source'     => $databasePath,
+                    'target'     => $targetPath,
+                ]);
+            } catch (Throwable $exception) {
+                throw new FileNotFoundException("SQLite database [{$databasePath}] not found.", previous: $exception);
+            }
+        } else {
+            File::copy($databasePath, $targetPath);
+        }
 
         return [
             'path'   => $targetPath,
@@ -252,10 +293,9 @@ final class BackupPrepareCommand extends Command
         $optionsPart = $options === '' ? '' : ' ' . $options;
 
         $command = sprintf(
-            '%s --host=%s --port=%s --user=%s%s %s > %s',
-            escapeshellarg($binary),
-            escapeshellarg($host),
-            escapeshellarg($port),
+            'mysqldump --host=%s --port=%s --user=%s --single-transaction --routines --events %s > %s',
+            escapeshellarg((string) $host),
+            escapeshellarg((string) $port),
             escapeshellarg($username),
             $optionsPart,
             escapeshellarg($database),
@@ -300,10 +340,9 @@ final class BackupPrepareCommand extends Command
         $optionsPart = $options === '' ? '' : ' ' . $options;
 
         $command = sprintf(
-            '%s --host=%s --port=%s --username=%s%s %s > %s',
-            escapeshellarg($binary),
-            escapeshellarg($host),
-            escapeshellarg($port),
+            'pg_dump --host=%s --port=%s --username=%s --no-owner --no-privileges %s > %s',
+            escapeshellarg((string) $host),
+            escapeshellarg((string) $port),
             escapeshellarg($username),
             $optionsPart,
             escapeshellarg($database),

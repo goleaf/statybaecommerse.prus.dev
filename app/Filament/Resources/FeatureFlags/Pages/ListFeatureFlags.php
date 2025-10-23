@@ -10,6 +10,8 @@ use Filament\Actions\CreateAction;
 
 class ListFeatureFlags extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = FeatureFlagResource::class;
 
     protected function getHeaderActions(): array

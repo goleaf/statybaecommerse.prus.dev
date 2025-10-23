@@ -102,10 +102,10 @@ return [
      * | ],
      * |
      */
-    'locale_mapping' => array_filter([
+    'locale_mapping' => [
         'lt' => ['currency' => 'EUR', 'zone' => 'eu'],
         // Add more mappings as needed
-    ]),
+    ],
 
     /*
      * |--------------------------------------------------------------------------
@@ -121,7 +121,8 @@ return [
     'key' => env('APP_KEY'),
     'previous_keys' => [
         ...array_filter(
-            explode(',', (string) env('APP_PREVIOUS_KEYS', ''))
+            explode(',', (string) env('APP_PREVIOUS_KEYS', '')),
+            static fn (string $key): bool => $key !== ''
         ),
     ],
 

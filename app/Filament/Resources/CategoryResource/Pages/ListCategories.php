@@ -11,10 +11,16 @@ use Filament\Actions;
 
 final class ListCategories extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = CategoryResource::class;
 
     protected function getHeaderActions(): array
     {
+        if (! CategoryResource::canCreate()) {
+            return [];
+        }
+
         return [
             Actions\CreateAction::make()
                 ->visible(fn () => AuthorizationMatrix::check('categories', 'create')),

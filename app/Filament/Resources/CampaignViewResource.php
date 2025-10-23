@@ -4,26 +4,30 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\CampaignViewResource\Pages;
 use App\Models\CampaignView;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class CampaignViewResource extends Resource
 {
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Marketing';
-    }
+    use HasNav;
+
+    
 
     protected static ?string $model = CampaignView::class;
 
@@ -46,9 +50,9 @@ final class CampaignViewResource extends Resource
         return __('campaign_views.navigation');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Tabs::make(__('campaign_views.section_title'))
                     ->tabs([
@@ -65,7 +69,8 @@ final class CampaignViewResource extends Resource
                                     ->label(__('campaign_views.customer'))
                                     ->relationship('customer', 'name')
                                     ->searchable()
-                                    ->preload(),
+                                    ->preload()
+                                    ->placeholder(__('campaign_views.guest')),
                                 TextInput::make('ip_address')
                                     ->label(__('campaign_views.ip_address'))
                                     ->ip()
@@ -90,8 +95,9 @@ final class CampaignViewResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('campaign.name')

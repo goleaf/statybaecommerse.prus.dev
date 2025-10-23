@@ -4,37 +4,44 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\CampaignResource\Pages;
 use App\Filament\Resources\CampaignResource\RelationManagers\TranslationsRelationManager;
 use App\Models\Campaign;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
 use Filament\Forms;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Novadaemon\FilamentCombobox\Combobox;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class CampaignResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Campaign::class;
 
     protected static ?int $navigationSort = 7;
@@ -46,7 +53,7 @@ final class CampaignResource extends Resource
         return __('campaigns.navigation.campaigns');
     }
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): string|UnitEnum|null
     {
         return 'Marketing';
     }
@@ -61,9 +68,9 @@ final class CampaignResource extends Resource
         return __('campaigns.models.campaign');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             // Section component keeps the basic information grouped for clarity in Filament v4.
             Section::make(__('campaigns.sections.basic_information'))
                 ->schema([
@@ -75,7 +82,7 @@ final class CampaignResource extends Resource
                                 ->required()
                                 ->maxLength(255)
                                 ->live(onBlur: true)
-                                ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', Str::slug((string) $state)) : null),
+                                ->afterStateUpdated(fn (string $operation, $state, Set $set) => $operation === 'create' ? $set('slug', Str::slug((string) $state)) : null),
                             TextInput::make('slug')
                                 ->label(self::label('campaigns.fields.slug', 'Slug'))
                                 ->unique(ignoreRecord: true),
@@ -148,37 +155,45 @@ final class CampaignResource extends Resource
                     Combobox::make('targetCategories')
                         ->label(self::label('campaigns.fields.target_categories', 'Target categories'))
                         ->relationship('targetCategories', 'name')
-                        ->boxSearchs()
-                        ->height('360px')
-                        ->optionsLabel(fn (): string => self::label('campaigns.combobox.options.target_categories', 'Available categories'))
-                        ->selectedLabel(fn (): string => self::label('campaigns.combobox.selected.target_categories', 'Selected categories'))
+                        ->translatedLabels(
+                            'campaigns.combobox.options.target_categories',
+                            'campaigns.combobox.selected.target_categories',
+                            'Available categories',
+                            'Selected categories',
+                        )
                         ->preload()
                         ->columnSpanFull(),
                     Combobox::make('targetProducts')
                         ->label(self::label('campaigns.fields.target_products', 'Target products'))
                         ->relationship('targetProducts', 'name')
-                        ->boxSearchs()
-                        ->height('360px')
-                        ->optionsLabel(fn (): string => self::label('campaigns.combobox.options.target_products', 'Available products'))
-                        ->selectedLabel(fn (): string => self::label('campaigns.combobox.selected.target_products', 'Selected products'))
+                        ->translatedLabels(
+                            'campaigns.combobox.options.target_products',
+                            'campaigns.combobox.selected.target_products',
+                            'Available products',
+                            'Selected products',
+                        )
                         ->preload()
                         ->columnSpanFull(),
                     Combobox::make('targetCustomerGroups')
                         ->label(self::label('campaigns.fields.target_customer_groups', 'Target customer groups'))
                         ->relationship('targetCustomerGroups', 'name')
-                        ->boxSearchs()
-                        ->height('360px')
-                        ->optionsLabel(fn (): string => self::label('campaigns.combobox.options.target_customer_groups', 'Available customer groups'))
-                        ->selectedLabel(fn (): string => self::label('campaigns.combobox.selected.target_customer_groups', 'Selected customer groups'))
+                        ->translatedLabels(
+                            'campaigns.combobox.options.target_customer_groups',
+                            'campaigns.combobox.selected.target_customer_groups',
+                            'Available customer groups',
+                            'Selected customer groups',
+                        )
                         ->preload()
                         ->columnSpanFull(),
                     Combobox::make('discounts')
                         ->label(self::label('campaigns.fields.discounts', 'Discounts'))
                         ->relationship('discounts', 'name')
-                        ->boxSearchs()
-                        ->height('360px')
-                        ->optionsLabel(fn (): string => self::label('campaigns.combobox.options.discounts', 'Available discounts'))
-                        ->selectedLabel(fn (): string => self::label('campaigns.combobox.selected.discounts', 'Selected discounts'))
+                        ->translatedLabels(
+                            'campaigns.combobox.options.discounts',
+                            'campaigns.combobox.selected.discounts',
+                            'Available discounts',
+                            'Selected discounts',
+                        )
                         ->preload()
                         ->columnSpanFull(),
                 ]),
@@ -232,8 +247,9 @@ final class CampaignResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('name')

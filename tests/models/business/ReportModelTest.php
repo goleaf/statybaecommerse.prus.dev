@@ -24,14 +24,21 @@ final class ReportModelTest extends TestCase
     public function test_report_has_translatable_fields(): void
     {
         $report = Report::factory()->create([
-            'name' => ['lt' => 'Testas', 'en' => 'Test'],
+            'name'        => ['lt' => 'Testas', 'en' => 'Test'],
             'description' => ['lt' => 'Aprašymas', 'en' => 'Description'],
+            'content'     => ['lt' => 'Turinys', 'en' => 'Content'],
         ]);
 
         $this->assertEquals('Testas', $report->getTranslation('name', 'lt'));
         $this->assertEquals('Test', $report->getTranslation('name', 'en'));
         $this->assertEquals('Aprašymas', $report->getTranslation('description', 'lt'));
         $this->assertEquals('Description', $report->getTranslation('description', 'en'));
+        $this->assertEquals('Turinys', $report->getTranslation('content', 'lt'));
+        $this->assertEquals('Content', $report->getTranslation('content', 'en'));
+        $this->assertSame([
+            'lt' => 'Testas',
+            'en' => 'Test',
+        ], $report->getTranslations('name'));
     }
 
     public function test_report_belongs_to_generator(): void

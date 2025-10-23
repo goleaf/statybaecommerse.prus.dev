@@ -10,6 +10,8 @@ use Filament\Actions;
 
 class ListSubscribers extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = SubscriberResource::class;
 
     protected function getHeaderActions(): array

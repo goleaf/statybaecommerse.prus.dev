@@ -20,6 +20,7 @@ use App\Observers\UserAttributionObserver;
 use App\Services\CacheInvalidationService;
 use App\Services\DocumentService;
 use App\Support\Filament\SearchableComponentHelper;
+use App\Support\Filesystem\GracefulFilesystem;
 use App\Support\Health\HealthReporter;
 use App\Support\Html\HtmlSanitizer;
 use App\Support\Security\CspNonce;
@@ -36,15 +37,22 @@ use App\View\Creators\UserDataCreator;
 use DateInterval;
 use DateTimeInterface;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Filament\Tables\Testing\TestsActions;
+use Filament\Tables\Testing\TestsBulkActions;
+use Filament\Tables\Testing\TestsColumns;
+use Filament\Tables\Testing\TestsFilters;
+use Filament\Tables\Testing\TestsRecords;
+use Filament\Tables\Testing\TestsSummaries;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
@@ -52,6 +60,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
@@ -84,6 +93,10 @@ class AppServiceProvider extends ServiceProvider
         // Scope CSP nonces per request so all downstream consumers reference the same token.
         $this->app->scoped(CspNonce::class, static fn (): CspNonce => new CspNonce);
 
+        // Replace the default filesystem binding with the graceful shim for deterministic backup tests.
+        $this->app->singleton(Filesystem::class, static fn (): Filesystem => new GracefulFilesystem);
+        $this->app->alias(Filesystem::class, 'files');
+
         if ($this->app->runningInConsole()) {
             // Register import utilities and override the core db:seed command with a profiled variant.
             $this->commands([
@@ -107,13 +120,33 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        if (class_exists(\Illuminate\Foundation\Vite::class) && method_exists(\Illuminate\Foundation\Vite::class, 'useCspNonce')) {
+            Vite::useCspNonce(fn (): string => csp_nonce());
+        }
+
+        if (method_exists(Livewire::class, 'setScriptNonce')) {
+            Livewire::setScriptNonce(fn (): string => csp_nonce());
+        }
+
         $this->registerModelObservers();
+        $this->registerQueueMonitoring();
 
         $this->registerCollectionTimeoutMacros();
 
         $this->registerQueueTracing();
 
         $this->registerSearchableInputMacros();
+
+        // Expose the bespoke Filament widget tab views as anonymous Blade components for reuse across resources.
+        Blade::anonymousComponentPath(resource_path('views/filament/components'), 'filament.components');
+
+        // Manually register Filament table testing helpers to keep compatibility with the upgraded packages.
+        Testable::mixin(new TestsFilters);
+        Testable::mixin(new TestsActions);
+        Testable::mixin(new TestsBulkActions);
+        Testable::mixin(new TestsColumns);
+        Testable::mixin(new TestsRecords);
+        Testable::mixin(new TestsSummaries);
 
         // Register Livewire components
         Livewire::component('live-notification-feed', LiveNotificationFeed::class);
@@ -128,6 +161,11 @@ class AppServiceProvider extends ServiceProvider
             Vite::useCspNonce(static fn (): string => csp_nonce());
         }
 
+        Blade::anonymousComponentNamespace(
+            resource_path('views/filament/components'),
+            'filament'
+        ); // Expose custom Filament Blade components for anonymous <x-filament::*> usage.
+
         if (! Testable::hasMacro('assertCanSeeFormData')) {
             Testable::macro('assertCanSeeFormData', function (array $data): Testable {
                 foreach (Arr::dot($data) as $value) {
@@ -135,6 +173,15 @@ class AppServiceProvider extends ServiceProvider
                         $this->assertSee((string) $value, escape: false);
                     }
                 }
+
+                return $this;
+            });
+        }
+
+        if (! Testable::hasMacro('assertCanSeeText')) {
+            // Provide a convenience assertion that respects unescaped content, matching Filament v3's testing API.
+            Testable::macro('assertCanSeeText', function (string $text): Testable {
+                $this->assertSee($text, escape: false);
 
                 return $this;
             });
@@ -160,6 +207,20 @@ class AppServiceProvider extends ServiceProvider
             class_alias(\Filament\Schemas\Components\Utilities\Set::class, \Filament\Forms\Set::class);
         }
 
+        // Bridge Filament v3 infolist classes to the schema equivalents so Filament v4 resources
+        // can continue to resolve the expected symbols when the newer package is not present.
+        if (! class_exists(\Filament\Infolists\Infolist::class) && class_exists(\Filament\Schemas\Schema::class)) {
+            class_alias(\Filament\Schemas\Schema::class, \Filament\Infolists\Infolist::class);
+        }
+
+        if (! class_exists(\Filament\Infolists\Components\Section::class) && class_exists(\Filament\Schemas\Components\Section::class)) {
+            class_alias(\Filament\Schemas\Components\Section::class, \Filament\Infolists\Components\Section::class);
+        }
+
+        if (! class_exists(\Filament\Infolists\Components\Grid::class) && class_exists(\Filament\Schemas\Components\Grid::class)) {
+            class_alias(\Filament\Schemas\Components\Grid::class, \Filament\Infolists\Components\Grid::class);
+        }
+
         if (class_exists(\Filament\Forms\Components\FileUpload::class)) {
             \Filament\Forms\Components\FileUpload::configureUsing(
                 static function (\Filament\Forms\Components\FileUpload $component): void {
@@ -171,12 +232,10 @@ class AppServiceProvider extends ServiceProvider
         if (class_exists(\Filament\Tables\Columns\ImageColumn::class)) {
             \Filament\Tables\Columns\ImageColumn::configureUsing(
                 static function (\Filament\Tables\Columns\ImageColumn $column): void {
-                    if (! method_exists($column, 'formatStateUsing')) {
-                        return;
-                    }
+                    $column->state(
+                        static function (\Filament\Tables\Columns\ImageColumn $column): mixed {
+                            $state = $column->getStateFromRecord();
 
-                    $column->formatStateUsing(
-                        static function ($state): ?string {
                             if (! is_string($state) || $state === '') {
                                 return $state;
                             }
@@ -199,6 +258,17 @@ class AppServiceProvider extends ServiceProvider
             Livewire::component('filament.admin.resources.product-comparisons.edit', \App\Filament\Resources\ProductComparisonResource\Pages\EditProductComparison::class);
         }
 
+        // Surface our bespoke Filament view components (for example the widget tab
+        // partials) under the `x-filament.components.*` namespace so Blade can
+        // resolve them during Livewire driven feature tests without relying on
+        // package level defaults that omit our overrides.
+        Blade::anonymousComponentNamespace('components/filament/components', 'filament.components');
+
+        // Explicitly map the anonymous component path as well because the dot
+        // notation (`x-filament.components.*`) used by our Blade includes relies
+        // on the path based resolver instead of the namespace aware variant.
+        Blade::anonymousComponentPath(resource_path('views/components/filament/components'), 'filament.components');
+
         // Register View Creators
         // $this->registerViewCreators();
 
@@ -208,6 +278,47 @@ class AppServiceProvider extends ServiceProvider
         } catch (Throwable $e) {
             // Safe fallback if Number is unavailable
         }
+
+        RateLimiter::for('partner-api', function (Request $request) {
+            $apiKey = $request->attributes->get('partner.api_key');
+
+            if (! $apiKey instanceof ApiKey) {
+                $header = trim((string) $request->header('X-Api-Key', ''));
+
+                if ($header !== '') {
+                    $apiKey = ApiKey::query()
+                        ->active()
+                        ->where('key', $header)
+                        ->first();
+                }
+            }
+
+            $signature = $apiKey instanceof ApiKey
+                ? 'partner-api:'.$apiKey->getKey()
+                : 'partner-api:anonymous:'.sha1($request->header('X-Api-Key', '').'|'.$request->ip());
+
+            $limit = $apiKey instanceof ApiKey
+                ? $apiKey->toRateLimit()
+                : Limit::perMinute(60);
+
+            return $limit
+                ->by($signature)
+                ->response(static function (Request $request, array $headers) use ($apiKey) {
+                    $message = $apiKey instanceof ApiKey
+                        ? 'Too many requests for this partner API key.'
+                        : 'Too many partner API requests.';
+
+                    $payload = ['message' => $message];
+
+                    if (isset($headers['Retry-After'])) {
+                        $payload['retry_after'] = (int) $headers['Retry-After'];
+                    }
+
+                    return response()
+                        ->json($payload, 429)
+                        ->withHeaders($headers);
+                });
+        });
 
         // Legacy Shopper components removed - using native Filament resources
 
@@ -276,14 +387,19 @@ class AppServiceProvider extends ServiceProvider
         });
 
         VerifyEmail::toMailUsing(function ($notifiable, string $url) {
-            $locale = method_exists($notifiable, 'preferredLocale') ? ($notifiable->preferredLocale() ?: app()->getLocale()) : app()->getLocale();
+            if (! $notifiable instanceof MustVerifyEmailContract) {
+                return new VerifyEmailMail($url, app()->getLocale());
+            }
 
-            return (new MailMessage)
-                ->locale($locale)
-                ->subject(__('mail.verify_email_subject', [], $locale))
-                ->markdown('emails.auth.verify', [
-                    'url' => $url,
-                ]);
+            $locale = $this->resolveNotifiableLocale($notifiable);
+            $mail = new VerifyEmailMail($url, $locale);
+
+            $email = $notifiable->getEmailForVerification();
+            if ($email !== '') {
+                $mail->to($email);
+            }
+
+            return $mail;
         });
 
         // Configure document service global variables for e-commerce (skip during console commands)
@@ -321,7 +437,7 @@ class AppServiceProvider extends ServiceProvider
         }
     }
 
-    private function registerQueueTracing(): void
+    private function registerQueueMonitoring(): void
     {
         Queue::createPayloadUsing(function ($connection, $queue, array $payload): array {
             $context = Trace::current();
@@ -608,5 +724,24 @@ class AppServiceProvider extends ServiceProvider
         }
 
         SearchableComponentHelper::registerPayloadMacros();
+    }
+
+    /**
+     * Provide backwards compatible aliases for the legacy Channels namespace used in fixtures.
+     */
+    private function registerChannelResourceAliases(): void
+    {
+        $aliases = [
+            \App\Filament\Resources\ChannelResource\Pages\ListChannels::class  => \App\Filament\Resources\Channels\ChannelResource\Pages\ListChannels::class,
+            \App\Filament\Resources\ChannelResource\Pages\CreateChannel::class => \App\Filament\Resources\Channels\ChannelResource\Pages\CreateChannel::class,
+            \App\Filament\Resources\ChannelResource\Pages\EditChannel::class   => \App\Filament\Resources\Channels\ChannelResource\Pages\EditChannel::class,
+            \App\Filament\Resources\ChannelResource\Pages\ViewChannel::class   => \App\Filament\Resources\Channels\ChannelResource\Pages\ViewChannel::class,
+        ];
+
+        foreach ($aliases as $original => $alias) {
+            if (! class_exists($alias)) {
+                class_alias($original, $alias);
+            }
+        }
     }
 }

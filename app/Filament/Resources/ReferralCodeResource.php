@@ -4,34 +4,37 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\ReferralCodeResource\Pages;
 use App\Models\ReferralCampaign;
 use App\Models\ReferralCode;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
-use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class ReferralCodeResource extends Resource
 {
     use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
@@ -43,9 +46,9 @@ final class ReferralCodeResource extends Resource
      */
     protected static UnitEnum|string|null $navigationGroup = 'Referral';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->components([
                 Section::make(__('referral.resource.referral_code.section.code_details'))
                     ->columns(2)
@@ -59,16 +62,18 @@ final class ReferralCodeResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->unique(ignoreRecord: true),
-                        TextInput::make('title')
-                            ->label(__('referral.form.title'))
-                            ->required()
-                            ->maxLength(255)
-                            ->translatable(),
-                        Textarea::make('description')
-                            ->label(__('referral.form.description'))
-                            ->maxLength(65535)
-                            ->nullable()
-                            ->translatable(),
+                        LanguageTabs::make([
+                            TextInput::make('title')
+                                ->label(__('referral.form.title'))
+                                ->required()
+                                ->maxLength(255)
+                                ->translatable(),
+                            Textarea::make('description')
+                                ->label(__('referral.form.description'))
+                                ->maxLength(65535)
+                                ->nullable()
+                                ->translatable(),
+                        ])->columnSpanFull(),
                         Toggle::make('is_active')
                             ->label(__('referral.form.is_active'))
                             ->inline(false)
@@ -131,8 +136,9 @@ final class ReferralCodeResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->query(ReferralCode::query()->withoutGlobalScopes())
             ->columns([
@@ -175,23 +181,22 @@ final class ReferralCodeResource extends Resource
             ->filters([
                 // Alias filter expected by tests
                 TernaryFilter::make('active')
-                    ->attribute('is_active')
                     ->label(__('referral.filters.is_active'))
+                    ->attribute('is_active')
                     ->trueLabel('active')
                     ->falseLabel('inactive')
-                    ->default(true)
                     ->query(function (Builder $query, array $data): Builder {
-                        $rawState = array_key_exists('value', $data) ? $data['value'] : true;
+                        $rawState = $data['value'] ?? null;
 
-                        if ($rawState === null || $rawState === '') {
-                            return $query;
-                        }
-
-                        $shouldShowActive = filter_var($rawState, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-
-                        if ($shouldShowActive === null) {
-                            return $query;
-                        }
+                        $shouldShowActive = match (true) {
+                            is_bool($rawState) => $rawState,
+                            $rawState === null => true,
+                            default => filter_var(
+                                $rawState,
+                                FILTER_VALIDATE_BOOLEAN,
+                                FILTER_NULL_ON_FAILURE,
+                            ) ?? true,
+                        };
 
                         return $query->where('is_active', $shouldShowActive);
                     }),
@@ -205,11 +210,7 @@ final class ReferralCodeResource extends Resource
                     ->query(function (Builder $query, array $data): Builder {
                         $value = $data['reward_type'] ?? $data['value'] ?? null;
 
-                        if ($value === null) {
-                            return $query;
-                        }
-
-                        return $query->where('reward_type', $value);
+                        return $value ? $query->where('reward_type', $value) : $query;
                     }),
                 SelectFilter::make('user_id')
                     ->label(__('referral.filters.user'))
@@ -244,6 +245,21 @@ final class ReferralCodeResource extends Resource
                         'admin' => 'admin',
                         'user'  => 'user',
                     ])
+                    ->indicateUsing(function (array $data): ?string {
+                        $value = $data['source'] ?? $data['value'] ?? null;
+                        if (is_array($value)) {
+                            $value = $value['value'] ?? reset($value);
+                        }
+
+                        if (! is_string($value) || $value === '') {
+                            return null;
+                        }
+
+                        return match ($value) {
+                            'admin', 'user' => $value,
+                            default => $value,
+                        };
+                    })
                     ->query(function (Builder $query, array $data): Builder {
                         $value = $data['source'] ?? $data['value'] ?? null;
 

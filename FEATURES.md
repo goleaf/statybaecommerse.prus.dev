@@ -3,23 +3,29 @@
 This snapshot complements the changelog by listing functional capabilities that ship with the storefront and admin panel.
 
 ## Core Commerce Platform
+
 - Laravel 12 + Filament v4 admin with multilingual product, pricing, discount, and order management flows.
 - Customer loyalty, referral tracking, and recommendation engines with configurable targeting rules.
 - Automated media processing, queue orchestration, and analytics dashboards for store operators.
 
 ## Storefront Experience
+
 - Livewire-powered storefront pages with localisation, SEO metadata, and responsive catalogue browsing.
 - Checkout, cart persistence, and account management journeys wired to the same aggregates used in the admin UI.
 
 ## Operational Tooling
+
 - Queue, cache, and deployment runbooks collected under [`docs/runbooks/`](docs/runbooks/) for production readiness.
 - API contracts, payload samples, and integration notes organised in [`docs/contracts/`](docs/contracts/).
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
-- Campaign click tracking screens now provide a configurable click timestamp, zero-default conversion values, and automatic fallbacks so operators can capture marketing signals without manual database edits.
+- Graceful filesystem shim now sits behind the global `files` binding, ensuring automated backup prepare/verify commands run when tests create fresh directories so scheduled backup coverage stops flaking.
+- Database index audit command suite runs against a dedicated SQLite database file, keeping duplicate-index detection isolated while preserving the cleanup assertions that power the console workflow.
+- Filament top navigation widget respects admin roles, permission requirements, and enum-defined ordering, aligning Livewire regression coverage with the expected navigation tree.
 - Brands page now features a light-themed layout, shared card components, and refreshed translations so the partner directory feels consistent across locales.
-- Attribute group selectors now rely on a shared translation helper so historical slugs show friendly labels across Filament forms, tables, and filters instead of exposing raw keys.
+- Product API endpoints now honour eager-loaded review aggregates so cached rating/count metrics stay in sync while
+  trimming redundant queries from feature and regression suites.
 - Region-to-city lookups and the dedicated customers table are restored for the SQLite harness, ensuring analytics sparklines, customer factories, and Filament resources can attach geographic metadata without migration errors.
 - Localized product/category routing plus collection seeding were hardened, ensuring homepage product links, category landing pages, and collection showcases load without 404s or empty states.
 - PHPUnit harness now boots a shared `database/testing.sqlite` schema (including Spatie permission tables and variant attribute pivots) and registers Filament SearchableInput payload macros so admin feature suites stay v4-compatible while reusing deterministic migrations.
@@ -36,11 +42,17 @@ This snapshot complements the changelog by listing functional capabilities that 
   exposing their translation model and defaulting fresh `converted_at` values, so
   completed, pending, and other lifecycle records remain accessible to analytics
   tooling without fighting an `is_active` filter that the table never exposed.
+- Order analytics scopes now explicitly target the standalone created-at index,
+  the orders migration seeds that index for clean installs, and diagnostics
+  seeders once again persist processing orders after refining the shared active
+  scope defaults.
 - Restored the default RefreshDatabase migration flow after the toggleable table Pest suite and ensured the news category factory seeds visible records so unit coverage can assert parent/child/category pivots without global scope interference.
 - Catalog contract docs now capture the streamlined product meta payload and nullable media thumbnails so integrators see the same shape published by the API presenter.
 - API validation errors now bundle localized violation lists with a fallback English reason so partner integrations can act on stable messaging even when the initial validation precedes locale negotiation.
+- Fallback validator execution now explicitly aligns the translator with the configured fallback locale, keeping English problem reasons free of untranslated placeholders and preserving consistent messaging for integrators.
 - Access denied problem responses produced by Symfony's HTTP layer now echo the denial reason inside `error.context.reason`, matching Laravel's authorization payloads and keeping client handlers consistent.
 - Test infrastructure now provisions an on-disk SQLite database and conditionally seeds customer group metadata, preventing the observer test suite from failing with missing table or column errors.
+- Campaign click analytics respect deterministic UTC timestamps, the authenticated user endpoint keeps Sanctum ability messaging within the RFC 7807 schema, and factory-generated categories use collision-free slugs so SQLite feature suites exercise the same flows as MySQL.
 - System setting translation workflows regained soft delete, restore, and replication support thanks to a relaxed locale index and streamlined fillable contract that better reflects the documented API surface.
 - API search now short-circuits suspicious payloads and boosts exact-title matches so catalogue lookups stay precise while SQL injection attempts return empty responses.
 - Search experiences normalise mixed-case `types[]` filters so targeted product/category/brand lookups keep the requested scope even when storefront clients send capitalised identifiers.

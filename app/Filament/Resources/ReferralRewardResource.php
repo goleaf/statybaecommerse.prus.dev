@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\ReferralRewardResource\Pages;
 use App\Models\ReferralReward;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
@@ -30,12 +31,13 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
-use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class ReferralRewardResource extends Resource
 {
     use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
@@ -56,14 +58,14 @@ final class ReferralRewardResource extends Resource
      */
     protected static UnitEnum|string|null $navigationGroup = 'Referral';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
-                Section::make(__('referral_rewards.sections.reward_details'))
+                Forms\Components\Section::make(__('referral_rewards.sections.reward_details'))
                     ->columns(2)
                     ->schema([
-                        Select::make('referral_id')
+                        Forms\Components\Select::make('referral_id')
                             ->label(__('referral_rewards.fields.referral'))
                             ->relationship(
                                 name: 'referral',
@@ -73,7 +75,7 @@ final class ReferralRewardResource extends Resource
                             ->searchable()
                             ->preload()
                             ->nullable(),
-                        Select::make('user_id')
+                        Forms\Components\Select::make('user_id')
                             ->label(__('referral_rewards.fields.user'))
                             ->relationship(
                                 name: 'user',
@@ -83,7 +85,7 @@ final class ReferralRewardResource extends Resource
                             ->searchable()
                             ->preload()
                             ->required(),
-                        Select::make('order_id')
+                        Forms\Components\Select::make('order_id')
                             ->label(__('referral_rewards.fields.order'))
                             ->relationship(
                                 name: 'order',
@@ -93,7 +95,7 @@ final class ReferralRewardResource extends Resource
                             ->searchable()
                             ->preload()
                             ->nullable(),
-                        Select::make('type')
+                        Forms\Components\Select::make('type')
                             ->label(__('referral_rewards.fields.type'))
                             ->options([
                                 'discount' => __('referral_rewards.types.discount'),
@@ -102,17 +104,17 @@ final class ReferralRewardResource extends Resource
                                 'gift'     => __('referral_rewards.types.gift'),
                             ])
                             ->required(),
-                        TextInput::make('amount')
+                        Forms\Components\TextInput::make('amount')
                             ->label(__('referral_rewards.fields.amount'))
                             ->numeric()
                             ->required()
                             ->prefix('€'),
-                        TextInput::make('currency_code')
+                        Forms\Components\TextInput::make('currency_code')
                             ->label(__('referral_rewards.fields.currency_code'))
                             ->required()
                             ->maxLength(3)
                             ->default('EUR'),
-                        Select::make('status')
+                        Forms\Components\Select::make('status')
                             ->label(__('referral_rewards.fields.status'))
                             ->options([
                                 'pending'   => __('referral_rewards.status.pending'),
@@ -127,38 +129,38 @@ final class ReferralRewardResource extends Resource
                         Flatpickr::makeDate('expires_at')
                             ->label(__('referral_rewards.fields.expires_at'))
                             ->nullable(),
-                        TextInput::make('title')
+                        Forms\Components\TextInput::make('title')
                             ->label(__('referral_rewards.fields.title'))
                             ->required()
                             ->maxLength(255),
-                        Textarea::make('description')
+                        Forms\Components\Textarea::make('description')
                             ->label(__('referral_rewards.fields.description'))
                             ->maxLength(65535)
                             ->nullable(),
-                        Toggle::make('is_active')
+                        Forms\Components\Toggle::make('is_active')
                             ->label(__('referral_rewards.fields.is_active'))
                             ->inline(false)
                             ->default(true),
-                        TextInput::make('priority')
+                        Forms\Components\TextInput::make('priority')
                             ->label(__('referral_rewards.fields.priority'))
                             ->numeric()
                             ->integer()
                             ->default(0),
-                        KeyValue::make('conditions')
+                        Forms\Components\KeyValue::make('conditions')
                             ->label(__('referral_rewards.fields.conditions'))
                             ->keyLabel(__('referral_rewards.fields.condition_key'))
                             ->valueLabel(__('referral_rewards.fields.condition_value'))
                             ->reorderable()
                             ->addActionLabel(__('referral_rewards.actions.add_condition'))
                             ->columnSpanFull(),
-                        KeyValue::make('reward_data')
+                        Forms\Components\KeyValue::make('reward_data')
                             ->label(__('referral_rewards.fields.reward_data'))
                             ->keyLabel(__('referral_rewards.fields.reward_key'))
                             ->valueLabel(__('referral_rewards.fields.reward_value'))
                             ->reorderable()
                             ->addActionLabel(__('referral_rewards.actions.add_reward_data'))
                             ->columnSpanFull(),
-                        KeyValue::make('metadata')
+                        Forms\Components\KeyValue::make('metadata')
                             ->label(__('referral_rewards.fields.metadata'))
                             ->keyLabel(__('referral_rewards.fields.metadata_key'))
                             ->valueLabel(__('referral_rewards.fields.metadata_value'))
@@ -169,60 +171,61 @@ final class ReferralRewardResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
-                TextColumn::make('title')
+                Tables\Columns\TextColumn::make('title')
                     ->label(__('referral_rewards.fields.title'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('referral.referral_code')
+                Tables\Columns\TextColumn::make('referral.referral_code')
                     ->label(__('referral_rewards.fields.referral_code'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('user.name')
+                Tables\Columns\TextColumn::make('user.name')
                     ->label(__('referral_rewards.fields.user_name'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('type')
+                Tables\Columns\TextColumn::make('type')
                     ->label(__('referral_rewards.fields.type'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('amount')
-                    ->money(fn (ReferralReward $record) => $record->currency_code)
+                    ->money(fn (ReferralReward $record): string => $record->currency_code)
                     ->sortable(),
-                TextColumn::make('status')
+                Tables\Columns\TextColumn::make('status')
                     ->label(__('referral_rewards.fields.status'))
                     ->searchable()
                     ->sortable(),
-                IconColumn::make('is_active')
+                Tables\Columns\IconColumn::make('is_active')
                     ->boolean()
                     ->label(__('referral_rewards.fields.is_active')),
-                TextColumn::make('applied_at')
+                Tables\Columns\TextColumn::make('applied_at')
                     ->label(__('referral_rewards.fields.applied_at'))
                     ->dateTime()
                     ->sortable(),
-                TextColumn::make('expires_at')
+                Tables\Columns\TextColumn::make('expires_at')
                     ->label(__('referral_rewards.fields.expires_at'))
                     ->dateTime()
                     ->sortable(),
-                TextColumn::make('created_at')
+                Tables\Columns\TextColumn::make('created_at')
                     ->label(__('referral_rewards.fields.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
+                Tables\Columns\TextColumn::make('updated_at')
                     ->label(__('referral_rewards.fields.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TernaryFilter::make('is_active')
+                Tables\Filters\TernaryFilter::make('is_active')
                     ->label(__('referral_rewards.filters.is_active'))
                     ->boolean(),
-                SelectFilter::make('type')
+                Tables\Filters\SelectFilter::make('type')
                     ->label(__('referral_rewards.filters.type'))
                     ->options([
                         'discount' => __('referral_rewards.types.discount'),
@@ -230,7 +233,7 @@ final class ReferralRewardResource extends Resource
                         'points'   => __('referral_rewards.types.points'),
                         'gift'     => __('referral_rewards.types.gift'),
                     ]),
-                SelectFilter::make('status')
+                Tables\Filters\SelectFilter::make('status')
                     ->label(__('referral_rewards.filters.status'))
                     ->options([
                         'pending'   => __('referral_rewards.status.pending'),
@@ -238,10 +241,10 @@ final class ReferralRewardResource extends Resource
                         'expired'   => __('referral_rewards.status.expired'),
                         'cancelled' => __('referral_rewards.status.cancelled'),
                     ]),
-                SelectFilter::make('referral_id')
+                Tables\Filters\SelectFilter::make('referral_id')
                     ->label(__('referral_rewards.filters.referral'))
                     ->relationship('referral', 'referral_code'),
-                SelectFilter::make('user_id')
+                Tables\Filters\SelectFilter::make('user_id')
                     ->label(__('referral_rewards.filters.user'))
                     ->relationship('user', 'name'),
             ])
@@ -251,11 +254,15 @@ final class ReferralRewardResource extends Resource
                 Action::make('apply')
                     ->label(__('referral_rewards.actions.apply'))
                     ->requiresConfirmation()
-                    ->action(static fn (ReferralReward $record) => $record->apply()),
+                    ->action(static function (ReferralReward $record): void {
+                        $record->apply();
+                    }),
                 Action::make('expire')
                     ->label(__('referral_rewards.actions.expire'))
                     ->requiresConfirmation()
-                    ->action(static fn (ReferralReward $record) => $record->markAsExpired()),
+                    ->action(static function (ReferralReward $record): void {
+                        $record->markAsExpired();
+                    }),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -263,33 +270,45 @@ final class ReferralRewardResource extends Resource
                         ->label(__('referral_rewards.actions.apply_selected'))
                         ->requiresConfirmation()
                         ->action(static function (Collection $records): void {
-                            $records->each(static fn (ReferralReward $record) => $record->apply());
+                            $records
+                                ->filter(static fn ($record): bool => $record instanceof ReferralReward)
+                                ->each(static function (ReferralReward $record): void {
+                                    $record->apply();
+                                });
                         }),
                     BulkAction::make('expire')
                         ->label(__('referral_rewards.actions.expire_selected'))
                         ->requiresConfirmation()
                         ->action(static function (Collection $records): void {
-                            $records->each(static fn (ReferralReward $record) => $record->markAsExpired());
+                            $records
+                                ->filter(static fn ($record): bool => $record instanceof ReferralReward)
+                                ->each(static function (ReferralReward $record): void {
+                                    $record->markAsExpired();
+                                });
                         }),
                     DeleteBulkAction::make(),
                 ]),
             ]);
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Schema $schema): Schema   
     {
         return $schema
             ->schema([
-                InfolistSection::make(__('referral_rewards.sections.reward_details'))
+                Infolists\Components\Section::make(__('referral_rewards.sections.reward_details'))
                     ->schema([
-                        TextEntry::make('title')->label(__('referral_rewards.fields.title')),
-                        TextEntry::make('description')->label(__('referral_rewards.fields.description')),
-                        TextEntry::make('user.name')->label(__('referral_rewards.fields.user_name')),
+                        TextEntry::make('title')
+                            ->label(__('referral_rewards.fields.title')),
+                        TextEntry::make('description')
+                            ->label(__('referral_rewards.fields.description')),
+                        TextEntry::make('user.name')
+                            ->label(__('referral_rewards.fields.user_name')),
                         TextEntry::make('referral_code')
                             ->label(__('referral_rewards.fields.referral_code'))
                             ->state(fn (ReferralReward $record): ?string => $record->referral?->referral_code)
                             ->visible(fn (ReferralReward $record): bool => filled($record->referral?->referral_code)),
-                        TextEntry::make('order.id')->label(__('referral_rewards.fields.order')),
+                        TextEntry::make('order.id')
+                            ->label(__('referral_rewards.fields.order')),
                     ])
                     ->columns(1),
             ]);
@@ -299,7 +318,7 @@ final class ReferralRewardResource extends Resource
     {
         $icon = self::$navigationIcon;
 
-        return $icon instanceof BackedEnum ? $icon->value : $icon;
+        return $icon instanceof BackedEnum|\UnitEnum ? $icon->value : $icon;
     }
 
     public static function getNavigationGroup(): ?string

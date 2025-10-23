@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantAttributeValueResource\Pages;
 use App\Models\Attribute;
 use App\Models\ProductVariant;
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\EnabledScope;
+use App\Models\Scopes\StatusScope;
+use App\Models\Scopes\VisibleScope;
 use App\Models\VariantAttributeValue;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -16,15 +21,15 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -33,6 +38,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
@@ -69,31 +75,36 @@ final class VariantAttributeValueResource extends Resource
         return __('admin.variant_attribute_values.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('admin.variant_attribute_values.basic_information'))
                 ->schema([
                     Grid::make(2)
                         ->schema([
                             Select::make('variant_id')
                                 ->label(__('admin.variant_attribute_values.variant'))
-                                ->relationship('variant', 'name')
+                                // Allow administrators to pick variants regardless of storefront-only scopes so fixtures created
+                                // inside the test suite remain selectable.
+                                ->relationship(
+                                    'variant',
+                                    'name',
+                                    fn (Builder $query): Builder => $query->withoutGlobalScopes([
+                                        ActiveScope::class,
+                                        EnabledScope::class,
+                                        StatusScope::class,
+                                    ])
+                                )
                                 ->required()
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->afterStateUpdated(function (?int $state, Set $set): void {
-                                    if (! $state) {
-                                        $set('variant_name', null);
-
-                                        return;
-                                    }
-
-                                    $variant = ProductVariant::find($state);
-
-                                    if ($variant) {
-                                        $set('variant_name', $variant->name);
+                                ->afterStateUpdated(function ($state, $set): void {
+                                    if ($state) {
+                                        $variant = ProductVariant::find($state);
+                                        if ($variant) {
+                                            $set('variant_name', $variant->name);
+                                        }
                                     }
                                 }),
                             TextInput::make('variant_name')
@@ -105,22 +116,26 @@ final class VariantAttributeValueResource extends Resource
                         ->schema([
                             Select::make('attribute_id')
                                 ->label(__('admin.variant_attribute_values.attribute'))
-                                ->relationship('attribute', 'name')
+                                // Mirror the variant behaviour by dropping the attribute visibility scopes when resolving options.
+                                ->relationship(
+                                    'attribute',
+                                    'name',
+                                    fn (Builder $query): Builder => $query->withoutGlobalScopes([
+                                        ActiveScope::class,
+                                        EnabledScope::class,
+                                        VisibleScope::class,
+                                    ])
+                                )
                                 ->required()
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->afterStateUpdated(function (?int $state, Set $set): void {
-                                    if (! $state) {
-                                        $set('attribute_name', null);
-
-                                        return;
-                                    }
-
-                                    $attribute = Attribute::find($state);
-
-                                    if ($attribute) {
-                                        $set('attribute_name', $attribute->name);
+                                ->afterStateUpdated(function ($state, $set): void {
+                                    if ($state) {
+                                        $attribute = Attribute::find($state);
+                                        if ($attribute) {
+                                            $set('attribute_name', $attribute->name);
+                                        }
                                     }
                                 }),
                             TextInput::make('attribute_name')
@@ -138,9 +153,9 @@ final class VariantAttributeValueResource extends Resource
                                 ->required()
                                 ->maxLength(255)
                                 ->live()
-                                ->afterStateUpdated(function (?string $state, Set $set): void {
-                                    if (! $state) {
-                                        return;
+                                ->afterStateUpdated(function ($state, $set): void {
+                                    if ($state) {
+                                        $set('attribute_value_slug', Str::slug($state));
                                     }
 
                                     $set('attribute_value_slug', Str::slug($state));
@@ -189,8 +204,9 @@ final class VariantAttributeValueResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('variant.name')
@@ -266,12 +282,30 @@ final class VariantAttributeValueResource extends Resource
             ->filters([
                 SelectFilter::make('variant_id')
                     ->label(__('admin.variant_attribute_values.variant'))
-                    ->relationship('variant', 'name')
+                    // Ensure admin filters ignore storefront-only scopes so inactive variants stay manageable.
+                    ->relationship(
+                        'variant',
+                        'name',
+                        fn (Builder $query): Builder => $query->withoutGlobalScopes([
+                            ActiveScope::class,
+                            EnabledScope::class,
+                            StatusScope::class,
+                        ])
+                    )
                     ->searchable()
                     ->preload(),
                 SelectFilter::make('attribute_id')
                     ->label(__('admin.variant_attribute_values.attribute'))
-                    ->relationship('attribute', 'name')
+                    // Match the variant behaviour by removing visibility scopes to expose dormant attributes when filtering.
+                    ->relationship(
+                        'attribute',
+                        'name',
+                        fn (Builder $query): Builder => $query->withoutGlobalScopes([
+                            ActiveScope::class,
+                            EnabledScope::class,
+                            VisibleScope::class,
+                        ])
+                    )
                     ->searchable()
                     ->preload(),
                 Filter::make('has_translations')

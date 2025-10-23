@@ -4,28 +4,29 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\NormalSettingTranslationResource\Pages;
 use App\Models\NormalSetting;
 use App\Models\NormalSettingTranslation;
-use BackedEnum;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 /**
  * NormalSettingTranslationResource
  *
@@ -44,7 +45,7 @@ final class NormalSettingTranslationResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'display_name';
 
-    public static function getNavigationIcon(): BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|\Illuminate\Contracts\Support\Htmlable|string|null
     {
         return 'heroicon-o-language';
     }
@@ -69,17 +70,17 @@ final class NormalSettingTranslationResource extends Resource
         return __('admin.normal_setting_translations.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
-                SchemaSection::make(__('admin.normal_setting_translations.basic_information'))
+                Section::make(__('admin.normal_setting_translations.basic_information'))
                     ->schema([
-                        SchemaGrid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 Select::make('enhanced_setting_id')
                                     ->label(__('admin.normal_setting_translations.enhanced_setting'))
-                                    ->options(NormalSetting::query()->pluck('key', 'id')->all())
+                                    ->options(fn (): array => NormalSetting::query()->pluck('key', 'id')->all())
                                     ->required()
                                     ->searchable(),
 
@@ -115,8 +116,9 @@ final class NormalSettingTranslationResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('enhancedSetting.key')
@@ -128,12 +130,12 @@ final class NormalSettingTranslationResource extends Resource
                 TextColumn::make('locale')
                     ->label(__('admin.normal_setting_translations.locale'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'en'    => 'success',
-                        'lt'    => 'info',
-                        'de'    => 'warning',
-                        'fr'    => 'danger',
-                        'es'    => 'primary',
+                    ->color(fn (?string $state): string => match ($state) {
+                        'en' => 'success',
+                        'lt' => 'info',
+                        'de' => 'warning',
+                        'fr' => 'danger',
+                        'es' => 'primary',
                         default => 'gray',
                     }),
 
@@ -142,29 +144,17 @@ final class NormalSettingTranslationResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->limit(50)
-                    ->tooltip(function (TextColumn $column): ?string {
-                        $state = $column->getState();
-
-                        return strlen($state) > 50 ? $state : null;
-                    }),
+                    ->tooltip(fn (TextColumn $column): ?string => filled($state = $column->getState()) && mb_strlen((string) $state) > 50 ? (string) $state : null),
 
                 TextColumn::make('description')
                     ->label(__('admin.normal_setting_translations.description'))
                     ->limit(50)
-                    ->tooltip(function (TextColumn $column): ?string {
-                        $state = $column->getState();
-
-                        return strlen($state) > 50 ? $state : null;
-                    }),
+                    ->tooltip(fn (TextColumn $column): ?string => filled($state = $column->getState()) && mb_strlen((string) $state) > 50 ? (string) $state : null),
 
                 TextColumn::make('help_text')
                     ->label(__('admin.normal_setting_translations.help_text'))
                     ->limit(50)
-                    ->tooltip(function (TextColumn $column): ?string {
-                        $state = $column->getState();
-
-                        return strlen($state) > 50 ? $state : null;
-                    }),
+                    ->tooltip(fn (TextColumn $column): ?string => filled($state = $column->getState()) && mb_strlen((string) $state) > 50 ? (string) $state : null),
 
                 TextColumn::make('created_at')
                     ->label(__('admin.common.created_at'))
@@ -175,7 +165,7 @@ final class NormalSettingTranslationResource extends Resource
             ->filters([
                 SelectFilter::make('enhanced_setting_id')
                     ->label(__('admin.normal_setting_translations.enhanced_setting'))
-                    ->options(NormalSetting::query()->pluck('key', 'id')->all())
+                    ->options(fn (): array => NormalSetting::query()->pluck('key', 'id')->all())
                     ->searchable(),
 
                 SelectFilter::make('locale')
@@ -193,7 +183,7 @@ final class NormalSettingTranslationResource extends Resource
                 EditAction::make(),
                 DeleteAction::make(),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),

@@ -89,6 +89,8 @@ final class SearchableComponentHelper
 
         $emptyPayload = self::normaliseEmptyPayload($emptyPayload);
 
+        self::ensurePayloadMacros();
+
         $clearSelection = static function () use ($component, $set, $attribute, $payloadField, $emptyPayload, $clearRelated): void {
             // Reset the persisted identifier alongside the lookup metadata to avoid stale state.
             $set($attribute, null);

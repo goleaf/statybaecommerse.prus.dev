@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CollectionResource\RelationManagers;
 
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+
+use Filament\Schemas\Schema;
 use App\Models\Product;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\EditAction;
@@ -12,14 +13,18 @@ use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class ProductsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'products';
 
     protected static ?string $title = 'Collection Products';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $schema): Schema   
     {
         return $schema
             ->schema([
@@ -47,8 +52,9 @@ final class ProductsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->recordTitleAttribute('name')
             ->columns([
@@ -126,6 +132,7 @@ final class ProductsRelationManager extends BaseRelationManager
                     ->preload(),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\AttachAction::make()
                     ->label(__('admin.collections.actions.add_product'))
                     ->preloadRecordSelect()

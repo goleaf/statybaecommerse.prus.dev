@@ -1,6 +1,7 @@
 @extends('frontend.layouts.app')
 
-@section('title', $product->name)
+@section('title', $product->seo_title ?: $product->name)
+@section('description', $product->seo_description ?: str($product->short_description)->stripTags()->limit(160))
 
 @section('content')
     <div class="bg-gray-50 py-12">
@@ -19,98 +20,89 @@
                 </ol>
             </nav>
 
-            <div class="grid gap-10 lg:grid-cols-2 lg:items-start">
+            <div class="mt-10 grid gap-10 lg:grid-cols-[1.1fr_1fr]">
                 <div class="space-y-6">
-                    @php
-                        $image = $product->getFirstMediaUrl('images', 'image-lg') ?: $product->getFirstMediaUrl('images');
-                    @endphp
-                    <div class="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
-                        @if($image)
-                            <img src="{{ $image }}" alt="{{ $product->name }}" class="w-full object-cover" loading="lazy">
-                        @else
-                            <div class="flex h-96 items-center justify-center bg-gray-100 text-gray-400">
-                                <x-untitledui-image class="h-12 w-12" />
-                            </div>
-                        @endif
+                    <div class="overflow-hidden rounded-3xl border border-gray-200 bg-gray-50">
+                        <img src="{{ $product->main_image ?: 'https://via.placeholder.com/1200x1200.png?text=Product' }}" alt="{{ $product->name }}" class="h-full w-full object-cover" loading="lazy" />
                     </div>
+                    @if ($product->description)
+                        <article class="prose prose-indigo max-w-none">
+                            {!! $product->description !!}
+                        </article>
+                    @endif
                 </div>
 
-                <div class="space-y-6">
-                    <div class="space-y-2">
-                        <span class="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
-                            <x-untitledui-check-badge class="h-3.5 w-3.5" />
-                            {{ __('In stock catalogue item') }}
+                <aside class="space-y-6 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm">
+                    <div class="space-y-3">
+                        <span class="inline-flex items-center gap-2 rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-indigo-600">
+                            {{ $product->brand?->name ?? __('Featured product') }}
                         </span>
-                        <h1 class="text-3xl font-bold text-gray-900 sm:text-4xl">{{ $product->name }}</h1>
-                        @if($product->brand)
-                            <div class="text-sm text-gray-500">
-                                {{ __('By :brand', ['brand' => $product->brand->name]) }}
+                        <h1 class="text-3xl font-bold text-gray-900">{{ $product->name }}</h1>
+                        <p class="text-sm text-gray-600">{{ str($product->short_description ?: strip_tags($product->description))->limit(180) }}</p>
+                    </div>
+
+                    <div class="flex items-baseline gap-3">
+                        <span class="text-3xl font-semibold text-indigo-600">{{ $product->formatted_price }}</span>
+                        @if ($product->sale_price && $product->sale_price < $product->price)
+                            <span class="text-lg font-medium text-gray-400 line-through">{{ app_money_format($product->price) }}</span>
+                        @endif
+                    </div>
+
+                    <div class="flex items-center gap-2 text-sm text-gray-600">
+                        <x-untitledui-star class="h-5 w-5 text-amber-500" />
+                        <span>{{ number_format($product->average_rating, 1) }} / 5</span>
+                        <span class="text-gray-400">·</span>
+                        <span>{{ __(':count reviews', ['count' => number_format($product->reviews_count)]) }}</span>
+                    </div>
+
+                    <div class="space-y-3 text-sm text-gray-600">
+                        <div class="flex items-center gap-2">
+                            <x-untitledui-tag class="h-5 w-5 text-gray-400" />
+                            <span>{{ __('SKU: :sku', ['sku' => $product->sku]) }}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <x-untitledui-layers-three class="h-5 w-5 text-gray-400" />
+                            <span>{{ __('Type: :type', ['type' => ucfirst($product->type)]) }}</span>
+                        </div>
+                        @if ($product->categories->isNotEmpty())
+                            <div class="flex items-start gap-2">
+                                <x-untitledui-folder-open class="mt-0.5 h-5 w-5 text-gray-400" />
+                                <span>
+                                    {{ __('Categories:') }}
+                                    {{ $product->categories->pluck('name')->join(', ') }}
+                                </span>
                             </div>
                         @endif
                     </div>
 
-                    <div class="flex items-center gap-4">
-                        @php
-                            $effectivePrice = $product->sale_price && $product->sale_price < $product->price ? $product->sale_price : $product->price;
-                        @endphp
-                        <p class="text-3xl font-semibold text-gray-900">
-                            {{ \Illuminate\Support\Number::currency((float) $effectivePrice, function_exists('current_currency') ? current_currency() : 'EUR', app()->getLocale()) }}
-                        </p>
-                        @if($product->sale_price && $product->sale_price < $product->price)
-                            <p class="text-lg text-gray-400 line-through">
-                                {{ \Illuminate\Support\Number::currency((float) $product->price, function_exists('current_currency') ? current_currency() : 'EUR', app()->getLocale()) }}
-                            </p>
-                        @endif
+                    <div class="space-y-4 rounded-3xl bg-indigo-50 p-6 text-sm text-indigo-900">
+                        <p class="font-semibold">{{ __('Fast facts') }}</p>
+                        <ul class="space-y-2">
+                            <li class="flex items-center gap-2">
+                                <x-untitledui-check class="h-4 w-4" />
+                                <span>{{ $product->is_in_stock ? __('In stock and ready to ship') : __('Currently out of stock') }}</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <x-untitledui-check class="h-4 w-4" />
+                                <span>{{ __('Ships from our Lithuanian warehouse') }}</span>
+                            </li>
+                        </ul>
                     </div>
-
-                    <div class="space-y-3 text-gray-600">
-                        {!! $product->description ?? '<p>'.e($product->short_description ?? __('Product description coming soon.')) .'</p>' !!}
-                    </div>
-
-                    @if($product->categories->isNotEmpty())
-                        <div class="space-y-2">
-                            <h2 class="text-sm font-semibold text-gray-900">{{ __('Categories') }}</h2>
-                            <div class="flex flex-wrap gap-2">
-                                @foreach($product->categories as $category)
-                                    <a href="{{ route('frontend.categories.show', $category) }}" class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 hover:bg-blue-100">
-                                        {{ $category->name }}
-                                    </a>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
-
-                    @if($product->brand)
-                        <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-                            <h2 class="text-sm font-semibold text-gray-900">{{ __('About the brand') }}</h2>
-                            <p class="mt-2 text-sm text-gray-600">
-                                {{ $product->brand->description ?? __('Trusted construction equipment supplier across the Baltics.') }}
-                            </p>
-                            @if($product->brand->website)
-                                <a href="{{ $product->brand->website }}" class="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700">
-                                    <x-untitledui-globe class="h-4 w-4" />
-                                    {{ __('Visit brand site') }}
-                                </a>
-                            @endif
-                        </div>
-                    @endif
-                </div>
+                </aside>
             </div>
 
-            <section class="space-y-6">
+            <section class="mt-16">
                 <div class="flex items-center justify-between">
                     <h2 class="text-2xl font-semibold text-gray-900">{{ __('Related products') }}</h2>
-                    <a href="{{ route('frontend.products.index', ['filter' => 'featured']) }}" class="text-sm font-semibold text-blue-600 hover:text-blue-700">
-                        {{ __('View all') }}
+                    <a href="{{ route('frontend.products.index', ['category' => optional($primaryCategory)->getKey()]) }}" class="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-700">
+                        {{ __('Browse the category') }}
+                        <x-untitledui-arrow-narrow-right class="h-4 w-4" />
                     </a>
                 </div>
-                @include('frontend.catalogue.product-grid', [
-                    'products' => $relatedProducts,
-                    'columns' => 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
-                    'emptyMessage' => __('More related items will appear as the catalogue grows.'),
-                ])
+                <div class="mt-8">
+                    @include('frontend.products.partials.product-grid', ['products' => $relatedProducts, 'emptyMessage' => __('No related products are available yet.')])
+                </div>
             </section>
         </div>
     </div>
 @endsection
-

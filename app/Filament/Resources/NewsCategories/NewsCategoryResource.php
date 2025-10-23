@@ -3,7 +3,10 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsCategories;
+use App\Support\Concerns\HasNav;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\NewsCategories\Pages\CreateNewsCategory;
 use App\Filament\Resources\NewsCategories\Pages\EditNewsCategory;
 use App\Filament\Resources\NewsCategories\Pages\ListNewsCategories;
@@ -11,32 +14,44 @@ use App\Filament\Resources\NewsCategories\Schemas\NewsCategoryForm;
 use App\Filament\Resources\NewsCategories\Tables\NewsCategoriesTable;
 use App\Models\NewsCategory;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class NewsCategoryResource extends Resource
 {
-    protected static ?string $model = NewsCategory::class;
+    use HasNav;
 
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    /**
+     * @var string|BackedEnum|null Keep the resource grouped with other news modules.
+     */
+    protected static $navigationGroup = NavigationGroup::News;
+
+    public static function getNavigationGroup(): ?string
     {
-        return 'News';
+        // Delegate to the enum label for localisation support.
+        $group = self::$navigationGroup;
+
+        return $group instanceof NavigationGroup ? $group->label() : $group;
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return NewsCategoryForm::configure($form);
+        return NewsCategoryForm::configure($schema);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return NewsCategoriesTable::configure($table);
     }
 

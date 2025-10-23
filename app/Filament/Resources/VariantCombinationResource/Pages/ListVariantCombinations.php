@@ -10,6 +10,8 @@ use Filament\Actions;
 
 final class ListVariantCombinations extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = VariantCombinationResource::class;
 
     protected function getHeaderActions(): array

@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ListCampaignCustomerSegments extends BaseListRecords
 {
+    use HasResizableColumns;
     use HasWidgetTabs;
 
     protected static string $resource = CampaignCustomerSegmentResource::class;
@@ -27,9 +28,8 @@ class ListCampaignCustomerSegments extends BaseListRecords
     public function getWidgetTabs(): array
     {
         return [
-            'all' => WidgetTab::make(__('campaign_customer_segments.tabs.all'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
-            'demographic' => WidgetTab::make(__('campaign_customer_segments.tabs.demographic'))
+            'all'         => Tab::make(__('campaign_customer_segments.tabs.all')),
+            'demographic' => Tab::make(__('campaign_customer_segments.tabs.demographic'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('segment_type', 'demographic'))
                 ->value(fn () => $this->getResource()::getEloquentQuery()->where('segment_type', 'demographic')->count()),
             'behavioral' => WidgetTab::make(__('campaign_customer_segments.tabs.behavioral'))

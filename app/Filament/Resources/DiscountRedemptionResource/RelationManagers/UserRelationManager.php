@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountRedemptionResource\RelationManagers;
 
+
+use Filament\Schemas\Schema;
+use Filament\Forms;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms;
@@ -11,7 +14,11 @@ use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 class UserRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'user';
@@ -22,7 +29,7 @@ class UserRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Users';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $schema): Schema   
     {
         return $schema
             ->schema([
@@ -55,8 +62,9 @@ class UserRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->recordTitleAttribute('name')
             ->columns([
@@ -110,6 +118,15 @@ class UserRelationManager extends BaseRelationManager
                     ->label('Email Verified'),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit ' . $this->getPluralModelLabel())
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        // Provide a quick-edit modal for managing records inline.
+                        return $repeater->schema($this->getQuickEditSchema());
+                    }),
                 Tables\Actions\CreateAction::make(),
                 Tables\Actions\AttachAction::make(),
             ])

@@ -25,6 +25,16 @@ Route::middleware(['web', 'signed'])
 Route::middleware(['web'])->group(function () {
     Route::get('/docs/api', ApiDocsController::class)->name('docs.api');
 
+    if (config('app.debug') || app()->environment(['local', 'development', 'testing'])) {
+        Route::middleware(['auth', 'can:viewMailPreviews'])
+            ->prefix('telescope/mail')
+            ->as('mail-previews.')
+            ->group(function () {
+                Route::get('/', [MailPreviewController::class, 'index'])->name('index');
+                Route::get('/{mail}', [MailPreviewController::class, 'show'])->name('show');
+            });
+    }
+
     // Live Demo Route
     Route::get('/live-demo', App\Livewire\Pages\LiveDemo::class)->name('live-demo');
 
@@ -404,7 +414,7 @@ Route::get('/', function () {
 // Backward-compatible redirect
 Route::get('/home', fn () => redirect()->route('home'));
 Route::get('/products', Pages\ProductCatalog::class)->name('products.index');
-Route::get('/products/{product}', Pages\SingleProduct::class)->name('products.show');
+Route::get('/products/{product:slug}', [App\Http\Controllers\Frontend\ProductController::class, 'show'])->name('products.show');
 Route::get('/products/{product}/history', Pages\ProductHistoryPage::class)->name('products.history');
 
 // Product Request routes (authenticated users only)

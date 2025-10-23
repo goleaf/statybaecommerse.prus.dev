@@ -10,6 +10,8 @@ use Filament\Actions\CreateAction;
 
 class ListReferralRewardLogs extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = ReferralRewardLogResource::class;
 
     protected function getHeaderActions(): array

@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantImageResource\Pages;
 use App\Models\ProductVariant;
 use App\Models\VariantImage;
 use App\Support\Storage\SecureStorage;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -16,25 +17,25 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
+use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -69,9 +70,9 @@ final class VariantImageResource extends Resource
         return __('admin.variant_images.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->components([
+        return $schema->components([
             Section::make(__('admin.variant_images.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -90,18 +91,23 @@ final class VariantImageResource extends Resource
                                             ->max('sort_order') + 1;
                                         $set('sort_order', $nextSortOrder);
                                     }
+
+                                    $nextSortOrder = VariantImage::where('variant_id', $state)
+                                        ->max('sort_order');
+
+                                    $set('sort_order', ($nextSortOrder ?? 0) + 1);
                                 }),
                             Placeholder::make('variant_info')
                                 ->label(__('admin.variant_images.variant_info'))
-                                ->content(function ($get) {
-                                    $variantId = $get('variant_id');
-                                    if ($variantId) {
-                                        $variant = ProductVariant::find($variantId);
-
-                                        return $variant ? "SKU: {$variant->sku}" : '';
+                                ->content(function (callable $get): string {
+                                    $variantId = (int) $get('variant_id');
+                                    if ($variantId <= 0) {
+                                        return '';
                                     }
 
-                                    return '';
+                                    $variant = ProductVariant::query()->find($variantId);
+
+                                    return $variant ? __('admin.variant_images.variant_sku', ['sku' => $variant->sku]) : '';
                                 })
                                 ->visible(fn ($get) => ! empty($get('variant_id'))),
                         ]),
@@ -114,6 +120,7 @@ final class VariantImageResource extends Resource
                                 ->label(__('admin.variant_images.image'))
                                 ->image()
                                 ->directory('variant-images')
+                                ->disk(SecureStorage::disk())
                                 ->visibility('private')
                                 ->required()
                                 ->imageEditor()
@@ -122,9 +129,26 @@ final class VariantImageResource extends Resource
                                     '4:3',
                                     '1:1',
                                 ])
-                                ->maxSize(5120)  // 5MB
+                                ->maxSize(5120) // 5MB
                                 ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                                ->helperText(__('admin.variant_images.image_help')),
+                                ->helperText(__('admin.variant_images.image_help'))
+                                ->afterStateUpdated(function (?TemporaryUploadedFile $file, Set $set): void {
+                                    if (! $file) {
+                                        return;
+                                    }
+
+                                    $set('file_size', $file->getSize());
+
+                                    try {
+                                        $dimensions = @getimagesize($file->getRealPath());
+                                        if ($dimensions !== false) {
+                                            $set('dimensions', sprintf('%d×%d', $dimensions[0], $dimensions[1]));
+                                        }
+                                    } catch (\Throwable) {
+                                        // Ignore failures while reading dimensions.
+                                    }
+                                })
+                                ->preserveFilenames(),
                             TextInput::make('alt_text')
                                 ->label(__('admin.variant_images.alt_text'))
                                 ->maxLength(255)
@@ -163,23 +187,20 @@ final class VariantImageResource extends Resource
                         ->schema([
                             TextInput::make('file_size')
                                 ->label(__('admin.variant_images.file_size'))
-                                ->disabled()
-                                ->dehydrated(false),
+                                ->readOnly(),
                             TextInput::make('dimensions')
                                 ->label(__('admin.variant_images.dimensions'))
-                                ->disabled()
-                                ->dehydrated(false),
+                                ->readOnly(),
                         ]),
-                    Hidden::make('created_by')
-                        ->default(auth()->id()),
                 ])
                 ->collapsible()
                 ->collapsed(),
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 ImageColumn::make('image_path')
@@ -286,19 +307,19 @@ final class VariantImageResource extends Resource
                     ->native(false),
                 Filter::make('created_at')
                     ->form([
-                        DateFilter::make('created_from')
+                        DatePicker::make('created_from')
                             ->label(__('admin.variant_images.created_from')),
-                        DateFilter::make('created_until')
+                        DatePicker::make('created_until')
                             ->label(__('admin.variant_images.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
                             ->when(
-                                $data['created_from'],
+                                $data['created_from'] ?? null,
                                 fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
-                                $data['created_until'],
+                                $data['created_until'] ?? null,
                                 fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
@@ -306,6 +327,7 @@ final class VariantImageResource extends Resource
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
+                DeleteAction::make(),
                 Action::make('set_as_primary')
                     ->label(__('admin.variant_images.set_as_primary'))
                     ->icon('heroicon-o-star')
@@ -337,10 +359,11 @@ final class VariantImageResource extends Resource
                         ? 'danger'
                         : 'success')
                     ->action(function (VariantImage $record): void {
-                        $record->update(['is_active' => ! $record->is_active]);
+                        $newStatus = ! $record->is_active;
+                        $record->update(['is_active' => $newStatus]);
 
                         Notification::make()
-                            ->title($record->is_active
+                            ->title($newStatus
                                 ? __('admin.variant_images.activated_successfully')
                                 : __('admin.variant_images.deactivated_successfully'))
                             ->success()
@@ -353,8 +376,9 @@ final class VariantImageResource extends Resource
                     ->action(function (VariantImage $record): void {
                         $newImage = $record->replicate();
                         $newImage->is_primary = false;
-                        $newImage->sort_order = VariantImage::where('variant_id', $record->variant_id)
-                            ->max('sort_order') + 1;
+                        $nextSortOrder = VariantImage::where('variant_id', $record->variant_id)
+                            ->max('sort_order');
+                        $newImage->sort_order = ($nextSortOrder ?? 0) + 1;
                         $newImage->save();
 
                         Notification::make()

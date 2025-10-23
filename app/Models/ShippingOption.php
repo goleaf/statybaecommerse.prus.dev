@@ -49,6 +49,7 @@ final class ShippingOption extends Model
         'estimated_days_max',
         'metadata',
         'shipping_matrix',
+        'zone_id',
     ];
 
     protected function casts(): array
@@ -103,11 +104,22 @@ final class ShippingOption extends Model
     }
 
     /**
+     * Handle zone functionality with proper error handling.
+     *
+     * @phpstan-return BelongsTo<Zone, ShippingOption>
+     */
+    public function zone(): BelongsTo
+    {
+        // Link each shipping option to the geographical zone it belongs to for filtering and reporting.
+        return $this->belongsTo(Zone::class);
+    }
+
+    /**
      * Handle scopeEnabled functionality with proper error handling.
      *
-     * @param  Builder<self>           $query
-     * @param  Builder<ShippingOption> $query
+     * @param  Builder<self> $query
      * @return Builder<self>
+     * @param  Builder<ShippingOption> $query
      * @return Builder<ShippingOption>
      */
     public function scopeEnabled(Builder $query): Builder
@@ -118,9 +130,9 @@ final class ShippingOption extends Model
     /**
      * Handle scopeDefault functionality with proper error handling.
      *
-     * @param  Builder<self>           $query
-     * @param  Builder<ShippingOption> $query
+     * @param  Builder<self> $query
      * @return Builder<self>
+     * @param  Builder<ShippingOption> $query
      * @return Builder<ShippingOption>
      */
     public function scopeDefault(Builder $query): Builder
@@ -131,14 +143,31 @@ final class ShippingOption extends Model
     /**
      * Handle scopeByCarrier functionality with proper error handling.
      *
-     * @param  Builder<self>           $query
-     * @param  Builder<ShippingOption> $query
+     * @param  Builder<self> $query
      * @return Builder<self>
+     * @param  Builder<ShippingOption> $query
      * @return Builder<ShippingOption>
      */
     public function scopeByCarrier(Builder $query, string $carrier): Builder
     {
         return $query->where('carrier_name', $carrier);
+    }
+
+    public function scopeByZone(Builder $query, int|string $zoneId): Builder
+    {
+        return $query->where('zone_id', $zoneId);
+    }
+
+    /**
+     * Scope shipping options by zone while tolerating null filters.
+     */
+    public function scopeByZone(Builder $query, null|int|string $zoneId): Builder
+    {
+        if ($zoneId === null || $zoneId === '') {
+            return $query;
+        }
+
+        return $query->where('zone_id', $zoneId);
     }
 
     /**
@@ -156,9 +185,9 @@ final class ShippingOption extends Model
     /**
      * Handle scopeOrdered functionality with proper error handling.
      *
-     * @param  Builder<self>           $query
-     * @param  Builder<ShippingOption> $query
+     * @param  Builder<self> $query
      * @return Builder<self>
+     * @param  Builder<ShippingOption> $query
      * @return Builder<ShippingOption>
      */
     public function scopeOrdered(Builder $query): Builder

@@ -12,11 +12,10 @@ final class PriceListStatsWidget extends BaseWidget
 {
     protected function getStats(): array
     {
-        $totalPriceLists = PriceList::query()->count();
-        $enabledPriceLists = PriceList::query()->enabled()->count();
+        $totalPriceLists = PriceList::count();
         $activePriceLists = PriceList::query()->active()->count();
+        $enabledPriceLists = PriceList::query()->where('is_enabled', true)->count();
         $defaultPriceLists = PriceList::query()->where('is_default', true)->count();
-        $autoApplyPriceLists = PriceList::query()->where('auto_apply', true)->count();
 
         return [
             Stat::make(__('price_lists.stats.total_price_lists'), $totalPriceLists)
@@ -33,6 +32,11 @@ final class PriceListStatsWidget extends BaseWidget
                 ->description(__('price_lists.stats.active_price_lists_description'))
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),
+
+            Stat::make(__('price_lists.stats.enabled_price_lists'), $enabledPriceLists)
+                ->description(__('price_lists.stats.enabled_price_lists_description'))
+                ->descriptionIcon('heroicon-m-bolt')
+                ->color('info'),
 
             Stat::make(__('price_lists.stats.default_price_lists'), $defaultPriceLists)
                 ->description(__('price_lists.stats.default_price_lists_description'))

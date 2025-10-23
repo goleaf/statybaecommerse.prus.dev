@@ -30,7 +30,7 @@
                         @if ($showImages)
                             <div class="flex-shrink-0">
                                 <div class="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden">
-                                    {{-- Determine the preferred product image before falling back to the placeholder. --}}
+                                    {{-- Determine the most relevant media URL while supporting historic payloads. --}}
                                     @php($image = $item['main_image'] ?? $item['thumbnail'] ?? ($item['image'] ?? null))
                                     <img src="{{ $image ?? product_placeholder_url('medium') }}"
                                          alt="{{ $item['name'] }}"

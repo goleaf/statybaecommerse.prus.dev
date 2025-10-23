@@ -10,6 +10,9 @@ return [
     'website' => 'Website',
     'industry' => 'Industry',
     'size' => 'Size',
+    // Provide descriptive helper text for nullable size selections and filters.
+    'size_placeholder' => 'Select a size (optional)',
+    'size_filter_placeholder' => 'All sizes',
     'description' => 'Description',
     'is_active' => 'Active',
     'created_at' => 'Created At',

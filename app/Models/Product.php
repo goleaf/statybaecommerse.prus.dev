@@ -12,7 +12,8 @@ use App\Observers\ProductObserver;
 use App\Support\Html\HtmlSanitizer;
 use App\Traits\HasProductPricing;
 use App\Traits\HasTranslations;
-use DateTimeInterface;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -25,8 +26,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Carbon;
+use Laravel\Scout\Searchable;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
@@ -43,7 +44,23 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property mixed  $appends
  * @property mixed  $table
  * @property string $translationModel
- * @property array  $translatable
+ * @property array $translatable
+ * @property int $id
+ * @property string $name
+ * @property string|null $slug
+ * @property string|null $short_description
+ * @property string|null $description
+ * @property string|null $sku
+ * @property float|string|null $price
+ * @property bool $is_featured
+ * @property bool $is_visible
+ * @property \Illuminate\Support\Carbon|null $published_at
+ * @property-read Brand|null $brand
+ * @property-read string|null $thumbnail
+ * @property-read string|null $main_image
+ * @property-read int $sales_count
+ * @property-read int $reviews_count
+ * @property-read float $average_rating
  *
  * @method static \Illuminate\Database\Eloquent\Builder|Product newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Product newQuery()
@@ -55,15 +72,42 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 #[ScopedBy([ActiveScope::class, PublishedScope::class, VisibleScope::class])]
 final class Product extends Model implements HasMedia, TranslatableRecord
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, Searchable, SoftDeletes;
     use HasProductPricing;
     use HasTranslations;
     use InteractsWithMedia;
     use LogsActivity;
 
-    protected $fillable = ['name', 'slug', 'description', 'short_description', 'sku', 'barcode', 'price', 'compare_price', 'cost_price', 'sale_price', 'manage_stock', 'track_stock', 'allow_backorder', 'stock_quantity', 'low_stock_threshold', 'weight', 'length', 'width', 'height', 'is_visible', 'is_featured', 'is_requestable', 'requests_count', 'minimum_quantity', 'hide_add_to_cart', 'request_message', 'published_at', 'seo_title', 'seo_description', 'brand_id', 'status', 'type', 'video_url', 'metadata', 'sort_order', 'tax_class', 'shipping_class', 'download_limit', 'download_expiry', 'external_url', 'button_text'];
+    protected $fillable = ['name', 'slug', 'description', 'short_description', 'sku', 'barcode', 'price', 'compare_price', 'cost_price', 'sale_price', 'manage_stock', 'track_stock', 'allow_backorder', 'stock_quantity', 'low_stock_threshold', 'weight', 'length', 'width', 'height', 'is_visible', 'is_featured', 'is_requestable', 'requests_count', 'minimum_quantity', 'hide_add_to_cart', 'request_message', 'published_at', 'seo_title', 'seo_description', 'brand_id', 'status', 'type', 'video_url', 'metadata', 'variant_attribute_matrix', 'sort_order', 'tax_class', 'shipping_class', 'download_limit', 'download_expiry', 'external_url', 'button_text'];
 
-    protected $casts = ['price' => 'decimal:2', 'compare_price' => 'decimal:2', 'cost_price' => 'decimal:2', 'sale_price' => 'decimal:2', 'weight' => 'decimal:2', 'length' => 'decimal:2', 'width' => 'decimal:2', 'height' => 'decimal:2', 'is_visible' => 'boolean', 'is_featured' => 'boolean', 'is_requestable' => 'boolean', 'hide_add_to_cart' => 'boolean', 'manage_stock' => 'boolean', 'track_stock' => 'boolean', 'allow_backorder' => 'boolean', 'published_at' => 'datetime', 'stock_quantity' => 'integer', 'low_stock_threshold' => 'integer', 'requests_count' => 'integer', 'minimum_quantity' => 'integer', 'sort_order' => 'integer', 'download_limit' => 'integer', 'download_expiry' => 'integer', 'metadata' => 'array'];
+    protected $casts = [
+        // Persist translated names as JSON so array payloads from search fixtures serialize correctly.
+        'name'                => 'array',
+        'price'               => 'decimal:2',
+        'compare_price'       => 'decimal:2',
+        'cost_price'          => 'decimal:2',
+        'sale_price'          => 'decimal:2',
+        'weight'              => 'decimal:2',
+        'length'              => 'decimal:2',
+        'width'               => 'decimal:2',
+        'height'              => 'decimal:2',
+        'is_visible'          => 'boolean',
+        'is_featured'         => 'boolean',
+        'is_requestable'      => 'boolean',
+        'hide_add_to_cart'    => 'boolean',
+        'manage_stock'        => 'boolean',
+        'track_stock'         => 'boolean',
+        'allow_backorder'     => 'boolean',
+        'published_at'        => 'datetime',
+        'stock_quantity'      => 'integer',
+        'low_stock_threshold' => 'integer',
+        'requests_count'      => 'integer',
+        'minimum_quantity'    => 'integer',
+        'sort_order'          => 'integer',
+        'download_limit'      => 'integer',
+        'download_expiry'     => 'integer',
+        'metadata'            => 'array',
+    ];
 
     /**
      * The accessors to append to the model's array form.
@@ -94,6 +138,18 @@ final class Product extends Model implements HasMedia, TranslatableRecord
 
                 // Ensure persisted rich text never exceeds the sanitized allow-list.
                 $product->{$field} = $sanitizer->sanitize($value);
+            }
+
+            // Keep publication metadata and status in sync so the storefront
+            // repositories that honour the PublishedScope do not drop fresh
+            // records that were scheduled via factories or seeders without a
+            // matching status flag.
+            if ($product->published_at !== null && $product->published_at <= now()) {
+                $currentStatus = (string) ($product->status ?? '');
+
+                if ($currentStatus === '' || in_array($currentStatus, ['draft', 'pending'], true)) {
+                    $product->status = 'published';
+                }
             }
         });
     }
@@ -328,6 +384,15 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         return 0.0;
     }
 
+    public function getCategoryAttribute(): ?Category
+    {
+        if (! $this->relationLoaded('categories')) {
+            return null;
+        }
+
+        return $this->getRelation('categories')->first();
+    }
+
     /**
      * Handle decreaseStock functionality with proper error handling.
      */
@@ -403,7 +468,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
 
     public function reserveStock(
         int $quantity,
-        ?DateTimeInterface $expiresAt = null,
+        ?\DateTimeInterface $expiresAt = null,
         array $meta = [],
         ?string $referenceType = null,
         ?string $referenceId = null
@@ -427,13 +492,13 @@ final class Product extends Model implements HasMedia, TranslatableRecord
             }
 
             return $product->stockReservations()->create([
-                'quantity'       => $quantity,
-                'status'         => StockReservation::STATUS_RESERVED,
-                'reserved_at'    => now(),
-                'expires_at'     => $expiresAt,
-                'meta'           => $meta ?: null,
+                'quantity' => $quantity,
+                'status' => StockReservation::STATUS_RESERVED,
+                'reserved_at' => now(),
+                'expires_at' => $expiresAt,
+                'meta' => $meta ?: null,
                 'reference_type' => $referenceType,
-                'reference_id'   => $referenceId,
+                'reference_id' => $referenceId,
             ]);
         });
 
@@ -887,6 +952,31 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
+     * Handle scopeEnabled functionality with proper error handling.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     */
+    public function scopeEnabled($query)
+    {
+        $schema = $this->getConnection()->getSchemaBuilder();
+        $table = $this->getTable();
+
+        if ($schema->hasColumn($table, 'is_enabled')) {
+            return $query->where('is_enabled', true);
+        }
+
+        if ($schema->hasColumn($table, 'is_active')) {
+            return $query->where('is_active', true);
+        }
+
+        if ($schema->hasColumn($table, 'status')) {
+            return $query->where('status', 'published');
+        }
+
+        return $query;
+    }
+
+    /**
      * Handle scopeFeatured functionality with proper error handling.
      *
      * @param mixed $query
@@ -904,6 +994,53 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     public function scopeVisible($query)
     {
         return $query->where('is_visible', true);
+    }
+
+    public function scopeReadyForCatalog(Builder $query): Builder
+    {
+        return $query
+            ->whereNotNull('name')
+            ->where('name', '!=', '')
+            ->whereNotNull('slug')
+            ->where('slug', '!=', '')
+            ->whereNotNull('price')
+            ->where('price', '>', 0);
+    }
+
+    public function scopeSearchTerm(Builder $query, string $term): Builder
+    {
+        return $query->where(function (Builder $builder) use ($term): void {
+            $builder->where('name', 'like', "%{$term}%")
+                ->orWhere('description', 'like', "%{$term}%")
+                ->orWhere('sku', 'like', "%{$term}%");
+        });
+    }
+
+    public function scopeWithCatalogRelations(Builder $query): Builder
+    {
+        return $query->with([
+            'brand:id,name,slug',
+            'categories:id,name,slug',
+            'media',
+        ]);
+    }
+
+    public function scopeWithSearchRelations(Builder $query): Builder
+    {
+        return $query->with([
+            'brand:id,name,slug',
+            'categories:id,name,slug',
+        ]);
+    }
+
+    public function scopeWithShowRelations(Builder $query): Builder
+    {
+        return $query->with([
+            'brand:id,name,slug',
+            'categories:id,name,slug',
+            'media',
+            'variants',
+        ]);
     }
 
     /**
@@ -995,10 +1132,14 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getAverageRatingAttribute(): float
     {
-        if (array_key_exists('approved_reviews_avg_rating', $this->attributes)) {
-            $rating = $this->attributes['approved_reviews_avg_rating'];
+        // When aggregate values are eager loaded (e.g. via loadAvg), prefer the hydrated
+        // attributes so we do not run redundant queries when the value is already known.
+        foreach (['average_rating', 'reviews_avg_rating', 'approved_reviews_avg_rating'] as $attribute) {
+            if (array_key_exists($attribute, $this->attributes)) {
+                $rating = $this->attributes[$attribute];
 
-            return $rating !== null ? (float) $rating : 0.0;
+                return $rating !== null ? (float) $rating : 0.0;
+            }
         }
 
         if ($this->relationLoaded('reviews')) {
@@ -1017,8 +1158,12 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getReviewsCountAttribute(): int
     {
-        if (array_key_exists('approved_reviews_count', $this->attributes)) {
-            return (int) $this->attributes['approved_reviews_count'];
+        // Respect any eager-loaded aggregate counts (loadCount / withCount) to avoid
+        // re-querying the database when the information is already on the model.
+        foreach (['reviews_count', 'approved_reviews_count'] as $attribute) {
+            if (array_key_exists($attribute, $this->attributes)) {
+                return (int) $this->attributes[$attribute];
+            }
         }
 
         if ($this->relationLoaded('reviews')) {
@@ -1202,7 +1347,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         if (empty($images)) {
             return ['src' => null, 'srcset' => '', 'sizes' => '', 'alt' => $this->name];
         }
-        $srcset = [$images['xs'] ?? null ? $images['xs'] . ' 150w' : null, $images['sm'] ?? null ? $images['sm'] . ' 300w' : null, $images['md'] ?? null ? $images['md'] . ' 500w' : null, $images['lg'] ?? null ? $images['lg'] . ' 800w' : null, $images['xl'] ?? null ? $images['xl'] . ' 1200w' : null];
+        $srcset = [$images['xs'] ?? null ? $images['xs'].' 150w' : null, $images['sm'] ?? null ? $images['sm'].' 300w' : null, $images['md'] ?? null ? $images['md'].' 500w' : null, $images['lg'] ?? null ? $images['lg'].' 800w' : null, $images['xl'] ?? null ? $images['xl'].' 1200w' : null];
         $sizeKey = $defaultSize ?? 'md';
 
         return ['src' => $images[$sizeKey] ?? $images['md'], 'srcset' => implode(', ', array_filter($srcset)), 'sizes' => '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 300px', 'alt' => __('translations.product_image_alt', ['name' => $this->name, 'number' => 1])];

@@ -4,31 +4,38 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\ChannelResource\Pages;
 use App\Models\Channel;
+use App\Support\Forms\MatrixFactory;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Str;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 /**
  * ChannelResource
  *
@@ -36,18 +43,17 @@ use UnitEnum;
  */
 final class ChannelResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Channel::class;
 
     protected static ?int $navigationSort = 2;
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'Settings';
-    }
+    
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
     {
         return 'heroicon-o-rectangle-stack';
     }
@@ -67,9 +73,9 @@ final class ChannelResource extends Resource
         return __('admin.channels.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.channels.basic_information'))
                     ->schema([
@@ -80,6 +86,7 @@ final class ChannelResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->live(onBlur: true)
+                                    // Keep the slug synchronised with the name when creating new channels.
                                     ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', Str::slug($state)) : null),
                                 TextInput::make('slug')
                                     ->label(__('admin.channels.slug'))
@@ -89,7 +96,9 @@ final class ChannelResource extends Resource
                                     ->rules(['alpha_dash']),
                                 TextInput::make('code')
                                     ->label(__('admin.channels.code'))
-                                    ->required()
+                                    // Allow empty values during edit operations while still requiring codes on create.
+                                    ->nullable()
+                                    ->required(fn (string $operation): bool => $operation === 'create')
                                     ->maxLength(50)
                                     ->unique(Channel::class, 'code', ignoreRecord: true)
                                     ->rules(['alpha_dash']),
@@ -141,6 +150,29 @@ final class ChannelResource extends Resource
                                     ->default('after'),
                             ]),
                     ]),
+                Section::make(__('admin.channels.payment_matrix_section'))
+                    ->schema([
+                        MatrixFactory::checkboxGrid(
+                            'payment_matrix',
+                            [
+                                'lt' => __('admin.channels.payment_rows.lt'),
+                                'lv' => __('admin.channels.payment_rows.lv'),
+                                'ee' => __('admin.channels.payment_rows.ee'),
+                                'pl' => __('admin.channels.payment_rows.pl'),
+                                'eu' => __('admin.channels.payment_rows.eu'),
+                            ],
+                            [
+                                'web'         => __('admin.channels.payment_columns.web'),
+                                'pos'         => __('admin.channels.payment_columns.pos'),
+                                'marketplace' => __('admin.channels.payment_columns.marketplace'),
+                            ],
+                            __('admin.channels.payment_matrix_label'),
+                        )
+                            ->helperText(__('admin.channels.payment_matrix_help'))
+                            ->columnSpanFull()
+                            ->live(),
+                    ])
+                    ->columns(1),
                 Section::make(__('admin.channels.status'))
                     ->schema([
                         Grid::make(3)
@@ -169,8 +201,9 @@ final class ChannelResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('name')
@@ -196,6 +229,10 @@ final class ChannelResource extends Resource
                     ->limit(30)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
+
+                        if (! is_string($state)) {
+                            return null;
+                        }
 
                         return strlen($state) > 30 ? $state : null;
                     }),
@@ -233,6 +270,7 @@ final class ChannelResource extends Resource
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

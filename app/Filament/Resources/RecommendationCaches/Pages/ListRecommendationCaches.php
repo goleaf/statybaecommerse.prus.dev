@@ -10,6 +10,8 @@ use Filament\Actions\CreateAction;
 
 final class ListRecommendationCaches extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = RecommendationCacheResource::class;
 
     protected function getHeaderActions(): array

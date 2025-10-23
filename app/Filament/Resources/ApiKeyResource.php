@@ -4,34 +4,37 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Enums\ApiKeyScope;
 use App\Filament\Resources\ApiKeyResource\Concerns\HandlesApiKeyCredentials;
 use App\Filament\Resources\ApiKeyResource\Pages;
 use App\Models\ApiKey;
-use BackedEnum;
 use Filament\Forms\Components\Actions\Action as FormAction;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action as TableAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
+use Filament\Actions\Action as TableAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TagsColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class ApiKeyResource extends Resource
 {
     use HandlesApiKeyCredentials;
@@ -52,12 +55,17 @@ final class ApiKeyResource extends Resource
 
     protected static ?int $navigationSort = 4;
 
+    public static function getNavigationIcon(): string|BackedEnum|null
+    {
+        return 'heroicon-o-key';
+    }
+
     public static function getNavigationLabel(): string
     {
         return __('api_keys.navigation.label');
     }
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): string|UnitEnum|null
     {
         return __('navigation.groups.system');
     }
@@ -72,9 +80,9 @@ final class ApiKeyResource extends Resource
         return __('api_keys.navigation.plural');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('api_keys.sections.details'))
                 ->columns(2)
                 ->schema([
@@ -147,8 +155,9 @@ final class ApiKeyResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('name')

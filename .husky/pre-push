@@ -1,7 +1,9 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
+#!/usr/bin/env sh
+# Bootstrap the Husky v9 runtime and block pushes if the Composer CI suite fails.
+. "$(dirname "$0")/_/h"
 
-set -e
+set -eu
 
+# Ensure we do not push code that breaks the shared CI workflow.
 echo "Running Composer CI suite before push..."
 composer ci

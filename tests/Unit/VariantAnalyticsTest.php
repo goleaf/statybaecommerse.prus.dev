@@ -7,6 +7,7 @@ namespace Tests\Unit;
 use App\Models\ProductVariant;
 use App\Models\VariantAnalytics;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 final class VariantAnalyticsTest extends TestCase

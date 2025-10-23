@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\CategoryResource;
 use App\Models\Category;
+use App\Support\Nav;
 use Tests\TestCase;
 
 class CategoryResourceIsolatedTest extends TestCase
@@ -72,12 +72,18 @@ class CategoryResourceIsolatedTest extends TestCase
 
     public function test_category_resource_navigation_group(): void
     {
-        $this->assertEquals(NavigationGroup::Products, CategoryResource::getNavigationGroup());
+        $this->assertSame(
+            Nav::groupForResource(CategoryResource::class),
+            CategoryResource::getNavigationGroup(),
+        );
     }
 
     public function test_category_resource_navigation_sort(): void
     {
-        $this->assertEquals(3, CategoryResource::getNavigationSort());
+        $this->assertSame(
+            Nav::sortForResource(CategoryResource::class),
+            CategoryResource::getNavigationSort(),
+        );
     }
 
     public function test_category_resource_record_title_attribute(): void

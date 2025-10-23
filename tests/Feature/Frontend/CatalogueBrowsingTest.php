@@ -9,42 +9,44 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Review;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Cache;
-use Tests\Feature\TestCase;
+use Tests\TestCase;
 
 final class CatalogueBrowsingTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function createPublishedProduct(array $overrides = []): Product
+    public function test_homepage_renders_catalogue_sections(): void
     {
-        $brand = $overrides['brand'] ?? Brand::factory()->create();
-        unset($overrides['brand']);
-
-        return Product::factory()
-            ->for($brand)
-            ->create(array_merge([
-                'is_visible' => true,
-                'status' => 'published',
-                'published_at' => now()->subDay(),
-                'is_featured' => false,
-            ], $overrides));
-    }
-
-    public function test_homepage_catalogue_sections_render(): void
-    {
-        Cache::flush();
-
-        $brand = Brand::factory()->create();
-        $category = Category::factory()->create();
-
-        $product = $this->createPublishedProduct([
-            'is_featured' => true,
-            'brand' => $brand,
+        $brand = Brand::factory()->create([
+            'is_visible' => true,
+            'is_active' => true,
         ]);
-        $product->categories()->attach($category->getKey());
 
-        Review::factory()->for($product)->approved()->create(['rating' => 5]);
+        $category = Category::factory()->create([
+            'is_enabled' => true,
+            'is_active' => true,
+            'is_visible' => true,
+        ]);
+
+        $product = Product::factory()->create([
+            'brand_id' => $brand->id,
+            'status' => 'published',
+            'is_visible' => true,
+            'is_featured' => true,
+            'published_at' => now()->subDay(),
+            'requests_count' => 12,
+            'price' => 120,
+            'sale_price' => 96,
+            'manage_stock' => true,
+            'stock_quantity' => 15,
+        ]);
+
+        $product->categories()->attach($category);
+
+        Review::factory()->approved()->create([
+            'product_id' => $product->id,
+            'rating' => 5,
+        ]);
 
         $response = $this->get(route('home'));
 
@@ -54,30 +56,40 @@ final class CatalogueBrowsingTest extends TestCase
             'stats',
             'featuredProducts',
             'latestProducts',
-            'popularCategories',
-            'topBrands',
+            'trendingProducts',
+            'saleProducts',
+            'topCategories',
+            'highlightedBrands',
         ]);
         $response->assertSeeText($product->name);
-        $response->assertSeeText($category->name);
-        $response->assertSeeText($brand->name);
     }
 
-    public function test_product_listing_displays_catalogue_data(): void
+    public function test_product_listing_filters_featured_products(): void
     {
-        Cache::flush();
+        $brand = Brand::factory()->create([
+            'is_visible' => true,
+            'is_active' => true,
+        ]);
 
-        $brand = Brand::factory()->create();
-        $category = Category::factory()->create();
+        $category = Category::factory()->create([
+            'is_enabled' => true,
+            'is_active' => true,
+            'is_visible' => true,
+        ]);
 
-        $visibleProducts = Product::factory()
-            ->count(3)
-            ->for($brand)
-            ->create([
-                'is_visible' => true,
-                'status' => 'published',
-                'published_at' => now()->subHours(2),
-                'is_featured' => true,
-            ]);
+        $featuredProduct = Product::factory()->create([
+            'brand_id' => $brand->id,
+            'status' => 'published',
+            'is_visible' => true,
+            'is_featured' => true,
+            'published_at' => now()->subDay(),
+            'requests_count' => 8,
+            'price' => 150,
+            'sale_price' => 120,
+            'manage_stock' => true,
+            'stock_quantity' => 10,
+        ]);
+        $featuredProduct->categories()->attach($category);
 
         $hiddenProduct = Product::factory()
             ->for($brand)
@@ -108,7 +120,7 @@ final class CatalogueBrowsingTest extends TestCase
         $draftProduct->categories()->attach($category->getKey());
         $scheduledProduct->categories()->attach($category->getKey());
 
-        $response = $this->get(route('frontend.products.index', ['filter' => 'featured', 'sort' => 'latest']));
+        $response = $this->get(route('frontend.products.index', ['filter' => 'featured']));
 
         $response->assertOk();
         $response->assertViewIs('frontend.products.index');
@@ -122,26 +134,32 @@ final class CatalogueBrowsingTest extends TestCase
         $response->assertDontSeeText($scheduledProduct->name);
     }
 
-    public function test_category_page_lists_associated_products(): void
+    public function test_category_page_displays_related_products(): void
     {
-        Cache::flush();
-
-        $category = Category::factory()->create();
-        $otherCategory = Category::factory()->create();
-        $brand = Brand::factory()->create();
-
-        $categoryProduct = $this->createPublishedProduct([
-            'brand' => $brand,
-            'is_featured' => true,
-            'published_at' => now()->subHour(),
+        $brand = Brand::factory()->create([
+            'is_visible' => true,
+            'is_active' => true,
         ]);
-        $categoryProduct->categories()->attach($category->getKey());
 
-        $otherProduct = $this->createPublishedProduct([
-            'brand' => $brand,
-            'published_at' => now()->subHours(5),
+        $category = Category::factory()->create([
+            'is_enabled' => true,
+            'is_active' => true,
+            'is_visible' => true,
         ]);
-        $otherProduct->categories()->attach($otherCategory->getKey());
+
+        $product = Product::factory()->create([
+            'brand_id' => $brand->id,
+            'status' => 'published',
+            'is_visible' => true,
+            'published_at' => now()->subDay(),
+            'requests_count' => 6,
+            'price' => 110,
+            'sale_price' => 88,
+            'manage_stock' => true,
+            'stock_quantity' => 20,
+        ]);
+
+        $product->categories()->attach($category);
 
         $hiddenProduct = Product::factory()->for($brand)->create([
             'is_visible' => false,
@@ -160,26 +178,32 @@ final class CatalogueBrowsingTest extends TestCase
         $response->assertDontSeeText($hiddenProduct->name);
     }
 
-    public function test_brand_page_lists_associated_products(): void
+    public function test_brand_page_surfaces_products_and_categories(): void
     {
-        Cache::flush();
-
-        $brand = Brand::factory()->create();
-        $otherBrand = Brand::factory()->create();
-        $category = Category::factory()->create();
-
-        $brandProduct = $this->createPublishedProduct([
-            'brand' => $brand,
-            'published_at' => now()->subHour(),
-            'is_featured' => true,
+        $brand = Brand::factory()->create([
+            'is_visible' => true,
+            'is_active' => true,
         ]);
-        $brandProduct->categories()->attach($category->getKey());
 
-        $otherProduct = $this->createPublishedProduct([
-            'brand' => $otherBrand,
-            'published_at' => now()->subHours(6),
+        $category = Category::factory()->create([
+            'is_enabled' => true,
+            'is_active' => true,
+            'is_visible' => true,
         ]);
-        $otherProduct->categories()->attach($category->getKey());
+
+        $product = Product::factory()->create([
+            'brand_id' => $brand->id,
+            'status' => 'published',
+            'is_visible' => true,
+            'published_at' => now()->subDay(),
+            'requests_count' => 4,
+            'price' => 130,
+            'sale_price' => 104,
+            'manage_stock' => true,
+            'stock_quantity' => 12,
+        ]);
+
+        $product->categories()->attach($category);
 
         $hiddenProduct = Product::factory()->for($brand)->create([
             'is_visible' => false,

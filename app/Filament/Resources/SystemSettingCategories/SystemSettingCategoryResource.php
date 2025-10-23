@@ -3,7 +3,10 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingCategories;
+use App\Support\Concerns\HasNav;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\SystemSettingCategories\Pages\CreateSystemSettingCategory;
 use App\Filament\Resources\SystemSettingCategories\Pages\EditSystemSettingCategory;
 use App\Filament\Resources\SystemSettingCategories\Pages\ListSystemSettingCategories;
@@ -11,29 +14,33 @@ use App\Filament\Resources\SystemSettingCategories\Schemas\SystemSettingCategory
 use App\Filament\Resources\SystemSettingCategories\Tables\SystemSettingCategoriesTable;
 use App\Models\SystemSettingCategory;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 class SystemSettingCategoryResource extends Resource
 {
-    protected static ?string $model = SystemSettingCategory::class;
+    use HasNav;
 
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
      */
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return SystemSettingCategoryForm::configure($form);
+        return SystemSettingCategoryForm::configure($schema);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return SystemSettingCategoriesTable::configure($table);
     }
 

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Support\Contracts\Entities\UserContract;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Arr;
 
 class AdminUserResource extends JsonResource
 {
@@ -17,11 +17,10 @@ class AdminUserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        // Use the except() method to exclude sensitive fields for admin display
-        $safeAttributes = $this->resource->toAdminSafeArray();
+        $contract = UserContract::fromModel($this->resource);
+        $meta = $contract['meta'];
 
-        return array_merge($safeAttributes, [
-            // Add computed fields that are safe for admin
+        $meta = array_merge($meta, [
             'full_name' => $this->resource->full_name,
             'initials' => $this->resource->initials,
             'avatar_url' => $this->resource->avatar_url,
@@ -37,52 +36,53 @@ class AdminUserResource extends JsonResource
             'gender_text' => $this->resource->gender_text,
             'locale_text' => $this->resource->locale_text,
             'roles_label' => $this->resource->roles_label,
-
-            // Add business metrics
             'total_spent' => $this->resource->total_spent,
             'average_order_value' => $this->resource->average_order_value,
             'last_order_date' => $this->resource->last_order_date,
             'orders_count' => $this->resource->orders_count,
             'reviews_count' => $this->resource->reviews_count,
             'average_rating' => $this->resource->average_rating,
-
-            // Add relationships if loaded
-            'addresses' => $this->whenLoaded('addresses', function () {
-                return Arr::from($this->resource->addresses->map(function ($address) {
-                    return $address->except(['user_id']);
-                }));
-            }),
-
-            'orders' => $this->whenLoaded('orders', function () {
-                return Arr::from($this->resource->orders->map(function ($order) {
-                    return $order->except(['user_id']);
-                }));
-            }),
-
-            'wishlist' => $this->whenLoaded('wishlist', function () {
-                return Arr::from($this->resource->wishlist->map(function ($product) {
-                    return $product;
-                }));
-            }),
-
-            'reviews' => $this->whenLoaded('reviews', function () {
-                return Arr::from($this->resource->reviews->map(function ($review) {
-                    return $review->except(['user_id']);
-                }));
-            }),
-
-            'partners' => $this->whenLoaded('partners', function () {
-                return Arr::from($this->resource->partners->map(function ($partner) {
-                    return $partner;
-                }));
-            }),
-
-            'referrals' => $this->whenLoaded('referrals', function () {
-                return Arr::from($this->resource->referrals->map(function ($referral) {
-                    return $referral->except(['referrer_id', 'referred_id']);
-                }));
-            }),
         ]);
+
+        if ($this->resource->relationLoaded('addresses')) {
+            $meta['addresses'] = $this->resource->addresses->map(function ($address) {
+                return $address->except(['user_id'])->toArray();
+            })->toArray();
+        }
+
+        if ($this->resource->relationLoaded('orders')) {
+            $meta['orders'] = $this->resource->orders->map(function ($order) {
+                return $order->except(['user_id'])->toArray();
+            })->toArray();
+        }
+
+        if ($this->resource->relationLoaded('wishlist')) {
+            $meta['wishlist'] = $this->resource->wishlist->map(function ($product) {
+                return $product->toArray();
+            })->toArray();
+        }
+
+        if ($this->resource->relationLoaded('reviews')) {
+            $meta['reviews'] = $this->resource->reviews->map(function ($review) {
+                return $review->except(['user_id'])->toArray();
+            })->toArray();
+        }
+
+        if ($this->resource->relationLoaded('partners')) {
+            $meta['partners'] = $this->resource->partners->map(function ($partner) {
+                return $partner->toArray();
+            })->toArray();
+        }
+
+        if ($this->resource->relationLoaded('referrals')) {
+            $meta['referrals'] = $this->resource->referrals->map(function ($referral) {
+                return $referral->except(['referrer_id', 'referred_id'])->toArray();
+            })->toArray();
+        }
+
+        $contract['meta'] = $meta;
+
+        return $contract;
     }
 
     /**

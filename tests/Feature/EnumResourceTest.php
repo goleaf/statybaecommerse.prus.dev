@@ -230,12 +230,25 @@ final class EnumResourceTest extends TestCase
 
     public function test_enum_value_cleanup_method(): void
     {
-        EnumValue::factory()->create([
+        $unusedEnum = EnumValue::factory()->create([
             'created_at' => now()->subMonths(7),
+            'metadata' => [
+                'usage_count' => 0,
+            ],
+        ]);
+
+        $activeEnum = EnumValue::factory()->create([
+            'created_at' => now()->subMonths(7),
+            'metadata' => [
+                'usage_count' => 10,
+            ],
         ]);
 
         $deletedCount = EnumValue::cleanupUnused();
-        $this->assertIsInt($deletedCount);
+
+        $this->assertSame(1, $deletedCount);
+        $this->assertDatabaseMissing('enum_values', ['id' => $unusedEnum->id]);
+        $this->assertDatabaseHas('enum_values', ['id' => $activeEnum->id]);
     }
 
     public function test_enum_value_bulk_actions(): void

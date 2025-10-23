@@ -1,0 +1,22 @@
+{
+  "id": 1001,
+  "number": "SBA-2024-0001",
+  "status": "pending",
+  "items": [],
+  "totals": {
+    "subtotal": 0,
+    "tax": 0,
+    "shipping": 0,
+    "discount": 0,
+    "total": 0,
+    "currency": "EUR"
+  },
+  "customer": {
+    "id": 50,
+    "email": "pirkjas@example.lt",
+    "name": "Statybininkas Pirkėjas",
+    "meta": {}
+  },
+  "payments": [],
+  "shipments": []
+}

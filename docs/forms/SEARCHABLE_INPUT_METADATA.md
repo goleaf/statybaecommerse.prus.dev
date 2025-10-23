@@ -19,7 +19,7 @@ The Alpine helper embedded in `filament/components/autocomplete-select.blade.php
 
 On the PHP side, reuse the shared `App\Support\Filament\SearchableComponentHelper` so hydration, synchronisation, and clearing logic stay centralised. The helper exposes `hydrate()` for normalising existing selections into `[value, label, payload]` tuples, `syncSelectedRecord()` for keeping persisted identifiers and cached payloads aligned, and `clear()` for resetting dependent fields whenever a lookup is wiped. Each method injects `id` and `label` keys into the payload so Livewire receives the same canonical structure produced by the search services.【F:app/Support/Filament/SearchableComponentHelper.php†L21-L205】
 
-Existing resources already expose the payload structures this helper needs. For example, the order form clears billing and shipping payloads when a user wipes the lookup, otherwise it resolves the cached `AddressSearch::payload()` structure into the associated `KeyValue` fields.【F:app/Filament/Resources/OrderResource.php†L312-L354】 Cart item forms follow the same pattern, using product metadata to fill name, SKU, unit price, and resetting related variant selections when the base product changes.【F:app/Filament/Resources/CartItemResource.php†L16-L56】
+The reusable PHP glue now lives in `App\Support\Filament\SearchableComponentHelper`. Hydrate existing records with `SearchableComponentHelper::hydrate()` so the component restores the canonical `SearchResult` payload, and rely on `SearchableComponentHelper::sync()` inside `afterStateUpdated` callbacks to keep model keys, labels, and metadata aligned. The helper also clears stale state automatically when the user wipes a lookup, which keeps Livewire from retaining orphaned payloads.
 
 ## Integration examples
 
@@ -29,10 +29,11 @@ The following resources already lean on the metadata payload to keep forms consi
 - **Order addresses** – billing and shipping lookups project the stored address payload into editable key/value rows, or blank them entirely when the lookup is cleared.【F:app/Filament/Resources/OrderResource.php†L312-L354】
 - **Wishlist items** – product lookups hydrate IDs and reset variant selectors, mirroring the cart workflow so storefront staff do not manage mismatched combinations.【F:app/Filament/Resources/WishlistItemResource.php†L160-L196】
 - **Order items** – both the standalone resource and relation manager wrap variant lookups with `ProductVariantFieldHelper` so hydration, clearing, and total recalculation logic stay uniform across admin entry points.【F:app/Filament/Resources/OrderItemResource.php†L86-L225】【F:app/Filament/Resources/OrderResource/RelationManagers/OrderItemsRelationManager.php†L70-L165】
+- **Sliders** – the quick actions widget, management page modal, and primary resource form now lean on `SearchableComponentHelper::hydrate()`/`clear()` so the `button_url` lookup restores metadata while clearing the stored payload when the selection is wiped, keeping downstream slider payloads consistent across admin surfaces.【F:app/Filament/Widgets/SliderQuickActionsWidget.php†L43-L110】【F:app/Filament/Pages/SliderManagement.php†L121-L188】【F:app/Filament/Resources/SliderResource.php†L94-L138】【F:app/Filament/Resources/Sliders/Schemas/SliderForm.php†L1-L94】
 
 Replicate these patterns for any new searchable inputs so metadata remains authoritative and downstream automation (exports, cache warmers, printable documents) can depend on the enriched payload.
 
 ## Follow-up checklist
 
 - [x] Adopt the shared helper once it lands and replace bespoke hydration closures.
-- [ ] Request a team review of this document whenever the helper contract changes to keep the documentation accurate.
+- [x] Request a team review of this document whenever the helper contract changes to keep the documentation accurate.

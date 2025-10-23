@@ -18,4 +18,9 @@ final class EditVariantImage extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        return VariantImageResource::populateFileMetadata($data);
+    }
 }

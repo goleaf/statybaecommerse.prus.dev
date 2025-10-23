@@ -15,7 +15,7 @@ This document outlines the comprehensive Filament admin navigation structure bas
 - CollectionResource - Product collections
 - AttributeResource - Product attributes
 - AttributeValueResource - Attribute values
-- PriceResource - Product pricing
+- PriceResource - Product pricing (morph-to price targets, currency-aware lifecycle controls, metadata capture)
 - PriceListResource - Price lists
 - PriceListItemResource - Price list items
 - ProductHistoryResource - Product change history
@@ -139,6 +139,8 @@ This document outlines the comprehensive Filament admin navigation structure bas
 
 ### Navigation Icons
 All resources use consistent Heroicons with appropriate colors for visual distinction.
+
+- ProductHistoryResource now explicitly follows the shared docblock typing rule for `$navigationIcon`, keeping parity with the Filament resource standardization pass.
 
 ### Sort Order
 Resources are ordered by priority within each group, with core functionality appearing first.

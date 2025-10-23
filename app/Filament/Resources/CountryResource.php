@@ -4,30 +4,38 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\CountryResource\Pages;
 use App\Filament\Resources\CountryResource\RelationManagers\AddressesRelationManager;
 use App\Filament\Resources\CountryResource\RelationManagers\CitiesRelationManager;
 use App\Filament\Resources\CountryResource\RelationManagers\CustomersRelationManager;
 use App\Filament\Resources\CountryResource\RelationManagers\UsersRelationManager;
 use App\Models\Country;
+use App\Models\Scopes\ActiveScope;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkAction as TableBulkAction;
+use Filament\Actions\BulkActionGroup as TableBulkActionGroup;
+use Filament\Actions\DeleteAction as TableDeleteAction;
+use Filament\Actions\DeleteBulkAction as TableDeleteBulkAction;
+use Filament\Actions\EditAction as TableEditAction;
+use Filament\Actions\ViewAction as TableViewAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Grid as InfolistGrid;
+use Filament\Infolists\Components\Section as InfolistSection;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup as TableBulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction as TableDeleteBulkAction;
-use Filament\Tables\Actions\EditAction as TableEditAction;
-use Filament\Tables\Actions\ViewAction as TableViewAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -35,13 +43,18 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Throwable;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class CountryResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Country::class;
 
     protected static ?int $navigationSort = 1;
@@ -69,9 +82,9 @@ final class CountryResource extends Resource
         return __('countries.models.countries');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('countries.sections.basic_info'))
                     ->schema([
@@ -234,8 +247,75 @@ final class CountryResource extends Resource
             ]);
     }
 
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                InfolistSection::make(__('countries.sections.basic_info'))
+                    ->schema([
+                        InfolistGrid::make(2)
+                            ->schema([
+                                TextEntry::make('name')
+                                    ->label(__('countries.fields.name'))
+                                    ->weight('bold'),
+                                TextEntry::make('name_official')
+                                    ->label(__('countries.fields.name_official'))
+                                    ->placeholder('—'),
+                            ]),
+                        InfolistGrid::make(3)
+                            ->schema([
+                                TextEntry::make('cca2')
+                                    ->label(__('countries.fields.cca2')),
+                                TextEntry::make('cca3')
+                                    ->label(__('countries.fields.cca3')),
+                                TextEntry::make('iso_code')
+                                    ->label(__('countries.fields.iso_code')),
+                            ]),
+                    ])
+                    ->columns(1),
+                InfolistSection::make(__('countries.sections.location_info'))
+                    ->schema([
+                        InfolistGrid::make(2)
+                            ->schema([
+                                TextEntry::make('region')
+                                    ->label(__('countries.fields.region')),
+                                TextEntry::make('subregion')
+                                    ->label(__('countries.fields.subregion')),
+                            ]),
+                        InfolistGrid::make(2)
+                            ->schema([
+                                TextEntry::make('timezone')
+                                    ->label(__('countries.fields.timezone')),
+                                TextEntry::make('phone_calling_code')
+                                    ->label(__('countries.fields.phone_calling_code'))
+                                    ->formatStateUsing(static fn (?string $state): string => filled($state) ? '+' . $state : '—'),
+                            ]),
+                    ])
+                    ->columns(1),
+                InfolistSection::make(__('countries.sections.economic_info'))
+                    ->schema([
+                        InfolistGrid::make(3)
+                            ->schema([
+                                TextEntry::make('currency_code')
+                                    ->label(__('countries.fields.currency_code')),
+                                TextEntry::make('currency_symbol')
+                                    ->label(__('countries.fields.currency_symbol'))
+                                    ->placeholder('—'),
+                                TextEntry::make('vat_rate')
+                                    ->label(__('countries.fields.vat_rate'))
+                                    ->formatStateUsing(static function ($state): string {
+                                        // Display a friendly VAT label while gracefully handling null data.
+                                        return $state !== null ? number_format((float) $state, 2) . '%' : '—';
+                                    }),
+                            ]),
+                    ])
+                    ->columns(1),
+            ]);
+    }
+
     public static function table(Table $table): Table
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('name')
@@ -367,52 +447,69 @@ final class CountryResource extends Resource
                 ActionGroup::make([
                     TableViewAction::make(),
                     TableEditAction::make(),
+                    TableDeleteAction::make(),
                     Action::make('activate')
                         ->label(__('countries.actions.activate'))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->action(function (Country $record): void {
+                        ->action(function (?Country $record): void {
+                            if (! $record instanceof Country) {
+                                return;
+                            }
+
                             $record->update(['is_active' => true]);
                             Notification::make()
                                 ->title(__('countries.notifications.activated'))
                                 ->success()
                                 ->send();
                         })
-                        ->visible(static fn (Country $record): bool => ! $record->is_active),
+                        ->visible(static fn (?Country $record): bool => ($record?->is_active ?? false) === false),
                     Action::make('deactivate')
                         ->label(__('countries.actions.deactivate'))
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
-                        ->action(function (Country $record): void {
+                        ->action(function (?Country $record): void {
+                            if (! $record instanceof Country) {
+                                return;
+                            }
+
                             $record->update(['is_active' => false]);
                             Notification::make()
                                 ->title(__('countries.notifications.deactivated'))
                                 ->success()
                                 ->send();
                         })
-                        ->visible(static fn (Country $record): bool => $record->is_active),
+                        ->visible(static fn (?Country $record): bool => ($record?->is_active ?? false) === true),
                 ]),
             ])
             ->bulkActions([
                 TableBulkActionGroup::make([
                     TableDeleteBulkAction::make(),
-                    BulkAction::make('activate')
+                    TableBulkAction::make('activate')
                         ->label(__('countries.actions.activate'))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->action(function (EloquentCollection $records): void {
-                            $records->each->update(['is_active' => true]);
+                        ->action(function (iterable $records): void {
+                            collect($records)->each(static function (Country $record): void {
+                                if ($record instanceof Country) {
+                                    $record->update(['is_active' => true]);
+                                }
+                            });
                             Notification::make()
                                 ->title(__('countries.notifications.bulk_activated'))
                                 ->success()
                                 ->send();
                         }),
-                    BulkAction::make('deactivate')
+                    TableBulkAction::make('deactivate')
                         ->label(__('countries.actions.deactivate'))
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
-                        ->action(function (EloquentCollection $records): void {
-                            $records->each->update(['is_active' => false]);
+                        ->action(function (iterable $records): void {
+                            collect($records)->each(static function (Country $record): void {
+                                if ($record instanceof Country) {
+                                    $record->update(['is_active' => false]);
+                                }
+                            });
                             Notification::make()
                                 ->title(__('countries.notifications.bulk_deactivated'))
                                 ->success()
@@ -420,6 +517,7 @@ final class CountryResource extends Resource
                         }),
                 ]),
             ])
+            ->modifyQueryUsing(static fn (Builder $query): Builder => $query->withoutGlobalScopes([ActiveScope::class]))
             ->defaultSort('name')
             ->striped()
             ->paginated([10, 25, 50, 100]);

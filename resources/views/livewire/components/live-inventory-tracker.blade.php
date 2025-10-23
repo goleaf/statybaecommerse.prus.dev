@@ -274,7 +274,7 @@
                         <tr class="hover:bg-gray-50 transition-colors duration-200">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    {{-- Resolve the inventory thumbnail so staff see the most relevant photo. --}}
+                                    {{-- Resolve the best possible inventory thumbnail from the API response. --}}
                                     @php($image = $item['main_image'] ?? $item['thumbnail'] ?? ($item['image'] ?? null))
                                     @if($image)
                                         <img class="h-10 w-10 rounded-lg object-cover" src="{{ $image }}" alt="{{ $item['name'] }}">

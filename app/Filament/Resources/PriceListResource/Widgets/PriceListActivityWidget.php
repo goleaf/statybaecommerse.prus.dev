@@ -6,11 +6,12 @@ namespace App\Filament\Resources\PriceListResource\Widgets;
 
 use App\Models\PriceList;
 use Filament\Widgets\ChartWidget;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\DB;
 
 final class PriceListActivityWidget extends ChartWidget
 {
-    public function getHeading(): ?string
+    public function getHeading(): string|Htmlable|null
     {
         return __('price_lists.charts.activity_over_time');
     }

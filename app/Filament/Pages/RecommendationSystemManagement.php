@@ -12,12 +12,13 @@ use App\Models\RecommendationConfig;
 use App\Models\UserBehavior;
 use App\Models\UserProductInteraction;
 use App\Services\RecommendationService;
-use BackedEnum;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use UnitEnum;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Throwable;
+use UnitEnum;
 
 final class RecommendationSystemManagement extends Page
 {
@@ -27,9 +28,9 @@ final class RecommendationSystemManagement extends Page
 
     protected static ?string $slug = 'recommendation-system-management';
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): BackedEnum|string|null
     {
-        return 'Analytics';
+        return 'Analytics'; // Group recommendation insights with the analytics tooling.
     }
 
     protected static ?int $navigationSort = 40;

@@ -14,12 +14,17 @@ use Illuminate\Database\Eloquent\Builder;
 
 final class ListProducts extends BaseListRecords
 {
+    use HasResizableColumns;
     use HasWidgetTabs;
 
     protected static string $resource = ProductResource::class;
 
     protected function getHeaderActions(): array
     {
+        if (! ProductResource::canCreate()) {
+            return [];
+        }
+
         return [
             Actions\CreateAction::make()
                 ->visible(fn () => AuthorizationMatrix::check('products', 'create')),

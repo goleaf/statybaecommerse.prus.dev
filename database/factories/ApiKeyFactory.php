@@ -4,34 +4,29 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\ApiKeyScope;
 use App\Models\ApiKey;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ApiKey>
+ * @extends Factory<ApiKey>
  */
 final class ApiKeyFactory extends Factory
 {
     protected $model = ApiKey::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
-        $availableScopes = [
-            'orders.read',
-            'orders.write',
-            'products.read',
-            'products.write',
-            'customers.read',
-            'customers.write',
-            'analytics.read',
-        ];
+        $cases = ApiKeyScope::cases();
 
-        $scopes = $this->faker->randomElements($availableScopes, $this->faker->numberBetween(1, 3));
+        $scopes = collect($cases)
+            ->shuffle()
+            ->take(random_int(1, count($cases)))
+            ->map(static fn (ApiKeyScope $scope): string => $scope->value)
+            ->values()
+            ->all();
+
+        $credentials = ApiKey::generateCredentials();
 
         $credentials = ApiKey::generateCredentials();
 
@@ -43,25 +38,5 @@ final class ApiKeyFactory extends Factory
             'active' => true,
             'last_used_at' => $this->faker->optional()->dateTimeBetween('-1 month', 'now'),
         ];
-    }
-
-    /**
-     * Indicate that the API key is inactive.
-     */
-    public function inactive(): static
-    {
-        return $this->state(fn () => [
-            'active' => false,
-        ]);
-    }
-
-    /**
-     * Indicate that the API key has no rate limit restrictions.
-     */
-    public function unlimited(): static
-    {
-        return $this->state(fn () => [
-            'rate_limit' => null,
-        ]);
     }
 }

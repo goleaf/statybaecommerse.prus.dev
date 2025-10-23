@@ -11,11 +11,10 @@ use App\Models\User;
 use App\Services\CacheInvalidationService;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTagHelper;
+use Illuminate\Cache\TaggableStore;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Cache\TaggableStore;
-use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -88,7 +87,6 @@ final class LiveDashboard extends Component
     /**
      * Handle realTimeStats functionality with proper error handling.
      */
-    #[Computed(persist: true, seconds: 60)]
     public function realTimeStats(): array
     {
         return $this->rememberDashboard(CacheKeys::dashboardStats($this->timeRange), CacheKeys::TTL_MINUTE, function () {
@@ -124,9 +122,18 @@ final class LiveDashboard extends Component
     }
 
     /**
+     * Expose a property-style accessor for Blade templates while delegating to
+     * the method above so cached values can be re-evaluated after manual cache
+     * invalidation.
+     */
+    public function getRealTimeStatsProperty(): array
+    {
+        return $this->realTimeStats();
+    }
+
+    /**
      * Handle liveActivity functionality with proper error handling.
      */
-    #[Computed(persist: true, seconds: 120)]
     public function liveActivity(): array
     {
         return $this->rememberDashboard(CacheKeys::dashboardActivity($this->timeRange), CacheKeys::TTL_TWO_MINUTES, function () {
@@ -177,9 +184,17 @@ final class LiveDashboard extends Component
     }
 
     /**
+     * Provide a computed property bridge for Livewire views without locking the
+     * underlying cached payload, ensuring refreshes honour cache invalidation.
+     */
+    public function getLiveActivityProperty(): array
+    {
+        return $this->liveActivity();
+    }
+
+    /**
      * Handle performanceMetrics functionality with proper error handling.
      */
-    #[Computed(persist: true, seconds: 300)]
     public function performanceMetrics(): array
     {
         return $this->rememberDashboard(CacheKeys::dashboardPerformance($this->timeRange), CacheKeys::TTL_FIVE_MINUTES, function () {
@@ -191,7 +206,16 @@ final class LiveDashboard extends Component
                 'conversion_rate'      => rand(2, 8),
                 'top_pages'            => [['page' => 'Home', 'views' => rand(500, 2000)], ['page' => 'Products', 'views' => rand(300, 1500)], ['page' => 'Categories', 'views' => rand(200, 1000)]],
             ];
-        });
+        }, [CacheKeys::dashboardTag()]);
+    }
+
+    /**
+     * Bridge property access for performance metrics so dashboard refreshes can
+     * compute fresh values when caches are cleared mid-request.
+     */
+    public function getPerformanceMetricsProperty(): array
+    {
+        return $this->performanceMetrics();
     }
 
     /**
@@ -221,6 +245,22 @@ final class LiveDashboard extends Component
     }
 
     /**
+     * Remember dashboard cache entries while applying dashboard tags when supported.
+     *
+     * @return array<string, mixed>
+     */
+    private function rememberDashboard(string $key, int|DateInterval $ttl, callable $callback): array
+    {
+        $store = Cache::getStore();
+
+        if ($store instanceof TaggableStore) {
+            return Cache::tags(CacheTagHelper::dashboards())->remember($key, $ttl, $callback);
+        }
+
+        return Cache::remember($key, $ttl, $callback);
+    }
+
+    /**
      * Handle clearCache functionality with proper error handling.
      */
     private function clearCache(): void
@@ -233,7 +273,7 @@ final class LiveDashboard extends Component
      *
      * @template TValue
      *
-     * @param  callable(): TValue  $callback
+     * @param  callable(): TValue $callback
      * @return TValue
      */
     private function rememberDashboard(string $key, int $ttl, callable $callback): mixed

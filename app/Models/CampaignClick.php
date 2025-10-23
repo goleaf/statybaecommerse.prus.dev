@@ -6,8 +6,11 @@ namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use App\Traits\HasTranslations;
+use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -46,7 +49,33 @@ final class CampaignClick extends Model
      */
     protected function casts(): array
     {
-        return ['clicked_at' => 'datetime', 'conversion_value' => 'decimal:2', 'is_converted' => 'boolean', 'conversion_data' => 'array'];
+        // Keep scalar casts while the clicked_at mutator manages timezone normalisation separately.
+        return ['conversion_value' => 'decimal:2', 'is_converted' => 'boolean', 'conversion_data' => 'array'];
+    }
+
+    /**
+     * Normalise clicked_at timestamps to UTC on read/write to ensure deterministic API snapshots.
+     */
+    protected function clickedAt(): Attribute
+    {
+        return Attribute::make(
+            get: fn (mixed $value): ?CarbonImmutable => $value === null
+                ? null
+                : CarbonImmutable::parse((string) $value, 'UTC'),
+            set: function (mixed $value): ?string {
+                if ($value instanceof CarbonInterface) {
+                    return $value->copy()->setTimezone('UTC')->format('Y-m-d H:i:s');
+                }
+
+                if ($value === null || $value === '') {
+                    return null;
+                }
+
+                return CarbonImmutable::parse((string) $value, config('app.timezone', 'UTC'))
+                    ->setTimezone('UTC')
+                    ->format('Y-m-d H:i:s');
+            }
+        );
     }
 
     protected string $translationModel = \App\Models\Translations\CampaignClickTranslation::class;

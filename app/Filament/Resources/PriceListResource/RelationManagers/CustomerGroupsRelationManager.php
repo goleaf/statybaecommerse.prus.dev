@@ -9,6 +9,7 @@ use Filament\Actions\AttachAction;
 use Filament\Actions\DetachAction;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Model;
 
 final class CustomerGroupsRelationManager extends BaseRelationManager
@@ -20,36 +21,51 @@ final class CustomerGroupsRelationManager extends BaseRelationManager
         return __('price_lists.relation_managers.customer_groups.title');
     }
 
-    public function table(Table $table): Table
+    public function table(Table $table): Table   
     {
+        // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
+            ->recordTitleAttribute('name')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('price_lists.customer_group'))
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('code')
-                    ->label(__('price_lists.code'))
+
+                Tables\Columns\TextColumn::make('slug')
+                    ->label(__('customer_groups.slug'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('discount_percentage')
                     ->label(__('price_lists.discount_percentage'))
                     ->formatStateUsing(fn (?float $state): string => $state !== null ? number_format($state, 2) . '%' : '-')
                     ->sortable(),
+
                 Tables\Columns\IconColumn::make('is_enabled')
-                    ->label(__('price_lists.is_active'))
-                    ->boolean(),
+                    ->label(__('customer_groups.is_enabled'))
+                    ->boolean()
+                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('price_lists.created_at'))
+                    ->label(__('customer_groups.created_at'))
                     ->dateTime()
-                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->filters([
+                Tables\Filters\TernaryFilter::make('is_enabled')
+                    ->label(__('price_lists.is_active'))
+                    ->boolean()
+                    ->trueLabel(__('price_lists.active_only'))
+                    ->falseLabel(__('price_lists.inactive_only'))
+                    ->native(false),
+            ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 AttachAction::make()->preloadRecordSelect(),
             ])
             ->actions([
-                DetachAction::make(),
+                Tables\Actions\DetachAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

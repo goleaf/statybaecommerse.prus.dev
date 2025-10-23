@@ -10,6 +10,8 @@ use Filament\Actions\CreateAction;
 
 class ListChannels extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = ChannelResource::class;
 
     protected function getHeaderActions(): array

@@ -25,7 +25,7 @@ Route::middleware(['web'])->group(function () {
         Route::get('/search', [App\Http\Controllers\Frontend\ProductController::class, 'search'])->name('search');
         Route::get('/category/{category}', [App\Http\Controllers\Frontend\ProductController::class, 'byCategory'])->name('by-category');
         Route::get('/brand/{brand}', [App\Http\Controllers\Frontend\ProductController::class, 'byBrand'])->name('by-brand');
-        Route::get('/{product}', [App\Http\Controllers\Frontend\ProductController::class, 'show'])->name('show');
+        Route::get('/{product:slug}', [App\Http\Controllers\Frontend\ProductController::class, 'show'])->name('show');
         Route::post('/{product}/review', [App\Http\Controllers\Frontend\ProductController::class, 'addReview'])->name('add-review');
     });
 
@@ -75,6 +75,8 @@ Route::middleware(['web'])->group(function () {
         Route::post('/addresses', [App\Http\Controllers\Frontend\ProfileController::class, 'storeAddress'])->name('store-address');
         Route::put('/addresses/{address}', [App\Http\Controllers\Frontend\ProfileController::class, 'updateAddress'])->name('update-address');
         Route::delete('/addresses/{address}', [App\Http\Controllers\Frontend\ProfileController::class, 'deleteAddress'])->name('delete-address');
+        Route::post('/data/export', [App\Http\Controllers\Frontend\DataPrivacyController::class, 'export'])->name('data.export');
+        Route::delete('/data', [App\Http\Controllers\Frontend\DataPrivacyController::class, 'destroy'])->name('data.destroy');
     });
 
     // Campaigns
@@ -94,6 +96,7 @@ Route::middleware(['web'])->group(function () {
         Route::get('/coupons', [App\Http\Controllers\Frontend\DiscountController::class, 'coupons'])->name('coupons');
         Route::post('/apply-coupon', [App\Http\Controllers\Frontend\DiscountController::class, 'applyCoupon'])->name('apply-coupon');
         Route::post('/remove-coupon', [App\Http\Controllers\Frontend\DiscountController::class, 'removeCoupon'])->name('remove-coupon');
+        Route::get('/{discount:slug}', [App\Http\Controllers\Frontend\DiscountController::class, 'show'])->name('show');
     });
 
     // Collections

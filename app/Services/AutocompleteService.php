@@ -16,10 +16,12 @@ use App\Models\Location;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
+use App\Support\Telemetry\TelemetryManager;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+use OpenTelemetry\API\Trace\SpanInterface;
 
 /**
  * AutocompleteService
@@ -77,7 +79,6 @@ final class AutocompleteService
                         $typeResults = $this->searchByType($type, $normalizedQuery, $typeLimit, $locale);
                         $results = array_merge($results, $typeResults);
                     }
-                }
 
                 // Sort by relevance and limit final results
                 return $this->sortByRelevance($results, $normalizedQuery, $limit);
@@ -92,7 +93,9 @@ final class AutocompleteService
             $this->cacheService->cacheSearchResults($cacheKey, $results, $normalizedQuery, $context);
         }
 
-        $executionTime = microtime(true) - $startTime;
+            $executionTime = microtime(true) - $startTime;
+            $span?->setAttribute('search.execution_time', $executionTime);
+            $span?->setAttribute('search.result_count', count($results));
 
         // Track search analytics
         $this->trackSearchAnalytics($normalizedQuery, count($results));

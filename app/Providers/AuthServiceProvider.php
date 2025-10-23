@@ -15,11 +15,55 @@ use App\Policies\CategoryPolicy;
 use App\Policies\OrderPolicy;
 use App\Policies\ProductPolicy;
 use App\Policies\UserPolicy;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
-class AuthServiceProvider extends ServiceProvider
+final class AuthServiceProvider extends ServiceProvider
 {
+    protected $policies = [
+        Export::class => ExportPolicy::class,
+    ];
+
+    /**
+     * The policy mappings for the application.
+     */
+    protected $policies = [
+        Product::class => ProductPolicy::class,
+        Category::class => CategoryPolicy::class,
+        Brand::class => BrandPolicy::class,
+        Order::class => OrderPolicy::class,
+        User::class => UserPolicy::class,
+    ];
+
+    /**
+     * The policy mappings for the application.
+     *
+     * @var array<class-string, class-string>
+     */
+    protected $policies = [
+        Product::class => ProductPolicy::class,
+        Category::class => CategoryPolicy::class,
+        Brand::class => BrandPolicy::class,
+        Customer::class => CustomerPolicy::class,
+        Order::class => OrderPolicy::class,
+        Legal::class => LegalPolicy::class,
+        SystemSetting::class => SystemSettingPolicy::class,
+    ];
+
+    /**
+     * The policy mappings for the application.
+     *
+     * @var array<class-string, class-string>
+     */
+    protected $policies = [
+        Brand::class => BrandPolicy::class,
+        Category::class => CategoryPolicy::class,
+        Order::class => OrderPolicy::class,
+        Product::class => ProductPolicy::class,
+        User::class => UserPolicy::class,
+    ];
+
     /**
      * The policy mappings for the application.
      */
@@ -51,6 +95,18 @@ class AuthServiceProvider extends ServiceProvider
             return $user->hasAnyRole(['administrator', 'super_admin'])
                 ? true
                 : null;
+        });
+
+        Gate::define('viewMailPreviews', static function (?Authenticatable $user = null): bool {
+            if (app()->environment(['local', 'development', 'testing'])) {
+                return true;
+            }
+
+            if ($user === null) {
+                return false;
+            }
+
+            return isset($user->is_admin) ? (bool) $user->is_admin : false;
         });
 
         $permissions = (array) config('dashboard.permissions');

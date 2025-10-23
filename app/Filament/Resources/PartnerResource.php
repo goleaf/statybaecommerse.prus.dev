@@ -4,24 +4,28 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\PartnerResource\Pages;
 use App\Models\Partner;
-use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class PartnerResource extends Resource
 {
-    protected static ?string $model = Partner::class;
+    use HasNav;
 
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
@@ -35,10 +39,11 @@ final class PartnerResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
+        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         // Build the Partner form using the Section helper to keep layouts consistent.
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.partners.sections.basic_information'))
                     ->schema([
@@ -105,8 +110,9 @@ final class PartnerResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
@@ -169,7 +175,7 @@ final class PartnerResource extends Resource
         return [
             'index'  => Pages\ListPartners::route('/'),
             'create' => Pages\CreatePartner::route('/create'),
-            'view'   => Pages\ViewPartner::route('/{record}'), // Provide a dedicated read-only partner detail page.
+            'view'   => Pages\ViewPartner::route('/{record}'),
             'edit'   => Pages\EditPartner::route('/{record}/edit'),
         ];
     }

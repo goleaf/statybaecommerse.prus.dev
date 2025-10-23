@@ -10,6 +10,8 @@ use Filament\Actions\CreateAction;
 
 final class ListSystemSettingHistories extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = SystemSettingHistoryResource::class;
 
     protected function getHeaderActions(): array

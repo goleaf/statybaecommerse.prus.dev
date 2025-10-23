@@ -3,7 +3,10 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\RecommendationAnalytics;
+use App\Support\Concerns\HasNav;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\RecommendationAnalytics\Pages\CreateRecommendationAnalytics;
 use App\Filament\Resources\RecommendationAnalytics\Pages\EditRecommendationAnalytics;
 use App\Filament\Resources\RecommendationAnalytics\Pages\ListRecommendationAnalytics;
@@ -12,13 +15,15 @@ use App\Filament\Resources\RecommendationAnalytics\Schemas\RecommendationAnalyti
 use App\Filament\Resources\RecommendationAnalytics\Tables\RecommendationAnalyticsTable;
 use App\Models\RecommendationAnalytics;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class RecommendationAnalyticsResource extends Resource
 {
-    protected static ?string $model = RecommendationAnalytics::class;
+    use HasNav;
 
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
@@ -49,13 +54,14 @@ final class RecommendationAnalyticsResource extends Resource
         return __('recommendation_analytics.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return RecommendationAnalyticsForm::configure($form);
+        return RecommendationAnalyticsForm::configure($schema);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return RecommendationAnalyticsTable::configure($table);
     }
 

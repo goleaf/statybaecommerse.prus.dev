@@ -3,7 +3,10 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\Channels;
+use App\Support\Concerns\HasNav;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\Channels\Pages\CreateChannel;
 use App\Filament\Resources\Channels\Pages\EditChannel;
 use App\Filament\Resources\Channels\Pages\ListChannels;
@@ -11,29 +14,35 @@ use App\Filament\Resources\Channels\Schemas\ChannelForm;
 use App\Filament\Resources\Channels\Tables\ChannelsTable;
 use App\Models\Channel;
 use BackedEnum;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 class ChannelResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = Channel::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
     {
         return 'heroicon-o-rectangle-stack';
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return ChannelForm::configure($form);
+        return ChannelForm::configure($schema);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return ChannelsTable::configure($table);
     }
 

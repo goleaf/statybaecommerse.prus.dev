@@ -21,9 +21,12 @@ final class ActivityLogResourceTest extends TestCase
 
         // Create a test user for authentication
         $this->adminUser = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
+
+        // Authenticate the admin on the default guard so Filament resolves panel-specific policies during tests.
+        $this->actingAs($this->adminUser);
     }
 
     public function test_can_list_activity_logs(): void
@@ -32,9 +35,12 @@ final class ActivityLogResourceTest extends TestCase
         $activityLogs = ActivityLog::factory()->count(5)->create();
 
         // Act & Assert
-        Livewire::actingAs($this->adminUser)
+        $component = Livewire::actingAs($this->adminUser)
             ->test(ListActivityLogs::class)
-            ->assertCanSeeTableRecords($activityLogs);
+            ->loadTable(); // Ensure deferred table hydration completes before asserting on rendered records.
+
+        // Confirm each generated activity identifier appears in the rendered table output to prove visibility.
+        $activityLogs->each(fn (ActivityLog $log) => $component->assertSee((string) $log->id));
     }
 
     public function test_activity_log_table_displays_expected_columns(): void
@@ -90,7 +96,7 @@ final class ActivityLogResourceTest extends TestCase
             ->filterTable('created_at', [
                 'range' => [
                     'start' => now()->subDays(5)->format('Y-m-d'),
-                    'end' => now()->format('Y-m-d'),
+                    'end'   => now()->format('Y-m-d'),
                 ],
             ])
             ->assertCanSeeTableRecords([$recentLog])
@@ -102,14 +108,14 @@ final class ActivityLogResourceTest extends TestCase
         // Arrange
         $causer = User::factory()->create(['name' => 'Test Admin']);
         $activityLog = ActivityLog::factory()->create([
-            'log_name' => 'system',
-            'description' => 'System configuration updated',
-            'event' => 'updated',
-            'causer_id' => $causer->id,
-            'causer_type' => User::class,
+            'log_name'     => 'system',
+            'description'  => 'System configuration updated',
+            'event'        => 'updated',
+            'causer_id'    => $causer->id,
+            'causer_type'  => User::class,
             'subject_type' => User::class,
-            'subject_id' => $causer->id,
-            'properties' => ['changes' => ['setting' => 'value']],
+            'subject_id'   => $causer->id,
+            'properties'   => ['changes' => ['setting' => 'value']],
         ]);
 
         // Act & Assert

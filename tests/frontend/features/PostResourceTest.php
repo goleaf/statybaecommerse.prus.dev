@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\ModerationState;
 use App\Filament\Resources\PostResource;
 use App\Filament\Resources\PostResource\Pages\CreatePost;
 use App\Filament\Resources\PostResource\Pages\EditPost;
@@ -14,44 +15,44 @@ use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->user = User::factory()->create();
     $this->actingAs($this->user);
 });
 
-it('can list posts', function () {
+it('can list posts', function (): void {
     $posts = Post::factory()->count(3)->create();
 
     Livewire::test(ListPosts::class)
         ->assertCanSeeTableRecords($posts);
 });
 
-it('can create a post', function () {
+it('can create a post', function (): void {
     $newPost = Post::factory()->make();
 
     Livewire::test(CreatePost::class)
         ->fillForm([
-            'title' => $newPost->title,
-            'slug' => $newPost->slug,
-            'content' => $newPost->content,
-            'excerpt' => $newPost->excerpt,
-            'status' => $newPost->status,
-            'user_id' => $this->user->id,
-            'meta_title' => $newPost->meta_title,
+            'title'            => $newPost->title,
+            'slug'             => $newPost->slug,
+            'content'          => $newPost->content,
+            'excerpt'          => $newPost->excerpt,
+            'status'           => $newPost->status,
+            'user_id'          => $this->user->id,
+            'meta_title'       => $newPost->meta_title,
             'meta_description' => $newPost->meta_description,
-            'featured' => $newPost->featured,
+            'featured'         => $newPost->featured,
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('posts', [
-        'title' => $newPost->title,
-        'slug' => $newPost->slug,
+        'title'   => $newPost->title,
+        'slug'    => $newPost->slug,
         'user_id' => $this->user->id,
     ]);
 });
 
-it('can edit a post', function () {
+it('can edit a post', function (): void {
     $post = Post::factory()->create(['user_id' => $this->user->id]);
     $newTitle = 'Updated Title';
 
@@ -86,12 +87,12 @@ it('can view a post', function () {
 
     Livewire::test(ViewPost::class, ['record' => $post->getRouteKey()])
         ->assertFormSet([
-            'title' => $post->title,
+            'title'   => $post->title,
             'content' => $post->content,
         ]);
 });
 
-it('can delete a post', function () {
+it('can delete a post', function (): void {
     $post = Post::factory()->create(['user_id' => $this->user->id]);
 
     Livewire::test(ListPosts::class)
@@ -102,35 +103,53 @@ it('can delete a post', function () {
     ]);
 });
 
-it('can publish a post', function () {
+it('can publish a post', function (): void {
     $post = Post::factory()->draft()->create(['user_id' => $this->user->id]);
 
     Livewire::test(ListPosts::class)
         ->callTableAction('publish', $post);
 
-    expect($post->fresh()->status)->toBe('published');
-    expect($post->fresh()->published_at)->not->toBeNull();
+    $post->refresh();
+
+    expect($post->status)->toBe('published');
+    expect($post->moderation_state)->toBe(ModerationState::Published);
+    expect($post->published_at)->not->toBeNull();
+    expect($post->submitted_for_review_at)->not->toBeNull();
+    expect($post->approved_at)->not->toBeNull();
+    expect($post->approved_by_id)->toBe($this->user->id);
 });
 
-it('can unpublish a post', function () {
+it('can unpublish a post', function (): void {
     $post = Post::factory()->published()->create(['user_id' => $this->user->id]);
 
     Livewire::test(ListPosts::class)
         ->callTableAction('unpublish', $post);
 
-    expect($post->fresh()->status)->toBe('draft');
+    $post->refresh();
+
+    expect($post->status)->toBe('draft');
+    expect($post->moderation_state)->toBe(ModerationState::Draft);
+    expect($post->published_at)->toBeNull();
+    expect($post->submitted_for_review_at)->toBeNull();
+    expect($post->approved_at)->toBeNull();
+    expect($post->approved_by_id)->toBeNull();
 });
 
-it('can archive a post', function () {
+it('can archive a post', function (): void {
     $post = Post::factory()->published()->create(['user_id' => $this->user->id]);
 
     Livewire::test(ListPosts::class)
         ->callTableAction('archive', $post);
 
-    expect($post->fresh()->status)->toBe('archived');
+    $post->refresh();
+
+    expect($post->status)->toBe('archived');
+    expect($post->moderation_state)->toBe(ModerationState::Draft);
+    expect($post->approved_at)->toBeNull();
+    expect($post->approved_by_id)->toBeNull();
 });
 
-it('can feature a post', function () {
+it('can feature a post', function (): void {
     $post = Post::factory()->create(['featured' => false, 'user_id' => $this->user->id]);
 
     Livewire::test(ListPosts::class)
@@ -139,7 +158,7 @@ it('can feature a post', function () {
     expect($post->fresh()->featured)->toBeTrue();
 });
 
-it('can unfeature a post', function () {
+it('can unfeature a post', function (): void {
     $post = Post::factory()->featured()->create(['user_id' => $this->user->id]);
 
     Livewire::test(ListPosts::class)
@@ -148,7 +167,7 @@ it('can unfeature a post', function () {
     expect($post->fresh()->featured)->toBeFalse();
 });
 
-it('can filter posts by status', function () {
+it('can filter posts by status', function (): void {
     Post::factory()->published()->create();
     Post::factory()->draft()->create();
     Post::factory()->archived()->create();
@@ -159,7 +178,7 @@ it('can filter posts by status', function () {
         ->assertCanNotSeeTableRecords(Post::where('status', 'draft')->get());
 });
 
-it('can filter posts by featured status', function () {
+it('can filter posts by featured status', function (): void {
     Post::factory()->featured()->create();
     Post::factory()->create(['featured' => false]);
 
@@ -169,7 +188,7 @@ it('can filter posts by featured status', function () {
         ->assertCanNotSeeTableRecords(Post::where('featured', false)->get());
 });
 
-it('can filter posts by author', function () {
+it('can filter posts by author', function (): void {
     $anotherUser = User::factory()->create();
     Post::factory()->create(['user_id' => $this->user->id]);
     Post::factory()->create(['user_id' => $anotherUser->id]);
@@ -180,20 +199,20 @@ it('can filter posts by author', function () {
         ->assertCanNotSeeTableRecords(Post::where('user_id', $anotherUser->id)->get());
 });
 
-it('can filter posts by published date range', function () {
+it('can filter posts by published date range', function (): void {
     $oldPost = Post::factory()->create(['published_at' => now()->subYear()]);
     $recentPost = Post::factory()->create(['published_at' => now()->subMonth()]);
 
     Livewire::test(ListPosts::class)
         ->filterTable('published_at', [
-            'published_from' => now()->subMonths(2)->format('Y-m-d'),
+            'published_from'  => now()->subMonths(2)->format('Y-m-d'),
             'published_until' => now()->format('Y-m-d'),
         ])
         ->assertCanSeeTableRecords([$recentPost])
         ->assertCanNotSeeTableRecords([$oldPost]);
 });
 
-it('can search posts by title', function () {
+it('can search posts by title', function (): void {
     $post1 = Post::factory()->create(['title' => 'Unique Title']);
     $post2 = Post::factory()->create(['title' => 'Another Title']);
 
@@ -203,7 +222,7 @@ it('can search posts by title', function () {
         ->assertCanNotSeeTableRecords([$post2]);
 });
 
-it('can search posts by excerpt', function () {
+it('can search posts by excerpt', function (): void {
     $post1 = Post::factory()->create(['excerpt' => 'Unique excerpt content']);
     $post2 = Post::factory()->create(['excerpt' => 'Another excerpt content']);
 
@@ -213,7 +232,7 @@ it('can search posts by excerpt', function () {
         ->assertCanNotSeeTableRecords([$post2]);
 });
 
-it('can sort posts by title', function () {
+it('can sort posts by title', function (): void {
     $post1 = Post::factory()->create(['title' => 'A Title']);
     $post2 = Post::factory()->create(['title' => 'Z Title']);
 
@@ -222,7 +241,7 @@ it('can sort posts by title', function () {
         ->assertCanSeeTableRecords([$post1, $post2], inOrder: true);
 });
 
-it('can sort posts by created date', function () {
+it('can sort posts by created date', function (): void {
     $post1 = Post::factory()->create(['created_at' => now()->subDay()]);
     $post2 = Post::factory()->create(['created_at' => now()]);
 
@@ -231,7 +250,7 @@ it('can sort posts by created date', function () {
         ->assertCanSeeTableRecords([$post2, $post1], inOrder: true);
 });
 
-it('can export posts', function () {
+it('can export posts', function (): void {
     Post::factory()->count(3)->create();
 
     Livewire::test(ListPosts::class)
@@ -239,7 +258,7 @@ it('can export posts', function () {
         ->assertFileDownloaded();
 });
 
-it('can bulk delete posts', function () {
+it('can bulk delete posts', function (): void {
     $posts = Post::factory()->count(3)->create();
 
     Livewire::test(ListPosts::class)
@@ -250,11 +269,11 @@ it('can bulk delete posts', function () {
     }
 });
 
-it('validates required fields on create', function () {
+it('validates required fields on create', function (): void {
     Livewire::test(CreatePost::class)
         ->fillForm([
-            'title' => '',
-            'slug' => '',
+            'title'   => '',
+            'slug'    => '',
             'content' => '',
             'user_id' => '',
         ])
@@ -262,14 +281,14 @@ it('validates required fields on create', function () {
         ->assertHasFormErrors(['title', 'slug', 'content', 'user_id']);
 });
 
-it('validates unique slug', function () {
+it('validates unique slug', function (): void {
     $existingPost = Post::factory()->create();
     $newPost = Post::factory()->make(['slug' => $existingPost->slug]);
 
     Livewire::test(CreatePost::class)
         ->fillForm([
-            'title' => $newPost->title,
-            'slug' => $newPost->slug,
+            'title'   => $newPost->title,
+            'slug'    => $newPost->slug,
             'content' => $newPost->content,
             'user_id' => $this->user->id,
         ])
@@ -277,11 +296,11 @@ it('validates unique slug', function () {
         ->assertHasFormErrors(['slug']);
 });
 
-it('validates slug format', function () {
+it('validates slug format', function (): void {
     Livewire::test(CreatePost::class)
         ->fillForm([
-            'title' => 'Test Title',
-            'slug' => 'invalid slug with spaces!',
+            'title'   => 'Test Title',
+            'slug'    => 'invalid slug with spaces!',
             'content' => 'Test content',
             'user_id' => $this->user->id,
         ])
@@ -289,12 +308,12 @@ it('validates slug format', function () {
         ->assertHasFormErrors(['slug']);
 });
 
-it('can access post resource pages', function () {
+it('can access post resource pages', function (): void {
     $this->get(PostResource::getUrl('index'))->assertOk();
     $this->get(PostResource::getUrl('create'))->assertOk();
 });
 
-it('can access post resource pages with record', function () {
+it('can access post resource pages with record', function (): void {
     $post = Post::factory()->create(['user_id' => $this->user->id]);
 
     $this->get(PostResource::getUrl('view', ['record' => $post]))->assertOk();

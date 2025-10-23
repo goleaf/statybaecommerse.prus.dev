@@ -11,10 +11,16 @@ use Filament\Actions;
 
 final class ListBrands extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = BrandResource::class;
 
     protected function getHeaderActions(): array
     {
+        if (! BrandResource::canCreate()) {
+            return [];
+        }
+
         return [
             Actions\CreateAction::make()
                 ->visible(fn () => AuthorizationMatrix::check('brands', 'create')),

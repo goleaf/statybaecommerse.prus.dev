@@ -6,15 +6,18 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Campaign;
+use DB;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use OpenApi\Attributes as OA;
 
 /**
  * CampaignController
  *
  * HTTP controller handling CampaignController related web requests, responses, and business logic with proper validation and error handling.
  */
+#[OA\Tag(name: 'Campaigns', description: 'Campaign engagement tracking and analytics endpoints.')]
 final class CampaignController extends Controller
 {
     /**
@@ -25,11 +28,11 @@ final class CampaignController extends Controller
         $campaigns = Campaign::query()->active()->byPriority()->with(['targetCategories', 'targetProducts', 'channel'])->when($request->filled('type'), function ($query) use ($request) {
             return $query->where('type', $request->get('type'));
         })->when($request->filled('category'), function ($query) use ($request) {
-            return $query->whereHas('targetCategories', function ($q) use ($request) {
+            return $query->whereHas('targetCategories', function ($q) use ($request): void {
                 $q->where('slug', $request->get('category'));
             });
         })->when($request->filled('search'), function ($query) use ($request) {
-            return $query->where('name', 'like', '%'.$request->get('search').'%');
+            return $query->where('name', 'like', '%' . $request->get('search') . '%');
         })->paginate(12);
 
         return view('campaigns.index', compact('campaigns'));
@@ -44,7 +47,7 @@ final class CampaignController extends Controller
         $campaign->recordView(session()->getId(), request()->ip(), request()->userAgent(), request()->header('referer'), auth()->id());
         $campaign->load(['targetCategories', 'targetProducts', 'targetCustomerGroups', 'channel', 'discounts']);
         // Get related campaigns
-        $relatedCampaigns = Campaign::query()->active()->where('id', '!=', $campaign->id)->whereHas('targetCategories', function ($query) use ($campaign) {
+        $relatedCampaigns = Campaign::query()->active()->where('id', '!=', $campaign->id)->whereHas('targetCategories', function ($query) use ($campaign): void {
             $query->whereIn('categories.id', $campaign->targetCategories->pluck('id'));
         })->limit(4)->get();
 
@@ -54,6 +57,27 @@ final class CampaignController extends Controller
     /**
      * Handle click functionality with proper error handling.
      */
+    #[OA\Post(
+        path: '/campaigns/{campaign}/click',
+        summary: 'Record a campaign click event.',
+        tags: ['Campaigns'],
+        parameters: [
+            new OA\PathParameter(
+                name: 'campaign',
+                description: 'Campaign identifier or slug.',
+                required: true,
+                schema: new OA\Schema(type: 'string'),
+            ),
+        ],
+        requestBody: new OA\RequestBody(
+            description: 'Optional click metadata.',
+            required: false,
+            content: new OA\JsonContent(ref: '#/components/schemas/CampaignInteractionRequest'),
+        ),
+        responses: [
+            new OA\Response(response: 200, ref: '#/components/responses/CampaignAcknowledgement'),
+        ]
+    )]
     public function click(Request $request, Campaign $campaign): JsonResponse
     {
         $clickType = $request->get('type', 'cta');
@@ -66,6 +90,27 @@ final class CampaignController extends Controller
     /**
      * Handle conversion functionality with proper error handling.
      */
+    #[OA\Post(
+        path: '/campaigns/{campaign}/conversion',
+        summary: 'Record a campaign conversion event.',
+        tags: ['Campaigns'],
+        parameters: [
+            new OA\PathParameter(
+                name: 'campaign',
+                description: 'Campaign identifier or slug.',
+                required: true,
+                schema: new OA\Schema(type: 'string'),
+            ),
+        ],
+        requestBody: new OA\RequestBody(
+            description: 'Conversion payload.',
+            required: false,
+            content: new OA\JsonContent(ref: '#/components/schemas/CampaignConversionRequest'),
+        ),
+        responses: [
+            new OA\Response(response: 200, ref: '#/components/responses/CampaignAcknowledgement'),
+        ]
+    )]
     public function conversion(Request $request, Campaign $campaign): JsonResponse
     {
         $conversionType = $request->get('type', 'purchase');
@@ -104,7 +149,7 @@ final class CampaignController extends Controller
     {
         $query = $request->get('q');
         $campaigns = Campaign::query()->active()->when($query, function ($q) use ($query) {
-            return $q->where('name', 'like', '%'.$query.'%')->orWhere('description', 'like', '%'.$query.'%');
+            return $q->where('name', 'like', '%' . $query . '%')->orWhere('description', 'like', '%' . $query . '%');
         })->byPriority()->with(['targetCategories', 'channel'])->paginate(12);
 
         return view('campaigns.search', compact('campaigns', 'query'));
@@ -113,9 +158,17 @@ final class CampaignController extends Controller
     /**
      * Handle getCampaignStatistics functionality with proper error handling.
      */
+    #[OA\Get(
+        path: '/campaigns/api/statistics',
+        summary: 'Retrieve aggregated campaign statistics.',
+        tags: ['Campaigns'],
+        responses: [
+            new OA\Response(response: 200, ref: '#/components/responses/CampaignStatistics'),
+        ]
+    )]
     public function getCampaignStatistics(): JsonResponse
     {
-        $statistics = ['total_campaigns' => Campaign::count(), 'active_campaigns' => Campaign::active()->count(), 'scheduled_campaigns' => Campaign::scheduled()->count(), 'completed_campaigns' => Campaign::where('status', 'completed')->count(), 'total_views' => Campaign::sum('total_views'), 'total_clicks' => Campaign::sum('total_clicks'), 'total_conversions' => Campaign::sum('total_conversions'), 'total_revenue' => Campaign::sum('total_revenue'), 'average_conversion_rate' => Campaign::where('total_views', '>', 0)->avg('conversion_rate') ?? 0, 'average_click_through_rate' => Campaign::where('total_views', '>', 0)->avg(\DB::raw('(total_clicks / total_views) * 100')) ?? 0, 'average_roi' => Campaign::where('budget', '>', 0)->avg(\DB::raw('((total_revenue - budget) / budget) * 100')) ?? 0];
+        $statistics = ['total_campaigns' => Campaign::count(), 'active_campaigns' => Campaign::active()->count(), 'scheduled_campaigns' => Campaign::scheduled()->count(), 'completed_campaigns' => Campaign::where('status', 'completed')->count(), 'total_views' => Campaign::sum('total_views'), 'total_clicks' => Campaign::sum('total_clicks'), 'total_conversions' => Campaign::sum('total_conversions'), 'total_revenue' => Campaign::sum('total_revenue'), 'average_conversion_rate' => Campaign::where('total_views', '>', 0)->avg('conversion_rate') ?? 0, 'average_click_through_rate' => Campaign::where('total_views', '>', 0)->avg(DB::raw('(total_clicks / total_views) * 100')) ?? 0, 'average_roi' => Campaign::where('budget', '>', 0)->avg(DB::raw('((total_revenue - budget) / budget) * 100')) ?? 0];
 
         return response()->json(['success' => true, 'data' => $statistics]);
     }
@@ -123,6 +176,14 @@ final class CampaignController extends Controller
     /**
      * Handle getCampaignTypes functionality with proper error handling.
      */
+    #[OA\Get(
+        path: '/campaigns/api/types',
+        summary: 'List available campaign types and their usage counts.',
+        tags: ['Campaigns'],
+        responses: [
+            new OA\Response(response: 200, ref: '#/components/responses/CampaignTypes'),
+        ]
+    )]
     public function getCampaignTypes(): JsonResponse
     {
         $campaigns = Campaign::all();
@@ -133,22 +194,22 @@ final class CampaignController extends Controller
         }
         $formattedTypes = [];
         foreach ($types as $type => $count) {
-            $formattedTypes[] = ['type' => $type, 'label' => __('campaigns.types.'.$type), 'count' => $count, 'icon' => match ($type) {
-                'email' => 'heroicon-o-envelope',
-                'sms' => 'heroicon-o-device-phone-mobile',
-                'push' => 'heroicon-o-bell',
-                'banner' => 'heroicon-o-photo',
-                'popup' => 'heroicon-o-window',
-                'social' => 'heroicon-o-share',
-                default => 'heroicon-o-megaphone',
+            $formattedTypes[] = ['type' => $type, 'label' => __('campaigns.types.' . $type), 'count' => $count, 'icon' => match ($type) {
+                'email'                 => 'heroicon-o-envelope',
+                'sms'                   => 'heroicon-o-device-phone-mobile',
+                'push'                  => 'heroicon-o-bell',
+                'banner'                => 'heroicon-o-photo',
+                'popup'                 => 'heroicon-o-window',
+                'social'                => 'heroicon-o-share',
+                default                 => 'heroicon-o-megaphone',
             }, 'color' => match ($type) {
-                'email' => 'blue',
-                'sms' => 'green',
-                'push' => 'yellow',
+                'email'  => 'blue',
+                'sms'    => 'green',
+                'push'   => 'yellow',
                 'banner' => 'purple',
-                'popup' => 'pink',
+                'popup'  => 'pink',
                 'social' => 'red',
-                default => 'gray',
+                default  => 'gray',
             }];
         }
 
@@ -158,9 +219,17 @@ final class CampaignController extends Controller
     /**
      * Handle getCampaignPerformance functionality with proper error handling.
      */
+    #[OA\Get(
+        path: '/campaigns/api/performance',
+        summary: 'Summarize campaign performance groupings.',
+        tags: ['Campaigns'],
+        responses: [
+            new OA\Response(response: 200, ref: '#/components/responses/CampaignPerformance'),
+        ]
+    )]
     public function getCampaignPerformance(): JsonResponse
     {
-        $performance = ['high_performing' => Campaign::where('conversion_rate', '>', 5)->count(), 'medium_performing' => Campaign::whereBetween('conversion_rate', [2, 5])->count(), 'low_performing' => Campaign::where('conversion_rate', '<', 2)->count(), 'needs_attention' => Campaign::where(function ($query) {
+        $performance = ['high_performing' => Campaign::where('conversion_rate', '>', 5)->count(), 'medium_performing' => Campaign::whereBetween('conversion_rate', [2, 5])->count(), 'low_performing' => Campaign::where('conversion_rate', '<', 2)->count(), 'needs_attention' => Campaign::where(function ($query): void {
             $query->where('conversion_rate', '<', 2)->orWhere('total_views', '>', 0)->whereRaw('(total_clicks / total_views) < 0.01');
         })->count()];
 
@@ -170,6 +239,22 @@ final class CampaignController extends Controller
     /**
      * Handle getCampaignAnalytics functionality with proper error handling.
      */
+    #[OA\Get(
+        path: '/campaigns/api/analytics',
+        summary: 'Retrieve campaign analytics for the requested period.',
+        tags: ['Campaigns'],
+        parameters: [
+            new OA\QueryParameter(
+                name: 'period',
+                description: 'Rolling window (in days) to evaluate. Defaults to 30.',
+                required: false,
+                schema: new OA\Schema(type: 'string', example: '30'),
+            ),
+        ],
+        responses: [
+            new OA\Response(response: 200, ref: '#/components/responses/CampaignAnalytics'),
+        ]
+    )]
     public function getCampaignAnalytics(Request $request): JsonResponse
     {
         $period = $request->input('period', '30');
@@ -183,6 +268,28 @@ final class CampaignController extends Controller
     /**
      * Handle getCampaignComparison functionality with proper error handling.
      */
+    #[OA\Get(
+        path: '/campaigns/api/compare',
+        summary: 'Compare multiple campaigns by their KPIs.',
+        tags: ['Campaigns'],
+        parameters: [
+            new OA\QueryParameter(
+                name: 'campaign_ids',
+                description: 'Campaign identifiers to compare.',
+                required: true,
+                schema: new OA\Schema(
+                    type: 'array',
+                    items: new OA\Items(type: 'integer'),
+                ),
+                style: 'form',
+                explode: true,
+            ),
+        ],
+        responses: [
+            new OA\Response(response: 200, ref: '#/components/responses/CampaignComparison'),
+            new OA\Response(response: 400, ref: '#/components/responses/CampaignComparisonError'),
+        ]
+    )]
     public function getCampaignComparison(Request $request): JsonResponse
     {
         $campaignIds = $request->input('campaign_ids', []);
@@ -191,7 +298,7 @@ final class CampaignController extends Controller
         }
         $campaigns = Campaign::whereIn('id', $campaignIds)->get(['id', 'name', 'type', 'status', 'total_views', 'total_clicks', 'total_conversions', 'total_revenue', 'conversion_rate', 'budget']);
         $comparison = $campaigns->map(function ($campaign) {
-            return ['id' => $campaign->id, 'name' => $campaign->name, 'type' => $campaign->type, 'type_label' => __('campaigns.types.'.$campaign->type), 'status' => $campaign->status, 'status_label' => __('campaigns.status.'.$campaign->status), 'views' => $campaign->total_views, 'clicks' => $campaign->total_clicks, 'conversions' => $campaign->total_conversions, 'revenue' => $campaign->total_revenue, 'conversion_rate' => $campaign->conversion_rate, 'click_through_rate' => $campaign->getClickThroughRate(), 'roi' => $campaign->getROI(), 'performance_score' => $campaign->performance_score, 'performance_grade' => $campaign->performance_grade, 'budget' => $campaign->budget, 'budget_utilization' => $campaign->budget_utilization];
+            return ['id' => $campaign->id, 'name' => $campaign->name, 'type' => $campaign->type, 'type_label' => __('campaigns.types.' . $campaign->type), 'status' => $campaign->status, 'status_label' => __('campaigns.status.' . $campaign->status), 'views' => $campaign->total_views, 'clicks' => $campaign->total_clicks, 'conversions' => $campaign->total_conversions, 'revenue' => $campaign->total_revenue, 'conversion_rate' => $campaign->conversion_rate, 'click_through_rate' => $campaign->getClickThroughRate(), 'roi' => $campaign->getROI(), 'performance_score' => $campaign->performance_score, 'performance_grade' => $campaign->performance_grade, 'budget' => $campaign->budget, 'budget_utilization' => $campaign->budget_utilization];
         });
 
         return response()->json(['success' => true, 'data' => $comparison]);
@@ -200,6 +307,22 @@ final class CampaignController extends Controller
     /**
      * Handle getCampaignRecommendations functionality with proper error handling.
      */
+    #[OA\Get(
+        path: '/campaigns/{campaign}/recommendations',
+        summary: 'Generate performance recommendations for a campaign.',
+        tags: ['Campaigns'],
+        parameters: [
+            new OA\PathParameter(
+                name: 'campaign',
+                description: 'Campaign identifier or slug.',
+                required: true,
+                schema: new OA\Schema(type: 'string'),
+            ),
+        ],
+        responses: [
+            new OA\Response(response: 200, ref: '#/components/responses/CampaignRecommendations'),
+        ]
+    )]
     public function getCampaignRecommendations(Campaign $campaign): JsonResponse
     {
         $recommendations = [];

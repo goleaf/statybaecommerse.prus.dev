@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @mixin \Eloquent
  */
+#[ObservedBy([AttributionObserver::class])]
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
 #[ObservedBy([UserAttributionObserver::class])]
 final class FeatureFlag extends Model

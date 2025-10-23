@@ -18,7 +18,7 @@ it('renders the search index page without errors', function (): void {
 
     $response->assertOk();
     $response->assertViewIs('frontend.search.index');
-    $response->assertSee(__('search_help'));
+    $response->assertSee(__('frontend.search.help'));
 });
 
 it('returns suggestion urls using the frontend product route', function (): void {

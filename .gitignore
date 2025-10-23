@@ -40,8 +40,13 @@ Thumbs.db
 # PHPDoc generated files
 /docs/html/
 /docs/cache/
+/storage/app/backups/
+*.sql.gz
+*.tar
+!/storage/app/backups/.gitignore
 
 # Data transfer artifacts
 /storage/app/exports/
 /storage/app/imports/
 /public/
+database/*.sqlite

@@ -89,6 +89,11 @@ final class Partner extends Model implements HasMedia
         return $this->hasMany(VariantInventory::class, 'supplier_id');
     }
 
+    public function apiKeys(): HasMany
+    {
+        return $this->hasMany(ApiKey::class);
+    }
+
     /**
      * Handle scopeEnabled functionality with proper error handling.
      *

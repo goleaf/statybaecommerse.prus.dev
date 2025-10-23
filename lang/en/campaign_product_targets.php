@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'single' => 'Campaign Product Target',
+    'navigation' => 'Campaign Product Targets',
     'plural' => 'Campaign Product Targets',
     'navigation' => 'Product Targets',
     'tab_label' => 'Tabs',

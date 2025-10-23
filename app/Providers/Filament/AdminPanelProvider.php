@@ -20,6 +20,7 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\SpatieLaravelMediaLibraryPlugin\FilamentSpatieLaravelMediaLibraryPlugin;
 use Filament\Support\Colors\Color;
 use Filament\Widgets\AccountWidget;
 use Hydrat\TableLayoutToggle\Persisters\LocalStoragePersister;
@@ -68,6 +69,48 @@ final class AdminPanelProvider extends PanelProvider
         ));
 
         /** @var array<class-string> $pageClasses */
+        $supportedLocales = config('app.supported_locales', []);
+        $defaultLocale = config('app.locale', 'en');
+
+        $defaultLocales = collect(is_array($supportedLocales) ? $supportedLocales : explode(',', (string) $supportedLocales))
+            ->map(static fn (mixed $locale): string => trim((string) $locale))
+            ->filter()
+            ->unique()
+            ->values()
+            ->whenEmpty(static fn ($locales) => $locales->push($defaultLocale))
+            ->all();
+
+        $translatablePlugin = SpatieTranslatablePlugin::make()
+            ->defaultLocales($defaultLocales)
+            ->persist();
+
+        $plugins = [
+            FilamentShieldPlugin::make(),
+        ];
+
+        if (class_exists(FilamentFullCalendarPlugin::class)) {
+            $plugins[] = FilamentFullCalendarPlugin::make()
+                ->selectable(true)
+                ->editable(true)
+                ->timezone('Europe/Vilnius')
+                ->locale('lt');
+        }
+
+        $plugins[] = TableLayoutTogglePlugin::make()
+            ->setDefaultLayout('grid')
+            ->persistLayoutUsing(
+                persister: LocalStoragePersister::class,
+                cacheStore: 'redis',
+                cacheTtl: 60 * 24,
+            )
+            ->shareLayoutBetweenPages(false)
+            ->displayToggleAction()
+            ->toggleActionHook('tables::toolbar.search.after')
+            ->listLayoutButtonIcon('heroicon-o-list-bullet')
+            ->gridLayoutButtonIcon('heroicon-o-squares-2x2');
+
+        $plugins[] = FilamentNordThemePlugin::make();
+        $plugins[] = ResizedColumnPlugin::make()->preserveOnDB();
 
         return $panel
             ->default()
@@ -75,14 +118,16 @@ final class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->profile()
-            ->when(app()->environment('testing'),
+            ->when(
+                app()->environment('testing'),
                 fn (Panel $p) => $p->authGuard('web'),
-                fn (Panel $p) => $p->authGuard('admin'))
+                fn (Panel $p) => $p->authGuard('admin'),
+            )
             ->authPasswordBroker('admin_users')
             ->brandName(__('admin.brand_name'))
-            ->brandLogo(asset('images/logo-admin.svg'))
+            ->brandLogo(fn (): string => asset('images/logo-admin.svg'))
             ->brandLogoHeight('2rem')
-            ->favicon(asset('favicon.ico'))
+            ->favicon(fn (): string => asset('favicon.ico'))
             ->colors([
                 'primary' => Color::Blue,
                 'gray'    => Color::Slate,
@@ -123,24 +168,32 @@ final class AdminPanelProvider extends PanelProvider
             ->unsavedChangesAlerts()
             ->databaseTransactions()
             ->readOnlyRelationManagersOnResourceViewPagesByDefault()
+            // Feed navigation groups generated from the shared helper so the sidebar uses
+            // consistent icons, order, and collapse behaviour across the application.
             ->navigationGroups($this->configuredNavigationGroups())
             ->userMenu(position: UserMenuPosition::Sidebar)
             ->userMenuItems([
                 'profile' => \Filament\Navigation\MenuItem::make()
-                    ->label(__('admin.navigation.profile'))
+                    ->label($this->translate('admin.navigation.profile'))
                     ->url(fn (): string => \App\Filament\Pages\Auth\EditProfile::getUrl())
                     ->icon('heroicon-o-user-circle'),
                 'language' => \Filament\Navigation\MenuItem::make()
-                    ->label(__('admin.navigation.language'))
-                    ->url(fn (): string => route('language.switch', ['locale' => app()->getLocale() === 'lt' ? 'en' : 'lt']))
+                    ->label($this->translate('admin.navigation.language'))
+                    ->url(fn (): string => $this->routeUrl('language.switch', [
+                        'locale' => $this->currentLocale() === 'lt' ? 'en' : 'lt',
+                    ]))
                     ->icon('heroicon-o-language'),
             ])
             ->when(app()->environment('testing'),
-                fn (Panel $p) => $p->plugins([]),
+                fn (Panel $p) => $p->plugins($this->testingPlugins()),
                 fn (Panel $p) => $p->plugins($this->configuredPlugins()))
-            // Enable the custom Filament theme so third-party plugin views (like the searchable input)
-            // are compiled with Tailwind during the build step.
-            ->viteTheme('resources/css/filament/admin/theme.css')
+            // Enable the custom Filament theme in non-testing environments. The Vite manifest is not
+            // available during feature tests, so we skip the theme there to keep rendering resilient.
+            ->when(
+                app()->environment('testing'),
+                fn (Panel $p): Panel => $p,
+                fn (Panel $p): Panel => $p->viteTheme('resources/css/filament/admin/theme.css')
+            )
             ->spa();
     }
 
@@ -183,17 +236,8 @@ final class AdminPanelProvider extends PanelProvider
             $plugins[] = FilamentNordThemePlugin::make();
         }
 
-        if (class_exists(SpatieTranslatablePlugin::class)) {
-            $supportedLocales = array_values(array_filter(
-                (array) config('shared.localization.supported_locales', []),
-                static fn (mixed $locale): bool => is_string($locale) && $locale !== '',
-            ));
-
-            // Persist the admin locale switcher so users return to their last
-            // editing language across Filament sessions.
-            $plugins[] = SpatieTranslatablePlugin::make()
-                ->defaultLocales($supportedLocales !== [] ? $supportedLocales : null)
-                ->persist();
+        if ($translatablePlugin = $this->makeTranslatablePlugin()) {
+            $plugins[] = $translatablePlugin;
         }
 
         if (class_exists(ResizedColumnPlugin::class)) {
@@ -201,6 +245,39 @@ final class AdminPanelProvider extends PanelProvider
         }
 
         return array_values($plugins);
+    }
+
+    /**
+     * @return array<int, FilamentPlugin>
+     */
+    private function testingPlugins(): array
+    {
+        $plugins = [];
+
+        if ($translatablePlugin = $this->makeTranslatablePlugin()) {
+            // Reuse the same plugin wiring in tests so resources depending on translation-aware
+            // components stay functional inside Livewire-powered feature tests.
+            $plugins[] = $translatablePlugin;
+        }
+
+        return $plugins;
+    }
+
+    private function makeTranslatablePlugin(): ?FilamentPlugin
+    {
+        if (! class_exists(SpatieTranslatablePlugin::class)) {
+            return null;
+        }
+
+        $supportedLocales = array_values(array_filter(
+            (array) config('shared.localization.supported_locales', []),
+            static fn (mixed $locale): bool => is_string($locale) && $locale !== '',
+        ));
+
+        // Persist the admin locale switcher so users return to their last editing language across sessions.
+        return SpatieTranslatablePlugin::make()
+            ->defaultLocales($supportedLocales !== [] ? $supportedLocales : null)
+            ->persist();
     }
 
     /**
@@ -283,5 +360,29 @@ final class AdminPanelProvider extends PanelProvider
             ->editable(true)
             ->timezone('Europe/Vilnius')
             ->locale('lt');
+    }
+
+    /**
+     * @template T of FilamentPlugin
+     *
+     * @param class-string<T> $pluginClass
+     * @param (callable(T): T)|null $configure
+     *
+     * @return T|null
+     */
+    private function optionalPlugin(string $pluginClass, ?callable $configure = null): ?FilamentPlugin
+    {
+        if (! class_exists($pluginClass)) {
+            return null;
+        }
+
+        /** @var FilamentPlugin $plugin */
+        $plugin = $pluginClass::make();
+
+        if ($configure !== null) {
+            $plugin = $configure($plugin);
+        }
+
+        return $plugin;
     }
 }

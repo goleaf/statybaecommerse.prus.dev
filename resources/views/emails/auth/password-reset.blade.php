@@ -7,7 +7,8 @@
         {{ __('mail.reset_password_button') }}
     @endcomponent
 
-    {{ trans_choice('mail.reset_password_expire', (int) config('auth.passwords.' . config('auth.defaults.passwords') . '.expire'), ['count' => (int) config('auth.passwords.' . config('auth.defaults.passwords') . '.expire')]) }}
+    @php($expiresIn = (int) ($minutes ?? config('auth.passwords.' . config('auth.defaults.passwords') . '.expire')))
+    {{ trans_choice('mail.reset_password_expire', $expiresIn, ['count' => $expiresIn]) }}
 
     {{ __('mail.reset_password_no_action') }}
 

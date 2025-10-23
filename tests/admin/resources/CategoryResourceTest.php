@@ -7,8 +7,6 @@ namespace Tests\Feature;
 use App\Filament\Resources\CategoryResource;
 use App\Models\Category;
 use App\Models\User;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

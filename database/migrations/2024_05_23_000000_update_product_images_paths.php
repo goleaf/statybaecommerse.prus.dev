@@ -11,7 +11,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (! Schema::hasTable('product_images')) {
+        if (! Schema::hasTable('product_images') || ! Schema::hasColumn('product_images', 'path')) {
             return;
         }
 
@@ -42,6 +42,18 @@ return new class extends Migration
                         continue;
                     }
 
+                    if (preg_match('/^[a-z0-9]+:\/\//i', $normalized) === 1) {
+                        continue;
+                    }
+
+                    if (Str::startsWith($normalized, 'data:')) {
+                        continue;
+                    }
+
+                    if (str_contains($normalized, '..')) {
+                        continue;
+                    }
+
                     if (Str::startsWith($normalized, 'public/')) {
                         $normalized = ltrim(Str::after($normalized, 'public/'), '/');
                     }
@@ -57,7 +69,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        if (! Schema::hasTable('product_images')) {
+        if (! Schema::hasTable('product_images') || ! Schema::hasColumn('product_images', 'path')) {
             return;
         }
 

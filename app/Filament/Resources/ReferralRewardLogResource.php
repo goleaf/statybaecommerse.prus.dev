@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\ReferralRewardLogResource\Pages;
 use App\Models\ReferralReward;
 use App\Models\ReferralRewardLog;
@@ -12,18 +14,21 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use UnitEnum;
+use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 /**
  * ReferralRewardLogResource
  *
@@ -31,6 +36,8 @@ use UnitEnum;
  */
 final class ReferralRewardLogResource extends Resource
 {
+    use HasNav;
+
     protected static ?string $model = ReferralRewardLog::class;
 
     protected static ?int $navigationSort = 10;
@@ -57,9 +64,9 @@ final class ReferralRewardLogResource extends Resource
         return __('admin.referral_reward_logs.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.referral_reward_logs.basic_information'))
                     ->schema([
@@ -79,14 +86,9 @@ final class ReferralRewardLogResource extends Resource
 
                                 Select::make('action')
                                     ->label(__('admin.referral_reward_logs.action'))
-                                    ->options([
-                                        'earned'    => __('admin.referral_reward_logs.actions.earned'),
-                                        'redeemed'  => __('admin.referral_reward_logs.actions.redeemed'),
-                                        'expired'   => __('admin.referral_reward_logs.actions.expired'),
-                                        'cancelled' => __('admin.referral_reward_logs.actions.cancelled'),
-                                    ])
+                                    ->options(self::getActionOptions())
                                     ->required()
-                                    ->default('earned'),
+                                    ->default(ReferralRewardLog::ACTION_EARNED),
 
                                 TextInput::make('ip_address')
                                     ->label(__('admin.referral_reward_logs.ip_address'))
@@ -106,8 +108,9 @@ final class ReferralRewardLogResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('referralReward.id')
@@ -124,11 +127,11 @@ final class ReferralRewardLogResource extends Resource
                     ->label(__('admin.referral_reward_logs.action'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'earned'    => 'success',
-                        'redeemed'  => 'info',
-                        'expired'   => 'warning',
-                        'cancelled' => 'danger',
-                        default     => 'gray',
+                        ReferralRewardLog::ACTION_EARNED => 'success',
+                        ReferralRewardLog::ACTION_REDEEMED => 'info',
+                        ReferralRewardLog::ACTION_EXPIRED => 'warning',
+                        ReferralRewardLog::ACTION_CANCELLED => 'danger',
+                        default => 'gray',
                     }),
 
                 TextColumn::make('ip_address')
@@ -168,16 +171,11 @@ final class ReferralRewardLogResource extends Resource
 
                 SelectFilter::make('action')
                     ->label(__('admin.referral_reward_logs.action'))
-                    ->options([
-                        'earned'    => __('admin.referral_reward_logs.actions.earned'),
-                        'redeemed'  => __('admin.referral_reward_logs.actions.redeemed'),
-                        'expired'   => __('admin.referral_reward_logs.actions.expired'),
-                        'cancelled' => __('admin.referral_reward_logs.actions.cancelled'),
-                    ]),
+                    ->options(self::getActionOptions()),
             ])
             ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
+                TableViewAction::make(),
+                TableEditAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
@@ -185,6 +183,17 @@ final class ReferralRewardLogResource extends Resource
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    private static function getActionOptions(): array
+    {
+        return array_combine(
+            ReferralRewardLog::ACTIONS,
+            array_map(
+                fn (string $action): string => __('admin.referral_reward_logs.actions.' . $action),
+                ReferralRewardLog::ACTIONS,
+            ),
+        );
     }
 
     public static function getRelations(): array

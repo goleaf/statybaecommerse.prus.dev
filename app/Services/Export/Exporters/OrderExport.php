@@ -15,6 +15,8 @@ use Illuminate\Database\Eloquent\Model;
 
 final class OrderExport implements Exportable
 {
+    public function __construct(private readonly PriceCalculator $priceCalculator) {}
+
     public function name(): string
     {
         return __('Orders Export');

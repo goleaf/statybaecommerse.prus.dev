@@ -20,14 +20,17 @@ final class ComprehensiveStatsWidget extends BaseStatsOverviewWidget
     {
         $now = Carbon::now();
 
-        $totalRevenue = (float) (Order::where('status', 'completed')
+        $totalRevenue = (float) (Order::query()
+            ->byStatus('completed')
             ->sum('total') ?? 0);
 
-        $monthlyRevenue = (float) (Order::where('status', 'completed')
+        $monthlyRevenue = (float) (Order::query()
+            ->byStatus('completed')
             ->createdThisMonth()
             ->sum('total') ?? 0);
 
-        $lastMonthRevenue = (float) (Order::where('status', 'completed')
+        $lastMonthRevenue = (float) (Order::query()
+            ->byStatus('completed')
             ->createdLastMonth()
             ->sum('total') ?? 0);
 
@@ -36,8 +39,8 @@ final class ComprehensiveStatsWidget extends BaseStatsOverviewWidget
             : 0;
 
         $totalOrders = (int) Order::count();
-        $monthlyOrders = (int) Order::createdThisMonth()->count();
-        $lastMonthOrders = (int) Order::createdLastMonth()->count();
+        $monthlyOrders = (int) Order::query()->createdThisMonth()->count();
+        $lastMonthOrders = (int) Order::query()->createdLastMonth()->count();
 
         $ordersChange = $lastMonthOrders > 0
             ? (($monthlyOrders - $lastMonthOrders) / $lastMonthOrders) * 100
@@ -98,7 +101,8 @@ final class ComprehensiveStatsWidget extends BaseStatsOverviewWidget
     {
         $since = Carbon::now()->subDays(30);
 
-        return Order::where('status', 'completed')
+        return Order::query()
+            ->byStatus('completed')
             ->createdSince($since)
             ->selectRaw('DATE(created_at) as date, SUM(total) as revenue')
             ->groupBy('date')
@@ -111,7 +115,8 @@ final class ComprehensiveStatsWidget extends BaseStatsOverviewWidget
     {
         $since = Carbon::now()->subDays(30);
 
-        return Order::createdSince($since)
+        return Order::query()
+            ->createdSince($since)
             ->selectRaw('DATE(created_at) as date, COUNT(*) as orders')
             ->groupBy('date')
             ->orderBy('date')

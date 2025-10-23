@@ -7,14 +7,18 @@ namespace App\Models;
 use App\Contracts\TranslatableRecord;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
+use App\Observers\BrandObserver;
 use App\Traits\HasTranslations;
 use DB;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
+use Laravel\Scout\Searchable;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
@@ -30,7 +34,15 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property mixed  $appends
  * @property mixed  $table
  * @property string $translationModel
- * @property mixed  $translatable
+ * @property mixed $translatable
+ * @property int $id
+ * @property string $name
+ * @property string|null $slug
+ * @property string|null $description
+ * @property bool $is_enabled
+ * @property bool $is_visible
+ * @property-read int|null $products_count
+ * @property-read string|null $logo
  *
  * @method static \Illuminate\Database\Eloquent\Builder|Brand newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Brand newQuery()
@@ -38,13 +50,17 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  *
  * @mixin \Eloquent
  */
+// Attach the cache-aware observer so brand changes invalidate storefront data.
+#[ObservedBy([BrandObserver::class])]
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
 final class Brand extends Model implements HasMedia, TranslatableRecord
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
     use HasTranslations;
     use InteractsWithMedia;
     use LogsActivity;
+    use Searchable;
+    use SoftDeletes;
 
     protected $fillable = ['name', 'slug', 'description', 'website', 'is_enabled', 'is_active', 'is_visible', 'is_featured', 'seo_title', 'seo_description'];
 
@@ -73,6 +89,55 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
     protected string $translationModel = \App\Models\Translations\BrandTranslation::class;
 
     protected $translatable = ['name', 'slug', 'description', 'seo_title', 'seo_description'];
+
+    public function shouldBeSearchable(): bool
+    {
+        if (config('search.driver') !== 'scout' || ! config('search.scout.enabled')) {
+            return false;
+        }
+
+        if (! $this->is_enabled || empty($this->slug)) {
+            return false;
+        }
+
+        return $this->searchableProductsExist();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function toSearchableArray(): array
+    {
+        $this->loadCount([
+            'products as products_count' => static fn (Builder $query): Builder => $query
+                ->where('is_visible', true)
+                ->whereNotNull('published_at')
+                ->where('published_at', '<=', now()),
+        ]);
+
+        $locale = app()->getLocale();
+
+        return [
+            'id' => $this->getKey(),
+            'type' => 'brand',
+            'name' => $this->name,
+            'slug' => $this->slug,
+            'description' => $this->description,
+            'translated_name' => $this->trans('name', $locale),
+            'translated_description' => $this->trans('description', $locale),
+            'products_count' => (int) ($this->products_count ?? 0),
+            'is_enabled' => (bool) $this->is_enabled,
+        ];
+    }
+
+    private function searchableProductsExist(): bool
+    {
+        return $this->products()
+            ->where('is_visible', true)
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->exists();
+    }
 
     /**
      * Handle booted functionality with proper error handling.

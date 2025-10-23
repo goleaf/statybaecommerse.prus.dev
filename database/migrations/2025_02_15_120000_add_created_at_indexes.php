@@ -32,6 +32,7 @@ return new class extends Migration
         }
 
         if (! Schema::hasColumn($tableName, 'created_at')) {
+            // Skip tables that opt out of timestamps to keep the migration idempotent.
             return;
         }
 
@@ -65,6 +66,21 @@ return new class extends Migration
     private function indexExists(string $tableName, string $indexName): bool
     {
         $connection = Schema::getConnection();
+        $table = $connection->getTablePrefix() . $tableName;
+
+        if ($connection->getDriverName() === 'sqlite') {
+            // SQLite keeps schema state between Pest invocations, so we must query the pragma
+            // metadata directly to detect an existing index when Doctrine DBAL is unavailable.
+            $existing = $connection->select("PRAGMA index_list('{$table}')");
+
+            foreach ($existing as $definition) {
+                if (($definition->name ?? null) === $indexName) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         if (! method_exists($connection, 'getDoctrineSchemaManager')) {
             // Doctrine DBAL is optional, therefore we fall back to driver-specific introspection so
@@ -73,7 +89,7 @@ return new class extends Migration
         }
 
         $schemaManager = $connection->getDoctrineSchemaManager();
-        $indexes = $schemaManager->listTableIndexes($connection->getTablePrefix() . $tableName);
+        $indexes = $schemaManager->listTableIndexes($table);
 
         foreach ($indexes as $name => $index) {
             // Doctrine may normalise index names to uppercase on some database drivers, therefore

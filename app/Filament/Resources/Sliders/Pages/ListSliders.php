@@ -10,6 +10,8 @@ use Filament\Actions\CreateAction;
 
 class ListSliders extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = SliderResource::class;
 
     protected function getHeaderActions(): array

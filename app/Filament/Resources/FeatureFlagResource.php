@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+
+use Filament\Schemas\Schema;
 use App\Filament\Resources\FeatureFlagResource\Pages;
 use App\Models\FeatureFlag;
 use App\Models\Scopes\ActiveScope;
@@ -12,26 +14,27 @@ use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\BulkActionGroup as TableBulkActionGroup;
-use Filament\Tables\Actions\DeleteAction as TableDeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction as TableDeleteBulkAction;
-use Filament\Tables\Actions\EditAction as TableEditAction;
-use Filament\Tables\Actions\ViewAction as TableViewAction;
+use Filament\Actions\BulkActionGroup as TableBulkActionGroup;
+use Filament\Actions\DeleteAction as TableDeleteAction;
+use Filament\Actions\DeleteBulkAction as TableDeleteBulkAction;
+use Filament\Actions\EditAction as TableEditAction;
+use Filament\Actions\ViewAction as TableViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
+use Filament\Schemas\Schema;
 /**
  * FeatureFlagResource
  *
@@ -39,17 +42,40 @@ use UnitEnum;
  */
 final class FeatureFlagResource extends Resource
 {
-    public static function getNavigationGroup(): UnitEnum|string|null
-    {
-        return 'System';
-    }
+    use HasNav;
+
+    
 
     protected static ?string $model = FeatureFlag::class;
 
-    // /** @var UnitEnum|string|null */
+    /**
+     * @var string|BackedEnum|null Navigation icon identifier for the resource navigation menu.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-flag';
+
     protected static ?int $navigationSort = 5;
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes([
+            ActiveScope::class,
+            EnabledScope::class,
+        ]);
+    }
+
+    /**
+     * Ensure administrators can query every feature flag regardless of default scopes.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        // Removing the Active and Enabled scopes keeps disabled flags visible for auditing and reactivation.
+        return parent::getEloquentQuery()->withoutGlobalScopes([
+            ActiveScope::class,
+            EnabledScope::class,
+        ]);
+    }
 
     /**
      * Handle getNavigationLabel functionality with proper error handling.
@@ -57,6 +83,25 @@ final class FeatureFlagResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('feature_flags.title');
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes([
+            ActiveScope::class,
+            EnabledScope::class,
+        ]);
+    }
+
+    /**
+     * Extend the base query so administrators can audit inactive and disabled flags.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes([
+            ActiveScope::class,
+            EnabledScope::class,
+        ]);
     }
 
     /**
@@ -90,9 +135,9 @@ final class FeatureFlagResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema   
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('feature_flags.basic_information'))
                 ->components([
                     Grid::make(2)
@@ -199,8 +244,9 @@ final class FeatureFlagResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table
+    public static function table(Table $table): Table   
     {
+        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('name')
@@ -215,7 +261,7 @@ final class FeatureFlagResource extends Resource
                 TextColumn::make('category')
                     ->label(__('feature_flags.category'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn (?string $state): string => match ($state) {
                         'ui'          => 'info',
                         'performance' => 'success',
                         'security'    => 'danger',
@@ -227,7 +273,7 @@ final class FeatureFlagResource extends Resource
                 TextColumn::make('environment')
                     ->label(__('feature_flags.environment'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn (?string $state): string => match ($state) {
                         'local'      => 'gray',
                         'staging'    => 'warning',
                         'production' => 'success',

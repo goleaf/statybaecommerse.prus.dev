@@ -26,17 +26,16 @@ final class CategoryController extends Controller
 {
     use HandlesContentNegotiation;
 
+    public function __construct(private readonly CategoryRepository $categories)
+    {
+    }
+
     /**
      * Handle tree functionality with proper error handling.
      */
     public function tree(Request $request): JsonResponse|View|Response
     {
-        $categories = Category::query()->where('is_visible', true)->with(['children' => function ($query) {
-            $query->where('is_visible', true)->orderBy('sort_order')->orderBy('name');
-        }])->whereNull('parent_id')->orderBy('sort_order')->orderBy('name')->get()->skipWhile(function (Category $category) {
-            // Skip categories that are not properly configured
-            return empty($category->name) || ! $category->is_visible || empty($category->slug);
-        });
+        $categories = $this->categories->getVisibleTree();
 
         $payload = CategoryContract::forCollection($categories, ['context' => 'tree']);
 
@@ -99,6 +98,31 @@ final class CategoryController extends Controller
         $category->load(['children', 'parent']);
         $payload = CategoryContract::forCategory($category);
 
-        return $this->respondWithContract($request, $payload);
+        return $this->handleContentNegotiation($request, $data);
+}
+
+    private function categoryListDefinition(): ListQueryDefinition
+    {
+        return ListQueryDefinition::make()
+            ->defaultPerPage(20)
+            ->maxPerPage(100)
+            ->defaultSort('sort_order', 'asc')
+            ->allowedSorts([
+                'name' => ['column' => ['name', 'id']],
+                'sort_order' => ['column' => ['sort_order', 'name']],
+                'product_count' => ['column' => 'products_count'],
+            ])
+            ->filters([
+                'search' => [
+                    'type' => 'string',
+                    'nullable' => true,
+                    'callback' => static function (Builder $builder, string $search): void {
+                        $builder->where(static function (Builder $query) use ($search): void {
+                            $query->where('name', 'like', '%'.$search.'%')
+                                ->orWhere('description', 'like', '%'.$search.'%');
+                        });
+                    },
+                ],
+            ]);
     }
 }

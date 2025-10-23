@@ -10,6 +10,8 @@ use Filament\Actions;
 
 final class ListVariantPricingRules extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = VariantPricingRuleResource::class;
 
     protected function getHeaderActions(): array

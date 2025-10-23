@@ -13,7 +13,7 @@ use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Create administrator role and permissions
     $role = Role::create(['name' => 'administrator']);
     $permissions = [
@@ -37,31 +37,31 @@ beforeEach(function () {
     // Create test category with translations
     $this->testCategory = NewsCategory::factory()->create();
     $this->testCategory->translations()->create([
-        'locale' => 'en',
-        'name' => 'Test Category',
-        'slug' => 'test-category',
+        'locale'      => 'en',
+        'name'        => 'Test Category',
+        'slug'        => 'test-category',
         'description' => 'Test category description',
     ]);
 
     // Create test news with translations
     $this->testNews = News::factory()->create([
-        'is_visible' => false,
-        'is_featured' => false,
+        'is_visible'   => false,
+        'is_featured'  => false,
         'published_at' => null,
     ]);
 
     $this->testNews->translations()->create([
-        'locale' => 'en',
-        'title' => 'Test News Article',
-        'slug' => 'test-news-article',
-        'content' => 'This is test content for the news article.',
-        'summary' => 'This is a test summary.',
-        'seo_title' => 'Test SEO Title',
+        'locale'          => 'en',
+        'title'           => 'Test News Article',
+        'slug'            => 'test-news-article',
+        'content'         => 'This is test content for the news article.',
+        'summary'         => 'This is a test summary.',
+        'seo_title'       => 'Test SEO Title',
         'seo_description' => 'Test SEO Description',
     ]);
 });
 
-it('can list news articles in admin panel', function () {
+it('can list news articles in admin panel', function (): void {
     $this
         ->actingAs($this->adminUser)
         ->get(NewsResource::getUrl('index'))
@@ -69,31 +69,55 @@ it('can list news articles in admin panel', function () {
         ->assertSee('Test News Article');
 });
 
-it('can create a new news article', function () {
+it('can create a new news article', function (): void {
     $category = NewsCategory::factory()->create();
     $category->translations()->create([
         'locale' => 'en',
-        'name' => 'New Category',
-        'slug' => 'new-category',
+        'name'   => 'New Category',
+        'slug'   => 'new-category',
     ]);
 
     Livewire::actingAs($this->adminUser)
         ->test(NewsResource\Pages\CreateNews::class)
         ->fillForm([
-            'is_visible' => true,
-            'is_featured' => false,
+            'translations' => [
+                'en' => [
+                    'title'           => 'New Article',
+                    'slug'            => 'new-article',
+                    'summary'         => 'English summary',
+                    'content'         => '<p>English content</p>',
+                    'seo_title'       => 'New Article SEO Title',
+                    'seo_description' => 'New Article SEO Description',
+                ],
+            ],
+            'is_visible'   => true,
+            'is_featured'  => false,
             'published_at' => now(),
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
+    $news = News::query()->latest('id')->first();
+    expect($news)->not->toBeNull();
+
     $this->assertDatabaseHas('news', [
-        'is_visible' => true,
+        'id'          => $news->id,
+        'is_visible'  => true,
         'is_featured' => false,
+    ]);
+
+    $this->assertDatabaseHas('news_translations', [
+        'news_id'         => $news->id,
+        'locale'          => 'en',
+        'title'           => 'New Article',
+        'slug'            => 'new-article',
+        'summary'         => 'English summary',
+        'seo_title'       => 'New Article SEO Title',
+        'seo_description' => 'New Article SEO Description',
     ]);
 });
 
-it('can view a news article', function () {
+it('can view a news article', function (): void {
     $this
         ->actingAs($this->adminUser)
         ->get(NewsResource::getUrl('view', ['record' => $this->testNews]))
@@ -101,24 +125,24 @@ it('can view a news article', function () {
         ->assertSee('Test News Article');
 });
 
-it('can edit a news article', function () {
+it('can edit a news article', function (): void {
     Livewire::actingAs($this->adminUser)
         ->test(NewsResource\Pages\EditNews::class, ['record' => $this->testNews->id])
         ->fillForm([
-            'is_visible' => true,
+            'is_visible'  => true,
             'is_featured' => true,
         ])
         ->call('save')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('news', [
-        'id' => $this->testNews->id,
-        'is_visible' => true,
+        'id'          => $this->testNews->id,
+        'is_visible'  => true,
         'is_featured' => true,
     ]);
 });
 
-it('can delete a news article', function () {
+it('can delete a news article', function (): void {
     $news = News::factory()->create();
 
     Livewire::actingAs($this->adminUser)
@@ -131,75 +155,104 @@ it('can delete a news article', function () {
     ]);
 });
 
-it('validates required fields when creating news', function () {
+it('requires a translation title when creating news', function (): void {
     Livewire::actingAs($this->adminUser)
         ->test(NewsResource\Pages\CreateNews::class)
         ->fillForm([
-            'is_visible' => null,
+            'translations' => [
+                'en' => [
+                    'title'   => '',
+                    'slug'    => 'missing-title',
+                    'content' => '<p>Required content</p>',
+                ],
+            ],
         ])
         ->call('create')
-        ->assertHasNoFormErrors();  // News model doesn't have required fields in the base model
+        ->assertHasFormErrors(['translations.en.title' => 'required']);
 });
 
-it('validates unique slug when creating news', function () {
+it('validates unique translation slug when creating news', function (): void {
     $existingNews = News::factory()->create();
     $existingNews->translations()->create([
-        'locale' => 'en',
-        'title' => 'Existing News',
-        'slug' => 'existing-slug',
+        'locale'  => 'en',
+        'title'   => 'Existing News',
+        'slug'    => 'existing-slug',
         'content' => 'Existing content',
     ]);
 
     Livewire::actingAs($this->adminUser)
         ->test(NewsResource\Pages\CreateNews::class)
         ->fillForm([
-            'title' => 'Another News Article',
-            'slug' => 'existing-slug',
-            'content' => 'Some new content',
+            'translations' => [
+                'en' => [
+                    'title'   => 'Duplicate Slug',
+                    'slug'    => 'existing-slug',
+                    'content' => '<p>Translated content</p>',
+                ],
+            ],
         ])
         ->call('create')
-        ->assertHasFormErrors(['slug' => 'unique']);
+        ->assertHasFormErrors(['translations.en.slug' => 'unique']);
 });
 
-it('validates unique slug when editing news', function () {
-    $originalNews = News::factory()->create();
-    $originalNews->translations()->create([
-        'locale' => 'en',
-        'title' => 'Original News',
-        'slug' => 'original-slug',
-        'content' => 'Original content',
-    ]);
+it('validates slug length when creating news', function (): void {
+    $longSlug = str_repeat('a', 260);
 
-    $conflictingNews = News::factory()->create();
-    $conflictingNews->translations()->create([
-        'locale' => 'en',
-        'title' => 'Conflicting News',
-        'slug' => 'conflicting-slug',
-        'content' => 'Conflicting content',
-    ]);
-
-    Livewire::actingAs($this->adminUser)
-        ->test(NewsResource\Pages\EditNews::class, ['record' => $originalNews->id])
-        ->fillForm([
-            'slug' => 'conflicting-slug',
-        ])
-        ->call('save')
-        ->assertHasFormErrors(['slug' => 'unique']);
-});
-
-it('validates slug length when creating news', function () {
-    // This test would need to be implemented based on the actual form validation
-    // For now, we'll just test that the form can be submitted
     Livewire::actingAs($this->adminUser)
         ->test(NewsResource\Pages\CreateNews::class)
         ->fillForm([
-            'is_visible' => true,
+            'translations' => [
+                'en' => [
+                    'title'   => 'Long Slug Article',
+                    'slug'    => $longSlug,
+                    'content' => '<p>Translated content</p>',
+                ],
+            ],
         ])
         ->call('create')
-        ->assertHasNoFormErrors();
+        ->assertHasFormErrors(['translations.en.slug' => 'max']);
 });
 
-it('can filter news by category', function () {
+it('populates translation fields when editing news', function (): void {
+    Livewire::actingAs($this->adminUser)
+        ->test(NewsResource\Pages\EditNews::class, ['record' => $this->testNews->id])
+        ->assertFormSet('translations.en.title', 'Test News Article')
+        ->assertFormSet('translations.en.slug', 'test-news-article')
+        ->assertFormSet('translations.en.summary', 'This is a test summary.')
+        ->assertFormSet('translations.en.seo_title', 'Test SEO Title')
+        ->assertFormSet('translations.en.seo_description', 'Test SEO Description');
+});
+
+it('updates translation fields for the active locale', function (): void {
+    Livewire::actingAs($this->adminUser)
+        ->test(NewsResource\Pages\EditNews::class, ['record' => $this->testNews->id])
+        ->fillForm([
+            'translations' => [
+                'en' => [
+                    'title'           => 'Updated Title',
+                    'slug'            => 'updated-title',
+                    'summary'         => 'Updated summary',
+                    'content'         => '<p>Updated content</p>',
+                    'seo_title'       => 'Updated SEO Title',
+                    'seo_description' => 'Updated SEO Description',
+                ],
+            ],
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $this->assertDatabaseHas('news_translations', [
+        'news_id'         => $this->testNews->id,
+        'locale'          => 'en',
+        'title'           => 'Updated Title',
+        'slug'            => 'updated-title',
+        'summary'         => 'Updated summary',
+        'seo_title'       => 'Updated SEO Title',
+        'seo_description' => 'Updated SEO Description',
+    ]);
+});
+
+it('can filter news by category', function (): void {
     $this
         ->actingAs($this->adminUser)
         ->get(NewsResource::getUrl('index'))
@@ -207,7 +260,7 @@ it('can filter news by category', function () {
         ->assertSee('Test Category');
 });
 
-it('can filter news by published status', function () {
+it('can filter news by published status', function (): void {
     $this
         ->actingAs($this->adminUser)
         ->get(NewsResource::getUrl('index'))
@@ -216,7 +269,7 @@ it('can filter news by published status', function () {
         ->assertSee('Draft');
 });
 
-it('can filter news by featured status', function () {
+it('can filter news by featured status', function (): void {
     $this
         ->actingAs($this->adminUser)
         ->get(NewsResource::getUrl('index'))
@@ -224,7 +277,7 @@ it('can filter news by featured status', function () {
         ->assertSee('Featured');
 });
 
-it('shows correct news data in table', function () {
+it('shows correct news data in table', function (): void {
     $this
         ->actingAs($this->adminUser)
         ->get(NewsResource::getUrl('index'))
@@ -232,15 +285,15 @@ it('shows correct news data in table', function () {
         ->assertSee('Test Category');
 });
 
-it('handles news publishing workflow', function () {
+it('handles news publishing workflow', function (): void {
     $news = News::factory()->create([
-        'is_visible' => false,
+        'is_visible'   => false,
         'published_at' => null,
     ]);
 
     // Publish the news
     $news->update([
-        'is_visible' => true,
+        'is_visible'   => true,
         'published_at' => now(),
     ]);
 
@@ -248,7 +301,7 @@ it('handles news publishing workflow', function () {
     expect($news->published_at)->not->toBeNull();
 });
 
-it('handles bulk actions on news articles', function () {
+it('handles bulk actions on news articles', function (): void {
     $news1 = News::factory()->create();
     $news2 = News::factory()->create();
 
@@ -266,38 +319,38 @@ it('handles bulk actions on news articles', function () {
     ]);
 });
 
-it('can manage news SEO fields', function () {
+it('can manage news SEO fields', function (): void {
     $news = News::factory()->create();
 
     // Create translation with SEO fields
     $news->translations()->create([
-        'locale' => 'en',
-        'title' => 'SEO Test Article',
-        'slug' => 'seo-test-article',
-        'content' => 'Test content',
-        'seo_title' => 'Custom SEO Title',
+        'locale'          => 'en',
+        'title'           => 'SEO Test Article',
+        'slug'            => 'seo-test-article',
+        'summary'         => 'SEO test summary',
+        'content'         => 'Test content',
+        'seo_title'       => 'Custom SEO Title',
         'seo_description' => 'Custom SEO description for better search results.',
-        'seo_keywords' => 'seo, test, article, keywords',
     ]);
 
     $this->assertDatabaseHas('news_translations', [
-        'news_id' => $news->id,
-        'locale' => 'en',
-        'title' => 'SEO Test Article',
-        'seo_title' => 'Custom SEO Title',
+        'news_id'         => $news->id,
+        'locale'          => 'en',
+        'title'           => 'SEO Test Article',
+        'summary'         => 'SEO test summary',
+        'seo_title'       => 'Custom SEO Title',
         'seo_description' => 'Custom SEO description for better search results.',
-        'seo_keywords' => 'seo, test, article, keywords',
     ]);
 });
 
-it('can set featured image for news', function () {
+it('can set featured image for news', function (): void {
     $news = News::factory()->create();
 
     // Create translation
     $news->translations()->create([
-        'locale' => 'en',
-        'title' => 'News with Image',
-        'slug' => 'news-with-image',
+        'locale'  => 'en',
+        'title'   => 'News with Image',
+        'slug'    => 'news-with-image',
         'content' => 'Test content',
     ]);
 
@@ -308,11 +361,11 @@ it('can set featured image for news', function () {
 
     $this->assertDatabaseHas('news_translations', [
         'news_id' => $news->id,
-        'title' => 'News with Image',
+        'title'   => 'News with Image',
     ]);
 });
 
-it('can manage news categories relationship', function () {
+it('can manage news categories relationship', function (): void {
     $news = News::factory()->create();
     $category1 = NewsCategory::factory()->create();
     $category2 = NewsCategory::factory()->create();
@@ -324,7 +377,7 @@ it('can manage news categories relationship', function () {
     expect($news->categories->pluck('id')->toArray())->toContain($category1->id, $category2->id);
 });
 
-it('can manage news tags relationship', function () {
+it('can manage news tags relationship', function (): void {
     $news = News::factory()->create();
     $tag1 = NewsTag::factory()->create();
     $tag2 = NewsTag::factory()->create();
@@ -336,7 +389,7 @@ it('can manage news tags relationship', function () {
     expect($news->tags->pluck('id')->toArray())->toContain($tag1->id, $tag2->id);
 });
 
-it('can manage news comments relationship', function () {
+it('can manage news comments relationship', function (): void {
     $news = News::factory()->create();
     $comment1 = NewsComment::factory()->create(['news_id' => $news->id]);
     $comment2 = NewsComment::factory()->create(['news_id' => $news->id]);
@@ -345,7 +398,7 @@ it('can manage news comments relationship', function () {
     expect($news->comments->pluck('id')->toArray())->toContain($comment1->id, $comment2->id);
 });
 
-it('can manage news images relationship', function () {
+it('can manage news images relationship', function (): void {
     $news = News::factory()->create();
     $image1 = NewsImage::factory()->create(['news_id' => $news->id]);
     $image2 = NewsImage::factory()->create(['news_id' => $news->id]);
@@ -354,21 +407,21 @@ it('can manage news images relationship', function () {
     expect($news->images->pluck('id')->toArray())->toContain($image1->id, $image2->id);
 });
 
-it('can handle multilingual news content', function () {
+it('can handle multilingual news content', function (): void {
     $news = News::factory()->create();
 
     // Create translations for multiple languages
     $news->translations()->create([
-        'locale' => 'en',
-        'title' => 'English Title',
-        'slug' => 'english-title',
+        'locale'  => 'en',
+        'title'   => 'English Title',
+        'slug'    => 'english-title',
         'content' => 'English content',
     ]);
 
     $news->translations()->create([
-        'locale' => 'lt',
-        'title' => 'Lietuvių pavadinimas',
-        'slug' => 'lietuviu-pavadinimas',
+        'locale'  => 'lt',
+        'title'   => 'Lietuvių pavadinimas',
+        'slug'    => 'lietuviu-pavadinimas',
         'content' => 'Lietuvių turinys',
     ]);
 
@@ -377,7 +430,7 @@ it('can handle multilingual news content', function () {
     expect($news->getTranslation('title', 'lt'))->toBe('Lietuvių pavadinimas');
 });
 
-it('can handle news view count increment', function () {
+it('can handle news view count increment', function (): void {
     $news = News::factory()->create(['view_count' => 0]);
 
     $news->incrementViewCount();
@@ -385,14 +438,14 @@ it('can handle news view count increment', function () {
     expect($news->fresh()->view_count)->toBe(1);
 });
 
-it('can scope published news', function () {
+it('can scope published news', function (): void {
     $publishedNews = News::factory()->create([
-        'is_visible' => true,
+        'is_visible'   => true,
         'published_at' => now()->subDay(),
     ]);
 
     $draftNews = News::factory()->create([
-        'is_visible' => false,
+        'is_visible'   => false,
         'published_at' => null,
     ]);
 
@@ -402,7 +455,7 @@ it('can scope published news', function () {
     expect($publishedResults->first()->id)->toBe($publishedNews->id);
 });
 
-it('can scope featured news', function () {
+it('can scope featured news', function (): void {
     $featuredNews = News::factory()->create(['is_featured' => true]);
     $regularNews = News::factory()->create(['is_featured' => false]);
 
@@ -426,15 +479,15 @@ it('can filter breaking news tab without database errors', function () {
 it('can search news by content', function () {
     $news1 = News::factory()->create();
     $news1->translations()->create([
-        'locale' => 'en',
-        'title' => 'Searchable Title',
+        'locale'  => 'en',
+        'title'   => 'Searchable Title',
         'content' => 'This content contains searchable text',
     ]);
 
     $news2 = News::factory()->create();
     $news2->translations()->create([
-        'locale' => 'en',
-        'title' => 'Different Title',
+        'locale'  => 'en',
+        'title'   => 'Different Title',
         'content' => 'This content is different',
     ]);
 
