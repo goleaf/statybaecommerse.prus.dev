@@ -7,7 +7,9 @@ namespace App\Filament\Pages;
 use App\Forms\Components\Flatpickr;
 use App\Models\Slider;
 use App\Support\Filament\Components\Flatpickr;
+use App\Support\Search\ContentLinkSearch;
 use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -40,7 +42,10 @@ class SliderManagement extends Page implements HasActions, HasForms
 {
     use InteractsWithActions, InteractsWithForms;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    /**
+     * @var string|BackedEnum|null
+     */
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationLabel = 'Slider Management';
 
@@ -117,29 +122,20 @@ class SliderManagement extends Page implements HasActions, HasForms
                             TextInput::make('button_text')
                                 ->label(__('translations.button_text'))
                                 ->maxLength(255),
-                            SearchableInput::make('button_url_lookup')
-                                ->label(__('translations.button_link_lookup'))
-                                ->placeholder(__('translations.button_link_lookup_placeholder'))
-                                ->searchUsing(fn (string $search): array => ContentLinkSearch::sliderLinks($search))
-                                ->dehydrated(false)
-                                ->afterStateUpdated(function (?string $state, Set $set, Get $get): void {
+                            SearchableInput::make('button_url')
+                                ->label(__('translations.button_url'))
+                                ->placeholder(__('translations.slider_link_placeholder'))
+                                ->maxLength(255)
+                                ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
+                                ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
+                                ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
                                     if ($state === null || $state === '') {
                                         return;
                                     }
 
-                                    $resolved = ContentLinkSearch::resolve($state);
-
-                                    if ($resolved !== null) {
-                                        $set('button_url', $resolved['url']);
-
-                                        if (($get('button_text') ?? '') === '' && $resolved['title'] !== '') {
-                                            $set('button_text', $resolved['title']);
-                                        }
-
-                                        return;
-                                    }
-
-                                    $set('button_url', $state);
+                                    $component
+                                        ->state($state)
+                                        ->options([$state => $state]);
                                 }),
                         ]),
                         TextInput::make('button_url')
@@ -305,42 +301,19 @@ class SliderManagement extends Page implements HasActions, HasForms
                                     ->label(__('translations.slide_image'))
                                     ->image()
                                     ->directory('sliders/slides'),
-                                SearchableInput::make('link_target')
-                                    ->label(__('translations.slide_link_target'))
-                                    ->placeholder(__('translations.link_target_placeholder'))
-                                    ->searchUsing(fn (string $search): array => ContentLinkSearch::suggestions($search))
-                                    ->onItemSelected(function (SearchResult $item): void {
-                                        app()->call(function (Set $set) use ($item): void {
-                                            $url = $item->value();
-
-                                            if ($url !== '') {
-                                                $set('link', $url);
-                                            }
-                                        });
-                                    })
-                                    ->dehydrated(false)
-                                    ->helperText(__('translations.link_target_hint'))
-                                    ->suffixIcon('heroicon-o-link'),
-                                TextInput::make('link')
+                                SearchableInput::make('link')
                                     ->label(__('translations.slide_link'))
                                     ->placeholder(__('translations.slider_link_placeholder'))
                                     ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                                     ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
                                     ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                                        // Reuse helper hydration so repeater slides follow documented metadata lifecycle.
-                                        SearchableInputHelper::hydrate(
-                                            $component,
-                                            $state,
-                                            static fn (string $value): ?array => ['value' => $value, 'label' => $value],
-                                        );
-                                    })
-                                    ->afterStateUpdated(function (?string $state, callable $set): void {
-                                        if ($state !== null && $state !== '') {
+                                        if ($state === null || $state === '') {
                                             return;
                                         }
 
-                                        // Reset slide-specific URLs when selections clear via the helper.
-                                        SearchableInputHelper::clear($set, ['link' => null]);
+                                        $component
+                                            ->state($state)
+                                            ->options([$state => $state]);
                                     }),
                             ])
                             ->collapsible()

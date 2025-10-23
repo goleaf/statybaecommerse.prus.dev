@@ -29,13 +29,13 @@ final class PartnerSearch
 
                 $result = SearchResult::make((string) ($identifier ?? ''), $label);
 
-                // Offer the partner metadata via the payload for downstream automation hooks.
-                return SearchResultPayload::normalise($result, [
-                    'partner_id' => $partner->getKey(),
-                    'name'       => self::stringValue($partner->getAttribute('name')),
-                    'code'       => self::stringValue($partner->getAttribute('code')),
-                    'email'      => self::stringValue($partner->getAttribute('contact_email')),
-                ]);
+                $result
+                    ->withData('partner_id', $partner->getKey())
+                    ->withData('name', self::stringValue($partner->getAttribute('name')))
+                    ->withData('code', self::stringValue($partner->getAttribute('code')))
+                    ->withData('email', self::stringValue($partner->getAttribute('contact_email')));
+
+                return $result;
             })
             ->all();
     }
@@ -85,3 +85,4 @@ final class PartnerSearch
         return is_string($value) ? $value : '';
     }
 }
+

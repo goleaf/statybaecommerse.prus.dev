@@ -87,52 +87,20 @@ final class SliderForm
                                     ->label(__('admin.sliders.button_text'))
                                     ->maxLength(255)
                                     ->columnSpan(1),
-                                SearchableInput::make('button_url_lookup')
-                                    ->label(__('admin.sliders.button_link_lookup'))
-                                    ->placeholder(__('admin.sliders.button_link_lookup_placeholder'))
-                                    ->searchUsing(fn (string $search): array => ContentLinkSearch::sliderLinks($search))
-                                    ->dehydrated(false)
-                                    ->afterStateUpdated(function (?string $state, Set $set, Get $get): void {
-                                        if ($state === null || $state === '') {
-                                            return;
-                                        }
-
-                                        $resolved = ContentLinkSearch::resolve($state);
-
-                                        if ($resolved !== null) {
-                                            $set('button_url', $resolved['url']);
-
-                                            if (($get('button_text') ?? '') === '' && $resolved['title'] !== '') {
-                                                $set('button_text', $resolved['title']);
-                                            }
-
-                                            return;
-                                        }
-
-                                        $set('button_url', $state);
-                                    })
-                                    ->columnSpan(1),
-                                TextInput::make('button_url')
+                                SearchableInput::make('button_url')
                                     ->label(__('admin.sliders.button_url'))
                                     ->placeholder(__('admin.sliders.link_search.placeholder'))
                                     ->maxLength(255)
                                     ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                                     ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
                                     ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                                        // Hydrate via helper to align with docs/forms/SEARCHABLE_INPUT_METADATA.md.
-                                        SearchableInputHelper::hydrate(
-                                            $component,
-                                            $state,
-                                            static fn (string $value): ?array => ['value' => $value, 'label' => $value],
-                                        );
-                                    })
-                                    ->afterStateUpdated(function (?string $state, callable $set): void {
-                                        if ($state !== null && $state !== '') {
+                                        if ($state === null || $state === '') {
                                             return;
                                         }
 
-                                        // Reset CTA URLs whenever lookup is cleared to avoid stale payloads.
-                                        SearchableInputHelper::clear($set, ['button_url' => null]);
+                                        $component
+                                            ->state($state)
+                                            ->options([$state => $state]);
                                     })
                                     ->columnSpan(1),
                             ]),

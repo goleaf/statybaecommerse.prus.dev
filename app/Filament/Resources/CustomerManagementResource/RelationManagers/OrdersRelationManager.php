@@ -7,9 +7,9 @@ namespace App\Filament\Resources\CustomerManagementResource\RelationManagers;
 use App\Forms\Components\Flatpickr;
 use App\Enums\OrderStatus;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
-use App\Models\Address;
 use App\Models\Order;
-use App\Support\Search\AddressSearch;
+use App\Support\Filament\Components\Flatpickr;
+use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\AssociateAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -38,7 +38,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use App\Support\Filament\Components\Flatpickr;
+use Illuminate\Support\Str;
 
 class OrdersRelationManager extends BaseRelationManager
 {
@@ -80,29 +80,17 @@ class OrdersRelationManager extends BaseRelationManager
                             })
                             ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
                             ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
-                                // Hydrate through the shared helper to ensure status options remain canonical.
-                                SearchableInputHelper::hydrate(
-                                    $component,
-                                    $state,
-                                    static function (string $value): ?array {
-                                        $label = OrderStatus::tryFrom($value)?->getLabel() ?? $value;
-
-                                        return [
-                                            'value' => $value,
-                                            'label' => $label,
-                                        ];
-                                    },
-                                );
-                            })
-                            ->afterStateUpdated(function (?string $state, Set $set): void {
                                 if ($state === null || $state === '') {
-                                    // Clear persisted status when wiped.
-                                    SearchableInputHelper::clear($set, ['status' => null]);
-
                                     return;
                                 }
 
-                                $set('status', $state);
+                                $label = OrderStatus::tryFrom($state)?->getLabel() ?? $state;
+
+                                $component
+                                    ->state($state)
+                                    ->options([
+                                        $state => $label,
+                                    ]);
                             }),
                         TextInput::make('total_amount')
                             ->label(__('orders.total_amount'))

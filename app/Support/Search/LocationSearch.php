@@ -30,14 +30,14 @@ final class LocationSearch
 
                 $result = SearchResult::make((string) ($identifier ?? ''), $label);
 
-                // Retain key warehouse metadata for downstream automation via the payload array.
-                return SearchResultPayload::normalise($result, [
-                    'location_id'  => $location->getKey(),
-                    'name'         => self::stringValue($location->getAttribute('name')),
-                    'code'         => self::stringValue($location->getAttribute('code')),
-                    'city'         => self::stringValue($location->getAttribute('city')),
-                    'country_code' => self::stringValue($location->getAttribute('country_code')),
-                ]);
+                $result
+                    ->withData('location_id', $location->getKey())
+                    ->withData('name', self::stringValue($location->getAttribute('name')))
+                    ->withData('code', self::stringValue($location->getAttribute('code')))
+                    ->withData('city', self::stringValue($location->getAttribute('city')))
+                    ->withData('country_code', self::stringValue($location->getAttribute('country_code')));
+
+                return $result;
             })
             ->all();
     }
@@ -92,3 +92,4 @@ final class LocationSearch
         return is_string($value) ? $value : '';
     }
 }
+
