@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 # Husky shim to bootstrap Git hooks with the repository's local toolchain and config.
-# Restores the expected behaviour after accidental replacement with the deprecation banner
-# so that Git hooks execute consistently while still surfacing actionable warnings for v10 upgrades.
+# This variant restores the behaviour lost when the file was replaced by the
+# deprecation banner stub, ensuring hooks keep running while still printing actionable warnings.
 [ "$HUSKY" = "2" ] && set -x
 n=$(basename "$0")
 s=$(dirname "$(dirname "$0")")/$n
