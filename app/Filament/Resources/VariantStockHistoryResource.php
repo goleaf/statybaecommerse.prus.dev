@@ -171,8 +171,8 @@ final class VariantStockHistoryResource extends Resource
                         'success' => 'sale',
                         'info'    => 'return',
                         'primary' => 'reserve',
-                        // Collapse multiple destructive reasons under the shared danger palette without overriding array keys.
-                        'danger'  => ['damage', 'theft'],
+                        'danger'  => 'damage',
+                        'danger'  => 'theft',
                         'warning' => 'expired',
                         'gray'    => 'manual',
                     ]),
