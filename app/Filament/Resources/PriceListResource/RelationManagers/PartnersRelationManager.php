@@ -4,24 +4,17 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\PriceListResource\RelationManagers;
 
-use Filament\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Actions\AttachAction;
+use Filament\Actions\DetachAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Model;
 
 final class PartnersRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'partners';
 
-    public static function getTitle(Model $ownerRecord, string $pageClass): string
-    {
-        return __('price_lists.relation_managers.partners.title');
-    }
+    protected static ?string $title = 'Partners';
 
     public function table(Table $table): Table
     {
