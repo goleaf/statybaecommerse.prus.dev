@@ -7,84 +7,74 @@ return [
 
     // Sections
     'basic_information' => 'Basic Information',
-    'availability' => 'Availability & Conditions',
+    'tiered_pricing' => 'Tiered Pricing',
+    'volume_pricing' => 'Volume Pricing',
     'settings' => 'Settings',
 
     // Fields
     'name' => 'Name',
-    'code' => 'Code',
-    'currency' => 'Currency',
-    'priority' => 'Priority',
     'description' => 'Description',
+    'pricing_type' => 'Pricing Type',
+    'fixed' => 'Fixed',
+    'tiered' => 'Tiered',
+    'volume' => 'Volume',
+    'tiers' => 'Tiers',
+    'volume_tiers' => 'Volume Tiers',
+    'min_quantity' => 'Minimum Quantity',
+    'max_quantity' => 'Maximum Quantity',
+    'price' => 'Price',
+    'add_tier' => 'Add Tier',
+    'is_active' => 'Active',
     'is_enabled' => 'Enabled',
     'is_default' => 'Default',
-    'auto_apply' => 'Auto-apply',
-    'starts_at' => 'Starts At',
-    'ends_at' => 'Ends At',
-    'starts_at_from' => 'Start date from',
-    'starts_at_until' => 'Start date until',
-    'ends_at_from' => 'End date from',
-    'ends_at_until' => 'End date until',
-    'min_order_amount' => 'Minimum Order Amount',
-    'max_order_amount' => 'Maximum Order Amount',
+    'is_public' => 'Public',
+    'currency' => 'Currency',
+    'valid_from' => 'Valid From',
+    'valid_until' => 'Valid Until',
+    'valid_from_from' => 'Valid From (start)',
+    'valid_from_until' => 'Valid From (end)',
+    'notes' => 'Notes',
     'created_at' => 'Created At',
     'updated_at' => 'Updated At',
+    'priority' => 'Priority',
+    'commission_percentage' => 'Commission Percentage',
+    'discount_percentage' => 'Discount Percentage',
+    'partner' => 'Partner',
+    'customer_group' => 'Customer Group',
+    'email' => 'Email',
+    'phone' => 'Phone',
 
     // Filters & options
     'all_records' => 'All records',
-    'enabled_only' => 'Enabled only',
-    'disabled_only' => 'Disabled only',
-    'default_only' => 'Default only',
-    'non_default_only' => 'Non-default only',
-    'auto_apply_only' => 'Auto-apply only',
-    'manual_only' => 'Manual only',
-
-    // Relation data
-    'customer_group' => 'Customer Group',
-    'discount_percentage' => 'Discount Percentage',
-    'is_active' => 'Active',
-    'partner' => 'Partner',
-    'email' => 'Email',
-    'phone' => 'Phone',
-    'commission_rate' => 'Commission Rate',
+    'active_only' => 'Active only',
+    'inactive_only' => 'Inactive only',
+    'valid_now' => 'Currently valid',
+    'expired' => 'Expired',
 
     // Tabs
     'tabs' => [
         'all' => 'All Price Lists',
         'active' => 'Active',
+        'public' => 'Public',
         'default' => 'Default',
-        'auto_apply' => 'Auto-apply',
-    ],
-
-    // Relation managers
-    'relation_managers' => [
-        'customer_groups' => [
-            'title' => 'Customer Groups',
-        ],
-        'partners' => [
-            'title' => 'Partners',
-        ],
-        'items' => [
-            'title' => 'Price List Items',
-        ],
+        'wholesale' => 'Wholesale',
+        'retail' => 'Retail',
+        'promotional' => 'Promotional',
     ],
 
     // Widgets & stats
     'stats' => [
         'total_price_lists' => 'Total Price Lists',
         'total_price_lists_description' => 'All price lists in the catalogue',
-        'enabled_price_lists' => 'Enabled Price Lists',
-        'enabled_price_lists_description' => 'Price lists currently enabled',
         'active_price_lists' => 'Active Price Lists',
-        'active_price_lists_description' => 'Price lists that are currently active',
+        'active_price_lists_description' => 'Price lists currently enabled for use',
+        'public_price_lists' => 'Public Price Lists',
+        'public_price_lists_description' => 'Price lists visible to everyone',
         'default_price_lists' => 'Default Price Lists',
         'default_price_lists_description' => 'Primary price lists applied automatically',
-        'auto_apply_price_lists' => 'Auto-apply Price Lists',
-        'auto_apply_price_lists_description' => 'Price lists automatically applied to customers',
     ],
 
     'charts' => [
-        'activity_over_time' => 'Price List Activity Over Time',
         'price_lists_created' => 'Price Lists Created',
     ],
 ];
