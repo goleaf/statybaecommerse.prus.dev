@@ -128,7 +128,9 @@ class WishlistItemResourceTest extends TestCase
         ]);
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function wishlist_user_placeholder_updates_when_wishlist_changes(): void
     {
         $this->actingAs($this->adminUser);
@@ -141,7 +143,9 @@ class WishlistItemResourceTest extends TestCase
             ->assertSee($this->regularUser->name);
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function admin_can_edit_wishlist_item(): void
     {
         $this->actingAs($this->adminUser);
