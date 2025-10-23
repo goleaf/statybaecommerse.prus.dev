@@ -7,6 +7,7 @@ namespace Tests\Feature;
 use App\Filament\Resources\SystemSettingHistories\Pages\CreateSystemSettingHistory;
 use App\Filament\Resources\SystemSettingHistories\Pages\EditSystemSettingHistory;
 use App\Filament\Resources\SystemSettingHistories\Pages\ListSystemSettingHistories;
+use App\Filament\Resources\SystemSettingHistories\Pages\ViewSystemSettingHistory;
 use App\Filament\Resources\SystemSettingHistories\SystemSettingHistoryResource;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
@@ -97,7 +98,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
 
         $this->actingAs($this->adminUser);
 
-        Livewire::test(EditSystemSettingHistory::class, [
+        Livewire::test(ViewSystemSettingHistory::class, [
             'record' => $history->getKey(),
         ])
             ->assertFormSet([
