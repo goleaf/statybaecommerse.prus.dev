@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\BrandResource\Pages;
 
-use App\Filament\Pages\Support\BaseListRecords;
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\BrandResource;
 use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions;
 
 final class ListBrands extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = BrandResource::class;
 
     protected function getHeaderActions(): array

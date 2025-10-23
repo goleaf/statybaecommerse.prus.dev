@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AnalyticsEventResource\Pages;
 
-use App\Filament\Pages\Support\BaseListRecords;
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\AnalyticsEventResource;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 final class ListAnalyticsEvents extends BaseListRecords
 {
-    use HasWidgetTabs;
+    use HasResizableColumns;
 
     protected static string $resource = AnalyticsEventResource::class;
 
@@ -31,9 +31,8 @@ final class ListAnalyticsEvents extends BaseListRecords
     public function getWidgetTabs(): array
     {
         return [
-            'all' => WidgetTab::make(__('analytics_events.tabs.all'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
-            'page_views' => WidgetTab::make(__('analytics_events.tabs.page_views'))
+            'all'        => Tab::make(__('analytics_events.tabs.all')),
+            'page_views' => Tab::make(__('analytics_events.tabs.page_views'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('event_type', 'page_view'))
                 ->value(fn () => $this->getResource()::getEloquentQuery()->where('event_type', 'page_view')->count()),
             'clicks' => WidgetTab::make(__('analytics_events.tabs.clicks'))

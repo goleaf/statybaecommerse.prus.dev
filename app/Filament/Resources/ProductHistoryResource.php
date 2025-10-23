@@ -11,6 +11,7 @@ use App\Filament\Resources\ProductHistoryResource\Pages;
 use App\Filament\Resources\ProductHistoryResource\Widgets\ProductHistoryStatsWidget;
 use App\Filament\Resources\ProductHistoryResource\Widgets\RecentProductChangesWidget;
 use App\Models\ProductHistory;
+use BackedEnum;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
@@ -32,8 +33,7 @@ final class ProductHistoryResource extends Resource
 
     protected static ?string $model = ProductHistory::class;
 
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-clock';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clock';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
@@ -161,10 +161,10 @@ final class ProductHistoryResource extends Resource
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['from'] ?? null) {
-                            $indicators[] = __('product_history.from').': '.$data['from'];
+                            $indicators[] = __('product_history.from') . ': ' . $data['from'];
                         }
                         if ($data['until'] ?? null) {
-                            $indicators[] = __('product_history.until').': '.$data['until'];
+                            $indicators[] = __('product_history.until') . ': ' . $data['until'];
                         }
 
                         return $indicators;
@@ -198,8 +198,8 @@ final class ProductHistoryResource extends Resource
         return [
             'index'  => Pages\ListProductHistories::route('/'),
             'create' => Pages\CreateProductHistory::route('/create'),
-            'view' => Pages\ViewProductHistory::route('/{record}'),
-            'edit' => Pages\EditProductHistory::route('/{record}/edit'),
+            'view'   => Pages\ViewProductHistory::route('/{record}'),
+            'edit'   => Pages\EditProductHistory::route('/{record}/edit'),
         ];
     }
 

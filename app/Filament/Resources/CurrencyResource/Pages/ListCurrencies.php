@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CurrencyResource\Pages;
 
-use App\Filament\Pages\Support\BaseListRecords;
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\CurrencyResource;
 use Filament\Actions;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
@@ -12,7 +12,7 @@ use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatabl
 
 final class ListCurrencies extends BaseListRecords
 {
-    use SpatieTranslatableListRecords; // Track the active locale for listing translated records.
+    use HasResizableColumns;
 
     protected static string $resource = CurrencyResource::class;
 

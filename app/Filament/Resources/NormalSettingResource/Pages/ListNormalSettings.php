@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\NormalSettingResource\Pages;
 
-use App\Filament\Pages\Support\BaseListRecords;
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\NormalSettingResource;
 use App\Models\NormalSetting;
 use Filament\Actions;
@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ListNormalSettings extends BaseListRecords
 {
-    use HasWidgetTabs;
+    use HasResizableColumns;
 
     protected static string $resource = NormalSettingResource::class;
 
@@ -29,9 +29,8 @@ class ListNormalSettings extends BaseListRecords
     public function getWidgetTabs(): array
     {
         return [
-            'all' => WidgetTab::make(__('normal_settings.tabs.all'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
-            'string' => WidgetTab::make(__('normal_settings.tabs.string'))
+            'all'    => Tab::make(__('normal_settings.tabs.all')),
+            'string' => Tab::make(__('normal_settings.tabs.string'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'string'))
                 ->value(fn () => $this->getResource()::getEloquentQuery()->where('type', 'string')->count()),
             'integer' => WidgetTab::make(__('normal_settings.tabs.integer'))

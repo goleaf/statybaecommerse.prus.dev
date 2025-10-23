@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DocumentTemplateResource\Pages;
 
-use App\Filament\Pages\Support\BaseListRecords;
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\DocumentTemplateResource;
 use App\Models\DocumentTemplate;
 use Filament\Actions;
@@ -14,6 +14,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ListDocumentTemplates extends BaseListRecords
 {
+    use HasResizableColumns;
+
     protected static string $resource = DocumentTemplateResource::class;
 
     protected function getHeaderActions(): array

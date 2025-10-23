@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\LegalResource\Pages;
 
-use App\Filament\Pages\Support\BaseListRecords;
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\LegalResource;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ListLegals extends BaseListRecords
 {
-    use HasWidgetTabs;
+    use HasResizableColumns;
 
     protected static string $resource = LegalResource::class;
 

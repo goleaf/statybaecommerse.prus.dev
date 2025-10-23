@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountConditionResource\Pages;
 
-use App\Filament\Pages\Support\BaseListRecords;
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\DiscountConditionResource;
 use App\Filament\Resources\DiscountConditionResource\Widgets\DiscountConditionChartWidget;
 use App\Filament\Resources\DiscountConditionResource\Widgets\DiscountConditionStatsWidget;
@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 final class ListDiscountConditions extends BaseListRecords
 {
-    use HasWidgetTabs;
+    use HasResizableColumns;
 
     protected static string $resource = DiscountConditionResource::class;
 
@@ -32,9 +32,8 @@ final class ListDiscountConditions extends BaseListRecords
     public function getWidgetTabs(): array
     {
         return [
-            'all' => WidgetTab::make(__('discount_conditions.tabs.all'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->count()),
-            'active' => WidgetTab::make(__('discount_conditions.tabs.active'))
+            'all'    => Tab::make(__('discount_conditions.tabs.all')),
+            'active' => Tab::make(__('discount_conditions.tabs.active'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_active', true))
                 ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_active', true)->count()),
             'minimum_amount' => WidgetTab::make(__('discount_conditions.tabs.minimum_amount'))

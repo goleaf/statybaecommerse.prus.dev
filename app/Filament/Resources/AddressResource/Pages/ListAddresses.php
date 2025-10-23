@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AddressResource\Pages;
 
-use App\Enums\AddressType;
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\AddressResource;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
@@ -16,7 +16,7 @@ use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatabl
 
 final class ListAddresses extends BaseListRecords
 {
-    use HasWidgetTabs;
+    use HasResizableColumns;
 
     protected static string $resource = AddressResource::class;
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\Pages;
 
-use App\Filament\Pages\Support\BaseListRecords;
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\OrderResource;
 use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions;
@@ -13,7 +13,7 @@ use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatabl
 
 final class ListOrders extends BaseListRecords
 {
-    use SpatieTranslatableListRecords; // Track the active locale for listing translated records.
+    use HasResizableColumns;
 
     protected static string $resource = OrderResource::class;
 

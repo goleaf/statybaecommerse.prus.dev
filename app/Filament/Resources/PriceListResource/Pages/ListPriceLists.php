@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\PriceListResource\Pages;
 
-use App\Filament\Pages\Support\BaseListRecords;
+use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\PriceListResource;
 use App\Models\PriceList;
 use Filament\Actions;
@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 final class ListPriceLists extends BaseListRecords
 {
-    use HasWidgetTabs;
+    use HasResizableColumns;
 
     protected static string $resource = PriceListResource::class;
 
