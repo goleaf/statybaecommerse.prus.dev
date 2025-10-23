@@ -14,9 +14,9 @@ final class AdvancedReports extends Page
      */
     protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    public static function getNavigationGroup(): string|UnitEnum|null
+    public static function getNavigationGroup(): BackedEnum|string|null
     {
-        return 'Analytics';
+        return 'Analytics'; // Ensure advanced analytics live with the rest of the reporting suite.
     }
 
     protected static ?string $title = 'Advanced Reports';

@@ -14,9 +14,9 @@ final class SearchExplorer extends Page
 {
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-magnifying-glass-circle';
 
-    public static function getNavigationGroup(): string|UnitEnum|null
+    public static function getNavigationGroup(): BackedEnum|string|null
     {
-        return 'Search';
+        return 'Search'; // Keep discovery tooling under the dedicated search navigation bucket.
     }
 
     protected static ?string $title = 'Search Explorer';

@@ -28,9 +28,9 @@ final class UserImpersonation extends Page implements HasTable
      */
     protected static $navigationIcon = 'heroicon-o-user';
 
-    public static function getNavigationGroup(): string|UnitEnum|null
+    public static function getNavigationGroup(): BackedEnum|string|null
     {
-        return 'System';
+        return 'System'; // Keep impersonation tools alongside other system controls.
     }
 
     protected static ?string $title = 'User Impersonation';
@@ -74,7 +74,6 @@ final class UserImpersonation extends Page implements HasTable
                     }),
             ]);
 
-        // Respect the shared table layout preferences so impersonation remains accessible and consistent.
-        return $this->applyToggleableTableLayout($table);
+        return $this->applyToggleableTableLayout($table); // Preserve stored table layout preferences.
     }
 }
