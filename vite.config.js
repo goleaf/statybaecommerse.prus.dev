@@ -14,7 +14,7 @@ export default defineConfig({
     laravel({
       input: [
         'resources/css/app.scss',
-        'resources/css/filament-enhancements.css',
+        'resources/css/filament-enhancements.scss',
         'resources/js/app.js',
         'resources/js/live-notifications.js',
         'resources/images/hero.png',

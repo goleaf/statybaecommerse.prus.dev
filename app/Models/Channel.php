@@ -35,14 +35,14 @@ final class Channel extends Model
 
     protected $table = 'channels';
 
-    protected $fillable = ['name', 'slug', 'code', 'type', 'description', 'timezone', 'url', 'is_enabled', 'is_default', 'is_active', 'sort_order', 'metadata', 'configuration', 'domain', 'ssl_enabled', 'meta_title', 'meta_description', 'meta_keywords', 'analytics_tracking_id', 'analytics_enabled', 'payment_methods', 'default_payment_method', 'shipping_methods', 'default_shipping_method', 'free_shipping_threshold', 'currency_code', 'currency_symbol', 'currency_position', 'default_language', 'supported_languages', 'contact_email', 'contact_phone', 'contact_address', 'social_media', 'legal_documents'];
+    protected $fillable = ['name', 'slug', 'code', 'type', 'description', 'timezone', 'url', 'is_enabled', 'is_default', 'is_active', 'sort_order', 'metadata', 'configuration', 'domain', 'ssl_enabled', 'meta_title', 'meta_description', 'meta_keywords', 'analytics_tracking_id', 'analytics_enabled', 'payment_methods', 'payment_matrix', 'default_payment_method', 'shipping_methods', 'default_shipping_method', 'free_shipping_threshold', 'currency_code', 'currency_symbol', 'currency_position', 'default_language', 'supported_languages', 'contact_email', 'contact_phone', 'contact_address', 'social_media', 'legal_documents'];
 
     /**
      * Handle casts functionality with proper error handling.
      */
     protected function casts(): array
     {
-        return ['is_enabled' => 'boolean', 'is_default' => 'boolean', 'is_active' => 'boolean', 'ssl_enabled' => 'boolean', 'analytics_enabled' => 'boolean', 'sort_order' => 'integer', 'free_shipping_threshold' => 'decimal:2', 'metadata' => 'array', 'configuration' => 'array', 'payment_methods' => 'array', 'shipping_methods' => 'array', 'supported_languages' => 'array', 'social_media' => 'array', 'legal_documents' => 'array'];
+        return ['is_enabled' => 'boolean', 'is_default' => 'boolean', 'is_active' => 'boolean', 'ssl_enabled' => 'boolean', 'analytics_enabled' => 'boolean', 'sort_order' => 'integer', 'free_shipping_threshold' => 'decimal:2', 'metadata' => 'array', 'configuration' => 'array', 'payment_methods' => 'array', 'payment_matrix' => 'array', 'shipping_methods' => 'array', 'supported_languages' => 'array', 'social_media' => 'array', 'legal_documents' => 'array'];
     }
 
     /**
@@ -72,7 +72,7 @@ final class Channel extends Model
     /**
      * Handle scopeEnabled functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeEnabled($query)
     {
@@ -82,7 +82,7 @@ final class Channel extends Model
     /**
      * Handle scopeDefault functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeDefault($query)
     {
@@ -92,7 +92,7 @@ final class Channel extends Model
     /**
      * Handle scopeActive functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeActive($query)
     {
@@ -102,7 +102,7 @@ final class Channel extends Model
     /**
      * Handle scopeByType functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByType($query, string $type)
     {
@@ -112,7 +112,7 @@ final class Channel extends Model
     /**
      * Handle scopeOrdered functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeOrdered($query)
     {

@@ -2,8 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import '../../filament-enhancements.css';
-@import '../../../../vendor/saade/filament-fullcalendar/resources/css/filament-fullcalendar.css';
+@import '../../filament-enhancements.scss';
 
 @source '../../../../app/Filament';
 @source '../../../../resources/views/filament';

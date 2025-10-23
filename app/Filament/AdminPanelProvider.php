@@ -75,7 +75,8 @@ class AdminPanelProvider extends PanelProvider
                 ])
                 ->authMiddleware([
                     \Illuminate\Auth\Middleware\Authenticate::class,
-                ]);
+                ])
+                ->viteTheme('resources/css/filament/admin/theme.scss');
         }
 
         return $panel
@@ -148,7 +149,7 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 \Illuminate\Auth\Middleware\Authenticate::class,
             ])
-            ->viteTheme('resources/css/filament/admin/theme.css');
+            ->viteTheme('resources/css/filament/admin/theme.scss');
     }
 
     private function isTestingEnvironment(): bool
