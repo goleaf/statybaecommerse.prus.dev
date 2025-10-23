@@ -249,12 +249,33 @@ final class ReferralCodeResource extends Resource
                     }),
                 SelectFilter::make('by_source')
                     ->label('source')
-                    ->options([
-                        'admin' => 'admin',
-                        'user'  => 'user',
+                    ->form([
+                        Select::make('source')
+                            ->options([
+                                'admin' => 'admin',
+                                'user' => 'user',
+                            ]),
                     ])
+                    ->indicateUsing(function (array $data): ?string {
+                        $value = $data['source'] ?? $data['value'] ?? null;
+                        if (is_array($value)) {
+                            $value = $value['value'] ?? reset($value);
+                        }
+
+                        if (! is_string($value) || $value === '') {
+                            return null;
+                        }
+
+                        return match ($value) {
+                            'admin', 'user' => $value,
+                            default => $value,
+                        };
+                    })
                     ->query(function (Builder $query, array $data): Builder {
                         $value = $data['source'] ?? $data['value'] ?? null;
+                        if (is_array($value)) {
+                            $value = $value['value'] ?? reset($value);
+                        }
 
                         return $value ? $query->where('source', $value) : $query;
                     }),
