@@ -248,7 +248,23 @@ final class AttributeResource extends Resource
                                 ->default(0),
                             Select::make('group_name')
                                 ->label(__('attributes.group'))
-                                ->options(static fn (): array => self::getGroupOptions())
+                                ->options([
+                                    // Legacy / factory-generated group names
+                                    'basic_info'      => 'basic_info',
+                                    'technical_specs' => 'technical_specs',
+                                    'materials'       => 'materials',
+                                    'features'        => 'features',
+                                    'compatibility'   => 'compatibility',
+                                    'warranty'        => 'warranty',
+                                    // Current UI groups
+                                    'general'    => __('attributes.groups.general'),
+                                    'technical'  => __('attributes.groups.technical'),
+                                    'appearance' => __('attributes.groups.appearance'),
+                                    'dimensions' => __('attributes.groups.dimensions'),
+                                    'shipping'   => __('attributes.groups.shipping'),
+                                    'seo'        => __('attributes.groups.seo'),
+                                    'other'      => __('attributes.groups.other'),
+                                ])
                                 ->default('general'),
                         ]),
                 ]),
@@ -276,8 +292,8 @@ final class AttributeResource extends Resource
                     ->color('gray'),
                 TextColumn::make('type')
                     ->label(__('attributes.type'))
-                    ->formatStateUsing(fn (?string $state): string => $state ? __("attributes.types.{$state}") : __('attributes.none'))
-                    ->color(fn (?string $state): string => match ($state) {
+                    ->formatStateUsing(fn (string $state): string => __("attributes.types.{$state}"))
+                    ->color(fn (string $state): string => match ($state) {
                         'text'        => 'blue',
                         'number'      => 'green',
                         'select'      => 'purple',
@@ -287,13 +303,12 @@ final class AttributeResource extends Resource
                         'datetime'    => 'indigo',
                         'color'       => 'red',
                         'file'        => 'gray',
-                        'image'       => 'cyan',
                         'url'         => 'teal',
                         default       => 'gray',
                     }),
                 TextColumn::make('group_name')
                     ->label(__('attributes.group'))
-                    ->formatStateUsing(static fn (?string $state): string => self::translateGroupName($state))
+                    ->formatStateUsing(fn (?string $state): string => $state ? __("attributes.groups.{$state}") : __('attributes.none'))
                     ->color('gray')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('options_count')
@@ -347,7 +362,15 @@ final class AttributeResource extends Resource
                         'url'         => __('attributes.types.url'),
                     ]),
                 SelectFilter::make('group_name')
-                    ->options(static fn (): array => self::getGroupOptions()),
+                    ->options([
+                        'general'    => __('attributes.groups.general'),
+                        'technical'  => __('attributes.groups.technical'),
+                        'appearance' => __('attributes.groups.appearance'),
+                        'dimensions' => __('attributes.groups.dimensions'),
+                        'shipping'   => __('attributes.groups.shipping'),
+                        'seo'        => __('attributes.groups.seo'),
+                        'other'      => __('attributes.groups.other'),
+                    ]),
                 TernaryFilter::make('is_required')
                     ->trueLabel(__('attributes.required_only'))
                     ->falseLabel(__('attributes.optional_only'))
