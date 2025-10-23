@@ -24,13 +24,12 @@ final class ApiController extends Controller
     {
         $query = $request->get('q', '');
 
-        // Clamp the requested limit to avoid excessive payloads or expensive queries.
-        $limit = max(1, min((int) $request->integer('limit', 10), 25));
+        $limit = (int) $request->integer('limit', 10);
+        $limit = max(1, min($limit, 25));
 
         $products = Product::query()
-            ->when($query !== '', static function ($productQuery) use ($query): void {
-                // Apply a LIKE search on both the name and description only when a query is present.
-                $productQuery->where(static function ($nestedQuery) use ($query): void {
+            ->when($query !== '', function ($productQuery) use ($query) {
+                $productQuery->where(function ($nestedQuery) use ($query) {
                     $likeQuery = "%{$query}%";
 
                     $nestedQuery
@@ -41,14 +40,13 @@ final class ApiController extends Controller
             ->limit($limit)
             ->get(['id', 'name', 'slug', 'price'])
             ->map(static function (Product $product): array {
-                // Provide structured media information while avoiding the deprecated image column.
                 return [
-                    'id'         => $product->id,
-                    'name'       => $product->name,
-                    'slug'       => $product->slug,
-                    'price'      => $product->price,
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'slug' => $product->slug,
+                    'price' => $product->price,
                     'main_image' => $product->main_image,
-                    'thumbnail'  => $product->thumbnail,
+                    'thumbnail' => $product->thumbnail,
                 ];
             })
             ->values();
@@ -145,13 +143,27 @@ final class ApiController extends Controller
             return response()->json([]);
         }
 
-        $recentlyViewed = array_slice($recentlyViewed, 0, 10);
+        $orderedIds = array_values(array_unique(array_slice($recentlyViewed, 0, 10)));
 
         $products = Product::query()
-            ->whereIn('id', $recentlyViewed)
-            ->get(['id', 'name', 'price', 'image'])
-            ->sortBy(fn (Product $product) => array_search($product->getKey(), $recentlyViewed, true))
-            ->values();
+            ->whereIn('id', $orderedIds)
+            ->get(['id', 'name', 'slug', 'price'])
+            ->sortBy(static function (Product $product) use ($orderedIds): int {
+                $position = array_search($product->id, $orderedIds, true);
+
+                return $position === false ? PHP_INT_MAX : $position;
+            })
+            ->values()
+            ->map(static function (Product $product): array {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'slug' => $product->slug,
+                    'price' => $product->price,
+                    'main_image' => $product->main_image,
+                    'thumbnail' => $product->thumbnail,
+                ];
+            });
 
         return response()->json($products);
     }
