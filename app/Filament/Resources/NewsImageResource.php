@@ -44,6 +44,8 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Storage;
+use Throwable;
 use UnitEnum;
 
 final class NewsImageResource extends Resource
@@ -117,18 +119,27 @@ final class NewsImageResource extends Resource
                                             ])
                                             ->live()
                                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                                if ($state) {
-                                                    $file = storage_path('app/public/'.$state);
-                                                    if (file_exists($file)) {
-                                                        $set('file_size', filesize($file));
-                                                        $set('mime_type', mime_content_type($file));
-                                                        $imageInfo = getimagesize($file);
-                                                        if ($imageInfo) {
-                                                            $set('dimensions', [
-                                                                'width' => $imageInfo[0],
-                                                                'height' => $imageInfo[1],
-                                                            ]);
-                                                        }
+                                                if (! $state) {
+                                                    return;
+                                                }
+
+                                                $disk = Storage::disk(SecureStorage::disk());
+
+                                                if (! $disk->exists($state)) {
+                                                    return;
+                                                }
+
+                                                $set('file_size', $disk->size($state));
+                                                $set('mime_type', $disk->mimeType($state));
+
+                                                $imageInfo = null;
+                                                $imagePath = null;
+
+                                                if (method_exists($disk, 'path')) {
+                                                    try {
+                                                        $imagePath = $disk->path($state);
+                                                    } catch (Throwable) {
+                                                        $imagePath = null;
                                                     }
 
                                                     if ($temporaryUrl) {
@@ -139,6 +150,29 @@ final class NewsImageResource extends Resource
                                                 if ($imageInfo) {
                                                     $set('dimensions', [
                                                         'width'  => $imageInfo[0],
+                                                        'height' => $imageInfo[1],
+                                                    ]);
+                                                }
+
+                                                if ($imagePath && is_file($imagePath)) {
+                                                    $imageInfo = @getimagesize($imagePath);
+                                                }
+
+                                                if (! $imageInfo && method_exists($disk, 'temporaryUrl')) {
+                                                    try {
+                                                        $temporaryUrl = $disk->temporaryUrl($state, now()->addMinutes(5));
+                                                    } catch (Throwable) {
+                                                        $temporaryUrl = null;
+                                                    }
+
+                                                    if ($temporaryUrl) {
+                                                        $imageInfo = @getimagesize($temporaryUrl);
+                                                    }
+                                                }
+
+                                                if ($imageInfo) {
+                                                    $set('dimensions', [
+                                                        'width' => $imageInfo[0],
                                                         'height' => $imageInfo[1],
                                                     ]);
                                                 }
