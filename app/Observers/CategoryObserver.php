@@ -11,26 +11,27 @@ final class CategoryObserver
 {
     public function saved(Category $category): void
     {
-        $this->flushCategoryCaches($category);
+        // Trigger the centralized cache invalidation pipeline for this category instance.
+        ($this->invalidateCategoryCache)($category);
+    }
+
+    public function updated(Category $category): void
+    {
+        ($this->invalidateCategoryCache)($category);
     }
 
     public function deleted(Category $category): void
     {
-        $this->flushCategoryCaches($category);
+        ($this->invalidateCategoryCache)($category);
     }
 
     public function restored(Category $category): void
     {
-        $this->flushCategoryCaches($category);
+        ($this->invalidateCategoryCache)($category);
     }
 
     public function forceDeleted(Category $category): void
     {
-        $this->flushCategoryCaches($category);
-    }
-
-    private function flushCategoryCaches(Category $category): void
-    {
-        app(CacheInvalidator::class)->categoryChanged($category);
+        ($this->invalidateCategoryCache)($category);
     }
 }

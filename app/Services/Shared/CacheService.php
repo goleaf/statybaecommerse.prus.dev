@@ -7,6 +7,7 @@ namespace App\Services\Shared;
 use App\Services\CacheInvalidationService;
 use App\Support\Cache\CacheTagHelper;
 use Closure;
+use DateInterval;
 use Illuminate\Cache\TaggableStore;
 use Illuminate\Support\Facades\Cache;
 
@@ -35,12 +36,12 @@ final class CacheService
     }
 
     /**
-     * Handle rememberShort functionality with proper error handling.
+     * Cache values for a short duration while respecting cache tags when possible.
      *
      * @template TCacheValue
      *
-     * @param  Closure(): TCacheValue  $callback
-     * @param  array<int, string>  $tags
+     * @param  Closure(): TCacheValue $callback
+     * @param  array<int, string>     $tags
      * @return TCacheValue
      */
     public function rememberShort(string $key, Closure $callback, ?int $ttl = null, array $tags = []): mixed
@@ -49,12 +50,12 @@ final class CacheService
     }
 
     /**
-     * Handle rememberDefault functionality with proper error handling.
+     * Cache values for the default duration while respecting cache tags when possible.
      *
      * @template TCacheValue
      *
-     * @param  Closure(): TCacheValue  $callback
-     * @param  array<int, string>  $tags
+     * @param  Closure(): TCacheValue $callback
+     * @param  array<int, string>     $tags
      * @return TCacheValue
      */
     public function rememberDefault(string $key, Closure $callback, ?int $ttl = null, array $tags = []): mixed
@@ -63,33 +64,17 @@ final class CacheService
     }
 
     /**
-     * Handle rememberLong functionality with proper error handling.
+     * Cache values for a long duration while respecting cache tags when possible.
      *
      * @template TCacheValue
      *
-     * @param  Closure(): TCacheValue  $callback
-     * @param  array<int, string>  $tags
+     * @param  Closure(): TCacheValue $callback
+     * @param  array<int, string>     $tags
      * @return TCacheValue
      */
     public function rememberLong(string $key, Closure $callback, ?int $ttl = null, array $tags = []): mixed
     {
         return $this->rememberWithTags($tags, $key, $ttl ?? self::LONG_TTL, $callback);
-    }
-
-    /**
-     * @template TCacheValue
-     *
-     * @param  array<int, string>  $tags
-     * @param  Closure(): TCacheValue  $callback
-     * @return TCacheValue
-     */
-    private function rememberWithTags(array $tags, string $key, int|\DateInterval $ttl, Closure $callback): mixed
-    {
-        if ($tags !== [] && $this->supportsTags) {
-            return Cache::tags($tags)->remember($key, $ttl, $callback);
-        }
-
-        return Cache::remember($key, $ttl, $callback);
     }
 
     /**
@@ -195,5 +180,23 @@ final class CacheService
                 );
             }
         }
+    }
+
+    /**
+     * Helper to remember cache values while conditionally applying tags.
+     *
+     * @template TCacheValue
+     *
+     * @param  array<int, string>     $tags
+     * @param  Closure(): TCacheValue $callback
+     * @return TCacheValue
+     */
+    private function rememberWithTags(array $tags, string $key, int|DateInterval $ttl, Closure $callback): mixed
+    {
+        if ($tags !== [] && $this->supportsTags) {
+            return Cache::tags($tags)->remember($key, $ttl, $callback);
+        }
+
+        return Cache::remember($key, $ttl, $callback);
     }
 }

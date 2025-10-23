@@ -7,8 +7,9 @@ namespace App\Livewire\Home;
 use App\Livewire\Concerns\WithCart;
 use App\Livewire\Concerns\WithNotifications;
 use App\Models\Product;
+use App\Services\Shared\CacheService as SharedCacheService;
 use App\Support\Cache\CacheKeys;
-use App\Support\Cache\TagAwareCache;
+use App\Support\Cache\CacheTagHelper;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
@@ -43,9 +44,9 @@ final class ProductShelf extends Component implements HasSchemas
 
         $this->title = $title !== ''
             ? $title
-            : __('frontend/home.products.sections.'.$sectionKey.'.title');
+            : __('frontend/home.products.sections.' . $sectionKey . '.title');
 
-        $this->subtitle = $subtitle ?? __('frontend/home.products.sections.'.$sectionKey.'.subtitle');
+        $this->subtitle = $subtitle ?? __('frontend/home.products.sections.' . $sectionKey . '.subtitle');
     }
 
     #[Computed]
@@ -53,18 +54,14 @@ final class ProductShelf extends Component implements HasSchemas
     {
         $cacheKey = sprintf('home:shelf:%s:%d:%s', $this->preset, $this->limit, app()->getLocale());
 
-        return app(SharedCacheService::class)->rememberShort($cacheKey, function (): EloquentCollection {
-            $locale = app()->getLocale();
-
-        return TagAwareCache::remember(
+        return app(SharedCacheService::class)->rememberShort(
             CacheKeys::homeShelf($this->preset, $this->limit, $locale),
-            CacheKeys::TTL_MINUTE,
             function () use ($locale): EloquentCollection {
                 $query = Product::query()
                     ->with(['brand', 'media', 'categories'])
-                    ->with(['translations' => function ($q) use ($locale) {
+                    ->with(['translations' => function ($q) use ($locale): void {
                         $q->where('locale', $locale);
-                    }, 'categories.translations' => function ($q) use ($locale) {
+                    }, 'categories.translations' => function ($q) use ($locale): void {
                         $q->where('locale', $locale);
                     }])
                     ->withAvg(['reviews as average_rating' => fn ($q) => $q->where('is_approved', true)], 'rating')
@@ -76,7 +73,7 @@ final class ProductShelf extends Component implements HasSchemas
 
                 $query = match ($this->preset) {
                     'latest' => $query->orderByDesc('published_at'),
-                    'sale' => $query
+                    'sale'   => $query
                         ->where(function ($saleQuery): void {
                             $saleQuery
                                 ->whereNotNull('sale_price')
@@ -102,7 +99,8 @@ final class ProductShelf extends Component implements HasSchemas
 
                 return $query->limit($this->limit)->get();
             },
-            [CacheKeys::homeTag()]
+            CacheKeys::TTL_MINUTE,
+            CacheTagHelper::products(),
         );
     }
 
@@ -114,9 +112,9 @@ final class ProductShelf extends Component implements HasSchemas
                 ->view('livewire.home.partials.product-shelf')
                 ->viewData(fn (): array => [
                     'products' => $this->products(),
-                    'title' => $this->title,
+                    'title'    => $this->title,
                     'subtitle' => $this->subtitle,
-                    'preset' => $this->preset,
+                    'preset'   => $this->preset,
                 ]),
         ]);
     }
