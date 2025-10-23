@@ -1050,6 +1050,8 @@ return [
         'deactivate' => 'Deaktyvuoti',
         'enable' => 'Įjungti',
         'disable' => 'Išjungti',
+        // Laiko žymų skyriaus pavadinimas administravimo formoms
+        'timestamps' => 'Laiko žymos',
     ],
     'messages' => [
         'created' => 'Sėkmingai sukurta',
