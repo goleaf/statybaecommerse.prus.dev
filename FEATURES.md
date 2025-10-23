@@ -26,6 +26,7 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Filament dashboard access now defaults to an open posture when no
   permissions are configured and inline sparkline widgets comply with the
   nullable model contract, preventing dashboard and widget regressions.
+- Currency resource workflows now expose inactive rows, accept longer ISO identifiers, and reuse the updated amount formatter so merchandising teams can audit every rate directly from Filament.
 - Campaign customer segment management now relies on explicit query scopes for
   activity state, campaign, customer group, and segment type so analytics and
   admin listings can intentionally include inactive records without removing
