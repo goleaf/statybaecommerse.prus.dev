@@ -28,28 +28,11 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 require_once __DIR__ . '/../app/Support/filament_compat.php';
 
-$providers = [
-    App\Providers\AuthServiceProvider::class,
-    App\Providers\ApiServiceProvider::class,
-];
-
-$appEnvironment = (string) env('APP_ENV', 'production');
-$queueConnection = (string) env('QUEUE_CONNECTION', 'sync');
-
-if ($appEnvironment !== 'local' || $queueConnection !== 'sync') {
-    $providers[] = App\Providers\HorizonServiceProvider::class;
-}
-
-$providers[] = App\Providers\LocaleServiceProvider::class;
-$providers[] = App\Providers\Filament\AdminPanelProvider::class;
-$providers[] = SecurityServiceProvider::class;
-
-return tap(
-    Application::configure(basePath: dirname(__DIR__))
-        ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        api: __DIR__.'/../routes/api.php',
-        commands: __DIR__.'/../routes/console.php',
+return Application::configure(basePath: dirname(__DIR__))
+    ->withRouting(
+        web: __DIR__ . '/../routes/web.php',
+        api: __DIR__ . '/../routes/api.php',
+        commands: __DIR__ . '/../routes/console.php',
         health: '/up',
         then: function (): void {
             Route::middleware('web')

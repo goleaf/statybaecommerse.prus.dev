@@ -20,9 +20,6 @@ final class DataImportExport extends Page
 {
     protected string $view = 'filament.pages.data-import-export';
 
-    /**
-     * @var string|BackedEnum|null
-     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-arrow-down-tray';
 
     public ?string $provider = 'xml';
