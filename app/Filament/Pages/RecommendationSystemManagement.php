@@ -32,9 +32,11 @@ final class RecommendationSystemManagement extends Page
     protected static ?int $navigationSort = 40;
 
     /**
-     * @var string|BackedEnum|null
+     * Navigation icon that Filament displays for this page.
+     *
+     * @var string|BackedEnum|null Filament navigation icon identifier.
      */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-sparkles';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-sparkles';
 
     protected string $view = 'filament.pages.recommendation-system-management';
 

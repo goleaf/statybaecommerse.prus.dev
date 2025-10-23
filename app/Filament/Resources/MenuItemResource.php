@@ -44,7 +44,12 @@ final class MenuItemResource extends Resource
 
     protected static UnitEnum|string|null $navigationGroup = 'Content';
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    /**
+     * Navigation icon that Filament displays for this resource.
+     *
+     * @var string|BackedEnum|null Filament navigation icon identifier.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?int $navigationSort = 5;
 
@@ -156,25 +161,23 @@ final class MenuItemResource extends Resource
                     ->tooltip(static function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        if ($state === null || $state === '') {
+                        if (! is_string($state) || $state === '') {
                             return null;
                         }
 
-                        $stateString = (string) $state;
-
-                        if (strlen($stateString) <= 30) {
+                        if (strlen($state) <= 30) {
                             return null;
                         }
 
-                        return $stateString;
+                        return $state;
                     }),
                 TextColumn::make('route_name')
                     ->label(__('admin.menu_items.route_name'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('icon')
+                IconColumn::make('icon')
                     ->label(__('admin.menu_items.icon'))
-                    ->icon()
+                    ->icon(static fn (?string $state): ?string => $state)
                     ->sortable(),
                 TextColumn::make('parent.label')
                     ->label(__('admin.menu_items.parent'))
@@ -204,7 +207,7 @@ final class MenuItemResource extends Resource
                 SelectFilter::make('parent_id')
                     ->label(__('admin.menu_items.parent'))
                     ->options(function (SelectFilter $filter): array {
-                        $menuFilterState = $filter->getLivewire()?->getTableFilterState('menu_id');
+                        $menuFilterState = $filter->getLivewire()->getTableFilterState('menu_id');
                         $menuId = $menuFilterState['value'] ?? null;
 
                         $query = MenuItem::withoutGlobalScopes()
@@ -252,6 +255,9 @@ final class MenuItemResource extends Resource
         ];
     }
 
+    /**
+     * @return Builder<MenuItem>
+     */
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->withoutGlobalScopes([VisibleScope::class]);

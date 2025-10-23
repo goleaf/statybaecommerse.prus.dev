@@ -23,9 +23,11 @@ final class InventoryManagement extends Page implements HasTable
     use InteractsWithTable;
 
     /**
-     * @var string|BackedEnum|null
+     * Navigation icon that Filament displays for this page.
+     *
+     * @var string|BackedEnum|null Filament navigation icon identifier.
      */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
 
     public static function getNavigationGroup(): UnitEnum|string|null
     {

@@ -54,6 +54,11 @@ final class VariantAnalyticsResource extends Resource
 {
     use HasNav;
 
+    /**
+     * Navigation icon that Filament displays for this resource.
+     *
+     * @var string|BackedEnum|null Filament navigation icon identifier.
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
     protected static BackedEnum|UnitEnum|string|null $navigationGroup = 'Inventory';
