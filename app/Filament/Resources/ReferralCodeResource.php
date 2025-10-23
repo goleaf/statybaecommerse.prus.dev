@@ -249,12 +249,9 @@ final class ReferralCodeResource extends Resource
                     }),
                 SelectFilter::make('by_source')
                     ->label('source')
-                    ->form([
-                        Select::make('source')
-                            ->options([
-                                'admin' => 'admin',
-                                'user' => 'user',
-                            ]),
+                    ->options([
+                        'admin' => 'admin',
+                        'user'  => 'user',
                     ])
                     ->indicateUsing(function (array $data): ?string {
                         $value = $data['source'] ?? $data['value'] ?? null;
