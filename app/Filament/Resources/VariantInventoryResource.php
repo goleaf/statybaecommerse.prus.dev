@@ -219,7 +219,7 @@ final class VariantInventoryResource extends Resource
                                     ->content(fn (?VariantInventory $record): string => $record ? ($record->is_out_of_stock ? __('admin.variant_inventory.yes') : __('admin.variant_inventory.no')) : '-'),
                                 Placeholder::make('stock_status')
                                     ->label(__('admin.variant_inventory.stock_status'))
-                                    ->content(fn (?VariantInventory $record): string => $record && $record->stock_status ? __('admin.variant_inventory.status_' . $record->stock_status) : '-'),
+                                    ->content(fn (?VariantInventory $record): string => $record ? __('admin.variant_inventory.status_' . $record->stock_status) : '-'),
                             ]),
                     ])
                     ->visible(fn (?VariantInventory $record): bool => $record !== null),
