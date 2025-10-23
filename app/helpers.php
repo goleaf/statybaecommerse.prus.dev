@@ -5,6 +5,9 @@ declare(strict_types=1);
 use App\Support\Security\CspNonce;
 
 if (! function_exists('csp_nonce')) {
+    /**
+     * Resolve the current request's CSP nonce so Blade templates can opt-in to strict policies.
+     */
     function csp_nonce(): string
     {
         return app(CspNonce::class)->value();
@@ -310,12 +313,8 @@ if (! function_exists('debug_order')) {
 if (! function_exists('safe_asset')) {
     function safe_asset(string $path): string
     {
-        $relativePath = '/'.ltrim($path, '/');
-
-        try {
-            $app = app();
-        } catch (\Throwable $exception) {
-            return $relativePath;
+        if (! app()->bound('request') || ! app('request') instanceof \Illuminate\Http\Request) {
+            return '/' . ltrim($path, '/');
         }
 
         if (! method_exists($app, 'bound') || ! $app->bound('url') || ! $app->bound('request')) {
