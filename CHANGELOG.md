@@ -7,7 +7,9 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Bug Fixes
-* Realigned the campaign customer segment resource with Filament v4 by swapping in the new action classes, backfilling Livewire testing macros, and removing the legacy campaign/customer group unique constraint so CRUD flows, filters, and regression tests succeed under the upgraded stack.
+* Restored the SQLite testing harness attribute tables, cast product names to arrays, and relaxed the published scope inside the
+  product search repository so API and unit search suites return newly seeded catalogue fixtures without hitting missing-table or
+  draft-status filters.
 * Re-enabled flexible system setting translations by replacing the locale uniqueness constraint with an index, restoring soft delete support, and trimming the fillable contract so replication and counting scenarios match the documented API.
 * Preserved Attribute validation rule strings while still decoding JSON arrays, refreshed the Filament form so arrays render as comma-separated chips, and added regression coverage for both storage paths.
 * Reintroduced the `regions` schema with defensive guards and rebuilt the `customers`/`orders` relationship so SQLite-backed factories and analytics widgets can create location-aware records without missing column errors during tests.
