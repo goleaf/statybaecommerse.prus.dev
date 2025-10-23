@@ -218,6 +218,9 @@ class SimplifiedStatsWidget extends BaseWidget
             $totalUsers = (int) User::query()->count();
             $newUsersThisMonth = (int) User::query()->where('created_at', '>=', $lastMonth)->count();
 
+            $totalUsers = (int) User::query()->count();
+            $newUsersThisMonth = (int) User::query()->where('created_at', '>=', $lastMonth)->count();
+
                 $productStats = Product::query()
                     ->selectRaw('
                     COUNT(*) as total_products,
