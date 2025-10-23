@@ -19,14 +19,16 @@ final class ApiController extends Controller
 
     public function searchProducts(Request $request): JsonResponse
     {
-        $query = $request->get('q', '');
+        $query = trim((string) $request->get('q', ''));
 
-        // Clamp the requested limit to avoid excessive payloads or expensive queries.
-        $limit = max(1, min((int) $request->integer('limit', 10), 25));
+        // Keep the API predictable by clamping the requested limit to a safe range.
+        $limit = (int) $request->integer('limit', 10);
+        $limit = max(1, min($limit, 25));
 
         $products = Product::query()
+            ->published()
             ->when($query !== '', static function ($productQuery) use ($query): void {
-                // Apply a LIKE search on both the name and description only when a query is present.
+                // Apply a scoped LIKE search across both name and description columns.
                 $productQuery->where(static function ($nestedQuery) use ($query): void {
                     $likeQuery = "%{$query}%";
 
@@ -38,12 +40,14 @@ final class ApiController extends Controller
             ->limit($limit)
             ->get(['id', 'name', 'slug', 'price'])
             ->map(static function (Product $product): array {
-                // Provide structured media information while avoiding the deprecated image column.
+                // Normalize the payload so every consumer receives consistent media keys.
                 return [
-                    'id'         => $product->id,
-                    'name'       => $product->name,
-                    'slug'       => $product->slug,
-                    'price'      => $product->price,
+                    'id'    => $product->getKey(),
+                    'name'  => $product->name,
+                    'slug'  => $product->slug,
+                    'price' => $product->price,
+                    // Preserve the historical `image` field while introducing explicit media aliases.
+                    'image'      => $product->main_image,
                     'main_image' => $product->main_image,
                     'thumbnail'  => $product->thumbnail,
                 ];
@@ -142,25 +146,28 @@ final class ApiController extends Controller
             return response()->json([]);
         }
 
-        $orderedIds = array_values(array_unique(array_slice($recentlyViewed, 0, 10)));
+        // Preserve the visit order while trimming to the most recent entries only.
+        $orderedIds = array_values(array_slice($recentlyViewed, 0, 10));
 
         $products = Product::query()
+            ->published()
             ->whereIn('id', $orderedIds)
             ->get(['id', 'name', 'slug', 'price'])
             ->sortBy(static function (Product $product) use ($orderedIds): int {
-                // Preserve the original order from the session store to keep UX expectations intact.
-                $position = array_search($product->id, $orderedIds, true);
+                $position = array_search($product->getKey(), $orderedIds, true);
 
                 return $position === false ? PHP_INT_MAX : $position;
             })
             ->values()
             ->map(static function (Product $product): array {
-                // Mirror the normalized media payload returned from the search endpoint.
+                // Mirror the search payload structure so widgets can reuse adapters.
                 return [
-                    'id'         => $product->id,
-                    'name'       => $product->name,
-                    'slug'       => $product->slug,
-                    'price'      => $product->price,
+                    'id'    => $product->getKey(),
+                    'name'  => $product->name,
+                    'slug'  => $product->slug,
+                    'price' => $product->price,
+                    // Maintain the legacy `image` attribute for downstream caches still expecting it.
+                    'image'      => $product->main_image,
                     'main_image' => $product->main_image,
                     'thumbnail'  => $product->thumbnail,
                 ];

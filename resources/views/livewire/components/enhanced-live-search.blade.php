@@ -257,7 +257,7 @@
                         <div class="flex items-center space-x-4">
                             <!-- Enhanced Result Image -->
                             <div class="flex-shrink-0">
-                                {{-- Determine the correct preview image, including support for normalized attributes. --}}
+                                {{-- Consolidate enhanced search imagery around the new API response keys. --}}
                                 @php($image = $result['main_image'] ?? $result['thumbnail'] ?? ($result['image'] ?? null))
                                 @if($image)
                                     <img
