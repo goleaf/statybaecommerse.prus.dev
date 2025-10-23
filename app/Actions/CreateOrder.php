@@ -8,7 +8,6 @@ use App\Mail\OrderPlaced;
 use App\Models\Country;
 use App\Models\Order;
 use App\Services\Cart\CartLifecycleService;
-use App\Services\Pricing\PriceCalculator;
 use Darryldecode\Cart\Facades\CartFacade;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -124,7 +123,11 @@ class CreateOrder
                 // ignore payment errors in stub
             }
             // Clear cart
-            CartFacade::session($sessionId)->clear();
+            app(CartLifecycleService::class)->clearAfterCheckout(
+                $customer?->id,
+                $sessionId,
+                $order->payment_status ?? null
+            );
             // Queue order confirmation email with user's preferred locale
             try {
                 $mailable = new OrderPlaced($order);

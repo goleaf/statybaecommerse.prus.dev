@@ -8,7 +8,6 @@ use App\Data\Pricing\PriceBreakdown;
 use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Services\Pricing\PriceCalculator;
 use App\Services\Cart\CartLifecycleService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
