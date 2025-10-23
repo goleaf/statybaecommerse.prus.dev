@@ -74,7 +74,7 @@ final class PostResource extends Resource
     protected static ?string $recordTitleAttribute = 'title';
 
     /**
-     * @var string|BackedEnum|\UnitEnum|null
+     * @var string|\BackedEnum|null
      */
     public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
     {
@@ -108,7 +108,7 @@ final class PostResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         return $schema

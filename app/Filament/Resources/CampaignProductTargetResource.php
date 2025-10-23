@@ -46,9 +46,9 @@ final class CampaignProductTargetResource extends Resource
     protected static ?string $model = CampaignProductTarget::class;
 
     /**
-     * Use the union type expected by Filament v4's Resource base class for navigation icons.
+     * @var string|\BackedEnum|null Keep Filament navigation metadata flexible between enums and plain strings.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-bullseye-arrow';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-bullseye-arrow';
 
     protected static ?string $recordTitleAttribute = 'target_type';
 
@@ -75,7 +75,7 @@ final class CampaignProductTargetResource extends Resource
     /**
      * Define the Campaign Product Target form with conditional selectors and marketing metadata.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         return $schema->schema([
@@ -357,7 +357,7 @@ final class CampaignProductTargetResource extends Resource
     /**
      * Provide a structured infolist for the record view page.
      */
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Schema $infolist): Schema
     {
         // Configure the Filament infolist schema using the v4 Schema API.
         return $schema->schema([

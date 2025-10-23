@@ -34,8 +34,8 @@ class NewsResource extends Resource
 
     protected static ?string $model = News::class;
 
-    /** @phpstan-var string|BackedEnum|null */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-newspaper';
+    /** @phpstan-var string|\BackedEnum|null */
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-newspaper';
 
     protected static ?int $navigationSort = 1;
 
@@ -43,7 +43,7 @@ class NewsResource extends Resource
 
     protected static ?string $pluralModelLabel = 'News Articles';
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         return $schema->components([

@@ -47,7 +47,7 @@ Use this page to discover the project's internal documentation. The content is o
 - [CURRENT_SYSTEM_STATUS](CURRENT_SYSTEM_STATUS.md) – snapshot of live issues, mitigations, and follow-up owners.
 - [Dependency automation schedule](operations/RENOVATE_OVERVIEW.md) – explains the Renovate rollup cadence and CI expectations.
 - [PR Branch Cleanup Workflow](../.github/workflows/pr-branch-cleanup.yml) – documents the automation that deletes local branches when pull requests close without merging; the job now ignores already-removed branches after validating the reference.
-- [Husky hook maintenance tips](../.husky/README.md) – outlines the shim script structure to keep Git hooks healthy and compatible with Husky v10 deprecation changes.
+- **Testing shortcut** – run `composer test` to invoke the bundled Pest runner (`vendor/bin/pest`) without requiring a global installation.
 
 ## Contribution checklist
 - Review the [Documentation Style Guide](CONTRIBUTING_DOCS.md) before adding or updating any files in this directory.

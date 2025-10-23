@@ -97,7 +97,7 @@ final class RoleResource extends Resource
         return __('roles.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         return $schema

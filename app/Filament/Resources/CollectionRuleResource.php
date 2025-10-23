@@ -83,7 +83,7 @@ final class CollectionRuleResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         // Expose the schema via the Filament v4 `Form` instance to drop the deprecated array fallback.

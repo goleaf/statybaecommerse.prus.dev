@@ -87,7 +87,7 @@ final class SliderResource extends Resource
         return __('sliders.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         return $schema->schema([

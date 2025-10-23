@@ -27,7 +27,7 @@ class UserProductInteractionResource extends Resource
         return LegacyUserProductInteractionResource::getNavigationGroup();
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         return UserProductInteractionForm::configure($form);

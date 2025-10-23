@@ -20,7 +20,7 @@ use Filament\Schemas\Schema;
 
 final class PartnerTierResource extends Resource
 {
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-star';
 
     protected static string|UnitEnum|null $navigationGroup = 'Marketing';
 
@@ -33,7 +33,7 @@ final class PartnerTierResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         return $schema

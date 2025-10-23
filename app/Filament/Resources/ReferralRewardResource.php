@@ -55,7 +55,7 @@ final class ReferralRewardResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'Referral';
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         return $schema
@@ -289,7 +289,7 @@ final class ReferralRewardResource extends Resource
             ]);
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Schema $infolist): Schema
     {
         // Configure the Filament infolist schema using the v4 Schema API.
         return $infolist

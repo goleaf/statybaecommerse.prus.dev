@@ -29,7 +29,7 @@ class ReferralCodeStatisticsResource extends Resource
      */
     protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         return ReferralCodeStatisticsForm::configure($form);

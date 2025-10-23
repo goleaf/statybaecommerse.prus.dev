@@ -13,6 +13,7 @@ use App\Models\Review;
 use Filament\Actions;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Schema;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Schema;
 use Icetalker\FilamentTableRepeatableEntry\Infolists\Components\TableRepeatableEntry;
@@ -33,7 +34,7 @@ final class ViewCustomer extends ViewRecord
         ];
     }
 
-    public function infolist(Schema $schema): Schema
+    public function infolist(Schema $infolist): Schema
     {
         // Configure the Filament infolist schema using the v4 Schema API.
         return $schema->schema([

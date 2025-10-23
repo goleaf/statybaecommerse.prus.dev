@@ -65,7 +65,7 @@ final class LegalResource extends Resource
         return __('legal.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         return $schema
