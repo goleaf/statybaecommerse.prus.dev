@@ -30,14 +30,14 @@ final class GenerateReportsCommand extends Command
             'date_to'   => $this->option('date-to') ?: null,
         ]);
 
+        // Validate the requested report type before dispatching work to the queue so we can fail fast.
         if (! in_array($type, ['all', 'sales', 'products', 'users', 'system'], true)) {
             $this->error("Unknown report type: {$type}");
-
-            $operation->fail($e);
 
             return self::FAILURE;
         }
 
+        // Ensure the requested export format is supported to avoid dispatching un-runnable jobs.
         if (! in_array($format, ['json', 'csv'], true)) {
             $this->error("Unsupported report format: {$format}");
 

@@ -234,6 +234,11 @@ class ProductFactory extends Factory
             return;
         }
 
+        if (app()->runningUnitTests()) {
+            // Allow tests to define explicit translation fixtures so assertions can target specific locales.
+            return;
+        }
+
         $relation = $product->translations();
         $connection = $relation->getQuery()->getConnection();
         $schema = $connection->getSchemaBuilder();

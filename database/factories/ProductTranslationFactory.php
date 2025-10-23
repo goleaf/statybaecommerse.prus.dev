@@ -7,6 +7,8 @@ namespace Database\Factories;
 use App\Models\Product;
 use App\Models\Translations\ProductTranslation;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\QueryException;
 
 /**
  * @extends Factory<\App\Models\Translations\ProductTranslation>
@@ -14,6 +16,50 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class ProductTranslationFactory extends Factory
 {
     protected $model = ProductTranslation::class;
+
+    public function create($attributes = [], ?Model $parent = null)
+    {
+        try {
+            return parent::create($attributes, $parent);
+        } catch (QueryException $exception) {
+            // When tests override the locale for a specific product we may hit the unique
+            // constraint on (product_id, locale). In that scenario we update the existing
+            // translation instead of throwing so fixtures can intentionally mutate the
+            // persisted HTML without having to worry about the factory defaults.
+            if ($attributes === []
+                || ! $this->isDuplicateProductLocaleViolation($exception)
+            ) {
+                throw $exception;
+            }
+
+            $model = $this->state($attributes)->make([], $parent);
+
+            if (! $model instanceof Model) {
+                throw $exception;
+            }
+
+            $payload = $model->getAttributes();
+            $productId = $payload['product_id'] ?? null;
+            $locale = $payload['locale'] ?? null;
+
+            if (! is_int($productId) || ! is_string($locale)) {
+                throw $exception;
+            }
+
+            $existing = ProductTranslation::query()
+                ->where('product_id', $productId)
+                ->where('locale', $locale)
+                ->first();
+
+            if ($existing === null) {
+                throw $exception;
+            }
+
+            $existing->fill($payload)->save();
+
+            return $existing;
+        }
+    }
 
     public function definition(): array
     {
@@ -70,5 +116,16 @@ class ProductTranslationFactory extends Factory
                 'Work Gloves',
             ]),
         ]);
+    }
+
+    private function isDuplicateProductLocaleViolation(QueryException $exception): bool
+    {
+        $message = $exception->getMessage();
+
+        if ($message === null) {
+            return false;
+        }
+
+        return str_contains($message, 'product_translations.product_id, product_translations.locale');
     }
 }
