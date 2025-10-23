@@ -201,11 +201,6 @@ return new class extends Migration
 
                 $table->index(['campaign_id', 'target_type']);
                 $table->index(['is_active', 'is_featured']);
-                $table->index(['priority', 'weight']);
-                $table->unique(['campaign_id', 'product_id']);
-                $table->unique(['campaign_id', 'category_id']);
-                $table->unique(['campaign_id', 'brand_id']);
-                $table->unique(['campaign_id', 'collection_id']);
             });
         }
 
