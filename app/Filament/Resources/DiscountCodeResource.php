@@ -263,7 +263,11 @@ final class DiscountCodeResource extends Resource
                     ->searchable(),
                 TextColumn::make('is_active')
                     ->label(__('discount_codes.status'))
-                    ->formatStateUsing(fn (bool $state): string => $state ? __('discount_codes.active') : __('discount_codes.inactive'))
+                    ->formatStateUsing(
+                        fn (bool $state): string => $state
+                            ? __('discount_codes.active')
+                            : __('discount_codes.inactive')
+                    )
                     ->badge()
                     ->color(fn (bool $state): string => $state ? 'success' : 'danger'),
                 IconColumn::make('is_public')
