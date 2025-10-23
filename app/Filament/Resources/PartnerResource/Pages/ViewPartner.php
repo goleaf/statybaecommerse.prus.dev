@@ -9,8 +9,8 @@ use Filament\Actions;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Schemas\Schema;
 
 final class ViewPartner extends ViewRecord
 {
@@ -24,11 +24,11 @@ final class ViewPartner extends ViewRecord
         ];
     }
 
-    public function infolist(Infolist $infolist): Infolist|array
+    public function infolist(Schema $schema): Schema
     {
         // Present the partner details in themed sections so admins see critical data at a glance.
-        return $infolist->schema([
-            SchemaSection::make(__('admin.partners.sections.basic_information'))
+        return $schema->components([
+            Section::make(__('admin.partners.sections.basic_information'))
                 ->schema([
                     TextEntry::make('name')
                         ->label(__('admin.partners.name'))
@@ -46,7 +46,7 @@ final class ViewPartner extends ViewRecord
                         ->boolean(),
                 ])
                 ->columns(2),
-            SchemaSection::make(__('admin.partners.sections.contact_information'))
+            Section::make(__('admin.partners.sections.contact_information'))
                 ->schema([
                     TextEntry::make('contact_email')
                         ->label(__('admin.partners.contact_email'))
@@ -58,7 +58,7 @@ final class ViewPartner extends ViewRecord
                         ->copyable(),
                 ])
                 ->columns(2),
-            SchemaSection::make(__('admin.partners.sections.financial_settings'))
+            Section::make(__('admin.partners.sections.financial_settings'))
                 ->schema([
                     TextEntry::make('discount_rate')
                         ->label(__('admin.partners.discount_rate'))
@@ -70,7 +70,7 @@ final class ViewPartner extends ViewRecord
                         ->suffix('%'),
                 ])
                 ->columns(2),
-            SchemaSection::make(__('admin.common.timestamps'))
+            Section::make(__('admin.common.timestamps'))
                 ->schema([
                     TextEntry::make('created_at')
                         ->label(__('admin.common.created_at'))

@@ -10,6 +10,7 @@ use App\Contracts\HealthReporter as HealthReporterContract;
 use App\Domain\Product\Repositories\ProductRepositoryInterface;
 use App\Filament\Components\LiveNotificationFeed;
 use App\Infrastructure\Product\Repositories\EloquentProductRepository;
+use App\Models\ApiKey;
 use App\Models\DiscountCode;
 use App\Models\DiscountRedemption;
 use App\Models\Document;
@@ -63,6 +64,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Vite;
@@ -483,6 +485,29 @@ class AppServiceProvider extends ServiceProvider
         Queue::failing(function (JobFailed $event) use ($cleanup): void {
             $cleanup();
         });
+    }
+
+    private function registerQueueTracing(): void
+    {
+        if (! method_exists(Queue::class, 'macro')) {
+            return;
+        }
+
+        if (method_exists(Queue::class, 'hasMacro') && Queue::hasMacro('withTraceContext')) {
+            return;
+        }
+
+        // Provide a lightweight macro so queued jobs can opt into propagating the current trace context.
+        try {
+            Queue::macro('withTraceContext', function (?TraceContext $context = null) {
+                /** @var \Illuminate\Queue\QueueManager $this */
+                Trace::store($context ?? Trace::childFromCurrent());
+
+                return $this;
+            });
+        } catch (Throwable) {
+            // Silently ignore macro registration failures to keep queue dispatching resilient in limited environments.
+        }
     }
 
     /**
