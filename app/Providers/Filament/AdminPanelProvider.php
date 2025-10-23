@@ -191,16 +191,13 @@ final class AdminPanelProvider extends PanelProvider
             ->when(
                 app()->environment('testing'),
                 fn (Panel $p) => $p->plugins([]),
-                fn (Panel $p) => $p->plugins(array_values(array_filter([
-                    $this->makeFilamentShieldPlugin(),
-                    $this->makeFullCalendarPlugin(),
-                    $this->makeTableLayoutTogglePlugin(),
-                    $this->makeFilamentNordThemePlugin(),
-                    $this->makeResizedColumnPlugin(),
-                ]))))
-            // Enable the custom Filament theme so third-party plugin views (like the searchable input)
-            // are compiled with Tailwind during the build step.
-            ->viteTheme('resources/css/filament/admin/theme.scss')
+                fn (Panel $p) => $p->plugins($this->configuredPlugins()))
+            // Enable the custom Filament theme and bundle supporting JavaScript so third-party plugin views
+            // (like the searchable input and combobox) are compiled during the build step.
+            ->viteTheme([
+                'resources/css/filament/admin/theme.css',
+                'resources/js/filament/admin/theme.js',
+            ])
             ->spa();
     }
 
