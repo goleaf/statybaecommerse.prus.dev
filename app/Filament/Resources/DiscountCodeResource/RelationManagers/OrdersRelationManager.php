@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountCodeResource\RelationManagers;
 
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -18,8 +19,8 @@ final class OrdersRelationManager extends BaseRelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
+        return $form
+            ->schema([
                 Forms\Components\TextInput::make('order_number')
                     ->label(__('Order Number'))
                     ->required()
@@ -92,7 +93,7 @@ final class OrdersRelationManager extends BaseRelationManager
                 Tables\Actions\AttachAction::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 Tables\Actions\DetachAction::make(),
             ])
             ->bulkActions([
