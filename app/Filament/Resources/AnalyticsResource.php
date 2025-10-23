@@ -10,9 +10,8 @@ use App\Filament\Resources\AnalyticsResource\Pages;
 use App\Models\Order;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
-use Filament\Schemas\Schema;
 use BackedEnum;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\Summarizers\Average;
@@ -39,7 +38,8 @@ final class AnalyticsResource extends Resource
     /**
      * Preserve the typed navigation group union to keep enum-backed grouping working across PHP upgrades.
      */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Analytics;
+    /** @var \Filament\Navigation\NavigationGroup|array|string|null */
+    protected static \Filament\Navigation\NavigationGroup|array|string|null $navigationGroup = NavigationGroup::Analytics->value;
 
     public static function getNavigationLabel(): string
     {

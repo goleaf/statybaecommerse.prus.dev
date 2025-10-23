@@ -52,10 +52,12 @@ final class NewsTagResource extends Resource
         return 'heroicon-o-tag';
     }
 
-    public static function getNavigationGroup(): BackedEnum|string|null
+    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
     {
-        // Returning the enum directly keeps Filament aware of the localization metadata without redundant UnitEnum imports.
-        return NavigationGroup::News;
+        // Returning the localized label keeps Filament aware of the navigation metadata introduced in v4.
+        $group = NavigationGroup::News;
+
+        return $group->label();
     }
 
     protected static ?int $navigationSort = 4;

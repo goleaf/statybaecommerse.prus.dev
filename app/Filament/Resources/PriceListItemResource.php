@@ -50,14 +50,14 @@ final class PriceListItemResource extends Resource
 
     protected static ?int $navigationSort = 16;
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Products';
+    protected static \Filament\Navigation\NavigationGroup|array|string|null $navigationGroup = 'Products';
 
     public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
         return 'heroicon-o-currency-euro';
     }
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
     {
         return 'Products';
     }

@@ -42,9 +42,11 @@ use UnitEnum;
  */
 final class OrderItemResource extends Resource
 {
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): \Filament\Navigation\NavigationGroup|array|string|null
     {
-        return NavigationGroup::Orders;
+        $group = NavigationGroup::Orders;
+
+        return $group->label();
     }
 
     protected static ?string $model = OrderItem::class;
