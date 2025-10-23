@@ -6,8 +6,8 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 
 ## [Unreleased]
 
-### Maintenance
-* Aligned Filament variant pricing and analytics resources with stricter action namespaces, clarified currency formatting, and refreshed navigation icon annotations to streamline BackedEnum usage across admin pages.
+### Features & Enhancements
+* Expanded the VariantInventory and VariantAnalytics resources with refreshed stock availability attributes and enhanced performance metric definitions for upcoming releases.
 
 ## [0.1.0] - 2025-10-20
 
