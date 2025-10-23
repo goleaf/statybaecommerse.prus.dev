@@ -8,6 +8,7 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\SliderResource\Pages;
 use App\Models\Slider;
+use BackedEnum;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
@@ -40,10 +41,7 @@ final class SliderResource extends Resource
 
     protected static ?string $model = Slider::class;
 
-    /**
-     * @var string|\BackedEnum|null
-     */
-    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static UnitEnum|string|null $navigationGroup = 'Content';
 
