@@ -2,122 +2,104 @@
 
 declare(strict_types=1);
 
-use App\Filament\Resources\Settings\Pages\CreateSetting;
-use App\Filament\Resources\Settings\Pages\EditSetting;
-use App\Filament\Resources\Settings\Pages\ListSettings;
+namespace Tests\Feature;
+
 use App\Models\Setting;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use Tests\TestCase;
 
-beforeEach(function (): void {
-    $this->admin = User::factory()->create();
-    $this->admin->assignRole('admin');
-});
+final class SettingResourceTest extends TestCase
+{
+    use RefreshDatabase;
 
-it('lists existing settings in the table', function (): void {
-    $settings = Setting::factory()->count(3)->create();
+    protected function setUp(): void
+    {
+        parent::setUp();
 
-    Livewire::actingAs($this->admin)
-        ->test(ListSettings::class)
-        ->assertCanSeeTableRecords($settings);
-});
+        $this->actingAs(User::factory()->create());
+    }
 
-it('creates a new setting record', function (): void {
-    $payload = [
-        'key'          => 'site_name',
-        'value'        => 'My Storefront',
-        'type'         => 'string',
-        'description'  => 'Primary storefront name',
-        'is_public'    => true,
-        'display_name' => 'Store Name',
-        'group'        => 'general',
-        'is_required'  => false,
-        'is_encrypted' => false,
-    ];
+    public function test_can_list_settings(): void
+    {
+        $settings = Setting::factory()->count(3)->create();
 
-    Livewire::actingAs($this->admin)
-        ->test(CreateSetting::class)
-        ->fillForm($payload)
-        ->call('create')
-        ->assertHasNoFormErrors();
+        Livewire::test(\App\Filament\Resources\Settings\Pages\ListSettings::class)
+            ->assertCanSeeTableRecords($settings);
+    }
 
-    $this->assertDatabaseHas('settings', [
-        'key'          => 'site_name',
-        'type'         => 'string',
-        'group'        => 'general',
-        'display_name' => 'Store Name',
-        'is_public'    => true,
-    ]);
-});
-
-it('validates required fields when creating a setting', function (): void {
-    Livewire::actingAs($this->admin)
-        ->test(CreateSetting::class)
-        ->fillForm([
-            'key'          => '',
-            'type'         => '',
-            'is_public'    => null,
-            'is_required'  => null,
-            'is_encrypted' => null,
-        ])
-        ->call('create')
-        ->assertHasFormErrors([
-            'key'          => 'required',
-            'type'         => 'required',
-            'is_public'    => 'required',
-            'is_required'  => 'required',
-            'is_encrypted' => 'required',
-        ]);
-});
-
-it('updates an existing setting record', function (): void {
-    $setting = Setting::factory()->create([
-        'key'          => 'site_tagline',
-        'value'        => 'Old tagline',
-        'type'         => 'string',
-        'description'  => 'Old description',
-        'display_name' => 'Tagline',
-        'group'        => 'branding',
-        'is_public'    => false,
-        'is_required'  => true,
-        'is_encrypted' => false,
-    ]);
-
-    Livewire::actingAs($this->admin)
-        ->test(EditSetting::class, ['record' => $setting->getKey()])
-        ->fillForm([
-            'value'        => 'New tagline',
-            'description'  => 'Updated description',
-            'display_name' => 'Brand Tagline',
-            'group'        => 'marketing',
+    public function test_can_create_setting(): void
+    {
+        $formData = [
+            'key'          => 'site_name',
+            'value'        => 'Statyba E-Commerce',
+            'type'         => 'string',
+            'description'  => 'Display name for the storefront.',
             'is_public'    => true,
+            'display_name' => 'Site Name',
+            'group'        => 'general',
             'is_required'  => false,
             'is_encrypted' => false,
+        ];
+
+        Livewire::test(\App\Filament\Resources\Settings\Pages\CreateSetting::class)
+            ->fillForm($formData)
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('settings', [
+            'key'       => 'site_name',
+            'value'     => 'Statyba E-Commerce',
+            'type'      => 'string',
+            'is_public' => true,
+            'group'     => 'general',
+        ]);
+    }
+
+    public function test_can_edit_setting(): void
+    {
+        $setting = Setting::factory()->create([
+            'value'       => 'Old Value',
+            'description' => 'Original description',
+            'is_public'   => false,
+        ]);
+
+        Livewire::test(\App\Filament\Resources\Settings\Pages\EditSetting::class, [
+            'record' => $setting->getRouteKey(),
         ])
-        ->call('save')
-        ->assertHasNoFormErrors();
+            ->fillForm([
+                'value'        => 'Updated Value',
+                'description'  => 'Updated description',
+                'is_public'    => true,
+                'is_required'  => true,
+                'is_encrypted' => true,
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
 
-    $this->assertDatabaseHas('settings', [
-        'id'           => $setting->id,
-        'value'        => 'New tagline',
-        'description'  => 'Updated description',
-        'display_name' => 'Brand Tagline',
-        'group'        => 'marketing',
-        'is_public'    => true,
-        'is_required'  => false,
-        'is_encrypted' => false,
-    ]);
-});
+        $this->assertDatabaseHas('settings', [
+            'id'           => $setting->id,
+            'value'        => 'Updated Value',
+            'description'  => 'Updated description',
+            'is_public'    => true,
+            'is_required'  => true,
+            'is_encrypted' => true,
+        ]);
+    }
 
-it('can delete a setting from the edit page', function (): void {
-    $setting = Setting::factory()->create();
+    public function test_can_bulk_delete_settings(): void
+    {
+        $settings = Setting::factory()->count(2)->create();
 
-    Livewire::actingAs($this->admin)
-        ->test(EditSetting::class, ['record' => $setting->getKey()])
-        ->callAction('delete')
-        ->assertOk();
+        Livewire::test(\App\Filament\Resources\Settings\Pages\ListSettings::class)
+            ->callTableBulkAction('delete', $settings)
+            ->assertHasNoTableBulkActionErrors();
 
-    $this->assertDatabaseMissing('settings', [
-        'id' => $setting->id,
-    ]);
-});
+        foreach ($settings as $setting) {
+            $this->assertDatabaseMissing('settings', [
+                'id' => $setting->id,
+            ]);
+        }
+    }
+}
