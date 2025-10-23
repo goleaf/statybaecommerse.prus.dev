@@ -15,7 +15,10 @@ final class PartnersRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'partners';
 
-    protected static ?string $title = 'Partners';
+    public static function getTitle(): ?string
+    {
+        return __('price_lists.relation_managers.partners.title');
+    }
 
     public function form(Form $form): Form
     {
