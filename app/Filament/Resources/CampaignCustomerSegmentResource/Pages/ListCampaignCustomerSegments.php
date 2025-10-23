@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ListCampaignCustomerSegments extends BaseListRecords
 {
-        use HasWidgetTabs;
+    use HasWidgetTabs;
 
     protected static string $resource = CampaignCustomerSegmentResource::class;
 
@@ -24,25 +24,31 @@ class ListCampaignCustomerSegments extends BaseListRecords
         ];
     }
 
+    /**
+     * @return array<string, WidgetTab>
+     */
     public function getWidgetTabs(): array
     {
         return [
-            'all'         => SchemaTab::make(__('campaign_customer_segments.tabs.all')),
-            'demographic' => SchemaTab::make(__('campaign_customer_segments.tabs.demographic'))
+            // Display every segment by default and surface the aggregate count to match dashboard expectations.
+            'all' => WidgetTab::make(__('campaign_customer_segments.tabs.all'))
+                ->value(fn (): int => CampaignCustomerSegmentResource::getEloquentQuery()->count()),
+            // Provide quick filters for the primary segment types so marketers can inspect performance faster.
+            'demographic' => WidgetTab::make(__('campaign_customer_segments.tabs.demographic'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('segment_type', 'demographic'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('segment_type', 'demographic')->count()),
+                ->value(fn (): int => CampaignCustomerSegmentResource::getEloquentQuery()->where('segment_type', 'demographic')->count()),
             'behavioral' => WidgetTab::make(__('campaign_customer_segments.tabs.behavioral'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('segment_type', 'behavioral'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('segment_type', 'behavioral')->count()),
+                ->value(fn (): int => CampaignCustomerSegmentResource::getEloquentQuery()->where('segment_type', 'behavioral')->count()),
             'geographic' => WidgetTab::make(__('campaign_customer_segments.tabs.geographic'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('segment_type', 'geographic'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('segment_type', 'geographic')->count()),
+                ->value(fn (): int => CampaignCustomerSegmentResource::getEloquentQuery()->where('segment_type', 'geographic')->count()),
             'psychographic' => WidgetTab::make(__('campaign_customer_segments.tabs.psychographic'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('segment_type', 'psychographic'))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('segment_type', 'psychographic')->count()),
+                ->value(fn (): int => CampaignCustomerSegmentResource::getEloquentQuery()->where('segment_type', 'psychographic')->count()),
             'active' => WidgetTab::make(__('campaign_customer_segments.tabs.active'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_active', true))
-                ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_active', true)->count()),
+                ->value(fn (): int => CampaignCustomerSegmentResource::getEloquentQuery()->where('is_active', true)->count()),
         ];
     }
 }
