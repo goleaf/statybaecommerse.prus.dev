@@ -15,6 +15,9 @@ use Illuminate\Support\Carbon;
 use UnitEnum;
 final class EnhancedEcommerceOverview extends StatsOverviewWidget
 {
+    /**
+     * Navigation icon override (string|\BackedEnum|null).
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-presentation-chart-line';
 
     protected static $navigationLabel = 'Enh. E-commerce Overview';

@@ -21,7 +21,10 @@ use UnitEnum;
 
 final class CacheMaintenance extends Page
 {
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-server-stack';
+    /**
+     * Navigation icon override (string|\BackedEnum|null).
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-server-stack';
 
     public static function getNavigationGroup(): string|UnitEnum|null
     {

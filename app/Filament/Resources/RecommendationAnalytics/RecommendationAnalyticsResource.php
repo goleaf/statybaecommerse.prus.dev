@@ -15,7 +15,6 @@ use App\Models\RecommendationAnalytics;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
-use UnitEnum;
 
 final class RecommendationAnalyticsResource extends Resource
 {
@@ -23,13 +22,16 @@ final class RecommendationAnalyticsResource extends Resource
 
     protected static ?string $model = RecommendationAnalytics::class;
 
+    /**
+     * Navigation icon override (string|\BackedEnum|null).
+     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?int $navigationSort = 8;
 
     protected static ?string $recordTitleAttribute = 'action';
 
-    public static function getNavigationGroup(): string|UnitEnum|null
+    public static function getNavigationGroup(): ?string
     {
         return 'Analytics';
     }

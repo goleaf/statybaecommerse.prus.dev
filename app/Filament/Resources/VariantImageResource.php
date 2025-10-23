@@ -40,9 +40,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Storage;
-use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
-use UnitEnum;
 
 use function array_key_exists;
 
@@ -57,9 +54,15 @@ final class VariantImageResource extends Resource
 
     protected static ?string $model = VariantImage::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-photo';
+    /**
+     * Navigation icon override (string|\BackedEnum|null).
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-photo';
 
-    
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Inventory';
+    }
 
     protected static ?int $navigationSort = 15;
 
@@ -273,7 +276,7 @@ final class VariantImageResource extends Resource
                     ->label(__('admin.variant_images.file_size'))
                     ->formatStateUsing(function ($state) {
                         if ($state) {
-                            return number_format($state / 1024, 2).' KB';
+                            return number_format($state / 1024, 2) . ' KB';
                         }
 
                         return '-';
