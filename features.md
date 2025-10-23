@@ -17,16 +17,14 @@
 - Focused PHPUnit runs now auto-run pending migrations when the in-memory SQLite database is empty, keeping factories from hitting missing-table errors while generating deterministic email addresses.
 
 ## Storefront discovery
-- Search endpoint hardening now rejects suspicious SQL fragments and adds an explicit exact-match boost so precise catalogue queries surface first and malicious payloads return empty buckets.
+- Recently viewed endpoints now downgrade draft catalogue entries to ID-only payloads while keeping full media metadata for published products, so guest history panels stay deterministic without leaking unpublished product details.
 - Search type filters now normalise mixed-case identifiers from clients, ensuring storefront queries stay restricted to the requested product, category, or brand buckets instead of ballooning to every result group.
 
 ## API contracts
 - OpenAPI documentation now mirrors the lean product meta payload and nullable media thumbnails emitted by the presenter, keeping schema validators and client SDKs in sync with production responses.
 
 ## Admin panel resilience
-- Campaign click factories now guard related lookups and PHPUnit targets the shared SQLite database file, eliminating the missing-table exceptions that previously interrupted API campaign listing tests during fresh runs.
-- Reintroduced the core `App\\Exceptions\\Handler` class so the application reports exceptions normally instead of crashing with `Whoops\\Run::handleShutdown()` during bootstrap.
-- Customer and product sparkline widgets now reuse the cached analytics series and expose matching dataset checksums, ensuring inline charts and regression tests evaluate the same trends.
+- The base test harness now resets Laravel's refresh state before each boot cycle so in-memory SQLite migrations execute for every PHPUnit suite, eliminating the missing table errors that previously surfaced in feature tests.
 - The custom Edit Profile page now imports `Filament\\Schemas\\Schema`, keeping the authentication profile form aligned with v4 expectations and preventing namespace-related fatal errors during automated test cycles.
 - Discount Redemption navigation now lives under the Marketing group with a warning badge and Filament v4 badge styling, and the Pest harness includes a HasTable-aware stub so table schemas are exercised reliably in unit tests.
 - Pest test bootstrap helpers now guard the `login()`, `get()`, and `post()` helpers with function-existence checks so repeated includes during `php artisan test` runs no longer trigger fatal redeclaration errors.

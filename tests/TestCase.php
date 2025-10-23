@@ -10,6 +10,7 @@ use Filament\Panel;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Illuminate\Contracts\Translation\Loader as TranslationLoader;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
+use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -29,6 +30,7 @@ abstract class TestCase extends BaseTestCase
 
     protected function setUp(): void
     {
+        // Reset the refresh state before Laravel boots so feature tests always run migrations.
         RefreshDatabaseState::$migrated = false;
 
         parent::setUp();
@@ -51,8 +53,8 @@ abstract class TestCase extends BaseTestCase
         }
 
         Config::set('database.default', 'sqlite');
-        Config::set('database.connections.sqlite.database', database_path('testing.sqlite'));
-        Config::set('app.key', 'base64:'.base64_encode(random_bytes(32)));
+        Config::set('database.connections.sqlite.database', ':memory:');
+        Config::set('app.key', 'base64:' . base64_encode(random_bytes(32)));
         // Ensure Telescope doesn't use MySQL during tests and avoid watchers overhead
         Config::set('telescope.enabled', false);
         Config::set('telescope.storage.database.connection', 'sqlite');
