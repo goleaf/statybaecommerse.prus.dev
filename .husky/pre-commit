@@ -1,6 +1,5 @@
-#!/usr/bin/env sh
-# Load Husky's helper which wires up PATH before running our quality gates.
-. "$(dirname -- "$0")/_/h"
+#!/bin/sh
+# Husky pre-commit hook executes local QA commands without relying on the deprecated bootstrap helper.
 
 set -eu
 
@@ -9,14 +8,15 @@ TMP_STAGED_JS=$(mktemp)
 TMP_STAGED_PRETTIER=$(mktemp)
 trap 'rm -f "$TMP_STAGED_PHP" "$TMP_STAGED_JS" "$TMP_STAGED_PRETTIER"' EXIT
 
-git diff --cached --name-only --diff-filter=ACMR -- '*.php' > "$TMP_STAGED_PHP"
-git diff --cached --name-only --diff-filter=ACMR -z -- '*.js' '*.jsx' '*.ts' '*.tsx' > "$TMP_STAGED_JS"
-git diff --cached --name-only --diff-filter=ACMR -z -- '*.js' '*.jsx' '*.ts' '*.tsx' '*.css' '*.scss' '*.json' '*.md' > "$TMP_STAGED_PRETTIER"
-
 PINT="vendor/bin/pint"
 PHPSTAN="vendor/bin/phpstan"
 ESLINT="node_modules/.bin/eslint"
 PRETTIER="node_modules/.bin/prettier"
+
+# Collect staged file paths for targeted tooling runs.
+git diff --cached --name-only --diff-filter=ACMR -- '*.php' > "$TMP_STAGED_PHP"
+git diff --cached --name-only --diff-filter=ACMR -z -- '*.js' '*.jsx' '*.ts' '*.tsx' > "$TMP_STAGED_JS"
+git diff --cached --name-only --diff-filter=ACMR -z -- '*.js' '*.jsx' '*.ts' '*.tsx' '*.css' '*.scss' '*.json' '*.md' > "$TMP_STAGED_PRETTIER"
 
 if [ -s "$TMP_STAGED_PHP" ]; then
     if [ ! -x "$PINT" ]; then

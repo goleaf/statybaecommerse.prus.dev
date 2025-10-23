@@ -1,6 +1,5 @@
-#!/usr/bin/env sh
-# Use Husky's helper to keep PATH enriched before running Composer's CI suite.
-. "$(dirname -- "$0")/_/h"
+#!/bin/sh
+# Husky pre-push hook verifies the Composer CI suite without legacy Husky bootstrapping.
 
 set -eu
 
