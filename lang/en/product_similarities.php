@@ -7,36 +7,28 @@ return [
     'plural' => 'Product Similarities',
     'single' => 'Product Similarity',
 
-    'sections' => [
-        'products'            => 'Products',
-        'similarity_details'  => 'Similarity Details',
-        'metadata'            => 'Metadata',
-    ],
+    'basic_information' => 'Similarity Details',
 
-    'fields' => [
-        'product'            => 'Product',
-        'similar_product'    => 'Similar Product',
-        'algorithm_type'     => 'Algorithm Type',
-        'similarity_score'   => 'Similarity Score',
-        'calculation_data'   => 'Calculation Data',
-        'data_point_key'     => 'Key',
-        'data_point_value'   => 'Value',
-        'calculated_at'      => 'Calculated At',
-        'created_at'         => 'Created At',
-        'updated_at'         => 'Updated At',
-        'min_score'          => 'Minimum Score',
-        'max_score'          => 'Maximum Score',
-        'calculated_from'    => 'Calculated From',
-        'calculated_until'   => 'Calculated Until',
-    ],
+    'product'          => 'Product',
+    'similar_product'  => 'Similar Product',
+    'algorithm_type'   => 'Algorithm Type',
+    'similarity_score' => 'Similarity Score',
+    'calculation_data' => 'Calculation Data',
+    'calculation_data_help' => 'Optional metadata describing how the similarity score was calculated.',
+    'calculated_at'    => 'Calculated At',
+    'created_at'       => 'Created At',
+    'updated_at'       => 'Updated At',
 
-    'actions' => [
-        'add_data_point' => 'Add data point',
+    'filters' => [
+        'product'         => 'Product',
+        'similar_product' => 'Similar Product',
+        'algorithm_type'  => 'Algorithm Type',
+        'min_score'       => 'Minimum Score',
+        'max_score'       => 'Maximum Score',
     ],
 
     'algorithm_types' => [
-        'cosine_similarity'   => 'Cosine Similarity',
-        'jaccard_similarity'  => 'Jaccard Similarity',
-        'pearson_correlation' => 'Pearson Correlation',
+        'cosine'  => 'Cosine Similarity',
+        'jaccard' => 'Jaccard Similarity',
     ],
 ];
