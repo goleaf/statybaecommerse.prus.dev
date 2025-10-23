@@ -17,9 +17,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
-use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -308,6 +306,15 @@ final class ReferralCodeResource extends Resource
             'create' => Pages\CreateReferralCode::route('/create'),
             'view'   => Pages\ViewReferralCode::route('/{record}'),
             'edit'   => Pages\EditReferralCode::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            \App\Filament\Resources\ReferralCodeResource\Widgets\ReferralCodeStatsWidget::class,
+            \App\Filament\Resources\ReferralCodeResource\Widgets\ReferralCodeUsageChartWidget::class,
+            \App\Filament\Resources\ReferralCodeResource\Widgets\TopReferralCodesWidget::class,
         ];
     }
 
