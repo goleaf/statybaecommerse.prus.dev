@@ -6,12 +6,14 @@ namespace App\Http\Middleware;
 
 use App\Models\ApiKey;
 use Closure;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 final class EnsurePartnerApiScope
 {
+    /**
+     * @param Closure(Request): Response $next
+     */
     public function handle(Request $request, Closure $next, string ...$scopes): Response
     {
         if ($scopes === []) {
@@ -21,23 +23,25 @@ final class EnsurePartnerApiScope
         $apiKey = $request->attributes->get('partner_api_key');
 
         if (! $apiKey instanceof ApiKey) {
+            // Exit early with an unauthorized response when the middleware pipeline lacks a key.
             return $this->reject('Missing partner API key.', Response::HTTP_UNAUTHORIZED);
         }
 
-        if (! $apiKey->hasAnyScope($scopes)) {
+        $normalizedScopes = array_values($scopes);
+
+        if (! $apiKey->hasAnyScope($normalizedScopes)) {
+            // Communicate that the key exists but does not satisfy the requested scope set.
             return $this->reject('Insufficient partner API permissions.', Response::HTTP_FORBIDDEN);
         }
 
-        $request->attributes->set('partner_api_required_scopes', array_values($scopes));
+        $request->attributes->set('partner_api_required_scopes', $normalizedScopes);
 
         return $next($request);
     }
 
-    /**
-     * Return a consistent JSON structure when scope validation fails.
-     */
-    private function reject(string $message, int $status): JsonResponse
+    private function reject(string $message, int $status): Response
     {
+        // Mirror the API response contract consumed by partner integrations.
         return response()->json([
             'message' => $message,
         ], $status);

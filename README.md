@@ -39,9 +39,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 -### Latest updates
-- Livewire component tests now auto-assign Filament resources and inject lightweight
-  table markup, allowing base `ListRecords`/`ViewRecord` assertions to run without
-  patching vendor classes while CampaignView coverage stays green.
+- Partner API middleware now returns structured JSON responses for missing keys, insufficient scopes, and rate limit breaches so external integrations and the regression suite receive the documented status codes instead of 500 errors.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
 - Attribute group selectors now reuse a shared translation helper so historical slugs render as human-readable labels across Filament forms, filters, and tables instead of exposing raw keys.
