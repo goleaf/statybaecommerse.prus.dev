@@ -55,7 +55,7 @@ final class AutocompleteSelect extends Select
         return parent::make($name);
     }
 
-    public function searchable(Closure|array|bool $condition = true): static
+    public function searchable(bool|Closure $condition = true): static
     {
         parent::searchable($condition);
 
@@ -114,16 +114,12 @@ final class AutocompleteSelect extends Select
 
         $modelClass = match (true) {
             $evaluatedModel instanceof Model => $evaluatedModel::class,
-            is_string($evaluatedModel)       => $evaluatedModel,
-            default                          => null,
+            is_string($evaluatedModel) => $evaluatedModel,
+            default => null,
         };
 
         if ($modelClass !== null) {
             parent::model($modelClass);
-        }
-
-        if ($modelClass !== $this->modelClass) {
-            $this->resetSearchState();
         }
 
         $this->modelClass = $modelClass;
