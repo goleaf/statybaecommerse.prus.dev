@@ -40,7 +40,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use UnitEnum;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 final class ReferralRewardResource extends Resource
 {
@@ -124,10 +124,10 @@ final class ReferralRewardResource extends Resource
                                 'cancelled' => __('referral_rewards.status.cancelled'),
                             ])
                             ->required(),
-                        Flatpickr::make('applied_at')->asDate()
+                        Flatpickr::makeDate('applied_at')
                             ->label(__('referral_rewards.fields.applied_at'))
                             ->nullable(),
-                        Flatpickr::make('expires_at')->asDate()
+                        Flatpickr::makeDate('expires_at')
                             ->label(__('referral_rewards.fields.expires_at'))
                             ->nullable(),
                         TextInput::make('title')

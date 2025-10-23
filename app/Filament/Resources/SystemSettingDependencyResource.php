@@ -38,7 +38,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\Rule;
 use UnitEnum;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 final class SystemSettingDependencyResource extends Resource
 {
@@ -128,7 +128,7 @@ final class SystemSettingDependencyResource extends Resource
                                 ->label(__('admin.system_setting_dependencies.is_active'))
                                 ->default(true)
                                 ->helperText(__('admin.system_setting_dependencies.is_active_help')),
-                            Flatpickr::make('created_at')->asDateTime()
+                            Flatpickr::makeDateTime('created_at')
                                 ->label(__('admin.common.created_at'))
                                 ->disabled()
                                 ->dehydrated(false)
@@ -238,9 +238,9 @@ final class SystemSettingDependencyResource extends Resource
                     ->label(__('admin.system_setting_dependencies.is_active')),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::make('created_from')->asDateTime()
+                        Flatpickr::makeDateTime('created_from')
                             ->label(__('admin.common.created_from')),
-                        Flatpickr::make('created_until')->asDateTime()
+                        Flatpickr::makeDateTime('created_until')
                             ->label(__('admin.common.created_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
@@ -256,9 +256,9 @@ final class SystemSettingDependencyResource extends Resource
                     }),
                 Filter::make('updated_at')
                     ->form([
-                        Flatpickr::make('updated_from')->asDateTime()
+                        Flatpickr::makeDateTime('updated_from')
                             ->label(__('admin.common.updated_from')),
-                        Flatpickr::make('updated_until')->asDateTime()
+                        Flatpickr::makeDateTime('updated_until')
                             ->label(__('admin.common.updated_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

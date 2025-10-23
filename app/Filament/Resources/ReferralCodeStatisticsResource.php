@@ -24,7 +24,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 /**
  * ReferralCodeStatisticsResource
@@ -74,7 +74,7 @@ final class ReferralCodeStatisticsResource extends Resource
                                     ->relationship('referralCode', 'code')
                                     ->required()
                                     ->searchable(),
-                                Flatpickr::make('date')->asDate()
+                                Flatpickr::makeDate('date')
                                     ->label(__('admin.referral_code_statistics.date'))
                                     ->required()
                                     ->default(now()),

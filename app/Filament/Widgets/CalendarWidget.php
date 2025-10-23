@@ -24,7 +24,7 @@ use Illuminate\Support\Str;
 use Saade\FilamentFullCalendar\Actions;
 use Saade\FilamentFullCalendar\Data\EventData;
 use Saade\FilamentFullCalendar\Widgets\FullCalendarWidget;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 final class CalendarWidget extends FullCalendarWidget
 {
@@ -162,10 +162,10 @@ final class CalendarWidget extends FullCalendarWidget
             Toggle::make('is_featured')
                 ->label($this->translate('campaigns.fields.is_featured', 'Featured'))
                 ->default(false),
-            Flatpickr::make('starts_at')->asDateTime()
+            Flatpickr::makeDateTime('starts_at')
                 ->label($this->translate('campaigns.fields.start_date', 'Start date'))
                 ->seconds(false),
-            Flatpickr::make('ends_at')->asDateTime()
+            Flatpickr::makeDateTime('ends_at')
                 ->label($this->translate('campaigns.fields.end_date', 'End date'))
                 ->seconds(false),
         ];

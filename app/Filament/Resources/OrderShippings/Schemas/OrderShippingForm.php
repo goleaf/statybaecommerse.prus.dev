@@ -11,7 +11,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 class OrderShippingForm
 {
@@ -53,9 +53,9 @@ class OrderShippingForm
                 TextInput::make('tracking_url')
                     ->url()
                     ->maxLength(500),
-                Flatpickr::make('shipped_at')->asDateTime(),
-                Flatpickr::make('estimated_delivery')->asDateTime(),
-                Flatpickr::make('delivered_at')->asDateTime(),
+                Flatpickr::makeDateTime('shipped_at'),
+                Flatpickr::makeDateTime('estimated_delivery'),
+                Flatpickr::makeDateTime('delivered_at'),
                 TextInput::make('weight')
                     ->numeric()
                     ->step(0.001)

@@ -24,7 +24,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 /**
  * RecommendationAnalyticsResource
@@ -109,7 +109,7 @@ final class RecommendationAnalyticsResource extends Resource
                                     ])
                                     ->required()
                                     ->default('view'),
-                                Flatpickr::make('date')->asDate()
+                                Flatpickr::makeDate('date')
                                     ->label(__('admin.recommendation_analytics.date'))
                                     ->required()
                                     ->default(now()),

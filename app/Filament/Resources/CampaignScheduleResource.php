@@ -34,7 +34,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 final class CampaignScheduleResource extends Resource
 {
@@ -95,11 +95,11 @@ final class CampaignScheduleResource extends Resource
                                         ]),
                                     Grid::make(2)
                                         ->schema([
-                                            Flatpickr::make('next_run_at')->asDateTime()
+                                            Flatpickr::makeDateTime('next_run_at')
                                                 ->label(__('admin.campaign_schedules.form.fields.next_run_at'))
                                                 ->required()
                                                 ->columnSpan(1),
-                                            Flatpickr::make('last_run_at')->asDateTime()
+                                            Flatpickr::makeDateTime('last_run_at')
                                                 ->label(__('admin.campaign_schedules.form.fields.last_run_at'))
                                                 ->columnSpan(1),
                                         ]),

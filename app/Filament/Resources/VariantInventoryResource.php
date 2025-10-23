@@ -43,7 +43,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 /**
  * VariantInventoryResource
@@ -172,7 +172,7 @@ final class VariantInventoryResource extends Resource
                             ]),
                         Grid::make(2)
                             ->schema([
-                                Flatpickr::make('expiry_date')->asDate()
+                                Flatpickr::makeDate('expiry_date')
                                     ->label(__('admin.variant_inventory.expiry_date')),
                                 SearchableInput::make('supplier_id')
                                     ->label(__('admin.variant_inventory.supplier_id'))
@@ -266,9 +266,9 @@ final class VariantInventoryResource extends Resource
                             ]),
                         Grid::make(2)
                             ->schema([
-                                Flatpickr::make('last_restocked_at')->asDate()
+                                Flatpickr::makeDate('last_restocked_at')
                                     ->label(__('admin.variant_inventory.last_restocked_at')),
-                                Flatpickr::make('last_sold_at')->asDate()
+                                Flatpickr::makeDate('last_sold_at')
                                     ->label(__('admin.variant_inventory.last_sold_at')),
                             ]),
                     ]),

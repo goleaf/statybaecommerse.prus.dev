@@ -29,7 +29,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 /**
  * FeatureFlagResource
@@ -151,10 +151,10 @@ final class FeatureFlagResource extends Resource
                 ->components([
                     Grid::make(2)
                         ->components([
-                            Flatpickr::make('starts_at')->asDateTime()
+                            Flatpickr::makeDateTime('starts_at')
                                 ->label(__('feature_flags.starts_at'))
                                 ->nullable(),
-                            Flatpickr::make('ends_at')->asDateTime()
+                            Flatpickr::makeDateTime('ends_at')
                                 ->label(__('feature_flags.ends_at'))
                                 ->nullable(),
                         ]),

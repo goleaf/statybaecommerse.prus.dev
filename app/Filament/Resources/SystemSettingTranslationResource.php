@@ -50,7 +50,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Throwable;
 use UnitEnum;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 /**
  * SystemSettingTranslationResource
@@ -359,8 +359,8 @@ final class SystemSettingTranslationResource extends Resource
                 Filter::make('created_at')
                     ->label(__('admin.common.created_at'))
                     ->form([
-                        Flatpickr::make('from')->asDate()->label(__('admin.common.from')),
-                        Flatpickr::make('until')->asDate()->label(__('admin.common.until')),
+                        Flatpickr::makeDate('from')->label(__('admin.common.from')),
+                        Flatpickr::makeDate('until')->label(__('admin.common.until')),
                     ])
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];

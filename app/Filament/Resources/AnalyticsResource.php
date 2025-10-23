@@ -15,14 +15,13 @@ use Filament\Tables\Columns\Summaries\Average;
 use Filament\Tables\Columns\Summaries\Sum;
 use Filament\Tables\Columns\TextColumn;
 use App\Support\Filament\Filters\DateRangeFilter;
-use App\Support\Filament\Forms\Components\Flatpickr;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 final class AnalyticsResource extends Resource
 {
@@ -154,9 +153,11 @@ final class AnalyticsResource extends Resource
                 Filter::make('created_at')
                     ->label(__('analytics.order_date_range'))
                     ->form([
-                        Flatpickr::make('created_from')->datePicker()
+                        Flatpickr::makeRange('range')
                             ->label(__('analytics.from_date'))
-                            ->asDateRange('Y-m-d'),
+                            
+                            ->format('Y-m-d')
+                            ->displayFormat('Y-m-d'),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,

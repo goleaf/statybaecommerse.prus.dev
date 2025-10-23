@@ -30,7 +30,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Lang;
 use UnitEnum;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 /**
  * UserPreferenceResource
@@ -91,7 +91,7 @@ final class UserPreferenceResource extends Resource
                     ->maxValue(1)
                     ->step(0.000001)
                     ->default(0),
-                Flatpickr::make('last_updated')->asDateTime()
+                Flatpickr::makeDateTime('last_updated')
                     ->label(__('admin.user_preferences.last_updated'))
                     ->default(now()),
                 KeyValue::make('metadata')

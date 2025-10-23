@@ -36,7 +36,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Number;
 use UnitEnum;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 /**
  * VariantPricingRuleResource
@@ -168,9 +168,9 @@ final class VariantPricingRuleResource extends Resource
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                                Flatpickr::make('valid_from')->asDateTime()
+                                Flatpickr::makeDateTime('valid_from')
                                     ->label(__('variant_pricing_rules.valid_from')),
-                                Flatpickr::make('valid_until')->asDateTime()
+                                Flatpickr::makeDateTime('valid_until')
                                     ->label(__('variant_pricing_rules.valid_until')),
                             ]),
                     ]),

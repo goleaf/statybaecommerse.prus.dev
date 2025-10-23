@@ -47,7 +47,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
 use UnitEnum;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 /**
  * ProductVariantResource
@@ -237,9 +237,9 @@ final class ProductVariantResource extends Resource
                                             ]),
                                         Grid::make(2)
                                             ->schema([
-                                                Flatpickr::make('sale_start_date')->asDateTime()
+                                                Flatpickr::makeDateTime('sale_start_date')
                                                     ->label(__('product_variants.fields.sale_start_date')),
-                                                Flatpickr::make('sale_end_date')->asDateTime()
+                                                Flatpickr::makeDateTime('sale_end_date')
                                                     ->label(__('product_variants.fields.sale_end_date')),
                                             ]),
                                     ]),

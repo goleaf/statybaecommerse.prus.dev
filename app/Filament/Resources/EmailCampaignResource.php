@@ -25,7 +25,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 final class EmailCampaignResource extends Resource
 {
@@ -95,7 +95,7 @@ final class EmailCampaignResource extends Resource
                         ]),
                     Grid::make(2)
                         ->schema([
-                            Flatpickr::make('scheduled_at')->asDateTime()
+                            Flatpickr::makeDateTime('scheduled_at')
                                 ->label(__('admin.email_campaigns.scheduled_at')),
                             Toggle::make('is_active')
                                 ->label(__('admin.email_campaigns.is_active'))

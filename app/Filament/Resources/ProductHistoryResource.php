@@ -27,7 +27,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use UnitEnum;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 final class ProductHistoryResource extends Resource
 {
@@ -173,9 +173,9 @@ final class ProductHistoryResource extends Resource
                 Filter::make('date')
                     ->label(__('product_history.date'))
                     ->form([
-                        Flatpickr::make('from')->asDate()
+                        Flatpickr::makeDate('from')
                             ->label(__('product_history.from')),
-                        Flatpickr::make('until')->asDate()
+                        Flatpickr::makeDate('until')
                             ->label(__('product_history.until')),
                     ])
                     ->indicateUsing(function (array $data): array {

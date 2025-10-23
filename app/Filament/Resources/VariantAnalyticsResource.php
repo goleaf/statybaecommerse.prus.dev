@@ -47,7 +47,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use BackedEnum;
 use UnitEnum;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 
 /**
  * VariantAnalyticsResource
@@ -121,7 +121,7 @@ final class VariantAnalyticsResource extends Resource
                                                             }
                                                         }
                                                     }),
-                                                Flatpickr::make('date')->asDate()
+                                                Flatpickr::makeDate('date')
                                                     ->label(__('admin.variant_analytics.date'))
                                                     ->required()
                                                     ->default(now())
@@ -494,9 +494,9 @@ final class VariantAnalyticsResource extends Resource
                     ->label(__('admin.variant_analytics.date')),
                 Tables\Filters\Filter::make('date_range')
                     ->form([
-                        Flatpickr::make('date_from')->asDate()
+                        Flatpickr::makeDate('date_from')
                             ->label(__('admin.variant_analytics.date_from')),
-                        Flatpickr::make('date_until')->asDate()
+                        Flatpickr::makeDate('date_until')
                             ->label(__('admin.variant_analytics.date_until')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

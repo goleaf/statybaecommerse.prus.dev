@@ -36,7 +36,7 @@ use UnitEnum;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 use UnitEnum;
-use App\Support\Filament\Forms\Components\Flatpickr;
+use App\Support\Filament\Components\Flatpickr;
 class SliderManagement extends Page implements HasActions, HasForms
 {
     use InteractsWithActions, InteractsWithForms;
@@ -271,10 +271,10 @@ class SliderManagement extends Page implements HasActions, HasForms
                 Section::make(__('translations.scheduling'))
                     ->components([
                         Grid::make(2)->components([
-                            Flatpickr::make('start_date')->asDateTime()
+                            Flatpickr::makeDateTime('start_date')
                                 ->label(__('translations.start_date'))
                                 ->default(now()),
-                            Flatpickr::make('end_date')->asDateTime()
+                            Flatpickr::makeDateTime('end_date')
                                 ->label(__('translations.end_date'))
                                 ->after('start_date'),
                         ]),
