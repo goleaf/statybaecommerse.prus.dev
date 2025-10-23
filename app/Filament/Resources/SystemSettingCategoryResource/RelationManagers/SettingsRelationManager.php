@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingCategoryResource\RelationManagers;
 
+use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -11,18 +16,14 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Actions\CreateAction;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Str;
+use Illuminate\Support\Str;
 
 final class SettingsRelationManager extends BaseRelationManager
 {
@@ -46,7 +47,7 @@ final class SettingsRelationManager extends BaseRelationManager
                                 ->required()
                                 ->maxLength(255)
                                 ->live()
-                                ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state)))
+                                ->afterStateUpdated(fn (?string $state, Set $set) => $set('slug', Str::slug($state ?? '')))
                                 ->helperText(__('system_setting_categories.settings.key_help')),
 
                             TextInput::make('slug')
@@ -141,11 +142,9 @@ final class SettingsRelationManager extends BaseRelationManager
                     ->searchable()
                     ->sortable()
                     ->limit(50)
-                    ->tooltip(function (TextColumn $column): ?string {
-                        $state = $column->getState();
-
-                        return strlen($state) > 50 ? $state : null;
-                    }),
+                    ->tooltip(fn (TextColumn $column): ?string => (is_string($state = $column->getState()) && strlen($state) > 50)
+                        ? $state
+                        : null),
 
                 TextColumn::make('type')
                     ->label(__('system_setting_categories.settings.type'))
@@ -168,21 +167,17 @@ final class SettingsRelationManager extends BaseRelationManager
                 TextColumn::make('default_value')
                     ->label(__('system_setting_categories.settings.default_value'))
                     ->limit(30)
-                    ->tooltip(function (TextColumn $column): ?string {
-                        $state = $column->getState();
-
-                        return strlen($state) > 30 ? $state : null;
-                    })
+                    ->tooltip(fn (TextColumn $column): ?string => (is_string($state = $column->getState()) && strlen($state) > 30)
+                        ? $state
+                        : null)
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('description')
                     ->label(__('system_setting_categories.settings.description'))
                     ->limit(50)
-                    ->tooltip(function (TextColumn $column): ?string {
-                        $state = $column->getState();
-
-                        return strlen($state) > 50 ? $state : null;
-                    })
+                    ->tooltip(fn (TextColumn $column): ?string => (is_string($state = $column->getState()) && strlen($state) > 50)
+                        ? $state
+                        : null)
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 IconColumn::make('is_active')

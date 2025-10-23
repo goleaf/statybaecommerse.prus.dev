@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingCategoryResource\RelationManagers;
 
+use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -11,18 +16,15 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Actions\CreateAction;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Str;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 
 final class ChildrenRelationManager extends BaseRelationManager
 {
@@ -46,7 +48,7 @@ final class ChildrenRelationManager extends BaseRelationManager
                                 ->required()
                                 ->maxLength(255)
                                 ->live()
-                                ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state)))
+                                ->afterStateUpdated(fn (?string $state, Set $set) => $set('slug', Str::slug($state ?? '')))
                                 ->helperText(__('system_setting_categories.children.name_help')),
                             TextInput::make('slug')
                                 ->label(__('system_setting_categories.children.slug'))
@@ -109,11 +111,9 @@ final class ChildrenRelationManager extends BaseRelationManager
                 TextColumn::make('description')
                     ->label(__('system_setting_categories.children.description'))
                     ->limit(50)
-                    ->tooltip(function (TextColumn $column): ?string {
-                        $state = $column->getState();
-
-                        return strlen($state) > 50 ? $state : null;
-                    })
+                    ->tooltip(fn (TextColumn $column): ?string => (is_string($state = $column->getState()) && strlen($state) > 50)
+                        ? $state
+                        : null)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('icon')
                     ->label(__('system_setting_categories.children.icon'))
@@ -130,7 +130,7 @@ final class ChildrenRelationManager extends BaseRelationManager
                     ->color('primary'),
                 TextColumn::make('active_settings_count')
                     ->label(__('system_setting_categories.children.active_settings_count'))
-                    ->counts(['settings' => fn ($query) => $query->where('is_active', true)])
+                    ->counts(['settings' => fn (Builder $query): Builder => $query->where('is_active', true)])
                     ->sortable()
                     ->badge()
                     ->color('success'),
