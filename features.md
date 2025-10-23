@@ -3,8 +3,12 @@
 ## Fulfilment & Logistics
 - Shipping option delivery ranges in the Filament admin now display a precise window even when carriers promise same-day (0 day) service or when only one bound is stored, helping staff quickly spot incomplete data.
 
-## Developer Experience
-- Restored Husky's bootstrap shim so repository Git hooks continue invoking Pint, PHPUnit, and other local tooling without manual setup, while still explaining the upcoming v10 deprecation change to contributors.
+## Admin panel resilience
+- Filament navigation icons once again use docblock overrides so enum-aware navigation metadata loads without typed property collisions introduced in PR #1098.
+- Variant stock history tables consolidate destructive change reasons under the `danger` badge, keeping badge colors predictable for both `damage` and `theft` events.
+
+## Tooling polish
+- The `data:import` Artisan command now documents its signature and description directly on the command class, improving discoverability via `php artisan list`.
 
 ## Reference
 - Review `app/Filament/Resources/ShippingOptionResource.php` for the table presentation logic and `app/Models/ShippingOption.php` for the accessor reused across storefront components.

@@ -16,6 +16,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Updated the Feature Flag resource to bypass active/enabled scopes so administrators can review inactive toggles directly from the listing view.
 * Restored the Husky bootstrap shim so Git hooks keep executing with the repository's local toolchain while still surfacing the upstream v10 deprecation guidance.
 * Ensured the User Product Interaction Filament resource now returns concrete `Form`/`Table` instances so Filament v4 boots without schema contract errors during analytics validation.
+* Normalized Filament navigation icon overrides to rely on docblocks, consolidated variant stock danger badges, and refreshed the `data:import` command metadata to resolve regressions from PR #1098.
 
 ### Bug Fixes
 * Ensured the price list discount filter only surfaces items where the compare price actually exceeds the net price and added coverage to guard the behaviour going forward.

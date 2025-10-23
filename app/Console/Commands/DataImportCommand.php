@@ -13,13 +13,17 @@ final class DataImportCommand extends Command
 {
     /**
      * Artisan signature for triggering the consolidated data import pipeline.
+     *
+     * @var string
      */
-    protected string $signature = 'data:import';
+    protected $signature = 'data:import';
 
     /**
      * Human readable description surfaced in `php artisan list` for discoverability.
+     *
+     * @var string
      */
-    protected string $description = 'Import data into the application.';
+    protected $description = 'Import data into the application.';
 
     public function handle(): int
     {
