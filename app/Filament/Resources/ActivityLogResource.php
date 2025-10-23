@@ -10,6 +10,7 @@ use App\Filament\Resources\ActivityLogResource\Pages;
 use App\Models\ActivityLog;
 use BackedEnum;
 use Filament\Actions\Action;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
@@ -17,12 +18,11 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Model;
 use UnitEnum;
 
 final class ActivityLogResource extends Resource
 {
-    protected static string|UnitEnum|null $navigationGroup = 'System';
-
     protected static ?string $model = ActivityLog::class;
 
     protected static ?int $navigationSort = 9;
@@ -34,6 +34,18 @@ final class ActivityLogResource extends Resource
     protected static ?string $modelLabel = null;
 
     protected static ?string $pluralModelLabel = null;
+
+    protected static ?string $recordTitleAttribute = 'description';
+
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return __('navigation.groups.system');
+    }
+
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-document-text';
+    }
 
     public static function getNavigationLabel(): string
     {
@@ -48,6 +60,11 @@ final class ActivityLogResource extends Resource
     public static function getPluralModelLabel(): string
     {
         return __('activity_logs.plural');
+    }
+
+    public static function form(Form $form): Form
+    {
+        return $form->schema([]);
     }
 
     /**
@@ -150,7 +167,7 @@ final class ActivityLogResource extends Resource
             $key = $record->getKey();
 
             if ($key !== null) {
-                return __('activity_logs.single') . ' #' . $key;
+                return __('activity_logs.single').' #'.$key;
             }
         }
 
