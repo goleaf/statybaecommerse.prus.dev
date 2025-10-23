@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\ReportResource\Pages;
 use App\Models\Report;
 use BackedEnum;
@@ -41,19 +38,12 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Str;
-use UnitEnum;
 
 final class ReportResource extends Resource
 {
-    use HasNav;
-
-    /**
-     * @var UnitEnum|string|null
-     */
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): string
     {
-        return NavigationGroup::Reports;
+        return __('navigation.groups.analytics');
     }
 
     protected static ?string $model = Report::class;
@@ -415,7 +405,7 @@ final class ReportResource extends Resource
                                     $action->reportBulkProcessingSuccessfulRecordsCount(
                                         $action->getSelectedRecordsQuery()->forceDelete(),
                                     );
-                                } catch (Throwable $exception) {
+                                } catch (\Throwable $exception) {
                                     $action->reportCompleteBulkProcessingFailure();
 
                                     report($exception);
@@ -429,7 +419,7 @@ final class ReportResource extends Resource
                             $records->each(function (Report $record) use ($action, &$isFirstException): void {
                                 try {
                                     $record->forceDelete() || $action->reportBulkProcessingFailure();
-                                } catch (Throwable $exception) {
+                                } catch (\Throwable $exception) {
                                     $action->reportBulkProcessingFailure();
 
                                     if ($isFirstException) {
@@ -588,10 +578,8 @@ final class ReportResource extends Resource
                         RepeatableEntry::make('filters')
                             ->label(__('reports.fields.filters'))
                             ->table([
-                                TableColumn::make('key')
-                                    ->label(__('reports.fields.filter_key')),
-                                TableColumn::make('value')
-                                    ->label(__('reports.fields.filter_value')),
+                                TableColumn::make(__('reports.fields.filter_key')),
+                                TableColumn::make(__('reports.fields.filter_value')),
                             ])
                             ->schema([
                                 TextEntry::make('key')
@@ -608,10 +596,8 @@ final class ReportResource extends Resource
                         RepeatableEntry::make('settings')
                             ->label(__('reports.fields.settings'))
                             ->table([
-                                TableColumn::make('key')
-                                    ->label(__('reports.fields.setting_key')),
-                                TableColumn::make('value')
-                                    ->label(__('reports.fields.setting_value')),
+                                TableColumn::make(__('reports.fields.setting_key')),
+                                TableColumn::make(__('reports.fields.setting_value')),
                             ])
                             ->schema([
                                 TextEntry::make('key')
@@ -628,10 +614,8 @@ final class ReportResource extends Resource
                         RepeatableEntry::make('metadata')
                             ->label(__('reports.fields.metadata'))
                             ->table([
-                                TableColumn::make('key')
-                                    ->label(__('reports.fields.metadata_key')),
-                                TableColumn::make('value')
-                                    ->label(__('reports.fields.metadata_value')),
+                                TableColumn::make(__('reports.fields.metadata_key')),
+                                TableColumn::make(__('reports.fields.metadata_value')),
                             ])
                             ->schema([
                                 TextEntry::make('key')

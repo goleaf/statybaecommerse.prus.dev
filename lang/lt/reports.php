@@ -109,6 +109,7 @@ return [
         'generate_all' => 'Generate selected',
         'activate_selected' => 'Activate selected',
         'deactivate_selected' => 'Deactivate selected',
+        'toggle_active' => 'Toggle active status',
         'add_filter' => 'Add filter',
         'add_setting' => 'Add setting',
         'add_metadata' => 'Add metadata',
@@ -120,6 +121,8 @@ return [
         'bulk_generated_successfully' => 'Selected reports were generated successfully.',
         'bulk_activated_successfully' => 'Selected reports were activated.',
         'bulk_deactivated_successfully' => 'Selected reports were deactivated.',
+        'activated' => 'Report activated successfully.',
+        'deactivated' => 'Report deactivated successfully.',
     ],
 
     'messages' => [
