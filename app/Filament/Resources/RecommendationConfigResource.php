@@ -23,7 +23,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Novadaemon\FilamentCombobox\Combobox;
+use Illuminate\Support\Collection;
 use UnitEnum;
 
 final class RecommendationConfigResource extends Resource
@@ -128,10 +128,11 @@ final class RecommendationConfigResource extends Resource
                                 ->multiple()
                                 ->preload()
                                 ->searchable()
-                                ->boxSearchs()
-                                ->height('360px')
-                                ->formatStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state)
-                                ->dehydrateStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state)
+                                ->formatStateUsing(static fn ($state) => $state instanceof Collection
+                                    ? $state->sort()->values()->all()
+                                    : (is_array($state)
+                                        ? array_values(collect($state)->sort()->all())
+                                        : $state))
                                 ->native(false),
                             Combobox::make('categories')
                                 ->label(__('recommendation_config.fields.categories'))
@@ -139,10 +140,11 @@ final class RecommendationConfigResource extends Resource
                                 ->multiple()
                                 ->preload()
                                 ->searchable()
-                                ->boxSearchs()
-                                ->height('360px')
-                                ->formatStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state)
-                                ->dehydrateStateUsing(fn ($state) => is_array($state) ? array_values(collect($state)->sort()->all()) : $state)
+                                ->formatStateUsing(static fn ($state) => $state instanceof Collection
+                                    ? $state->sort()->values()->all()
+                                    : (is_array($state)
+                                        ? array_values(collect($state)->sort()->all())
+                                        : $state))
                                 ->native(false),
                         ]),
                 ]),
@@ -151,6 +153,18 @@ final class RecommendationConfigResource extends Resource
 
     public static function table(Table $table): Table
     {
+        /** @var \Filament\Actions\BulkAction $activateAction */
+        $activateAction = BulkAction::make('activate')
+            ->label(__('recommendation_config.actions.activate'))
+            ->requiresConfirmation()
+            ->action(fn (Collection $records) => $records->each->update(['is_active' => true]));
+
+        /** @var \Filament\Actions\BulkAction $deactivateAction */
+        $deactivateAction = BulkAction::make('deactivate')
+            ->label(__('recommendation_config.actions.deactivate'))
+            ->requiresConfirmation()
+            ->action(fn (Collection $records) => $records->each->update(['is_active' => false]));
+
         return $table
             ->columns([
                 TextColumn::make('name')
@@ -191,14 +205,8 @@ final class RecommendationConfigResource extends Resource
             ])
             ->bulkActions([
                 DeleteBulkAction::make(),
-                BulkAction::make('activate')
-                    ->label(__('recommendation_config.actions.activate'))
-                    ->requiresConfirmation()
-                    ->action(fn ($records) => $records->each->update(['is_active' => true])),
-                BulkAction::make('deactivate')
-                    ->label(__('recommendation_config.actions.deactivate'))
-                    ->requiresConfirmation()
-                    ->action(fn ($records) => $records->each->update(['is_active' => false])),
+                $activateAction,
+                $deactivateAction,
             ])
             ->defaultSort('created_at', 'desc');
     }
