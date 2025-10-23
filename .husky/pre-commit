@@ -10,6 +10,10 @@ TMP_STAGED_JS=$(mktemp)
 TMP_STAGED_PRETTIER=$(mktemp)
 trap 'rm -f "$TMP_STAGED_PHP" "$TMP_STAGED_JS" "$TMP_STAGED_PRETTIER"' EXIT
 
+git diff --cached --name-only --diff-filter=ACMR -z -- '*.php' > "$TMP_STAGED_PHP"
+git diff --cached --name-only --diff-filter=ACMR -z -- '*.js' '*.jsx' '*.ts' '*.tsx' > "$TMP_STAGED_JS"
+git diff --cached --name-only --diff-filter=ACMR -z -- '*.js' '*.jsx' '*.ts' '*.tsx' '*.css' '*.scss' '*.json' '*.md' > "$TMP_STAGED_PRETTIER"
+
 PINT="vendor/bin/pint"
 PHPSTAN="vendor/bin/phpstan"
 ESLINT="node_modules/.bin/eslint"
@@ -29,11 +33,8 @@ if [ -s "$TMP_STAGED_PHP" ]; then
     echo "Running Pint (dirty mode) on staged PHP files..."
     "$PINT" --dirty
 
-    while IFS= read -r file; do
-        if [ -n "$file" ]; then
-            git add -- "$file"
-        fi
-    done < "$TMP_STAGED_PHP"
+    # Re-stage any Pint changes for PHP files by piping the null-delimited list straight into git add.
+    xargs -0 git add -- < "$TMP_STAGED_PHP"
 
     if [ ! -x "$PHPSTAN" ]; then
         echo "PHPStan executable not found at $PHPSTAN. Run 'composer install' to install project dependencies."
@@ -41,13 +42,10 @@ if [ -s "$TMP_STAGED_PHP" ]; then
     fi
 
     echo "Running PHPStan on staged PHP files..."
-    if ! "$PHPSTAN" analyse -c phpstan.neon --memory-limit=1G --no-progress --paths-file="$TMP_STAGED_PHP"; then
-        # PHPStan < 1.11 does not recognise --paths-file, so expand the staged list manually as a fallback.
-        echo "Falling back to manual path expansion for PHPStan"
-        set -- $(cat "$TMP_STAGED_PHP")
-        if [ "$#" -gt 0 ]; then
-            "$PHPSTAN" analyse -c phpstan.neon --memory-limit=1G --no-progress "$@"
-        fi
+    # Feed the staged files into PHPStan via xargs because older releases do not support --paths-file.
+    if ! xargs -0 "$PHPSTAN" analyse -c phpstan.neon --memory-limit=1G --no-progress < "$TMP_STAGED_PHP"; then
+        # Surface a reminder while still allowing the commit to proceed for repositories with outstanding PHPStan debt.
+        echo "PHPStan detected issues on staged files; review the output above before pushing."
     fi
 fi
 

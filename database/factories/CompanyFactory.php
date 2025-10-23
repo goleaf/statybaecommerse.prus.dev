@@ -24,7 +24,7 @@ final class CompanyFactory extends Factory
         return [
             'name'     => fake()->company(),
             'email'    => fake()->unique()->safeEmail(),
-            'phone'    => fake()->phoneNumber(),
+            'phone'    => fake()->e164PhoneNumber(), // Use E.164 format to satisfy tel validation in admin forms.
             'address'  => fake()->address(),
             'website'  => fake()->url(),
             'industry' => fake()->randomElement([

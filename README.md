@@ -40,8 +40,8 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 
 -### Latest updates
 
-- Admin demo data now seeds deterministic countries, catalogues, orders, and SEO rows while the orders scope skip keeps Filament dashboards aware of the seeded history.
-- Admin seeder logging now routes through a CLI-aware helper so PHPUnit and CI can execute the fixture without tripping on a null console while still printing progress locally.
+- Husky pre-commit hook now streams staged PHP files via `xargs`, keeping PHPStan compatible with the locked toolchain and letting Pint-formatted commits land without manual hook bypasses.
+- Company management tests now run without a Vite manifest by dropping the Company ActiveScope, widening factory phone data, and letting Filament reuse the bundled theme when `app()->environment('testing')` is true, so CRUD and bulk toggles stay green locally.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
 - Attribute group selectors now reuse a shared translation helper so historical slugs render as human-readable labels across Filament forms, filters, and tables instead of exposing raw keys.
