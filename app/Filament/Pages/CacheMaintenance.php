@@ -21,9 +21,12 @@ use UnitEnum;
 
 final class CacheMaintenance extends Page
 {
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-server-stack';
+    /**
+     * @var string|BackedEnum|null
+     */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-server-stack';
 
-    protected static UnitEnum|string|null $navigationGroup = 'System';
+    protected static \UnitEnum|string|null $navigationGroup = 'System';
 
     protected static ?string $title = 'Cache Maintenance';
 
