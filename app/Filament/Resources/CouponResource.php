@@ -26,6 +26,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
+use LaraZeus\Quantity\Components\Quantity;
 
 final class CouponResource extends Resource
 {
@@ -118,21 +119,28 @@ final class CouponResource extends Resource
                 ->schema([
                     Grid::make(2)
                         ->schema([
-                            TextInput::make('usage_limit')
+                            Quantity::make('usage_limit')
                                 ->label(__('coupons.usage_limit'))
-                                ->numeric()
                                 ->minValue(1)
+                                ->steps(1)
                                 ->nullable()
                                 ->helperText(__('coupons.usage_limit_help')),
-                            TextInput::make('usage_limit_per_user')
+                            Quantity::make('usage_limit_per_user')
                                 ->label(__('coupons.usage_limit_per_user'))
-                                ->numeric()
                                 ->minValue(1)
+                                ->steps(1)
                                 ->nullable()
                                 ->helperText(__('coupons.usage_limit_per_user_help')),
-                            TextInput::make('used_count')
+                            Quantity::make('used_count')
                                 ->label(__('coupons.used_count'))
-                                ->numeric()
+                                ->minValue(0)
+                                ->steps(1)
+                                ->default(0)
+                                ->disabled(),
+                            Quantity::make('remaining_uses')
+                                ->label(__('coupons.remaining_uses'))
+                                ->minValue(0)
+                                ->steps(1)
                                 ->default(0)
                                 ->disabled(),
                         ]),
@@ -191,8 +199,8 @@ final class CouponResource extends Resource
                     ->limit(50),
                 TextColumn::make('type')
                     ->label(__('coupons.type'))
-                    ->formatStateUsing(fn (string $state): string => __("coupons.types.{$state}"))
-                    ->color(fn (string $state): string => match ($state) {
+                    ->formatStateUsing(fn (?string $state): string => $state ? __("coupons.types.{$state}") : '—')
+                    ->color(fn (?string $state): string => match ($state) {
                         'percentage'    => 'green',
                         'fixed'         => 'blue',
                         'free_shipping' => 'purple',
@@ -202,9 +210,15 @@ final class CouponResource extends Resource
                     ->label(__('coupons.value'))
                     ->formatStateUsing(function ($state, Coupon $record): string {
                         if ($record->type === 'percentage') {
-                            return $state . '%';
-                        } elseif ($record->type === 'free_shipping') {
+                            return is_null($state) ? '—' : $state . '%';
+                        }
+
+                        if ($record->type === 'free_shipping') {
                             return __('coupons.free_shipping');
+                        }
+
+                        if (is_null($state)) {
+                            return '—';
                         }
 
                         return '€' . number_format((float) $state, 2);

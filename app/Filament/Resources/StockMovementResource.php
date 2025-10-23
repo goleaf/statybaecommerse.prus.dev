@@ -28,6 +28,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use LaraZeus\Quantity\Components\Quantity;
 use UnitEnum;
 
 /**
@@ -88,9 +89,11 @@ final class StockMovementResource extends Resource
                         ]),
                     Grid::make(2)
                         ->components([
-                            TextInput::make('quantity')
+                            Quantity::make('quantity')
                                 ->label(__('stock_movement.fields.quantity'))
-                                ->numeric()
+                                ->minValue(1)
+                                ->steps(1)
+                                ->default(1)
                                 ->required(),
                             Select::make('type')
                                 ->label(__('stock_movement.fields.type'))
@@ -146,9 +149,9 @@ final class StockMovementResource extends Resource
                 TextColumn::make('type')
                     ->label(__('stock_movement.fields.type'))
                     ->badge()
-                    ->color(fn (?string $state): string => match ($state) {
-                        'in' => 'success',
-                        'out' => 'danger',
+                    ->color(fn (string $state): string => match ($state) {
+                        'in'         => 'success',
+                        'out'        => 'danger',
                         'adjustment' => 'warning',
                         'transfer'   => 'info',
                         default      => 'gray',
@@ -208,8 +211,8 @@ final class StockMovementResource extends Resource
         return [
             'index'  => Pages\ListStockMovements::route('/'),
             'create' => Pages\CreateStockMovement::route('/create'),
-            'view' => Pages\ViewStockMovement::route('/{record}'),
-            'edit' => Pages\EditStockMovement::route('/{record}/edit'),
+            'view'   => Pages\ViewStockMovement::route('/{record}'),
+            'edit'   => Pages\EditStockMovement::route('/{record}/edit'),
         ];
     }
 }

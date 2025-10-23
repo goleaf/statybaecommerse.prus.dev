@@ -21,7 +21,7 @@ use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
+use LaraZeus\Quantity\Components\Quantity;
 
 class StockMovementsRelationManager extends BaseRelationManager
 {
@@ -54,9 +54,11 @@ class StockMovementsRelationManager extends BaseRelationManager
     {
         return $schema
             ->components([
-                TextInput::make('quantity')
+                Quantity::make('quantity')
                     ->label(__('inventory.quantity'))
-                    ->numeric()
+                    ->minValue(1)
+                    ->steps(1)
+                    ->default(1)
                     ->required()
                     ->helperText(__('inventory.quantity_help')),
                 Select::make('type')

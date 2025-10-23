@@ -39,7 +39,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Str;
+use LaraZeus\Quantity\Components\Quantity;
 
 final class CartItemResource extends Resource
 {
@@ -158,23 +158,24 @@ final class CartItemResource extends Resource
                         ->disabled()
                         ->dehydrated(false),
                     Grid::make(2)
-                        ->schema([
-                            TextInput::make('quantity')
+                        ->components([
+                            Quantity::make('quantity')
                                 ->label(__('cart_items.quantity'))
-                                ->numeric()
                                 ->minValue(1)
+                                ->steps(1)
                                 ->default(1)
                                 ->required()
-                                ->afterStateUpdated(function ($state, Get $get, Set $set) {
+                                ->live()
+                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
                                     $unitPrice = (float) $get('unit_price');
                                     $quantity = (int) $state;
                                     $total = $unitPrice * $quantity;
                                     $set('total_price', number_format($total, 2, '.', ''));
                                 }),
-                            TextInput::make('minimum_quantity')
+                            Quantity::make('minimum_quantity')
                                 ->label(__('cart_items.minimum_quantity'))
-                                ->numeric()
                                 ->minValue(1)
+                                ->steps(1)
                                 ->default(1),
                         ]),
                     TextInput::make('session_id')
