@@ -5,14 +5,31 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Facades\DB;
+use InvalidArgumentException;
+use RuntimeException;
+use Stringable;
 
 final class DbAuditIndexesCommand extends Command
 {
     /**
+     * @var array<int, array{table: string, columns: array<int, string>, reason: string, enforce: bool}>
+     */
+    private const RECOMMENDATIONS = [
+        ['table' => 'orders', 'columns' => ['customer_id', 'status'], 'reason' => 'keeps CRM order status dashboards responsive', 'enforce' => false],
+        ['table' => 'orders', 'columns' => ['status', 'created_at'], 'reason' => 'accelerates fulfilment queues sorted by status and recency', 'enforce' => true],
+        ['table' => 'orders', 'columns' => ['customer_id', 'created_at'], 'reason' => 'supports retention reports per customer with date filters', 'enforce' => true],
+        ['table' => 'order_items', 'columns' => ['order_id', 'product_id'], 'reason' => 'optimises joins between orders and ordered products', 'enforce' => true],
+        ['table' => 'cart_items', 'columns' => ['cart_id', 'product_id'], 'reason' => 'stabilises storefront cart merges across sessions', 'enforce' => false],
+        ['table' => 'products', 'columns' => ['is_visible', 'price'], 'reason' => 'improves merchandising filters combining visibility and price', 'enforce' => true],
+        ['table' => 'products', 'columns' => ['category_id', 'is_visible'], 'reason' => 'speeds up catalogue category listings by visibility', 'enforce' => true],
+    ];
+
+    /**
      * The name and signature of the console command.
      */
-    protected $signature = 'db:audit-indexes';
+    protected $signature = 'db:audit-indexes {--database= : Connection name to inspect for duplicate and missing indexes}';
 
     /**
      * The console command description.
@@ -20,11 +37,29 @@ final class DbAuditIndexesCommand extends Command
     protected $description = 'Analyze database indexes, highlighting duplicates and suggesting improvements';
 
     /**
+     * Connection name configured for this run; null implies the default connection.
+     */
+    private ?string $connectionName = null;
+
+    /**
      * Execute the console command.
      */
     public function handle(): int
     {
-        $tables = $this->listTables();
+        // Resolve the requested database connection, defaulting to the application's configured default.
+        $databaseOption = $this->option('database');
+        if (is_string($databaseOption) && $databaseOption !== '') {
+            $this->connectionName = $databaseOption;
+        }
+
+        try {
+            $tables = $this->listTables();
+        } catch (RuntimeException $exception) {
+            $this->error($exception->getMessage());
+
+            return self::FAILURE;
+        }
+
         if ($tables === []) {
             $this->info('No tables found to audit.');
 
@@ -54,30 +89,45 @@ final class DbAuditIndexesCommand extends Command
         }
 
         $this->newLine();
-        $this->info('Generating index improvement suggestions...');
+        $this->info('Suggested composite indexes for commerce tables:');
 
         $suggestions = $this->suggestIndexes($tables);
 
+        foreach (self::RECOMMENDATIONS as $recommendation) {
+            $this->line(sprintf(
+                '- %s on [%s]: %s',
+                $recommendation['table'],
+                implode(', ', $recommendation['columns']),
+                $recommendation['reason'],
+            ));
+        }
+
         if ($suggestions === []) {
-            $this->info('No missing indexes were identified based on known query patterns.');
+            $this->line('- All tracked composite indexes are present.');
+
+            if ($duplicatesFound) {
+                return self::FAILURE;
+            }
+
+            $this->info('No duplicate indexes found and all recommended composites are present');
 
             return self::SUCCESS;
         }
 
         foreach ($suggestions as $suggestion) {
             $this->line(sprintf(
-                'Suggestion: add index on %s (%s) - %s',
+                '- %s on [%s]: %s',
                 $suggestion['table'],
                 implode(', ', $suggestion['columns']),
                 $suggestion['reason'],
             ));
         }
 
-        return self::SUCCESS;
+        return self::FAILURE;
     }
 
     /**
-     * @param  array<int, array{name: string, columns: array<int, string>, unique: bool, primary: bool}>  $indexes
+     * @param  array<int, array{name: string, columns: array<int, string>, unique: bool, primary: bool}> $indexes
      * @return array<string, list<string>>
      */
     private function detectDuplicateIndexes(array $indexes): array
@@ -89,7 +139,7 @@ final class DbAuditIndexesCommand extends Command
                 continue;
             }
 
-            $key = implode('|', $index['columns']).'|'.($index['unique'] ? 'unique' : 'non_unique');
+            $key = implode('|', $index['columns']) . '|' . ($index['unique'] ? 'unique' : 'non_unique');
 
             $signatures[$key] ??= [];
             $signatures[$key][] = $index['name'];
@@ -112,63 +162,45 @@ final class DbAuditIndexesCommand extends Command
     }
 
     /**
-     * @param  list<string>  $tables
+     * @param  list<string>                                                      $tables
      * @return list<array{table: string, columns: list<string>, reason: string}>
      */
     private function suggestIndexes(array $tables): array
     {
-        $expected = [
-            'orders' => [
-                ['columns' => ['user_id', 'status'], 'reason' => 'supports frequent customer order status lookups'],
-                ['columns' => ['created_at'], 'reason' => 'improves recent orders sorting and filtering'],
-            ],
-            'order_items' => [
-                ['columns' => ['order_id', 'product_id'], 'reason' => 'accelerates order detail joins and product frequency queries'],
-            ],
-            'products' => [
-                ['columns' => ['sku'], 'reason' => 'ensures fast SKU based product retrieval'],
-                ['columns' => ['category_id', 'is_active'], 'reason' => 'optimizes merchandising filters by category and status'],
-            ],
-            'users' => [
-                ['columns' => ['email'], 'reason' => 'prevents full table scans for login lookups'],
-            ],
-            'product_categories' => [
-                ['columns' => ['parent_id', 'slug'], 'reason' => 'speeds up navigation tree resolution by parent and slug'],
-            ],
-        ];
-
         $suggestions = [];
 
-        foreach ($expected as $table => $configs) {
-            if (! in_array($table, $tables, true)) {
+        foreach (self::RECOMMENDATIONS as $recommendation) {
+            if (! $recommendation['enforce']) {
                 continue;
             }
 
-            $indexes = $this->listIndexes($table);
+            if (! in_array($recommendation['table'], $tables, true)) {
+                continue;
+            }
+
+            $indexes = $this->listIndexes($recommendation['table']);
             $existing = array_map(
                 static fn (array $index): array => $index['columns'],
                 $indexes,
             );
 
-            foreach ($configs as $config) {
-                if ($this->hasMatchingIndex($existing, $config['columns'])) {
-                    continue;
-                }
-
-                $suggestions[] = [
-                    'table' => $table,
-                    'columns' => $config['columns'],
-                    'reason' => $config['reason'],
-                ];
+            if ($this->hasMatchingIndex($existing, $recommendation['columns'])) {
+                continue;
             }
+
+            $suggestions[] = [
+                'table'   => $recommendation['table'],
+                'columns' => $recommendation['columns'],
+                'reason'  => $recommendation['reason'],
+            ];
         }
 
         return $suggestions;
     }
 
     /**
-     * @param  array<int, array<int, string>>  $existing
-     * @param  list<string>  $target
+     * @param array<int, array<int, string>> $existing
+     * @param list<string>                   $target
      */
     private function hasMatchingIndex(array $existing, array $target): bool
     {
@@ -186,7 +218,7 @@ final class DbAuditIndexesCommand extends Command
      */
     private function listTables(): array
     {
-        $connection = DB::connection();
+        $connection = $this->connection();
         $driver = $connection->getDriverName();
 
         if (in_array($driver, ['sqlite', 'sqlite3'], true)) {
@@ -267,7 +299,7 @@ final class DbAuditIndexesCommand extends Command
 
                 $stringNames = array_values(array_filter(array_map(
                     static function ($name): ?string {
-                        if (is_scalar($name) || $name instanceof \Stringable) {
+                        if (is_scalar($name) || $name instanceof Stringable) {
                             return (string) $name;
                         }
 
@@ -288,7 +320,7 @@ final class DbAuditIndexesCommand extends Command
      */
     private function listIndexes(string $table): array
     {
-        $connection = DB::connection();
+        $connection = $this->connection();
         $driver = $connection->getDriverName();
 
         if (in_array($driver, ['sqlite', 'sqlite3'], true)) {
@@ -314,7 +346,7 @@ final class DbAuditIndexesCommand extends Command
                 });
 
                 $indexes[] = [
-                    'name' => $indexName,
+                    'name'    => $indexName,
                     'columns' => array_values(array_filter(array_map(
                         static function (object $col): ?string {
                             $column = (array) $col;
@@ -323,7 +355,7 @@ final class DbAuditIndexesCommand extends Command
                         },
                         $columns,
                     ))),
-                    'unique' => $unique,
+                    'unique'  => $unique,
                     'primary' => $origin === 'pk',
                 ];
             }
@@ -347,9 +379,9 @@ final class DbAuditIndexesCommand extends Command
                 }
 
                 $grouped[$name] ??= [
-                    'name' => $name,
+                    'name'    => $name,
                     'columns' => [],
-                    'unique' => ! (bool) $nonUnique,
+                    'unique'  => ! (bool) $nonUnique,
                     'primary' => $name === 'PRIMARY',
                 ];
 
@@ -385,9 +417,9 @@ final class DbAuditIndexesCommand extends Command
                 }
 
                 $indexes[] = [
-                    'name' => $indexName,
+                    'name'    => $indexName,
                     'columns' => $columns,
-                    'unique' => str_contains(strtoupper($definition), 'UNIQUE'),
+                    'unique'  => str_contains(strtoupper($definition), 'UNIQUE'),
                     'primary' => str_contains(strtoupper($definition), 'PRIMARY KEY'),
                 ];
             }
@@ -407,9 +439,9 @@ final class DbAuditIndexesCommand extends Command
                     }
 
                     $normalized[] = [
-                        'name' => $name,
+                        'name'    => $name,
                         'columns' => $index->getColumns(),
-                        'unique' => method_exists($index, 'isUnique') ? $index->isUnique() : false,
+                        'unique'  => method_exists($index, 'isUnique') ? $index->isUnique() : false,
                         'primary' => method_exists($index, 'isPrimary') ? $index->isPrimary() : false,
                     ];
                 }
@@ -419,5 +451,15 @@ final class DbAuditIndexesCommand extends Command
         }
 
         return [];
+    }
+
+    private function connection(): ConnectionInterface
+    {
+        // Centralise connection resolution so every helper pulls from the requested database name.
+        try {
+            return DB::connection($this->connectionName);
+        } catch (InvalidArgumentException $exception) {
+            throw new RuntimeException($exception->getMessage(), (int) $exception->getCode(), $exception);
+        }
     }
 }
