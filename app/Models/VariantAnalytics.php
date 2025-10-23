@@ -5,14 +5,10 @@ declare(strict_types=1);
 namespace App\Models;
 
 use DateTimeInterface;
-use App\Models\Product;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
-use InvalidArgumentException;
 
 /**
  * VariantAnalytics
@@ -185,51 +181,24 @@ final class VariantAnalytics extends Model
     public static function recordAnalytics(
         int $variantId,
         string|DateTimeInterface $date,
-        array $data = [],
-        string $granularity = self::BUCKET_DAILY,
-        ?int $productId = null
+        array $data = []
     ): self {
-        $granularity = strtolower($granularity);
-        self::ensureValidGranularity($granularity);
+        $normalizedDate = self::normalizeDate($date);
 
-        $productId ??= self::resolveProductId($variantId);
-        $normalizedDate = self::normalizeDate($date, $granularity);
-        $bucket = self::buildDateBucket($granularity, $normalizedDate);
-        $now = now();
-
-        $payload = [
-            'product_id' => $productId,
+        $defaultData = [
             'variant_id' => $variantId,
             'date' => $normalizedDate,
-            'date_bucket' => $bucket,
-            'views' => (int) ($data['views'] ?? 0),
-            'clicks' => (int) ($data['clicks'] ?? 0),
-            'add_to_cart' => (int) ($data['add_to_cart'] ?? 0),
-            'purchases' => (int) ($data['purchases'] ?? 0),
-            'revenue' => (float) ($data['revenue'] ?? 0),
-            'conversion_rate' => $data['conversion_rate'] ?? null,
-            'created_at' => $now,
-            'updated_at' => $now,
+            'views' => $data['views'] ?? 0,
+            'clicks' => $data['clicks'] ?? 0,
+            'add_to_cart' => $data['add_to_cart'] ?? 0,
+            'purchases' => $data['purchases'] ?? 0,
+            'revenue' => $data['revenue'] ?? 0,
+            'conversion_rate' => $data['conversion_rate'] ?? 0,
         ];
 
-        $updates = [
-            'updated_at' => $now,
-            'date' => $normalizedDate,
-            'views' => self::incrementExpression('views'),
-            'clicks' => self::incrementExpression('clicks'),
-            'add_to_cart' => self::incrementExpression('add_to_cart'),
-            'purchases' => self::incrementExpression('purchases'),
-            'revenue' => self::incrementExpression('revenue'),
-        ];
-
-        if (array_key_exists('conversion_rate', $data)) {
-            $updates['conversion_rate'] = self::replacementExpression('conversion_rate');
-        }
-
-        self::query()->upsert(
-            [$payload],
-            ['product_id', 'variant_id', 'date_bucket'],
-            $updates
+        return self::updateOrCreate(
+            ['variant_id' => $variantId, 'date' => $normalizedDate],
+            $defaultData
         );
 
         return self::query()
@@ -292,6 +261,15 @@ final class VariantAnalytics extends Model
     private static function connectionDriver(): string
     {
         return self::query()->getConnection()->getDriverName();
+    }
+
+    private static function normalizeDate(string|DateTimeInterface $date): string
+    {
+        if ($date instanceof DateTimeInterface) {
+            return Carbon::instance($date)->toDateString();
+        }
+
+        return Carbon::parse($date)->toDateString();
     }
 
     /**
