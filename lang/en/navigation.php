@@ -19,4 +19,5 @@ return [
     'api_keys' => 'API Keys',
     'user_impersonation' => 'User Impersonation',
     'user_management' => 'User Management',
+    'api_keys' => 'API Keys',
 ];

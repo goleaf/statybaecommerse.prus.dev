@@ -4,55 +4,38 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-use Illuminate\Support\Collection;
-
 enum ApiKeyScope: string
 {
-    case OrdersRead = 'orders.read';
-    case OrdersWrite = 'orders.write';
-    case ProductsRead = 'products.read';
-    case ProductsWrite = 'products.write';
-    case CustomersRead = 'customers.read';
-    case CustomersWrite = 'customers.write';
-    case AnalyticsRead = 'analytics.read';
+    case ReadProducts = 'read:products';
+    case WriteProducts = 'write:products';
+    case ReadOrders = 'read:orders';
+    case ManageOrders = 'manage:orders';
+    case ManageCustomers = 'manage:customers';
+    case AccessAnalytics = 'access:analytics';
 
     public function label(): string
     {
         return match ($this) {
-            self::OrdersRead => __('api_keys.scopes.orders_read.label'),
-            self::OrdersWrite => __('api_keys.scopes.orders_write.label'),
-            self::ProductsRead => __('api_keys.scopes.products_read.label'),
-            self::ProductsWrite => __('api_keys.scopes.products_write.label'),
-            self::CustomersRead => __('api_keys.scopes.customers_read.label'),
-            self::CustomersWrite => __('api_keys.scopes.customers_write.label'),
-            self::AnalyticsRead => __('api_keys.scopes.analytics_read.label'),
+            self::ReadProducts => __('api_keys.scopes.read_products'),
+            self::WriteProducts => __('api_keys.scopes.write_products'),
+            self::ReadOrders => __('api_keys.scopes.read_orders'),
+            self::ManageOrders => __('api_keys.scopes.manage_orders'),
+            self::ManageCustomers => __('api_keys.scopes.manage_customers'),
+            self::AccessAnalytics => __('api_keys.scopes.access_analytics'),
         };
     }
 
-    public function description(): string
-    {
-        return match ($this) {
-            self::OrdersRead => __('api_keys.scopes.orders_read.description'),
-            self::OrdersWrite => __('api_keys.scopes.orders_write.description'),
-            self::ProductsRead => __('api_keys.scopes.products_read.description'),
-            self::ProductsWrite => __('api_keys.scopes.products_write.description'),
-            self::CustomersRead => __('api_keys.scopes.customers_read.description'),
-            self::CustomersWrite => __('api_keys.scopes.customers_write.description'),
-            self::AnalyticsRead => __('api_keys.scopes.analytics_read.description'),
-        };
-    }
-
+    /**
+     * @return array<string, string>
+     */
     public static function options(): array
     {
-        return Collection::make(self::cases())
-            ->mapWithKeys(fn (self $case) => [$case->value => $case->label()])
-            ->toArray();
-    }
+        $options = [];
 
-    public static function descriptions(): array
-    {
-        return Collection::make(self::cases())
-            ->mapWithKeys(fn (self $case) => [$case->value => $case->description()])
-            ->toArray();
+        foreach (self::cases() as $case) {
+            $options[$case->value] = $case->label();
+        }
+
+        return $options;
     }
 }
