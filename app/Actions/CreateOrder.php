@@ -17,8 +17,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
-use RuntimeException;
+use Illuminate\Support\Number;
 use Throwable;
 
 /**
@@ -42,54 +41,30 @@ final class CreateOrder
             throw new RuntimeException('Checkout session payload is missing.');
         }
 
-        $customer = Auth::user();
-        if (! $customer instanceof User && ! $customer instanceof AdminUser) {
-            throw new RuntimeException('Authenticated customer is required to create an order.');
-        }
-
-        if (! class_exists(CartFacade::class)) {
-            throw new RuntimeException('Shopping cart integration is not available.');
-        }
-
-        /** @var Cart $cart */
-        $cart = CartFacade::session(session()->getId());
-
-        return DB::transaction(function () use ($checkout, $cart, $customer) {
-            $shippingAddress = $this->buildAddressPayload($checkout, 'shipping_address');
-            $billingAddress = $this->shouldReuseShippingAddress($checkout)
-                ? $shippingAddress
-                : $this->buildAddressPayload($checkout, 'billing_address');
-
-            $shippingOption = $this->resolveShippingOption($checkout);
-            $paymentMethod = $this->resolvePaymentMethod($checkout);
-
-            $subtotal = (float) $cart->getSubTotal();
-            $shippingTotal = $shippingOption['price'];
-            $couponCode = $this->normalizeCouponCode(data_get($checkout, 'coupon.code'));
-
-            $codeRow = $couponCode ? $this->findValidDiscountCode($couponCode) : null;
-
-            $discountResult = $this->discountEngine->evaluate([
-                'currency_code' => current_currency(),
-                'channel_id' => null,
-                'user_id' => $customer->id,
-                'now' => now(),
-                'code' => $codeRow ? $couponCode : null,
-                'cart' => [
-                    'subtotal' => $subtotal,
-                    'items' => $this->mapCartItems($cart->getContent()),
-                ],
+        return DB::transaction(function () use ($checkout, $sessionId, $customer) {
+            /** @var OrderAddress $shippingAddress */
+            $shippingAddress = OrderAddress::query()->create([
+                'customer_id'         => data_get($checkout, 'shipping_address.user_id'),
+                'last_name'           => data_get($checkout, 'shipping_address.last_name'),
+                'first_name'          => data_get($checkout, 'shipping_address.first_name'),
+                'street_address'      => data_get($checkout, 'shipping_address.street_address'),
+                'street_address_plus' => data_get($checkout, 'shipping_address.street_address_plus'),
+                'city'                => data_get($checkout, 'shipping_address.city'),
+                'postal_code'         => data_get($checkout, 'shipping_address.postal_code'),
+                'phone'               => data_get($checkout, 'shipping_address.phone_number'),
+                // @phpstan-ignore-next-line
+                'country_name' => Country::query()->find(data_get($checkout, 'shipping_address.country_id'))->name,
             ]);
             /** @var OrderAddress $billingAddress */
             $billingAddress = ! data_get($checkout, 'same_as_shipping') ? OrderAddress::query()->create([
-                'customer_id' => data_get($checkout, 'billing_address.user_id'),
-                'last_name' => data_get($checkout, 'billing_address.last_name'),
-                'first_name' => data_get($checkout, 'billing_address.first_name'),
-                'street_address' => data_get($checkout, 'billing_address.street_address'),
+                'customer_id'         => data_get($checkout, 'billing_address.user_id'),
+                'last_name'           => data_get($checkout, 'billing_address.last_name'),
+                'first_name'          => data_get($checkout, 'billing_address.first_name'),
+                'street_address'      => data_get($checkout, 'billing_address.street_address'),
                 'street_address_plus' => data_get($checkout, 'billing_address.street_address_plus'),
-                'city' => data_get($checkout, 'billing_address.city'),
-                'postal_code' => data_get($checkout, 'billing_address.postal_code'),
-                'phone' => data_get($checkout, 'billing_address.phone_number'),
+                'city'                => data_get($checkout, 'billing_address.city'),
+                'postal_code'         => data_get($checkout, 'billing_address.postal_code'),
+                'phone'               => data_get($checkout, 'billing_address.phone_number'),
                 // @phpstan-ignore-next-line
                 'country_name' => Country::query()->find(data_get($checkout, 'billing_address.country_id'))->name,
             ]) : $shippingAddress;
@@ -120,7 +95,6 @@ final class CreateOrder
             /** @var Order $order */
             $order = Order::query()->create(['number' => generate_number(), 'customer_id' => $customer->id, 'currency_code' => current_currency(), 'shipping_address_id' => $shippingAddress->id, 'billing_address_id' => $billingAddress->id, 'shipping_option_id' => data_get($checkout, 'shipping_option')[0]['id'], 'payment_method_id' => data_get($checkout, 'payment')[0]['id'], 'payment_method' => (string) data_get($checkout, 'payment')[0]['name'], 'subtotal_amount' => round($breakdown->subtotal, 2), 'discount_total_amount' => round($breakdown->discount, 2), 'tax_total_amount' => round($breakdown->tax, 2), 'shipping_total_amount' => round($breakdown->shipping, 2), 'grand_total_amount' => $grandTotal]);
             // Items
-            // @phpstan-ignore-next-line
             foreach (CartFacade::session($sessionId)->getContent() as $item) {
                 OrderItem::query()->create(['order_id' => $order->id, 'quantity' => $item->quantity, 'unit_price_amount' => $item->price, 'name' => $item->name, 'sku' => $item->associatedModel->sku, 'product_id' => $item->associatedModel->id, 'product_type' => $item->associatedModel->getMorphClass()]);
             }
@@ -155,7 +129,7 @@ final class CreateOrder
                 $existing[] = (array) ($payment['transaction'] ?? []);
                 $order->transactions = $existing;
                 $order->save();
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 // ignore payment errors in stub
             }
             // Clear cart
@@ -164,35 +138,16 @@ final class CreateOrder
                 $sessionId,
                 $order->payment_status ?? null
             );
-
-            $taxTotal = $this->taxCalculator->compute(max(0.0, $subtotal - $discountTotal));
-            $grandTotal = max(0.0, round($subtotal - $discountTotal + $shippingTotal + $taxTotal, 2));
-
-            $order = Order::query()->create([
-                'number' => $this->generateOrderNumber(),
-                'user_id' => $customer->id,
-                'currency' => current_currency(),
-                'shipping_address' => $shippingAddress,
-                'billing_address' => $billingAddress,
-                'shipping_option_id' => $shippingOption['id'],
-                'payment_method' => $paymentMethod['name'],
-                'payment_reference' => $paymentMethod['reference'],
-                'subtotal' => round($subtotal, 2),
-                'shipping_amount' => round($shippingTotal, 2),
-                'discount_amount' => round($discountTotal, 2),
-                'tax_amount' => round($taxTotal, 2),
-                'total' => $grandTotal,
-                'status' => 'pending',
-                'payment_status' => 'pending',
-            ]);
-
-            $this->persistItems($order, $cart->getContent());
-            $this->recordRedemptions($order, (int) $customer->id, $appliedDiscounts, $codeRow);
-            $this->processPayment($order, $paymentMethod['raw']);
-
-            $cart->clear();
-
-            $this->queueConfirmationMail($order, $customer);
+            // Queue order confirmation email with user's preferred locale
+            try {
+                $mailable = new OrderPlaced($order);
+                if (! empty($customer->preferred_locale)) {
+                    $mailable->locale($customer->preferred_locale);
+                }
+                Mail::to($customer->email)->queue($mailable);
+            } catch (Throwable $e) {
+                // swallow mail errors to not block checkout
+            }
 
             return $order;
         });

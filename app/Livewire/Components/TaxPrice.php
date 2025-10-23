@@ -8,6 +8,7 @@ use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use Throwable;
 
 /**
  * TaxPrice
@@ -26,9 +27,8 @@ class TaxPrice extends Component
         $subtotal = 0.0;
         if (class_exists(\Darryldecode\Cart\Facades\CartFacade::class)) {
             try {
-                // @phpstan-ignore-next-line
                 $subtotal = (float) \Darryldecode\Cart\Facades\CartFacade::session($sessionKey)->getSubTotal();
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $subtotal = 0.0;
             }
         }
@@ -43,14 +43,14 @@ class TaxPrice extends Component
                     foreach (\Darryldecode\Cart\Facades\CartFacade::session(session()->getId())->getContent() as $item) {
                         $items[] = ['product_id' => optional($item->associatedModel)->id, 'variant_id' => method_exists($item->associatedModel, 'getKey') ? $item->associatedModel->getKey() : null, 'quantity' => (int) $item->quantity, 'unit_price' => (float) $item->price];
                     }
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     $items = [];
                 }
             }
             $context = ['currency_code' => current_currency(), 'channel_id' => optional(config('app.url')), 'user_id' => optional(auth()->user())->id, 'group_ids' => [], 'partner_tier' => null, 'now' => now(), 'code' => $code, 'cart' => ['subtotal' => $subtotal, 'items' => $items]];
             $result = (array) app(\App\Services\Discounts\DiscountEngine::class)->evaluate($context);
             $discount = (float) ($result['discount_total_amount'] ?? 0.0);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $discount = 0.0;
         }
 

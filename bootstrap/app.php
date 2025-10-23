@@ -10,8 +10,10 @@ use App\Services\TranslationService;
 use App\Support\ApiErrorResponse;
 use App\Support\ErrorCodes;
 use App\Support\RequestContext;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Auth\AuthenticationException;
+use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
+use Illuminate\Database\Connectors\ConnectionFactory;
+use Illuminate\Database\DatabaseManager;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -26,7 +28,23 @@ use Throwable;
 
 require_once __DIR__ . '/../app/Support/filament_compat.php';
 
-return Application::configure(basePath: dirname(__DIR__))
+$providers = [
+    App\Providers\AuthServiceProvider::class,
+    App\Providers\ApiServiceProvider::class,
+];
+
+$appEnvironment = (string) env('APP_ENV', 'production');
+$queueConnection = (string) env('QUEUE_CONNECTION', 'sync');
+
+if ($appEnvironment !== 'local' || $queueConnection !== 'sync') {
+    $providers[] = App\Providers\HorizonServiceProvider::class;
+}
+
+$providers[] = App\Providers\LocaleServiceProvider::class;
+$providers[] = App\Providers\Filament\AdminPanelProvider::class;
+$providers[] = SecurityServiceProvider::class;
+
+$app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__ . '/../routes/web.php',
         api: __DIR__ . '/../routes/api.php',
@@ -63,12 +81,11 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (DomainException $exception, Request $request) {
-            if (! RequestContext::isApiRequest($request)) {
-                return null;
-            }
-
             $locale = RequestContext::resolveLocale($request);
             $traceId = RequestContext::resolveTraceId($request);
+            $correlationHeader = RequestContext::correlationHeader();
+
+            $message = TranslationService::get($exception->translationKey(), $exception->context(), $locale);
 
             Log::withContext([
                 'trace_id'       => $traceId,
@@ -84,6 +101,50 @@ return Application::configure(basePath: dirname(__DIR__))
                 'status'          => $exception->status(),
                 'translation_key' => $exception->translationKey(),
                 'context'         => $exception->context(),
+            ]);
+
+            $payload = [
+                'error' => [
+                    'code'    => $exception->errorCode(),
+                    'message' => $message,
+                    'locale'  => $locale,
+                ],
+                'meta' => [
+                    'trace_id'       => $traceId,
+                    'correlation_id' => $traceId,
+                    'timestamp'      => now()->toIso8601String(),
+                ],
+            ];
+
+            if ($exception->context() !== []) {
+                $payload['error']['context'] = $exception->context();
+            }
+
+            return response()
+                ->json($payload, $exception->status())
+                ->header($correlationHeader, $traceId)
+                ->header('Content-Language', $locale);
+        });
+
+        $exceptions->render(function (Throwable $throwable, Request $request) {
+            if ($throwable instanceof DomainException) {
+                return null;
+            }
+
+            $locale = RequestContext::resolveLocale($request);
+            $traceId = RequestContext::resolveTraceId($request);
+
+            Log::withContext([
+                'trace_id'       => $traceId,
+                'correlation_id' => $traceId,
+                'locale'         => $locale,
+                'request_path'   => $request->path(),
+                'request_method' => $request->method(),
+            ]);
+
+            Log::error('Unhandled exception rendered.', [
+                'exception' => $throwable::class,
+                'message'   => $throwable->getMessage(),
             ]);
 
             $message = TranslationService::get($exception->translationKey(), $exception->context(), $locale);
@@ -309,14 +370,23 @@ return Application::configure(basePath: dirname(__DIR__))
                     $message = __('Something went wrong. Please try again later.', [], $locale);
                 }
 
-                return ApiErrorResponse::problem(
-                    request: $request,
-                    errorCode: ErrorCodes::SERVER_ERROR,
-                    detail: $message,
-                    status: 500,
-                    title: ApiErrorResponse::titleFor(ErrorCodes::SERVER_ERROR),
-                    locale: $locale,
-                );
+                $payload = [
+                    'error' => [
+                        'code'    => ErrorCodes::SERVER_ERROR,
+                        'message' => $message,
+                        'locale'  => $locale,
+                    ],
+                    'meta' => [
+                        'trace_id'       => $traceId,
+                        'correlation_id' => $traceId,
+                        'timestamp'      => now()->toIso8601String(),
+                    ],
+                ];
+
+                return response()
+                    ->json($payload, 500)
+                    ->header($correlationHeader, $traceId)
+                    ->header('Content-Language', $locale);
             }
 
             Log::error('Unhandled exception rendered.', [
@@ -333,23 +403,27 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->header('Content-Language', $locale);
         });
     })
-    ->withProviders((static function (): array {
-        $providers = [
-            App\Providers\AuthServiceProvider::class,
-            App\Providers\ApiServiceProvider::class,
-        ];
-
-        $appEnvironment = (string) env('APP_ENV', 'production');
-        $queueConnection = (string) env('QUEUE_CONNECTION', 'sync');
-
-        if ($appEnvironment !== 'local' || $queueConnection !== 'sync') {
-            $providers[] = App\Providers\HorizonServiceProvider::class;
-        }
-
-        $providers[] = App\Providers\LocaleServiceProvider::class;
-        $providers[] = App\Providers\Filament\AdminPanelProvider::class;
-        $providers[] = SecurityServiceProvider::class;
-
-        return $providers;
-    })())
+    ->withProviders($providers)
     ->create();
+
+$app->instance('request', Request::capture());
+
+$app->singleton('db.factory', static fn (Application $app) => new ConnectionFactory($app));
+$app->singleton('db', static fn (Application $app) => new DatabaseManager($app, $app['db.factory']));
+
+$app->booting(function (Application $app): void {
+    Model::setConnectionResolver($app['db']);
+    Model::setEventDispatcher($app['events']);
+});
+
+$app->make(ConsoleKernel::class)->bootstrap();
+
+$app['config']->set('database.default', $app['config']->get('database.default', 'sqlite'));
+$app['config']->set('database.connections.sqlite', array_replace([
+    'driver'                  => 'sqlite',
+    'database'                => env('DB_DATABASE', ':memory:'),
+    'prefix'                  => '',
+    'foreign_key_constraints' => true,
+], $app['config']->get('database.connections.sqlite', [])));
+
+return $app;
