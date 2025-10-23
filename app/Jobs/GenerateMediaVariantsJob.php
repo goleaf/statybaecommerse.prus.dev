@@ -26,7 +26,8 @@ final class GenerateMediaVariantsJob implements ShouldQueue
     public function __construct(
         private readonly int $mediaId,
         private readonly array $variants
-    ) {}
+    ) {
+    }
 
     public function handle(MediaService $mediaService): void
     {
