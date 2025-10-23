@@ -48,6 +48,8 @@
 ## API contracts
 
 - OpenAPI documentation now mirrors the lean product meta payload and nullable media thumbnails emitted by the presenter, keeping schema validators and client SDKs in sync with production responses.
+- Product endpoints now reuse eager-loaded review counts and averages, keeping API consumers aligned with cached
+  storefront metrics while trimming duplicate queries from feature coverage.
 
 ## Admin panel resilience
 - Livewire resource tests now register resource-aware hooks and a lightweight ViewRecord stub that emits table markup, so generic `ListRecords`/`ViewRecord` assertions pass without vendor patches while CampaignView coverage stays stable.
