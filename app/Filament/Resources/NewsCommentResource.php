@@ -71,43 +71,14 @@ final class NewsCommentResource extends Resource
                         ->schema([
                             Select::make('news_id')
                                 ->label(__('admin.news_comments.news'))
-                                ->relationship(
-                                    name: 'news',
-                                    titleAttribute: 'title',
-                                    modifyQueryUsing: fn (Builder $query): Builder => $query->withoutGlobalScopes([
-                                        ActiveScope::class,
-                                        ApprovedScope::class,
-                                        VisibleScope::class,
-                                    ])
-                                )
+                                ->options(fn () => News::query()->pluck('title', 'id')->toArray())
                                 ->required()
                                 ->searchable()
                                 ->preload()
                                 ->live(),
                             Select::make('parent_id')
                                 ->label(__('admin.news_comments.parent_comment'))
-                                ->options(function (Get $get, ?NewsComment $record): array {
-                                    $newsId = $get('news_id') ?? $record?->news_id;
-
-                                    if (! $newsId) {
-                                        return [];
-                                    }
-
-                                    $query = NewsComment::query()
-                                        ->withoutGlobalScopes([
-                                            ActiveScope::class,
-                                            ApprovedScope::class,
-                                            VisibleScope::class,
-                                        ])
-                                        ->where('news_id', $newsId)
-                                        ->orderBy('created_at');
-
-                                    if ($record?->exists) {
-                                        $query->whereKeyNot($record->getKey());
-                                    }
-
-                                    return $query->pluck('author_name', 'id')->all();
-                                })
+                                ->options(fn () => NewsComment::query()->pluck('author_name', 'id')->toArray())
                                 ->searchable()
                                 ->preload()
                                 ->live(),
@@ -203,15 +174,7 @@ final class NewsCommentResource extends Resource
             ->filters([
                 SelectFilter::make('news_id')
                     ->label(__('admin.news_comments.news'))
-                    ->relationship(
-                        'news',
-                        'title',
-                        modifyQueryUsing: fn (Builder $query): Builder => $query->withoutGlobalScopes([
-                            ActiveScope::class,
-                            ApprovedScope::class,
-                            VisibleScope::class,
-                        ])
-                    )
+                    ->options(fn () => News::query()->pluck('title', 'id')->toArray())
                     ->searchable()
                     ->preload(),
                 TernaryFilter::make('is_approved')
@@ -222,15 +185,7 @@ final class NewsCommentResource extends Resource
                     ->boolean(),
                 SelectFilter::make('parent_id')
                     ->label(__('admin.news_comments.parent_comment'))
-                    ->options(fn (): array => NewsComment::query()
-                        ->withoutGlobalScopes([
-                            ActiveScope::class,
-                            ApprovedScope::class,
-                            VisibleScope::class,
-                        ])
-                        ->orderBy('author_name')
-                        ->pluck('author_name', 'id')
-                        ->all())
+                    ->options(fn () => NewsComment::query()->pluck('author_name', 'id')->toArray())
                     ->searchable()
                     ->preload(),
             ])
