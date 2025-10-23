@@ -8,10 +8,6 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\SliderResource\Pages;
 use App\Models\Slider;
-use App\Support\Filament\SearchableInputHelper;
-use App\Support\Search\ContentLinkSearch;
-use BackedEnum;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
@@ -44,7 +40,10 @@ final class SliderResource extends Resource
 
     protected static ?string $model = Slider::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    /**
+     * @var string|\BackedEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static UnitEnum|string|null $navigationGroup = 'Content';
 
