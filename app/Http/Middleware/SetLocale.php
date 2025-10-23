@@ -76,7 +76,20 @@ final class SetLocale
         }
 
         if (! in_array($locale, $supportedLocales, true)) {
-            $locale = $defaultLocale;
+            $fallbackLocaleConfig = config('app.fallback_locale');
+            $fallbackLocale = is_string($fallbackLocaleConfig) && $fallbackLocaleConfig !== ''
+                ? $fallbackLocaleConfig
+                : $defaultLocale;
+
+            if (in_array($fallbackLocale, $supportedLocales, true)) {
+                $locale = $fallbackLocale;
+            } elseif (in_array($defaultLocale, $supportedLocales, true)) {
+                $locale = $defaultLocale;
+            } elseif ($supportedLocales !== []) {
+                $locale = $supportedLocales[0];
+            } else {
+                $locale = $defaultLocale;
+            }
         }
 
         // Set application locale
