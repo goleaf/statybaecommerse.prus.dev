@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Support\ListQuery\ListQueryDefinition;
 use App\Support\ListQuery\ListQueryValidator;
 use App\Support\ListQuery\ListResponse;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -27,55 +28,30 @@ class UserController extends Controller
     public function index(Request $request): JsonResponse
     {
         $this->authorize('viewAny', User::class);
-        $definition = ListQueryDefinition::make(
-            allowedSorts: [
-                'created_at' => 'created_at',
-                'name' => 'name',
-                'email' => 'email',
-                'last_login_at' => 'last_login_at',
-            ],
-            defaultSort: 'created_at',
-            defaultDirection: 'desc',
-            defaultPerPage: 15,
-            maxPerPage: 100,
-        );
-
+        $definition = $this->userListDefinition();
         $listQuery = ListQueryValidator::fromRequest($request, $definition);
-        $filters = $listQuery->filters;
 
-        $users = User::with(['addresses', 'orders', 'wishlist', 'reviews', 'partners', 'referrals']);
+        $query = User::query()->with(['addresses', 'orders', 'wishlist', 'reviews', 'partners', 'referrals']);
 
-        if ($search = $filters['search'] ?? null) {
-            $users->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('first_name', 'like', "%{$search}%")
-                    ->orWhere('last_name', 'like', "%{$search}%");
-            });
-        }
-
-        if (array_key_exists('status', $filters)) {
-            $isActive = filter_var($filters['status'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-            if ($isActive !== null) {
-                $users->where('is_active', $isActive);
-            }
-        }
-
-        if ($role = $filters['role'] ?? null) {
-            $users->whereHas('roles', function ($q) use ($role) {
-                $q->where('name', $role);
-            });
-        }
-
-        $users = $listQuery->apply($users, $definition)
-            ->paginate($listQuery->perPage, ['*'], 'page', $listQuery->page)
-            ->appends($request->query());
+        $paginator = $listQuery->apply($query, $definition);
 
         $response = ListResponse::fromPaginator(
-            $users->through(fn (User $user) => (new AdminUserResource($user))->toArray($request)),
+            $paginator,
+            $listQuery,
+            static fn (User $user) => (new AdminUserResource($user))->toArray($request),
         );
 
-        return response()->json($response);
+        $meta = $response['meta'];
+        $meta['timestamp'] = now()->toISOString();
+        $meta['version'] = '1.0';
+        $meta['admin_view'] = true;
+
+        return response()->json([
+            'success' => true,
+            'data' => $response['data'],
+            'meta' => $meta,
+            'links' => $response['links'],
+        ]);
     }
 
     /**
@@ -133,5 +109,49 @@ class UserController extends Controller
         $activity = ['user_id' => $user->id, 'user_name' => $user->name, 'last_login_at' => $user->last_login_at?->toISOString(), 'last_activity_at' => $user->last_activity_at?->toISOString(), 'login_count' => $user->login_count, 'orders_count' => $user->orders()->count(), 'reviews_count' => $user->reviews()->count(), 'wishlist_count' => $user->wishlist()->count(), 'addresses_count' => $user->addresses()->count(), 'total_spent' => $user->total_spent, 'average_order_value' => $user->average_order_value, 'last_order_date' => $user->last_order_date, 'is_on_trial' => $user->isOnTrial(), 'has_active_subscription' => $user->hasActiveSubscription(), 'subscription_status' => $user->subscription_status, 'referral_stats' => $user->referral_stats];
 
         return response()->json(['success' => true, 'data' => $activity, 'timestamp' => now()->toISOString()]);
+}
+
+    private function userListDefinition(): ListQueryDefinition
+    {
+        return ListQueryDefinition::make()
+            ->defaultPerPage(15)
+            ->maxPerPage(100)
+            ->defaultSort('created_at', 'desc')
+            ->allowedSorts([
+                'created_at' => ['column' => 'created_at'],
+                'name' => ['column' => ['name', 'id']],
+                'email' => ['column' => ['email', 'id']],
+                'last_login_at' => ['column' => 'last_login_at'],
+            ])
+            ->filters([
+                'search' => [
+                    'type' => 'string',
+                    'nullable' => true,
+                    'callback' => static function (Builder $builder, string $search): void {
+                        $builder->where(static function (Builder $query) use ($search): void {
+                            $query->where('name', 'like', '%'.$search.'%')
+                                ->orWhere('email', 'like', '%'.$search.'%')
+                                ->orWhere('first_name', 'like', '%'.$search.'%')
+                                ->orWhere('last_name', 'like', '%'.$search.'%');
+                        });
+                    },
+                ],
+                'status' => [
+                    'type' => 'bool',
+                    'nullable' => true,
+                    'callback' => static function (Builder $builder, bool $status): void {
+                        $builder->where('is_active', $status);
+                    },
+                ],
+                'role' => [
+                    'type' => 'string',
+                    'nullable' => true,
+                    'callback' => static function (Builder $builder, string $role): void {
+                        $builder->whereHas('roles', static function (Builder $query) use ($role): void {
+                            $query->where('name', $role);
+                        });
+                    },
+                ],
+            ]);
     }
 }

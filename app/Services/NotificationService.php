@@ -13,6 +13,9 @@ use App\Application\DTOs\Notifications\NotificationSearchData;
 use App\Application\DTOs\Notifications\NotificationStatsData;
 use App\Models\Notification;
 use App\Models\User;
+use App\Support\ListQuery\ListQuery;
+use App\Support\ListQuery\ListQueryDefinition;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 
 final class NotificationService
@@ -122,15 +125,52 @@ final class NotificationService
     /**
      * Handle getUserNotifications functionality with proper error handling.
      */
-    public function getUserNotifications(
-        User $user,
-        int $perPage = 25,
-        ?string $type = null,
-        ?bool $read = null,
-        string $sortColumn = 'created_at',
-        string $sortDirection = 'desc',
-        int $page = 1,
-    ): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    public function getUserNotifications(User $user, ListQuery $listQuery, ListQueryDefinition $definition): LengthAwarePaginator
+    {
+        $query = Notification::forUser($user->id);
+
+        return $listQuery->apply($query, $definition);
+    }
+
+    /**
+     * Aggregate statistics for the authenticated user's notifications.
+     */
+    public function getUserNotificationStats(User $user): array
+    {
+        $baseQuery = Notification::forUser($user->id);
+
+        return [
+            'total' => (clone $baseQuery)->count(),
+            'read' => (clone $baseQuery)->read()->count(),
+            'unread' => (clone $baseQuery)->unread()->count(),
+            'urgent' => (clone $baseQuery)->urgent()->count(),
+        ];
+    }
+
+    /**
+     * Mark all notifications as unread for the given user.
+     */
+    public function markAllAsUnreadForUser(User $user): int
+    {
+        return Notification::markAllAsUnreadForUser($user->id);
+    }
+
+    /**
+     * Search notifications for the authenticated user.
+     */
+    public function searchNotifications(string $query, User $user, ?string $type = null, ?bool $read = null, int $perPage = 25): LengthAwarePaginator
+    {
+        $builder = $this->applyFilters(Notification::forUser($user->id), $type, $read)
+            ->where(function (Builder $searchQuery) use ($query): void {
+                $searchQuery->where('data->title', 'like', '%'.$query.'%')
+                    ->orWhere('data->message', 'like', '%'.$query.'%')
+                    ->orWhere('data->type', 'like', '%'.$query.'%');
+            });
+
+        return $builder->latest()->paginate($perPage);
+    }
+
+    private function applyFilters(Builder $query, ?string $type, ?bool $read): Builder
     {
         if ($type) {
             $query->byType($type);
