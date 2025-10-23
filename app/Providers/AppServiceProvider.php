@@ -23,6 +23,7 @@ use App\Services\DocumentService;
 use App\Support\Filament\SearchableComponentHelper;
 use App\Support\Filesystem\GracefulFilesystem;
 use App\Support\Health\HealthReporter;
+use App\Support\Livewire\Hooks\PropagateValidationExceptionHook;
 use App\Support\Html\HtmlSanitizer;
 use App\Support\Security\CspNonce;
 use App\Support\Storage\SecureStorage;
@@ -121,6 +122,12 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ProductRepositoryInterface::class, EloquentProductRepository::class);
 
         $this->registerFilamentResourceAutoloader();
+
+        if ($this->app->runningUnitTests()) {
+            // Ensure Livewire exposes throttling validation exceptions to the test harness
+            // before the core validation hook suppresses them within the error bag.
+            Livewire::componentHook(PropagateValidationExceptionHook::class);
+        }
     }
 
     public function boot(): void
