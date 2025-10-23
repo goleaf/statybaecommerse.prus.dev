@@ -5,38 +5,48 @@ declare(strict_types=1);
 use App\Support\ErrorCode;
 
 return [
-    // @translators: Displayed when a requested page or record is missing (HTTP 404).
-    ErrorCode::NotFound->value => 'Seite nicht gefunden',
+    'titles' => [
+        // @translators: Wird angezeigt, wenn die angeforderte Seite oder Ressource fehlt (HTTP 404).
+        ErrorCodes::key(ErrorCodes::NOT_FOUND) => 'Seite nicht gefunden',
 
-    // @translators: Shown when the system encounters an unexpected failure (HTTP 500).
-    ErrorCode::ServerError->value => 'Serverfehler',
+        // @translators: Hinweis auf einen unerwarteten Serverfehler (HTTP 500).
+        ErrorCodes::key(ErrorCodes::SERVER_ERROR) => 'Serverfehler',
 
-    // @translators: Used when form submission fails validation and users must review inputs.
-    ErrorCode::ValidationFailed->value => 'Bitte überprüfen Sie Ihre Eingaben',
+        // @translators: Verwenden, wenn Benutzereingaben die Validierung nicht bestehen.
+        ErrorCodes::key(ErrorCodes::VALIDATION_FAILED) => 'Bitte überprüfen Sie Ihre Eingaben',
 
-    // @translators: Indicates the user needs to log in before accessing the requested content.
-    ErrorCode::Unauthorized->value => 'Nicht autorisiert',
+        // @translators: Bedeutet, dass der Benutzer sich anmelden muss, um fortzufahren.
+        ErrorCodes::key(ErrorCodes::UNAUTHORIZED) => 'Nicht autorisiert',
 
-    // @translators: Indicates the user is logged in but does not have permission for the action.
-    ErrorCode::Forbidden->value => 'Zugriff verweigert',
+        // @translators: Bedeutet, dass dem angemeldeten Benutzer die Berechtigung fehlt.
+        ErrorCodes::key(ErrorCodes::FORBIDDEN) => 'Zugriff verweigert',
 
-    // @translators: Displayed when an order number could not be located in the system.
-    ErrorCode::OrderNotFound->value => 'Bestellung :order wurde nicht gefunden.',
+        // @translators: Wird angezeigt, wenn eine Bestellung mit der angegebenen Nummer nicht gefunden wurde.
+        ErrorCodes::key(ErrorCodes::ORDER_NOT_FOUND) => 'Bestellung :order wurde nicht gefunden.',
 
-    // @translators: Hinweis darauf, dass nicht genügend Bestand für die angeforderte SKU vorhanden ist.
-    ErrorCodes::INVENTORY_INSUFFICIENT => 'Für SKU :sku ist nicht genügend Bestand verfügbar.',
-    // @translators: Wird angezeigt, wenn das Profil des angemeldeten Benutzers nicht geladen werden kann.
-    ErrorCodes::PROFILE_UNAVAILABLE => 'Profil nicht verfügbar',
-    // @translators: Wird angezeigt, wenn der Checkout abgebrochen wird, weil der Warenkorb leer ist.
-    ErrorCodes::CHECKOUT_CART_EMPTY => 'Warenkorb ist leer',
+        // @translators: Hinweis darauf, dass nicht genügend Bestand für die angeforderte SKU vorhanden ist.
+        ErrorCodes::key(ErrorCodes::INVENTORY_INSUFFICIENT) => 'Für SKU :sku ist nicht genügend Bestand verfügbar.',
+        // @translators: Wird angezeigt, wenn das Profil des angemeldeten Benutzers nicht geladen werden kann.
+        ErrorCodes::key(ErrorCodes::PROFILE_UNAVAILABLE) => 'Profil nicht verfügbar',
+        // @translators: Wird angezeigt, wenn der Checkout abgebrochen wird, weil der Warenkorb leer ist.
+        ErrorCodes::key(ErrorCodes::CHECKOUT_CART_EMPTY) => 'Warenkorb ist leer',
+    ],
 
     'messages' => [
         // @translators: Generische Meldung für API-Antworten bei unerwarteten Serverfehlern.
-        'server_error' => 'Etwas ist schiefgelaufen. Bitte versuche es später erneut.',
+        ErrorCodes::key(ErrorCodes::SERVER_ERROR) => 'Etwas ist schiefgelaufen. Bitte versuchen Sie es später erneut.',
+        // @translators: Meldung, wenn eine Validierung scheitert und keine spezifische Nachricht vorhanden ist.
+        ErrorCodes::key(ErrorCodes::VALIDATION_FAILED) => 'Bitte korrigieren Sie die markierten Eingaben und versuchen Sie es erneut.',
+        // @translators: Meldung, wenn eine Anmeldung erforderlich ist.
+        ErrorCodes::key(ErrorCodes::UNAUTHORIZED) => 'Bitte melden Sie sich an, um fortzufahren.',
+        // @translators: Meldung, wenn dem Benutzer die Berechtigung fehlt.
+        ErrorCodes::key(ErrorCodes::FORBIDDEN) => 'Sie haben keine Berechtigung für diese Aktion.',
+        // @translators: Meldung, wenn die angeforderte Ressource nicht gefunden wird.
+        ErrorCodes::key(ErrorCodes::NOT_FOUND) => 'Die angeforderte Ressource wurde nicht gefunden.',
         // @translators: Meldung, wenn das Benutzerprofil für die Antwort nicht erzeugt werden konnte.
-        'profile_unavailable' => 'Ihr Profil konnte nicht geladen werden. Bitte aktualisieren Sie die Seite und versuchen Sie es erneut.',
+        ErrorCodes::key(ErrorCodes::PROFILE_UNAVAILABLE) => 'Ihr Profil konnte nicht geladen werden. Bitte aktualisieren Sie die Seite und versuchen Sie es erneut.',
         // @translators: Meldung, wenn der Checkout an einem leeren Warenkorb scheitert.
-        'checkout_empty' => 'Ihr Warenkorb ist leer. Fügen Sie Artikel hinzu, bevor Sie zur Kasse gehen.',
+        ErrorCodes::key(ErrorCodes::CHECKOUT_CART_EMPTY) => 'Ihr Warenkorb ist leer. Bitte fügen Sie Artikel hinzu, bevor Sie zur Kasse gehen.',
     ],
 
     'pages' => [
