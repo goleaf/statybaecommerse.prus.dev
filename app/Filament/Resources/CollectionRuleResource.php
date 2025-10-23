@@ -43,11 +43,13 @@ final class CollectionRuleResource extends Resource
 
     public static function getNavigationIcon(): BackedEnum|\UnitEnum|Htmlable|string|null
     {
+        // Document the navigation icon choice so Filament adopters know where to adjust it.
         return 'heroicon-o-cog-6-tooth';
     }
 
     public static function getNavigationGroup(): UnitEnum|string|null
     {
+        // Keep the resource grouped with other product tooling links.
         return 'Products';
     }
 
@@ -74,7 +76,7 @@ final class CollectionRuleResource extends Resource
      */
     public static function form(Form $form): Form
     {
-        // Filament 4 expects returning the Form builder instance.
+        // Define the Filament form schema using the v4 `Form` contract exclusively.
         return $form->schema([
             Tabs::make('collection_rule_tabs')
                 ->tabs([
@@ -157,7 +159,7 @@ final class CollectionRuleResource extends Resource
      */
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Configure the Filament table definition following the v4 `Table` signature.
         return $table
             ->columns([
                 TextColumn::make('collection.name')
@@ -234,15 +236,22 @@ final class CollectionRuleResource extends Resource
                     ->label(__('admin.collection_rules.actions.reorder'))
                     ->icon('heroicon-o-arrows-up-down')
                     ->color('info')
-                    ->fillForm(static function (CollectionRule $record): array {
-                        // Prefill the modal so administrators can fine-tune the existing position quickly.
-                        return [
-                            'position' => $record->position,
-                        ];
-                    })
+                    ->modalIcon('heroicon-o-arrows-up-down')
+                    ->modalHeading(__('admin.collection_rules.actions.reorder'))
+                    ->modalSubmitActionLabel(__('admin.collection_rules.actions.reorder'))
+                    ->fillForm(fn (CollectionRule $record): array => [
+                        'position' => $record->position,
+                    ])
+                    ->form([
+                        TextInput::make('position')
+                            ->label(__('admin.collection_rules.form.fields.position'))
+                            ->numeric()
+                            ->required(),
+                    ])
                     ->action(function (CollectionRule $record, array $data): void {
-                        // Persist the requested position and celebrate success with a Filament notification.
+                        // Persist the reordered position once the modal-backed action is confirmed.
                         $record->update(['position' => $data['position'] ?? 0]);
+
                         FilamentNotification::make()
                             ->title(__('admin.collection_rules.reordered_successfully'))
                             ->success()
