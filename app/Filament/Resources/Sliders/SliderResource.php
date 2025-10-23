@@ -45,7 +45,7 @@ final class SliderResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return SliderForm::configure($schema);
     }

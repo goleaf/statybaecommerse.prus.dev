@@ -27,7 +27,7 @@ class NewsCommentResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return NewsCommentForm::configure($schema);
     }

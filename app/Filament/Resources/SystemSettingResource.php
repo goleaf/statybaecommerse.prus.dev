@@ -75,7 +75,7 @@ class SystemSettingResource extends Resource
         return true;
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema
             ->schema([

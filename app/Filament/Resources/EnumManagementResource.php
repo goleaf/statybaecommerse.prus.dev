@@ -54,12 +54,10 @@ final class EnumManagementResource extends Resource
     /**
      * @var string|\BackedEnum|null Keep the navigation icon typed so Filament surfaces enum-backed icons reliably.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-squares-2x2';
 
-    /**
-     * @var string|\UnitEnum|null Pin enum tools to the shared System navigation section.
-     */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
+    /** @var string|\BackedEnum|null Pin enum tools to the shared System navigation section. */
+    protected static string | \UnitEnum | null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 2;
 

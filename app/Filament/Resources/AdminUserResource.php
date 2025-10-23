@@ -69,7 +69,7 @@ final class AdminUserResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation on the provided Form instance for v4 compliance.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema->schema([
             Section::make(__('admin.admin_users.form.sections.basic_information'))

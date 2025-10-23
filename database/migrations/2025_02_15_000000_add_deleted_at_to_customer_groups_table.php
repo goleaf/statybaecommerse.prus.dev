@@ -14,6 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         if (! Schema::hasTable('customer_groups')) {
+            // Skip the soft delete enhancement when the customer_groups table hasn't been provisioned yet in lean test runs.
             return;
         }
 
@@ -30,6 +31,7 @@ return new class extends Migration
     public function down(): void
     {
         if (! Schema::hasTable('customer_groups')) {
+            // Nothing to roll back if the table never existed in this environment snapshot.
             return;
         }
 

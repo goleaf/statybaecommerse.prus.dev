@@ -20,7 +20,7 @@ final class CitiesRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Cities';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
         return $schema
             ->schema([

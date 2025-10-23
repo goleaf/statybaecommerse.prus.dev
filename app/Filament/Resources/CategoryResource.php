@@ -39,15 +39,11 @@ use Filament\Schemas\Schema;
 use UnitEnum;
 final class CategoryResource extends Resource
 {
-    /**
-     * @var string|\BackedEnum|null Keep compatibility with Filament v4 navigation icon expectations.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
+    /** @var string|BackedEnum|null Keep compatibility with Filament v4 navigation icon expectations. */
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-tag';
 
-    /**
-     * @var string|\UnitEnum|null Align the resource under the Products navigation section.
-     */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
+    /** @var string|BackedEnum|null Align the resource under the Products navigation section. */
+    protected static string | \UnitEnum | null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 3;
 

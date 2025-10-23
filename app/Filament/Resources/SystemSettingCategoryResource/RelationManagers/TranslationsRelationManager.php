@@ -31,7 +31,7 @@ final class TranslationsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Translations';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
         return $schema->schema([
             Section::make(__('system_setting_categories.translations.basic_information'))

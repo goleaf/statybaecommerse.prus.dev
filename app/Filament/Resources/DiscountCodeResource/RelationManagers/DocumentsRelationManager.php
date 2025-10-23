@@ -21,7 +21,7 @@ final class DocumentsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'documents';
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
         return $schema
             ->components([

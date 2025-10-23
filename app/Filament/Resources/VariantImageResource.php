@@ -80,7 +80,7 @@ final class VariantImageResource extends Resource
         return __('admin.variant_images.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema->components([
             Section::make(__('admin.variant_images.basic_information'))

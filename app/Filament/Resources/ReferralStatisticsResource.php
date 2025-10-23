@@ -65,7 +65,7 @@ final class ReferralStatisticsResource extends Resource
         return __('referral_statistics.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema
             ->columns(3)
