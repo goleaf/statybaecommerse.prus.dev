@@ -13,7 +13,6 @@ use App\Models\Review;
 use Filament\Actions;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Schemas\Schema;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Schema;
 use Icetalker\FilamentTableRepeatableEntry\Infolists\Components\TableRepeatableEntry;
@@ -23,6 +22,7 @@ use LaraZeus\ListGroup\Infolists\ListEntry;
 use Illuminate\Support\Str;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class ViewCustomer extends ViewRecord
 {
     protected static string $resource = CustomerResource::class;

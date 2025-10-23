@@ -11,13 +11,13 @@ use App\Filament\Resources\ReferralCodeStatistics\Schemas\ReferralCodeStatistics
 use App\Filament\Resources\ReferralCodeStatistics\Tables\ReferralCodeStatisticsTable;
 use App\Models\ReferralCodeStatistics;
 use BackedEnum;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 class ReferralCodeStatisticsResource extends Resource
 {
     protected static ?string $model = ReferralCodeStatistics::class;
@@ -26,8 +26,7 @@ class ReferralCodeStatisticsResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return ReferralCodeStatisticsForm::configure($form);
+        return ReferralCodeStatisticsForm::configure($schema);
     }
 
     public static function table(Table $table): Table

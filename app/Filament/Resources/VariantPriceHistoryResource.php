@@ -12,7 +12,6 @@ use App\Models\VariantPriceHistory;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Forms;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
@@ -22,6 +21,9 @@ use Filament\Schemas\Schema;
 use BackedEnum;
 use UnitEnum;
 
+use Filament\Schemas\Schema;
+use BackedEnum;
+use UnitEnum;
 final class VariantPriceHistoryResource extends Resource
 {
     use HasNav;
@@ -29,14 +31,14 @@ final class VariantPriceHistoryResource extends Resource
     protected static ?string $model = VariantPriceHistory::class;
 
     /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     * @var string|\BackedEnum|null Navigation icon override (string|\BackedEnum|null) for Filament v4 alignment.
      */
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-currency-euro';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-currency-euro';
 
-    /** @var string|\BackedEnum|null Navigation grouping centralized via enum. */
-    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::System;
+    /**
+     * @var string|\UnitEnum|null Navigation grouping centralized via enum.
+     */
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 20;
 

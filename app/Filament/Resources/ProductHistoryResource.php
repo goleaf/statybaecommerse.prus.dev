@@ -17,7 +17,6 @@ use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\Select as SelectInput;
 use Filament\Forms\Components\KeyValue;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Textarea;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -29,13 +28,15 @@ use Illuminate\Support\Arr;
 use UnitEnum;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class ProductHistoryResource extends Resource
 {
     use HasNav;
 
     protected static ?string $model = ProductHistory::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clock';
+    /** @var string|\BackedEnum|null */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-clock';
 
     protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::Products;
 

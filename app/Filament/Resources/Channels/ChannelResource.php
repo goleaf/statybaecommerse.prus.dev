@@ -12,7 +12,6 @@ use App\Filament\Resources\Channels\Schemas\ChannelForm;
 use App\Filament\Resources\Channels\Tables\ChannelsTable;
 use App\Models\Channel;
 use BackedEnum;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
@@ -21,6 +20,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 class ChannelResource extends Resource
 {
     use HasNav;
@@ -34,8 +34,7 @@ class ChannelResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return ChannelForm::configure($form);
+        return ChannelForm::configure($schema);
     }
 
     public static function table(Table $table): Table

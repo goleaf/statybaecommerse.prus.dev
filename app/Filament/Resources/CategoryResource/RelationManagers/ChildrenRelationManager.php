@@ -11,7 +11,6 @@ use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 use Filament\Forms\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables\Actions\CreateAction;
@@ -25,6 +24,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class ChildrenRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'children';

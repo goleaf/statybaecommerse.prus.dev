@@ -19,7 +19,6 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -43,6 +42,7 @@ use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use UnitEnum;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class InventoryResource extends Resource
 {
     protected static ?string $model = Inventory::class;

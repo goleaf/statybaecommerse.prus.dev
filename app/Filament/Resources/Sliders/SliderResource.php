@@ -13,7 +13,6 @@ use App\Filament\Resources\Sliders\Schemas\SliderForm;
 use App\Filament\Resources\Sliders\Tables\SlidersTable;
 use App\Models\Slider;
 use BackedEnum;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -21,6 +20,7 @@ use Filament\Tables\Table;
 use UnitEnum;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class SliderResource extends Resource
 {
     use HasNav;
@@ -47,8 +47,7 @@ final class SliderResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return SliderForm::configure($form);
+        return SliderForm::configure($schema);
     }
 
     public static function table(Table $table): Table

@@ -14,7 +14,6 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action as TableAction;
@@ -33,6 +32,7 @@ use Illuminate\Support\Collection;
 use UnitEnum;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class ApiKeyResource extends Resource
 {
     use HandlesApiKeyCredentials;

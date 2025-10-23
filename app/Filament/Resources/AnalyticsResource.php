@@ -10,7 +10,6 @@ use App\Filament\Resources\AnalyticsResource\Pages;
 use App\Models\Order;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Actions\ViewAction;
@@ -26,6 +25,7 @@ use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class AnalyticsResource extends Resource
 {
     use TranslatableResource;

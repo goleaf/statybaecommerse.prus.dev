@@ -15,7 +15,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
@@ -36,6 +35,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class ReferralRewardResource extends Resource
 {
     use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
@@ -285,7 +285,6 @@ final class ReferralRewardResource extends Resource
 
     public static function infolist(Schema $schema): Schema
     {
-        // Provide the infolist schema using the Filament v4 return type.
         return $schema
             ->schema([
                 Infolists\Components\Section::make(__('referral_rewards.sections.reward_details'))

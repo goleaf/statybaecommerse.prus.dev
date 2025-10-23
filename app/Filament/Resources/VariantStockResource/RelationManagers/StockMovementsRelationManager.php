@@ -12,7 +12,6 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\BadgeColumn;
@@ -24,6 +23,7 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 class StockMovementsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'stockMovements';

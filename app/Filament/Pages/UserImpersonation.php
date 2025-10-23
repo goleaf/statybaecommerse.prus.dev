@@ -18,6 +18,7 @@ use Filament\Tables\Table;
 use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
 use BackedEnum;
 
+use BackedEnum;
 final class UserImpersonation extends Page implements HasTable
 {
     use ConfiguresToggleableTableLayout;
@@ -27,7 +28,7 @@ final class UserImpersonation extends Page implements HasTable
     /**
      * @var string|BackedEnum|null Navigation icon override documented to keep BackedEnum usage inline.
      */
-    /** @var string|\BackedEnum|null */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user';
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-user';
 

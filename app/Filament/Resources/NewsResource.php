@@ -13,7 +13,6 @@ use App\Models\News;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Forms;
-use Filament\Schemas\Schema;
 use Filament\Infolists;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -34,8 +33,10 @@ class NewsResource extends Resource
 
     protected static ?string $model = News::class;
 
-    /** @phpstan-var string|BackedEnum|null */
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-newspaper';
+    /**
+     * @var string|\BackedEnum|null @phpstan-var string|BackedEnum|null
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-newspaper';
 
     protected static ?int $navigationSort = 1;
 

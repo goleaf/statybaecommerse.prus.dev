@@ -12,13 +12,13 @@ use App\Filament\Resources\MenuItems\Schemas\MenuItemForm;
 use App\Filament\Resources\MenuItems\Tables\MenuItemsTable;
 use App\Models\MenuItem;
 use BackedEnum;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 class MenuItemResource extends Resource
 {
     use HasNav;
@@ -29,8 +29,7 @@ class MenuItemResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return MenuItemForm::configure($form);
+        return MenuItemForm::configure($schema);
     }
 
     public static function table(Table $table): Table

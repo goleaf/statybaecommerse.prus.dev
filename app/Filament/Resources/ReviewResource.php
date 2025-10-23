@@ -20,7 +20,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
@@ -39,6 +38,8 @@ use Illuminate\Database\Eloquent\Collection;
 use BackedEnum;
 use UnitEnum;
 
+use BackedEnum;
+use UnitEnum;
 final class ReviewResource extends Resource
 {
     use HasNav;
@@ -48,7 +49,7 @@ final class ReviewResource extends Resource
     /**
      * @var string|BackedEnum|null Normalize Filament icon typing for consistency.
      */
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-star';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-star';
 
     protected static ?int $navigationSort = 4;
 
@@ -57,7 +58,7 @@ final class ReviewResource extends Resource
     /**
      * @var string|\UnitEnum|null Allow enum-backed navigation grouping.
      */
-    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::ContentManagement;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::ContentManagement;
 
     public static function getNavigationGroup(): ?string
     {

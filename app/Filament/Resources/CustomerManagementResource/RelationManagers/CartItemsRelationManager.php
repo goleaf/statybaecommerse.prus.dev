@@ -16,12 +16,12 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Schema;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 class CartItemsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'cartItems';
@@ -41,8 +41,7 @@ class CartItemsRelationManager extends BaseRelationManager
 
     public function infolist(Schema $schema): Schema
     {
-        // Configure the Filament infolist schema using the v4 Schema API.
-        return $infolist
+        return $schema
             ->schema([
                 TextEntry::make('id'),
             ]);

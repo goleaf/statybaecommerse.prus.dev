@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Resources\DiscountRedemptionResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Forms;
 use Filament\Schemas\Schema;
@@ -14,6 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 class DiscountRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'discount';

@@ -15,7 +15,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 use Filament\Forms\Get;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\Section as InfolistSection;
@@ -41,6 +40,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Lang;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class CampaignProductTargetResource extends Resource
 {
     protected static ?string $model = CampaignProductTarget::class;
@@ -48,7 +48,7 @@ final class CampaignProductTargetResource extends Resource
     /**
      * @var string|\BackedEnum|null Keep Filament navigation metadata flexible between enums and plain strings.
      */
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-bullseye-arrow';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-bullseye-arrow';
 
     protected static ?string $recordTitleAttribute = 'target_type';
 

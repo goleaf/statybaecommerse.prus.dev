@@ -13,13 +13,13 @@ use App\Filament\Resources\NewsCategories\Schemas\NewsCategoryForm;
 use App\Filament\Resources\NewsCategories\Tables\NewsCategoriesTable;
 use App\Models\NewsCategory;
 use BackedEnum;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use UnitEnum;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class NewsCategoryResource extends Resource
 {
     use HasNav;
@@ -43,8 +43,7 @@ final class NewsCategoryResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return NewsCategoryForm::configure($form);
+        return NewsCategoryForm::configure($schema);
     }
 
     public static function table(Table $table): Table

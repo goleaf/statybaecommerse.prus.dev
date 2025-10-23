@@ -8,13 +8,13 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\ReferralCodeUsageLogResource\Pages;
 use App\Models\ReferralCodeUsageLog;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use UnitEnum;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 /**
  * ReferralCodeUsageLogResource
  *
@@ -49,8 +49,7 @@ final class ReferralCodeUsageLogResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return ReferralCodeUsageLogFormSchema::configure($form);
+        return ReferralCodeUsageLogFormSchema::configure($schema);
     }
 
     public static function table(Table $table): Table

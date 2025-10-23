@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Resources\DiscountCodeResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Forms;
 use Filament\Schemas\Schema;
@@ -15,6 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class UsersRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'users';

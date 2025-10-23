@@ -17,7 +17,6 @@ use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 use Filament\Forms\Set;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
@@ -175,8 +174,8 @@ final class CalendarWidget extends FullCalendarWidget
     {
         return [
             Actions\CreateAction::make()
-                ->mountUsing(function (?Schema $form, array $arguments = []): void {
-                    if (! $form) {
+                ->mountUsing(function (?Form $schema, array $arguments = []): void {
+                    if (! $schema) {
                         return;
                     }
 
@@ -186,7 +185,7 @@ final class CalendarWidget extends FullCalendarWidget
                         return;
                     }
 
-                    $state = $this->normaliseFormState($form);
+                    $state = $this->normaliseFormState($schema);
                     $state = $this->prepareStateWithDateRange(
                         $state,
                         $arguments['start'] ?? null,
@@ -204,14 +203,14 @@ final class CalendarWidget extends FullCalendarWidget
     {
         return [
             Actions\EditAction::make()
-                ->mountUsing(function (?Schema $form, array $arguments = []): void {
-                    if (! $form) {
+                ->mountUsing(function (?Form $schema, array $arguments = []): void {
+                    if (! $schema) {
                         return;
                     }
 
                     $schema->fill();
 
-                    $state = $this->normaliseFormState($form);
+                    $state = $this->normaliseFormState($schema);
 
                     if (in_array($arguments['type'] ?? null, ['drop', 'resize'], true)) {
                         $state = $this->prepareStateWithDateRange(
@@ -305,7 +304,7 @@ final class CalendarWidget extends FullCalendarWidget
     /**
      * @return array<string, mixed>
      */
-    private function normaliseFormState(Schema $form): array
+    private function normaliseFormState(Form $schema): array
     {
         $state = $schema->getRawState();
 

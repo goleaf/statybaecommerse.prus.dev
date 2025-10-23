@@ -12,13 +12,13 @@ use App\Filament\Resources\ReferralStatistics\Schemas\ReferralStatisticsForm;
 use App\Filament\Resources\ReferralStatistics\Tables\ReferralStatisticsTable;
 use App\Models\ReferralStatistics;
 use BackedEnum;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 class ReferralStatisticsResource extends Resource
 {
     use HasNav;
@@ -34,8 +34,7 @@ class ReferralStatisticsResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return ReferralStatisticsForm::configure($form);
+        return ReferralStatisticsForm::configure($schema);
     }
 
     public static function table(Table $table): Table

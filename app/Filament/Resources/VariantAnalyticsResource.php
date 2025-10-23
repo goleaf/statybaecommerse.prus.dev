@@ -13,7 +13,6 @@ use App\Models\VariantAnalytics;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Forms;
-use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -25,6 +24,8 @@ use Illuminate\Database\Eloquent\Collection;
 use Filament\Schemas\Schema;
 use UnitEnum;
 
+use Filament\Schemas\Schema;
+use UnitEnum;
 /**
  * VariantAnalyticsResource
  *
@@ -37,10 +38,12 @@ final class VariantAnalyticsResource extends Resource
     /**
      * @var string|BackedEnum|null Flag the analytics icon while staying compatible with Filament v4 conventions.
      */
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    /** @var string|\BackedEnum|null Anchor inventory analytics beneath the shared navigation enum. */
-    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::Inventory;
+    /**
+     * @var string|\UnitEnum|null Anchor inventory analytics beneath the shared navigation enum.
+     */
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Inventory;
 
     public static function getNavigationGroup(): ?string
     {

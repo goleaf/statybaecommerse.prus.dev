@@ -23,7 +23,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
-use Filament\Schemas\Schema;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification as FilamentNotification;
@@ -41,6 +40,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class NotificationResource extends Resource
 {
     use HasNav;

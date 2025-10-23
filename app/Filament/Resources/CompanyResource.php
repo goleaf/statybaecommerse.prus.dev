@@ -9,7 +9,6 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\CompanyResource\Pages;
 use App\Models\Company;
 use Filament\Forms;
-use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -28,6 +27,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class CompanyResource extends Resource
 {
     use HasNav;

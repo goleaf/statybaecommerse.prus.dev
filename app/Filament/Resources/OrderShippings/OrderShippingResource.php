@@ -12,7 +12,6 @@ use App\Filament\Resources\OrderShippings\Schemas\OrderShippingForm;
 use App\Filament\Resources\OrderShippings\Tables\OrderShippingsTable;
 use App\Models\OrderShipping;
 use BackedEnum;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -20,6 +19,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 class OrderShippingResource extends Resource
 {
     use HasNav;
@@ -33,8 +33,7 @@ class OrderShippingResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return OrderShippingForm::configure($form);
+        return OrderShippingForm::configure($schema);
     }
 
     public static function table(Table $table): Table

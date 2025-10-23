@@ -12,13 +12,13 @@ use App\Filament\Resources\NotificationTemplates\Schemas\NotificationTemplateFor
 use App\Filament\Resources\NotificationTemplates\Tables\NotificationTemplatesTable;
 use App\Models\NotificationTemplate;
 use BackedEnum;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 class NotificationTemplateResource extends Resource
 {
     use HasNav;
@@ -29,8 +29,7 @@ class NotificationTemplateResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return NotificationTemplateForm::configure($form);
+        return NotificationTemplateForm::configure($schema);
     }
 
     public static function table(Table $table): Table

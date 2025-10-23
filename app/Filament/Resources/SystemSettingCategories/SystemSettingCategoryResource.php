@@ -12,7 +12,6 @@ use App\Filament\Resources\SystemSettingCategories\Schemas\SystemSettingCategory
 use App\Filament\Resources\SystemSettingCategories\Tables\SystemSettingCategoriesTable;
 use App\Models\SystemSettingCategory;
 use BackedEnum;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -21,6 +20,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 class SystemSettingCategoryResource extends Resource
 {
     use HasNav;
@@ -31,8 +31,7 @@ class SystemSettingCategoryResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return SystemSettingCategoryForm::configure($form);
+        return SystemSettingCategoryForm::configure($schema);
     }
 
     public static function table(Table $table): Table

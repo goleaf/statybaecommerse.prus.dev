@@ -18,7 +18,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -39,6 +38,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use UnitEnum;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class NewsCommentResource extends Resource
 {
     use HasNav;

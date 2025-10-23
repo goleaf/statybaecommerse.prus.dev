@@ -15,7 +15,6 @@ use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -38,6 +37,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 final class CampaignScheduleResource extends Resource
 {
     use HasNav;

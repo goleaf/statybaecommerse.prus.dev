@@ -29,7 +29,6 @@ use Filament\Forms\Components\Select; // Select component import keeps dropdown 
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
@@ -48,6 +47,7 @@ use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 /**
  * VariantInventoryResource
  *
@@ -66,7 +66,7 @@ final class VariantInventoryResource extends Resource
     /**
      * @var string|\BackedEnum|null Navigation icon configured for the inventory module.
      */
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-archive-box';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Inventory';
 

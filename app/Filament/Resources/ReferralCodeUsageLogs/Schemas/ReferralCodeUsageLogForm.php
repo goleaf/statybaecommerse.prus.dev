@@ -9,13 +9,12 @@ use App\Models\User;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 
 final class ReferralCodeUsageLogForm
 {
-    public static function configure(Schema $schema): Schema
+    public static function configure(Form $schema): Form
     {
         return $schema
             ->schema([

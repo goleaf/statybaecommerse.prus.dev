@@ -8,7 +8,6 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\UserProductInteractionResource as LegacyUserProductInteractionResource;
 use App\Models\UserProductInteraction;
 use BackedEnum;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -16,6 +15,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
 class UserProductInteractionResource extends Resource
 {
     use HasNav;
@@ -29,8 +29,7 @@ class UserProductInteractionResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return UserProductInteractionForm::configure($form);
+        return UserProductInteractionForm::configure($schema);
     }
 
     public static function table(Table $table): Table

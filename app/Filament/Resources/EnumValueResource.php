@@ -25,7 +25,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -40,17 +39,24 @@ use Filament\Schemas\Schema;
 use BackedEnum;
 use UnitEnum;
 
+use Filament\Schemas\Schema;
+use BackedEnum;
+use UnitEnum;
 final class EnumValueResource extends Resource
 {
     use HasNav;
 
     protected static ?string $model = EnumValue::class;
 
-    /** @var string|\BackedEnum|null Provide a consistent icon for value maintenance. */
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-squares-2x2';
+    /**
+     * @var string|\BackedEnum|null Provide a consistent icon for value maintenance.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
 
-    /** @var string|\BackedEnum|null Keep enum value tools inside the System cluster. */
-    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::System;
+    /**
+     * @var string|\UnitEnum|null Keep enum value tools inside the System cluster.
+     */
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
 
     public static function getNavigationGroup(): ?string
     {

@@ -9,11 +9,10 @@ use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 
 final class NewsCategoryForm
 {
-    public static function configure(Schema $schema): Schema
+    public static function configure(Form $schema): Form
     {
         return $schema
             ->schema([

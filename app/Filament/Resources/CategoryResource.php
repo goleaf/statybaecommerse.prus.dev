@@ -16,7 +16,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -36,13 +35,19 @@ use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 use Filament\Schemas\Schema;
 use UnitEnum;
 
+use Filament\Schemas\Schema;
+use UnitEnum;
 final class CategoryResource extends Resource
 {
-    /** @var string|BackedEnum|null Keep compatibility with Filament v4 navigation icon expectations. */
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-tag';
+    /**
+     * @var string|\BackedEnum|null Keep compatibility with Filament v4 navigation icon expectations.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
-    /** @var string|\UnitEnum|null Align the resource under the Products navigation section. */
-    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::Products;
+    /**
+     * @var string|\UnitEnum|null Align the resource under the Products navigation section.
+     */
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 3;
 
