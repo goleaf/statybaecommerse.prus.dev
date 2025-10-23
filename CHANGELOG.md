@@ -7,7 +7,10 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Bug Fixes
-* Prevented variant analytics upserts from writing `NULL` conversion rates so daily and weekly tracking rows insert cleanly on SQLite-backed test runs.
+* Re-aligned the user/product interaction model with its factory by trimming
+  mass-assignable attributes, forcing float/date casts, bypassing storefront
+  product scopes in the relationship, and stabilising the factory's timestamp
+  window so the analytics/unit suites regain green runs.
 * Preserved Attribute validation rule strings while still decoding JSON arrays, refreshed the Filament form so arrays render as comma-separated chips, and added regression coverage for both storage paths.
 * Reintroduced the `regions` schema with defensive guards and rebuilt the `customers`/`orders` relationship so SQLite-backed factories and analytics widgets can create location-aware records without missing column errors during tests.
 * Resolved localized product and category routing by honouring translated slugs during route model binding and updating storefront links so product detail pages load reliably from the home feed and other localized listings.

@@ -39,7 +39,9 @@ This snapshot complements the changelog by listing functional capabilities that 
 - API validation errors now bundle localized violation lists with a fallback English reason so partner integrations can act on stable messaging even when the initial validation precedes locale negotiation.
 - Access denied problem responses produced by Symfony's HTTP layer now echo the denial reason inside `error.context.reason`, matching Laravel's authorization payloads and keeping client handlers consistent.
 - Test infrastructure now provisions an on-disk SQLite database and conditionally seeds customer group metadata, preventing the observer test suite from failing with missing table or column errors.
-- System setting translation workflows regained soft delete, restore, and replication support thanks to a relaxed locale index and streamlined fillable contract that better reflects the documented API surface.
+- User-product interaction telemetry now respects deterministic factories,
+  lean mass-assignment rules, and scope-free product relations so reporting and
+  recommendation dashboards keep access to historical records during tests.
 - API search now short-circuits suspicious payloads and boosts exact-title matches so catalogue lookups stay precise while SQL injection attempts return empty responses.
 - Search experiences normalise mixed-case `types[]` filters so targeted product/category/brand lookups keep the requested scope even when storefront clients send capitalised identifiers.
 - Attribute management in the Filament admin preserves plain string validation rules, converts stored arrays into readable comma-separated chips, and carries new regression tests that guarantee both storage paths round-trip without JSON artefacts.
