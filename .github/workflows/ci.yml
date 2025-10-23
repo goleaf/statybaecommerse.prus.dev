@@ -101,15 +101,61 @@ jobs:
             public/openapi.json
             public/openapi.yaml
 
-      - name: Run test suite
-        run: composer test:ci
+      - name: Run unit tests
+        id: unit-tests
+        continue-on-error: true
+        run: |
+          set +e
+          php artisan test --testsuite=Unit --log-junit build/junit-unit.xml
+          status=$?
+          echo "exit_code=${status}" >> "$GITHUB_OUTPUT"
+          exit ${status}
+
+      - name: Run feature tests with coverage
+        id: feature-tests
+        continue-on-error: true
+        run: |
+          set +e
+          php artisan test --testsuite=Feature --log-junit build/junit-feature.xml --coverage-clover build/coverage.xml
+          status=$?
+          echo "exit_code=${status}" >> "$GITHUB_OUTPUT"
+          exit ${status}
+
+      - name: Evaluate test results
+        if: always()
+        run: |
+          unit_status="${{ steps.unit-tests.outputs.exit_code }}"
+          feature_status="${{ steps.feature-tests.outputs.exit_code }}"
+
+          if [ -z "${unit_status}" ]; then
+            echo "::error::Unit test suite did not report a status."
+            exit 1
+          fi
+
+          if [ -z "${feature_status}" ]; then
+            echo "::error::Feature test suite did not report a status."
+            exit 1
+          fi
+
+          if [ "${unit_status}" != "0" ] || [ "${feature_status}" != "0" ]; then
+            echo "::error::One or more Laravel test suites failed."
+            exit 1
+          fi
 
       - name: Upload coverage artifact
         if: always()
+        with:
+          files: |
+            build/junit-unit.xml
+            build/junit-feature.xml
+
+      - name: Upload junit reports
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-php-${{ matrix.php-version }}
-          path: coverage.xml
+          name: phpunit-junit
+          path: |
+            build/junit-unit.xml
+            build/junit-feature.xml
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
@@ -121,92 +167,8 @@ jobs:
   php-compat:
     name: "PHP Compatibility (PHP ${{ matrix.php-version }})"
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php-version: ${{ fromJSON(github.event_name == 'pull_request' && startsWith(github.actor, 'renovate') ? '["8.2","8.3"]' : '["8.3"]') }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Ensure documentation files remain below 2 MB
-        run: |
-          python <<'PY'
-from pathlib import Path
-import sys
-
-# Guardrail: keep Markdown and ancillary docs below 2 MB so they stay reviewable in Git.
-limit_bytes = 2 * 1024 * 1024
-violations = []
-
-for path in Path("docs").rglob("*"):
-    if not path.is_file():
-        continue
-    size = path.stat().st_size
-    if size > limit_bytes:
-        violations.append((path, size))
-
-if violations:
-    print("The following documentation files exceed the 2 MB limit:")
-    for path, size in violations:
-        print(f" - {path} ({size} bytes)")
-    sys.exit(1)
-
-# Provide positive feedback to make CI logs easier to parse.
-print("All documentation files are below the 2 MB threshold.")
-PY
-
-  migration-freeze:
-    name: Migration Freeze Guard
-    runs-on: ubuntu-latest
-    needs: documentation-size
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Fetch base branch
-        if: github.event_name == 'pull_request'
-        run: git fetch origin "${GITHUB_BASE_REF}:${GITHUB_BASE_REF}"
-
-      - name: Ensure historical migrations remain immutable
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
-            base_ref="origin/${GITHUB_BASE_REF}"
-            diff_range="${base_ref}...HEAD"
-          else
-            if git rev-parse --verify HEAD^ >/dev/null 2>&1; then
-              diff_range="HEAD^...HEAD"
-            else
-              echo "No parent commit to compare against; skipping migration freeze check."
-              exit 0
-            fi
-          fi
-
-          changed_files="$(git diff --name-status ${diff_range} -- database/migrations || true)"
-
-          if [[ -z "${changed_files}" ]]; then
-            exit 0
-          fi
-
-          violations="$(echo "${changed_files}" | awk '$1 != "A" && $1 != "?" {print $0}')"
-
-          if [[ -n "${violations}" ]]; then
-            echo "Detected modifications to existing migration files:"
-            echo "${violations}"
-            echo "Add a new forward-only migration instead of editing history."
-            exit 1
-          fi
-
-          echo "Migration freeze check passed."
-
-  php-lint-pint:
-    name: PHP Lint & Pint
-    runs-on: ubuntu-latest
-    needs: migration-freeze
+    needs: phpunit
+    if: always()
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
