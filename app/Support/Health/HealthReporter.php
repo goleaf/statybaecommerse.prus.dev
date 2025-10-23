@@ -6,7 +6,6 @@ namespace App\Support\Health;
 
 use App\Contracts\HealthReporter as HealthReporterContract;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
-use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Contracts\Queue\Factory as QueueFactory;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Support\Arr;
@@ -19,7 +18,6 @@ final class HealthReporter implements HealthReporterContract
         private readonly DatabaseManager $database,
         private readonly CacheFactory $cache,
         private readonly QueueFactory $queue,
-        private readonly FilesystemFactory $filesystem,
     ) {}
 
     /**
@@ -30,7 +28,6 @@ final class HealthReporter implements HealthReporterContract
         $checks = [
             'database' => $this->checkDatabase(),
             'cache' => $this->checkCache(),
-            'disk' => $this->checkDisk(),
         ];
 
         if ($includeQueue) {
@@ -85,7 +82,7 @@ final class HealthReporter implements HealthReporterContract
     }
 
     /**
-     * @return array{status: string, latency_ms: float, message?: string, meta?: array<string, mixed>}|null
+     * @return array{status: string, latency_ms: float, message?: string, meta?: array{connection: string, driver: string}}|null
      */
     private function checkQueue(): ?array
     {
@@ -123,39 +120,7 @@ final class HealthReporter implements HealthReporterContract
     }
 
     /**
-     * @return array{status: string, latency_ms: float, message?: string, meta?: array<string, mixed>}
-     */
-    private function checkDisk(): array
-    {
-        $startedAt = microtime(true);
-        $defaultDisk = config('filesystems.default');
-
-        try {
-            if (! \is_string($defaultDisk) || $defaultDisk === '') {
-                throw new \RuntimeException('Default filesystem disk is not configured.');
-            }
-
-            $driver = config("filesystems.disks.{$defaultDisk}.driver");
-            $disk = $this->filesystem->disk($defaultDisk);
-            $key = 'health-check/'.Str::uuid()->toString();
-
-            $disk->put($key, 'ok');
-            $disk->delete($key);
-
-            return $this->formatResult($startedAt, null, [
-                'disk' => $defaultDisk,
-                'driver' => \is_string($driver) ? $driver : null,
-            ]);
-        } catch (Throwable $exception) {
-            return $this->formatResult($startedAt, $exception, [
-                'disk' => \is_string($defaultDisk) ? $defaultDisk : null,
-                'driver' => isset($driver) && \is_string($driver) ? $driver : null,
-            ]);
-        }
-    }
-
-    /**
-     * @param  array<string, array{status: string, latency_ms: float, message?: string}>  $checks
+     * @param array<string, array{status: string, latency_ms: float, message?: string}> $checks
      */
     private function evaluateStatus(array $checks): string
     {
@@ -169,9 +134,10 @@ final class HealthReporter implements HealthReporterContract
     }
 
     /**
-     * @param  float  $startedAt  microtime(true) value
-     * @param  array<string, mixed>|null  $meta
-     * @return array{status: string, latency_ms: float, message?: string, meta?: array<string, mixed>}
+     * @param float $startedAt microtime(true) value
+     * @param array{connection: string, driver: string}|null $meta
+     *
+     * @return array{status: string, latency_ms: float, message?: string, meta?: array{connection: string, driver: string}}
      */
     private function formatResult(float $startedAt, ?Throwable $exception = null, ?array $meta = null): array
     {
