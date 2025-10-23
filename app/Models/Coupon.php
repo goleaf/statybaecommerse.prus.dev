@@ -8,6 +8,7 @@ use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -31,9 +32,9 @@ final class Coupon extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['code', 'name', 'description', 'type', 'value', 'minimum_amount', 'maximum_discount', 'usage_limit', 'usage_limit_per_user', 'used_count', 'is_active', 'is_public', 'is_auto_apply', 'is_stackable', 'starts_at', 'expires_at', 'applicable_products', 'applicable_categories'];
+    protected $fillable = ['code', 'name', 'description', 'type', 'value', 'minimum_amount', 'maximum_discount', 'usage_limit', 'usage_limit_per_user', 'used_count', 'is_active', 'is_public', 'is_auto_apply', 'is_stackable', 'is_first_time_only', 'customer_group_id', 'starts_at', 'expires_at', 'applicable_products', 'applicable_categories'];
 
-    protected $casts = ['value' => 'decimal:2', 'minimum_amount' => 'decimal:2', 'maximum_discount' => 'decimal:2', 'usage_limit' => 'integer', 'usage_limit_per_user' => 'integer', 'used_count' => 'integer', 'is_active' => 'boolean', 'is_public' => 'boolean', 'is_auto_apply' => 'boolean', 'is_stackable' => 'boolean', 'starts_at' => 'datetime', 'expires_at' => 'datetime', 'applicable_products' => 'array', 'applicable_categories' => 'array'];
+    protected $casts = ['value' => 'decimal:2', 'minimum_amount' => 'decimal:2', 'maximum_discount' => 'decimal:2', 'usage_limit' => 'integer', 'usage_limit_per_user' => 'integer', 'used_count' => 'integer', 'is_active' => 'boolean', 'is_public' => 'boolean', 'is_auto_apply' => 'boolean', 'is_stackable' => 'boolean', 'is_first_time_only' => 'boolean', 'customer_group_id' => 'integer', 'starts_at' => 'datetime', 'expires_at' => 'datetime', 'applicable_products' => 'array', 'applicable_categories' => 'array'];
 
     // Relationships
 
@@ -53,8 +54,9 @@ final class Coupon extends Model
         return $this->belongsToMany(Category::class, 'coupon_categories');
     }
 
-    public function customerGroup()
+    public function customerGroup(): BelongsTo
     {
+        // Provide access to the owning customer group so filters and forms can reference it safely.
         return $this->belongsTo(CustomerGroup::class);
     }
 
@@ -79,7 +81,7 @@ final class Coupon extends Model
     /**
      * Handle scopeActive functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeActive($query)
     {
@@ -89,7 +91,7 @@ final class Coupon extends Model
     /**
      * Handle scopeValid functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeValid($query)
     {
@@ -105,7 +107,7 @@ final class Coupon extends Model
     /**
      * Handle scopeExpired functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeExpired($query)
     {
@@ -115,7 +117,7 @@ final class Coupon extends Model
     /**
      * Handle scopeByType functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByType($query, string $type)
     {
@@ -125,7 +127,7 @@ final class Coupon extends Model
     /**
      * Handle scopeByCode functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByCode($query, string $code)
     {
@@ -197,5 +199,17 @@ final class Coupon extends Model
         }
 
         return (float) min($this->value, $orderTotal);
+    }
+
+    /**
+     * Compute the remaining usage count without persisting a dedicated column.
+     */
+    public function getRemainingUsesAttribute(): int
+    {
+        if ($this->usage_limit === null) {
+            return max(0, (int) ($this->usage_limit ?? 0));
+        }
+
+        return max(0, (int) ($this->usage_limit - $this->used_count));
     }
 }
