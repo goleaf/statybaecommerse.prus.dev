@@ -8,6 +8,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
@@ -141,7 +142,57 @@ final class ImagesRelationManager extends BaseRelationManager
                     ->native(false),
             ])
             ->headerActions([
-                RelationManagerRepeaterAction::make(),
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit images')
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit product images')
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        return $repeater
+                            ->reorderable()
+                            ->collapsible()
+                            ->cloneable()
+                            ->defaultItems(0)
+                            ->schema([
+                                Forms\Components\Hidden::make('id'),
+                                Forms\Components\FileUpload::make('image')
+                                    ->label(__('products.images.image'))
+                                    ->image()
+                                    ->maxSize(10240)
+                                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                    ->directory('products/images')
+                                    ->visibility('private'),
+                                Forms\Components\TextInput::make('alt_text')
+                                    ->label(__('products.images.alt_text'))
+                                    ->maxLength(255),
+                                Forms\Components\TextInput::make('title')
+                                    ->label(__('products.images.title'))
+                                    ->maxLength(255),
+                                Forms\Components\Textarea::make('description')
+                                    ->label(__('products.images.description'))
+                                    ->maxLength(500)
+                                    ->rows(2)
+                                    ->columnSpanFull(),
+                                Forms\Components\Select::make('type')
+                                    ->label(__('products.images.type'))
+                                    ->options([
+                                        'main'      => __('products.images.types.main'),
+                                        'gallery'   => __('products.images.types.gallery'),
+                                        'thumbnail' => __('products.images.types.thumbnail'),
+                                        'banner'    => __('products.images.types.banner'),
+                                        'icon'      => __('products.images.types.icon'),
+                                    ])
+                                    ->default('gallery'),
+                                Forms\Components\Toggle::make('is_primary')
+                                    ->label(__('products.images.is_primary')),
+                                Forms\Components\Toggle::make('is_active')
+                                    ->label(__('products.images.is_active')),
+                                Forms\Components\TextInput::make('sort_order')
+                                    ->label(__('products.images.sort_order'))
+                                    ->numeric()
+                                    ->minValue(0),
+                            ]);
+                    }),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([
