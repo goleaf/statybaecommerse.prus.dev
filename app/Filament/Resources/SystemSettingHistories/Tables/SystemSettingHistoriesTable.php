@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemSettingHistories\Tables;
 
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
+use App\Models\SystemSettingHistory;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
@@ -91,7 +94,7 @@ final class SystemSettingHistoriesTable
                     ->color('warning')
                     ->action(function (SystemSettingHistory $record): void {
                         $record->systemSetting()->update([
-                            'type'  => 'string',
+                            'type' => 'string',
                             'value' => $record->old_value,
                         ]);
 
@@ -103,7 +106,7 @@ final class SystemSettingHistoriesTable
                     ->requiresConfirmation()
                     ->visible(fn (SystemSettingHistory $record): bool => ! empty($record->old_value)),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     BulkAction::make('export_history')
