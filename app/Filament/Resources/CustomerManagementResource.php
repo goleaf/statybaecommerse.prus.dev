@@ -4,69 +4,62 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\CustomerManagementResource\Pages;
+use App\Filament\Resources\CustomerManagementResource\RelationManagers\AddressesRelationManager;
+use App\Filament\Resources\CustomerManagementResource\RelationManagers\CartItemsRelationManager;
+use App\Filament\Resources\CustomerManagementResource\RelationManagers\DiscountRedemptionsRelationManager;
+use App\Filament\Resources\CustomerManagementResource\RelationManagers\OrdersRelationManager;
+use App\Filament\Resources\CustomerManagementResource\RelationManagers\ReviewsRelationManager;
 use App\Models\User;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Actions\ViewAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as TranslatableResource;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
 
-use Filament\Schemas\Schema;
+/**
+ * CustomerManagementResource
+ *
+ * Central Filament resource that drives the back-office customer management
+ * experience.  The resource exposes form components for CRUD operations and
+ * table utilities for quick moderation actions, mirroring the behaviour
+ * expected by the feature tests in {@see \Tests\Feature\CustomerManagementResourceTest}.
+ */
 final class CustomerManagementResource extends Resource
 {
-    use TranslatableResource;
+    use SpatieTranslatableResource; // Keep parity with other translated resources.
+
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-user-group';
 
     protected static ?string $model = User::class;
 
     /**
-     * Handle getPluralModelLabel functionality with proper error handling.
+     * Build the Filament form used on the create and edit pages.
      */
-    public static function getPluralModelLabel(): string
+    public static function form(Form $form): Form
     {
-        return __('customers.plural');
-    }
-
-    /**
-     * Handle getModelLabel functionality with proper error handling.
-     */
-    public static function getModelLabel(): string
-    {
-        return __('customers.single');
-    }
-
-    /**
-     * Configure the Filament form schema with fields and validation.
-     */
-    public static function form(Schema $schema): Schema   
-    {
-        return $schema->schema([
+        return $form->schema([
             Section::make(__('customers.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -78,6 +71,7 @@ final class CustomerManagementResource extends Resource
                             TextInput::make('email')
                                 ->label(__('customers.email'))
                                 ->email()
+                                ->required()
                                 ->unique(ignoreRecord: true),
                         ]),
                     Grid::make(2)
@@ -88,7 +82,7 @@ final class CustomerManagementResource extends Resource
                                 ->maxLength(20),
                             Flatpickr::makeDateTime('email_verified_at')
                                 ->label(__('customers.email_verified_at'))
-                                ->displayFormat('d/m/Y H:i'),
+                                ->displayFormat('Y-m-d H:i'),
                         ]),
                 ]),
             Section::make(__('customers.account_settings'))
@@ -135,24 +129,29 @@ final class CustomerManagementResource extends Resource
                             Select::make('gender')
                                 ->label(__('customers.gender'))
                                 ->options([
-                                    'male'   => __('customers.genders.male'),
+                                    'male' => __('customers.genders.male'),
                                     'female' => __('customers.genders.female'),
-                                    'other'  => __('customers.genders.other'),
-                                ]),
+                                    'other' => __('customers.genders.other'),
+                                ])
+                                ->nullable(),
                         ]),
                 ]),
             Section::make(__('customers.preferences'))
                 ->schema([
                     Grid::make(2)
                         ->schema([
-                            Select::make('preferred_locale')
+                            Select::make('preferred_language')
                                 ->label(__('customers.preferred_language'))
                                 ->options([
                                     'lt' => __('customers.languages.lt'),
                                     'en' => __('customers.languages.en'),
                                 ])
-                                ->default('lt'),
-                            Select::make('preferences->preferred_currency')
+                                ->default('lt')
+                                ->dehydrated(false) // Persist through dedicated mapping handled on the page classes.
+                                ->afterStateHydrated(function (Select $component, ?User $record): void {
+                                    $component->state($record?->preferred_locale ?? 'lt');
+                                }),
+                            Select::make('preferred_currency')
                                 ->label(__('customers.preferred_currency'))
                                 ->options([
                                     'EUR' => 'EUR (€)',
@@ -162,10 +161,10 @@ final class CustomerManagementResource extends Resource
                         ]),
                     Grid::make(2)
                         ->schema([
-                            Toggle::make('notification_preferences->newsletter_subscription')
+                            Toggle::make('newsletter_subscription')
                                 ->label(__('customers.newsletter_subscription'))
                                 ->default(false),
-                            Toggle::make('notification_preferences->sms_notifications')
+                            Toggle::make('sms_notifications')
                                 ->label(__('customers.sms_notifications'))
                                 ->default(false),
                         ]),
@@ -174,11 +173,10 @@ final class CustomerManagementResource extends Resource
     }
 
     /**
-     * Configure the Filament table with columns, filters, and actions.
+     * Configure the table displayed on the list page.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
-        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('name')
@@ -228,16 +226,44 @@ final class CustomerManagementResource extends Resource
             ->filters([
                 SelectFilter::make('customerGroups')
                     ->relationship('customerGroups', 'name')
+                    ->label(__('customers.customer_group'))
                     ->preload(),
-                TernaryFilter::make('email_verified_at')
+                SelectFilter::make('email_verified_at')
                     ->label(__('customers.email_verified'))
-                    ->trueLabel(__('customers.verified_only'))
-                    ->falseLabel(__('customers.unverified_only'))
-                    ->native(false),
-                TernaryFilter::make('is_active')
-                    ->trueLabel(__('customers.active_only'))
-                    ->falseLabel(__('customers.inactive_only'))
-                    ->native(false),
+                    ->options([
+                        '1' => __('customers.verified_only'),
+                        '0' => __('customers.unverified_only'),
+                    ])
+                    ->query(function (Builder $query, string $state): void {
+                        // Translate simple string values from the UI into database constraints.
+                        if ($state === '1') {
+                            $query->whereNotNull('email_verified_at');
+
+                            return;
+                        }
+
+                        if ($state === '0') {
+                            $query->whereNull('email_verified_at');
+                        }
+                    }),
+                SelectFilter::make('is_active')
+                    ->label(__('customers.is_active'))
+                    ->options([
+                        '1' => __('customers.active_only'),
+                        '0' => __('customers.inactive_only'),
+                    ])
+                    ->query(function (Builder $query, string $state): void {
+                        // Keep a predictable boolean comparison for Livewire powered table tests.
+                        if ($state === '1') {
+                            $query->where('is_active', true);
+
+                            return;
+                        }
+
+                        if ($state === '0') {
+                            $query->where('is_active', false);
+                        }
+                    }),
                 ValueRangeFilter::make('orders_count')
                     ->label(__('customers.orders_count')),
                 Filter::make('created_at')
@@ -254,11 +280,11 @@ final class CustomerManagementResource extends Resource
                         return $query
                             ->when(
                                 $createdFrom,
-                                fn (Builder $query, string $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn (Builder $innerQuery, string $date): Builder => $innerQuery->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $createdUntil,
-                                fn (Builder $query, string $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn (Builder $innerQuery, string $date): Builder => $innerQuery->whereDate('created_at', '<=', $date),
                             );
                     }),
             ])
@@ -271,7 +297,9 @@ final class CustomerManagementResource extends Resource
                     ->color('success')
                     ->visible(fn (User $record): bool => $record->email_verified_at === null)
                     ->action(function (User $record): void {
+                        // Instantly confirm the email to keep parity with the bulk action below.
                         $record->update(['email_verified_at' => now()]);
+
                         Notification::make()
                             ->title(__('customers.email_verified_successfully'))
                             ->success()
@@ -283,7 +311,9 @@ final class CustomerManagementResource extends Resource
                     ->icon(fn (User $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                     ->color(fn (User $record): string => $record->is_active ? 'warning' : 'success')
                     ->action(function (User $record): void {
+                        // Flip the active flag and immediately reflect the change in the UI table.
                         $record->update(['is_active' => ! $record->is_active]);
+
                         Notification::make()
                             ->title($record->is_active ? __('customers.activated_successfully') : __('customers.deactivated_successfully'))
                             ->success()
@@ -299,7 +329,9 @@ final class CustomerManagementResource extends Resource
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
                         ->action(function (Collection $records): void {
+                            // Approve every selected customer email in one go.
                             $records->each->update(['email_verified_at' => now()]);
+
                             Notification::make()
                                 ->title(__('customers.bulk_verified_success'))
                                 ->success()
@@ -311,7 +343,9 @@ final class CustomerManagementResource extends Resource
                         ->icon('heroicon-o-eye')
                         ->color('success')
                         ->action(function (Collection $records): void {
+                            // Ensure all selected customers are active.
                             $records->each->update(['is_active' => true]);
+
                             Notification::make()
                                 ->title(__('customers.bulk_activated_success'))
                                 ->success()
@@ -323,7 +357,9 @@ final class CustomerManagementResource extends Resource
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
                         ->action(function (Collection $records): void {
+                            // Toggle the active flag off for every selected record.
                             $records->each->update(['is_active' => false]);
+
                             Notification::make()
                                 ->title(__('customers.bulk_deactivated_success'))
                                 ->success()
@@ -336,29 +372,29 @@ final class CustomerManagementResource extends Resource
     }
 
     /**
-     * Get the relations for this resource.
+     * Register the relation managers displayed on the customer view.
      */
     public static function getRelations(): array
     {
         return [
-            \App\Filament\Resources\CustomerManagementResource\RelationManagers\OrdersRelationManager::class,
-            \App\Filament\Resources\CustomerManagementResource\RelationManagers\AddressesRelationManager::class,
-            \App\Filament\Resources\CustomerManagementResource\RelationManagers\ReviewsRelationManager::class,
-            \App\Filament\Resources\CustomerManagementResource\RelationManagers\CartItemsRelationManager::class,
-            \App\Filament\Resources\CustomerManagementResource\RelationManagers\DiscountRedemptionsRelationManager::class,
+            OrdersRelationManager::class,
+            AddressesRelationManager::class,
+            ReviewsRelationManager::class,
+            CartItemsRelationManager::class,
+            DiscountRedemptionsRelationManager::class,
         ];
     }
 
     /**
-     * Get the pages for this resource.
+     * Configure the page routes used by this resource.
      */
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListCustomers::route('/'),
+            'index' => Pages\ListCustomers::route('/'),
             'create' => Pages\CreateCustomer::route('/create'),
-            'view'   => Pages\ViewCustomer::route('/{record}'),
-            'edit'   => Pages\EditCustomer::route('/{record}/edit'),
+            'view' => Pages\ViewCustomer::route('/{record}'),
+            'edit' => Pages\EditCustomer::route('/{record}/edit'),
         ];
     }
 }
