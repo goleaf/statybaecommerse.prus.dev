@@ -44,7 +44,7 @@ final class VariantPricingRuleResource extends Resource
 {
     protected static ?string $model = VariantPricingRule::class;
 
-    protected static string|UnitEnum|null $navigationGroup = 'Products';
+    protected static string|\UnitEnum|null $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 10;
 
@@ -85,10 +85,9 @@ final class VariantPricingRuleResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('variant_pricing_rules.basic_information'))
                     ->schema([

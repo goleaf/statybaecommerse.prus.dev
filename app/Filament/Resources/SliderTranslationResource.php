@@ -37,18 +37,13 @@ final class SliderTranslationResource extends Resource
 
     protected static ?string $model = SliderTranslation::class;
 
-    /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?int $navigationSort = 3;
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Content Management';
+    protected static string|\UnitEnum|null $navigationGroup = 'Content Management';
 
     public static function getNavigationLabel(): string
     {
@@ -65,10 +60,9 @@ final class SliderTranslationResource extends Resource
         return __('admin.slider_translations.model_label');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form->schema([
+        return $schema->schema([
             SchemaSection::make(__('admin.slider_translations.basic_information'))
                 ->components([
                     Grid::make(2)

@@ -48,7 +48,7 @@ final class SubscriberResource extends Resource
 
     protected static ?string $model = Subscriber::class;
 
-    protected static string|UnitEnum|null $navigationGroup = 'Users';
+    protected static string|\UnitEnum|null $navigationGroup = 'Users';
 
     protected static ?int $navigationSort = 1;
 
@@ -86,10 +86,9 @@ final class SubscriberResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('subscribers.personal_information'))
                     ->schema([

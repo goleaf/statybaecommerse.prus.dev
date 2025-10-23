@@ -46,7 +46,7 @@ final class UserProductInteractionResource extends Resource
 {
     protected static ?string $model = UserProductInteraction::class;
 
-    protected static string|UnitEnum|null $navigationGroup = 'Users';
+    protected static string|\UnitEnum|null $navigationGroup = 'Users';
 
     public static function getNavigationLabel(): string
     {
@@ -63,10 +63,9 @@ final class UserProductInteractionResource extends Resource
         return __('admin.user_product_interactions.model_label');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form
+        return $schema
             ->schema([
                 SchemaGrid::make(2)
                     ->schema([

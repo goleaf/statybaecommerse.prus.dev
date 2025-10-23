@@ -16,7 +16,7 @@ use App\Support\Filament\Components\Flatpickr;
 
 class FeatureFlagForm
 {
-    public static function configure(Schema $form): Schema
+    public static function configure(Schema $schema): Schema
     {
         return $schema
             ->components([

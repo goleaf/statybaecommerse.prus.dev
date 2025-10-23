@@ -20,10 +20,9 @@ final class UsersRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Users';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-        // Bridge the relation manager form to the Schema-based builder expected by Filament v4.
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Section::make(__('users.title'))
                     ->columns(2)

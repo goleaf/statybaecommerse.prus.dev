@@ -47,12 +47,7 @@ final class InventoryResource extends Resource
 {
     protected static ?string $model = Inventory::class;
 
-    /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static $navigationIcon = 'heroicon-o-cube';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cube';
 
     protected static ?int $navigationSort = 2;
 
@@ -76,10 +71,9 @@ final class InventoryResource extends Resource
         return __('Inventory');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('Inventory Details'))
                 ->schema([
                     Grid::make(2)

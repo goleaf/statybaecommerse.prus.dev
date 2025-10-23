@@ -41,7 +41,7 @@ final class PriceListResource extends Resource
 
     protected static ?string $model = PriceList::class;
 
-    protected static string|UnitEnum|null $navigationGroup = 'Products';
+    protected static string|\UnitEnum|null $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 15;
 
@@ -67,10 +67,9 @@ final class PriceListResource extends Resource
         return __('price_lists.single');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('price_lists.basic_information'))
                 ->columns(2)
                 ->schema([

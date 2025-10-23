@@ -33,7 +33,7 @@ final class NormalSettingTranslationResource extends Resource
 {
     protected static ?string $model = NormalSettingTranslation::class;
 
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::System;
+    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 16;
 
@@ -64,10 +64,9 @@ final class NormalSettingTranslationResource extends Resource
         return __('admin.normal_setting_translations.model_label');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.normal_setting_translations.basic_information'))
                     ->schema([

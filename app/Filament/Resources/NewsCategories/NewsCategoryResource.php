@@ -26,12 +26,7 @@ final class NewsCategoryResource extends Resource
 
     protected static ?string $model = NewsCategory::class;
 
-    /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     /**
      * @var string|BackedEnum|null Keep the resource grouped with other news modules.
@@ -46,7 +41,7 @@ final class NewsCategoryResource extends Resource
         return $group instanceof NavigationGroup ? $group->label() : $group;
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         return NewsCategoryForm::configure($form);

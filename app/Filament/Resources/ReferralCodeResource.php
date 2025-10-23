@@ -40,12 +40,11 @@ final class ReferralCodeResource extends Resource
 
     protected static ?string $model = ReferralCode::class;
 
-    protected static string|UnitEnum|null $navigationGroup = 'Referral';
+    protected static string|\UnitEnum|null $navigationGroup = 'Referral';
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form
+        return $schema
             ->components([
                 Section::make(__('referral.resource.referral_code.section.code_details'))
                     ->columns(2)

@@ -44,14 +44,9 @@ final class CampaignConversionResource extends Resource
 
     protected static ?string $model = CampaignConversion::class;
 
-    /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static $navigationIcon = 'heroicon-o-rocket-launch';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rocket-launch';
 
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Campaigns;
+    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::Campaigns;
 
     public static function getNavigationLabel(): string
     {
@@ -78,10 +73,9 @@ final class CampaignConversionResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('campaign_conversions.basic_information'))
                 ->schema([
                     Grid::make(3)

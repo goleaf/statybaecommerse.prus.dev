@@ -66,9 +66,9 @@ final class VariantInventoryResource extends Resource
     /**
      * @var string|\BackedEnum|null Navigation icon configured for the inventory module.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-archive-box';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Inventory';
+    protected static string|\UnitEnum|null $navigationGroup = 'Inventory';
 
     public static function getNavigationLabel(): string
     {
@@ -88,10 +88,9 @@ final class VariantInventoryResource extends Resource
     /**
      * Configure the Variant Inventory form schema for Filament administrators.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.variant_inventory.basic_information'))
                     ->columns(2)

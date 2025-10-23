@@ -28,10 +28,9 @@ final class UsagesRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Usages';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-        // Bridge the relation manager form to the Schema-based builder expected by Filament v4.
-        return $form->schema([
+        return $schema->schema([
             Forms\Components\Select::make('user_id')
                 ->label(__('admin.common.user'))
                 ->relationship('user', 'name')

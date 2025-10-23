@@ -25,12 +25,9 @@ class MenuItemResource extends Resource
 
     protected static ?string $model = MenuItem::class;
 
-    /**
-     * @var string|\BackedEnum|null Menu resource icon aligned with Filament v4 docblock conventions.
-     */
-    protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         return MenuItemForm::configure($form);

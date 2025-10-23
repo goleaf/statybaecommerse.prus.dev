@@ -33,14 +33,13 @@ final class PriceResource extends Resource
 
     protected static ?string $model = Price::class;
 
-    protected static string|UnitEnum|null $navigationGroup = 'Products';
+    protected static string|\UnitEnum|null $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 12;
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.prices.priceable_association'))
                     ->description(__('admin.prices.priceable_association_description'))

@@ -27,7 +27,9 @@ final class UserImpersonation extends Page implements HasTable
     /**
      * @var string|BackedEnum|null Navigation icon override documented to keep BackedEnum usage inline.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user';
+    /** @var string|\BackedEnum|null */
+
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-user';
 
     public static function getNavigationGroup(): BackedEnum|string|null
     {

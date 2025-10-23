@@ -25,10 +25,9 @@ final class ViewsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Campaign Views';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-        // Bridge the relation manager form to the Schema-based builder expected by Filament v4.
-        return $form->schema([
+        return $schema->schema([
             TextInput::make('session_id')
                 ->label('Session ID')
                 ->maxLength(255),

@@ -27,10 +27,9 @@ class ReviewsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'reviews';
 
-    public function form(Schema $form): Schema
+    public function form(Schema $schema): Schema
     {
-        // Bridge the relation manager form to the Schema-based builder expected by Filament v4.
-        return $form
+        return $schema
             ->components([
                 TextInput::make('id')
                     ->required()

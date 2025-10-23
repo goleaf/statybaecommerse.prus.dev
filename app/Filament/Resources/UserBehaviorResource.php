@@ -49,14 +49,9 @@ final class UserBehaviorResource extends Resource
 
     protected static ?string $model = UserBehavior::class;
 
-    /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static $navigationIcon = 'heroicon-o-document-text';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Users';
+    protected static string|\UnitEnum|null $navigationGroup = 'Users';
 
     protected static ?int $navigationSort = 5;
 
@@ -91,10 +86,9 @@ final class UserBehaviorResource extends Resource
         return __('admin.user_behaviors.model_label');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form
+        return $schema
             ->schema([
                 Section::make(__('admin.user_behaviors.basic_information'))
                     ->description(__('admin.user_behaviors.basic_information_description'))

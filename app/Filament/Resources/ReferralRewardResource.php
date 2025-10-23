@@ -42,23 +42,17 @@ final class ReferralRewardResource extends Resource
 
     protected static ?string $model = ReferralReward::class;
 
-    /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static $navigationIcon = 'heroicon-o-gift';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-gift';
 
     protected static ?int $navigationSort = 15;
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Referral';
+    protected static string|\UnitEnum|null $navigationGroup = 'Referral';
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Section::make(__('referral_rewards.sections.reward_details'))
                     ->columns(2)

@@ -34,7 +34,7 @@ final class AnalyticsResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Analytics;
+    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::Analytics;
 
     public static function getNavigationLabel(): string
     {
@@ -69,10 +69,9 @@ final class AnalyticsResource extends Resource
         return 'warning';
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form;
+        return $schema;
     }
 
     public static function table(Table $table): Table

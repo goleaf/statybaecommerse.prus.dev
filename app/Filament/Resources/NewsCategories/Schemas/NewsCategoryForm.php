@@ -13,7 +13,7 @@ use Filament\Schemas\Schema;
 
 final class NewsCategoryForm
 {
-    public static function configure(Schema $form): Schema
+    public static function configure(Schema $schema): Schema
     {
         return $schema
             ->schema([

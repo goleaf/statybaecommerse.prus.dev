@@ -57,10 +57,9 @@ final class CurrencyResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form->components([
+        return $schema->components([
             Section::make(__('currencies.basic_information'))
                 ->components([
                     Grid::make(2)

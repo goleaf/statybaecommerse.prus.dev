@@ -41,7 +41,6 @@ final class ViewOrder extends ViewRecord
 
     public function infolist(Schema $schema): Schema
     {
-        // Provide the view record infolist using the Schema-based API required by Filament v4.
         return $schema->schema([
             ListEntry::make('orderQuickLinks')
                 ->heading(__('Quick links'))

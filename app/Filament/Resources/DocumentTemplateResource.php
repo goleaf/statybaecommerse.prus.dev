@@ -42,12 +42,7 @@ use Filament\Schemas\Schema;
 
 final class DocumentTemplateResource extends Resource
 {
-    /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static $navigationIcon = 'heroicon-o-document-text';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
     public static function getNavigationGroup(): string|UnitEnum|null
     {
@@ -87,10 +82,9 @@ final class DocumentTemplateResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form->schema([
+        return $schema->schema([
             Tabs::make('document_template_form')
                 ->tabs([
                     Tab::make(__('admin/document_templates.form.tabs.basic_information'))

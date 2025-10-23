@@ -40,7 +40,7 @@ final class CustomerGroupResource extends Resource
 
     protected static ?string $model = CustomerGroup::class;
 
-    protected static string|UnitEnum|null $navigationGroup = null;
+    protected static string|\UnitEnum|null $navigationGroup = null;
 
     public static function getNavigationGroup(): UnitEnum|string|null
     {
@@ -66,10 +66,9 @@ final class CustomerGroupResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
-        // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
-        return $form->schema([
+        return $schema->schema([
             Section::make(__('customer_groups.basic_information'))
                 ->schema([
                     Grid::make(2)

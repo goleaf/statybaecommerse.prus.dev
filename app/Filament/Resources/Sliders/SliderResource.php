@@ -27,9 +27,9 @@ final class SliderResource extends Resource
 
     protected static ?string $model = Slider::class;
 
-    protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::Content;
+    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::Content;
 
     /**
      * Navigation group for Filament navigation.
@@ -45,7 +45,7 @@ final class SliderResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    public static function form(Schema $form): Schema
+    public static function form(Schema $schema): Schema
     {
         // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         return SliderForm::configure($form);

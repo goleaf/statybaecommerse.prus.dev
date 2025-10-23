@@ -15,7 +15,7 @@ use Filament\Schemas\Components\Section as SchemaSection;
 
 final class ReferralCodeUsageLogForm
 {
-    public static function configure(Schema $form): Schema
+    public static function configure(Schema $schema): Schema
     {
         return $schema
             ->schema([
